@@ -47,6 +47,24 @@ describe("Agent OS PowerShell launcher smoke", () => {
     expect(statusSource).not.toContain("API_KEY");
   });
 
+  test("loads runtime auth from Process or Windows User scope without persisting secrets", () => {
+    expect(startSource).toContain('GetEnvironmentVariable($Name, "Process")');
+    expect(startSource).toContain('GetEnvironmentVariable($Name, "User")');
+    expect(startSource).toContain('"DASHBOARD_INTERNAL_ALLOWED_EMAILS"');
+    expect(startSource).toContain('"DASHBOARD_CSRF_SECRET"');
+    expect(startSource).toContain('"DASHBOARD_INTERNAL_API_KEY"');
+    expect(startSource).toContain('DashboardAuthMode = "inherit"');
+    expect(startSource).toContain('DashboardAccountIds = ""');
+    expect(startSource).toContain("New-RuntimeSecret");
+    expect(startSource).not.toContain("SetEnvironmentVariable($Name, $userValue, \"User\")");
+  });
+
+  test("passes tenant flags through without enabling them", () => {
+    expect(startSource).toContain('"FEATURE_MULTI_TENANT_AUTH"');
+    expect(startSource).toContain('"DASHBOARD_MULTI_TENANT_AUTH"');
+    expect(startSource).not.toMatch(/(?:FEATURE|DASHBOARD)_MULTI_TENANT_AUTH\s*=\s*["'](?:true|1|on|yes)["']/i);
+  });
+
   test("validates or generates and launches only the ignored runtime demo database", () => {
     expect(startSource).toContain('".runtime/db/agents-demo.db"');
     expect(startSource).toContain("ensure-runtime-db.ts");

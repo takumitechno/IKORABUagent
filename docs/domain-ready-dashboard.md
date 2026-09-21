@@ -81,6 +81,45 @@ Required user-owned inputs when enabling it:
 6. A server-side Bridge API key if the Bridge is moved off loopback. Never put
    it in browser code, query strings, or Cloudflare public variables.
 
+## Rollbackable localhost deployment
+
+The canonical launcher reads the approved dashboard and Bridge settings from
+the current Process environment first and Windows User environment second. It
+passes them only to the child process; it does not persist or print their
+values. This makes a newly configured verified-email allowlist available even
+when the calling shell was opened before that User variable was created.
+
+Before applying a production-equivalent auth profile, record only presence and
+item counts (never values) for the relevant Process and User variables. No
+machine-level or User-level variable is changed by the launcher.
+
+Use this localhost-only apply command after confirming port 5733 is unused:
+
+```powershell
+.\scripts\start-agent-os.ps1 `
+  -DashboardAuthMode cloudflare-access `
+  -DashboardAccountIds acct_8ssana
+```
+
+The verified email comes from `DASHBOARD_INTERNAL_ALLOWED_EMAILS`. The launcher
+uses an existing `DASHBOARD_CSRF_SECRET` when configured, otherwise it creates a
+process-only random secret for that dashboard instance. Bridge and dashboard
+API keys are likewise read server-side and are never placed in a command line.
+
+Exact rollback is process replacement, because the apply step changes no
+persistent configuration: stop only the PID started by the apply command, then
+run the following command. Existing Windows User values remain intact.
+
+```powershell
+.\scripts\start-agent-os.ps1 -DashboardAuthMode local
+```
+
+Tenant enforcement is a separate overlay. Keep all normal, shadow, and canary
+tenant flags off while establishing this auth baseline. A later tenant canary
+can therefore be rolled back by removing only its tenant flag/scope overlay and
+restarting the dashboard; the verified-email, account allowlist, CSRF, Bridge,
+and local bind settings remain unchanged.
+
 Recommended hostname roles:
 
 - `admin.<domain>`: private operator dashboard, always protected by Access.

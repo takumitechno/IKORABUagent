@@ -5,6 +5,9 @@ param(
     [int]$BridgePort = 8000,
     [ValidateRange(1, 65535)]
     [int]$DashboardPort = 5733,
+    [ValidateSet("inherit", "local", "cloudflare-access")]
+    [string]$DashboardAuthMode = "inherit",
+    [string]$DashboardAccountIds = "",
     [string]$ThreadsRepo = (Join-Path $env:USERPROFILE "Threads-"),
     [string]$DashboardRepo = "",
     [ValidateRange(5, 120)]
@@ -170,6 +173,23 @@ function Wait-Healthy {
     return & $Probe
 }
 
+function Get-RuntimeEnvironmentValue {
+    param([string]$Name)
+
+    $processValue = [Environment]::GetEnvironmentVariable($Name, "Process")
+    if (-not [string]::IsNullOrWhiteSpace($processValue)) { return $processValue }
+    $userValue = [Environment]::GetEnvironmentVariable($Name, "User")
+    if (-not [string]::IsNullOrWhiteSpace($userValue)) { return $userValue }
+    return $null
+}
+
+function New-RuntimeSecret {
+    $bytes = New-Object byte[] 32
+    $generator = [Security.Cryptography.RandomNumberGenerator]::Create()
+    try { $generator.GetBytes($bytes) } finally { $generator.Dispose() }
+    return ([BitConverter]::ToString($bytes) -replace "-", "").ToLowerInvariant()
+}
+
 if ($BridgePort -eq 8765) {
     Write-Host "[停止] 8765番は旧設定のため、このlauncherでは起動しません。" -ForegroundColor Red
     exit 2
@@ -211,15 +231,29 @@ try {
 
         $logDirectory = Join-Path $DashboardRepo ".runtime\logs"
         New-Item -ItemType Directory -Path $logDirectory -Force | Out-Null
+        $bridgeApiKey = Get-RuntimeEnvironmentValue "AUTOPILOT_BRIDGE_API_KEY"
+        $bridgeEnvironment = @{
+            AUTOPILOT_BRIDGE_HOST = "127.0.0.1"
+            AUTOPILOT_BRIDGE_PORT = [string]$BridgePort
+            THREADS_PRODUCTION_DB = $productionDb
+            AUTOPILOT_BRIDGE_AUTH_MODE = if ($bridgeApiKey) { "api-key" } else { "local" }
+        }
+        if ($bridgeApiKey) { $bridgeEnvironment.AUTOPILOT_BRIDGE_API_KEY = $bridgeApiKey }
+        foreach ($name in @(
+            "FEATURE_MULTI_TENANT_AUTH",
+            "FEATURE_MULTI_TENANT_AUTH_SHADOW",
+            "FEATURE_MULTI_TENANT_AUTH_CANARY",
+            "FEATURE_MULTI_TENANT_AUTH_CANARY_USER_ID",
+            "FEATURE_MULTI_TENANT_AUTH_CANARY_ACCOUNT_ID"
+        )) {
+            $value = Get-RuntimeEnvironmentValue $name
+            if ($null -ne $value) { $bridgeEnvironment[$name] = $value }
+        }
+
         $process = Start-ProcessWithEnvironment -FilePath $python `
             -ArgumentList @("-m", "threads_autopilot.bridge") `
             -WorkingDirectory $threadsRoot `
-            -Environment @{
-                AUTOPILOT_BRIDGE_HOST = "127.0.0.1"
-                AUTOPILOT_BRIDGE_PORT = [string]$BridgePort
-                THREADS_PRODUCTION_DB = $productionDb
-                AUTOPILOT_BRIDGE_AUTH_MODE = if ($env:AUTOPILOT_BRIDGE_API_KEY) { "api-key" } else { "local" }
-            } `
+            -Environment $bridgeEnvironment `
             -StdoutPath (Join-Path $logDirectory "bridge.stdout.log") `
             -StderrPath (Join-Path $logDirectory "bridge.stderr.log")
         Write-Host "[起動中] production Bridgeを公式経路で開始しました (PID $($process.Id))。" -ForegroundColor Cyan
@@ -266,8 +300,50 @@ try {
             POKEMON_AGENTS_SCHEDULER = "off"
             THREADS_BRIDGE_URL = "http://127.0.0.1:$BridgePort"
         }
-        if (-not $env:THREADS_BRIDGE_API_KEY -and $env:AUTOPILOT_BRIDGE_API_KEY) {
-            $dashboardEnvironment.THREADS_BRIDGE_API_KEY = $env:AUTOPILOT_BRIDGE_API_KEY
+        $dashboardBridgeKey = Get-RuntimeEnvironmentValue "THREADS_BRIDGE_API_KEY"
+        if (-not $dashboardBridgeKey) { $dashboardBridgeKey = Get-RuntimeEnvironmentValue "AUTOPILOT_BRIDGE_API_KEY" }
+        if ($dashboardBridgeKey) {
+            $dashboardEnvironment.THREADS_BRIDGE_API_KEY = $dashboardBridgeKey
+        }
+
+        $effectiveAuthMode = $DashboardAuthMode
+        if ($effectiveAuthMode -eq "inherit") {
+            $effectiveAuthMode = Get-RuntimeEnvironmentValue "DASHBOARD_INTERNAL_AUTH"
+            if (-not $effectiveAuthMode) { $effectiveAuthMode = "local" }
+        }
+        $dashboardEnvironment.DASHBOARD_INTERNAL_AUTH = $effectiveAuthMode
+        foreach ($name in @(
+            "DASHBOARD_INTERNAL_ALLOWED_EMAILS",
+            "DASHBOARD_INTERNAL_ACCOUNT_IDS",
+            "DASHBOARD_CSRF_SECRET",
+            "DASHBOARD_INTERNAL_API_KEY",
+            "DASHBOARD_MULTI_TENANT_AUTH",
+            "DASHBOARD_MULTI_TENANT_AUTH_SHADOW",
+            "DASHBOARD_MULTI_TENANT_AUTH_CANARY",
+            "DASHBOARD_MULTI_TENANT_AUTH_CANARY_USER_ID",
+            "DASHBOARD_MULTI_TENANT_AUTH_CANARY_ACCOUNT_ID",
+            "DASHBOARD_LOCAL_USER_ID",
+            "DASHBOARD_LOCAL_TENANT_ROLE"
+        )) {
+            $value = Get-RuntimeEnvironmentValue $name
+            if ($null -ne $value) { $dashboardEnvironment[$name] = $value }
+        }
+        if (-not [string]::IsNullOrWhiteSpace($DashboardAccountIds)) {
+            $dashboardEnvironment.DASHBOARD_INTERNAL_ACCOUNT_IDS = $DashboardAccountIds
+        }
+        if ($effectiveAuthMode -eq "cloudflare-access") {
+            if (-not $dashboardEnvironment.ContainsKey("DASHBOARD_INTERNAL_ALLOWED_EMAILS") -or
+                [string]::IsNullOrWhiteSpace($dashboardEnvironment["DASHBOARD_INTERNAL_ALLOWED_EMAILS"])) {
+                throw "cloudflare-access mode requires DASHBOARD_INTERNAL_ALLOWED_EMAILS in Process or Windows User environment."
+            }
+            if (-not $dashboardEnvironment.ContainsKey("DASHBOARD_INTERNAL_ACCOUNT_IDS") -or
+                [string]::IsNullOrWhiteSpace($dashboardEnvironment["DASHBOARD_INTERNAL_ACCOUNT_IDS"])) {
+                throw "cloudflare-access mode requires DashboardAccountIds or DASHBOARD_INTERNAL_ACCOUNT_IDS."
+            }
+            if (-not $dashboardEnvironment.ContainsKey("DASHBOARD_CSRF_SECRET") -or
+                [string]::IsNullOrWhiteSpace($dashboardEnvironment["DASHBOARD_CSRF_SECRET"])) {
+                $dashboardEnvironment.DASHBOARD_CSRF_SECRET = New-RuntimeSecret
+            }
         }
 
         $logDirectory = Join-Path $dashboardRoot ".runtime\logs"
