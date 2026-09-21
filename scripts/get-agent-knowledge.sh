@@ -21,8 +21,10 @@ if [ -z "$AGENT_SLUG" ]; then
   exit 1
 fi
 
-DB_PATH="$(git rev-parse --show-toplevel 2>/dev/null || pwd)/.claude/db/agents.db"
-KNOWLEDGE_ROOT="$(git rev-parse --show-toplevel 2>/dev/null || pwd)/docs/knowledge"
+REPO_ROOT="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
+source "$REPO_ROOT/scripts/lib/runtime-db.sh"
+DB_PATH="$(resolve_runtime_db "$REPO_ROOT")"
+KNOWLEDGE_ROOT="$REPO_ROOT/docs/knowledge"
 
 # priority フィルタ
 case "$PRIORITY" in

@@ -11,6 +11,11 @@
 
 set -euo pipefail
 
+# repo root をスクリプト自身の位置から動的に解決する(2026-09-18)。
+# 旧開発環境の絶対パスのハードコードを撤去。
+SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+
 SLUG=""
 PARENT=""
 TRIGGER="manual"
@@ -29,7 +34,8 @@ if [ -z "$SLUG" ]; then
   exit 1
 fi
 
-DB="/Users/tom/dev/hojokin-db/.claude/db/agents.db"
+source "$REPO_ROOT/scripts/lib/runtime-db.sh"
+DB="$(resolve_runtime_db "$REPO_ROOT")"
 
 # parent カラムは NULL or 整数
 PARENT_SQL="NULL"

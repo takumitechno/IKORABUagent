@@ -9,13 +9,24 @@
 import { Database } from "bun:sqlite";
 import { readFileSync, readdirSync, statSync } from "fs";
 import { createHash } from "crypto";
-import { resolve, dirname } from "path";
+import { resolve, dirname, relative } from "path";
 import { fileURLToPath } from "url";
+import { findAgentCharacter } from "../web/lib/agent-character-images";
+import { resolveAgentsDbPath } from "../runtime/db-path";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = resolve(__dirname, "..", "..");
-const DB_PATH = process.env.AGENTS_DB_PATH || resolve(REPO_ROOT, ".claude/db/agents.db");
+const DB_PATH = resolveAgentsDbPath();
 const AGENTS_DIR = resolve(REPO_ROOT, ".claude/agents");
+const RETIRED_HQ02_SLUGS = [
+  "megagengar-orchestrator",
+  "gastly-validator",
+  "haunter-hypothesizer",
+  "gengar-selector",
+  "mew-supervisor",
+  "mewtwo-executor",
+  "arceus-knowledge-editor",
+];
 
 const db = new Database(DB_PATH);
 db.exec("PRAGMA journal_mode = WAL");
@@ -23,6 +34,7 @@ db.exec("PRAGMA foreign_keys = ON");
 
 interface Frontmatter {
   name?: string;
+  department?: string;
   description?: string;
   model?: string;
   pokemon_slug?: string;
@@ -109,47 +121,24 @@ function listAgentMdPaths(root: string): string[] {
   return [...new Set(result)].sort();
 }
 
-// アイコンは PokéAPI の公式アート (GitHub 公開 CDN・図鑑番号で決まる・消えない) を使う。
-// 旧 Supabase バケットは消滅したため移行 (2026-06-24)。
-const POKEAPI_ART = "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork";
-// pokemon_slug → 全国図鑑番号 (mega-gengar はメガフォーム id 10038)
-const DEX: Record<string, number> = {
-  abra: 63, arceus: 493, butterfree: 12, caterpie: 10, delibird: 225, gastly: 92,
-  gengar: 94, haunter: 93, kadabra: 64, magnemite: 81, magneton: 82, magnezone: 462,
-  "mega-gengar": 10038, metapod: 11, mew: 151, mewtwo: 150, pidgeot: 18, pidgeotto: 17,
-  pidgey: 16, "pidgey-solo": 16, pinsir: 127, porygon: 137, scizor: 212, shuckle: 213,
-  starmie: 121, vulpix: 37,
-};
-function avatarUrlFor(pokemonSlug: string): string | null {
-  const id = DEX[pokemonSlug];
-  return id ? `${POKEAPI_ART}/${id}.png` : null;
+// Character-image identity lives in one catalog shared with Internal HQ.
+// Missing verified assets remain null so seed never guesses another person.
+function avatarUrlFor(identitySlug: string): string | null {
+  return findAgentCharacter({ slug: identitySlug })?.imagePath ?? null;
 }
 
 const ROLE_LABELS: Record<string, string> = {
-  "butterfree-subsidy-sync": "補助金パイプライン統括",
-  "caterpie-subsidy-writer": "補助金記事ライター",
-  "metapod-subsidy-reviewer": "補助金記事レビュアー",
-  "scizor-guide-writer": "補助金ガイド執筆",
-  "magnezone-benefit-orchestrator": "給付金パイプライン統括",
-  "magnemite-benefit-writer": "給付金記事ライター",
-  "magneton-kyufukin": "給付金記事レビュアー",
-  "pidgeot-editorial": "記事編集パイプライン統括",
-  "pidgey-editorial-writer": "記事編集ライター",
-  "pidgeotto-editorial-reviewer": "記事編集レビュアー",
-  "megagengar-orchestrator": "仮説ライン統括",
-  "haunter-hypothesizer": "仮説生成 (Axis A)",
-  "gastly-validator": "仮説検証 (Axis A)",
-  "gengar-selector": "仮説選抜 (Axis A)",
-  "mew-supervisor": "運用観測 (Axis B)",
-  "mewtwo-executor": "運用改修実行 (Axis B)",
-  "pinsir-permit-writer": "許認可記事ライター",
-  "porygon-keyword-research": "キーワード調査",
-  "starmie-expert-outreach": "専門家アウトリーチ",
-  "abra-seo-report": "SEOレポート",
-  "kadabra-rank-monitor": "検索順位モニタリング",
-  "vulpix-note-publisher": "note 配信 (被リンク)",
-  "shuckle-hatena-publisher": "はてなブログ配信 (被リンク)",
-  "delibird-chat": "対話AI (サイト内チャット)",
+  "sashihara-orchestrator": "総監督 / Orchestrator",
+  "iori-validator": "Evidence検証 / Validator",
+  "maika-hypothesizer": "仮説・分析 / Hypothesizer",
+  "hitomi-selector": "戦略選定 / Selector",
+  "anna-supervisor": "改善司令 / Supervisor",
+  "kiara-executor": "改善実行 / Executor",
+  "sanatsun-knowledge-editor": "知識編集 / Knowledge Editor",
+  "risa-notifier": "通知判断 / Notifier",
+  "hana-heartbeat": "稼働監視 / Heartbeat",
+  "shoko-reporter": "報告判断 / Reporter",
+  "mirinya-cost-analyst": "コスト分析 / Cost Analyst",
 };
 
 interface AgentDef {
@@ -171,8 +160,8 @@ interface AgentDef {
 function parseAgentMd(mdPath: string): AgentDef {
   const content = readFileSync(mdPath, "utf-8");
   const { fm } = parseFrontmatter(content);
-  const rel = mdPath.replace(REPO_ROOT + "/", "");
-  const parts = rel.split("/"); // .claude/agents/<slug>/agent.md (フラット化済)
+  const rel = relative(REPO_ROOT, mdPath).replace(/\\/g, "/");
+  const parts = rel.split("/"); // .claude/agents/<slug>.md または <slug>/agent.md
   const dirSlug = parts[2] || "";
   const slug = fm.name || dirSlug;
   // department は frontmatter が SSOT (フラット化前は path から推定してた)
@@ -208,10 +197,11 @@ function upsertAgent(def: AgentDef): { id: number; created: boolean; updated: bo
         department: string | null; model: string | null; config: string | null;
         pokemon_slug: string | null; pokemon_jp: string | null; display_name: string | null;
         avatar_url: string | null;
+        status: string | null;
       },
       [string]
     >(`SELECT id, instructions_hash, version, instructions, source_md_path, role, role_label,
-              department, model, config, pokemon_slug, pokemon_jp, display_name, avatar_url
+              department, model, config, pokemon_slug, pokemon_jp, display_name, avatar_url, status
        FROM agents WHERE slug=?`)
     .get(def.slug);
 
@@ -259,12 +249,13 @@ function upsertAgent(def: AgentDef): { id: number; created: boolean; updated: bo
       existing.pokemon_slug !== def.pokemon_slug ||
       existing.pokemon_jp !== def.pokemon_jp ||
       existing.display_name !== def.display_name ||
-      existing.avatar_url !== def.avatar_url;
+      existing.avatar_url !== def.avatar_url ||
+      existing.status !== "active";
     if (!metaDrift) return { id: existing.id, created: false, updated: false };
     db.run(
       `UPDATE agents SET
          pokemon_slug=?, pokemon_jp=?, display_name=?, role=?, role_label=?, department=?, model=?,
-         source_md_path=?, config=?, avatar_url=?, updated_at=datetime('now','localtime')
+         source_md_path=?, config=?, avatar_url=?, status='active', updated_at=datetime('now','localtime')
        WHERE id=?`,
       [
         def.pokemon_slug, def.pokemon_jp, def.display_name, def.role, def.role_label,
@@ -279,7 +270,7 @@ function upsertAgent(def: AgentDef): { id: number; created: boolean; updated: bo
     `UPDATE agents SET
        pokemon_slug=?, pokemon_jp=?, display_name=?, role=?, role_label=?, department=?, model=?,
        source_md_path=?, instructions=?, instructions_hash=?, version=version+1,
-       config=?, avatar_url=?, updated_at=datetime('now','localtime')
+       config=?, avatar_url=?, status='active', updated_at=datetime('now','localtime')
      WHERE id=?`,
     [
       def.pokemon_slug,
@@ -309,30 +300,17 @@ function upsertAgent(def: AgentDef): { id: number; created: boolean; updated: bo
 // Edges (reports_to / reviews / triggers) — CLAUDE.md の構成から導出
 // ============================================================================
 const EDGES: Array<{ sup: string; sub: string; type: string }> = [
-  // Subsidy pipeline (Writer → Reviewer → Orchestrator)
-  { sup: "butterfree-subsidy-sync", sub: "caterpie-subsidy-writer", type: "supervises" },
-  { sup: "butterfree-subsidy-sync", sub: "metapod-subsidy-reviewer", type: "supervises" },
-  { sup: "metapod-subsidy-reviewer", sub: "caterpie-subsidy-writer", type: "reviews" },
-
-  // Benefit pipeline
-  { sup: "magnezone-benefit-orchestrator", sub: "magnemite-benefit-writer", type: "supervises" },
-  { sup: "magnezone-benefit-orchestrator", sub: "magneton-kyufukin", type: "supervises" },
-  { sup: "magneton-kyufukin", sub: "magnemite-benefit-writer", type: "reviews" },
-
-  // Editorial pipeline
-  { sup: "pidgeot-editorial", sub: "pidgey-editorial-writer", type: "supervises" },
-  { sup: "pidgeot-editorial", sub: "pidgeotto-editorial-reviewer", type: "supervises" },
-  { sup: "pidgeotto-editorial-reviewer", sub: "pidgey-editorial-writer", type: "reviews" },
-
-  // Hypothesis pipeline (Axis A)
-  { sup: "megagengar-orchestrator", sub: "gastly-validator", type: "supervises" },
-  { sup: "megagengar-orchestrator", sub: "haunter-hypothesizer", type: "supervises" },
-  { sup: "megagengar-orchestrator", sub: "gengar-selector", type: "supervises" },
-  { sup: "haunter-hypothesizer", sub: "gastly-validator", type: "triggers" },
-  { sup: "gengar-selector", sub: "haunter-hypothesizer", type: "triggers" },
-
-  // Control / Self-improvement (Axis B)
-  { sup: "mew-supervisor", sub: "mewtwo-executor", type: "triggers" },
+  { sup: "sashihara-orchestrator", sub: "iori-validator", type: "supervises" },
+  { sup: "sashihara-orchestrator", sub: "maika-hypothesizer", type: "supervises" },
+  { sup: "sashihara-orchestrator", sub: "hitomi-selector", type: "supervises" },
+  { sup: "iori-validator", sub: "maika-hypothesizer", type: "triggers" },
+  { sup: "maika-hypothesizer", sub: "hitomi-selector", type: "triggers" },
+  { sup: "anna-supervisor", sub: "kiara-executor", type: "triggers" },
+  { sup: "sashihara-orchestrator", sub: "sanatsun-knowledge-editor", type: "collaborates" },
+  { sup: "sashihara-orchestrator", sub: "risa-notifier", type: "collaborates" },
+  { sup: "sashihara-orchestrator", sub: "hana-heartbeat", type: "collaborates" },
+  { sup: "sashihara-orchestrator", sub: "shoko-reporter", type: "collaborates" },
+  { sup: "anna-supervisor", sub: "mirinya-cost-analyst", type: "collaborates" },
 ];
 
 function upsertEdges(slugToId: Map<string, number>) {
@@ -366,6 +344,11 @@ let unchanged = 0;
 const slugToId = new Map<string, number>();
 
 db.transaction(() => {
+  // Rename migration is source-driven: old HQ02 identities remain auditable but
+  // can no longer appear as active dashboard agents when an existing DB is seeded.
+  for (const slug of RETIRED_HQ02_SLUGS) {
+    db.run("UPDATE agents SET status='deprecated', updated_at=datetime('now','localtime') WHERE slug=?", [slug]);
+  }
   for (const mdPath of paths) {
     const def = parseAgentMd(mdPath);
     const r = upsertAgent(def);

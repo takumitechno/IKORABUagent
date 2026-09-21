@@ -86,7 +86,7 @@ bash scripts/get-agent-knowledge.sh "$AGENT_SLUG" required
 
 ## 編集担当はアルセウス (パターン A)
 
-**ドメイン知識の更新は `arceus-knowledge-editor` が専任で行う** (Wikipedia 編集長)。
+**ドメイン知識の更新は `sanatsun-knowledge-editor` が専任で行う**。
 
 ### なぜアルセウス専任か (パターン A)
 
@@ -114,7 +114,7 @@ bash scripts/get-agent-knowledge.sh "$AGENT_SLUG" required
 
 ## インデックスと検索
 
-- `.claude/db/agents.db` の `knowledge_index` テーブルが `docs/knowledge/**/*.md` の frontmatter をキャッシュ
+- `.runtime/db/agents-demo.db` の `knowledge_index` テーブルが `docs/knowledge/**/*.md` の frontmatter をキャッシュ
 - サーバ起動時 + `/api/reindex-knowledge` で rebuild
 - **Markdown が SSOT、DB は検索インデックスのみ** (書き込みはしない)
 

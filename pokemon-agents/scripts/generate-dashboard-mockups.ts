@@ -1,6 +1,6 @@
 #!/usr/bin/env bun
 /**
- * gpt-image-2 で Pokemon Agents ダッシュボードのデザイン案を3パターン生成する。
+ * gpt-image-2 で =LOVE Agent OS ダッシュボードのデザイン案を3パターン生成する。
  *
  * 生成先: tmp/dashboard-mockups/{pattern-a,pattern-b,pattern-c}.png
  *
@@ -20,10 +20,9 @@ const OUT_DIR = resolve(import.meta.dir, "..", "..", "tmp", "dashboard-mockups")
 mkdirSync(OUT_DIR, { recursive: true });
 
 const COMMON_CONTEXT = `
-This is a web dashboard called "Pokemon Agents" that monitors 22 autonomous AI agents
-working together on a Japanese subsidy (補助金) database website. Each agent is
-personified as a different Pokemon (Pidgey, Caterpie, Magnemite, Gengar, Mew, etc.)
-and assigned to departments like "記事執筆部", "仮説検証部", "SEO計測部", "監査部".
+This is the internal "=LOVE Agent OS" Control Plane dashboard for 11 AI agents
+running a Threads content operation. Agent names and orchestration details are
+allowed only on this internal surface.
 
 The dashboard has these main sections visible as a left sidebar:
   - エージェント (Agents: org chart, list, schedule timeline, cost)
@@ -34,11 +33,11 @@ The dashboard has these main sections visible as a left sidebar:
 
 The main content area shows:
   - A 24-hour horizontal timeline of scheduled agent executions
-    (each row = one Pokemon agent, dots at firing times, current-time red line)
+    (each row = one internal agent, dots at firing times, current-time red line)
   - A table listing all agents with columns:
     エージェント | 役割 | 部署 | モデル | スケジュール | 次回起動 | 操作
   - Metric cards at top showing: active agent count, executions today, cost
-  - Pokemon avatars next to each agent row (small 32px sprites)
+  - Internal agent avatars next to each agent row (small 32px portraits)
 
 All labels are in Japanese. The overall vibe is a mission-control / operations
 dashboard for a fleet of cute autonomous agents.
@@ -57,7 +56,7 @@ Design style: **Modern minimal, Linear/Notion/Vercel-inspired**.
 - Subtle shadows, no gradients, no decorative illustrations
 - The 24-hour timeline uses tiny colored dots aligned on thin grid lines
 - Table rows have minimal borders, hover-highlight only
-- Pokemon avatars are small circular chips (22px) with soft gray background
+- Agent avatars are small circular chips (22px) with soft gray background
 - Sidebar is narrow, icon + text, active item has indigo left border stripe
 - Metric cards at top are borderless, just large numbers + tiny muted labels
 
@@ -67,18 +66,18 @@ Include realistic Japanese text on all labels and buttons.`,
   },
   {
     name: "pattern-b-playful",
-    title: "Pattern B — ポケモンゲーム風 (playful)",
+    title: "Pattern B — playful operations UI",
     prompt: `${COMMON_CONTEXT}
 
-Design style: **Pokemon game UI inspired, playful and vibrant**.
-- Soft pastel background with subtle pokeball-pattern watermark
+Design style: **Playful and vibrant operations UI**.
+- Soft pastel background with a subtle geometric watermark
 - Rich palette: red (#EF4444), yellow (#FBBF24), blue (#3B82F6), green (#22C55E)
 - Rounded chunky cards with 2px outlined borders (like a Game Boy UI)
 - Pixel-art style section dividers, small sprite decorations in corners
-- The 24-hour timeline: each Pokemon row is a "pokeball track" with animated-looking dot marks
-- Department headers styled like Pokemon gym badges
-- Pokemon avatars are slightly larger (40px) with drop shadows, rendered as
-  anime-style character portraits (Pikachu, Charmander, etc.)
+- The 24-hour timeline: each Agent row is a rounded track with animated-looking dot marks
+- Department headers use compact role badges
+- Agent avatars are slightly larger (40px) with drop shadows, rendered as
+  stylized internal character portraits
 - Sidebar items have colored icon chips matching each section
 - Typography: rounded sans-serif, slightly playful (like Nintendo DS menus)
 
@@ -99,7 +98,7 @@ Design style: **Dark mission-control / observability cockpit, Grafana + Sentry i
 - The 24-hour timeline is the centerpiece: wide dark panel, bright dots, a
   vertical red "NOW" line glowing across all rows
 - Table rows are compact (28px), zebra-striped with #1F2937
-- Pokemon avatars shown as small rounded thumbnails, de-saturated to fit dark theme,
+- Agent avatars shown as small rounded thumbnails, de-saturated to fit dark theme,
   with a tiny colored status dot (green/amber/red) in the corner
 - Top bar has metric tiles with big glowing numbers + sparkline charts
 - Sidebar is very narrow (collapsed), icon-only

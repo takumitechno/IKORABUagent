@@ -12,10 +12,11 @@ import { Database } from "bun:sqlite";
 import { resolve, dirname } from "path";
 import { fileURLToPath } from "url";
 import { startScheduler } from "./scheduler-loop";
+import { ensureRuntimeDb, resolveAgentsDbPath } from "./db-path";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = resolve(__dirname, "..", "..");
-const DB_PATH = resolve(REPO_ROOT, ".claude/db/agents.db");
+const DB_PATH = ensureRuntimeDb(resolveAgentsDbPath());
 
 const db = new Database(DB_PATH);
 db.exec("PRAGMA journal_mode = WAL");

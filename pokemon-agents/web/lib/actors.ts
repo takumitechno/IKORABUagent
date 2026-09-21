@@ -7,16 +7,16 @@
  *   - claude   : 対話セッションの Claude Code (= 人間との会話中)
  *   - user     : UserPromptSubmit そのもの
  *
- * ポケモン情報 (日本語名 / avatar) は agents テーブルから runtime で引く。
+ * Agent表示情報は agents テーブルから runtime で引く。
  * TS 側に辞書を書かない — CLAUDE.md の「ダッシュボードは DB-native 必須」ルール参照。
  */
 
 import type { Database } from "bun:sqlite";
 
 export interface AgentMeta {
-  slug: string;          // 'caterpie-subsidy-writer'
-  pokemon_slug: string;  // 'caterpie'
-  pokemon_jp: string;    // 'キャタピー'
+  slug: string;
+  pokemon_slug: string;  // legacy-compatible identity key
+  pokemon_jp: string;    // legacy-compatible display-name column
   avatar_url: string | null;
 }
 
@@ -121,7 +121,7 @@ export function classifyActor(
     }
   }
 
-  // agent カラムに pokemon 名が入ってる場合 (Task tool 経由の subagent)
+  // agent カラムにslugが入っている場合 (Task tool 経由の subagent)
   if (event.agent) {
     const meta = lookupAgent(event.agent, agentLookup);
     if (meta) {
@@ -144,8 +144,7 @@ export function classifyActor(
 }
 
 /**
- * agent 文字列 ('caterpie', 'caterpie-subsidy-writer' 等) から AgentMeta を引く。
- * full slug → pokemon_slug の順で試す。
+ * agent文字列からAgentMetaを引く。full slug → legacy identity keyの順で試す。
  */
 function lookupAgent(agent: string, lookup?: Map<string, AgentMeta>): AgentMeta | null {
   if (!lookup) return null;
@@ -156,7 +155,7 @@ function lookupAgent(agent: string, lookup?: Map<string, AgentMeta>): AgentMeta 
 }
 
 function normalizeKey(agent: string): string {
-  // 'caterpie-subsidy-writer' → 'caterpie'
+  // full slug → identity prefix
   return agent.split("-")[0].toLowerCase();
 }
 

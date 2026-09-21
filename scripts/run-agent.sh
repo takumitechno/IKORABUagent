@@ -3,6 +3,15 @@
 # エージェント実行ラッパー — コスト追跡 + 実行ログ自動記録
 # 使い方: bash scripts/run-agent.sh <agent-name> <agent-md-path> [model]
 
+# repo root をスクリプト自身の位置から動的に解決する(2026-09-18)。
+# 旧開発環境の絶対パスのハードコードを撤去し、どの環境・どの
+# ディレクトリ配置・どの cwd から起動しても動くようにする。
+SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+source "$REPO_ROOT/scripts/lib/runtime-db.sh"
+AGENTS_DB_PATH="$(resolve_runtime_db "$REPO_ROOT")"
+export AGENTS_DB_PATH
+
 AGENT_FULL="$1"
 AGENT_MD="$2"
 MODEL="${3:-}"
@@ -12,13 +21,13 @@ MODEL="${3:-}"
 #   1. 引数 path がそのまま存在 → 使う
 #   2. .claude/agents/<slug>.md (公式フラット配置) → 移行先
 #   3. .claude/agents/*/.../<slug>/agent.md (旧サブフォルダ配置) → 移行元、互換維持
-if [ ! -f "/Users/tom/dev/hojokin-db/$AGENT_MD" ] && [ ! -f "$AGENT_MD" ]; then
-    FLAT="/Users/tom/dev/hojokin-db/.claude/agents/${AGENT_FULL}.md"
+if [ ! -f "$REPO_ROOT/$AGENT_MD" ] && [ ! -f "$AGENT_MD" ]; then
+    FLAT="$REPO_ROOT/.claude/agents/${AGENT_FULL}.md"
     if [ -f "$FLAT" ]; then
         echo "[run-agent] flat resolved: $AGENT_MD -> $FLAT" >&2
         AGENT_MD="$FLAT"
     else
-        RESOLVED=$(find /Users/tom/dev/hojokin-db/.claude/agents -type f -name 'agent.md' -path "*/${AGENT_FULL}/agent.md" 2>/dev/null | head -1)
+        RESOLVED=$(find "$REPO_ROOT/.claude/agents" -type f -name 'agent.md' -path "*/${AGENT_FULL}/agent.md" 2>/dev/null | head -1)
         if [ -n "$RESOLVED" ]; then
             echo "[run-agent] subfolder fallback: $AGENT_MD -> $RESOLVED" >&2
             AGENT_MD="$RESOLVED"
@@ -35,7 +44,7 @@ fi
 # full の場合 runs との JOIN が失敗するので廃止（2026-04-24）
 AGENT_NAME="$AGENT_FULL"
 
-cd /Users/tom/dev/hojokin-db
+cd "$REPO_ROOT"
 
 # モデル: 第3引数 > agent.md frontmatter の model: > claude 既定 の優先順位。
 # frontmatter に model: sonnet 等があるのに未指定だと既定(Opus等)で走り高コストになるため、
@@ -58,7 +67,7 @@ TIMEOUT_SEC="${AGENT_TIMEOUT:-$DEFAULT_TIMEOUT}"
 # 実行開始時に reflections に running 行を INSERT → RUN_ID を agent 環境変数で渡す
 # agent.md は UPDATE reflections SET self_score=... WHERE id=$RUN_ID で reflection を書く
 # 共通ヘルパー scripts/start-reflection.sh を使う (subagent も同じヘルパーを使うので統一)
-RUN_ID=$(bash /Users/tom/dev/hojokin-db/scripts/start-reflection.sh --slug "$AGENT_NAME" --trigger launchd)
+RUN_ID=$(bash "$REPO_ROOT/scripts/start-reflection.sh" --slug "$AGENT_NAME" --trigger launchd)
 export AGENT_RUN_ID="$RUN_ID"
 
 # macOS互換タイムアウト（バックグラウンド+wait+kill方式）
@@ -171,7 +180,7 @@ try:
     status = os.environ.get("PA_STATUS") or "success"
     run_id = int(os.environ.get("PA_RUN_ID") or 0)
 
-    conn = sqlite3.connect(".claude/db/agents.db")
+    conn = sqlite3.connect(os.environ["AGENTS_DB_PATH"])
     conn.execute(
         """INSERT INTO agent_costs (agent, cost_usd, input_tokens, output_tokens,
              cache_read_tokens, cache_creation_tokens, duration_ms, num_turns)
@@ -225,7 +234,7 @@ if [ -n "${DISCORD_WEBHOOK_URL:-}" ]; then
   python3 <<PYEOF 2>/dev/null || true
 import os, json, sqlite3, urllib.request, urllib.error
 
-conn = sqlite3.connect('.claude/db/agents.db')
+conn = sqlite3.connect(os.environ['AGENTS_DB_PATH'])
 row = conn.execute("""
   SELECT agent_slug, what_done, output_details, what_went_well, what_to_improve,
          lesson_learned, quality_score, cost_usd, duration_ms,

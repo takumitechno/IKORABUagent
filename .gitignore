@@ -3,3 +3,6 @@
 *.db-journal
 node_modules/
 .env.local
+.runtime/
+.claude/db/agents-demo.db
+.claude/db/agents.db

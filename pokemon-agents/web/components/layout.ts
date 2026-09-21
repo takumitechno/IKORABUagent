@@ -1,6 +1,6 @@
 /**
  * Paperclip-inspired layout: 左 sidebar + main content area
- * - 240px sidebar (sections: Overview / Work / Pokemon / Company)
+ * - 240px sidebar (sections: Overview / Work / Agents / Company)
  * - main は max-w-7xl 相当の余裕、padding 24px
  * - design tokens (CSS vars: --bg, --fg, --muted, --border, --accent)
  */
@@ -23,22 +23,14 @@ interface NavSection {
 
 function buildNav(currentPath: string, badges: { approvals: number; running: number }): NavSection[] {
   const pathOnly = currentPath.split("?")[0];
-  const search = currentPath.includes("?") ? currentPath.slice(currentPath.indexOf("?") + 1) : "";
-  const params = new URLSearchParams(search);
-  const a = (href: string) => pathOnly === href;
-  // フラット 1 階層構造 (URL = DB table name)
   return [
     {
       items: [
-        { href: "/agents",       label: "エージェント",            iconName: "agents",    active: pathOnly === "/agents",       badge: badges.running > 0 ? badges.running : undefined },
-        { href: "/schedules",    label: "スケジュール",            iconName: "clock",     active: pathOnly === "/schedules" },
-        { href: "/costs",        label: "コスト",                  iconName: "costs",     active: pathOnly === "/costs" },
-        { href: "/reflections",  label: "リフレクションログ",      iconName: "list",      active: pathOnly === "/reflections" },
-        { href: "/logs",         label: "行動ログ",                iconName: "activity",  active: pathOnly === "/logs" },
-        { href: "/hypotheses",   label: "仮説検証",                iconName: "zap",       active: pathOnly === "/hypotheses" },
-        { href: "/improvements", label: "自律改善",                iconName: "knowledge", active: pathOnly === "/improvements", badge: badges.approvals > 0 ? badges.approvals : undefined },
-        { href: "/knowledge",    label: "ドメイン知識",            iconName: "knowledge", active: pathOnly === "/knowledge" },
-        { href: "/reports",      label: "日報",                    iconName: "knowledge", active: pathOnly === "/reports" },
+        { href: "/#overview",   label: "運用サマリー",   iconName: "activity",  active: pathOnly === "/" },
+        { href: "/#pipeline",   label: "投稿パイプライン", iconName: "list" },
+        { href: "/#morning-report", label: "投稿実績・KPI", iconName: "activity" },
+        { href: "/improvement", label: "AI改善レポート",  iconName: "zap", active: pathOnly === "/improvement" },
+        { href: "/#operations", label: "次回テスト",      iconName: "knowledge" },
       ],
     },
   ];
@@ -47,6 +39,10 @@ function buildNav(currentPath: string, badges: { approvals: number; running: num
 export interface LayoutOpts {
   title: string;
   body: string;
+  /** Server-verified access to the internal HQ. Defaults to false. */
+  internalAccessAllowed?: boolean;
+  /** Server-issued token for authenticated internal mutation requests only. */
+  csrfToken?: string;
   flash?: { type: "ok" | "err"; msg: string };
   currentPath: string;
   badges?: {
@@ -64,13 +60,41 @@ export interface LayoutOpts {
 export function renderLayout(opts: LayoutOpts): string {
   const badges = opts.badges || { approvals: 0, running: 0 };
   const nav = buildNav(opts.currentPath, badges);
+  const pathOnly = opts.currentPath.split("?")[0];
+  const isCustomerDashboard = pathOnly === "/" || pathOnly === "/improvement";
+  const isInternalOperations = pathOnly === "/internal";
+  const internalHomeButton = isCustomerDashboard
+    ? opts.internalAccessAllowed
+      ? `<a href="/internal" class="nav-item office-back-button" data-nav="home">
+        <span class="nav-icon-chip office-icon" aria-hidden="true">🏢</span>
+        <span class="nav-label">オフィスに戻る</span>
+      </a>`
+      : ""
+    : `<a href="/internal" class="nav-item internal-home-button ${isInternalOperations ? "active" : ""}" data-nav="home"${isInternalOperations ? ' aria-current="page"' : ""}>
+        <span class="nav-icon-chip">${icon("home", "size-4")}</span>
+        <span class="nav-label">トップページ</span>
+      </a>`;
+  const browserTitle = isCustomerDashboard
+    ? "匠 Technologies | AI SNS運用"
+    : isInternalOperations
+      ? "=LOVE Agent OS | 匠 Technologies"
+      : `${opts.title} | 匠 Technologies`;
+  const brandContext = isCustomerDashboard ? "AI SNS運用" : "=LOVE Agent OS · Internal HQ";
+  const brandMarkSrc = isCustomerDashboard
+    ? "/brand/takumi-mark-compact.png?v=brand03"
+    : "/brand/takumi-mark.png";
 
   return `<!DOCTYPE html>
 <html lang="ja">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>${escapeHtml(opts.title)} — Pokemon Agents</title>
+  <title>${escapeHtml(browserTitle)}</title>
+  <meta name="application-name" content="匠 Technologies">
+  <meta name="theme-color" content="#ffffff">
+  ${isCustomerDashboard ? `<script>(()=>{try{const saved=localStorage.getItem('takumi-customer-theme');const theme=saved==='light'||saved==='dark'?saved:(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');document.documentElement.dataset.customerTheme=theme}catch(_){}})();</script>` : ""}
+  <link rel="icon" type="image/png" href="${brandMarkSrc}">
+  <link rel="apple-touch-icon" href="${brandMarkSrc}">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=LINE+Seed+JP:wght@400;700&display=swap">
@@ -93,23 +117,19 @@ export function renderLayout(opts: LayoutOpts): string {
   </script>
   <link rel="stylesheet" href="/styles.css">
 </head>
-<body>
+<body class="${isCustomerDashboard ? "customer-shell" : "internal-shell"}">
   <div class="app">
     <aside class="sidebar">
       <a href="/" class="sidebar-header" style="text-decoration:none;color:inherit;display:block;">
         <div class="brand">
           <span class="brand-mark">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <circle cx="12" cy="12" r="10" fill="currentColor" opacity="0.15"/>
-              <path d="M2 12h8a2 2 0 014 0h8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-              <circle cx="12" cy="12" r="2.5" fill="#fff" stroke="currentColor" stroke-width="1.8"/>
-              <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.8" fill="none"/>
-            </svg>
+            <img src="${brandMarkSrc}" alt="" width="34" height="34">
           </span>
-          <span class="brand-name">Pokemon Agents</span>
+          <span class="brand-name">匠 Technologies</span>
         </div>
-        <div class="brand-sub">hojokin-agent / local</div>
+        <div class="brand-sub">${brandContext}</div>
       </a>
+      ${internalHomeButton}
       <nav class="sidebar-nav">
         ${nav
           .map(
@@ -141,15 +161,57 @@ export function renderLayout(opts: LayoutOpts): string {
           )
           .join("")}
       </nav>
+      <div class="sidebar-footer">
+        <div class="sys-status-card">
+          <span class="sys-status-mark" style="background:#dcfce7;color:#166534;">${icon("activity", "size-4")}</span>
+          <div class="sys-status-body">
+            <div class="sys-status-label">${isCustomerDashboard ? "運用ステータス" : "AI運用"}</div>
+            <div class="sys-status-state">${isCustomerDashboard ? "画面内で確認" : '<span class="sys-status-dot"></span> 稼働中'}</div>
+          </div>
+        </div>
+        ${isCustomerDashboard ? "" : '<div class="env-pill"><span class="dot dot-on"></span> Threads 接続済み</div>'}
+      </div>
     </aside>
     <main class="main" id="main">
       ${opts.flash ? `<div class="flash ${opts.flash.type}">${escapeHtml(opts.flash.msg)}</div>` : ""}
       <div id="live-content">${opts.body}</div>
     </main>
   </div>
-  <script>${liveScript(opts.currentPath)}</script>
+  ${opts.csrfToken ? `<meta name="csrf-token" content="${escapeHtml(opts.csrfToken)}">` : ""}
+  ${opts.csrfToken ? `<script>${internalSecurityScript(opts.csrfToken)}</script>` : ""}
+  ${isCustomerDashboard ? "" : `<script>${liveScript(opts.currentPath)}</script>`}
 </body>
 </html>`;
+}
+
+function internalSecurityScript(token: string): string {
+  return `
+(() => {
+  const csrf = ${JSON.stringify(token)};
+  const nativeFetch = window.fetch.bind(window);
+  window.fetch = (input, init = {}) => {
+    const url = new URL(typeof input === 'string' ? input : input.url, location.href);
+    const method = String(init.method || (typeof input === 'string' ? 'GET' : input.method) || 'GET').toUpperCase();
+    if (url.origin === location.origin && !['GET','HEAD','OPTIONS'].includes(method)) {
+      const headers = new Headers(init.headers || (typeof input === 'string' ? undefined : input.headers));
+      headers.set('X-CSRF-Token', csrf);
+      init = { ...init, headers };
+    }
+    return nativeFetch(input, init);
+  };
+  document.addEventListener('submit', event => {
+    const form = event.target;
+    if (!(form instanceof HTMLFormElement) || String(form.method).toUpperCase() !== 'POST') return;
+    let field = form.querySelector('input[name="csrf_token"]');
+    if (!field) {
+      field = document.createElement('input');
+      field.type = 'hidden';
+      field.name = 'csrf_token';
+      form.appendChild(field);
+    }
+    field.value = csrf;
+  }, true);
+})();`;
 }
 
 /**

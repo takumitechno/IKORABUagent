@@ -168,7 +168,7 @@ export async function generateReportForDate(db: Database, date: string): Promise
  * Claude Code CLI (claude -p) で日報 markdown を要約生成
  */
 async function summarizeViaClaude(rawData: unknown): Promise<string | null> {
-  const PROMPT = `あなたは Pokemon Agents プラットフォームの日報執筆者です。
+  const PROMPT = `あなたは =LOVE Agent OS Control Plane の日報執筆者です。
 以下の生データから、その日の Tom (人間オペレーター) と AI エージェントの動きを
 **400-700 字程度** の日本語 markdown で要約してください。
 
@@ -187,7 +187,7 @@ async function summarizeViaClaude(rawData: unknown): Promise<string | null> {
 
 # ルール
 - 絵文字は禁止
-- 「キャタピー」「レアコイル」など pokemon_jp は名前で呼ぶ
+- Agentはlegacy互換列 pokemon_jp に保存された現行表示名（例: 指原、衣織）で呼ぶ
 - 重複したり似た指示はまとめる、生データの羅列は避ける
 - 出力は markdown 本文のみ (前置きや「以下が日報です」等は不要)
 

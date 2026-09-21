@@ -11,8 +11,9 @@ const OUT_DIR = resolve(import.meta.dir, "..", "..", "tmp", "dashboard-mockups",
 mkdirSync(OUT_DIR, { recursive: true });
 
 const CONTEXT = `
-Internal web dashboard "Pokemon Agents" — ops console for 22 autonomous AI agents
-running a Japanese subsidy database site. Each agent is a cute mascot character.
+Internal web dashboard "=LOVE Agent OS" — the operator-only Control Plane console
+for 11 AI agents running a Threads content operation. Each agent uses its current
+=LOVE-inspired internal display name.
 
 Sidebar nav (Japanese): エージェント / エージェントログ / 仮説・検証 / 自律改善 / ドメイン知識
 Main content: a 24-hour schedule timeline (rows = agents, dots = firings, vertical
@@ -73,7 +74,7 @@ Render 1536x1024 landscape. Bold. Confident. 2026.`,
   color pop in the whole interface.
 - Table: 10px uppercase tracked header, rows 40px tall, no zebra.
 - Avatars: small 24px rounded squares with duotone black/white treatment on
-  each Pokemon — no soft pastel backgrounds.
+  each Agent — no soft pastel backgrounds.
 
 Render 1536x1024 landscape. Editorial, confident, monochrome, precise.`,
   },

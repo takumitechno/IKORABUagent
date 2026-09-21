@@ -10,10 +10,10 @@ import {
 } from "../lib/actors";
 
 /**
- * Events — 旧 pokemon-dashboard の行動ログストリーム相当
+ * Events — Control Planeの行動ログストリーム
  *
  * - 各 row に actor (Claude Code / scheduled agent / subagent / user) を表示
- * - ポケモンアイコン + 日本語名
+ * - DB由来のAgent表示名
  * - tool 要約 (file_path / command / query)
  * - client 側で SSE tick ごとに新 event を prepend (全 fragment swap しない)
  */

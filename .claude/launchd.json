@@ -1,67 +1,54 @@
 {
-  "project": "hojokin",
-  "description": "メタ自己改善システム (ゲンガー集団 / ミュウ・ミューツー / アルセウス) のスケジュール",
-  "naming_convention": "com.claude.hojokin.{task}",
-  "updated_at": "2026-04-21",
+  "project": "ikolabu-agent-os",
+  "description": "=LOVE Agent OS Control Plane のローカルスケジュール",
+  "naming_convention": "com.ikolabu.agentos.{task}",
+  "updated_at": "2026-09-18",
   "jobs": [
     {
-      "label": "com.claude.hojokin.pokemon-dashboard",
-      "agent": "pokemon-dashboard",
-      "description": "ポケモンエージェント司令部（Pokemon Agent Dashboard）。Hooks駆動の監視+ロスター+仮説ボード+プレイブック（常駐、ポート5733）",
+      "label": "com.ikolabu.agentos.dashboard",
+      "agent": "agent-os-dashboard",
+      "description": "Control Plane dashboard（常駐、ポート5733）",
       "schedule": "常駐（KeepAlive）",
       "model": "N/A",
       "agent_md": "N/A",
       "runner": "bun pokemon-agents/web/server.ts",
-      "log": "~/.claude/logs/hojokin-pokemon-dashboard.log",
+      "log": "~/.claude/logs/ikolabu-agent-os-dashboard.log",
       "dashboard": "http://localhost:5733/"
     },
     {
-      "label": "com.claude.hojokin.mew-supervisor",
-      "agent": "mew",
-      "description": "Axis B supervisor。毎日5:00に観測→仮説起草を1セッションで完結、auto_applyはミューツーに委譲、human_gateはDiscord通知",
-      "schedule": "毎日 5:00",
+      "label": "com.ikolabu.agentos.sashihara-orchestrator",
+      "agent": "sashihara-orchestrator",
+      "description": "通常運用を衣織→舞香→瞳の順で委譲する総監督",
+      "schedule": "毎日 2:00",
       "model": "opus",
-      "agent_md": ".claude/agents/mew-supervisor.md",
-      "log": "~/.claude/logs/hojokin-mew-supervisor.log",
-      "note": "2026-04-22 再編。旧アルセウス+ディアルガ+パルキア(3体)をミュウ1体に統合。ギラティナは安全壁として分離維持→ミューツーにリネーム。context cohesion を優先",
+      "agent_md": ".claude/agents/sashihara-orchestrator.md",
+      "log": "~/.claude/logs/ikolabu-sashihara-orchestrator.log",
       "subagents": [
-        {
-          "name": "mewtwo-executor",
-          "role": "auto_apply分類のdiffをgit branchで適用+効果測定+revert (安全壁)",
-          "agent_md": ".claude/agents/mewtwo-executor.md",
-          "model": "sonnet"
-        }
+        { "name": "iori-validator", "role": "Evidence検証", "agent_md": ".claude/agents/iori-validator.md", "model": "sonnet" },
+        { "name": "maika-hypothesizer", "role": "仮説・分析", "agent_md": ".claude/agents/maika-hypothesizer.md", "model": "opus" },
+        { "name": "hitomi-selector", "role": "戦略選定", "agent_md": ".claude/agents/hitomi-selector.md", "model": "sonnet" }
       ]
     },
     {
-      "label": "com.claude.hojokin.megagengar-orchestrator",
-      "agent": "megagengar",
-      "description": "仮説パイプライン全体オーケストレーター。毎日2:00にゴース→ゴースト→ゲンガーをTask起動。月初は長期メタレビュー兼務",
-      "schedule": "毎日 2:00",
+      "label": "com.ikolabu.agentos.anna-supervisor",
+      "agent": "anna-supervisor",
+      "description": "Control Planeを監査し、承認済み改善だけを樹愛羅へ委譲",
+      "schedule": "毎日 5:00",
       "model": "opus",
-      "agent_md": ".claude/agents/megagengar-orchestrator.md",
-      "log": "~/.claude/logs/hojokin-megagengar-orchestrator.log",
-      "note": "2026-04-22 新規。進化軸と実行順を揃える再編で supervisor-worker パターンに移行",
+      "agent_md": ".claude/agents/anna-supervisor.md",
+      "log": "~/.claude/logs/ikolabu-anna-supervisor.log",
       "subagents": [
-        {
-          "name": "gastly-validator",
-          "role": "実測・検証+playbook昇華（Stage 1）",
-          "agent_md": ".claude/agents/gastly-validator.md",
-          "model": "sonnet"
-        },
-        {
-          "name": "haunter-hypothesizer",
-          "role": "仮説生成 3LLM（Stage 2）",
-          "agent_md": ".claude/agents/haunter-hypothesizer.md",
-          "model": "opus"
-        },
-        {
-          "name": "gengar-selector",
-          "role": "Eloトーナメント+guidance発行（Stage 3）",
-          "agent_md": ".claude/agents/gengar-selector.md",
-          "model": "sonnet"
-        }
+        { "name": "kiara-executor", "role": "承認済み改善の適用・テスト・revert", "agent_md": ".claude/agents/kiara-executor.md", "model": "sonnet" }
       ]
+    },
+    {
+      "label": "com.ikolabu.agentos.sanatsun-knowledge-editor",
+      "agent": "sanatsun-knowledge-editor",
+      "description": "ドメイン知識・編集基準・ブランド規則の週次保守",
+      "schedule": "毎週月曜 3:00",
+      "model": "sonnet",
+      "agent_md": ".claude/agents/sanatsun-knowledge-editor.md",
+      "log": "~/.claude/logs/ikolabu-sanatsun-knowledge-editor.log"
     }
   ]
 }

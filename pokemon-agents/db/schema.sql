@@ -90,9 +90,9 @@ CREATE TABLE knowledge (
 );
 CREATE TABLE agents (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
-  slug TEXT NOT NULL UNIQUE,              -- 'caterpie-subsidy-writer'
-  pokemon_slug TEXT NOT NULL,             -- 'caterpie'
-  pokemon_jp TEXT NOT NULL,               -- 'キャタピー'
+  slug TEXT NOT NULL UNIQUE,              -- 'sashihara-orchestrator'
+  pokemon_slug TEXT NOT NULL,             -- legacy-compatible key, e.g. 'sashihara'
+  pokemon_jp TEXT NOT NULL,               -- legacy-compatible display column, e.g. '指原'
   display_name TEXT NOT NULL,
   role TEXT NOT NULL CHECK (role IN (
     'writer','reviewer','publisher','orchestrator',
@@ -118,7 +118,7 @@ CREATE TABLE agent_revisions (
   prev_instructions TEXT,
   new_instructions TEXT NOT NULL,
   diff TEXT,
-  changed_by TEXT NOT NULL,               -- 'human:tom' | 'agent:mewtwo-executor' | 'sync:md-watcher'
+  changed_by TEXT NOT NULL,               -- 'human:operator' | 'agent:kiara-executor' | 'sync:md-watcher'
   reason TEXT,
   derived_from_approval_id INTEGER,
   git_commit_sha TEXT,
@@ -361,9 +361,9 @@ CREATE TRIGGER knowledge_hypothesis_writer_guard
 BEFORE INSERT ON knowledge
 FOR EACH ROW
 WHEN NEW.kind = 'hypothesis'
-  AND NEW.agent NOT IN ('haunter-hypothesizer','gastly-hypothesizer','megagengar-orchestrator','human')
+  AND NEW.agent NOT IN ('maika-hypothesizer','sashihara-orchestrator','human')
 BEGIN
-  SELECT RAISE(ABORT, 'kind=hypothesis の直接書込は haunter-hypothesizer 専権です。実行エージェントは decision / guidance を使ってください');
+  SELECT RAISE(ABORT, 'kind=hypothesis の直接書込は maika-hypothesizer 専権です。実行エージェントは decision / guidance を使ってください');
 END;
 CREATE TRIGGER knowledge_control_hypothesis_quality_insert
 BEFORE INSERT ON knowledge
@@ -404,7 +404,7 @@ CREATE TRIGGER knowledge_hypothesis_quality_gate
 BEFORE INSERT ON knowledge
 FOR EACH ROW
 WHEN NEW.kind = 'hypothesis'
-  AND NEW.agent = 'haunter-hypothesizer'  -- 既存の legacy レコードは grandfathered
+  AND NEW.agent = 'maika-hypothesizer'
 BEGIN
   SELECT CASE
     WHEN NEW.affected_resources IS NULL OR NEW.affected_resources IN ('','[]')
@@ -429,7 +429,7 @@ CREATE TRIGGER knowledge_hypothesis_schedule_gate
 BEFORE INSERT ON knowledge
 FOR EACH ROW
 WHEN NEW.kind = 'hypothesis'
-  AND NEW.agent = 'haunter-hypothesizer'
+  AND NEW.agent = 'maika-hypothesizer'
 BEGIN
   SELECT CASE
     WHEN NEW.follow_up_schedule IS NULL OR NEW.follow_up_schedule IN ('','[]')
@@ -439,7 +439,7 @@ END;
 CREATE TRIGGER knowledge_hypothesis_structured_gate
 BEFORE INSERT ON knowledge
 FOR EACH ROW
-WHEN NEW.kind = 'hypothesis' AND NEW.agent = 'haunter-hypothesizer'
+WHEN NEW.kind = 'hypothesis' AND NEW.agent = 'maika-hypothesizer'
 BEGIN
   SELECT CASE
     WHEN json_extract(NEW.metadata, '$.executor_agent') IS NULL OR json_extract(NEW.metadata, '$.executor_agent') = ''

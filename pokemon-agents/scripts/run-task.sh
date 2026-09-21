@@ -18,7 +18,8 @@ if [ -z "$TASK_ID" ]; then
 fi
 
 REPO_ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
-DB="$REPO_ROOT/.claude/db/agents.db"
+source "$REPO_ROOT/scripts/lib/runtime-db.sh"
+DB="$(resolve_runtime_db "$REPO_ROOT")"
 WORKER_ID="$$:$(hostname -s)"
 NOW() { date '+%Y-%m-%d %H:%M:%S'; }
 

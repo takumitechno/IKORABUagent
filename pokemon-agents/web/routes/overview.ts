@@ -1,615 +1,248 @@
 import type { Database } from "bun:sqlite";
 import { escapeHtml, timeAgo } from "../components/layout";
-import { q1 } from "../lib/db-helpers";
+import {
+  customerDashboardStyles, customerThemeScript, dashboardIcon,
+} from "../components/customer-dashboard-visuals";
+import type { ManualPostStatus, ThreadsContent, ThreadsDashboardData } from "../lib/threads-dashboard";
 
-/**
- * Top page = バーチャルオフィス (島マップ版)
- *
- * - 見出しの下に島マップエリア
- * - エージェントが島の各エリアに配置される (部署で集まってる)
- * - 各キャラの上に最新の reflection の吹き出しが常時表示
- * - SSE 経由で新着が来たら該当キャラの吹き出しが差し替わる
- */
-
-interface MemberRow {
-  slug: string;
-  pokemon_jp: string;
-  avatar_url: string | null;
-  role_label: string | null;
-  department: string;
-  department_label: string | null;
-  refl_id: number | null;
-  refl_status: string | null;
-  refl_what_done: string | null;
-  refl_result_summary: string | null;
-  refl_error_message: string | null;
-  refl_created_at: string | null;
-}
-
+// Legacy live-update exports. Customer responses never expose actor identities.
 export interface Post {
-  id: number;
-  agent_slug: string;
-  pokemon_jp: string | null;
-  avatar_url: string | null;
-  role_label: string | null;
-  status: string;
-  what_done: string | null;
-  result_summary: string | null;
-  error_message: string | null;
-  created_at: string;
+  id: number; agent_slug: string; pokemon_jp: string | null; avatar_url: string | null;
+  role_label: string | null; status: string; what_done: string | null;
+  result_summary: string | null; error_message: string | null; created_at: string;
 }
-
-const COMPLETE_INTROS = [
-  "やってきたよー！",
-  "おっす、終わった！",
-  "報告します！",
-  "見て見てー！",
-  "おしごと完了！",
-  "できたよ！",
-];
-const FAIL_INTROS = ["やばい、失敗しちゃった…", "ごめん、コケた。"];
-const RUNNING_INTROS = ["今がんばってる！", "作業中…"];
-
-function pickIntro(status: string, id: number): string {
-  const arr = status === "running"
-    ? RUNNING_INTROS
-    : status === "failed" || status === "timeout" || status === "error"
-      ? FAIL_INTROS
-      : COMPLETE_INTROS;
-  return arr[id % arr.length];
-}
-
-function statusKey(status: string | null): string {
-  if (status === "completed") return "completed";
-  if (status === "failed" || status === "timeout" || status === "error") return "failed";
-  if (status === "running") return "running";
-  return "queued";
-}
-
-function shortenContent(text: string): string {
-  const cleaned = text.replace(/\r/g, "").trim();
-  const firstLine = cleaned.split("\n").find((l) => l.trim().length > 0) || cleaned;
-  const stripped = firstLine.replace(/^[-・*•▶●]\s*/, "").trim();
-  return stripped.length > 50 ? stripped.slice(0, 50) + "…" : stripped;
-}
-
-/**
- * 各エージェントの島内ポジション (left%, top%) — 画像に合わせて部署ごとに配置
- * 部署近接 + 個性的な場所 (火山・雪山・森・海・街・砂漠) に分配
- */
-const POSITIONS: Record<string, { left: number; top: number }> = {
-  // 仮説ライン — 火山 (左下)、不気味な雰囲気
-  "haunter-hypothesizer":     { left: 12, top: 56 },
-  "gengar-selector":          { left: 18, top: 64 },
-  "gastly-validator":         { left: 8,  top: 68 },
-  "megagengar-orchestrator":  { left: 16, top: 76 },
-
-  // 補助金 — 右上の街 (production)
-  "butterfree-subsidy-sync":  { left: 80, top: 14 },
-  "caterpie-subsidy-writer":  { left: 86, top: 20 },
-  "metapod-subsidy-reviewer": { left: 76, top: 22 },
-  "scizor-guide-writer":      { left: 84, top: 28 },
-
-  // 給付金 — 中央右の湖+遺跡
-  "magnemite-benefit-writer":          { left: 60, top: 36 },
-  "magneton-kyufukin":                 { left: 67, top: 38 },
-  "magnezone-benefit-orchestrator":    { left: 64, top: 44 },
-
-  // 記事編集 — 左上の森
-  "pidgey-editorial-writer":           { left: 28, top: 18 },
-  "pidgeotto-editorial-reviewer":      { left: 36, top: 22 },
-  "pidgeot-editorial":                 { left: 32, top: 14 },
-
-  // SEO計測 — 雪山山頂
-  "abra-seo-report":     { left: 50, top: 10 },
-  "kadabra-rank-monitor":{ left: 56, top: 16 },
-
-  // 監査 — 高い山の上 (神殿っぽいエリア)
-  "mew-supervisor":    { left: 44, top: 30 },
-  "mewtwo-executor":   { left: 50, top: 32 },
-
-  // 被リンク — 海岸 (beach)
-  "vulpix-note-publisher":      { left: 30, top: 78 },
-  "shuckle-hatena-publisher":   { left: 22, top: 84 },
-
-  // アライアンス — 北西の小島
-  "starmie-expert-outreach":    { left: 6,  top: 30 },
-
-  // キーワード調査 — 中央の砂漠
-  "porygon-keyword-research":   { left: 44, top: 70 },
-
-  // ドメイン知識 — 中央の古代遺跡
-  "arceus-knowledge-editor":    { left: 52, top: 50 },
-
-  // 対話 — 街の入口
-  "delibird-chat":              { left: 70, top: 70 },
-
-  // 許認可 — 右下の島
-  "pinsir-permit-writer":       { left: 86, top: 64 },
-};
 
 export function fetchReflectionsSince(db: Database, sinceId: number, limit: number): Post[] {
-  return db
-    .query<Post, []>(
-      `SELECT r.id, r.agent_slug, a.pokemon_jp, a.avatar_url, a.role_label,
-              r.status, r.what_done, r.result_summary, r.error_message, r.created_at
-       FROM reflections r
-       LEFT JOIN agents a ON a.slug = r.agent_slug OR a.pokemon_slug = r.agent_slug
-       WHERE r.id > ${sinceId}
-         AND (r.what_done IS NOT NULL OR r.result_summary IS NOT NULL OR r.error_message IS NOT NULL)
-       ORDER BY r.id DESC LIMIT ${limit}`,
-    )
-    .all();
+  return db.query<Post, []>(
+    `SELECT r.id, r.agent_slug, NULL AS pokemon_jp, NULL AS avatar_url, NULL AS role_label,
+            r.status, r.what_done, r.result_summary, r.error_message, r.created_at
+     FROM reflections r WHERE r.id > ${Number(sinceId) || 0}
+     ORDER BY r.id DESC LIMIT ${Math.max(1, Math.min(100, Number(limit) || 30))}`,
+  ).all();
 }
 
 export function renderReflectionPost(p: Post): string {
-  const intro = pickIntro(p.status, p.id);
-  const rawText = p.what_done || p.result_summary || p.error_message || "";
-  const text = shortenContent(rawText);
-  const sk = statusKey(p.status);
   return JSON.stringify({
-    id: p.id,
-    slug: p.agent_slug,
-    intro,
-    text,
-    status: sk,
-    time_ago: timeAgo(p.created_at),
+    id: p.id, slug: "marketing-operation", intro: "運用状況を更新しました",
+    text: p.status === "failed" ? "確認が必要な更新があります" : "運用タスクを更新しました",
+    status: p.status === "failed" ? "failed" : "completed", time_ago: timeAgo(p.created_at),
   });
 }
 
-export function renderOverview(db: Database): string {
-  const members = db
-    .query<MemberRow, []>(
-      `SELECT a.slug, a.pokemon_jp, a.avatar_url, a.role_label,
-              a.department, a.department_label,
-              r.id as refl_id, r.status as refl_status,
-              r.what_done as refl_what_done,
-              r.result_summary as refl_result_summary,
-              r.error_message as refl_error_message,
-              r.created_at as refl_created_at
-       FROM agents a
-       LEFT JOIN (
-         SELECT r1.* FROM reflections r1
-         INNER JOIN (
-           SELECT agent_slug, MAX(id) as mid
-           FROM reflections
-           WHERE what_done IS NOT NULL OR result_summary IS NOT NULL OR error_message IS NOT NULL
-           GROUP BY agent_slug
-         ) r2 ON r1.id = r2.mid
-       ) r ON r.agent_slug = a.slug OR r.agent_slug = a.pokemon_slug
-       ORDER BY a.slug`,
-    )
-    .all();
+const metricLabels: Record<string, string> = {
+  views: "表示", likes: "いいね", replies: "返信", reposts: "再投稿", quotes: "引用", shares: "シェア",
+  profile_visits: "プロフィール遷移", follower_delta: "フォロワー増減", link_clicks: "リンククリック",
+  lead_registrations: "登録", free_reading_applications: "無料申込", paid_conversions: "有料転換", revenue: "売上",
+};
+const originLabels: Record<ThreadsContent["origin"], string> = {
+  ai_auto: "AI自動", ai_manual: "AI案を手動投稿", human_manual: "手動投稿", unknown: "作成方法を確認中",
+};
 
-  const lastId = q1(db, `SELECT COALESCE(MAX(id),0) FROM reflections`);
+function formatDate(value: string | null, fallback: string): string {
+  if (!value) return fallback;
+  const parsed = new Date(value);
+  if (Number.isNaN(parsed.getTime())) return fallback;
+  return new Intl.DateTimeFormat("ja-JP", { month: "numeric", day: "numeric", hour: "2-digit", minute: "2-digit", timeZone: "Asia/Tokyo" }).format(parsed);
+}
+function ageHours(value: string | null): number | null {
+  if (!value) return null;
+  const time = new Date(value).getTime();
+  return Number.isFinite(time) ? Math.max(0, (Date.now() - time) / 3_600_000) : null;
+}
+function elapsedLabel(value: string | null): string {
+  const hours = ageHours(value);
+  if (hours === null) return "未投稿";
+  if (hours < 1) return `${Math.max(1, Math.floor(hours * 60))}分経過`;
+  if (hours < 24) return `${Math.floor(hours)}時間経過`;
+  return `${Math.floor(hours / 24)}日${Math.floor(hours % 24)}時間経過`;
+}
+function roleLabel(role: string | null): string {
+  return ({ reach: "認知を広げる", trust: "信頼を育てる", desire: "興味を高める", conversion: "行動を促す" } as Record<string, string>)[role || ""] || "目的を整理中";
+}
+function accountStatusLabel(status: string | null): string {
+  return ({ active: "稼働中", paused: "一時停止中", disabled: "停止中" } as Record<string, string>)[status || ""] || "状態確認中";
+}
+function contentStatus(content: ThreadsContent): { label: string; tone: string; stage: number } {
+  const hasPublishedPart = content.publication?.mode === "live" && Boolean(content.publication.externalId);
+  const hasMetrics = Object.values(content.metrics).some((value) => typeof value === "number");
+  if (hasPublishedPart && content.publication?.status === "succeeded" && hasMetrics) return { label: "分析中", tone: "completed", stage: 6 };
+  if (hasPublishedPart && content.publication?.status === "succeeded") return { label: "投稿済み", tone: "completed", stage: 5 };
+  if (hasPublishedPart) return { label: "一部投稿済み", tone: "warning", stage: 5 };
+  if (content.scheduledAt) return { label: "投稿予定", tone: "running", stage: 4 };
+  if (content.approved) return { label: "承認済み", tone: "running", stage: 3 };
+  if (content.state === "human_approval_pending") return { label: "承認待ち", tone: "pending", stage: 3 };
+  if (content.qaVerdict === "pass") return { label: "内容確認済み", tone: "pending", stage: 2 };
+  return { label: "企画・作成中", tone: "queued", stage: 1 };
+}
+function metricEntries(content: ThreadsContent): [string, number][] {
+  return Object.entries(content.metrics).filter((entry): entry is [string, number] => typeof entry[1] === "number");
+}
+function renderMetrics(content: ThreadsContent): string {
+  const entries = metricEntries(content);
+  if (!entries.length) return `<span class="measuring">計測中</span>`;
+  const primary = ["views", "likes", "replies", "reposts", "quotes", "shares"] as const;
+  const values = primary.map((key) => typeof content.metrics[key] === "number"
+    ? `<span class="actual-metric metric-${key}"><b>${escapeHtml(metricLabels[key])}</b>${content.metrics[key]!.toLocaleString("ja-JP")}</span>`
+    : `<span class="actual-metric metric-${key} unavailable"><b>${escapeHtml(metricLabels[key])}</b>取得不可</span>`);
+  if (content.viewsPerHour !== null) values.push(`<span class="actual-metric normalized metric-views-hour"><b>表示/時</b>${content.viewsPerHour.toFixed(1)}</span>`);
+  if (content.engagementPerHour !== null) values.push(`<span class="actual-metric normalized metric-reaction-hour"><b>反応/時</b>${content.engagementPerHour.toFixed(1)}</span>`);
+  const reactions = [content.metrics.likes, content.metrics.replies, content.metrics.reposts, content.metrics.quotes, content.metrics.shares]
+    .filter((value): value is number => typeof value === "number").reduce((sum, value) => sum + value, 0);
+  if (typeof content.metrics.views === "number" && content.metrics.views > 0 && reactions > 0) values.push(`<span class="actual-metric normalized metric-reaction-rate"><b>反応率</b>${((reactions / content.metrics.views) * 100).toFixed(1)}%</span>`);
+  return `<div class="actual-metrics">${values.join("")}<small class="metric-updated">最終取得 ${escapeHtml(formatDate(content.metricsFetchedAt ?? content.metricsObservedAt, "時刻不明"))}</small></div>`;
+}
+function currentHypothesis(contents: ThreadsContent[]): string {
+  const candidates = contents.map((content) => content.viewsPerHour !== null
+    ? { topic: content.topic || "テーマ未設定", rate: content.viewsPerHour } : null)
+    .filter((item): item is { topic: string; rate: number } => item !== null);
+  if (candidates.length < 2) return "比較できる投稿がまだ少ないため、反応の違いは仮説として保留します。";
+  candidates.sort((a, b) => b.rate - a.rate);
+  return `「${candidates[0].topic}」は表示の伸びが相対的に高い可能性があります。ただし、現時点では小標本の暫定仮説です。`;
+}
+function totalMetric(contents: ThreadsContent[], key: keyof ThreadsContent["metrics"]): number | null {
+  const values = contents.map((content) => content.metrics[key]).filter((value): value is number => typeof value === "number");
+  return values.length ? values.reduce((sum, value) => sum + value, 0) : null;
+}
+
+function sectionContext(iconName: string, now: string, next: string): string {
+  return `<div class="section-context"><span class="section-context-icon">${dashboardIcon(iconName)}</span><div><small>NOW / 今の状態</small><b>${escapeHtml(now)}</b></div><div><small>NEXT / 次に起きること</small><b>${escapeHtml(next)}</b></div></div>`;
+}
+
+function renderSparkline(contents: ThreadsContent[], key: keyof ThreadsContent["metrics"]): string {
+  const values = contents.map((content) => content.metrics[key]).filter((value): value is number => typeof value === "number");
+  if (values.length < 2) return `<div class="kpi-measured" aria-label="実測 ${values.length}件"><i style="width:${values.length ? "34" : "0"}%"></i></div>`;
+  const max = Math.max(...values), min = Math.min(...values), range = Math.max(1, max - min);
+  const points = values.map((value, index) => {
+    const x = values.length === 1 ? 50 : (index / (values.length - 1)) * 100;
+    const y = 25 - ((value - min) / range) * 21;
+    return `${x.toFixed(1)},${y.toFixed(1)}`;
+  });
+  const dots = points.map((point) => {
+    const [cx, cy] = point.split(",");
+    return `<circle cx="${cx}" cy="${cy}" r="1.7"/>`;
+  }).join("");
+  return `<svg viewBox="0 0 100 28" preserveAspectRatio="none" role="img" aria-label="${values.length}件の実測推移"><polyline points="${points.join(" ")}"/>${dots}</svg>`;
+}
+
+function renderViewsChart(contents: ThreadsContent[]): string {
+  const rows = contents.map((content) => typeof content.metrics.views === "number"
+    ? { label: content.topic || "テーマ未設定", value: content.metrics.views } : null)
+    .filter((row): row is { label: string; value: number } => row !== null)
+    .slice(0, 6);
+  if (!rows.length) return `<div class="empty-visual">${dashboardIcon("chart")}<div><b>表示データを計測中</b><p>実測値が取得できると投稿ごとの比較を表示します。</p></div></div>`;
+  const max = Math.max(1, ...rows.map((row) => row.value));
+  return `<div class="bar-chart" role="img" aria-label="投稿ごとの表示数比較">${rows.map((row) => `<div class="bar-row"><span class="bar-label" title="${escapeHtml(row.label)}">${escapeHtml(row.label)}</span><span class="bar-track"><i class="bar-fill" style="width:${Math.max(row.value > 0 ? 3 : 0, (row.value / max) * 100).toFixed(1)}%"></i></span><b class="bar-value">${row.value.toLocaleString("ja-JP")}</b></div>`).join("")}</div>`;
+}
+
+function renderStatusDonut(contents: ThreadsContent[]): string {
+  if (!contents.length) return `<div class="empty-visual">${dashboardIcon("pipeline")}<div><b>投稿データを待っています</b><p>実データ接続後に状態内訳を表示します。</p></div></div>`;
+  const segments = [
+    { label: "作成・審査", value: contents.filter((content) => contentStatus(content).stage <= 2).length, color: "#94a3b8" },
+    { label: "承認・予定", value: contents.filter((content) => [3, 4].includes(contentStatus(content).stage)).length, color: "#3b82f6" },
+    { label: "投稿済み", value: contents.filter((content) => contentStatus(content).stage === 5).length, color: "#8b5cf6" },
+    { label: "分析中", value: contents.filter((content) => contentStatus(content).stage >= 6).length, color: "#10b981" },
+  ];
+  let cursor = 0;
+  const stops = segments.map((segment) => {
+    const start = cursor;
+    cursor += (segment.value / contents.length) * 100;
+    return `${segment.color} ${start.toFixed(1)}% ${cursor.toFixed(1)}%`;
+  }).join(",");
+  return `<div class="donut-layout"><div class="donut" style="background:conic-gradient(${stops})" role="img" aria-label="投稿状態の内訳"><div class="donut-center"><b>${contents.length}</b><span>投稿</span></div></div><div class="donut-legend">${segments.map((segment) => `<span><i style="background:${segment.color}"></i>${segment.label} <b>${segment.value}</b></span>`).join("")}</div></div>`;
+}
+
+function renderManualPostSync(posts: ManualPostStatus[]): string {
+  const labels = { ai_auto: "AI自動", ai_manual: "AI案を手動投稿", human_manual: "手動投稿" };
+  const rows = posts.slice(0, 6).map((post) => {
+    const firstLine = post.body.split(/\r?\n/).find(Boolean) ?? "手動投稿";
+    const structure = post.partCount > 1 ? `スレッド投稿 1/${post.partCount}〜${post.partCount}/${post.partCount}` : labels[post.origin];
+    const parts = post.partCount > 1 ? `<details><summary>スレッドの本文と実績を見る</summary>${post.parts.map((part) => `<p><b>${part.partIndex + 1}/${post.partCount}</b> ${escapeHtml(part.body.slice(0, 100))}${Object.keys(part.metrics).length ? ` · ${Object.entries(part.metrics).map(([key, value]) => `${escapeHtml(metricLabels[key] || "取得指標")} ${value}`).join(" / ")}` : " · 計測中"}</p>`).join("")}</details>` : "";
+    return `<li><div class="manual-copy"><b>${escapeHtml(firstLine.slice(0, 64))}</b><small>${escapeHtml(formatDate(post.publishedAt, "公開日時を確認中"))} · ${escapeHtml(structure)}</small>${parts}</div><span class="manual-state ${post.analyzeEnabled ? "on" : "wait"}">${post.analyzeEnabled ? "分析に使う" : "分析対象外"}</span><span class="manual-state ${post.learnEnabled ? "on" : "off"}">${post.learnEnabled ? "今後の改善学習に使う" : "改善学習には使わない"}</span></li>`;
+  }).join("");
+  const analyzing = posts.filter((post) => post.analyzeEnabled).length;
+  return `<section class="section chapter chapter-manual manual-sync"><div class="section-header"><div><div class="card-eyebrow">MANUAL / SELF-REPLY</div><h2>手動投稿も改善につなげる</h2><p class="section-lead">自分で投稿した内容も分析できます。人がThreadsで直接投稿した内容を検出し、分析と今後の学習に使う場所です。</p></div><span class="chapter-icon">${dashboardIcon("publish")}</span></div>${sectionContext("activity", `${posts.length}件を検出・${analyzing}件を分析対象`, posts.length ? "次回同期で新しい投稿と反応を確認" : "新しい手動投稿の検出待ち")}${rows ? `<ul>${rows}</ul>` : `<div class="empty-inline">現在、検出済みの手動投稿はありません。</div>`}</section>`;
+}
+
+export function renderOverview(_db: Database, data?: ThreadsDashboardData): string {
+  const connected = data?.connected === true;
+  const contents = connected ? data.contents.slice(0, 12) : [];
+  const published = contents.filter((content) => content.publication?.mode === "live" && content.publication.externalId);
+  const measured = contents.filter((content) => metricEntries(content).length > 0);
+  const nextContent = contents.filter((content) => !content.publication?.externalId).sort((a, b) => (a.scheduledAt || "9999").localeCompare(b.scheduledAt || "9999"))[0] ?? null;
+  const recentContent = [...published].sort((a, b) => (b.publication?.publishedAt || "").localeCompare(a.publication?.publishedAt || ""))[0] ?? null;
+  const handle = connected && data.handle ? (data.handle.startsWith("@") ? data.handle : `@${data.handle}`) : null;
+  const accountName = connected ? data.displayName || "Threadsアカウント" : "Threadsアカウント";
+  const updatedAt = formatDate(data?.fetchedAt ?? null, "未接続");
+  const pendingApproval = contents.filter((content) => content.state === "human_approval_pending").length;
+  const actualMetricCount = contents.reduce((sum, content) => sum + metricEntries(content).length, 0);
+  const maxStage = contents.reduce((max, content) => Math.max(max, contentStatus(content).stage), 1);
+  const operationNow = !connected ? "連携の復旧を待っています" : pendingApproval > 0 ? `${pendingApproval}件の承認を待っています` : nextContent ? "次回投稿の準備を進めています" : measured.length ? "投稿結果を分析しています" : "新しい企画を準備しています";
+  const recentResult = recentContent ? typeof recentContent.metrics.views === "number" ? `表示 ${recentContent.metrics.views.toLocaleString("ja-JP")}` : "実績を計測中" : "投稿後に表示";
+  const pipelineRows = contents.map((content, index) => {
+    const status = contentStatus(content);
+    const firstLine = content.body.split(/\r?\n/).find(Boolean) ?? "本文を準備中";
+    const schedule = formatDate(content.scheduledAt ?? content.publication?.publishedAt ?? null, content.publication?.externalId ? "公開時刻を確認中" : "予定を調整中");
+    return `<article class="pipeline-row post-row" tabindex="0" role="button" data-post-index="${index}"><div class="pipeline-card-head"><div class="pipeline-topic"><span class="topic-name">${escapeHtml(content.topic || firstLine.slice(0, 42))}</span><small>${escapeHtml(roleLabel(content.contentRole))}</small></div><button class="detail-button" type="button" aria-label="投稿詳細を開く">›</button></div><div class="pipeline-card-meta"><div class="pipeline-meta"><span>作成方法</span><b><span class="origin-chip">${escapeHtml(originLabels[content.origin])}</span></b></div><div class="pipeline-meta"><span>現在地</span><b><span class="badge ${status.tone}">${status.label}</span></b></div><div class="pipeline-meta schedule-cell"><span>${content.publication?.externalId ? "公開実績" : "投稿予定"}</span><b>${escapeHtml(schedule)}</b></div></div><div class="pipeline-card-metrics">${renderMetrics(content)}</div></article>`;
+  }).join("");
+  const safeContents = JSON.stringify(contents.map((content) => ({
+    topic: content.topic || "テーマ未設定", body: content.body, role: roleLabel(content.contentRole), origin: originLabels[content.origin],
+    status: contentStatus(content).label, schedule: formatDate(content.scheduledAt ?? content.publication?.publishedAt ?? null, "予定を調整中"),
+    quality: content.qaVerdict === "pass" ? "内容確認済み" : content.qaVerdict ? "内容を再確認中" : "内容確認前",
+    approval: content.approved ? "承認済み" : content.state === "human_approval_pending" ? "承認待ち" : "承認前",
+    published: content.publication?.externalId ? "公開を確認済み" : "未公開",
+  }))).replace(/</g, "\\u003c");
+  const hasMetricObservation = contents.some((content) => content.metricsObservedAt !== null);
+  const metrics = [["views", "表示"], ["likes", "いいね"], ["replies", "返信"], ["reposts", "再投稿"], ["quotes", "引用"], ["shares", "シェア"]] as const;
+  const latestMetricAt = contents.map((content) => content.metricsFetchedAt ?? content.metricsObservedAt).filter((value): value is string => Boolean(value)).sort().at(-1) ?? null;
+  const totalViews = totalMetric(contents, "views");
+  const latestViews = recentContent?.metrics.views;
+  const stageCounts = [1, 2, 3, 4, 5, 6, 7].map((stage) => contents.filter((content) => contentStatus(content).stage === stage).length);
+  const nextPostLabel = nextContent ? `${formatDate(nextContent.scheduledAt, "予定を調整中")} · ${nextContent.topic || "テーマ未設定"}` : connected ? "投稿予定を調整中" : "接続復旧後に表示";
+  const metricNext = latestMetricAt ? "次回Insights更新を待っています" : connected ? "最初のKPI取得待ち" : "接続復旧後に計測開始";
+  const pipelineNow = connected ? `企画・審査 ${stageCounts[0] + stageCounts[1]}件 / 承認・予定 ${stageCounts[2] + stageCounts[3]}件 / 投稿・分析 ${stageCounts[4] + stageCounts[5]}件` : "運用データへ接続待ち";
 
   return `
-<div class="page-header">
-  <div>
-    <div class="page-kicker">Live Office</div>
-    <h1>みんなのオフィス</h1>
-  </div>
-  <div class="watching-pill" id="watching-indicator">
-    <span class="watching-dot"></span>
-    <span id="watching-text">見守り中</span>
-  </div>
+<div id="overview" class="customer-dashboard">
+  <header class="customer-hero"><div class="hero-main"><div class="page-kicker">SOCIAL OPERATIONS</div><h1>${escapeHtml(accountName)}のSNS運用</h1><div class="account-line">${handle ? `<span>${escapeHtml(handle)}</span>` : ""}<span class="status-badge ${connected ? "online" : "waiting"}"><i></i>${connected ? accountStatusLabel(data?.accountStatus ?? null) : "接続待ち"}</span></div><p>${escapeHtml(operationNow)}</p></div><div class="hero-actions"><div class="hero-update"><span>最終確認</span><b>${escapeHtml(updatedAt)}</b><small>${connected ? "最新の運用データを表示" : "実データは表示していません"}</small></div><button class="theme-toggle" id="theme-toggle" type="button" aria-label="表示テーマを切り替える"><span class="theme-moon">${dashboardIcon("moon")}</span><span class="theme-sun">${dashboardIcon("sun")}</span><span id="theme-label">ダーク</span></button></div></header>
+  <section class="section chapter chapter-today" aria-label="今日の運用"><div class="section-header"><div><div class="card-eyebrow">TODAY'S OPERATION</div><h2>今日の運用</h2><p class="section-lead">今動いていることと、このあと予定されている動きを最初に確認する場所です。</p></div><span class="chapter-icon">${dashboardIcon("activity")}</span></div>${sectionContext("calendar", connected ? `${accountStatusLabel(data?.accountStatus ?? null)} · 公開 ${published.length}件 · KPI取得 ${measured.length}件` : "Threads連携の復旧待ち", nextPostLabel)}<div class="now-grid">
+    <article class="now-card primary"><div class="summary-top"><span class="summary-label">稼働状態</span><span class="summary-icon">${dashboardIcon("activity")}</span></div><strong class="summary-value textual">${escapeHtml(operationNow)}</strong><small>${connected ? `運用中 ${contents.length}件` : "連携復旧後に自動更新"}</small></article>
+    <article class="now-card"><div class="summary-top"><span class="summary-label">次回投稿</span><span class="summary-icon">${dashboardIcon("calendar")}</span></div><strong class="summary-value textual">${escapeHtml(nextContent?.topic || (connected ? "企画を準備中" : "接続待ち"))}</strong><small>${escapeHtml(nextContent ? formatDate(nextContent.scheduledAt, "予定を調整中") : connected ? "予定確定後に表示" : "—")}</small></article>
+    <article class="now-card"><div class="summary-top"><span class="summary-label">公開済み</span><span class="summary-icon">${dashboardIcon("publish")}</span></div><strong class="summary-value">${connected ? published.length : "—"}</strong><small>${connected ? "公開を確認できた投稿" : "実データ待ち"}</small></article>
+    <article class="now-card"><div class="summary-top"><span class="summary-label">総表示数</span><span class="summary-icon">${dashboardIcon("chart")}</span></div><strong class="summary-value">${typeof totalViews === "number" ? totalViews.toLocaleString("ja-JP") : connected ? "計測中" : "—"}</strong><small>取得済み投稿のviews合計</small></article>
+    <article class="now-card"><div class="summary-top"><span class="summary-label">最新投稿の表示数</span><span class="summary-icon">${dashboardIcon("metrics")}</span></div><strong class="summary-value">${typeof latestViews === "number" ? latestViews.toLocaleString("ja-JP") : connected ? "計測中" : "—"}</strong><small>${escapeHtml(recentContent?.topic || "公開後に実値を表示")}</small></article>
+    <article class="now-card"><div class="summary-top"><span class="summary-label">KPI観測状態</span><span class="summary-icon">${dashboardIcon("clock")}</span></div><strong class="summary-value textual">${connected ? `${measured.length}件を観測` : "接続待ち"}</strong><small>${latestMetricAt ? `最終取得 ${escapeHtml(formatDate(latestMetricAt))}` : "数値は推測しません"}</small></article>
+  </div></section>
+  <section id="pipeline" class="section chapter chapter-pipeline pipeline-section"><div class="section-header"><div><div class="card-eyebrow">CONTENT PIPELINE</div><h2>投稿パイプライン</h2><p class="section-lead">企画から投稿・分析まで、各投稿がどの工程にいるかを見る場所です。</p></div><span class="chapter-icon">${dashboardIcon("pipeline")}</span></div>${sectionContext("pipeline", pipelineNow, nextContent ? `次に動く投稿: ${nextContent.topic || "テーマ未設定"}` : connected ? "次の企画・投稿予定の登録待ち" : "接続復旧後に進行を再表示")}<div class="workflow-section" aria-label="運用フロー"><div class="workflow-copy"><span>運用の流れ</span><b>今いる段階をひと目で確認</b></div><div class="journey">${["企画", "審査", "承認", "投稿予定", "投稿済み", "分析", "改善"].map((label, index) => `<div class="journey-step ${index + 1 < maxStage ? "done" : index + 1 === maxStage ? "active" : ""}"><span>${index + 1}<em>${stageCounts[index]}</em></span><b>${label}</b></div>${index < 6 ? "<i></i>" : ""}`).join("")}</div></div>${connected && pipelineRows ? `<div class="pipeline-head"><span>テーマ / 役割</span><span>作成方法</span><span>現在地</span><span>投稿予定・実績</span><span>KPI</span><span></span></div><div class="pipeline-list">${pipelineRows}</div>` : `<div class="empty-state"><b>${connected ? "運用中の投稿はありません" : "運用データに接続していません"}</b><p>${connected ? "新しい企画が始まると、ここに進行状況が表示されます。" : "接続が復旧するまで、投稿内容や数値を仮のデータで補いません。"}</p></div>`}</section>
+  ${connected ? renderManualPostSync(data?.manualPosts ?? []) : ""}
+  <section id="morning-report" class="section chapter chapter-performance performance-section"><div class="section-header"><div><div class="card-eyebrow green">PERFORMANCE</div><h2>投稿実績とKPI</h2><p class="section-lead">実際の反応を実測値で確認し、投稿どうしを比較する場所です。</p></div><span class="chapter-icon">${dashboardIcon("chart")}</span></div>${sectionContext("metrics", connected ? `表示 ${typeof totalViews === "number" ? totalViews.toLocaleString("ja-JP") : "計測中"} · KPI ${actualMetricCount}項目 · 比較 ${measured.length}件` : "実データへ接続待ち", metricNext)}<div class="kpi-grid">${metrics.map(([key, label]) => { const value = totalMetric(contents, key); return `<article class="kpi-card"><span>${label}</span><strong>${typeof value === "number" ? value.toLocaleString("ja-JP") : hasMetricObservation ? "取得不可" : "計測中"}</strong><small>${typeof value === "number" ? "取得済み投稿の合計" : hasMetricObservation ? "APIから値が返っていません" : "実値の取得待ち"}</small><div class="kpi-visual">${renderSparkline(contents, key)}</div></article>`; }).join("")}</div>${connected && contents.length ? `<div class="performance-list">${contents.map((content) => `<article><div><span class="origin-chip">${escapeHtml(originLabels[content.origin])}</span><h3>${escapeHtml(content.topic || "テーマ未設定")}</h3><small>${escapeHtml(formatDate(content.publication?.publishedAt ?? null, "未投稿"))} · ${escapeHtml(elapsedLabel(content.publication?.publishedAt ?? null))}</small></div>${renderMetrics(content)}<details><summary>本文を見る</summary><p>${escapeHtml(content.body)}</p></details></article>`).join("")}</div>` : `<div class="empty-state compact"><b>${connected ? "比較できる実績を蓄積中です" : "接続待ち"}</b><p>実値が取得できるまで、推定値やデモ値は表示しません。</p></div>`}</section>
+  <section class="section chapter chapter-visuals visuals-section" aria-label="実績の可視化"><div class="section-header compact-heading"><div><div class="card-eyebrow">VISUAL INSIGHTS</div><h2>実績を図で確認</h2><p class="section-lead">KPI章の補助ビュー。実測値だけで違いを可視化します。</p></div><span class="count-pill">実データのみ</span></div><div class="chart-grid"><article class="chart-card"><div class="chart-title"><div><span class="summary-icon">${dashboardIcon("chart")}</span><b>投稿ごとの表示数</b></div><small>${contents.filter((content) => typeof content.metrics.views === "number").length}件を比較</small></div>${renderViewsChart(contents)}</article><article class="chart-card"><div class="chart-title"><div><span class="summary-icon">${dashboardIcon("pipeline")}</span><b>投稿状態の内訳</b></div><small>現在地</small></div>${renderStatusDonut(contents)}</article></div></section>
+  <section id="insights" class="section chapter chapter-ai report-section"><div class="section-header"><div><div class="card-eyebrow purple">AI IMPROVEMENT REPORT</div><h2>AI改善</h2><p class="section-lead">AIが何を確認し、次の投稿で何を1つ変えるかを整理する場所です。</p></div><span class="chapter-icon">${dashboardIcon("experiment")}</span></div>${sectionContext("hypothesis", connected ? `事実 ${measured.length}件 / 仮説を${measured.length < 2 ? "保留中" : "更新中"}` : "判断材料へ接続待ち", data?.editorial.customerSummary ? "登録済みの次回テストを実行予定" : "比較可能な実績が揃うまで計測")}<div class="decision-grid"><article><span>${dashboardIcon("experiment")}</span><b>今回確認していること</b><p>${connected && measured.length ? `${escapeHtml(measured.slice(0, 3).map((content) => content.topic || roleLabel(content.contentRole)).join("、"))}の実測結果を観測しています。` : "運用データの接続後に表示します。"}</p></article><article><span>${dashboardIcon("hypothesis")}</span><b>結果から見えたこと</b><p>${connected ? escapeHtml(currentHypothesis(contents)) : "接続待ちのため、結果の仮説は表示していません。"}</p></article><article id="operations"><span>${dashboardIcon("next")}</span><b>次回テスト</b><p>${data?.editorial.customerSummary ? "登録済みの改善方針と変更する要素を、詳細レポートで確認できます。" : "変更内容はまだ登録されていません。比較可能な実績が揃った後、1要素に絞ります。"}</p></article></div><div class="analysis-grid"><article class="analysis-box fact"><span class="analysis-icon">${dashboardIcon("fact")}</span><h3>確認できた事実</h3><p>${connected ? `保存 ${contents.length}件・公開 ${published.length}件・KPI取得 ${measured.length}件。` : "実データに接続していません。"}</p></article><article class="analysis-box hypothesis"><span class="analysis-icon">${dashboardIcon("hypothesis")}</span><h3>現時点の仮説</h3><p>${connected ? escapeHtml(currentHypothesis(contents)) : "判断材料を取得できていません。"}</p></article><article class="analysis-box unknown"><span class="analysis-icon">${dashboardIcon("unknown")}</span><h3>まだ判断できないこと</h3><p>${measured.length < 2 ? "投稿間の優劣・勝ちパターン・最適解。" : "本文要素と反応の因果関係、長期的な再現性。"}</p></article><article class="analysis-box next-test"><span class="analysis-icon">${dashboardIcon("next")}</span><h3>検証の原則</h3><p>一度に変える要素は1つ。実値と経過時間をセットで比較します。</p></article></div><a class="report-cta" href="/improvement">AI改善レポートを詳しく見る <span>→</span></a></section>
 </div>
-
-<div class="office-map" data-last-id="${lastId}">
-  <div class="office-map-inner" id="office-map-inner">
-    <img class="office-map-bg" src="/bg/dashboard-bg.png" alt="">
-    <div class="office-map-overlay"></div>
-    ${members.map(renderCharacter).join("")}
-  </div>
-  <div class="office-map-hint">ドラッグでマップを動かせるよ</div>
-</div>
-
-${OFFICE_STYLES}
-
-<script>
-(() => {
-  const map = document.querySelector('.office-map');
-  if (!map) return;
-  const liveText = document.getElementById('watching-text');
-  let lastId = Number(map.dataset.lastId || 0);
-
-  function flash() {
-    if (!liveText) return;
-    liveText.textContent = '更新';
-    setTimeout(() => { liveText.textContent = '見守り中'; }, 1400);
-  }
-  function escHtml(s) {
-    return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
-  }
-
-  function updateChar(payload) {
-    const ch = document.querySelector('.office-character[data-slug="' + payload.slug + '"]');
-    if (!ch) return;
-    const bubble = ch.querySelector('.character-bubble');
-    if (!bubble) return;
-    bubble.classList.remove('completed', 'failed', 'running', 'queued', 'empty');
-    bubble.classList.add(payload.status || 'queued');
-    bubble.innerHTML =
-      '<div class="bubble-intro">「' + escHtml(payload.intro) + '」</div>' +
-      '<div class="bubble-text">' + escHtml(payload.text) + '</div>' +
-      '<div class="bubble-time">' + escHtml(payload.time_ago) + '</div>';
-    ch.classList.add('just-updated');
-    setTimeout(() => ch.classList.remove('just-updated'), 2000);
-  }
-
-  async function fetchNew() {
-    try {
-      const r = await fetch('/api/reflections-since?since=' + lastId);
-      if (!r.ok) return;
-      const data = await r.json();
-      const rows = data.rows || [];
-      if (rows.length === 0) return;
-      const reversed = [...rows].reverse();
-      for (const row of reversed) {
-        try { updateChar(JSON.parse(row.html)); } catch (_) {}
-      }
-      lastId = Math.max(lastId, ...rows.map(r => r.id));
-      map.dataset.lastId = String(lastId);
-      flash();
-    } catch (e) {}
-  }
-
-  const es = new EventSource('/api/events');
-  es.onmessage = (ev) => {
-    try { const m = JSON.parse(ev.data); if (m.hello) return; fetchNew(); } catch (_) {}
-  };
-  es.onerror = () => { if (liveText) liveText.textContent = '再接続中…'; };
-  es.onopen = () => { if (liveText) liveText.textContent = '見守り中'; };
-  setInterval(fetchNew, 15000);
-
-  // ===== Drag-to-pan =====
-  const inner = document.getElementById('office-map-inner');
-  if (!inner) return;
-  const ASPECT = 1600 / 1067;   // 島画像のアスペクト比
-  let tx = 0, ty = 0;
-  let startX = 0, startY = 0;
-  let startTx = 0, startTy = 0;
-  let dragging = false;
-
-  // 画像 inner サイズを viewport に合わせて scale (常に viewport を覆う)
-  function fitInner() {
-    const mapW = map.offsetWidth;
-    const mapH = map.offsetHeight;
-    const baseW = 1600;
-    const baseH = 1067;
-    let w = baseW, h = baseH;
-    // viewport の方が大きい場合は inner を拡大
-    if (mapW > w) { w = mapW; h = w / ASPECT; }
-    if (mapH > h) { h = mapH; w = h * ASPECT; }
-    // 一辺が拡大されたらもう一辺も連動 (cover 風)
-    if (w < mapW) { w = mapW; h = w / ASPECT; }
-    if (h < mapH) { h = mapH; w = h * ASPECT; }
-    inner.style.width  = w + 'px';
-    inner.style.height = h + 'px';
-  }
-
-  function getBounds() {
-    const innerW = inner.offsetWidth;
-    const innerH = inner.offsetHeight;
-    const mapW = map.offsetWidth;
-    const mapH = map.offsetHeight;
-    return {
-      minX: Math.min(0, mapW - innerW),
-      minY: Math.min(0, mapH - innerH),
-      maxX: 0,
-      maxY: 0,
-    };
-  }
-  function clamp(v, min, max) { return Math.max(min, Math.min(max, v)); }
-  function applyTransform() {
-    inner.style.transform = 'translate(' + tx + 'px,' + ty + 'px)';
-  }
-  function center() {
-    fitInner();
-    const b = getBounds();
-    tx = clamp((map.offsetWidth - inner.offsetWidth) / 2, b.minX, b.maxX);
-    ty = clamp((map.offsetHeight - inner.offsetHeight) / 2, b.minY, b.maxY);
-    applyTransform();
-  }
-
-  function onDown(e) {
-    dragging = true;
-    map.classList.add('dragging');
-    const p = e.touches ? e.touches[0] : e;
-    startX = p.clientX; startY = p.clientY;
-    startTx = tx; startTy = ty;
-    if (e.cancelable) e.preventDefault();
-  }
-  function onMove(e) {
-    if (!dragging) return;
-    const p = e.touches ? e.touches[0] : e;
-    const b = getBounds();
-    tx = clamp(startTx + p.clientX - startX, b.minX, b.maxX);
-    ty = clamp(startTy + p.clientY - startY, b.minY, b.maxY);
-    applyTransform();
-    if (e.cancelable) e.preventDefault();
-  }
-  function onUp() {
-    if (!dragging) return;
-    dragging = false;
-    map.classList.remove('dragging');
-  }
-
-  // 初期位置: 中央寄せ (画像読み込み後)
-  if (inner.querySelector('img')?.complete) center();
-  else inner.querySelector('img')?.addEventListener('load', center);
-  window.addEventListener('resize', () => {
-    fitInner();
-    const b = getBounds();
-    tx = clamp(tx, b.minX, b.maxX);
-    ty = clamp(ty, b.minY, b.maxY);
-    applyTransform();
-  });
-
-  map.addEventListener('mousedown', onDown);
-  window.addEventListener('mousemove', onMove);
-  window.addEventListener('mouseup', onUp);
-  map.addEventListener('touchstart', onDown, { passive: false });
-  window.addEventListener('touchmove', onMove, { passive: false });
-  window.addEventListener('touchend', onUp);
-})();
-</script>
-`;
+<div class="drawer-backdrop" id="drawer-backdrop" hidden></div><aside class="post-drawer" id="post-drawer" aria-hidden="true" aria-labelledby="drawer-title"><button class="drawer-close" id="drawer-close" type="button" aria-label="閉じる">×</button><div class="card-eyebrow">POST DETAIL</div><h2 id="drawer-title"></h2><div class="drawer-tags"><span id="drawer-status"></span><span id="drawer-origin"></span></div><div class="drawer-block"><span>投稿本文</span><p id="drawer-body"></p></div><div class="drawer-grid"><div><span>投稿の役割</span><p id="drawer-role"></p></div><div><span>投稿予定・実績</span><p id="drawer-schedule"></p></div><div><span>内容確認</span><p id="drawer-quality"></p></div><div><span>承認状況</span><p id="drawer-approval"></p></div><div><span>公開状況</span><p id="drawer-published"></p></div></div></aside>
+<style>
+.customer-dashboard{max-width:1440px;margin:0 auto}.customer-hero{display:flex;justify-content:space-between;align-items:flex-end;gap:24px;padding:4px 2px 20px}.hero-main h1{font-size:30px;letter-spacing:-.04em;color:#0f172a;text-transform:none;margin:2px 0 6px}.hero-main>p{font-size:14px;font-weight:700;color:#334155;margin-top:13px}.account-line{display:flex;align-items:center;gap:9px;color:#64748b;font-size:12px}.status-badge{display:inline-flex;align-items:center;gap:7px;border-radius:999px;padding:6px 10px;font-size:10px;font-weight:800;background:#ecfdf5;color:#047857}.status-badge i{width:7px;height:7px;border-radius:50%;background:#10b981}.status-badge.waiting{background:#fff7ed;color:#c2410c}.status-badge.waiting i{background:#f59e0b}.hero-update{min-width:210px;padding:13px 15px;border:1px solid #e2e8f0;background:rgba(255,255,255,.75);border-radius:14px;display:grid}.hero-update span,.hero-update small{font-size:9px;color:#94a3b8}.hero-update b{font-size:12px;color:#334155;margin:2px 0}
+.now-grid{display:grid;grid-template-columns:1.35fr repeat(3,1fr);gap:11px;margin-bottom:14px}.now-card{min-width:0;background:#fff;border:1px solid #e2e8f0;border-radius:16px;padding:18px;display:flex;flex-direction:column;box-shadow:var(--shadow-card)}.now-card.primary{background:linear-gradient(135deg,#172554,#1e3a8a);border:0}.now-card span{font-size:9px;font-weight:800;letter-spacing:.08em;color:#64748b}.now-card strong{font-size:15px;color:#0f172a;margin:8px 0 5px;line-height:1.45}.now-card small{font-size:10px;color:#94a3b8}.now-card.primary span,.now-card.primary small{color:#bfdbfe}.now-card.primary strong{color:#fff}
+.workflow-section{display:flex;align-items:center;gap:24px;background:#fff;border-radius:16px;padding:14px 18px;margin-bottom:14px;box-shadow:var(--shadow-card)}.workflow-copy{width:180px;flex:none;display:flex;flex-direction:column}.workflow-copy span{font-size:9px;color:#94a3b8}.workflow-copy b{font-size:11px;color:#334155;margin-top:2px}.journey{display:flex;align-items:center;gap:7px;flex:1}.journey i{height:1px;background:#e2e8f0;flex:1;min-width:8px}.journey-step{display:flex;align-items:center;gap:6px;color:#94a3b8;font-size:10px;white-space:nowrap}.journey-step span{width:23px;height:23px;border-radius:50%;display:grid;place-items:center;background:#f1f5f9;font-size:9px;font-weight:800}.journey-step.done{color:#047857}.journey-step.done span{background:#dcfce7;color:#047857}.journey-step.active{color:#1d4ed8}.journey-step.active span{background:#dbeafe;color:#1d4ed8;box-shadow:0 0 0 4px #eff6ff}
+.section{margin-bottom:14px}.section-header{display:flex;justify-content:space-between;align-items:flex-start;gap:16px}.section-header h2{font-size:19px;color:#0f172a;text-transform:none;letter-spacing:-.02em;margin:0}.section-lead{color:#64748b;font-size:11px;margin-top:4px}.card-eyebrow{font-size:9px;letter-spacing:.14em;font-weight:800;color:#64748b;margin-bottom:6px}.card-eyebrow.green{color:#059669}.card-eyebrow.purple{color:#7c3aed}.count-pill,.hypothesis-pill{padding:6px 10px;border-radius:999px;background:#f1f5f9;color:#475569;font-size:9px;font-weight:800;white-space:nowrap}.hypothesis-pill{background:#fef3c7;color:#92400e}.pipeline-section,.performance-section,.report-section,.manual-sync{padding:22px}.pipeline-head,.pipeline-row{display:grid;grid-template-columns:minmax(210px,1.5fr) minmax(110px,.7fr) minmax(105px,.65fr) minmax(130px,.8fr) minmax(210px,1.25fr) 34px;gap:12px;align-items:center}.pipeline-head{margin-top:18px;padding:0 12px 8px;color:#94a3b8;font-size:9px;font-weight:800}.pipeline-list{border-top:1px solid #e2e8f0}.pipeline-row{padding:13px 12px;border-bottom:1px solid #edf2f7;cursor:pointer;outline:none;border-radius:10px}.pipeline-row:hover,.pipeline-row:focus{background:#f8fafc}.pipeline-topic{display:flex;flex-direction:column;min-width:0}.topic-name{font-size:11.5px;font-weight:800;color:#0f172a;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.pipeline-topic small,.schedule-cell small{font-size:9px;color:#94a3b8;margin-top:3px}.origin-chip{display:inline-flex;padding:4px 7px;border-radius:7px;background:#eff6ff;color:#1d4ed8;font-size:9px;font-weight:800}.schedule-cell{display:flex;flex-direction:column}.schedule-cell b{font-size:10px;color:#334155}.detail-button{border:0;background:#f1f5f9;width:28px;height:28px;border-radius:9px;cursor:pointer;font-size:20px;color:#475569}.measuring{display:inline-flex;padding:5px 8px;border-radius:7px;background:#f1f5f9;color:#64748b;font-size:9px;font-weight:800}.actual-metrics{display:flex;gap:4px;flex-wrap:wrap}.actual-metric{display:flex;flex-direction:column;padding:4px 6px;border-radius:7px;background:#ecfdf5;color:#065f46;font-size:10px;font-weight:800}.actual-metric b{font-size:7.5px;color:#059669}.actual-metric.normalized{background:#eff6ff;color:#1d4ed8}.actual-metric.normalized b{color:#3b82f6}.empty-state{text-align:center;padding:34px 18px;margin-top:18px;border:1px dashed #cbd5e1;border-radius:14px;background:#f8fafc}.empty-state b{font-size:13px;color:#334155}.empty-state p{font-size:10.5px;color:#64748b;margin-top:5px}.empty-state.compact{padding:22px}
+.actual-metric.unavailable{background:#f8fafc;color:#94a3b8}.actual-metric.unavailable b{color:#94a3b8}.metric-updated{flex-basis:100%;font-size:8.5px;color:#94a3b8;margin-top:2px}
+.manual-sync ul{list-style:none;padding:0;margin:16px 0 0;display:grid;gap:8px}.manual-sync li{display:grid;grid-template-columns:minmax(0,1fr) auto auto;align-items:center;gap:8px;padding:11px 12px;border-radius:11px;background:#f8fafc}.manual-copy{min-width:0;display:flex;flex-direction:column}.manual-copy>b{font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#334155}.manual-copy small{font-size:9px;color:#94a3b8;margin-top:3px}.manual-copy details{margin-top:8px}.manual-copy summary{font-size:9px;color:#475569;cursor:pointer}.manual-copy details p{font-size:9.5px;white-space:normal;margin-top:5px}.manual-state{padding:5px 8px;border-radius:999px;font-size:8.5px;font-weight:800;white-space:nowrap}.manual-state.on{background:#dcfce7;color:#047857}.manual-state.wait{background:#fff7ed;color:#c2410c}.manual-state.off{background:#f1f5f9;color:#64748b}.empty-inline{margin-top:14px;padding:13px;border-radius:10px;background:#f8fafc;color:#64748b;font-size:10.5px}
+.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin-top:17px}.kpi-card{border:1px solid #e2e8f0;border-radius:13px;padding:14px;background:#fff;display:flex;flex-direction:column}.kpi-card span{font-size:9px;font-weight:800;color:#64748b}.kpi-card strong{font-size:22px;color:#0f172a;margin:4px 0}.kpi-card small{font-size:8.5px;color:#94a3b8}.performance-list{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-top:12px}.performance-list>article{border:1px solid #e2e8f0;border-radius:13px;padding:14px;min-width:0}.performance-list h3{font-size:11.5px;color:#0f172a;margin:7px 0 2px}.performance-list small{font-size:9px;color:#94a3b8}.performance-list .actual-metrics{margin-top:10px}.performance-list details{margin-top:10px;border-top:1px solid #f1f5f9;padding-top:8px}.performance-list summary{font-size:9px;font-weight:800;color:#475569;cursor:pointer}.performance-list details p{font-size:10px;line-height:1.7;color:#334155;white-space:pre-line;max-height:180px;overflow:auto;margin-top:7px}
+.decision-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-top:18px}.decision-grid article{display:flex;gap:10px;padding:15px;border-radius:13px;background:#f8fafc}.decision-grid article>span{font-size:9px;font-weight:800;color:#7c3aed}.decision-grid b{font-size:11px;color:#0f172a}.decision-grid p{font-size:10.5px;line-height:1.65;color:#475569;margin-top:5px}.analysis-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin-top:10px}.analysis-box{border-radius:12px;padding:13px;border:1px solid #e2e8f0;background:#fff}.analysis-box h3{font-size:10.5px;color:#0f172a;margin:0 0 7px}.analysis-box p{font-size:10px;line-height:1.6;color:#475569}.analysis-box.fact{border-top:3px solid #10b981}.analysis-box.hypothesis{border-top:3px solid #8b5cf6}.analysis-box.unknown{border-top:3px solid #f59e0b}.analysis-box.next-test{border-top:3px solid #3b82f6}
+.report-cta{display:flex;align-items:center;justify-content:space-between;margin-top:12px;padding:13px 15px;border:1px solid var(--c-line);border-radius:12px;background:color-mix(in srgb,var(--c-brand) 8%,var(--c-panel));color:var(--c-brand);font-size:11px;font-weight:800;text-decoration:none}.report-cta:hover{border-color:var(--c-brand);transform:translateY(-1px)}.report-cta span{font-size:18px}.drawer-backdrop{position:fixed;inset:0;background:rgba(15,23,42,.28);z-index:50;backdrop-filter:blur(2px)}.post-drawer{position:fixed;right:0;top:0;bottom:0;width:min(500px,92vw);background:#fff;z-index:51;padding:32px;overflow-y:auto;transform:translateX(104%);transition:transform .24s ease;box-shadow:-20px 0 50px rgba(15,23,42,.16)}.post-drawer.open{transform:translateX(0)}.drawer-close{position:absolute;right:20px;top:18px;width:32px;height:32px;border:0;border-radius:50%;background:#f1f5f9;font-size:20px;cursor:pointer}.post-drawer>h2{font-size:22px;color:#0f172a;text-transform:none;margin:0 0 10px}.drawer-tags{display:flex;gap:7px;margin-bottom:14px}.drawer-tags span{padding:5px 8px;border-radius:7px;background:#f1f5f9;color:#475569;font-size:9px;font-weight:800}.drawer-block,.drawer-grid>div{background:#f8fafc;border-radius:12px;padding:14px}.drawer-block>span,.drawer-grid span{display:block;font-size:9px;font-weight:800;color:#94a3b8;margin-bottom:5px}.drawer-block p{white-space:pre-line;color:#334155;font-size:12px;line-height:1.8}.drawer-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}.drawer-grid p{font-size:11px;color:#334155}
+@media(max-width:1180px){.now-grid{grid-template-columns:1fr 1fr}.workflow-section{align-items:flex-start;flex-direction:column;gap:10px}.workflow-copy{width:auto}.journey{width:100%;overflow-x:auto;padding:4px}.pipeline-head{display:none}.pipeline-row{grid-template-columns:minmax(190px,1.3fr) minmax(100px,.7fr) minmax(100px,.6fr) minmax(130px,.8fr) minmax(180px,1fr) 34px;min-width:930px}.pipeline-list{overflow-x:auto}.performance-list{grid-template-columns:repeat(2,1fr)}.analysis-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:900px){.customer-hero{align-items:flex-start;flex-direction:column}.hero-update{width:100%}.kpi-grid,.decision-grid{grid-template-columns:1fr 1fr}.manual-sync li{grid-template-columns:1fr}.manual-state{width:max-content}}
+@media(max-width:640px){.customer-shell .app{display:block;padding:10px}.customer-shell .sidebar{position:static;width:100%;height:auto;padding:11px 13px;margin-bottom:8px;border-radius:15px;display:flex;flex-direction:row;align-items:center;justify-content:space-between}.customer-shell .sidebar-header{padding:0}.customer-shell .sidebar-header .brand{font-size:13px}.customer-shell .sidebar-header .brand-mark{width:34px;height:34px}.customer-shell .sidebar-header .brand-mark img{width:34px;height:34px}.customer-shell .sidebar-header .brand-sub,.customer-shell .sidebar-nav{display:none}.customer-shell .sidebar-footer{padding:0;margin:0}.customer-shell .sys-status-card{padding:7px 9px}.customer-shell .sys-status-label{display:none}.customer-shell .main{padding:12px 2px 24px}.hero-main h1{font-size:24px}.now-grid,.kpi-grid,.decision-grid,.performance-list,.analysis-grid{grid-template-columns:1fr}.workflow-section{padding:12px}.journey{align-items:flex-start}.journey i{min-width:14px;margin-top:11px}.journey-step{flex-direction:column;gap:3px}.journey-step b{font-size:8.5px}.pipeline-section,.performance-section,.report-section,.manual-sync{padding:17px}.pipeline-list{overflow:visible}.pipeline-row{position:relative;min-width:0;grid-template-columns:1fr;gap:8px;padding:15px 46px 15px 10px}.pipeline-row .detail-button{position:absolute;right:9px;top:14px}.pipeline-topic{padding-right:4px}.section-header{flex-direction:column}.post-drawer{padding:25px}.drawer-grid{grid-template-columns:1fr}}
+/* UX08: chapter hierarchy and explicit What / Now / Next context */
+.chapter{--chapter-accent:var(--c-brand);position:relative;margin:0 0 34px;padding:30px;border:1px solid color-mix(in srgb,var(--chapter-accent) 18%,var(--c-line));border-radius:24px;background:linear-gradient(145deg,color-mix(in srgb,var(--chapter-accent) 7%,var(--c-panel)),var(--c-panel) 44%);box-shadow:0 18px 42px color-mix(in srgb,var(--chapter-accent) 8%,transparent)}
+.chapter:before{content:'';position:absolute;left:30px;right:30px;top:-18px;height:1px;background:linear-gradient(90deg,transparent,color-mix(in srgb,var(--chapter-accent) 40%,var(--c-line)),transparent)}.chapter:first-of-type:before{display:none}
+.chapter-today{--chapter-accent:#2563eb}.chapter-pipeline{--chapter-accent:#0f766e}.chapter-manual{--chapter-accent:#d97706}.chapter-performance{--chapter-accent:#059669}.chapter-visuals{--chapter-accent:#0891b2}.chapter-ai{--chapter-accent:#7c3aed}
+.chapter .section-header{align-items:center}.chapter .section-header h2{font-size:27px;color:var(--c-text)}.chapter .section-lead{max-width:760px;font-size:15px;line-height:1.6;color:var(--c-muted)}.chapter .card-eyebrow{font-size:13px;color:var(--chapter-accent)}
+.chapter-icon,.section-context-icon{display:grid;place-items:center;flex:none;color:var(--chapter-accent);background:color-mix(in srgb,var(--chapter-accent) 11%,var(--c-panel));border:1px solid color-mix(in srgb,var(--chapter-accent) 20%,var(--c-line))}.chapter-icon{width:54px;height:54px;border-radius:17px}.chapter-icon .ui-icon{width:27px;height:27px}
+.section-context{display:grid;grid-template-columns:42px minmax(0,1fr) minmax(0,1fr);gap:14px;align-items:stretch;margin:20px 0 24px;padding:14px;border:1px solid color-mix(in srgb,var(--chapter-accent) 17%,var(--c-line));border-radius:16px;background:color-mix(in srgb,var(--c-panel) 82%,transparent)}.section-context-icon{width:42px;height:42px;align-self:center;border-radius:13px}.section-context>div{display:flex;flex-direction:column;justify-content:center;min-width:0;padding:3px 14px;border-left:1px solid var(--c-line-soft)}.section-context small{font-size:13px;font-weight:800;letter-spacing:.05em;color:var(--chapter-accent)}.section-context b{margin-top:4px;font-size:15px;line-height:1.5;color:var(--c-text-2)}
+.chapter .now-grid{margin:0}.chapter .workflow-section{margin:0 0 22px;border:1px solid var(--c-line);background:var(--c-raised);box-shadow:none}.chapter-visuals{margin-top:-18px}.chapter .compact-heading{margin-bottom:22px}.chapter .now-card,.chapter .kpi-card,.chapter .performance-list>article,.chapter .chart-card,.chapter .decision-grid article,.chapter .analysis-box{background:var(--c-raised);border-color:var(--c-line)}
+html[data-customer-theme="dark"] .chapter{box-shadow:0 18px 42px rgba(0,0,0,.2)}html[data-customer-theme="dark"] .chapter-today{--chapter-accent:#60a5fa}html[data-customer-theme="dark"] .chapter-pipeline{--chapter-accent:#2dd4bf}html[data-customer-theme="dark"] .chapter-manual{--chapter-accent:#fbbf24}html[data-customer-theme="dark"] .chapter-performance{--chapter-accent:#34d399}html[data-customer-theme="dark"] .chapter-visuals{--chapter-accent:#22d3ee}html[data-customer-theme="dark"] .chapter-ai{--chapter-accent:#a78bfa}
+@media(max-width:700px){.chapter{margin-bottom:28px;padding:20px;border-radius:20px}.chapter:before{left:20px;right:20px}.chapter .section-header{flex-direction:row;align-items:flex-start}.chapter .section-header h2{font-size:25px}.chapter-icon{width:46px;height:46px;border-radius:14px}.section-context{grid-template-columns:38px 1fr;gap:10px}.section-context-icon{width:38px;height:38px}.section-context>div{padding:3px 9px}.section-context>div:last-child{grid-column:2}.section-context small{font-size:12px}.section-context b{font-size:14px}.chapter-visuals{margin-top:-12px}}
+${customerDashboardStyles}
+</style>
+<script>(()=>{${customerThemeScript}const posts=${safeContents};const drawer=document.getElementById('post-drawer'),backdrop=document.getElementById('drawer-backdrop'),closeButton=document.getElementById('drawer-close');function openPost(index){const p=posts[index];if(!p||!drawer||!backdrop)return;document.getElementById('drawer-title').textContent=p.topic;document.getElementById('drawer-status').textContent=p.status;document.getElementById('drawer-origin').textContent=p.origin;document.getElementById('drawer-body').textContent=p.body;document.getElementById('drawer-role').textContent=p.role;document.getElementById('drawer-schedule').textContent=p.schedule;document.getElementById('drawer-quality').textContent=p.quality;document.getElementById('drawer-approval').textContent=p.approval;document.getElementById('drawer-published').textContent=p.published;backdrop.hidden=false;drawer.classList.add('open');drawer.setAttribute('aria-hidden','false');closeButton?.focus()}function closePost(){if(!drawer||!backdrop)return;drawer.classList.remove('open');drawer.setAttribute('aria-hidden','true');backdrop.hidden=true}document.querySelectorAll('.post-row').forEach(row=>{row.addEventListener('click',()=>openPost(Number(row.dataset.postIndex)));row.addEventListener('keydown',event=>{if(event.key==='Enter'||event.key===' '){event.preventDefault();openPost(Number(row.dataset.postIndex))}})});closeButton?.addEventListener('click',closePost);backdrop?.addEventListener('click',closePost);document.addEventListener('keydown',event=>{if(event.key==='Escape')closePost()})})();</script>`;
 }
-
-function renderCharacter(m: MemberRow): string {
-  const pos = POSITIONS[m.slug] || { left: 50, top: 50 };
-  const sk = statusKey(m.refl_status);
-  const hasActivity = m.refl_id != null;
-  const intro = hasActivity && m.refl_status ? pickIntro(m.refl_status, m.refl_id!) : "";
-  const rawText = m.refl_what_done || m.refl_result_summary || m.refl_error_message || "";
-  const text = rawText ? shortenContent(rawText) : "";
-  const timeStr = m.refl_created_at ? timeAgo(m.refl_created_at) : "";
-
-  return `<div class="office-character" data-slug="${escapeHtml(m.slug)}"
-    style="left:${pos.left}%; top:${pos.top}%;">
-    <div class="character-bubble ${hasActivity ? sk : "empty"}">
-      ${
-        hasActivity
-          ? `<div class="bubble-intro">「${escapeHtml(intro)}」</div>
-             <div class="bubble-text">${escapeHtml(text)}</div>
-             <div class="bubble-time">${escapeHtml(timeStr)}</div>`
-          : `<div class="bubble-empty">アイドル中</div>`
-      }
-    </div>
-    <div class="character-figure">
-      ${
-        m.avatar_url
-          ? `<img class="character-avatar" src="${escapeHtml(m.avatar_url)}" alt="${escapeHtml(m.pokemon_jp)}">`
-          : `<span class="character-avatar placeholder"></span>`
-      }
-      <div class="character-name">${escapeHtml(m.pokemon_jp)}</div>
-    </div>
-  </div>`;
-}
-
-const OFFICE_STYLES = `<style>
-.watching-pill {
-  display: inline-flex; align-items: center; gap: 8px;
-  padding: 6px 14px;
-  background: #fff;
-  border-radius: 999px;
-  box-shadow: var(--shadow-card);
-  font-size: 12px;
-  font-weight: 700;
-  color: #475569;
-}
-.watching-dot {
-  width: 8px; height: 8px;
-  border-radius: 50%;
-  background: #10b981;
-  box-shadow: 0 0 0 4px rgba(16,185,129,0.18);
-  animation: watching-pulse 1.8s ease-in-out infinite;
-}
-@keyframes watching-pulse {
-  0%, 100% { box-shadow: 0 0 0 4px rgba(16,185,129,0.18); }
-  50% { box-shadow: 0 0 0 8px rgba(16,185,129,0); }
-}
-
-/* このページだけ .main + 内側 #live-content をフレックス化して map に残り高さを渡す */
-.main:has(.office-map) {
-  display: flex;
-  flex-direction: column;
-  height: calc(100vh - 40px);
-  padding-bottom: 0;
-  overflow: hidden;
-}
-.main:has(.office-map) > #live-content {
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-  min-height: 0;
-}
-.main:has(.office-map) .page-header { flex-shrink: 0; }
-
-/* マップエリア — サイドバー下端まで延ばして、内部ドラッグでパン */
-.office-map {
-  position: relative;
-  width: 100%;
-  flex: 1;
-  min-height: 0;
-  border-radius: var(--r-md);
-  overflow: hidden;
-  box-shadow: var(--shadow-card);
-  background: #cfeaff;
-  cursor: grab;
-  user-select: none;
-  -webkit-user-select: none;
-  touch-action: none;
-  margin-bottom: 0;
-}
-.office-map.dragging { cursor: grabbing; }
-
-/* 内側のスクロール可能 inner — 大きめサイズで、translate で動かす */
-.office-map-inner {
-  position: absolute;
-  top: 0; left: 0;
-  width: 1600px;
-  height: 1067px;
-  will-change: transform;
-  transform-origin: 0 0;
-}
-.office-map-bg {
-  position: absolute; inset: 0;
-  width: 100%; height: 100%;
-  object-fit: cover;
-  display: block;
-  pointer-events: none;
-}
-.office-map-overlay {
-  position: absolute; inset: 0;
-  background: linear-gradient(180deg, rgba(244,247,254,0) 0%, rgba(244,247,254,0.10) 100%);
-  pointer-events: none;
-}
-
-/* 操作ヒント (右下) */
-.office-map-hint {
-  position: absolute;
-  right: 12px; bottom: 12px;
-  background: rgba(15,23,42,0.78);
-  color: #fff;
-  font-size: 10.5px;
-  font-weight: 700;
-  padding: 5px 12px;
-  border-radius: 999px;
-  pointer-events: none;
-  z-index: 100;
-  letter-spacing: 0.02em;
-  opacity: 0.7;
-  transition: opacity 0.3s ease;
-}
-.office-map.dragging .office-map-hint { opacity: 0; }
-
-/* キャラクター = avatar + 名前 + 吹き出し */
-.office-character {
-  position: absolute;
-  transform: translate(-50%, -50%);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  z-index: 5;
-  transition: z-index 0s;
-}
-.office-character:hover { z-index: 20; }
-.office-character.just-updated .character-figure {
-  animation: char-bounce 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
-}
-@keyframes char-bounce {
-  0%   { transform: translateY(0); }
-  40%  { transform: translateY(-10px); }
-  70%  { transform: translateY(2px); }
-  100% { transform: translateY(0); }
-}
-
-.character-figure {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  filter: drop-shadow(0 4px 8px rgba(15,23,42,0.25));
-  transition: transform 0.25s cubic-bezier(0.34, 1.6, 0.64, 1);
-  cursor: pointer;
-}
-.office-character:hover .character-figure { transform: scale(1.1); }
-
-.character-avatar {
-  width: 52px; height: 52px;
-  border-radius: 14px;
-  background: rgba(255,255,255,0.9);
-  object-fit: cover;
-  display: block;
-  box-shadow: 0 0 0 3px rgba(255,255,255,0.85);
-}
-.character-avatar.placeholder { display: block; }
-.character-name {
-  margin-top: 4px;
-  padding: 1px 8px;
-  background: rgba(15,23,42,0.78);
-  color: #fff;
-  font-size: 10.5px;
-  font-weight: 800;
-  border-radius: 999px;
-  white-space: nowrap;
-  letter-spacing: 0.01em;
-}
-
-/* 吹き出しは avatar の上 */
-.character-bubble {
-  position: absolute;
-  bottom: calc(100% + 6px);
-  left: 50%;
-  transform: translateX(-50%);
-  width: 200px;
-  padding: 8px 12px 10px;
-  border-radius: 14px;
-  background: #ffffff;
-  box-shadow: 0 4px 12px rgba(15,23,42,0.18);
-  font-size: 11px;
-  line-height: 1.5;
-  pointer-events: none;
-  opacity: 0;
-  transition: opacity 0.4s ease, transform 0.4s ease;
-  transform: translateX(-50%) translateY(4px);
-}
-/* 活動済み → 吹き出し常時表示。empty → hover のみ */
-.office-character .character-bubble.completed,
-.office-character .character-bubble.failed,
-.office-character .character-bubble.running {
-  opacity: 1;
-  transform: translateX(-50%) translateY(0);
-}
-.office-character:hover .character-bubble {
-  opacity: 1 !important;
-  transform: translateX(-50%) translateY(0) !important;
-  z-index: 30;
-}
-
-.character-bubble::after {
-  content: "";
-  position: absolute;
-  top: 100%; left: 50%; margin-left: -6px;
-  border-top: 7px solid #ffffff;
-  border-left: 6px solid transparent;
-  border-right: 6px solid transparent;
-}
-.character-bubble.completed { background: #f0fdf4; box-shadow: 0 4px 12px rgba(16,185,129,0.25); }
-.character-bubble.completed::after { border-top-color: #f0fdf4; }
-.character-bubble.failed { background: #fef2f2; box-shadow: 0 4px 12px rgba(239,68,68,0.25); }
-.character-bubble.failed::after { border-top-color: #fef2f2; }
-.character-bubble.running { background: #eff6ff; box-shadow: 0 4px 12px rgba(59,130,246,0.25); }
-.character-bubble.running::after { border-top-color: #eff6ff; }
-
-.bubble-intro {
-  font-size: 11.5px;
-  font-weight: 800;
-  color: #0f172a;
-  margin-bottom: 2px;
-  letter-spacing: -0.005em;
-}
-.character-bubble.failed .bubble-intro { color: #b91c1c; }
-.bubble-text {
-  font-size: 10.5px;
-  color: #334155;
-  font-weight: 500;
-  line-height: 1.4;
-}
-.bubble-time {
-  font-size: 9.5px;
-  color: #94a3b8;
-  font-weight: 700;
-  margin-top: 4px;
-  text-align: right;
-}
-.bubble-empty {
-  font-size: 10.5px;
-  color: #94a3b8;
-  font-weight: 600;
-  font-style: italic;
-}
-</style>`;
-

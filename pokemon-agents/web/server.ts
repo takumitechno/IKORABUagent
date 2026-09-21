@@ -1,11 +1,11 @@
 #!/usr/bin/env bun
 /**
- * Pokemon Agents Dashboard Server
+ * =LOVE Agent OS Dashboard Server
  *
  * Bun.serve() で HTTP server を起動。
  * - scheduler と統合: 同じプロセスで heartbeat tick も実行
- * - localhost 専用、auth なし
- * - bun:sqlite で .claude/db/agents.db を直接読み書き
+ * - 既定は localhost 専用。外部入口は Cloudflare Access 前提
+ * - bun:sqlite で ignored runtime DB を直接読み書き
  * - HTML を SSR (テンプレート文字列、ビルド不要)
  *
  * 起動: bun pokemon-agents/web/server.ts
@@ -18,6 +18,8 @@ import { fileURLToPath } from "url";
 import { startScheduler } from "../runtime/scheduler-loop";
 import { renderLayout, escapeHtml } from "./components/layout";
 import { renderOverview } from "./routes/overview";
+import { renderImprovementReport } from "./routes/improvement-report";
+import { renderInternalOperations } from "./routes/internal-operations";
 import { renderAgents } from "./routes/agents";
 import { renderHeartbeat } from "./routes/heartbeat";
 import { renderApprovalActions } from "./routes/approvalActions";
@@ -30,7 +32,15 @@ import { renderDomainKnowledge, reindexKnowledge } from "./routes/domain-knowled
 import { syncLaunchdToDb } from "./lib/launchd-sync";
 import { saveSchedule, toggleSchedule, readScheduleTimes, type TimeSpec } from "./lib/schedule-writer";
 import { classifyActor, buildAgentLookup } from "./lib/actors";
+import {
+  accountAllowed, createDashboardAuthConfig, csrfToken, isPublicDashboardPath,
+  mutationAllowed, resolveInternalIdentity,
+} from "./lib/internal-auth";
+import {
+  configureManualPostPolicy, getThreadsAccounts, getThreadsDashboard,
+} from "./lib/threads-dashboard";
 import { sseHandler } from "./sse";
+import { ensureRuntimeDb, resolveAgentsDbPath } from "../runtime/db-path";
 
 function getBadges(db: Database): {
   approvals: number;
@@ -81,8 +91,26 @@ function getBadges(db: Database): {
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = resolve(__dirname, "..", "..");
-const DB_PATH = process.env.AGENTS_DB_PATH || resolve(REPO_ROOT, ".claude/db/agents.db");
+const DB_PATH = ensureRuntimeDb(resolveAgentsDbPath());
 const PORT = Number(process.env.POKEMON_AGENTS_PORT || 5733);
+const HOST = process.env.POKEMON_AGENTS_HOST || "127.0.0.1";
+const DEFAULT_THREADS_ACCOUNT = process.env.THREADS_DASHBOARD_ACCOUNT_ID || "acct_8ssana";
+const INTERNAL_AUTH = createDashboardAuthConfig(process.env, HOST);
+
+function internalAccessAllowed(req: Request): boolean {
+  return resolveInternalIdentity(req, INTERNAL_AUTH) !== null;
+}
+
+async function internalAccount(requested: string | null) {
+  const accounts = (await getThreadsAccounts()).filter((account) => accountAllowed(account.accountId, INTERNAL_AUTH));
+  const allowed = new Set(accounts.map((account) => account.accountId));
+  const selected = requested && allowed.has(requested)
+    ? requested
+    : allowed.has(DEFAULT_THREADS_ACCOUNT)
+      ? DEFAULT_THREADS_ACCOUNT
+      : accounts[0]?.accountId ?? DEFAULT_THREADS_ACCOUNT;
+  return { accounts, selected };
+}
 
 const db = new Database(DB_PATH);
 db.exec("PRAGMA journal_mode = WAL");
@@ -123,8 +151,8 @@ function hydrateSessionSource(db: Database): void {
 }
 
 function extractAgentFromPrompt(prompt: string): string | null {
-  // prompt 例: "/Users/tom/dev/hojokin-db/.claude/agents/_seo-metrics/abra-seo-report/agent.md を読み..."
-  const m = prompt.match(/\.claude\/agents\/(?:_[a-z-]+\/)?([a-z][a-z0-9-]+)\/agent\.md/);
+  // prompt例: ".claude/agents/iori-validator.md を読み..."
+  const m = prompt.match(/\.claude\/agents\/(?:_[a-z-]+\/)?([a-z][a-z0-9-]+)(?:\/agent)?\.md/);
   return m ? m[1] : null;
 }
 
@@ -203,14 +231,46 @@ function resolveSessionAttribution(
 
 const server = Bun.serve({
   port: PORT,
-  hostname: "127.0.0.1", // localhost のみ
+  hostname: HOST,
   async fetch(req) {
     const url = new URL(req.url);
     const path = url.pathname;
 
     try {
+      const identity = resolveInternalIdentity(req, INTERNAL_AUTH);
+      if (!isPublicDashboardPath(path) && !identity) {
+        return new Response("Unauthorized", { status: 401 });
+      }
+      const isMutation = !["GET", "HEAD", "OPTIONS"].includes(req.method)
+        || path === "/api/reindex-knowledge";
+      if (isMutation && !isPublicDashboardPath(path)
+        && (!identity || !(await mutationAllowed(req, identity, INTERNAL_AUTH)))) {
+        return new Response("Forbidden", { status: 403 });
+      }
       // POST: approve / reject / schedule / budget actions / hook ingestion
       if (req.method === "POST") {
+        if (path === "/api/internal/manual-policy") {
+          try {
+            const form = await req.formData();
+            const accountId = String(form.get("account_id") || "");
+            const selection = await internalAccount(accountId);
+            if (selection.selected !== accountId) return new Response("invalid account", { status: 400 });
+            const origin = String(form.get("origin") || "");
+            if (!(["ai_auto", "ai_manual", "human_manual"] as string[]).includes(origin)) {
+              return new Response("invalid origin", { status: 400 });
+            }
+            await configureManualPostPolicy({
+              accountId,
+              detectionId: String(form.get("detection_id") || ""),
+              origin: origin as "ai_auto" | "ai_manual" | "human_manual",
+              analyzeEnabled: form.has("analyze_enabled"),
+              learnEnabled: form.has("learn_enabled"),
+            });
+            return redirect(`/internal?account_id=${encodeURIComponent(accountId)}`);
+          } catch {
+            return new Response("Manual Post Sync の設定更新に失敗しました。Bridge接続と入力を確認してください。", { status: 502 });
+          }
+        }
         // Claude Code hook: POST /event/{PreToolUse,PostToolUse,UserPromptSubmit,SessionStart,Stop}
         if (path.startsWith("/event/")) {
           const hookEvent = path.slice("/event/".length);
@@ -320,17 +380,28 @@ const server = Bun.serve({
           );
           return redirect("/agents?view=list");
         }
+        if (path === "/api/reindex-knowledge") {
+          const result = reindexKnowledge(db);
+          return new Response(JSON.stringify(result), { headers: { "Content-Type": "application/json" } });
+        }
         return new Response("Not Found", { status: 404 });
       }
 
+      if (path === "/health") {
+        return new Response(JSON.stringify({ status: "ok" }), {
+          headers: { "Content-Type": "application/json" },
+        });
+      }
       // Static styles
       if (path === "/styles.css") {
         return new Response(stylesheet(), {
           headers: { "Content-Type": "text/css" },
         });
       }
-      // Static assets under public/ (bg/*, hero/*)
-      if (path.startsWith("/bg/") || path.startsWith("/hero/")) {
+      // Static assets under public/. internal-assets/* shares the /internal
+      // access boundary above and is never referenced by the customer route.
+      if (path.startsWith("/brand/") || path.startsWith("/bg/") || path.startsWith("/hero/")
+        || path.startsWith("/internal-assets/")) {
         if (path.includes("..")) return new Response("Not Found", { status: 404 });
         const file = Bun.file(`${import.meta.dir}/public${path}`);
         if (await file.exists()) {
@@ -351,7 +422,7 @@ const server = Bun.serve({
         });
       }
       if (path === "/api/fragments/dashboard") {
-        return new Response(renderOverview(db), {
+        return new Response(renderOverview(db, await getThreadsDashboard()), {
           headers: { "Content-Type": "text/html; charset=utf-8" },
         });
       }
@@ -374,7 +445,7 @@ const server = Bun.serve({
           headers: { "Content-Type": "application/json" },
         });
       }
-      // /api/reflections-since?since=<id> — 新しい reflections (= ポケモンの活動報告) を返す
+      // /api/reflections-since?since=<id> — 新しいAgent reflectionを返す
       if (path === "/api/reflections-since") {
         const sinceId = Number(url.searchParams.get("since") || "0");
         const { fetchReflectionsSince, renderReflectionPost } = await import("./routes/overview");
@@ -415,10 +486,25 @@ const server = Bun.serve({
       const badges = getBadges(db);
       const currentPath = path + (url.search || "");
       const lay = (title: string, body: string) =>
-        html(renderLayout({ title, body, currentPath, badges }));
+        html(renderLayout({
+          title,
+          body,
+          currentPath,
+          badges,
+          internalAccessAllowed: internalAccessAllowed(req),
+          csrfToken: !isPublicDashboardPath(path) && identity ? csrfToken(identity, INTERNAL_AUTH) : undefined,
+        }));
 
       // ===== 4-menu structure =====
-      if (path === "/" || path === "") return lay("Dashboard", renderOverview(db));
+      if (path === "/internal") {
+        const selection = await internalAccount(url.searchParams.get("account_id"));
+        return lay(
+          "=LOVE Agent OS",
+          renderInternalOperations(db, await getThreadsDashboard(selection.selected), selection.accounts),
+        );
+      }
+      if (path === "/" || path === "") return lay("Dashboard", renderOverview(db, await getThreadsDashboard()));
+      if (path === "/improvement") return lay("AI改善レポート", renderImprovementReport(await getThreadsDashboard()));
       // ===== Flat URL = DB table name =====
       // /agents       (table: agents)         一覧 (default) — ?view=org で組織図
       // /schedules    (table: agent_schedules) スケジュール
@@ -456,11 +542,6 @@ const server = Bun.serve({
         const { renderReports } = await import("./routes/reports");
         return lay("日報", renderReports(db, url.searchParams));
       }
-      if (path === "/api/reindex-knowledge") {
-        const result = reindexKnowledge(db);
-        return new Response(JSON.stringify(result), { headers: { "Content-Type": "application/json" } });
-      }
-
       // ===== Legacy redirects =====
       if (path === "/runs") return redirect("/reflections");
       if (path === "/events") return redirect("/logs");
@@ -488,9 +569,9 @@ const server = Bun.serve({
   },
 });
 
-console.log(`[pokemon-agents] dashboard ready at http://localhost:${server.port}/`);
-console.log(`[pokemon-agents] db: ${DB_PATH}`);
-console.log(`[pokemon-agents] scheduler: ${process.env.POKEMON_AGENTS_SCHEDULER === "off" ? "DISABLED" : "running"}`);
+console.log(`[=LOVE Agent OS] dashboard ready at http://${HOST}:${server.port}/`);
+console.log(`[=LOVE Agent OS] db: ${DB_PATH}`);
+console.log(`[=LOVE Agent OS] scheduler: ${process.env.POKEMON_AGENTS_SCHEDULER === "off" ? "DISABLED" : "running"}`);
 
 // ゾンビ reflection の自動回収 (process 死亡 + DB が running のまま放置されたもの)
 //   ・boot 時に 1 回 + 30 分毎の定期スキャン
@@ -654,12 +735,43 @@ strong, b { font-weight: 700; color: #000; }
 .sidebar-header .brand-mark {
   width: 34px; height: 34px;
   display: inline-flex; align-items: center; justify-content: center;
-  color: #EF4444;
-  background: #FEE2E2;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
   border-radius: var(--r-sm);
+  overflow: hidden;
 }
-.sidebar-header .brand-mark svg { width: 19px; height: 19px; }
+.sidebar-header .brand-mark img { width: 30px; height: 30px; object-fit: contain; display: block; }
+.customer-shell .sidebar-header .brand-mark {
+  width: 40px; height: 40px;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  overflow: visible;
+}
+.customer-shell .sidebar-header .brand-mark img { width: 40px; height: 40px; }
+.customer-shell .sidebar-header .brand-sub { padding-left: 52px; }
 .sidebar-header .brand-sub { color: var(--muted); font-size: 11.5px; margin-top: 6px; padding-left: 46px; font-weight: 600; }
+
+.internal-home-button {
+  margin: 0 4px 2px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 5px 14px rgba(15,23,42,0.06);
+}
+.office-back-button {
+  margin: 0 4px 2px;
+  border: 1px solid var(--c-line, #cbd5e1);
+  background: var(--c-panel-soft, #f8fafc);
+  color: var(--c-text, #0f172a);
+  box-shadow: 0 5px 14px rgba(15,23,42,0.06);
+}
+.office-back-button:hover {
+  border-color: var(--c-faint, #94a3b8);
+  background: var(--c-panel, #f1f5f9);
+}
+.internal-home-button.active {
+  border-color: #0f172a;
+  box-shadow: 0 7px 18px rgba(15,23,42,0.16);
+}
 
 .sidebar-nav { flex: 1; overflow-y: auto; padding: 4px 4px; display: flex; flex-direction: column; gap: 3px; }
 .sidebar-nav::-webkit-scrollbar { width: 6px; }
@@ -1452,13 +1564,13 @@ input.list-sort-select { background-image: none; padding-right: 14px; }
 
 // graceful shutdown
 process.on("SIGTERM", () => {
-  console.log("[pokemon-agents] SIGTERM, shutting down");
+  console.log("[=LOVE Agent OS] SIGTERM, shutting down");
   server.stop();
   db.close();
   process.exit(0);
 });
 process.on("SIGINT", () => {
-  console.log("[pokemon-agents] SIGINT, shutting down");
+  console.log("[=LOVE Agent OS] SIGINT, shutting down");
   server.stop();
   db.close();
   process.exit(0);

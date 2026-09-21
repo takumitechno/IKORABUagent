@@ -1,11 +1,11 @@
 /**
  * launchd plist → agent_schedules 自動同期
  *
- * plist ファイル (~/Library/LaunchAgents/com.claude.hojokin.*.plist) を SSOT として、
+ * plist ファイル (~/Library/LaunchAgents/com.ikolabu.agentos.*.plist) を SSOT として、
  * サーバ起動時にスキャンして agent_schedules テーブルを rebuild する。
  *
  * 対応フィールド:
- *   - ファイル名 → agent slug (com.claude.hojokin.{slug}.plist)
+ *   - ファイル名 → agent slug (com.ikolabu.agentos.{slug}.plist)
  *   - StartCalendarInterval → cron_expr (毎日 HH:MM, 複数可)
  *   - StartInterval → interval_sec
  *   - `.disabled` サフィックス → enabled=0
@@ -17,7 +17,7 @@ import { homedir } from "node:os";
 import { resolve } from "node:path";
 
 const LAUNCHD_DIR = resolve(homedir(), "Library/LaunchAgents");
-const PLIST_PREFIX = "com.claude.hojokin.";
+const PLIST_PREFIX = "com.ikolabu.agentos.";
 
 interface PlistSchedule {
   slug: string;
@@ -87,8 +87,8 @@ function parsePlist(fullPath: string): PlistSchedule | null {
   const fileName = fullPath.split("/").pop()!;
   const enabled = !fileName.endsWith(".disabled");
 
-  // ファイル名から slug 抽出: com.claude.hojokin.{slug}.plist[.disabled]
-  const slugMatch = fileName.match(/^com\.claude\.hojokin\.(.+?)\.plist(\.disabled)?$/);
+  // ファイル名から slug 抽出: com.ikolabu.agentos.{slug}.plist[.disabled]
+  const slugMatch = fileName.match(/^com\.ikolabu\.agentos\.(.+?)\.plist(\.disabled)?$/);
   if (!slugMatch) return null;
   const slug = slugMatch[1];
 

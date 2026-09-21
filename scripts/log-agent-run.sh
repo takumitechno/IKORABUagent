@@ -1,5 +1,5 @@
 #!/bin/bash
-# エージェント実行ログを .claude/db/agents.db の agent_runs テーブルに記録する
+# エージェント実行ログを canonical runtime DB に記録する
 #
 # Usage:
 #   bash scripts/log-agent-run.sh AGENT ACTION STATUS PROCESSED SUCCEEDED FAILED ERROR METADATA_JSON
@@ -29,7 +29,8 @@ if [ -z "$AGENT" ] || [ -z "$ACTION" ]; then
 fi
 
 REPO_ROOT="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
-DB_PATH="$REPO_ROOT/.claude/db/agents.db"
+source "$REPO_ROOT/scripts/lib/runtime-db.sh"
+DB_PATH="$(resolve_runtime_db "$REPO_ROOT")"
 
 if [ ! -f "$DB_PATH" ]; then
   echo "[log-agent-run] agents.db not found: $DB_PATH" >&2

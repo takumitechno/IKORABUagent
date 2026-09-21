@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
-# agents.db 定期メンテナンス: WAL checkpoint + VACUUM で肥大を回収する。
+# runtime DB 定期メンテナンス: WAL checkpoint + VACUUM で肥大を回収する。
 #
-# 背景: logs/events の churn で .claude/db/agents.db は放置すると死領域が肥大する
+# 背景: logs/events の churn で runtime DB は放置すると死領域が肥大する
 # (2026-06-23 時点で 1.59GB → VACUUM で 329MB に回収した実績)。
 #
 # 安全設計: VACUUM INTO で圧縮コピーを作り、integrity_check + 主要テーブルの行数照合に
@@ -13,8 +13,9 @@
 
 set -euo pipefail
 cd "$(dirname "$0")/.."
-
-DB=".claude/db/agents.db"
+REPO_ROOT="$(pwd)"
+source "$REPO_ROOT/scripts/lib/runtime-db.sh"
+DB="$(resolve_runtime_db "$REPO_ROOT")"
 TMP="$DB.vacuumed.$$"
 
 [ -f "$DB" ] || { echo "DB not found: $DB" >&2; exit 1; }

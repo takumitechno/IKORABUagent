@@ -11,9 +11,8 @@ const OUT_DIR = resolve(import.meta.dir, "..", "..", "tmp", "dashboard-mockups",
 mkdirSync(OUT_DIR, { recursive: true });
 
 const COMMON_CONTEXT = `
-This is a web dashboard for "Pokemon Agents" — an internal ops console for 22
-autonomous AI agents running a Japanese subsidy (補助金) database website.
-Each agent is personified as a cute creature character (small mascot avatars).
+This is the internal "=LOVE Agent OS" Control Plane dashboard for 11 AI agents
+running a Threads content operation. Agent identities are internal-only.
 
 The dashboard must feel like a serious SaaS product (Linear / Stripe / Vercel /
 Notion / Raycast) — clean typography, generous white space, proper data density,

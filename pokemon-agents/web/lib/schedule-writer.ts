@@ -2,7 +2,7 @@
  * スケジュール編集 (launchd plist 書き込み)
  *
  * ダッシュボードから plist を生成・保存・有効化/無効化・削除する。
- * com.claude.hojokin.{agent-slug}.plist に限定、他プロジェクトは一切触らない。
+ * com.ikolabu.agentos.{agent-slug}.plist に限定、他プロジェクトは一切触らない。
  *
  * 2 モード対応:
  *   - "calendar": StartCalendarInterval (毎日決まった時刻に実行)
@@ -14,7 +14,7 @@ import { homedir } from "node:os";
 import { resolve } from "node:path";
 
 const LAUNCHD_DIR = resolve(homedir(), "Library/LaunchAgents");
-const LABEL_PREFIX = "com.claude.hojokin.";
+const LABEL_PREFIX = "com.ikolabu.agentos.";
 const LOG_DIR = resolve(homedir(), ".claude/logs");
 const REPO_ROOT = resolve(import.meta.dir, "..", "..", "..");
 
@@ -133,7 +133,7 @@ function buildIntervalPlist(label: string, agentSlug: string, intervalSec: numbe
 }
 
 function basePlist(label: string, agentSlug: string, triggerXml: string): string {
-  const logPath = `${LOG_DIR}/hojokin-${agentSlug}.log`;
+  const logPath = `${LOG_DIR}/ikolabu-${agentSlug}.log`;
   // run-agent.sh は <slug> <md-path> [model] を期待。
   // md-path 指定がなくても run-agent.sh の find fallback で解決はできるが、
   // 明示しておく方が安全 (DB と launchd の SSOT 一貫性のため)。

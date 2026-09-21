@@ -1,7 +1,7 @@
 /**
  * SSE (Server-Sent Events) broadcaster
  *
- * 旧 pokemon-dashboard と同じ思想:
+ * 旧ダッシュボード実装と同じSSE更新方式:
  *   - /api/events に EventSource 接続を貼ってもらう
  *   - サーバ側で 3 秒ごとに DB tasks/approvals/agent_runs の "状態 hash" を計算
  *   - 変化あれば全 subscriber に "tick" イベントを push
