@@ -1,7 +1,9 @@
 import { describe, expect, test } from "bun:test";
 import {
   createDashboardTenantConfig, resolveTrustedTenantIdentity,
-  selectAuthorizedAccount, tenantCan, unavailableTenantDirectory,
+  dashboardTenantShadowSnapshot, evaluateDashboardTenantShadow,
+  resetDashboardTenantShadow, selectAuthorizedAccount, tenantCan, unavailableTenantDirectory,
+  tenantEnforcementEnabled,
   type TenantDirectory,
 } from "../web/lib/dashboard-tenant";
 import {
@@ -32,6 +34,70 @@ function cloudflareRequest(extraHeaders: Record<string, string> = {}): Request {
 describe("dashboard trusted tenant identity", () => {
   test("feature flag defaults off", () => {
     expect(createDashboardTenantConfig({}, "local").enabled).toBe(false);
+    expect(createDashboardTenantConfig({}, "local").shadowEnabled).toBe(false);
+    expect(createDashboardTenantConfig({}, "local").canaryEnabled).toBe(false);
+  });
+
+  test("canary enforcement applies only to its canonical resolved user", async () => {
+    const canary = createDashboardTenantConfig({
+      DASHBOARD_MULTI_TENANT_AUTH: "false",
+      DASHBOARD_MULTI_TENANT_AUTH_CANARY: "true",
+      DASHBOARD_MULTI_TENANT_AUTH_CANARY_USER_ID: "user_A",
+      DASHBOARD_MULTI_TENANT_AUTH_CANARY_ACCOUNT_ID: "acct_A",
+    }, "cloudflare-access");
+    const selected = { userId: "user_A", organizationId: "org_A", role: "admin" as const };
+    const other = { userId: "user_B", organizationId: "org_B", role: "admin" as const };
+    expect(tenantEnforcementEnabled(canary, selected)).toBe(true);
+    expect(tenantEnforcementEnabled(canary, other)).toBe(false);
+    expect(tenantEnforcementEnabled(canary, null)).toBe(false);
+    expect(() => createDashboardTenantConfig({
+      DASHBOARD_MULTI_TENANT_AUTH_CANARY: "true",
+    }, "cloudflare-access")).toThrow(/CANARY_USER_ID/);
+  });
+
+  test("shadow resolves verified identity and evaluates accounts without enabling enforcement", async () => {
+    resetDashboardTenantShadow();
+    const shadowConfig = createDashboardTenantConfig({
+      DASHBOARD_MULTI_TENANT_AUTH: "false",
+      DASHBOARD_MULTI_TENANT_AUTH_SHADOW: "true",
+    }, "cloudflare-access");
+    const directory: TenantDirectory = {
+      async resolveByEmail() {
+        return { userId: "user_A", organizationId: "org_A", role: "admin" };
+      },
+      async shadowAccounts() {
+        return {
+          wouldBeAccounts: ["acct_A"], currentCount: 3,
+          wouldBeCount: 1, wouldHideCount: 2,
+        };
+      },
+    };
+    const request = cloudflareRequest();
+    const resolved = await resolveTrustedTenantIdentity(
+      request, resolveInternalIdentity(request, cloudflareAuth), shadowConfig, directory,
+    );
+    expect(shadowConfig.enabled).toBe(false);
+    expect(resolved?.userId).toBe("user_A");
+    await evaluateDashboardTenantShadow(resolved, directory);
+    expect(dashboardTenantShadowSnapshot()).toMatchObject({
+      totalEvaluations: 1,
+      wouldAllow: 1,
+      wouldDeny: 0,
+      unexpectedAllow: 0,
+      unexpectedDeny: 0,
+      last: {
+        decision: "allow",
+        reasonCode: "account_list_allowed",
+        wouldAllowAccounts: ["acct_A"],
+        wouldHideCount: 2,
+      },
+    });
+    const currentAccounts = [
+      { accountId: "acct_A", handle: "a", displayName: "A", accountStatus: "active" },
+      { accountId: "acct_B", handle: "b", displayName: "B", accountStatus: "active" },
+    ];
+    expect(selectAuthorizedAccount("acct_B", currentAccounts, "acct_A", shadowConfig.enabled))
+      .toMatchObject({ selected: "acct_B", rejected: false });
   });
 
   test("ignores browser user-id spoofing and resolves only the verified email", async () => {

@@ -38,7 +38,9 @@ import {
 } from "./lib/internal-auth";
 import {
   createBridgeTenantDirectory, createDashboardTenantConfig, resolveTrustedTenantIdentity,
+  dashboardTenantShadowSnapshot, evaluateDashboardTenantShadow,
   selectAuthorizedAccount, tenantCan, tenantIdentityFailure,
+  tenantEnforcementEnabled,
   type ResolvedTenantIdentity,
 } from "./lib/dashboard-tenant";
 import {
@@ -108,11 +110,15 @@ function internalAccessAllowed(req: Request): boolean {
   return resolveInternalIdentity(req, INTERNAL_AUTH) !== null;
 }
 
-async function internalAccount(requested: string | null, tenantUserId?: string) {
-  const accounts = (await getThreadsAccounts(tenantUserId))
-    .filter((account) => accountAllowed(account.accountId, INTERNAL_AUTH));
+async function internalAccount(
+  requested: string | null, tenantUserId: string | undefined, enforcementEnabled: boolean,
+  exactCanaryAccount: string | null = null,
+) {
+  const accounts = (await getThreadsAccounts(tenantUserId)).filter((account) =>
+    accountAllowed(account.accountId, INTERNAL_AUTH)
+    && (!exactCanaryAccount || account.accountId === exactCanaryAccount));
   return selectAuthorizedAccount(
-    requested, accounts, DEFAULT_THREADS_ACCOUNT, TENANT_AUTH.enabled,
+    requested, accounts, DEFAULT_THREADS_ACCOUNT, enforcementEnabled,
   );
 }
 
@@ -264,7 +270,14 @@ const server = Bun.serve({
       } catch (error) {
         tenantFailure = tenantIdentityFailure(error);
       }
-      if (TENANT_AUTH.enabled && tenantIdentityRequired(path) && !tenantIdentity) {
+      const tenantEnforced = tenantEnforcementEnabled(TENANT_AUTH, tenantIdentity);
+      const exactCanaryAccount = tenantEnforced && !TENANT_AUTH.enabled
+        ? TENANT_AUTH.canaryAccountId : null;
+      if (TENANT_AUTH.shadowEnabled && tenantIdentityRequired(path)) {
+        await evaluateDashboardTenantShadow(tenantIdentity, TENANT_DIRECTORY);
+      }
+      if ((TENANT_AUTH.enabled || TENANT_AUTH.canaryEnabled)
+        && tenantIdentityRequired(path) && !tenantIdentity && !isPublicDashboardPath(path)) {
         if (path === "/internal" && tenantFailure) {
           return new Response(`Tenant identity unavailable (${tenantFailure})`, { status: 401 });
         }
@@ -282,13 +295,15 @@ const server = Bun.serve({
           try {
             const form = await req.formData();
             const accountId = String(form.get("account_id") || "");
-            const trustedTenant = TENANT_AUTH.enabled ? requireTenantSelection(tenantIdentity) : null;
+            const trustedTenant = tenantEnforced ? requireTenantSelection(tenantIdentity) : null;
             if (trustedTenant && !tenantCan(trustedTenant, "content:review")) {
               return new Response("Forbidden", { status: 403 });
             }
-            const selection = await internalAccount(accountId, trustedTenant?.userId);
+            const selection = await internalAccount(
+              accountId, trustedTenant?.userId, tenantEnforced, exactCanaryAccount,
+            );
             if (selection.rejected || selection.selected !== accountId) {
-              return new Response("invalid account", { status: TENANT_AUTH.enabled ? 403 : 400 });
+              return new Response("invalid account", { status: tenantEnforced ? 403 : 400 });
             }
             const origin = String(form.get("origin") || "");
             if (!(["ai_auto", "ai_manual", "human_manual"] as string[]).includes(origin)) {
@@ -451,6 +466,11 @@ const server = Bun.serve({
       if (path === "/api/events") {
         return sseHandler(db);
       }
+      if (path === "/api/internal/tenant-shadow") {
+        return new Response(JSON.stringify(dashboardTenantShadowSnapshot()), {
+          headers: { "Content-Type": "application/json" },
+        });
+      }
       // Live fragments (SSE 受信時に部分 swap で取得)
       if (path === "/api/fragments/heartbeat") {
         return new Response(renderHeartbeat(db), {
@@ -533,9 +553,10 @@ const server = Bun.serve({
 
       // ===== 4-menu structure =====
       if (path === "/internal") {
-        const trustedTenant = TENANT_AUTH.enabled ? requireTenantSelection(tenantIdentity) : null;
+        const trustedTenant = tenantEnforced ? requireTenantSelection(tenantIdentity) : null;
         const selection = await internalAccount(
-          url.searchParams.get("account_id"), trustedTenant?.userId,
+          url.searchParams.get("account_id"), trustedTenant?.userId, tenantEnforced,
+          exactCanaryAccount,
         );
         if (selection.rejected || !selection.selected) {
           return new Response("Forbidden", { status: 403 });
@@ -550,20 +571,24 @@ const server = Bun.serve({
         );
       }
       if (path === "/" || path === "") {
-        if (!TENANT_AUTH.enabled) return lay("Dashboard", renderOverview(db, await getThreadsDashboard()));
+        if (!tenantEnforced) return lay("Dashboard", renderOverview(db, await getThreadsDashboard()));
         const trustedTenant = requireTenantSelection(tenantIdentity);
-        const selection = await internalAccount(null, trustedTenant.userId);
+        const selection = await internalAccount(
+          null, trustedTenant.userId, tenantEnforced, exactCanaryAccount,
+        );
         if (!selection.selected) return new Response("Forbidden", { status: 403 });
         return lay("Dashboard", renderOverview(
           db, await getThreadsDashboard(selection.selected, trustedTenant.userId),
         ));
       }
       if (path === "/improvement") {
-        if (!TENANT_AUTH.enabled) {
+        if (!tenantEnforced) {
           return lay("AI改善レポート", renderImprovementReport(await getThreadsDashboard()));
         }
         const trustedTenant = requireTenantSelection(tenantIdentity);
-        const selection = await internalAccount(null, trustedTenant.userId);
+        const selection = await internalAccount(
+          null, trustedTenant.userId, tenantEnforced, exactCanaryAccount,
+        );
         if (!selection.selected) return new Response("Forbidden", { status: 403 });
         return lay("AI改善レポート", renderImprovementReport(
           await getThreadsDashboard(selection.selected, trustedTenant.userId),

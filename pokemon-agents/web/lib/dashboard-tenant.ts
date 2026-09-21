@@ -10,6 +10,10 @@ export type TenantPermission = "dashboard:read" | "content:review" | "operations
 
 export interface DashboardTenantConfig {
   enabled: boolean;
+  shadowEnabled: boolean;
+  canaryEnabled: boolean;
+  canaryUserId: string | null;
+  canaryAccountId: string | null;
   authMode: DashboardAuthMode;
   localUserId: string | null;
   localRole: TenantRole;
@@ -23,6 +27,49 @@ export interface ResolvedTenantIdentity {
 
 export interface TenantDirectory {
   resolveByEmail(email: string): Promise<ResolvedTenantIdentity | null>;
+  shadowAccounts?(userId: string): Promise<TenantShadowAccounts>;
+}
+
+export interface TenantShadowAccounts {
+  wouldBeAccounts: string[];
+  currentCount: number;
+  wouldBeCount: number;
+  wouldHideCount: number;
+}
+
+export interface DashboardTenantShadowSnapshot {
+  totalEvaluations: number;
+  wouldAllow: number;
+  wouldDeny: number;
+  unexpectedAllow: number;
+  unexpectedDeny: number;
+  last: null | {
+    decision: "allow" | "deny";
+    reasonCode: string;
+    wouldAllowAccounts: string[];
+    wouldHideCount: number;
+    timestamp: string;
+  };
+}
+
+let shadowSnapshot: DashboardTenantShadowSnapshot = {
+  totalEvaluations: 0,
+  wouldAllow: 0,
+  wouldDeny: 0,
+  unexpectedAllow: 0,
+  unexpectedDeny: 0,
+  last: null,
+};
+
+export function resetDashboardTenantShadow(): void {
+  shadowSnapshot = {
+    totalEvaluations: 0, wouldAllow: 0, wouldDeny: 0,
+    unexpectedAllow: 0, unexpectedDeny: 0, last: null,
+  };
+}
+
+export function dashboardTenantShadowSnapshot(): DashboardTenantShadowSnapshot {
+  return structuredClone(shadowSnapshot);
 }
 
 export type TenantIdentityFailure =
@@ -126,6 +173,56 @@ export function createBridgeTenantDirectory(options: {
         throw new TenantIdentityResolutionError("MALFORMED_RESPONSE");
       }
     },
+    async shadowAccounts(userId: string): Promise<TenantShadowAccounts> {
+      if (!validCanonicalUserId(userId)) {
+        throw new TenantIdentityResolutionError("UNAUTHORIZED");
+      }
+      let origin: string;
+      try {
+        origin = bridgeOrigin(
+          options.bridgeUrl ?? process.env.THREADS_BRIDGE_URL ?? "http://127.0.0.1:8000",
+        );
+      } catch {
+        throw new TenantIdentityResolutionError("UNREACHABLE");
+      }
+      const apiKey = options.apiKey ?? process.env.THREADS_BRIDGE_API_KEY ?? "";
+      if (!apiKey && !localBridge(origin)) {
+        throw new TenantIdentityResolutionError("UNAUTHORIZED");
+      }
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), options.timeoutMs ?? 2_500);
+      let response: Response;
+      try {
+        response = await (options.fetcher ?? fetch)(
+          `${origin}/operator/tenant-shadow/accounts`,
+          { headers: {
+            ...(apiKey ? { Authorization: `Bearer ${apiKey}` } : {}),
+            "X-Threads-User-ID": userId,
+          }, signal: controller.signal },
+        );
+      } catch {
+        throw new TenantIdentityResolutionError("UNREACHABLE");
+      } finally {
+        clearTimeout(timer);
+      }
+      if (!response.ok) throw new TenantIdentityResolutionError("UNREACHABLE");
+      const payload = await response.json() as Record<string, unknown>;
+      const accounts = Array.isArray(payload.would_be_accounts)
+        ? payload.would_be_accounts.filter((value): value is string =>
+          typeof value === "string" && /^acct_[a-zA-Z0-9_-]+$/.test(value))
+        : [];
+      const currentCount = Number(payload.current_count);
+      const wouldBeCount = Number(payload.would_be_count);
+      const wouldHideCount = Number(payload.would_hide_count);
+      if (![currentCount, wouldBeCount, wouldHideCount].every(Number.isSafeInteger)
+        || wouldBeCount !== accounts.length || currentCount < wouldBeCount
+        || wouldHideCount !== currentCount - wouldBeCount) {
+        throw new TenantIdentityResolutionError("MALFORMED_RESPONSE");
+      }
+      return {
+        wouldBeAccounts: accounts, currentCount, wouldBeCount, wouldHideCount,
+      };
+    },
   };
 }
 
@@ -165,8 +262,21 @@ export function createDashboardTenantConfig(
   if (localUserId && !validCanonicalUserId(localUserId)) {
     throw new Error("DASHBOARD_LOCAL_USER_ID is not a valid canonical user ID");
   }
+  const canaryEnabled = enabled(env.DASHBOARD_MULTI_TENANT_AUTH_CANARY);
+  const canaryUserId = (env.DASHBOARD_MULTI_TENANT_AUTH_CANARY_USER_ID || "").trim() || null;
+  const canaryAccountId = (env.DASHBOARD_MULTI_TENANT_AUTH_CANARY_ACCOUNT_ID || "").trim() || null;
+  if (canaryEnabled && (!canaryUserId || !validCanonicalUserId(canaryUserId))) {
+    throw new Error("DASHBOARD_MULTI_TENANT_AUTH_CANARY_USER_ID is required and invalid");
+  }
+  if (canaryEnabled && (!canaryAccountId || !/^acct_[a-zA-Z0-9_-]+$/.test(canaryAccountId))) {
+    throw new Error("DASHBOARD_MULTI_TENANT_AUTH_CANARY_ACCOUNT_ID is required and invalid");
+  }
   return {
     enabled: enabled(env.DASHBOARD_MULTI_TENANT_AUTH),
+    shadowEnabled: enabled(env.DASHBOARD_MULTI_TENANT_AUTH_SHADOW),
+    canaryEnabled,
+    canaryUserId,
+    canaryAccountId,
     authMode,
     localUserId,
     localRole: tenantRole(env.DASHBOARD_LOCAL_TENANT_ROLE),
@@ -186,7 +296,7 @@ export async function resolveTrustedTenantIdentity(
   config: DashboardTenantConfig,
   directory: TenantDirectory,
 ): Promise<ResolvedTenantIdentity | null> {
-  if (!config.enabled || !identity) return null;
+  if ((!config.enabled && !config.shadowEnabled && !config.canaryEnabled) || !identity) return null;
   // Browser X-Threads-User-ID and query parameters are intentionally never read.
   if (identity.kind === "cloudflare-user") {
     const resolved = await directory.resolveByEmail(identity.subject.trim().toLowerCase());
@@ -201,6 +311,45 @@ export async function resolveTrustedTenantIdentity(
   }
   // Service auth receives no implicit cross-tenant or system-admin exception.
   return null;
+}
+
+export function tenantEnforcementEnabled(
+  config: DashboardTenantConfig,
+  identity: ResolvedTenantIdentity | null,
+): boolean {
+  return config.enabled || Boolean(
+    config.canaryEnabled && identity && identity.userId === config.canaryUserId,
+  );
+}
+
+export async function evaluateDashboardTenantShadow(
+  identity: ResolvedTenantIdentity | null,
+  directory: TenantDirectory,
+): Promise<DashboardTenantShadowSnapshot> {
+  let decision: "allow" | "deny" = "deny";
+  let reasonCode = "missing_identity";
+  let accounts: TenantShadowAccounts = {
+    wouldBeAccounts: [], currentCount: 0, wouldBeCount: 0, wouldHideCount: 0,
+  };
+  if (identity && directory.shadowAccounts) {
+    try {
+      accounts = await directory.shadowAccounts(identity.userId);
+      decision = accounts.wouldBeCount > 0 ? "allow" : "deny";
+      reasonCode = decision === "allow" ? "account_list_allowed" : "no_visible_accounts";
+    } catch {
+      reasonCode = "shadow_directory_unavailable";
+    }
+  }
+  shadowSnapshot.totalEvaluations += 1;
+  shadowSnapshot[decision === "allow" ? "wouldAllow" : "wouldDeny"] += 1;
+  shadowSnapshot.last = {
+    decision,
+    reasonCode,
+    wouldAllowAccounts: [...accounts.wouldBeAccounts],
+    wouldHideCount: accounts.wouldHideCount,
+    timestamp: new Date().toISOString(),
+  };
+  return dashboardTenantShadowSnapshot();
 }
 
 export function tenantCan(identity: ResolvedTenantIdentity, permission: TenantPermission): boolean {

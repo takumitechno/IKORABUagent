@@ -65,6 +65,17 @@ function tenantBridge() {
         : Response.json({ detail: { code: "identity_not_found" } }, { status: 404 });
     }
 
+    if (url.pathname.endsWith("/tenant-shadow/accounts")) {
+      const userId = request.headers.get("x-threads-user-id");
+      const accountId = userId === "user_A" ? "acct_A" : userId === "user_B" ? "acct_B" : null;
+      return Response.json({
+        would_be_accounts: accountId ? [accountId] : [],
+        current_count: 2,
+        would_be_count: accountId ? 1 : 0,
+        would_hide_count: accountId ? 1 : 2,
+      });
+    }
+
     const userId = request.headers.get("x-threads-user-id");
     const accountId = userId === "user_A" ? "acct_A" : userId === "user_B" ? "acct_B" : null;
     if (!accountId) return new Response("denied", { status: 403 });
