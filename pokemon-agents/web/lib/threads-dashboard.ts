@@ -1,3 +1,21 @@
+import type {
+  BridgeAccountResponseV1 as AccountResponse,
+  BridgeAccountsResponseV1 as AccountsResponse,
+  BridgeContentResponseV1 as ContentResponse,
+} from "./threads-bridge-contract-v1.generated";
+import {
+  ThreadsBridgeContractError,
+  bridgeFailureStatus,
+  getContractJson,
+  parseAccountResponseV1,
+  parseAccountsResponseV1,
+  parseContentResponseV1,
+  parseEditorialCustomerResponseV1,
+  parseEditorialInternalResponseV1,
+  parseSafetyResponseV1,
+  type ThreadsBridgeStatus,
+} from "./threads-bridge-contract";
+
 const DEFAULT_BRIDGE_URL = "http://127.0.0.1:8000";
 const DEFAULT_ACCOUNT_ID = "acct_8ssana";
 const CACHE_TTL_MS = 15_000;
@@ -119,6 +137,7 @@ export interface ThreadsEditorial {
 
 export interface ThreadsDashboardData {
   connected: boolean;
+  bridgeStatus: ThreadsBridgeStatus;
   accountId: string;
   handle: string | null;
   displayName: string | null;
@@ -131,7 +150,7 @@ export interface ThreadsDashboardData {
   operations: ThreadsOperations;
   safety: ThreadsSafetyStatus;
   editorial: ThreadsEditorial;
-  message: "実アカウント連携済み" | "接続待ち";
+  message: "実アカウント連携済み" | "接続待ち" | "データ取得待ち" | "アカウントが見つかりません";
 }
 
 export interface ThreadsAccountOption {
@@ -142,42 +161,6 @@ export interface ThreadsAccountOption {
 }
 
 type FetchLike = typeof fetch;
-
-type AccountResponse = {
-  account_id?: unknown;
-  handle?: unknown;
-  display_name?: unknown;
-  account_status?: unknown;
-  recent_contents?: unknown;
-  recent_publications?: unknown;
-  pipeline?: unknown;
-  manual_posts?: unknown;
-  operations?: unknown;
-};
-
-type ContentResponse = {
-  content_id?: unknown;
-  topic?: unknown;
-  content_role?: unknown;
-  body_text?: unknown;
-  parts?: unknown;
-  state?: unknown;
-  qa?: unknown;
-  approved_for_current_body?: unknown;
-  created_at?: unknown;
-  updated_at?: unknown;
-  scheduled_at?: unknown;
-  publications?: unknown;
-  metrics?: unknown;
-  metrics_observation?: unknown;
-  origin?: unknown;
-  analyze_enabled?: unknown;
-  learn_enabled?: unknown;
-};
-
-type AccountsResponse = {
-  accounts?: unknown;
-};
 
 const EMPTY_OPERATIONS: ThreadsOperations = {
   nightBatchItems: [], publicationsLastHour: null, publicationsLast24h: null,
@@ -382,10 +365,11 @@ function publicationFor(
   };
 }
 
-async function getJson(fetcher: FetchLike, url: string, headers: HeadersInit, signal: AbortSignal): Promise<unknown> {
-  const response = await fetcher(url, { method: "GET", headers, signal });
-  if (!response.ok) throw new Error(`bridge HTTP ${response.status}`);
-  return response.json();
+function customerMessage(status: ThreadsBridgeStatus): ThreadsDashboardData["message"] {
+  if (status === "HEALTHY") return "実アカウント連携済み";
+  if (status === "HEALTHY_EMPTY") return "データ取得待ち";
+  if (status === "ACCOUNT_NOT_FOUND") return "アカウントが見つかりません";
+  return "接続待ち";
 }
 
 export async function loadThreadsDashboard(options: {
@@ -397,18 +381,18 @@ export async function loadThreadsDashboard(options: {
 } = {}): Promise<ThreadsDashboardData> {
   const accountId = options.accountId ?? process.env.THREADS_DASHBOARD_ACCOUNT_ID ?? DEFAULT_ACCOUNT_ID;
   const fetchedAt = new Date().toISOString();
-  const fallback = (): ThreadsDashboardData => ({
-    connected: false, accountId, handle: null, displayName: null, accountStatus: null,
+  const fallback = (bridgeStatus: ThreadsBridgeStatus): ThreadsDashboardData => ({
+    connected: false, bridgeStatus, accountId, handle: null, displayName: null, accountStatus: null,
     fetchedAt, contents: [], manualPosts: [], metricsRecordCount: 0, hasLearningSnapshot: false,
     operations: { ...EMPTY_OPERATIONS }, safety: { ...EMPTY_SAFETY },
-    editorial: { ...EMPTY_EDITORIAL }, message: "接続待ち",
+    editorial: { ...EMPTY_EDITORIAL }, message: customerMessage(bridgeStatus),
   });
   try {
-    if (!/^acct_[a-zA-Z0-9_-]+$/.test(accountId)) return fallback();
+    if (!/^acct_[a-zA-Z0-9_-]+$/.test(accountId)) return fallback("ACCOUNT_NOT_FOUND");
     const origin = safeOrigin(options.bridgeUrl ?? process.env.THREADS_BRIDGE_URL ?? DEFAULT_BRIDGE_URL);
     const apiKey = options.apiKey ?? process.env.THREADS_BRIDGE_API_KEY ?? "";
     if (!apiKey && !["127.0.0.1", "localhost", "::1", "[::1]"].includes(new URL(origin).hostname.toLowerCase())) {
-      return fallback();
+      return fallback("UNAUTHORIZED");
     }
     const headers: HeadersInit = apiKey ? { Authorization: `Bearer ${apiKey}` } : {};
     const controller = new AbortController();
@@ -416,10 +400,13 @@ export async function loadThreadsDashboard(options: {
     try {
       const fetcher = options.fetcher ?? fetch;
       const encodedAccount = encodeURIComponent(accountId);
-      const summary = record(await getJson(
+      const summary: AccountResponse = await getContractJson(
         fetcher, `${origin}/operator/accounts/${encodedAccount}`, headers, controller.signal,
-      )) as AccountResponse | null;
-      if (!summary || text(summary.account_id) !== accountId) return fallback();
+        parseAccountResponseV1,
+      );
+      if (summary.account_id !== accountId) {
+        throw new ThreadsBridgeContractError("MALFORMED_RESPONSE", "account-scope-mismatch");
+      }
       const recentContentRows = Array.isArray(summary.recent_contents)
         ? summary.recent_contents.map(record).filter((row): row is Record<string, unknown> => row !== null)
         : [];
@@ -437,25 +424,21 @@ export async function loadThreadsDashboard(options: {
       );
       const pipeline = record(summary.pipeline);
       const operations = operationsFrom(summary.operations);
-      let safety = { ...EMPTY_SAFETY };
-      try {
-        safety = safetyFrom(await getJson(
-          fetcher, `${origin}/autopilot/v2/safety/status?account_id=${encodedAccount}`,
-          headers, controller.signal,
-        ));
-      } catch {
-        // Older Bridges do not expose safety status. Keep the field explicitly unavailable.
-      }
-      let editorial: ThreadsEditorial = { ...EMPTY_EDITORIAL };
-      try {
-        const [internalEditorial, customerEditorial] = await Promise.all([
-          getJson(fetcher, `${origin}/autopilot/v2/editorial/internal?account_id=${encodedAccount}`, headers, controller.signal),
-          getJson(fetcher, `${origin}/autopilot/v2/editorial/customer?account_id=${encodedAccount}`, headers, controller.signal),
-        ]);
-        editorial = editorialFrom(internalEditorial, customerEditorial);
-      } catch {
-        // Older Bridges do not expose EDITORIAL01. Keep an explicit empty state.
-      }
+      const safety = safetyFrom(await getContractJson(
+        fetcher, `${origin}/autopilot/v2/safety/status?account_id=${encodedAccount}`,
+        headers, controller.signal, parseSafetyResponseV1,
+      ));
+      const [internalEditorial, customerEditorial] = await Promise.all([
+        getContractJson(
+          fetcher, `${origin}/autopilot/v2/editorial/internal?account_id=${encodedAccount}`,
+          headers, controller.signal, parseEditorialInternalResponseV1,
+        ),
+        getContractJson(
+          fetcher, `${origin}/autopilot/v2/editorial/customer?account_id=${encodedAccount}`,
+          headers, controller.signal, parseEditorialCustomerResponseV1,
+        ),
+      ]);
+      const editorial = editorialFrom(internalEditorial, customerEditorial);
       const manualPosts: ManualPostStatus[] = Array.isArray(summary.manual_posts)
         ? summary.manual_posts.map(record).filter((row): row is Record<string, unknown> => row !== null)
           .map((row): ManualPostStatus | null => {
@@ -500,19 +483,21 @@ export async function loadThreadsDashboard(options: {
       const contents: ThreadsContent[] = [];
       // The existing read-only operator dependency owns one SQLite connection per
       // request. Fetch details serially so its sync dependency lifecycle never
-      // overlaps across worker threads. A single malformed record must not hide
-      // the other safe records from the dashboard.
+      // overlaps across worker threads. Contract violations fail the whole load
+      // closed instead of silently presenting a partial, apparently healthy view.
       for (const item of recentContents) {
         const contentId = text(item.content_id);
         if (!contentId) continue;
-        try {
-          const detail = record(await getJson(
+        const detail: ContentResponse = await getContractJson(
             fetcher,
             `${origin}/operator/accounts/${encodedAccount}/contents/${encodeURIComponent(contentId)}`,
             headers,
             controller.signal,
-          )) as ContentResponse | null;
-          if (!detail || text(detail.content_id) !== contentId) continue;
+            parseContentResponseV1,
+          );
+          if (detail.content_id !== contentId) {
+            throw new ThreadsBridgeContractError("MALFORMED_RESPONSE", "content-scope-mismatch");
+          }
           const qa = record(detail.qa);
           const parts = Array.isArray(detail.parts) ? detail.parts.map(text).filter((part): part is string => Boolean(part)) : [];
           const qaVerdict = text(qa?.verdict);
@@ -520,7 +505,7 @@ export async function loadThreadsDashboard(options: {
           const metrics = metricMap(detail.metrics);
           const observation = metricObservation(detail.metrics_observation);
           const rates = hourlyRates(metrics, publication?.publishedAt ?? null, observation.observedAt);
-          contents.push({
+        contents.push({
             contentId,
             topic: text(detail.topic),
             contentRole: text(detail.content_role),
@@ -542,13 +527,18 @@ export async function loadThreadsDashboard(options: {
             analyzeEnabled: detail.analyze_enabled !== false,
             learnEnabled: detail.learn_enabled !== false,
             partCount: Math.max(1, parts.length),
-          });
-        } catch {
-          continue;
-        }
+        });
       }
+      const bridgeStatus: ThreadsBridgeStatus = (
+        contents.length === 0
+        && manualPosts.length === 0
+        && editorial.state === null
+        && editorial.customerSummary === null
+        && editorial.experiments.length === 0
+      ) ? "HEALTHY_EMPTY" : "HEALTHY";
       return {
         connected: true,
+        bridgeStatus,
         accountId,
         handle: text(summary.handle),
         displayName: text(summary.display_name),
@@ -561,13 +551,13 @@ export async function loadThreadsDashboard(options: {
         operations,
         safety,
         editorial,
-        message: "実アカウント連携済み",
+        message: customerMessage(bridgeStatus),
       };
     } finally {
       clearTimeout(timer);
     }
-  } catch {
-    return fallback();
+  } catch (error) {
+    return fallback(bridgeFailureStatus(error));
   }
 }
 
@@ -608,10 +598,10 @@ export async function loadThreadsAccounts(options: {
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), options.timeoutMs ?? 2_500);
     try {
-      const payload = record(await getJson(
+      const payload: AccountsResponse = await getContractJson(
         options.fetcher ?? fetch, `${origin}/operator/accounts`, headers, controller.signal,
-      )) as AccountsResponse | null;
-      if (!payload || !Array.isArray(payload.accounts)) return [];
+        parseAccountsResponseV1,
+      );
       return payload.accounts.map(record).filter((row): row is Record<string, unknown> => row !== null)
         .map((row): ThreadsAccountOption | null => {
           const accountId = text(row.account_id);

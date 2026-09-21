@@ -6,6 +6,18 @@ import { loadThreadsDashboard } from "../web/lib/threads-dashboard";
 import { AGENT_CHARACTER_IMAGES, findAgentCharacter, resolveAgentCharacterImage } from "../web/lib/agent-character-images";
 import { renderInternalOperations } from "../web/routes/internal-operations";
 import { renderOverview } from "../web/routes/overview";
+import {
+  accountResponseV1,
+  contentResponseV1,
+  editorialCustomerV1,
+  editorialCycleV1,
+  editorialExperimentV1,
+  editorialInternalV1,
+  manualThreadV1,
+  recentContentV1,
+  recentPublicationV1,
+  safetyResponseV1,
+} from "./threads-bridge-v1-fixtures";
 
 function agentDb(): Database {
   const db = new Database(":memory:");
@@ -64,36 +76,38 @@ describe("internal operations dashboard", () => {
   test("renders safety, NIGHT batch, policy flags and agents without secret fields", async () => {
     const fetcher = (async (input: RequestInfo | URL) => {
       const url = String(input);
-      if (url.includes("/autopilot/v2/safety/status")) return Response.json({
+      if (url.includes("/autopilot/v2/safety/status")) return Response.json(safetyResponseV1({
         global_stop: false, account_stop: false, capability_stop: false,
         approval_mode: "human", unresolved_ambiguous_publication: false,
         rate_guard_ready: true,
         rate_policy: { min_interval_seconds: 600, hourly_limit: 2, daily_limit: 5 },
         admin_key: "must-never-render",
-      });
-      if (url.endsWith("/operator/accounts/acct_8ssana")) return Response.json({
+      }));
+      if (url.includes("/editorial/internal")) return Response.json(editorialInternalV1());
+      if (url.includes("/editorial/customer")) return Response.json(editorialCustomerV1());
+      if (url.endsWith("/operator/accounts/acct_8ssana")) return Response.json(accountResponseV1({
         account_id: "acct_8ssana", handle: "8ssana", display_name: "Sana", account_status: "active",
         access_token: "must-never-render", pipeline: { n_metrics: 4, has_learning_snapshot: true },
         operations: {
           rolling_usage: { publications_last_hour: 1, publications_last_24h: 3 },
           features: { manual_post_sync: true, self_reply_sync: "active" },
-          night_batch_items: [{ item_id: "item-1", batch_id: "batch-1", content_id: "content-1", scheduled_at: "2026-09-21T12:00:00Z", status: "pending", batch_status: "approved" }],
+          night_batch_items: [{ item_id: "item-1", batch_id: "batch-1", content_id: "content-1", scheduled_at: "2026-09-21T12:00:00Z", status: "pending", block_reason: null, attempted_at: null, batch_status: "approved", expires_at: "2026-09-22T12:00:00Z" }],
         },
-        manual_posts: [{ detection_id: "manual-1", external_post_id: "external-1", body_text: "手動投稿本文", published_at: "2026-09-21T01:00:00Z", origin: "human_manual", analyze_enabled: true, learn_enabled: false, tracking_state: "tracked", logical_thread_id: "thread-1", root_external_id: "external-1", part_index: 0, n_parts: 1 }],
-        recent_contents: [{ content_id: "content-1" }], recent_publications: [{
+        manual_posts: [manualThreadV1({ detection_id: "manual-1", external_post_id: "external-1", body_text: "手動投稿本文", published_at: "2026-09-21T01:00:00Z", origin: "human_manual", analyze_enabled: true, learn_enabled: false, tracking_state: "tracked", logical_thread_id: "thread-1", root_external_id: "external-1", part_index: 0, n_parts: 1, detected_at: "2026-09-21T01:00:00Z", updated_at: "2026-09-21T01:00:00Z" })],
+        recent_contents: [recentContentV1({ content_id: "content-1" })], recent_publications: [recentPublicationV1({
           content_id: "content-1", mode: "live", status: "succeeded",
           published_at: "2026-09-21T02:00:00Z",
-        }],
-      });
-      if (url.endsWith("/contents/content-1")) return Response.json({
+        })],
+      }));
+      if (url.endsWith("/contents/content-1")) return Response.json(contentResponseV1({
         content_id: "content-1", topic: "内部テスト", content_role: "reach", body_text: "実投稿本文",
         parts: ["実投稿本文"], state: "publish_ready", qa: { verdict: "pass" },
         approved_for_current_body: true, origin: "ai_auto", analyze_enabled: true, learn_enabled: false,
         publications: [{ mode: "live", status: "succeeded", external_publish_id: "external-live-1",
           published_at: "2026-09-21T02:00:00Z", parts_state: [{ external_id: "external-live-1", published_at: "2026-09-21T02:00:00Z" }] }],
         metrics: { views: 120, likes: 4, replies: 2, reposts: 0, quotes: 0 },
-        metrics_observation: { observed_at: "2026-09-21T04:00:00Z", fetched_at: "2026-09-21T04:00:05Z" },
-      });
+        metrics_observation: { observed_at: "2026-09-21T04:00:00Z", fetched_at: "2026-09-21T04:00:05Z", available_keys: ["views", "likes", "replies", "reposts", "quotes"], source: "threads_insights" },
+      }));
       return new Response("not found", { status: 404 });
     }) as typeof fetch;
     const data = await loadThreadsDashboard({ bridgeUrl: "http://127.0.0.1:8765", fetcher });
@@ -163,6 +177,7 @@ describe("internal operations dashboard", () => {
     });
     const db = agentDb();
     const html = renderInternalOperations(db, data);
+    expect(html).toContain("接続エラー");
     expect(html).toContain("接続待ち");
     expect(html).toContain("デモ値には置換しません");
     expect(html).toContain('name="account_id" disabled');
@@ -178,15 +193,17 @@ describe("internal operations dashboard", () => {
       bridgeUrl: "http://127.0.0.1:8765",
       fetcher: (async (input: RequestInfo | URL) => {
         const url = String(input);
-        if (url.includes("/autopilot/v2/safety/status")) return Response.json({});
-        return Response.json({
+        if (url.includes("/autopilot/v2/safety/status")) return Response.json(safetyResponseV1());
+        if (url.includes("/editorial/internal")) return Response.json(editorialInternalV1());
+        if (url.includes("/editorial/customer")) return Response.json(editorialCustomerV1());
+        return Response.json(accountResponseV1({
           account_id: "acct_8ssana", handle: "8ssana", account_status: "active",
           recent_contents: [], recent_publications: [], manual_posts: [],
           operations: {
             features: { manual_post_sync: true, self_reply_sync: "reauthorization_required" },
             night_batch_items: [], rolling_usage: {},
           },
-        });
+        }));
       }) as typeof fetch,
     });
     const db = agentDb();
@@ -204,8 +221,8 @@ describe("internal operations dashboard", () => {
       bridgeUrl: "http://127.0.0.1:8765",
       fetcher: (async (input: RequestInfo | URL) => {
         const url = String(input);
-        if (url.includes("/editorial/internal")) return Response.json({
-          cycle: {
+        if (url.includes("/editorial/internal")) return Response.json(editorialInternalV1({
+          cycle: editorialCycleV1({
             state: "CRITIQUE", status: "READY", current_agent: "Voice Judge",
             waiting_reason: null,
             summary: {
@@ -215,17 +232,17 @@ describe("internal operations dashboard", () => {
               rejected_options: [{ reason: "今回は変数を1つに限定。" }],
               final_decision: { test_variable: "ending" },
             },
-          },
-          experiments: [{ experiment_id: "exp-1", test_variable: "ending", status: "planned", evidence_level: "hypothesis_only" }],
-        });
-        if (url.includes("/editorial/customer")) return Response.json({
+          }),
+          experiments: [editorialExperimentV1({ experiment_id: "exp-1", test_variable: "ending", status: "planned", evidence_level: "hypothesis_only" })],
+        }));
+        if (url.includes("/editorial/customer")) return Response.json(editorialCustomerV1({
           summary: { "今回試したこと": "ending", "確認できた事実": ["指標取得済み 3件。"], "次回変えること": "ending" },
-        });
-        if (url.includes("/safety/status")) return Response.json({});
-        return Response.json({
+        }));
+        if (url.includes("/safety/status")) return Response.json(safetyResponseV1());
+        return Response.json(accountResponseV1({
           account_id: "acct_8ssana", handle: "8ssana", account_status: "active",
           recent_contents: [], recent_publications: [], manual_posts: [], operations: {},
-        });
+        }));
       }) as typeof fetch,
     });
     const db = agentDb();

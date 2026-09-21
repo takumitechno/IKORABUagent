@@ -3,6 +3,18 @@ import type { Database } from "bun:sqlite";
 import { loadThreadsAccounts, loadThreadsDashboard } from "../web/lib/threads-dashboard";
 import { renderOverview } from "../web/routes/overview";
 import { renderImprovementReport } from "../web/routes/improvement-report";
+import {
+  accountResponseV1,
+  accountSummaryV1,
+  accountsResponseV1,
+  contentResponseV1,
+  editorialCustomerV1,
+  editorialInternalV1,
+  manualThreadV1,
+  recentContentV1,
+  recentPublicationV1,
+  safetyResponseV1,
+} from "./threads-bridge-v1-fixtures";
 
 describe("read-only Threads dashboard connector", () => {
   test("loads the account selector from the Bridge and only keeps display-safe fields", async () => {
@@ -12,12 +24,10 @@ describe("read-only Threads dashboard connector", () => {
       apiKey: "server-only-key",
       fetcher: (async (input: RequestInfo | URL, init?: RequestInit) => {
         requests.push(new Request(input, init));
-        return Response.json({
-          accounts: [
-            { account_id: "acct_8ssana", handle: "8sssana", display_name: "Sana", account_status: "active", access_token: "never-render" },
-            { account_id: "acct_other", handle: "other", display_name: "Other", account_status: "paused", db_path: "never-render" },
-          ],
-        });
+        return Response.json(accountsResponseV1([
+          accountSummaryV1({ account_id: "acct_8ssana", handle: "8sssana", display_name: "Sana", account_status: "active", access_token: "never-render" }),
+          accountSummaryV1({ account_id: "acct_other", handle: "other", display_name: "Other", account_status: "paused", db_path: "never-render" }),
+        ]));
       }) as typeof fetch,
     });
     expect(accounts).toEqual([
@@ -37,11 +47,12 @@ describe("read-only Threads dashboard connector", () => {
       fetcher: (async (input: RequestInfo | URL) => {
         const url = String(input);
         urls.push(url);
-        if (url.includes("/autopilot/v2/safety/status")) return Response.json({ rate_guard_ready: false });
-        return Response.json({
-          account_id: "acct_other", handle: "other", display_name: "Other",
-          account_status: "active", recent_contents: [], recent_publications: [],
-        });
+        if (url.includes("/autopilot/v2/safety/status")) return Response.json(safetyResponseV1({ account_id: "acct_other", rate_guard_ready: false }));
+        if (url.includes("/editorial/internal")) return Response.json(editorialInternalV1({ account_id: "acct_other" }));
+        if (url.includes("/editorial/customer")) return Response.json(editorialCustomerV1({ account_id: "acct_other" }));
+        return Response.json(accountResponseV1({
+          account_id: "acct_other", handle: "other", display_name: "Other", account_status: "active",
+        }));
       }) as typeof fetch,
     });
     expect(data.connected).toBe(true);
@@ -56,14 +67,17 @@ describe("read-only Threads dashboard connector", () => {
     const fetcher = (async (input: RequestInfo | URL, init?: RequestInit) => {
       const request = new Request(input, init);
       requests.push(request);
+      if (request.url.includes("/autopilot/v2/safety/status")) return Response.json(safetyResponseV1());
+      if (request.url.includes("/editorial/internal")) return Response.json(editorialInternalV1());
+      if (request.url.includes("/editorial/customer")) return Response.json(editorialCustomerV1());
       if (request.url.endsWith("/operator/accounts/acct_8ssana")) {
-        return Response.json({
+        return Response.json(accountResponseV1({
           account_id: "acct_8ssana",
           handle: "8sssana",
           display_name: "Sana",
           account_status: "active",
           pipeline: { n_metrics: 2, has_learning_snapshot: false },
-          manual_posts: [{
+          manual_posts: [manualThreadV1({
             external_post_id: "manual-101", body_text: "自分で投稿した本文",
             published_at: "2026-09-20T11:00:00Z", origin: "human_manual",
             analyze_enabled: true, learn_enabled: false,
@@ -71,21 +85,22 @@ describe("read-only Threads dashboard connector", () => {
             tracking_state: "tracked", request_id: "must-not-surface",
             logical_thread_id: "internal-thread-id", root_external_id: "manual-101",
             n_parts: 3, thread_metrics: { views: 210, likes: 7 },
+            detected_at: "2026-09-20T11:00:00Z", updated_at: "2026-09-20T11:00:00Z",
             parts: [
-              { external_post_id: "manual-101", part_index: 0, body_text: "1つ目", metrics: { views: 100 } },
-              { external_post_id: "manual-102", part_index: 1, body_text: "2つ目", metrics: { views: 70 } },
-              { external_post_id: "manual-103", part_index: 2, body_text: "3つ目", metrics: { views: 40 } },
+              { external_post_id: "manual-101", reply_to_external_id: null, part_index: 0, body_text: "1つ目", published_at: "2026-09-20T11:00:00Z", permalink: null, metrics: { views: 100 } },
+              { external_post_id: "manual-102", reply_to_external_id: "manual-101", part_index: 1, body_text: "2つ目", published_at: "2026-09-20T11:01:00Z", permalink: null, metrics: { views: 70 } },
+              { external_post_id: "manual-103", reply_to_external_id: "manual-102", part_index: 2, body_text: "3つ目", published_at: "2026-09-20T11:02:00Z", permalink: null, metrics: { views: 40 } },
             ],
-          }],
-          recent_contents: [{ content_id: "cv-live" }],
-          recent_publications: [{
+          })],
+          recent_contents: [recentContentV1({ content_id: "cv-live" })],
+          recent_publications: [recentPublicationV1({
             content_id: "cv-live", mode: "live", status: "succeeded",
             published_at: null,
-          }],
-        });
+          })],
+        }));
       }
       if (request.url.endsWith("/operator/accounts/acct_8ssana/contents/cv-live")) {
-        return Response.json({
+        return Response.json(contentResponseV1({
           content_id: "cv-live",
           topic: "実投稿のテーマ",
           content_role: "reach",
@@ -109,7 +124,9 @@ describe("read-only Threads dashboard connector", () => {
           },
           origin: "human_manual", analyze_enabled: true, learn_enabled: false,
           parts: ["1つ目", "2つ目", "3つ目"],
-        });
+          n_parts: 3,
+          n_chars: 13,
+        }));
       }
       return new Response("not found", { status: 404 });
     }) as typeof fetch;
@@ -203,7 +220,7 @@ describe("read-only Threads dashboard connector", () => {
 
   test("keeps measured content visible when it falls outside the five newest rows", async () => {
     const detailRequests: string[] = [];
-    const recentContents = Array.from({ length: 6 }, (_, index) => ({
+    const recentContents = Array.from({ length: 6 }, (_, index) => recentContentV1({
       content_id: `cv-${index + 1}`,
       state: index === 5 ? "metrics_collected" : "publish_ready",
     }));
@@ -211,23 +228,26 @@ describe("read-only Threads dashboard connector", () => {
       bridgeUrl: "http://127.0.0.1:8765",
       fetcher: (async (input: RequestInfo | URL) => {
         const url = String(input);
+        if (url.includes("/autopilot/v2/safety/status")) return Response.json(safetyResponseV1());
+        if (url.includes("/editorial/internal")) return Response.json(editorialInternalV1());
+        if (url.includes("/editorial/customer")) return Response.json(editorialCustomerV1());
         if (url.endsWith("/operator/accounts/acct_8ssana")) {
-          return Response.json({
+          return Response.json(accountResponseV1({
             account_id: "acct_8ssana",
             handle: "8sssana",
             display_name: "Sana",
             account_status: "active",
             recent_contents: recentContents,
-            recent_publications: [{
+            recent_publications: [recentPublicationV1({
               content_id: "cv-6", mode: "live", status: "partial",
               external_publish_id: "18125587639858005", published_at: null,
-            }],
-          });
+            })],
+          }));
         }
         if (url.includes("/contents/")) {
           detailRequests.push(url);
           const contentId = url.split("/").at(-1);
-          return Response.json({
+          return Response.json(contentResponseV1({
             content_id: contentId,
             topic: contentId === "cv-6" ? "LINEの温度差" : contentId,
             body_text: "実投稿本文",
@@ -243,7 +263,7 @@ describe("read-only Threads dashboard connector", () => {
               ],
             }] : [],
             metrics: contentId === "cv-6" ? { views: 189 } : {},
-          });
+          }));
         }
         return new Response("not found", { status: 404 });
       }) as typeof fetch,
@@ -267,6 +287,7 @@ describe("read-only Threads dashboard connector", () => {
       timeoutMs: 50,
     });
     expect(data.connected).toBe(false);
+    expect(data.bridgeStatus).toBe("UNREACHABLE");
     expect(data.message).toBe("接続待ち");
     expect(data.contents).toEqual([]);
 
@@ -291,15 +312,19 @@ describe("read-only Threads dashboard connector", () => {
       bridgeUrl: "http://127.0.0.1:8765",
       fetcher: (async (input: RequestInfo | URL) => {
         const url = String(input);
-        return url.endsWith("/operator/accounts/acct_8ssana")
-          ? Response.json({
-              account_id: "acct_8ssana", handle: "8sssana", display_name: "Sana", account_status: "active",
-              recent_contents: [{ content_id: "cv-one" }], recent_publications: [],
-            })
-          : Response.json({
-              content_id: "cv-one", topic: "保存済み投稿", body_text: "実投稿本文", state: "human_approval_pending",
-              qa: { verdict: "pass" }, approved_for_current_body: false, publications: [],
-            });
+        if (url.includes("/autopilot/v2/safety/status")) return Response.json(safetyResponseV1());
+        if (url.includes("/editorial/internal")) return Response.json(editorialInternalV1());
+        if (url.includes("/editorial/customer")) return Response.json(editorialCustomerV1());
+        if (url.endsWith("/operator/accounts/acct_8ssana")) return Response.json(accountResponseV1({
+          account_id: "acct_8ssana", handle: "8sssana", display_name: "Sana", account_status: "active",
+          recent_contents: [recentContentV1({ content_id: "cv-one" })], recent_publications: [],
+        }));
+        return Response.json(contentResponseV1({
+          content_id: "cv-one", topic: "保存済み投稿", body_text: "実投稿本文", state: "human_approval_pending",
+          parts: ["実投稿本文"], n_chars: 5,
+          qa: { verdict: "pass", findings: [], created_at: "2026-09-21T00:00:00Z", n_results: 1 },
+          approved_for_current_body: false, publications: [],
+        }));
       }) as typeof fetch,
     });
     const html = renderOverview({} as Database, data);
