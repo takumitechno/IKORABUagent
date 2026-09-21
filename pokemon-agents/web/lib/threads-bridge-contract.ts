@@ -129,6 +129,24 @@ function validateMeta(root: BridgeJsonObject): void {
   if (version !== THREADS_BRIDGE_SCHEMA_VERSION) incompatible("unsupported-schema-version");
 }
 
+export function parseTenantIdentityResponseV1(value: unknown) {
+  const root = object(value, "tenant.identity");
+  validateMeta(root);
+  const userId = string(root.user_id, "tenant.identity.user_id");
+  const organizationId = string(root.org_id, "tenant.identity.org_id");
+  const role = string(root.role, "tenant.identity.role");
+  if (!/^[a-zA-Z0-9][a-zA-Z0-9._:@-]{0,199}$/.test(userId)) {
+    malformed("tenant.identity.user_id:canonical-id");
+  }
+  if (!organizationId.trim() || organizationId.length > 200) {
+    malformed("tenant.identity.org_id:canonical-id");
+  }
+  if (role !== "viewer" && role !== "editor" && role !== "admin") {
+    malformed("tenant.identity.role:known-role");
+  }
+  return { userId, organizationId, role };
+}
+
 function validateReadiness(value: unknown, path: string): void {
   const got = object(value, path);
   boolean(got.config_ok, `${path}.config_ok`);

@@ -376,6 +376,7 @@ export async function loadThreadsDashboard(options: {
   bridgeUrl?: string;
   apiKey?: string;
   accountId?: string;
+  tenantUserId?: string;
   timeoutMs?: number;
   fetcher?: FetchLike;
 } = {}): Promise<ThreadsDashboardData> {
@@ -394,7 +395,7 @@ export async function loadThreadsDashboard(options: {
     if (!apiKey && !["127.0.0.1", "localhost", "::1", "[::1]"].includes(new URL(origin).hostname.toLowerCase())) {
       return fallback("UNAUTHORIZED");
     }
-    const headers: HeadersInit = apiKey ? { Authorization: `Bearer ${apiKey}` } : {};
+    const headers = bridgeRequestHeaders(apiKey, options.tenantUserId);
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), options.timeoutMs ?? 2_500);
     try {
@@ -563,17 +564,33 @@ export async function loadThreadsDashboard(options: {
 
 const dashboardCache = new Map<string, { expiresAt: number; value: ThreadsDashboardData }>();
 const dashboardPending = new Map<string, Promise<ThreadsDashboardData>>();
-let accountsCached: { expiresAt: number; value: ThreadsAccountOption[] } | null = null;
-let accountsPending: Promise<ThreadsAccountOption[]> | null = null;
+const accountsCached = new Map<string, { expiresAt: number; value: ThreadsAccountOption[] }>();
+const accountsPending = new Map<string, Promise<ThreadsAccountOption[]>>();
 
-export async function getThreadsDashboard(accountId?: string): Promise<ThreadsDashboardData> {
-  const key = accountId ?? process.env.THREADS_DASHBOARD_ACCOUNT_ID ?? DEFAULT_ACCOUNT_ID;
+function tenantCacheKey(tenantUserId?: string): string {
+  return tenantUserId ? `user:${tenantUserId}` : "legacy";
+}
+
+export function bridgeRequestHeaders(apiKey: string, tenantUserId?: string): Record<string, string> {
+  const headers: Record<string, string> = apiKey ? { Authorization: `Bearer ${apiKey}` } : {};
+  if (tenantUserId !== undefined) {
+    if (!/^[a-zA-Z0-9][a-zA-Z0-9._:@-]{0,199}$/.test(tenantUserId)) {
+      throw new Error("invalid canonical tenant user ID");
+    }
+    headers["X-Threads-User-ID"] = tenantUserId;
+  }
+  return headers;
+}
+
+export async function getThreadsDashboard(accountId?: string, tenantUserId?: string): Promise<ThreadsDashboardData> {
+  const accountKey = accountId ?? process.env.THREADS_DASHBOARD_ACCOUNT_ID ?? DEFAULT_ACCOUNT_ID;
+  const key = `${tenantCacheKey(tenantUserId)}:${accountKey}`;
   const now = Date.now();
   const cached = dashboardCache.get(key);
   if (cached && cached.expiresAt > now) return cached.value;
   let pending = dashboardPending.get(key);
   if (!pending) {
-    pending = loadThreadsDashboard({ accountId: key }).then((value) => {
+    pending = loadThreadsDashboard({ accountId: accountKey, tenantUserId }).then((value) => {
       dashboardCache.set(key, { expiresAt: Date.now() + CACHE_TTL_MS, value });
       return value;
     }).finally(() => { dashboardPending.delete(key); });
@@ -585,6 +602,7 @@ export async function getThreadsDashboard(accountId?: string): Promise<ThreadsDa
 export async function loadThreadsAccounts(options: {
   bridgeUrl?: string;
   apiKey?: string;
+  tenantUserId?: string;
   timeoutMs?: number;
   fetcher?: FetchLike;
 } = {}): Promise<ThreadsAccountOption[]> {
@@ -594,7 +612,7 @@ export async function loadThreadsAccounts(options: {
     if (!apiKey && !["127.0.0.1", "localhost", "::1", "[::1]"].includes(new URL(origin).hostname.toLowerCase())) {
       return [];
     }
-    const headers: HeadersInit = apiKey ? { Authorization: `Bearer ${apiKey}` } : {};
+    const headers = bridgeRequestHeaders(apiKey, options.tenantUserId);
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), options.timeoutMs ?? 2_500);
     try {
@@ -621,16 +639,20 @@ export async function loadThreadsAccounts(options: {
   }
 }
 
-export async function getThreadsAccounts(): Promise<ThreadsAccountOption[]> {
+export async function getThreadsAccounts(tenantUserId?: string): Promise<ThreadsAccountOption[]> {
+  const key = tenantCacheKey(tenantUserId);
   const now = Date.now();
-  if (accountsCached && accountsCached.expiresAt > now) return accountsCached.value;
-  if (!accountsPending) {
-    accountsPending = loadThreadsAccounts().then((value) => {
-      accountsCached = { expiresAt: Date.now() + CACHE_TTL_MS, value };
+  const cached = accountsCached.get(key);
+  if (cached && cached.expiresAt > now) return cached.value;
+  let pending = accountsPending.get(key);
+  if (!pending) {
+    pending = loadThreadsAccounts({ tenantUserId }).then((value) => {
+      accountsCached.set(key, { expiresAt: Date.now() + CACHE_TTL_MS, value });
       return value;
-    }).finally(() => { accountsPending = null; });
+    }).finally(() => { accountsPending.delete(key); });
+    accountsPending.set(key, pending);
   }
-  return accountsPending;
+  return pending;
 }
 
 export async function configureManualPostPolicy(input: {
@@ -639,6 +661,7 @@ export async function configureManualPostPolicy(input: {
   origin: ManualPostStatus["origin"];
   analyzeEnabled: boolean;
   learnEnabled: boolean;
+  tenantUserId?: string;
 }): Promise<void> {
   const accountId = input.accountId;
   if (!/^acct_[a-zA-Z0-9_-]+$/.test(accountId)
@@ -657,7 +680,7 @@ export async function configureManualPostPolicy(input: {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        ...(apiKey ? { Authorization: `Bearer ${apiKey}` } : {}),
+        ...bridgeRequestHeaders(apiKey, input.tenantUserId),
       },
       body: JSON.stringify({
         actor: "operator:ikorabu-dashboard",
@@ -669,5 +692,7 @@ export async function configureManualPostPolicy(input: {
     },
   );
   if (!response.ok) throw new Error(`manual policy update failed (${response.status})`);
-  dashboardCache.delete(accountId);
+  for (const key of dashboardCache.keys()) {
+    if (key.endsWith(`:${accountId}`)) dashboardCache.delete(key);
+  }
 }

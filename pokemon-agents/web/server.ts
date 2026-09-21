@@ -37,6 +37,11 @@ import {
   mutationAllowed, resolveInternalIdentity,
 } from "./lib/internal-auth";
 import {
+  createBridgeTenantDirectory, createDashboardTenantConfig, resolveTrustedTenantIdentity,
+  selectAuthorizedAccount, tenantCan, tenantIdentityFailure,
+  type ResolvedTenantIdentity,
+} from "./lib/dashboard-tenant";
+import {
   configureManualPostPolicy, getThreadsAccounts, getThreadsDashboard,
 } from "./lib/threads-dashboard";
 import { sseHandler } from "./sse";
@@ -96,20 +101,29 @@ const PORT = Number(process.env.POKEMON_AGENTS_PORT || 5733);
 const HOST = process.env.POKEMON_AGENTS_HOST || "127.0.0.1";
 const DEFAULT_THREADS_ACCOUNT = process.env.THREADS_DASHBOARD_ACCOUNT_ID || "acct_8ssana";
 const INTERNAL_AUTH = createDashboardAuthConfig(process.env, HOST);
+const TENANT_AUTH = createDashboardTenantConfig(process.env, INTERNAL_AUTH.mode);
+const TENANT_DIRECTORY = createBridgeTenantDirectory();
 
 function internalAccessAllowed(req: Request): boolean {
   return resolveInternalIdentity(req, INTERNAL_AUTH) !== null;
 }
 
-async function internalAccount(requested: string | null) {
-  const accounts = (await getThreadsAccounts()).filter((account) => accountAllowed(account.accountId, INTERNAL_AUTH));
-  const allowed = new Set(accounts.map((account) => account.accountId));
-  const selected = requested && allowed.has(requested)
-    ? requested
-    : allowed.has(DEFAULT_THREADS_ACCOUNT)
-      ? DEFAULT_THREADS_ACCOUNT
-      : accounts[0]?.accountId ?? DEFAULT_THREADS_ACCOUNT;
-  return { accounts, selected };
+async function internalAccount(requested: string | null, tenantUserId?: string) {
+  const accounts = (await getThreadsAccounts(tenantUserId))
+    .filter((account) => accountAllowed(account.accountId, INTERNAL_AUTH));
+  return selectAuthorizedAccount(
+    requested, accounts, DEFAULT_THREADS_ACCOUNT, TENANT_AUTH.enabled,
+  );
+}
+
+function tenantIdentityRequired(path: string): boolean {
+  return path === "/" || path === "/improvement" || path === "/internal"
+    || path === "/api/internal/manual-policy";
+}
+
+function requireTenantSelection(identity: ResolvedTenantIdentity | null): ResolvedTenantIdentity {
+  if (!identity) throw new Error("tenant identity unavailable");
+  return identity;
 }
 
 const db = new Database(DB_PATH);
@@ -241,6 +255,21 @@ const server = Bun.serve({
       if (!isPublicDashboardPath(path) && !identity) {
         return new Response("Unauthorized", { status: 401 });
       }
+      let tenantIdentity: ResolvedTenantIdentity | null = null;
+      let tenantFailure: string | null = null;
+      try {
+        tenantIdentity = await resolveTrustedTenantIdentity(
+          req, identity, TENANT_AUTH, TENANT_DIRECTORY,
+        );
+      } catch (error) {
+        tenantFailure = tenantIdentityFailure(error);
+      }
+      if (TENANT_AUTH.enabled && tenantIdentityRequired(path) && !tenantIdentity) {
+        if (path === "/internal" && tenantFailure) {
+          return new Response(`Tenant identity unavailable (${tenantFailure})`, { status: 401 });
+        }
+        return new Response("Unauthorized", { status: 401 });
+      }
       const isMutation = !["GET", "HEAD", "OPTIONS"].includes(req.method)
         || path === "/api/reindex-knowledge";
       if (isMutation && !isPublicDashboardPath(path)
@@ -253,8 +282,14 @@ const server = Bun.serve({
           try {
             const form = await req.formData();
             const accountId = String(form.get("account_id") || "");
-            const selection = await internalAccount(accountId);
-            if (selection.selected !== accountId) return new Response("invalid account", { status: 400 });
+            const trustedTenant = TENANT_AUTH.enabled ? requireTenantSelection(tenantIdentity) : null;
+            if (trustedTenant && !tenantCan(trustedTenant, "content:review")) {
+              return new Response("Forbidden", { status: 403 });
+            }
+            const selection = await internalAccount(accountId, trustedTenant?.userId);
+            if (selection.rejected || selection.selected !== accountId) {
+              return new Response("invalid account", { status: TENANT_AUTH.enabled ? 403 : 400 });
+            }
             const origin = String(form.get("origin") || "");
             if (!(["ai_auto", "ai_manual", "human_manual"] as string[]).includes(origin)) {
               return new Response("invalid origin", { status: 400 });
@@ -265,6 +300,7 @@ const server = Bun.serve({
               origin: origin as "ai_auto" | "ai_manual" | "human_manual",
               analyzeEnabled: form.has("analyze_enabled"),
               learnEnabled: form.has("learn_enabled"),
+              tenantUserId: trustedTenant?.userId,
             });
             return redirect(`/internal?account_id=${encodeURIComponent(accountId)}`);
           } catch {
@@ -497,14 +533,42 @@ const server = Bun.serve({
 
       // ===== 4-menu structure =====
       if (path === "/internal") {
-        const selection = await internalAccount(url.searchParams.get("account_id"));
+        const trustedTenant = TENANT_AUTH.enabled ? requireTenantSelection(tenantIdentity) : null;
+        const selection = await internalAccount(
+          url.searchParams.get("account_id"), trustedTenant?.userId,
+        );
+        if (selection.rejected || !selection.selected) {
+          return new Response("Forbidden", { status: 403 });
+        }
         return lay(
           "=LOVE Agent OS",
-          renderInternalOperations(db, await getThreadsDashboard(selection.selected), selection.accounts),
+          renderInternalOperations(
+            db,
+            await getThreadsDashboard(selection.selected, trustedTenant?.userId),
+            selection.accounts,
+          ),
         );
       }
-      if (path === "/" || path === "") return lay("Dashboard", renderOverview(db, await getThreadsDashboard()));
-      if (path === "/improvement") return lay("AI改善レポート", renderImprovementReport(await getThreadsDashboard()));
+      if (path === "/" || path === "") {
+        if (!TENANT_AUTH.enabled) return lay("Dashboard", renderOverview(db, await getThreadsDashboard()));
+        const trustedTenant = requireTenantSelection(tenantIdentity);
+        const selection = await internalAccount(null, trustedTenant.userId);
+        if (!selection.selected) return new Response("Forbidden", { status: 403 });
+        return lay("Dashboard", renderOverview(
+          db, await getThreadsDashboard(selection.selected, trustedTenant.userId),
+        ));
+      }
+      if (path === "/improvement") {
+        if (!TENANT_AUTH.enabled) {
+          return lay("AI改善レポート", renderImprovementReport(await getThreadsDashboard()));
+        }
+        const trustedTenant = requireTenantSelection(tenantIdentity);
+        const selection = await internalAccount(null, trustedTenant.userId);
+        if (!selection.selected) return new Response("Forbidden", { status: 403 });
+        return lay("AI改善レポート", renderImprovementReport(
+          await getThreadsDashboard(selection.selected, trustedTenant.userId),
+        ));
+      }
       // ===== Flat URL = DB table name =====
       // /agents       (table: agents)         一覧 (default) — ?view=org で組織図
       // /schedules    (table: agent_schedules) スケジュール

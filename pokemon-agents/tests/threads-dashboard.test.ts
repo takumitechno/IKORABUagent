@@ -37,6 +37,34 @@ describe("read-only Threads dashboard connector", () => {
     expect(requests).toHaveLength(1);
     expect(requests[0].url).toEndWith("/operator/accounts");
     expect(requests[0].headers.get("authorization")).toBe("Bearer server-only-key");
+    expect(requests[0].headers.get("x-threads-user-id")).toBeNull();
+  });
+
+  test("propagates only an explicitly resolved canonical user ID server-to-server", async () => {
+    const requests: Request[] = [];
+    const accounts = await loadThreadsAccounts({
+      bridgeUrl: "http://127.0.0.1:8765",
+      apiKey: "server-only-key",
+      tenantUserId: "user_A",
+      fetcher: (async (input: RequestInfo | URL, init?: RequestInit) => {
+        requests.push(new Request(input, init));
+        return Response.json(accountsResponseV1([
+          accountSummaryV1({ account_id: "acct_A", handle: "a", display_name: "A" }),
+        ]));
+      }) as typeof fetch,
+    });
+    expect(accounts.map((account) => account.accountId)).toEqual(["acct_A"]);
+    expect(requests[0].headers.get("authorization")).toBe("Bearer server-only-key");
+    expect(requests[0].headers.get("x-threads-user-id")).toBe("user_A");
+
+    let called = false;
+    const invalid = await loadThreadsAccounts({
+      bridgeUrl: "http://127.0.0.1:8765",
+      tenantUserId: "forged\r\nAuthorization: bad",
+      fetcher: (async () => { called = true; return Response.json({}); }) as typeof fetch,
+    });
+    expect(invalid).toEqual([]);
+    expect(called).toBe(false);
   });
 
   test("scopes summary and safety reads to the selected account", async () => {
