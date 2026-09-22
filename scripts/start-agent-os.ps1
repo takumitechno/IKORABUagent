@@ -61,6 +61,12 @@ function Invoke-LocalGet {
         return Invoke-WebRequest -UseBasicParsing -Uri $Uri -TimeoutSec 3
     }
     catch {
+        if ($null -ne $_.Exception.Response) {
+            return [pscustomobject]@{
+                StatusCode = [int]$_.Exception.Response.StatusCode
+                Content = ""
+            }
+        }
         return $null
     }
 }
@@ -94,12 +100,16 @@ function Get-DashboardState {
     $root = Invoke-LocalGet "http://127.0.0.1:$Port/"
     $internal = Invoke-LocalGet "http://127.0.0.1:$Port/internal"
     $health = Invoke-LocalGet "http://127.0.0.1:$Port/health"
-    $rootHealthy = $null -ne $root -and [int]$root.StatusCode -eq 200 -and
+    $rootRendered = $null -ne $root -and [int]$root.StatusCode -eq 200 -and
         $root.Content -match "<title>[^<]*AI SNS運用[^<]*</title>"
     $healthHealthy = $false
     if ($null -ne $health -and [int]$health.StatusCode -eq 200) {
         try { $healthHealthy = ($health.Content | ConvertFrom-Json).status -eq "ok" } catch { $healthHealthy = $false }
     }
+    $authMode = Get-RuntimeEnvironmentValue "DASHBOARD_INTERNAL_AUTH"
+    $rootProtected = $authMode -eq "cloudflare-access" -and $null -ne $root -and
+        [int]$root.StatusCode -eq 401 -and $healthHealthy
+    $rootHealthy = $rootRendered -or $rootProtected
     $internalHealthy = ($null -ne $internal -and [int]$internal.StatusCode -eq 200 -and
         $internal.Content -match "<title>[^<]*Agent OS[^<]*</title>") -or $healthHealthy
     $healthy = $rootHealthy -and $internalHealthy
