@@ -19,6 +19,14 @@ describe("NIGHT04 registration preparation", () => {
     expect(registration).toContain("-StartWhenAvailable -WakeToRun");
     expect(launcher).toContain("CREATE_NO_WINDOW");
   });
+  test("uses an unbounded five-minute recurrence and snapshots before apply", () => {
+    expect(registration).toContain("New-TimeSpan -Minutes 5");
+    expect(registration).toContain("-RepetitionInterval $repetitionInterval");
+    expect(registration).toContain('RepetitionDuration = $null');
+    expect(registration).toContain('EndBoundary = $null');
+    expect(registration).toContain("Export-ScheduledTask -TaskName $TaskName");
+    expect(registration).toContain("-Principal $existing.Principal");
+  });
   test("redirects output to a persistent log without command secrets", () => {
     expect(registration).toContain(".runtime\\logs\\night-runner.log");
     expect(launcher).toContain("stdout=log, stderr=log");
