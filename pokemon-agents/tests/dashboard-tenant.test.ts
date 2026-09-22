@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
 import {
-  createDashboardTenantConfig, resolveTrustedTenantIdentity,
+  canaryAccountForIdentity, createDashboardTenantConfig, resolveTrustedTenantIdentity,
   dashboardTenantShadowSnapshot, evaluateDashboardTenantShadow,
   resetDashboardTenantShadow, selectAuthorizedAccount, tenantCan, unavailableTenantDirectory,
   tenantEnforcementEnabled,
@@ -50,9 +50,25 @@ describe("dashboard trusted tenant identity", () => {
     expect(tenantEnforcementEnabled(canary, selected)).toBe(true);
     expect(tenantEnforcementEnabled(canary, other)).toBe(false);
     expect(tenantEnforcementEnabled(canary, null)).toBe(false);
+    expect(canaryAccountForIdentity(canary, selected)).toBe("acct_A");
+    expect(canaryAccountForIdentity(canary, other)).toBeNull();
     expect(() => createDashboardTenantConfig({
       DASHBOARD_MULTI_TENANT_AUTH_CANARY: "true",
     }, "cloudflare-access")).toThrow(/CANARY_USER_ID/);
+  });
+
+  test("supports additive scoped canaries without enabling the global flag", () => {
+    const config = createDashboardTenantConfig({
+      DASHBOARD_MULTI_TENANT_AUTH: "false",
+      DASHBOARD_MULTI_TENANT_AUTH_CANARY: "true",
+      DASHBOARD_MULTI_TENANT_AUTH_CANARY_USER_ID: "user_A,user_B",
+      DASHBOARD_MULTI_TENANT_AUTH_CANARY_ACCOUNT_ID: "acct_A,acct_B",
+    }, "cloudflare-access");
+    const a = { userId: "user_A", organizationId: "org_A", role: "admin" as const };
+    const b = { userId: "user_B", organizationId: "org_B", role: "admin" as const };
+    expect(config.enabled).toBe(false);
+    expect(canaryAccountForIdentity(config, a)).toBe("acct_A");
+    expect(canaryAccountForIdentity(config, b)).toBe("acct_B");
   });
 
   test("shadow resolves verified identity and evaluates accounts without enabling enforcement", async () => {

@@ -12,8 +12,7 @@ export interface DashboardTenantConfig {
   enabled: boolean;
   shadowEnabled: boolean;
   canaryEnabled: boolean;
-  canaryUserId: string | null;
-  canaryAccountId: string | null;
+  canaryScopes: ReadonlyArray<{ userId: string; accountId: string }>;
   authMode: DashboardAuthMode;
   localUserId: string | null;
   localRole: TenantRole;
@@ -263,20 +262,27 @@ export function createDashboardTenantConfig(
     throw new Error("DASHBOARD_LOCAL_USER_ID is not a valid canonical user ID");
   }
   const canaryEnabled = enabled(env.DASHBOARD_MULTI_TENANT_AUTH_CANARY);
-  const canaryUserId = (env.DASHBOARD_MULTI_TENANT_AUTH_CANARY_USER_ID || "").trim() || null;
-  const canaryAccountId = (env.DASHBOARD_MULTI_TENANT_AUTH_CANARY_ACCOUNT_ID || "").trim() || null;
-  if (canaryEnabled && (!canaryUserId || !validCanonicalUserId(canaryUserId))) {
-    throw new Error("DASHBOARD_MULTI_TENANT_AUTH_CANARY_USER_ID is required and invalid");
+  const canaryUsers = (env.DASHBOARD_MULTI_TENANT_AUTH_CANARY_USER_ID || "")
+    .split(",").map((value) => value.trim()).filter(Boolean);
+  const canaryAccounts = (env.DASHBOARD_MULTI_TENANT_AUTH_CANARY_ACCOUNT_ID || "")
+    .split(",").map((value) => value.trim()).filter(Boolean);
+  if (canaryEnabled && (canaryUsers.length === 0 || canaryUsers.length !== canaryAccounts.length
+    || canaryUsers.some((value) => !validCanonicalUserId(value))
+    || canaryAccounts.some((value) => !/^acct_[a-zA-Z0-9_-]+$/.test(value))
+    || new Set(canaryUsers).size !== canaryUsers.length
+    || new Set(canaryAccounts).size !== canaryAccounts.length)) {
+    throw new Error(
+      "DASHBOARD_MULTI_TENANT_AUTH_CANARY_USER_ID/ACCOUNT_ID scopes are required and invalid",
+    );
   }
-  if (canaryEnabled && (!canaryAccountId || !/^acct_[a-zA-Z0-9_-]+$/.test(canaryAccountId))) {
-    throw new Error("DASHBOARD_MULTI_TENANT_AUTH_CANARY_ACCOUNT_ID is required and invalid");
-  }
+  const canaryScopes = canaryUsers.map((userId, index) => ({
+    userId, accountId: canaryAccounts[index],
+  }));
   return {
     enabled: enabled(env.DASHBOARD_MULTI_TENANT_AUTH),
     shadowEnabled: enabled(env.DASHBOARD_MULTI_TENANT_AUTH_SHADOW),
     canaryEnabled,
-    canaryUserId,
-    canaryAccountId,
+    canaryScopes,
     authMode,
     localUserId,
     localRole: tenantRole(env.DASHBOARD_LOCAL_TENANT_ROLE),
@@ -318,8 +324,17 @@ export function tenantEnforcementEnabled(
   identity: ResolvedTenantIdentity | null,
 ): boolean {
   return config.enabled || Boolean(
-    config.canaryEnabled && identity && identity.userId === config.canaryUserId,
+    config.canaryEnabled && identity
+      && config.canaryScopes.some((scope) => scope.userId === identity.userId),
   );
+}
+
+export function canaryAccountForIdentity(
+  config: DashboardTenantConfig,
+  identity: ResolvedTenantIdentity | null,
+): string | null {
+  if (!config.canaryEnabled || !identity) return null;
+  return config.canaryScopes.find((scope) => scope.userId === identity.userId)?.accountId ?? null;
 }
 
 export async function evaluateDashboardTenantShadow(

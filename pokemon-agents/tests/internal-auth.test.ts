@@ -1,7 +1,8 @@
 import { describe, expect, test } from "bun:test";
 import {
-  accountAllowed, createDashboardAuthConfig, csrfToken, isPublicDashboardPath,
-  mutationAllowed, resolveInternalIdentity,
+  accountAllowed, createDashboardAuthConfig, csrfToken, customerCsrfToken,
+  customerMutationAllowed, isPublicDashboardPath, mutationAllowed,
+  resolveCustomerIdentity, resolveInternalIdentity,
 } from "../web/lib/internal-auth";
 
 const cloudflare = createDashboardAuthConfig({
@@ -38,6 +39,36 @@ describe("unified dashboard internal auth boundary", () => {
     expect(resolveInternalIdentity(cfRequest("/agents"), cloudflare)?.subject).toBe("owner@example.com");
     expect(accountAllowed("acct_8ssana", cloudflare)).toBe(true);
     expect(accountAllowed("acct_other", cloudflare)).toBe(false);
+  });
+
+  test("admits a verified customer independently while keeping the internal allowlist explicit", () => {
+    const customer = new Request("https://admin.example.com/", { headers: {
+      "cf-access-authenticated-user-email": "customer@example.com",
+      "cf-access-jwt-assertion": "signed-by-cloudflare-access",
+      "x-threads-user-id": "forged-user",
+    } });
+    expect(resolveCustomerIdentity(customer, cloudflare)?.subject).toBe("customer@example.com");
+    expect(resolveInternalIdentity(customer, cloudflare)).toBeNull();
+    const missingAssertion = new Request("https://admin.example.com/", { headers: {
+      "cf-access-authenticated-user-email": "customer@example.com",
+    } });
+    expect(resolveCustomerIdentity(missingAssertion, cloudflare)).toBeNull();
+  });
+
+  test("binds customer CSRF separately to canonical tenant identity", async () => {
+    const tenant = { userId: "user_customer", organizationId: "org_customer", role: "admin" as const };
+    const valid = new Request("https://admin.example.com/api/customer/content/content_A/approve", {
+      method: "POST",
+      headers: {
+        origin: "https://admin.example.com",
+        "x-csrf-token": customerCsrfToken(tenant, cloudflare),
+      },
+    });
+    expect(await customerMutationAllowed(valid, tenant, cloudflare)).toBe(true);
+    const internal = { kind: "cloudflare-user" as const, subject: "owner@example.com" };
+    expect(await mutationAllowed(valid, internal, cloudflare)).toBe(false);
+    expect(await customerMutationAllowed(valid, { ...tenant, userId: "user_other" }, cloudflare))
+      .toBe(false);
   });
 
   test("rejects Origin-only mutation and accepts authenticated same-origin CSRF", async () => {

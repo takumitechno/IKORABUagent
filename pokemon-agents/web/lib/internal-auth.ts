@@ -16,6 +16,12 @@ export interface InternalIdentity {
   subject: string;
 }
 
+export interface CustomerCsrfIdentity {
+  userId: string;
+  organizationId: string;
+  role: "viewer" | "editor" | "admin";
+}
+
 const PUBLIC_PATHS = new Set(["/", "/improvement", "/styles.css", "/health"]);
 const PUBLIC_PREFIXES = ["/brand/", "/bg/", "/hero/"];
 const LOOPBACK_HOSTS = new Set(["127.0.0.1", "::1", "localhost", "[::1]"]);
@@ -96,15 +102,38 @@ export function resolveInternalIdentity(req: Request, config: DashboardAuthConfi
   if (config.mode === "local") {
     return { kind: "local-user", subject: "localhost-operator" };
   }
+  const verified = resolveCustomerIdentity(req, config);
+  if (!verified || !config.allowedEmails.has(verified.subject)) return null;
+  return verified;
+}
+
+export function resolveCustomerIdentity(
+  req: Request,
+  config: DashboardAuthConfig,
+): InternalIdentity | null {
+  if (config.mode === "local") {
+    return { kind: "local-user", subject: "localhost-customer" };
+  }
   const email = (req.headers.get("cf-access-authenticated-user-email") || "").trim().toLowerCase();
   const assertion = req.headers.get("cf-access-jwt-assertion") || "";
-  if (!email || !assertion || !config.allowedEmails.has(email)) return null;
+  if (!email || !assertion) return null;
   return { kind: "cloudflare-user", subject: email };
 }
 
 export function csrfToken(identity: InternalIdentity, config: DashboardAuthConfig): string {
   return createHmac("sha256", config.csrfSecret)
     .update(`dashboard-csrf-v1\n${identity.kind}\n${identity.subject}`)
+    .digest("hex");
+}
+
+export function customerCsrfToken(
+  identity: CustomerCsrfIdentity,
+  config: DashboardAuthConfig,
+): string {
+  return createHmac("sha256", config.csrfSecret)
+    .update(
+      `dashboard-customer-csrf-v1\n${identity.userId}\n${identity.organizationId}\n${identity.role}`,
+    )
     .digest("hex");
 }
 
@@ -144,4 +173,13 @@ export async function mutationAllowed(
   if (config.mode === "local" && !req.headers.get("origin")) return true;
   if (!sameOrigin(req, config)) return false;
   return equalSecret(await suppliedCsrf(req), csrfToken(identity, config));
+}
+
+export async function customerMutationAllowed(
+  req: Request,
+  identity: CustomerCsrfIdentity,
+  config: DashboardAuthConfig,
+): Promise<boolean> {
+  if (!sameOrigin(req, config)) return false;
+  return equalSecret(await suppliedCsrf(req), customerCsrfToken(identity, config));
 }

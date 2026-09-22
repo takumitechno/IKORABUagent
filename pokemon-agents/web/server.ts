@@ -33,11 +33,13 @@ import { syncLaunchdToDb } from "./lib/launchd-sync";
 import { saveSchedule, toggleSchedule, readScheduleTimes, type TimeSpec } from "./lib/schedule-writer";
 import { classifyActor, buildAgentLookup } from "./lib/actors";
 import {
-  accountAllowed, createDashboardAuthConfig, csrfToken, isPublicDashboardPath,
-  mutationAllowed, resolveInternalIdentity,
+  accountAllowed, createDashboardAuthConfig, csrfToken, customerCsrfToken,
+  customerMutationAllowed, isPublicDashboardPath, mutationAllowed,
+  resolveCustomerIdentity, resolveInternalIdentity,
 } from "./lib/internal-auth";
 import {
-  createBridgeTenantDirectory, createDashboardTenantConfig, resolveTrustedTenantIdentity,
+  canaryAccountForIdentity, createBridgeTenantDirectory, createDashboardTenantConfig,
+  resolveTrustedTenantIdentity,
   dashboardTenantShadowSnapshot, evaluateDashboardTenantShadow,
   selectAuthorizedAccount, tenantCan, tenantIdentityFailure,
   tenantEnforcementEnabled,
@@ -114,9 +116,10 @@ function internalAccessAllowed(req: Request): boolean {
 async function internalAccount(
   requested: string | null, tenantUserId: string | undefined, enforcementEnabled: boolean,
   exactCanaryAccount: string | null = null,
+  applyInternalAllowlist = true,
 ) {
   const accounts = (await getThreadsAccounts(tenantUserId)).filter((account) =>
-    accountAllowed(account.accountId, INTERNAL_AUTH)
+    (!applyInternalAllowlist || accountAllowed(account.accountId, INTERNAL_AUTH))
     && (!exactCanaryAccount || account.accountId === exactCanaryAccount));
   return selectAuthorizedAccount(
     requested, accounts, DEFAULT_THREADS_ACCOUNT, enforcementEnabled,
@@ -126,6 +129,10 @@ async function internalAccount(
 function tenantIdentityRequired(path: string): boolean {
   return path === "/" || path === "/improvement" || path === "/internal"
     || path === "/api/internal/manual-policy" || path.startsWith("/api/customer/content/");
+}
+
+function customerIdentityRequired(path: string): boolean {
+  return path === "/" || path === "/improvement" || path.startsWith("/api/customer/content/");
 }
 
 function requireTenantSelection(identity: ResolvedTenantIdentity | null): ResolvedTenantIdentity {
@@ -258,26 +265,35 @@ const server = Bun.serve({
     const path = url.pathname;
 
     try {
-      const identity = resolveInternalIdentity(req, INTERNAL_AUTH);
-      if (!isPublicDashboardPath(path) && !identity) {
+      const internalIdentity = resolveInternalIdentity(req, INTERNAL_AUTH);
+      const customerIdentity = resolveCustomerIdentity(req, INTERNAL_AUTH);
+      const customerRoute = customerIdentityRequired(path);
+      if (!isPublicDashboardPath(path) && !customerRoute && !internalIdentity) {
         return new Response("Unauthorized", { status: 401 });
       }
       let tenantIdentity: ResolvedTenantIdentity | null = null;
       let tenantFailure: string | null = null;
       try {
         tenantIdentity = await resolveTrustedTenantIdentity(
-          req, identity, TENANT_AUTH, TENANT_DIRECTORY,
+          req, customerRoute ? customerIdentity : internalIdentity,
+          TENANT_AUTH, TENANT_DIRECTORY,
         );
       } catch (error) {
         tenantFailure = tenantIdentityFailure(error);
       }
-      const tenantEnforced = tenantEnforcementEnabled(TENANT_AUTH, tenantIdentity);
+      const customerAdmissionRequired = customerRoute && INTERNAL_AUTH.mode === "cloudflare-access";
+      const tenantEnforced = customerAdmissionRequired
+        || tenantEnforcementEnabled(TENANT_AUTH, tenantIdentity);
       const exactCanaryAccount = tenantEnforced && !TENANT_AUTH.enabled
-        ? TENANT_AUTH.canaryAccountId : null;
+        ? canaryAccountForIdentity(TENANT_AUTH, tenantIdentity) : null;
       if (TENANT_AUTH.shadowEnabled && tenantIdentityRequired(path)) {
         await evaluateDashboardTenantShadow(tenantIdentity, TENANT_DIRECTORY);
       }
-      if ((TENANT_AUTH.enabled || TENANT_AUTH.canaryEnabled)
+      if (customerRoute && !tenantIdentity
+        && (customerAdmissionRequired || TENANT_AUTH.enabled || TENANT_AUTH.canaryEnabled)) {
+        return new Response("Unauthorized", { status: 401 });
+      }
+      if (!customerRoute && (TENANT_AUTH.enabled || TENANT_AUTH.canaryEnabled)
         && tenantIdentityRequired(path) && !tenantIdentity && !isPublicDashboardPath(path)) {
         if (path === "/internal" && tenantFailure) {
           return new Response(`Tenant identity unavailable (${tenantFailure})`, { status: 401 });
@@ -286,8 +302,14 @@ const server = Bun.serve({
       }
       const isMutation = !["GET", "HEAD", "OPTIONS"].includes(req.method)
         || path === "/api/reindex-knowledge";
-      if (isMutation && !isPublicDashboardPath(path)
-        && (!identity || !(await mutationAllowed(req, identity, INTERNAL_AUTH)))) {
+      if (isMutation && customerRoute) {
+        if (!tenantIdentity
+          || !(await customerMutationAllowed(req, tenantIdentity, INTERNAL_AUTH))) {
+          return new Response("Forbidden", { status: 403 });
+        }
+      } else if (isMutation && !isPublicDashboardPath(path)
+        && (!internalIdentity
+          || !(await mutationAllowed(req, internalIdentity, INTERNAL_AUTH)))) {
         return new Response("Forbidden", { status: 403 });
       }
       // POST: approve / reject / schedule / budget actions / hook ingestion
@@ -301,7 +323,7 @@ const server = Bun.serve({
           const form = await req.formData();
           const accountId = String(form.get("account_id") || "");
           const selection = await internalAccount(
-            accountId, trustedTenant.userId, true, exactCanaryAccount,
+            accountId, trustedTenant.userId, true, exactCanaryAccount, false,
           );
           if (selection.rejected || selection.selected !== accountId) {
             return new Response("Forbidden", { status: 403 });
@@ -575,14 +597,15 @@ const server = Bun.serve({
 
       const badges = getBadges(db);
       const currentPath = path + (url.search || "");
-      const lay = (title: string, body: string) =>
+      const lay = (title: string, body: string, routeCsrfToken?: string) =>
         html(renderLayout({
           title,
           body,
           currentPath,
           badges,
           internalAccessAllowed: internalAccessAllowed(req),
-          csrfToken: identity ? csrfToken(identity, INTERNAL_AUTH) : undefined,
+          csrfToken: routeCsrfToken
+            ?? (internalIdentity ? csrfToken(internalIdentity, INTERNAL_AUTH) : undefined),
         }));
 
       // ===== 4-menu structure =====
@@ -608,7 +631,7 @@ const server = Bun.serve({
         if (!tenantEnforced) return lay("Dashboard", renderOverview(db, await getThreadsDashboard()));
         const trustedTenant = requireTenantSelection(tenantIdentity);
         const selection = await internalAccount(
-          null, trustedTenant.userId, tenantEnforced, exactCanaryAccount,
+          null, trustedTenant.userId, tenantEnforced, exactCanaryAccount, false,
         );
         if (!selection.selected) return new Response("Forbidden", { status: 403 });
         const [dashboard, reviews] = await Promise.all([
@@ -620,7 +643,7 @@ const server = Bun.serve({
           canReview: tenantCan(trustedTenant, "content:review"),
           accountId: selection.selected,
           notice: url.searchParams.get("review"),
-        }));
+        }), customerCsrfToken(trustedTenant, INTERNAL_AUTH));
       }
       if (path === "/improvement") {
         if (!tenantEnforced) {
@@ -628,12 +651,12 @@ const server = Bun.serve({
         }
         const trustedTenant = requireTenantSelection(tenantIdentity);
         const selection = await internalAccount(
-          null, trustedTenant.userId, tenantEnforced, exactCanaryAccount,
+          null, trustedTenant.userId, tenantEnforced, exactCanaryAccount, false,
         );
         if (!selection.selected) return new Response("Forbidden", { status: 403 });
         return lay("AI改善レポート", renderImprovementReport(
           await getThreadsDashboard(selection.selected, trustedTenant.userId),
-        ));
+        ), customerCsrfToken(trustedTenant, INTERNAL_AUTH));
       }
       // ===== Flat URL = DB table name =====
       // /agents       (table: agents)         一覧 (default) — ?view=org で組織図
