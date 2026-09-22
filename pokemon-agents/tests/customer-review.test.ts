@@ -41,6 +41,23 @@ const dashboard = {
 
 
 describe("customer content review experience", () => {
+  test("shows a concrete first action for a new empty customer account", () => {
+    const html = renderOverview({} as Database, dashboard, {
+      reviews: [], canReview: true, accountId: "acct_A",
+    });
+
+    expect(html).toContain("まず、ここから始めましょう");
+    expect(html).toContain("Threadsで5〜10件投稿");
+    expect(html).toContain("投稿の取り込みを依頼");
+    expect(html).toContain("届いたAI案を確認");
+    expect(html).toContain("紹介リンクは後から登録できます");
+    expect(html).toContain("販売を促す投稿案を作りません");
+    for (const forbidden of [
+      "content_id", "workflow state", "meeting ledger", "tenant internals",
+      "agent name", "OAuth", "hash",
+    ]) expect(html).not.toContain(forbidden);
+  });
+
   test("loads only the selected tenant account with canonical server identity", async () => {
     const requests: Request[] = [];
     const reviews = await loadCustomerPendingReviews({
