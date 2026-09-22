@@ -61,9 +61,10 @@ function Invoke-LocalGet {
         return Invoke-WebRequest -UseBasicParsing -Uri $Uri -TimeoutSec 3
     }
     catch {
-        if ($null -ne $_.Exception.Response) {
+        $responseProperty = $_.Exception.PSObject.Properties["Response"]
+        if ($null -ne $responseProperty -and $null -ne $responseProperty.Value) {
             return [pscustomobject]@{
-                StatusCode = [int]$_.Exception.Response.StatusCode
+                StatusCode = [int]$responseProperty.Value.StatusCode
                 Content = ""
             }
         }
@@ -106,9 +107,8 @@ function Get-DashboardState {
     if ($null -ne $health -and [int]$health.StatusCode -eq 200) {
         try { $healthHealthy = ($health.Content | ConvertFrom-Json).status -eq "ok" } catch { $healthHealthy = $false }
     }
-    $authMode = Get-RuntimeEnvironmentValue "DASHBOARD_INTERNAL_AUTH"
-    $rootProtected = $authMode -eq "cloudflare-access" -and $null -ne $root -and
-        [int]$root.StatusCode -eq 401 -and $healthHealthy
+    $rootProtected = $null -ne $root -and [int]$root.StatusCode -eq 401 -and
+        $healthHealthy
     $rootHealthy = $rootRendered -or $rootProtected
     $internalHealthy = ($null -ne $internal -and [int]$internal.StatusCode -eq 200 -and
         $internal.Content -match "<title>[^<]*Agent OS[^<]*</title>") -or $healthHealthy
