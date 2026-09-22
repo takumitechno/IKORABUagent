@@ -35,6 +35,11 @@ describe("Agent OS PowerShell launcher smoke", () => {
     expect(startSource).toMatch(/\[int\]\$DashboardPort\s*=\s*5733/);
     expect(statusSource).toMatch(/\[int\]\$BridgePort\s*=\s*8000/);
     expect(statusSource).toMatch(/\[int\]\$DashboardPort\s*=\s*5733/);
+    expect(startSource).toMatch(/\[int\]\$LegacyDashboardPort\s*=\s*5735/);
+    expect(statusSource).toMatch(/\[int\]\$LegacyDashboardPort\s*=\s*5735/);
+    expect(startSource).toContain("stale legacy dashboard detected");
+    expect(startSource).toContain("Auto-kill is disabled");
+    expect(startSource).not.toContain("Stop-Process");
     expect(startSource).toContain("elseif ($bridge.Listening)");
     expect(startSource).toContain("elseif ($dashboard.Listening)");
     expect(startSource).toContain("Local\\IKORABUagent.AgentOS.Launcher");

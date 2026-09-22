@@ -5,6 +5,8 @@ param(
     [int]$BridgePort = 8000,
     [ValidateRange(1, 65535)]
     [int]$DashboardPort = 5733,
+    [ValidateRange(1, 65535)]
+    [int]$LegacyDashboardPort = 5735,
     [ValidateSet("inherit", "local", "cloudflare-access")]
     [string]$DashboardAuthMode = "inherit",
     [string]$DashboardAccountIds = "",
@@ -36,6 +38,20 @@ function Test-LocalPort {
     finally {
         $client.Dispose()
     }
+}
+
+function Get-ListenerPid {
+    param([int]$Port)
+    $listener = Get-NetTCPConnection -State Listen -LocalPort $Port -ErrorAction SilentlyContinue |
+        Select-Object -First 1
+    if ($null -eq $listener) { return $null }
+    return [int]$listener.OwningProcess
+}
+
+function Get-LegacyDashboardState {
+    param([int]$Port)
+    $pidValue = Get-ListenerPid $Port
+    [pscustomobject]@{ Detected = $null -ne $pidValue; Port = $Port; ProcessId = $pidValue }
 }
 
 function Invoke-LocalGet {
@@ -99,10 +115,11 @@ function Get-DashboardState {
 }
 
 function Show-AgentOsStatus {
-    param([int]$BridgePort, [int]$DashboardPort)
+    param([int]$BridgePort, [int]$DashboardPort, [int]$LegacyDashboardPort)
 
     $bridge = Get-BridgeState $BridgePort
     $dashboard = Get-DashboardState $DashboardPort
+    $legacy = Get-LegacyDashboardState $LegacyDashboardPort
 
     if ($bridge.Healthy) {
         Write-Host "[OK] production Bridge: 正常 ($($bridge.Url))" -ForegroundColor Green
@@ -128,7 +145,14 @@ function Show-AgentOsStatus {
         Write-Host "[NG] 内部HQ: 応答を確認できません。" -ForegroundColor Red
     }
 
-    [pscustomobject]@{ Bridge = $bridge; Dashboard = $dashboard }
+    if ($legacy.Detected) {
+        Write-Host "[CRITICAL] stale legacy dashboard detected: port $($legacy.Port), PID $($legacy.ProcessId). Auto-kill is disabled." -ForegroundColor Red
+    }
+    else {
+        Write-Host "[OK] legacy $LegacyDashboardPort port: listenerなし" -ForegroundColor Green
+    }
+
+    [pscustomobject]@{ Bridge = $bridge; Dashboard = $dashboard; Legacy = $legacy }
 }
 
 function Start-ProcessWithEnvironment {
@@ -194,10 +218,14 @@ if ($BridgePort -eq 8765) {
     Write-Host "[停止] 8765番は旧設定のため、このlauncherでは起動しません。" -ForegroundColor Red
     exit 2
 }
+if ($LegacyDashboardPort -eq $DashboardPort) {
+    Write-Host "[停止] legacy portとcanonical dashboard portは別にしてください。" -ForegroundColor Red
+    exit 2
+}
 
 if ($StatusOnly) {
-    $status = Show-AgentOsStatus -BridgePort $BridgePort -DashboardPort $DashboardPort
-    if ($status.Bridge.Healthy -and $status.Dashboard.Healthy) { exit 0 }
+    $status = Show-AgentOsStatus -BridgePort $BridgePort -DashboardPort $DashboardPort -LegacyDashboardPort $LegacyDashboardPort
+    if ($status.Bridge.Healthy -and $status.Dashboard.Healthy -and -not $status.Legacy.Detected) { exit 0 }
     exit 1
 }
 
@@ -364,8 +392,8 @@ try {
     }
 
     Write-Host ""
-    $status = Show-AgentOsStatus -BridgePort $BridgePort -DashboardPort $DashboardPort
-    if ($status.Bridge.Healthy -and $status.Dashboard.Healthy) {
+    $status = Show-AgentOsStatus -BridgePort $BridgePort -DashboardPort $DashboardPort -LegacyDashboardPort $LegacyDashboardPort
+    if ($status.Bridge.Healthy -and $status.Dashboard.Healthy -and -not $status.Legacy.Detected) {
         Write-Host "準備完了です。ブラウザで http://127.0.0.1:$DashboardPort/ を開いてください。" -ForegroundColor Green
         exit 0
     }
