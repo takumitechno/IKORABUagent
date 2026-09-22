@@ -44,7 +44,8 @@ import {
   type ResolvedTenantIdentity,
 } from "./lib/dashboard-tenant";
 import {
-  configureManualPostPolicy, getThreadsAccounts, getThreadsDashboard,
+  configureManualPostPolicy, getCustomerPendingReviews, getThreadsAccounts, getThreadsDashboard,
+  mutateCustomerReview,
 } from "./lib/threads-dashboard";
 import { sseHandler } from "./sse";
 import { ensureRuntimeDb, resolveAgentsDbPath } from "../runtime/db-path";
@@ -124,7 +125,7 @@ async function internalAccount(
 
 function tenantIdentityRequired(path: string): boolean {
   return path === "/" || path === "/improvement" || path === "/internal"
-    || path === "/api/internal/manual-policy";
+    || path === "/api/internal/manual-policy" || path.startsWith("/api/customer/content/");
 }
 
 function requireTenantSelection(identity: ResolvedTenantIdentity | null): ResolvedTenantIdentity {
@@ -291,6 +292,39 @@ const server = Bun.serve({
       }
       // POST: approve / reject / schedule / budget actions / hook ingestion
       if (req.method === "POST") {
+        const customerMatch = path.match(/^\/api\/customer\/content\/([^/]+)\/(approve|reject|request-revision)$/);
+        if (customerMatch) {
+          const trustedTenant = requireTenantSelection(tenantIdentity);
+          if (!tenantEnforced || !tenantCan(trustedTenant, "content:review")) {
+            return new Response("Forbidden", { status: 403 });
+          }
+          const form = await req.formData();
+          const accountId = String(form.get("account_id") || "");
+          const selection = await internalAccount(
+            accountId, trustedTenant.userId, true, exactCanaryAccount,
+          );
+          if (selection.rejected || selection.selected !== accountId) {
+            return new Response("Forbidden", { status: 403 });
+          }
+          try {
+            await mutateCustomerReview({
+              action: customerMatch[2] as "approve" | "reject" | "request-revision",
+              accountId,
+              contentId: decodeURIComponent(customerMatch[1]),
+              version: Number(form.get("version")),
+              contentHash: String(form.get("binding") || ""),
+              tenantUserId: trustedTenant.userId,
+              reason: String(form.get("reason") || ""),
+              feedback: String(form.get("feedback") || ""),
+            });
+            return redirect(`/?review=${customerMatch[2]}`);
+          } catch (error) {
+            if ((error as { status?: number }).status === 409) {
+              return new Response("投稿案が更新されています。最新案を確認してください。", { status: 409 });
+            }
+            return new Response("投稿案の更新に失敗しました。内容を確認してもう一度お試しください。", { status: 502 });
+          }
+        }
         if (path === "/api/internal/manual-policy") {
           try {
             const form = await req.formData();
@@ -548,7 +582,7 @@ const server = Bun.serve({
           currentPath,
           badges,
           internalAccessAllowed: internalAccessAllowed(req),
-          csrfToken: !isPublicDashboardPath(path) && identity ? csrfToken(identity, INTERNAL_AUTH) : undefined,
+          csrfToken: identity ? csrfToken(identity, INTERNAL_AUTH) : undefined,
         }));
 
       // ===== 4-menu structure =====
@@ -577,9 +611,16 @@ const server = Bun.serve({
           null, trustedTenant.userId, tenantEnforced, exactCanaryAccount,
         );
         if (!selection.selected) return new Response("Forbidden", { status: 403 });
-        return lay("Dashboard", renderOverview(
-          db, await getThreadsDashboard(selection.selected, trustedTenant.userId),
-        ));
+        const [dashboard, reviews] = await Promise.all([
+          getThreadsDashboard(selection.selected, trustedTenant.userId),
+          getCustomerPendingReviews(selection.selected, trustedTenant.userId),
+        ]);
+        return lay("Dashboard", renderOverview(db, dashboard, {
+          reviews,
+          canReview: tenantCan(trustedTenant, "content:review"),
+          accountId: selection.selected,
+          notice: url.searchParams.get("review"),
+        }));
       }
       if (path === "/improvement") {
         if (!tenantEnforced) {

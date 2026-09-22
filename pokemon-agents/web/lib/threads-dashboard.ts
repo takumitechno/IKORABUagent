@@ -160,6 +160,21 @@ export interface ThreadsAccountOption {
   accountStatus: string | null;
 }
 
+export interface CustomerReviewItem {
+  contentId: string;
+  version: number;
+  contentHash: string;
+  topic: string;
+  contentRole: string;
+  body: string;
+  createdAt: string;
+  status: string;
+  scheduledAt: string | null;
+  aiChanges: string[];
+}
+
+export type CustomerReviewAction = "approve" | "reject" | "request-revision";
+
 type FetchLike = typeof fetch;
 
 const EMPTY_OPERATIONS: ThreadsOperations = {
@@ -566,6 +581,7 @@ const dashboardCache = new Map<string, { expiresAt: number; value: ThreadsDashbo
 const dashboardPending = new Map<string, Promise<ThreadsDashboardData>>();
 const accountsCached = new Map<string, { expiresAt: number; value: ThreadsAccountOption[] }>();
 const accountsPending = new Map<string, Promise<ThreadsAccountOption[]>>();
+const customerReviewCache = new Map<string, { expiresAt: number; value: CustomerReviewItem[] }>();
 
 function tenantCacheKey(tenantUserId?: string): string {
   return tenantUserId ? `user:${tenantUserId}` : "legacy";
@@ -653,6 +669,97 @@ export async function getThreadsAccounts(tenantUserId?: string): Promise<Threads
     accountsPending.set(key, pending);
   }
   return pending;
+}
+
+export async function loadCustomerPendingReviews(options: {
+  accountId: string;
+  tenantUserId: string;
+  bridgeUrl?: string;
+  apiKey?: string;
+  timeoutMs?: number;
+  fetcher?: FetchLike;
+}): Promise<CustomerReviewItem[]> {
+  const origin = safeOrigin(options.bridgeUrl ?? process.env.THREADS_BRIDGE_URL ?? DEFAULT_BRIDGE_URL);
+  const apiKey = options.apiKey ?? process.env.THREADS_BRIDGE_API_KEY ?? "";
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), options.timeoutMs ?? 2_500);
+  try {
+    const response = await (options.fetcher ?? fetch)(
+      `${origin}/api/customer/content/pending?account_id=${encodeURIComponent(options.accountId)}`,
+      { headers: bridgeRequestHeaders(apiKey, options.tenantUserId), signal: controller.signal },
+    );
+    if (!response.ok) throw new Error(`customer review load failed (${response.status})`);
+    const payload = record(await response.json());
+    const meta = record(payload?.meta);
+    if (!payload || meta?.schema_version !== 1 || !Array.isArray(payload.items)) {
+      throw new Error("invalid customer review contract");
+    }
+    return payload.items.map(record).filter((row): row is Record<string, unknown> => row !== null)
+      .map((row): CustomerReviewItem | null => {
+        const contentId = text(row.content_id), contentHash = text(row.content_hash);
+        const version = nonNegativeInt(row.version);
+        const body = text(row.body), topic = text(row.topic), role = text(row.content_role);
+        const createdAt = text(row.created_at);
+        if (!contentId || !contentHash || contentHash.length !== 64 || !version || !body || !topic || !role || !createdAt) return null;
+        return {
+          contentId, contentHash, version, body, topic, contentRole: role, createdAt,
+          status: text(row.status) ?? "確認待ち",
+          scheduledAt: text(row.scheduled_at),
+          aiChanges: Array.isArray(row.ai_changes) ? row.ai_changes.map(text).filter((v): v is string => Boolean(v)) : [],
+        };
+      }).filter((row): row is CustomerReviewItem => row !== null);
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+export async function getCustomerPendingReviews(
+  accountId: string, tenantUserId: string,
+): Promise<CustomerReviewItem[]> {
+  const key = `${tenantCacheKey(tenantUserId)}:${accountId}`;
+  const cached = customerReviewCache.get(key);
+  if (cached && cached.expiresAt > Date.now()) return cached.value;
+  const value = await loadCustomerPendingReviews({ accountId, tenantUserId });
+  customerReviewCache.set(key, { expiresAt: Date.now() + CACHE_TTL_MS, value });
+  return value;
+}
+
+export async function mutateCustomerReview(input: {
+  action: CustomerReviewAction;
+  accountId: string;
+  contentId: string;
+  version: number;
+  contentHash: string;
+  tenantUserId: string;
+  reason?: string;
+  feedback?: string;
+  fetcher?: FetchLike;
+}): Promise<void> {
+  if (!/^[a-zA-Z0-9_-]+$/.test(input.contentId) || !/^[0-9a-f]{64}$/i.test(input.contentHash)) {
+    throw new Error("invalid review binding");
+  }
+  const origin = safeOrigin(process.env.THREADS_BRIDGE_URL ?? DEFAULT_BRIDGE_URL);
+  const apiKey = process.env.THREADS_BRIDGE_API_KEY ?? "";
+  const response = await (input.fetcher ?? fetch)(`${origin}/api/customer/content/${encodeURIComponent(input.contentId)}/${input.action}`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...bridgeRequestHeaders(apiKey, input.tenantUserId) },
+    body: JSON.stringify({
+      account_id: input.accountId,
+      expected_version: input.version,
+      expected_content_hash: input.contentHash,
+      request_id: `customer-${crypto.randomUUID()}`,
+      human_confirmed: true,
+      reason: input.reason,
+      feedback: input.feedback,
+    }),
+  });
+  if (!response.ok) {
+    const error = new Error(`customer review mutation failed (${response.status})`);
+    Object.assign(error, { status: response.status });
+    throw error;
+  }
+  customerReviewCache.delete(`${tenantCacheKey(input.tenantUserId)}:${input.accountId}`);
+  dashboardCache.delete(`${tenantCacheKey(input.tenantUserId)}:${input.accountId}`);
 }
 
 export async function configureManualPostPolicy(input: {
