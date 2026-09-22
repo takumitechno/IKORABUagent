@@ -17,6 +17,8 @@ describe("NIGHT04 registration preparation", () => {
     expect(registration).toContain("pythonw.exe");
     expect(registration).toContain("-Hidden -MultipleInstances IgnoreNew");
     expect(registration).toContain("-StartWhenAvailable -WakeToRun");
+    expect(registration).toContain("-AllowStartIfOnBatteries");
+    expect(registration).toContain("-DontStopIfGoingOnBatteries");
     expect(launcher).toContain("CREATE_NO_WINDOW");
   });
   test("uses an unbounded five-minute recurrence and snapshots before apply", () => {

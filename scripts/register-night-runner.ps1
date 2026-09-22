@@ -51,6 +51,8 @@ $expected = [ordered]@{
     MultipleInstances = "IgnoreNew"
     StartWhenAvailable = $true
     WakeToRun = $true
+    DisallowStartIfOnBatteries = $false
+    StopIfGoingOnBatteries = $false
     LogPath = $logPath
 }
 
@@ -65,6 +67,8 @@ $current = if ($existing) {
         MultipleInstances = [string]$existing.Settings.MultipleInstances
         StartWhenAvailable = $existing.Settings.StartWhenAvailable
         WakeToRun = $existing.Settings.WakeToRun
+        DisallowStartIfOnBatteries = $existing.Settings.DisallowStartIfOnBatteries
+        StopIfGoingOnBatteries = $existing.Settings.StopIfGoingOnBatteries
         TriggerAt = Format-Utc $existingTrigger.StartBoundary
         RepetitionInterval = $existingTrigger.Repetition.Interval
         RepetitionDuration = $existingTrigger.Repetition.Duration
@@ -80,6 +84,8 @@ if ($current) {
         $current.MultipleInstances -eq $expected.MultipleInstances -and
         $current.StartWhenAvailable -eq $expected.StartWhenAvailable -and
         $current.WakeToRun -eq $expected.WakeToRun -and
+        $current.DisallowStartIfOnBatteries -eq $expected.DisallowStartIfOnBatteries -and
+        $current.StopIfGoingOnBatteries -eq $expected.StopIfGoingOnBatteries -and
         $current.TriggerAt -eq $expected.TriggerAt -and
         $current.RepetitionInterval -eq $expected.RepetitionInterval -and
         $null -eq $current.RepetitionDuration -and
@@ -104,7 +110,8 @@ if ($existing -and -not [string]::IsNullOrWhiteSpace($SnapshotPath)) {
 $action = New-ScheduledTaskAction -Execute $pythonw -Argument $arguments -WorkingDirectory $ThreadsRoot
 $trigger = New-ScheduledTaskTrigger -Once -At $At -RepetitionInterval $repetitionInterval
 $settings = New-ScheduledTaskSettingsSet -Hidden -MultipleInstances IgnoreNew `
-    -StartWhenAvailable -WakeToRun
+    -StartWhenAvailable -WakeToRun -AllowStartIfOnBatteries `
+    -DontStopIfGoingOnBatteries
 if ($existing) {
     Register-ScheduledTask -TaskName $TaskName -Action $action -Trigger $trigger `
         -Settings $settings -Principal $existing.Principal -Force | Out-Null

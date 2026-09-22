@@ -6,6 +6,8 @@ both supplied. `-Inspect` prints expected/current settings without mutation.
 
 The task action uses `pythonw.exe`, a windowless launcher, `Hidden=True`,
 `MultipleInstances=IgnoreNew`, `StartWhenAvailable=True`, and `WakeToRun=True`.
+It retains the prior battery-safe scheduling behavior: starting and continuing
+the runner are allowed while the host is on battery power.
 Its trigger repeats every five minutes with no repetition duration and no end
 boundary, so future approved NIGHT items do not require task re-registration.
 Safe runner output is appended to `.runtime/logs/night-runner.log`; credentials,
