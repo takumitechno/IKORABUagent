@@ -10,6 +10,7 @@ import {
 } from "node:fs";
 import { dirname, isAbsolute, relative, resolve, sep } from "node:path";
 import { migrateAgentActivityLedger } from "../web/lib/agent-activity-ledger";
+import { migrateThreadsActivityProjector } from "../web/lib/threads-activity-projector";
 
 const root = resolve(import.meta.dir, "..", "..");
 const runtimeRoot = resolve(root, ".runtime");
@@ -61,6 +62,7 @@ try {
     schemaDb.exec("PRAGMA foreign_keys=ON");
     schemaDb.exec(readFileSync(schemaPath, "utf8"));
     migrateAgentActivityLedger(schemaDb);
+    migrateThreadsActivityProjector(schemaDb);
   } finally {
     schemaDb.close();
   }
