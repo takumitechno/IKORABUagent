@@ -97,6 +97,9 @@ describe("CUSTOMER-AUTH01 customer UX", () => {
     expect(choice).toContain("紗凪｜恋愛診断士");
     expect(choice).toContain("タク｜AI仕事術×副業");
     expect(choice).toContain("csrf-token");
+    expect(choice.match(/action="\/api\/customer\/workspaces\/select"/g)).toHaveLength(2);
+    expect(choice).toContain(`name="selector" value="${views[0].selector}"`);
+    expect(choice).toContain(`name="selector" value="${views[1].selector}"`);
     const dashboard = renderLayout({
       title: "Dashboard", body: "customer body", currentPath: "/",
       csrfToken: "csrf-token", customerWorkspaces: views,
@@ -104,8 +107,41 @@ describe("CUSTOMER-AUTH01 customer UX", () => {
     });
     expect(dashboard).toContain("現在のアカウント");
     expect(dashboard).toContain("/api/customer/workspaces/select");
+    expect(dashboard.match(/action="\/api\/customer\/workspaces\/select"/g)).toHaveLength(2);
+    expect(dashboard.match(/name="csrf_token" value="csrf-token"/g)).toHaveLength(2);
+    for (const workspace of views) {
+      expect(dashboard).toContain(`name="selector" value="${workspace.selector}"`);
+    }
+    expect(dashboard).toContain('disabled aria-current="true"');
+    expect(dashboard).not.toContain('name="account_id"');
     expect(dashboard).not.toContain("オフィスに戻る");
     expect(dashboard).not.toContain("/internal\"");
+  });
+
+  test("customer workspace typography never renders below 12px", () => {
+    const pixelSizes = [...customerWorkspaceStyles.matchAll(/font-size:\s*(\d+)px/g)]
+      .map((match) => Number(match[1]));
+    expect(pixelSizes.length).toBeGreaterThan(0);
+    expect(pixelSizes.every((size) => size >= 12)).toBe(true);
+    expect(customerWorkspaceStyles).toContain(
+      ".customer-workspace>small{display:block;font-size:var(--t-type-caption-size,12px)",
+    );
+    expect(customerWorkspaceStyles).toContain(
+      ".customer-workspace-list button span{font-size:var(--t-type-caption-size,12px)",
+    );
+  });
+
+  test("single-workspace dashboard stays selected without switch actions", () => {
+    const views = customerWorkspaceViews([accounts[0]], accounts[0].accountId, identity, secret);
+    const dashboard = renderLayout({
+      title: "Dashboard", body: "customer body", currentPath: "/",
+      csrfToken: "csrf-token", customerWorkspaces: views,
+      internalAccessAllowed: false,
+    });
+    expect(dashboard).toContain('<details class="customer-workspace" open>');
+    expect(dashboard).toContain("紗凪｜恋愛診断士");
+    expect(dashboard).toContain("@8sssana");
+    expect(dashboard).not.toContain("/api/customer/workspaces/select");
   });
 
   test("zero-workspace and expired-selection states are friendly", () => {
