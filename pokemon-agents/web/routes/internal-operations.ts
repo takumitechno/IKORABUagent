@@ -2,6 +2,10 @@ import type { Database } from "bun:sqlite";
 import { escapeHtml } from "../components/layout";
 import { icon } from "../components/icons";
 import { resolveAgentCharacterImage } from "../lib/agent-character-images";
+import {
+  mapThreadsActor, threadsActorActivityLabel,
+  type ThreadsActorAttribution,
+} from "../lib/agent-role-registry";
 import type {
   ManualPostStatus, NightBatchItem, ThreadsAccountOption, ThreadsContent, ThreadsDashboardData,
 } from "../lib/threads-dashboard";
@@ -245,29 +249,24 @@ function renderManual(data: ThreadsDashboardData): string {
   }).join("") || `<div class="ops-empty">手動投稿は未検出、またはBridge接続待ちです。</div>`}</div></section>`;
 }
 
-function editorialActivity(agent: string | null): string | null {
-  if (!agent) return null;
-  if (agent === "Performance Learner") return "KPI分析中";
-  if (agent === "Voice Judge") return "Voice監査中";
-  if (agent === "Theme Diversity Judge") return "テーマ偏重を確認中";
-  if (agent === "Experiment Planner") return "次回テスト設計中";
-  if (agent === "Writer") return "投稿案を作成中";
-  if (agent === "Human") return "人間承認待ち";
-  return `${agent} が担当中`;
-}
-
 function renderEditorial(data: ThreadsDashboardData): string {
   const editorial = data.editorial;
+  const attribution = mapThreadsActor(editorial.currentAgent);
+  const currentActorActivity = threadsActorActivityLabel(attribution);
+  const currentActorLabel = attribution.actor_kind === "unknown"
+    ? "未帰属"
+    : `${attribution.display_name} · ${currentActorActivity || "担当中"}`;
   const stages = ["OBSERVE", "FACTS", "HYPOTHESES", "CRITIQUE", "DECIDE", "BRIEF", "DRAFT", "EDIT", "HUMAN_APPROVAL"];
   const current = Math.max(0, stages.indexOf(editorial.state || "OBSERVE"));
   const variable = typeof editorial.finalDecision?.test_variable === "string" ? editorial.finalDecision.test_variable : "未決定";
   const hypothesis = editorial.proposals[0]?.hypothesis;
   const rows = editorial.experiments.slice(0, 8).map((item) => `<tr><td><code>${escapeHtml(String(item.experiment_id || "—"))}</code></td><td>${escapeHtml(String(item.test_variable || "—"))}</td><td>${escapeHtml(String(item.status || "unknown"))}</td><td>${escapeHtml(String(item.evidence_level || "insufficient_evidence"))}</td></tr>`).join("");
-  return `<section class="ops-section ops-chapter chapter-editorial editorial-section"><div class="ops-section-head"><div><span>C · EDITORIAL SLOW LANE</span><h2>編集部 — 今日の編集会議</h2><p>Slow Laneの判断工程と、今どのAgent・stageが担当しているかを見る場所です。</p></div><b class="ops-status ${editorial.status === "WAITING_FOR_EVIDENCE" ? "warn" : "ok"}">${escapeHtml(editorial.status || "未開始")}</b></div>${opsChapterContext("knowledge", `${editorial.state || "OBSERVE"} · ${editorial.currentAgent || "担当Agent待ち"}`, `次のstage: ${stages[current + 1] || "HUMAN_APPROVAL"}`)}<div class="editorial-stages">${stages.map((stage, index) => `<span class="${index < current ? "done" : index === current ? "current" : "future"}">${escapeHtml(stage)}</span>`).join("")}</div>${editorial.waitingReason ? `<div class="ops-alert warn"><b>WAITING_FOR_EVIDENCE</b><span>${escapeHtml(editorial.waitingReason)}</span></div>` : ""}<div class="editorial-grid"><article><b>確認できた事実</b><ul>${editorial.facts.map((fact) => `<li>${escapeHtml(fact)}</li>`).join("") || "<li>まだありません</li>"}</ul></article><article><b>まだ判断できないこと</b><ul>${editorial.unknowns.map((item) => `<li>${escapeHtml(item)}</li>`).join("") || "<li>証拠待ち</li>"}</ul></article><article><b>現在の仮説</b><p>${escapeHtml(typeof hypothesis === "string" ? hypothesis : "仮説は未生成です")}</p></article><article><b>次回テスト変数</b><p>${escapeHtml(variable)}</p><small>一度に変える変数は1つ</small></article></div><details><summary>反対意見・却下理由の要約</summary><ul>${editorial.critiques.map((item) => `<li><b>${escapeHtml(String(item.agent || "Critic"))}</b> ${escapeHtml(String(item.critique || ""))}</li>`).join("") || "<li>未生成</li>"}${editorial.rejectedOptions.map((item) => `<li><b>保留</b> ${escapeHtml(String(item.reason || ""))}</li>`).join("")}</ul></details><div class="ops-table-wrap"><table class="ops-table"><thead><tr><th>experiment</th><th>変数</th><th>status</th><th>evidence</th></tr></thead><tbody>${rows || `<tr><td colspan="4" class="ops-empty">実験履歴はまだありません</td></tr>`}</tbody></table></div></section>`;
+  return `<section class="ops-section ops-chapter chapter-editorial editorial-section"><div class="ops-section-head"><div><span>C · EDITORIAL SLOW LANE</span><h2>編集部 — 今日の編集会議</h2><p>Slow Laneの判断工程と、今どのAgent・stageが担当しているかを見る場所です。</p></div><b class="ops-status ${editorial.status === "WAITING_FOR_EVIDENCE" ? "warn" : "ok"}">${escapeHtml(editorial.status || "未開始")}</b></div>${opsChapterContext("knowledge", `${editorial.state || "OBSERVE"} · ${currentActorLabel}`, `次のstage: ${stages[current + 1] || "HUMAN_APPROVAL"}`)}<div class="editorial-stages">${stages.map((stage, index) => `<span class="${index < current ? "done" : index === current ? "current" : "future"}">${escapeHtml(stage)}</span>`).join("")}</div>${editorial.waitingReason ? `<div class="ops-alert warn"><b>WAITING_FOR_EVIDENCE</b><span>${escapeHtml(editorial.waitingReason)}</span></div>` : ""}<div class="editorial-grid"><article><b>確認できた事実</b><ul>${editorial.facts.map((fact) => `<li>${escapeHtml(fact)}</li>`).join("") || "<li>まだありません</li>"}</ul></article><article><b>まだ判断できないこと</b><ul>${editorial.unknowns.map((item) => `<li>${escapeHtml(item)}</li>`).join("") || "<li>証拠待ち</li>"}</ul></article><article><b>現在の仮説</b><p>${escapeHtml(typeof hypothesis === "string" ? hypothesis : "仮説は未生成です")}</p></article><article><b>次回テスト変数</b><p>${escapeHtml(variable)}</p><small>一度に変える変数は1つ</small></article></div><details><summary>反対意見・却下理由の要約</summary><ul>${editorial.critiques.map((item) => `<li><b>${escapeHtml(String(item.agent || "Critic"))}</b> ${escapeHtml(String(item.critique || ""))}</li>`).join("") || "<li>未生成</li>"}${editorial.rejectedOptions.map((item) => `<li><b>保留</b> ${escapeHtml(String(item.reason || ""))}</li>`).join("")}</ul></details><div class="ops-table-wrap"><table class="ops-table"><thead><tr><th>experiment</th><th>変数</th><th>status</th><th>evidence</th></tr></thead><tbody>${rows || `<tr><td colspan="4" class="ops-empty">実験履歴はまだありません</td></tr>`}</tbody></table></div></section>`;
 }
 
 function renderAgents(db: Database, selector: string, connected: boolean, fetchedAt: string, editorialAgent: string | null): string {
   const rows = agents(db);
+  const editorialActor: ThreadsActorAttribution = mapThreadsActor(editorialAgent);
   const states = rows.map((agent) => agentState(agent.status, agent.current_task_status, agent.last_status));
   const working = states.filter((state) => state.label === "稼働中").length;
   const attention = states.filter((state) => state.label === "要確認").length;
@@ -279,7 +278,9 @@ function renderAgents(db: Database, selector: string, connected: boolean, fetche
     const position = officePositions[agent.slug] || { left: 50, top: 50, zone: "operations" as OfficeZone };
     const name = agent.pokemon_jp || agentName(agent.display_name);
     const characterImage = resolveAgentCharacterImage(agent);
-    const editorialTask = agent.slug === "sashihara-orchestrator" ? editorialActivity(editorialAgent) : null;
+    const editorialTask = editorialActor.actor_kind === "employee" && editorialActor.agent_id === agent.slug
+      ? threadsActorActivityLabel(editorialActor)
+      : null;
     const popup = state.label === "待機" && !editorialTask
       ? `<span class="hq-waiting-label"><i></i>待機</span>`
       : `<div class="hq-agent-popup ${state.tone}"><b>${editorialTask ? "編集部" : state.label}</b><span>${escapeHtml(editorialTask || agent.current_task || "確認が必要な項目があります")}</span><small>最終実行 ${fmt(agent.last_at, "未実行")}</small></div>`;

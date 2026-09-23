@@ -25,7 +25,7 @@ describe("unified dashboard internal auth boundary", () => {
     expect(isPublicDashboardPath("/")).toBe(true);
     expect(isPublicDashboardPath("/improvement")).toBe(true);
     expect(isPublicDashboardPath("/brand/logo.png")).toBe(true);
-    for (const path of ["/internal", "/agents", "/logs", "/schedules", "/api/events", "/api/approve", "/event/Stop", "/internal-assets/member.jpg", "/bg/internal-hq-office.png"]) {
+    for (const path of ["/internal", "/agents", "/logs", "/schedules", "/api/events", "/api/approve", "/api/internal/activities", "/api/customer/activities", "/event/Stop", "/internal-assets/member.jpg", "/bg/internal-hq-office.png"]) {
       expect(isPublicDashboardPath(path)).toBe(false);
     }
   });

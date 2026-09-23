@@ -44,6 +44,15 @@ function agentDb(): Database {
   return db;
 }
 
+function agentCard(html: string, agentId: string): string {
+  const marker = `data-agent="${agentId}"`;
+  const markerAt = html.indexOf(marker);
+  if (markerAt < 0) return "";
+  const start = html.lastIndexOf("<article", markerAt);
+  const end = html.indexOf("</article>", markerAt);
+  return start >= 0 && end >= 0 ? html.slice(start, end + "</article>".length) : "";
+}
+
 describe("internal operations dashboard", () => {
   test("keeps one explicit, alias-tolerant character-image mapping without external image fallback", () => {
     expect(AGENT_CHARACTER_IMAGES).toHaveLength(11);
@@ -248,13 +257,39 @@ describe("internal operations dashboard", () => {
     const db = agentDb();
     const internal = renderInternalOperations(db, data);
     const customer = renderOverview(db, data);
+    const poisonedCustomer = renderOverview(db, {
+      ...data,
+      internal_activity: {
+        activity_id: "org02-customer-poison",
+        decision_summary: "org02-internal-activity-sentinel",
+        raw_prompt: "must-never-render",
+      },
+    } as any);
     expect(internal).toContain("今日の編集会議");
     expect(internal).toContain("Voice監査中");
+    expect(agentCard(internal, "sashihara-orchestrator")).not.toContain("Voice監査中");
+    expect(agentCard(internal, "sashihara-orchestrator")).not.toContain("Voice Judge");
     expect(internal).toContain("問いかけの常用に反対");
     expect(internal).toContain("exp-1");
     expect(customer).not.toContain("Voice Judge");
     expect(customer).not.toContain("問いかけの常用に反対");
     expect(customer).not.toContain("exp-1");
+    expect(poisonedCustomer).not.toContain("org02-customer-poison");
+    expect(poisonedCustomer).not.toContain("org02-internal-activity-sentinel");
+    expect(poisonedCustomer).not.toContain("raw_prompt");
+
+    const attributed = renderInternalOperations(db, {
+      ...data, editorial: { ...data.editorial, currentAgent: "maika-hypothesizer" },
+    });
+    expect(agentCard(attributed, "maika-hypothesizer")).toContain("Maika が担当中");
+    expect(agentCard(attributed, "sashihara-orchestrator")).not.toContain("Maika が担当中");
+
+    const unknown = renderInternalOperations(db, {
+      ...data, editorial: { ...data.editorial, currentAgent: "unregistered-runner" },
+    });
+    expect(unknown).toContain("CRITIQUE · 未帰属");
+    expect(unknown).not.toContain("unregistered-runner が担当中");
+    expect(agentCard(unknown, "sashihara-orchestrator")).not.toContain("unregistered-runner");
     db.close();
   });
 });

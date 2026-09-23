@@ -45,10 +45,10 @@ interface Frontmatter {
 }
 
 function parseFrontmatter(content: string): { fm: Frontmatter; body: string } {
-  const m = content.match(/^---\n([\s\S]*?)\n---\n?([\s\S]*)$/);
+  const m = content.match(/^---\r?\n([\s\S]*?)\r?\n---\r?\n?([\s\S]*)$/);
   if (!m) return { fm: {}, body: content };
   const fm: Frontmatter = {};
-  for (const line of m[1].split("\n")) {
+  for (const line of m[1].split(/\r?\n/)) {
     const kv = line.match(/^([a-z_]+):\s*(.+?)\s*$/);
     if (!kv) continue;
     const [, k, v] = kv;
@@ -170,7 +170,9 @@ function parseAgentMd(mdPath: string): AgentDef {
   const pokemon_jp = fm.pokemon_jp || pokemon_slug;
   const role = normalizeRole(fm.role, slug);
   const model = fm.model || "sonnet";
-  const hash = createHash("sha256").update(content).digest("hex");
+  // Git may materialize the same definition as LF or CRLF. Hash the canonical
+  // form so a line-ending-only checkout never creates an agent revision.
+  const hash = createHash("sha256").update(content.replace(/\r\n/g, "\n")).digest("hex");
   return {
     slug,
     pokemon_slug,
