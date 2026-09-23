@@ -1,8 +1,11 @@
 import { createHash } from "node:crypto";
 import type { Database } from "bun:sqlite";
 import {
+  ACTIVITY_MESSAGE_CODES,
   EMPLOYEE_ROLE_REGISTRY,
+  FORMAL_EDITORIAL_QA,
   FORMAL_EDITORIAL_WRITER,
+  HUMAN_AUTHORITY_CONTRACTS,
   INTERNAL_ACTIVITY_FIELDS,
   SYSTEM_CAPABILITY_ROLES,
   classifyActivityActor,
@@ -14,7 +17,11 @@ import {
   type InternalActivity,
 } from "./agent-role-registry";
 
-export const AGENT_ACTIVITY_LEDGER_MIGRATION_ID = "20260924_agent_activity_ledger_v1";
+export const AGENT_ACTIVITY_LEDGER_MIGRATION_ID = "20260924_agent_activity_ledger_v2_message_codes";
+export const AGENT_ACTIVITY_LEDGER_MIGRATION_IDS = Object.freeze([
+  "20260924_agent_activity_ledger_v1",
+  AGENT_ACTIVITY_LEDGER_MIGRATION_ID,
+]);
 const DEFAULT_PAGE_SIZE = 50;
 const MAX_PAGE_SIZE = 100;
 const ACCOUNT_PATTERN = /^acct_[A-Za-z0-9_-]{1,128}$/;
@@ -28,6 +35,15 @@ const canonicalEmployeeSql = EMPLOYEE_ROLE_REGISTRY
   .map((employee) => `(NEW.agent_id = ${sqlLiteral(employee.agent_id)} AND NEW.agent_role = ${sqlLiteral(employee.role)})`)
   .join(" OR ");
 const canonicalSystemRolesSql = SYSTEM_CAPABILITY_ROLES.map(sqlLiteral).join(",");
+const activityMessageCodesSql = ACTIVITY_MESSAGE_CODES.map(sqlLiteral).join(",");
+const canonicalNextOwnersSql = [
+  ...EMPLOYEE_ROLE_REGISTRY.map((employee) => employee.agent_id),
+  FORMAL_EDITORIAL_WRITER.agent_id,
+  FORMAL_EDITORIAL_QA.agent_id,
+  HUMAN_AUTHORITY_CONTRACTS.ceo.actor_id,
+  HUMAN_AUTHORITY_CONTRACTS.approval_gate.actor_id,
+].map(sqlLiteral).join(",");
+const eightDigitsGlob = "*[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]*";
 
 export const AGENT_ACTIVITY_LEDGER_SCHEMA_SQL = `
 CREATE TABLE IF NOT EXISTS agent_activity_accounts (
@@ -134,6 +150,83 @@ WHEN NOT (
 )
 BEGIN
   SELECT RAISE(ABORT, 'agent activity actor is not canonical');
+END;
+
+CREATE TRIGGER IF NOT EXISTS agent_activity_message_codes
+BEFORE INSERT ON agent_activity_ledger
+WHEN (NEW.decision_summary IS NOT NULL AND NEW.decision_summary NOT IN (${activityMessageCodesSql}))
+  OR (NEW.next_action IS NOT NULL AND NEW.next_action NOT IN (${activityMessageCodesSql}))
+  OR (NEW.confidence_basis IS NOT NULL AND NEW.confidence_basis NOT IN (${activityMessageCodesSql}))
+BEGIN
+  SELECT RAISE(ABORT, 'agent activity text must use an approved message code');
+END;
+
+CREATE TRIGGER IF NOT EXISTS agent_activity_payload_sanitized
+BEFORE INSERT ON agent_activity_ledger
+WHEN length(NEW.activity_id) NOT BETWEEN 1 AND 200
+  OR substr(NEW.activity_id, 1, 1) NOT GLOB '[A-Za-z0-9]'
+  OR NEW.activity_id GLOB '*[^A-Za-z0-9._:-]*'
+  OR NEW.activity_id GLOB '${eightDigitsGlob}'
+  OR length(NEW.action) NOT BETWEEN 1 AND 160
+  OR substr(NEW.action, 1, 1) NOT GLOB '[a-z]'
+  OR NEW.action GLOB '*[^a-z0-9._:-]*'
+  OR json_array_length(NEW.evidence_refs) > 50
+  OR EXISTS (
+    SELECT 1 FROM json_each(NEW.evidence_refs) ref
+    WHERE ref.type <> 'text'
+      OR length(ref.value) NOT BETWEEN 3 AND 520
+      OR NOT (
+        ref.value GLOB 'activity:[A-Za-z0-9]*' OR ref.value GLOB 'artifact:[A-Za-z0-9]*'
+        OR ref.value GLOB 'content:[A-Za-z0-9]*' OR ref.value GLOB 'cycle:[A-Za-z0-9]*'
+        OR ref.value GLOB 'experiment:[A-Za-z0-9]*' OR ref.value GLOB 'metric:[A-Za-z0-9]*'
+        OR ref.value GLOB 'source:[A-Za-z0-9]*'
+      )
+      OR ref.value GLOB '*[^A-Za-z0-9._:/-]*'
+      OR ref.value GLOB '${eightDigitsGlob}'
+  )
+  OR NEW.evidence_refs <> (
+    SELECT json_group_array(value)
+    FROM (SELECT DISTINCT value FROM json_each(NEW.evidence_refs) ORDER BY value)
+  )
+  OR (NEW.next_action_owner IS NOT NULL
+    AND NEW.next_action_owner NOT IN (${canonicalNextOwnersSql})
+    AND NOT (
+      NEW.next_action_owner GLOB 'system:[a-z0-9]*'
+      AND NEW.next_action_owner NOT GLOB '*[^a-z0-9:_-]*'
+      AND substr(NEW.next_action_owner, -1) GLOB '[a-z0-9]'
+    ))
+  OR (NEW.artifact_ref IS NOT NULL AND (
+    length(NEW.artifact_ref) NOT BETWEEN 3 AND 520
+    OR NOT (
+      NEW.artifact_ref GLOB 'activity:[A-Za-z0-9]*' OR NEW.artifact_ref GLOB 'artifact:[A-Za-z0-9]*'
+      OR NEW.artifact_ref GLOB 'content:[A-Za-z0-9]*' OR NEW.artifact_ref GLOB 'cycle:[A-Za-z0-9]*'
+      OR NEW.artifact_ref GLOB 'experiment:[A-Za-z0-9]*' OR NEW.artifact_ref GLOB 'metric:[A-Za-z0-9]*'
+      OR NEW.artifact_ref GLOB 'source:[A-Za-z0-9]*'
+    )
+    OR NEW.artifact_ref GLOB '*[^A-Za-z0-9._:/-]*'
+    OR NEW.artifact_ref GLOB '${eightDigitsGlob}'
+  ))
+  OR (NEW.cycle_id IS NOT NULL AND (
+    length(NEW.cycle_id) NOT BETWEEN 1 AND 200 OR substr(NEW.cycle_id, 1, 1) NOT GLOB '[A-Za-z0-9]'
+    OR NEW.cycle_id GLOB '*[^A-Za-z0-9._:-]*' OR NEW.cycle_id GLOB '${eightDigitsGlob}'
+  ))
+  OR (NEW.experiment_id IS NOT NULL AND (
+    length(NEW.experiment_id) NOT BETWEEN 1 AND 200 OR substr(NEW.experiment_id, 1, 1) NOT GLOB '[A-Za-z0-9]'
+    OR NEW.experiment_id GLOB '*[^A-Za-z0-9._:-]*' OR NEW.experiment_id GLOB '${eightDigitsGlob}'
+  ))
+  OR (NEW.correlation_id IS NOT NULL AND (
+    length(NEW.correlation_id) NOT BETWEEN 1 AND 200 OR substr(NEW.correlation_id, 1, 1) NOT GLOB '[A-Za-z0-9]'
+    OR NEW.correlation_id GLOB '*[^A-Za-z0-9._:-]*' OR NEW.correlation_id GLOB '${eightDigitsGlob}'
+  ))
+  OR (NEW.corrects_activity_id IS NOT NULL AND (
+    length(NEW.corrects_activity_id) NOT BETWEEN 1 AND 200
+    OR substr(NEW.corrects_activity_id, 1, 1) NOT GLOB '[A-Za-z0-9]'
+    OR NEW.corrects_activity_id GLOB '*[^A-Za-z0-9._:-]*'
+    OR NEW.corrects_activity_id GLOB '${eightDigitsGlob}'
+  ))
+  OR NEW.payload_hash GLOB '*[^0-9a-f]*'
+BEGIN
+  SELECT RAISE(ABORT, 'agent activity payload is not sanitized');
 END;
 
 CREATE TRIGGER IF NOT EXISTS agent_activity_correction_same_account
@@ -283,7 +376,6 @@ function rowToActivity(row: LedgerRow): LedgerActivity {
     corrects_activity_id: row.corrects_activity_id,
   });
   if (row.actor_type !== classifyActivityActor(activity)) throw new ActivityLedgerSchemaError("stored actor_type does not match activity identity");
-  if (row.payload_hash !== payloadHash(activity)) throw new ActivityLedgerSchemaError("stored activity payload hash does not match");
   validateIso(row.created_at, "created_at");
   return Object.freeze({ ...activity, actor_type: row.actor_type, created_at: row.created_at });
 }
@@ -295,15 +387,23 @@ export function migrateAgentActivityLedger(db: Database): boolean {
       version TEXT PRIMARY KEY,
       applied_at TEXT DEFAULT (datetime('now','localtime'))
     )`);
-    const applied = db.query<{ version: string }, [string]>(
+    const pending = AGENT_ACTIVITY_LEDGER_MIGRATION_IDS.filter((version) => !db.query<{ version: string }, [string]>(
       "SELECT version FROM schema_migrations WHERE version = ?",
-    ).get(AGENT_ACTIVITY_LEDGER_MIGRATION_ID);
-    db.exec(AGENT_ACTIVITY_LEDGER_SCHEMA_SQL);
-    if (!applied) {
-      db.query("INSERT INTO schema_migrations(version) VALUES (?)").run(AGENT_ACTIVITY_LEDGER_MIGRATION_ID);
-      return true;
+    ).get(version));
+    const upgradingV1 = pending.includes(AGENT_ACTIVITY_LEDGER_MIGRATION_ID)
+      && !pending.includes(AGENT_ACTIVITY_LEDGER_MIGRATION_IDS[0]);
+    if (upgradingV1) {
+      try {
+        for (const row of db.query<LedgerRow, []>("SELECT * FROM agent_activity_ledger").all()) rowToActivity(row);
+      } catch {
+        throw new ActivityLedgerSchemaError("v1 activity ledger contains rows incompatible with v2 sanitization");
+      }
     }
-    return false;
+    db.exec(AGENT_ACTIVITY_LEDGER_SCHEMA_SQL);
+    for (const version of pending) {
+      db.query("INSERT INTO schema_migrations(version) VALUES (?)").run(version);
+    }
+    return pending.length > 0;
   });
   return migrate.immediate();
 }
@@ -312,13 +412,14 @@ export function assertAgentActivityLedgerSchema(db: Database): void {
   const rows = db.query<{ name: string }, []>(
     `SELECT name FROM sqlite_master
      WHERE (type='table' AND name IN ('agent_activity_accounts','agent_activity_ledger'))
-        OR (type='trigger' AND name IN ('agent_activity_ledger_no_update','agent_activity_ledger_no_delete','agent_activity_ledger_no_duplicate_insert','agent_activity_actor_canonical','agent_activity_correction_same_account'))`,
+        OR (type='trigger' AND name IN ('agent_activity_ledger_no_update','agent_activity_ledger_no_delete','agent_activity_ledger_no_duplicate_insert','agent_activity_actor_canonical','agent_activity_message_codes','agent_activity_payload_sanitized','agent_activity_correction_same_account'))`,
   ).all();
   const names = new Set(rows.map((row) => row.name));
   for (const required of [
     "agent_activity_accounts", "agent_activity_ledger", "agent_activity_ledger_no_update",
     "agent_activity_ledger_no_delete", "agent_activity_ledger_no_duplicate_insert",
-    "agent_activity_actor_canonical", "agent_activity_correction_same_account",
+    "agent_activity_actor_canonical", "agent_activity_message_codes", "agent_activity_payload_sanitized",
+    "agent_activity_correction_same_account",
   ]) {
     if (!names.has(required)) throw new ActivityLedgerSchemaError(`missing activity ledger schema object: ${required}`);
   }

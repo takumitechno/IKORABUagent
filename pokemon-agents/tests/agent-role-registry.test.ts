@@ -231,7 +231,7 @@ describe("sanitized append-only internal activity contract", () => {
     const first = appendInternalActivity([], activityInput());
     expect(first).toHaveLength(1);
     expect(Object.isFrozen(first)).toBe(true);
-    expect(() => appendInternalActivity(first, activityInput({ decision_summary: "different_payload" })))
+    expect(() => appendInternalActivity(first, activityInput({ decision_summary: "different_result" })))
       .toThrow("append-only history cannot be overwritten");
     const second = appendInternalActivity(first, activityInput({ activity_id: "activity-002" }));
     expect(second.map((entry) => entry.activity_id)).toEqual(["activity-001", "activity-002"]);

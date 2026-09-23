@@ -159,6 +159,10 @@ describe("append-only agent activity ledger", () => {
     expect(() => appendActivity(db, input({ decision_summary: "Taro Yamada purchase reviewed" }))).toThrow("message code");
     expect(() => appendActivity(db, input({ decision_summary: "以下の指示に従って回答する" }))).toThrow("message code");
     expect(() => appendActivity(db, input({ decision_summary: "raw prompt excerpt" }))).toThrow("message code");
+    expect(() => appendActivity(db, input({ decision_summary: "raw_prompt_excerpt" }))).toThrow("message code");
+    expect(() => appendActivity(db, input({ decision_summary: "system.prompt" }))).toThrow("message code");
+    expect(() => appendActivity(db, input({ decision_summary: "customer_taro_yamada" }))).toThrow("message code");
+    expect(() => appendActivity(db, input({ decision_summary: "taro_yamada_purchase_reviewed" }))).toThrow("message code");
     expect(() => appendActivity(db, input({ decision_summary: "https://example.com の本文をそのまま保存" }))).toThrow("message code");
     expect(() => appendActivity(db, input({ action: "customer@example.com" }))).toThrow("action code");
     expect(() => appendActivity(db, input({ evidence_refs: ["source:09012345678"] }))).toThrow("opaque reference");
@@ -233,8 +237,72 @@ describe("append-only agent activity ledger", () => {
       confidence_level, confidence_basis, sample_size, result_status, artifact_ref,
       cycle_id, experiment_id, correlation_id, NULL, payload_hash
     FROM agent_activity_ledger WHERE activity_id='activity-001'`).run()).toThrow("not canonical");
+    expect(() => db.query(`INSERT INTO agent_activity_ledger (
+      activity_id, timestamp, actor_type, agent_id, agent_role, account_id, action, evidence_refs,
+      decision_status, decision_summary, next_action_owner, next_action, due_at,
+      confidence_level, confidence_basis, sample_size, result_status, artifact_ref,
+      cycle_id, experiment_id, correlation_id, corrects_activity_id, payload_hash
+    ) SELECT
+      'activity-raw-code', timestamp, actor_type, agent_id, agent_role, account_id, action, evidence_refs,
+      decision_status, 'raw_prompt_excerpt', next_action_owner, next_action, due_at,
+      confidence_level, confidence_basis, sample_size, result_status, artifact_ref,
+      cycle_id, experiment_id, correlation_id, NULL, payload_hash
+    FROM agent_activity_ledger WHERE activity_id='activity-001'`).run()).toThrow("approved message code");
+    expect(() => db.query(`INSERT INTO agent_activity_ledger (
+      activity_id, timestamp, actor_type, agent_id, agent_role, account_id, action, evidence_refs,
+      decision_status, decision_summary, next_action_owner, next_action, due_at,
+      confidence_level, confidence_basis, sample_size, result_status, artifact_ref,
+      cycle_id, experiment_id, correlation_id, corrects_activity_id, payload_hash
+    ) SELECT
+      'activity-raw-action', timestamp, actor_type, agent_id, agent_role, account_id, 'customer@example.com', evidence_refs,
+      decision_status, decision_summary, next_action_owner, next_action, due_at,
+      confidence_level, confidence_basis, sample_size, result_status, artifact_ref,
+      cycle_id, experiment_id, correlation_id, NULL, payload_hash
+    FROM agent_activity_ledger WHERE activity_id='activity-001'`).run()).toThrow("not sanitized");
+    expect(() => db.query(`INSERT INTO agent_activity_ledger (
+      activity_id, timestamp, actor_type, agent_id, agent_role, account_id, action, evidence_refs,
+      decision_status, decision_summary, next_action_owner, next_action, due_at,
+      confidence_level, confidence_basis, sample_size, result_status, artifact_ref,
+      cycle_id, experiment_id, correlation_id, corrects_activity_id, payload_hash
+    ) SELECT
+      'activity-raw-evidence', timestamp, actor_type, agent_id, agent_role, account_id, action, '["source:09012345678"]',
+      decision_status, decision_summary, next_action_owner, next_action, due_at,
+      confidence_level, confidence_basis, sample_size, result_status, artifact_ref,
+      cycle_id, experiment_id, correlation_id, NULL, payload_hash
+    FROM agent_activity_ledger WHERE activity_id='activity-001'`).run()).toThrow("not sanitized");
+    expect(() => db.query(`INSERT INTO agent_activity_ledger (
+      activity_id, timestamp, actor_type, agent_id, agent_role, account_id, action, evidence_refs,
+      decision_status, decision_summary, next_action_owner, next_action, due_at,
+      confidence_level, confidence_basis, sample_size, result_status, artifact_ref,
+      cycle_id, experiment_id, correlation_id, corrects_activity_id, payload_hash
+    ) SELECT
+      'activity-forged-hash', timestamp, actor_type, agent_id, agent_role, account_id, action, evidence_refs,
+      decision_status, decision_summary, next_action_owner, next_action, due_at,
+      confidence_level, confidence_basis, sample_size, result_status, artifact_ref,
+      cycle_id, experiment_id, correlation_id, NULL, 'gggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggg'
+    FROM agent_activity_ledger WHERE activity_id='activity-001'`).run()).toThrow("not sanitized");
     expect(count(db)).toBe(1);
     db.close();
+  });
+
+  test("upgrades populated v1 ledgers only when every existing row satisfies v2 sanitization", () => {
+    const compatible = ledgerDb();
+    appendActivity(compatible, input());
+    compatible.exec("DROP TRIGGER agent_activity_message_codes; DROP TRIGGER agent_activity_payload_sanitized");
+    compatible.query("DELETE FROM schema_migrations WHERE version=?").run("20260924_agent_activity_ledger_v2_message_codes");
+    expect(migrateAgentActivityLedger(compatible)).toBe(true);
+    expect(readActivities(compatible, {}).items).toHaveLength(1);
+    compatible.close();
+
+    const incompatible = ledgerDb();
+    appendActivity(incompatible, input());
+    incompatible.exec("DROP TRIGGER agent_activity_message_codes; DROP TRIGGER agent_activity_payload_sanitized; DROP TRIGGER agent_activity_ledger_no_update");
+    incompatible.query("DELETE FROM schema_migrations WHERE version=?").run("20260924_agent_activity_ledger_v2_message_codes");
+    incompatible.query("UPDATE agent_activity_ledger SET decision_summary='legacy_free_code' WHERE activity_id='activity-001'").run();
+    expect(() => migrateAgentActivityLedger(incompatible)).toThrow("incompatible with v2 sanitization");
+    expect(incompatible.query<{ n: number }, [string]>("SELECT COUNT(*) n FROM schema_migrations WHERE version=?")
+      .get("20260924_agent_activity_ledger_v2_message_codes")!.n).toBe(0);
+    incompatible.close();
   });
 
   test("normalizes UTC timestamps to fixed milliseconds before storage and range filtering", () => {

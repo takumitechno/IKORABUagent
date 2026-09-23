@@ -40,8 +40,8 @@ describe("runtime demo DB regeneration", () => {
       expect(db.query<{ n: number }, []>("SELECT COUNT(*) n FROM agent_schedules WHERE enabled=1").get()!.n).toBe(3);
       expect(db.query<{ n: number }, []>("SELECT COUNT(*) n FROM approvals WHERE status='pending'").get()!.n).toBeGreaterThan(0);
       expect(db.query<{ n: number }, []>("SELECT COUNT(*) n FROM sqlite_master WHERE type='table' AND name='agent_activity_ledger'").get()!.n).toBe(1);
-      expect(db.query<{ n: number }, []>("SELECT COUNT(*) n FROM sqlite_master WHERE type='trigger' AND name IN ('agent_activity_ledger_no_update','agent_activity_ledger_no_delete','agent_activity_ledger_no_duplicate_insert','agent_activity_actor_canonical')").get()!.n).toBe(4);
-      expect(db.query<{ n: number }, [string]>("SELECT COUNT(*) n FROM schema_migrations WHERE version=?").get("20260924_agent_activity_ledger_v1")!.n).toBe(1);
+      expect(db.query<{ n: number }, []>("SELECT COUNT(*) n FROM sqlite_master WHERE type='trigger' AND name IN ('agent_activity_ledger_no_update','agent_activity_ledger_no_delete','agent_activity_ledger_no_duplicate_insert','agent_activity_actor_canonical','agent_activity_message_codes','agent_activity_payload_sanitized')").get()!.n).toBe(6);
+      expect(db.query<{ n: number }, [string, string]>("SELECT COUNT(*) n FROM schema_migrations WHERE version IN (?,?)").get("20260924_agent_activity_ledger_v1", "20260924_agent_activity_ledger_v2_message_codes")!.n).toBe(2);
       expect(db.query<{ integrity_check: string }, []>("PRAGMA integrity_check").get()!.integrity_check).toBe("ok");
       db.close();
     }

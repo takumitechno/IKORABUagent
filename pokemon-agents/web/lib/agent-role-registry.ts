@@ -365,7 +365,27 @@ const ACCOUNT_PATTERN = /^acct_[A-Za-z0-9_-]{1,128}$/;
 const REF_PATTERN = /^(?:activity|artifact|content|cycle|experiment|metric|source):[A-Za-z0-9][A-Za-z0-9._:\/-]{0,499}$/;
 const ISO_PATTERN = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{1,6})?Z$/;
 const ACTION_PATTERN = /^[a-z][a-z0-9._:-]{0,159}$/;
-const MESSAGE_CODE_PATTERN = /^[a-z][a-z0-9._:-]{0,159}$/;
+export const ACTIVITY_MESSAGE_CODES = Object.freeze([
+  "evidence_verified",
+  "source_verified",
+  "insufficient_evidence",
+  "decision_pending",
+  "decision_approved",
+  "decision_rejected",
+  "result_succeeded",
+  "result_failed",
+  "result_blocked",
+  "handoff_requested",
+  "create_testable_hypothesis",
+  "two_verified_sources",
+  "low_sample",
+  "data_unavailable",
+  "correction_recorded",
+  "corrected_summary",
+  "corrected_decision_summary",
+  "different_result",
+] as const);
+const ACTIVITY_MESSAGE_CODE_SET = new Set<string>(ACTIVITY_MESSAGE_CODES);
 const MAX_EVIDENCE_REFS = 50;
 
 function isPlainDataObject(value: unknown): value is Record<string, unknown> {
@@ -408,7 +428,7 @@ function nullableString(value: unknown, field: string, max = 2_000): string | nu
 function nullableSanitizedSummary(value: unknown, field: string): string | null {
   const text = nullableString(value, field, 160);
   if (text !== null && (
-    !MESSAGE_CODE_PATTERN.test(text) || CUSTOMER_PII_MARKER.test(text)
+    !ACTIVITY_MESSAGE_CODE_SET.has(text) || CUSTOMER_PII_MARKER.test(text)
     || UNSAFE_SUMMARY_MARKER.test(text) || OPAQUE_PII_MARKER.test(text) || /[\r\n]/.test(text)
   )) {
     throw new Error(`${field} must be a sanitized message code`);
