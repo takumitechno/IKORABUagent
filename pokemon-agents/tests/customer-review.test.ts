@@ -1,7 +1,8 @@
 import { describe, expect, test } from "bun:test";
 import type { Database } from "bun:sqlite";
 import {
-  addManualPostToAnalysis, loadCustomerPendingReviews, mutateCustomerReview, type ThreadsDashboardData,
+  addManualPostToAnalysis, loadCustomerPendingReviews, mutateCustomerReview,
+  type ThreadsContent, type ThreadsDashboardData,
 } from "../web/lib/threads-dashboard";
 import { renderOverview } from "../web/routes/overview";
 
@@ -40,8 +41,67 @@ const dashboard = {
   message: "実アカウント連携済み",
 } as ThreadsDashboardData;
 
+function customerContent(overrides: Partial<ThreadsContent>): ThreadsContent {
+  return {
+    contentId: "content-default", topic: null, contentRole: null, body: "投稿本文",
+    state: "metrics_collected", qaVerdict: "pass", approved: true, copyGuard: "pass",
+    createdAt: "2026-09-22T01:00:00Z", updatedAt: "2026-09-22T01:00:00Z",
+    scheduledAt: null,
+    publication: { mode: "live", status: "succeeded", externalId: "external-default", publishedAt: "2026-09-22T02:00:00Z" },
+    metrics: { views: 10 }, metricsObservedAt: "2026-09-22T03:00:00Z",
+    metricsFetchedAt: "2026-09-22T03:00:00Z", viewsPerHour: 5,
+    engagementPerHour: 1, origin: "human_manual", analyzeEnabled: true,
+    learnEnabled: false, partCount: 1,
+    ...overrides,
+  };
+}
+
 
 describe("customer content review experience", () => {
+  test("keeps internal topic sentinels out of every customer-facing topic fallback", () => {
+    const contents = [
+      customerContent({
+        contentId: "content-a", topic: "unclassified", contentRole: "trust",
+        body: "未分類本文プレビューA\n続き", publication: { mode: "live", status: "succeeded", externalId: "external-a", publishedAt: "2026-09-22T02:00:00Z" },
+      }),
+      customerContent({
+        contentId: "content-b", topic: "未指定", contentRole: "reach",
+        body: "未分類本文プレビューB", publication: { mode: "live", status: "succeeded", externalId: "external-b", publishedAt: "2026-09-22T02:01:00Z" },
+      }),
+      customerContent({
+        contentId: "content-null", topic: null, contentRole: "desire",
+        body: "未分類本文プレビューC", publication: { mode: "live", status: "succeeded", externalId: "external-c", publishedAt: "2026-09-22T02:02:00Z" },
+      }),
+      customerContent({
+        contentId: "content-empty", topic: "", contentRole: "conversion",
+        body: "未分類本文プレビューD", publication: { mode: "live", status: "succeeded", externalId: "external-d", publishedAt: "2026-09-22T02:03:00Z" },
+      }),
+      customerContent({
+        contentId: "content-normal", topic: "恋愛の悩み", contentRole: "trust",
+        body: "通常テーマ本文", publication: { mode: "live", status: "succeeded", externalId: "external-e", publishedAt: "2026-09-22T02:04:00Z" },
+      }),
+    ];
+    const review = {
+      contentId: "review-a", version: 1, contentHash: "c".repeat(64),
+      topic: "unclassified", contentRole: "trust", body: "確認待ち本文",
+      createdAt: "2026-09-22T01:00:00Z", scheduledAt: null, status: "確認待ち",
+      aiChanges: [], origin: "ai_auto" as const,
+    };
+    const html = renderOverview({} as Database, { ...dashboard, contents }, {
+      reviews: [review], canReview: true, accountId: "acct_A",
+    });
+
+    expect(html).not.toContain("unclassified");
+    expect(html).not.toContain("未指定");
+    expect(html).toContain("テーマ未設定");
+    expect(html).toContain("恋愛の悩み");
+    for (const preview of [
+      "未分類本文プレビューA", "未分類本文プレビューB",
+      "未分類本文プレビューC", "未分類本文プレビューD",
+    ]) expect(html).toContain(preview);
+    expect(html).toContain("信頼を育てる、認知を広げる、興味を高めるの実測結果を観測しています。");
+  });
+
   test("shows a concrete first action for a new empty customer account", () => {
     const html = renderOverview({} as Database, dashboard, {
       reviews: [], canReview: true, accountId: "acct_A",
