@@ -6,6 +6,7 @@
  */
 
 import { icon } from "./icons";
+import { baseComponents, designTokens } from "./design-tokens";
 import type { CustomerWorkspaceView } from "../lib/customer-workspaces";
 
 interface NavItem {
@@ -78,11 +79,10 @@ export function renderLayout(opts: LayoutOpts): string {
         <span class="nav-label">トップページ</span>
       </a>`;
   const browserTitle = isCustomerDashboard
-    ? "匠 Technologies | AI SNS運用"
-    : isInternalOperations
-      ? "=LOVE Agent OS | 匠 Technologies"
-      : `${opts.title} | 匠 Technologies`;
-  const brandContext = isCustomerDashboard ? "AI SNS運用" : "=LOVE Agent OS · Internal HQ";
+    ? "Takumi Technologies | AI SNS運用"
+    : "Takumi Technologies HQ | Mission Control";
+  const brandName = isCustomerDashboard ? "Takumi Technologies" : "Takumi Technologies HQ";
+  const brandContext = isCustomerDashboard ? "AI SNS運用" : "Mission Control";
   const brandMarkSrc = isCustomerDashboard
     ? "/brand/takumi-mark-compact.png?v=brand03"
     : "/brand/takumi-mark.png";
@@ -99,31 +99,16 @@ export function renderLayout(opts: LayoutOpts): string {
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>${escapeHtml(browserTitle)}</title>
-  <meta name="application-name" content="匠 Technologies">
-  <meta name="theme-color" content="#ffffff">
+  <meta name="application-name" content="${escapeHtml(brandName)}">
+  <meta name="theme-color" content="#0b0f14">
   ${isCustomerDashboard ? `<script>(()=>{try{const saved=localStorage.getItem('takumi-customer-theme');const theme=saved==='light'||saved==='dark'?saved:(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');document.documentElement.dataset.customerTheme=theme}catch(_){}})();</script>` : ""}
   <link rel="icon" type="image/png" href="${brandMarkSrc}">
   <link rel="apple-touch-icon" href="${brandMarkSrc}">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=LINE+Seed+JP:wght@400;700&display=swap">
-  <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/marked@12.0.2/marked.min.js"></script>
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: {
-            brand: '#6a8de9',
-          },
-          fontFamily: {
-            sans: ['Poppins','"LINE Seed JP"','-apple-system','BlinkMacSystemFont','"Hiragino Sans"','"Yu Gothic"','sans-serif'],
-            mono: ['ui-monospace','"SF Mono"','Menlo','Consolas','monospace'],
-          },
-        },
-      },
-    };
-  </script>
+  <style>${designTokens}${baseComponents}</style>
   <link rel="stylesheet" href="/styles.css">
 </head>
 <body class="${isCustomerDashboard ? "customer-shell" : "internal-shell"}">
@@ -134,7 +119,7 @@ export function renderLayout(opts: LayoutOpts): string {
           <span class="brand-mark">
             <img src="${brandMarkSrc}" alt="" width="34" height="34">
           </span>
-          <span class="brand-name">匠 Technologies</span>
+          <span class="brand-name">${brandName}</span>
         </div>
         <div class="brand-sub">${brandContext}</div>
       </a>
@@ -460,7 +445,12 @@ const STATUS_CLASS: Record<string, string> = {
 
 export function statusBadge(status: string): string {
   const cls = STATUS_CLASS[status] || "queued";
-  return `<span class="badge ${cls}">${escapeHtml(jpStatus(status))}</span>`;
+  const iconMark = cls === "completed" ? "✓"
+    : cls === "running" || cls === "in_progress" ? "↻"
+      : cls === "failed" || cls === "rejected" || cls === "blocked" ? "!"
+        : cls === "warning" || cls === "budget_halted" || cls === "pending" ? "△"
+          : "•";
+  return `<span class="badge ${cls}"><span aria-hidden="true">${iconMark}</span><span>${escapeHtml(jpStatus(status))}</span></span>`;
 }
 
 export function fmtDuration(ms: number | null): string {

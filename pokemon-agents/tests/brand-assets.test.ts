@@ -8,9 +8,9 @@ const root = resolve(import.meta.dir, "..", "..");
 describe("BRAND01 site branding", () => {
   test("customer shell uses the company brand without internal HQ wording", () => {
     const html = renderLayout({ title: "Dashboard", body: "<main>customer</main>", currentPath: "/" });
-    expect(html).toContain("<title>匠 Technologies | AI SNS運用</title>");
+    expect(html).toContain("<title>Takumi Technologies | AI SNS運用</title>");
     expect(html).toContain('<img src="/brand/takumi-mark-compact.png?v=brand03"');
-    expect(html).toContain('<span class="brand-name">匠 Technologies</span>');
+    expect(html).toContain('<span class="brand-name">Takumi Technologies</span>');
     expect(html).toContain('<div class="brand-sub">AI SNS運用</div>');
     expect(html).toContain('rel="icon" type="image/png" href="/brand/takumi-mark-compact.png?v=brand03"');
     expect(html).toContain('rel="apple-touch-icon" href="/brand/takumi-mark-compact.png?v=brand03"');
@@ -46,9 +46,9 @@ describe("BRAND01 site branding", () => {
 
   test("internal shell keeps Agent OS context under the company brand", () => {
     const html = renderLayout({ title: "=LOVE Agent OS", body: "<main>internal</main>", currentPath: "/internal" });
-    expect(html).toContain("<title>=LOVE Agent OS | 匠 Technologies</title>");
-    expect(html).toContain('<span class="brand-name">匠 Technologies</span>');
-    expect(html).toContain('<div class="brand-sub">=LOVE Agent OS · Internal HQ</div>');
+    expect(html).toContain("<title>Takumi Technologies HQ | Mission Control</title>");
+    expect(html).toContain('<span class="brand-name">Takumi Technologies HQ</span>');
+    expect(html).toContain('<div class="brand-sub">Mission Control</div>');
     expect(html).toContain('href="/internal" class="nav-item internal-home-button active"');
     expect(html).toContain('data-nav="home" aria-current="page"');
     expect(html).toContain('<span class="nav-label">トップページ</span>');
