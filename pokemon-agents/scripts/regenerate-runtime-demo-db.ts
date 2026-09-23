@@ -9,6 +9,7 @@ import {
   rmSync,
 } from "node:fs";
 import { dirname, isAbsolute, relative, resolve, sep } from "node:path";
+import { migrateAgentActivityLedger } from "../web/lib/agent-activity-ledger";
 
 const root = resolve(import.meta.dir, "..", "..");
 const runtimeRoot = resolve(root, ".runtime");
@@ -59,6 +60,7 @@ try {
   try {
     schemaDb.exec("PRAGMA foreign_keys=ON");
     schemaDb.exec(readFileSync(schemaPath, "utf8"));
+    migrateAgentActivityLedger(schemaDb);
   } finally {
     schemaDb.close();
   }

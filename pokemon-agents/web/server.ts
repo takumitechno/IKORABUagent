@@ -58,6 +58,7 @@ import {
 } from "./lib/threads-dashboard";
 import { sseHandler } from "./sse";
 import { ensureRuntimeDb, resolveAgentsDbPath } from "../runtime/db-path";
+import { assertAgentActivityLedgerSchema } from "./lib/agent-activity-ledger";
 
 function getBadges(db: Database): {
   approvals: number;
@@ -159,6 +160,7 @@ async function authorizedCustomerAccounts(
 const db = new Database(DB_PATH);
 db.exec("PRAGMA journal_mode = WAL");
 db.exec("PRAGMA foreign_keys = ON");
+assertAgentActivityLedgerSchema(db);
 
 // scheduler を同プロセスで開始 (環境変数で抑止可)
 if (process.env.POKEMON_AGENTS_SCHEDULER !== "off") {

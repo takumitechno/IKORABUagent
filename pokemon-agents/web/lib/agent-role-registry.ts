@@ -246,13 +246,20 @@ const SYSTEM_ACTORS: Readonly<Record<string, { role: string; label: string }>> =
   "editorial critic": { role: "editorial_critic", label: "Editorial Critic" },
   "voice judge": { role: "voice_judge", label: "Voice Judge" },
   "theme diversity judge": { role: "theme_diversity_judge", label: "Theme Diversity Judge" },
+  "theme judge": { role: "theme_diversity_judge", label: "Theme Judge" },
   "experiment planner": { role: "experiment_planner", label: "Experiment Planner" },
   "qa": { role: "editorial_qa", label: "Editorial QA" },
+  "night": { role: "night_scheduler", label: "NIGHT" },
 });
+export const SYSTEM_CAPABILITY_ROLES = Object.freeze([
+  ...new Set(Object.values(SYSTEM_ACTORS).map((entry) => entry.role)),
+]);
 const SYSTEM_ACTIVITY_ROLES = new Set([
-  ...Object.values(SYSTEM_ACTORS).map((entry) => entry.role),
+  ...SYSTEM_CAPABILITY_ROLES,
   "human_approval",
 ]);
+
+export type ActivityActorType = "employee" | "writer" | "human" | "system_capability" | "unknown";
 
 /**
  * Exact attribution only. Account/tenant context is deliberately absent: actor
@@ -350,10 +357,16 @@ const FORBIDDEN_FIELD_NAMES = new Set([
   "clientsecret", "authorization", "raw", "toolinput", "toolresponse", "transcriptpath",
 ]);
 const SECRET_MARKER = /(?:\bBearer\s+[A-Za-z0-9._~+\/-]+|(?:access_token|oauth_token|api_key|client_secret)\s*[=:]|\bsk-[A-Za-z0-9_-]{8,})/i;
+const CUSTOMER_PII_MARKER = /(?:[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}|(?:\+?\d[\d ()-]{7,}\d)|(?:氏名|住所|電話番号?|メール(?:アドレス)?|customer\s*(?:name|address|phone|email))\s*[:：]|(?:東京都|北海道|(?:京都|大阪)府|.{2,3}県).{1,40}(?:市|区|町|村)|[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}]{2,20}(?:さん|様|氏))/iu;
+const UNSAFE_SUMMARY_MARKER = /(?:https?:\/\/|<[^>]+>|[{}\[\]]|raw\s*(?:prompt|source|body)|system\s*prompt|user\s*prompt|(?:生|元|外部)データ|全文|原文|プロンプト|ソース本文)/i;
+const OPAQUE_PII_MARKER = /\d{8,}/;
 const ID_PATTERN = /^[A-Za-z0-9][A-Za-z0-9._:-]{0,199}$/;
 const ACCOUNT_PATTERN = /^acct_[A-Za-z0-9_-]{1,128}$/;
 const REF_PATTERN = /^(?:activity|artifact|content|cycle|experiment|metric|source):[A-Za-z0-9][A-Za-z0-9._:\/-]{0,499}$/;
-const ISO_PATTERN = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{1,6})?(?:Z|[+-]\d{2}:\d{2})$/;
+const ISO_PATTERN = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{1,6})?Z$/;
+const ACTION_PATTERN = /^[a-z][a-z0-9._:-]{0,159}$/;
+const MESSAGE_CODE_PATTERN = /^[a-z][a-z0-9._:-]{0,159}$/;
+const MAX_EVIDENCE_REFS = 50;
 
 function isPlainDataObject(value: unknown): value is Record<string, unknown> {
   if (!value || typeof value !== "object" || Array.isArray(value)) return false;
@@ -392,9 +405,26 @@ function nullableString(value: unknown, field: string, max = 2_000): string | nu
   return requiredString(value, field, max);
 }
 
+function nullableSanitizedSummary(value: unknown, field: string): string | null {
+  const text = nullableString(value, field, 160);
+  if (text !== null && (
+    !MESSAGE_CODE_PATTERN.test(text) || CUSTOMER_PII_MARKER.test(text)
+    || UNSAFE_SUMMARY_MARKER.test(text) || OPAQUE_PII_MARKER.test(text) || /[\r\n]/.test(text)
+  )) {
+    throw new Error(`${field} must be a sanitized message code`);
+  }
+  return text;
+}
+
+function actionCode(value: unknown): string {
+  const action = requiredString(value, "action", 160);
+  if (!ACTION_PATTERN.test(action)) throw new Error("action must be a sanitized action code");
+  return action;
+}
+
 function nullableOpaqueRef(value: unknown, field: string): string | null {
   const ref = nullableString(value, field, 520);
-  if (ref !== null && (!REF_PATTERN.test(ref) || ref.includes("?") || ref.includes("#"))) {
+  if (ref !== null && (!REF_PATTERN.test(ref) || ref.includes("?") || ref.includes("#") || OPAQUE_PII_MARKER.test(ref))) {
     throw new Error(`${field} is not an opaque reference`);
   }
   return ref;
@@ -402,7 +432,7 @@ function nullableOpaqueRef(value: unknown, field: string): string | null {
 
 function nullableId(value: unknown, field: string): string | null {
   const id = nullableString(value, field, 200);
-  if (id !== null && !ID_PATTERN.test(id)) throw new Error(`${field} is invalid`);
+  if (id !== null && (!ID_PATTERN.test(id) || OPAQUE_PII_MARKER.test(id))) throw new Error(`${field} is invalid`);
   return id;
 }
 
@@ -423,7 +453,7 @@ function isoTimestamp(value: unknown, field: string, nullable = false): string |
   if (nullable && value === null) return null;
   const text = requiredString(value, field, 64);
   if (!ISO_PATTERN.test(text) || Number.isNaN(Date.parse(text))) throw new Error(`${field} must be an ISO-8601 timestamp`);
-  return text;
+  return new Date(text).toISOString();
 }
 
 function oneOf<T extends string>(value: unknown, field: string, values: readonly T[]): T {
@@ -458,37 +488,38 @@ export function createInternalActivity(input: unknown): InternalActivity {
   if (missingKeys.length) throw new Error(`activity is missing fields: ${missingKeys.join(",")}`);
 
   const activityId = requiredString(input.activity_id, "activity_id", 200);
-  if (!ID_PATTERN.test(activityId)) throw new Error("activity_id is invalid");
+  if (!ID_PATTERN.test(activityId) || OPAQUE_PII_MARKER.test(activityId)) throw new Error("activity_id is invalid");
   const accountId = requiredString(input.account_id, "account_id", 140);
   if (!ACCOUNT_PATTERN.test(accountId)) throw new Error("account_id is invalid");
   const actor = validateAgent(input.agent_id, input.agent_role);
   if (!Array.isArray(input.evidence_refs)) throw new Error("evidence_refs must be an array");
   const evidenceRefs = [...new Set(input.evidence_refs.map((ref, index) => {
     const value = requiredString(ref, `evidence_refs[${index}]`, 520);
-    if (!REF_PATTERN.test(value) || value.includes("?") || value.includes("#")) throw new Error(`evidence_refs[${index}] is not an opaque reference`);
+    if (!REF_PATTERN.test(value) || value.includes("?") || value.includes("#") || OPAQUE_PII_MARKER.test(value)) throw new Error(`evidence_refs[${index}] is not an opaque reference`);
     return value;
   }))].sort();
+  if (evidenceRefs.length > MAX_EVIDENCE_REFS) throw new Error(`evidence_refs exceeds ${MAX_EVIDENCE_REFS} items`);
   const sampleSize = input.sample_size;
   if (sampleSize !== null && (!Number.isSafeInteger(sampleSize) || Number(sampleSize) < 0 || Number(sampleSize) > 1_000_000_000)) {
     throw new Error("sample_size is invalid");
   }
   const correction = nullableString(input.corrects_activity_id, "corrects_activity_id", 200);
-  if (correction !== null && !ID_PATTERN.test(correction)) throw new Error("corrects_activity_id is invalid");
+  if (correction !== null && (!ID_PATTERN.test(correction) || OPAQUE_PII_MARKER.test(correction))) throw new Error("corrects_activity_id is invalid");
   const result: InternalActivity = {
     activity_id: activityId,
     timestamp: isoTimestamp(input.timestamp, "timestamp")!,
     agent_id: actor.agent_id,
     agent_role: actor.agent_role,
     account_id: accountId,
-    action: requiredString(input.action, "action", 160),
+    action: actionCode(input.action),
     evidence_refs: Object.freeze(evidenceRefs),
     decision_status: oneOf(input.decision_status, "decision_status", ["not_applicable", "pending", "approved", "rejected", "blocked", "unknown"]),
-    decision_summary: nullableString(input.decision_summary, "decision_summary"),
+    decision_summary: nullableSanitizedSummary(input.decision_summary, "decision_summary"),
     next_action_owner: nullableOwner(input.next_action_owner),
-    next_action: nullableString(input.next_action, "next_action"),
+    next_action: nullableSanitizedSummary(input.next_action, "next_action"),
     due_at: isoTimestamp(input.due_at, "due_at", true),
     confidence_level: oneOf(input.confidence_level, "confidence_level", ["unknown", "low", "medium", "high"]),
-    confidence_basis: nullableString(input.confidence_basis, "confidence_basis"),
+    confidence_basis: nullableSanitizedSummary(input.confidence_basis, "confidence_basis"),
     sample_size: sampleSize as number | null,
     result_status: oneOf(input.result_status, "result_status", ["not_applicable", "pending", "succeeded", "failed", "blocked", "unknown"]),
     artifact_ref: nullableOpaqueRef(input.artifact_ref, "artifact_ref"),
@@ -501,6 +532,16 @@ export function createInternalActivity(input: unknown): InternalActivity {
   if (result.action !== "correction" && result.corrects_activity_id) throw new Error("only correction may set corrects_activity_id");
   if (result.corrects_activity_id === result.activity_id) throw new Error("correction must use a new activity_id");
   return Object.freeze(result);
+}
+
+/** Derives the persisted actor classification; callers cannot assert authority through this value. */
+export function classifyActivityActor(activity: InternalActivity): ActivityActorType {
+  const validated = createInternalActivity(activity);
+  if (validated.agent_id === FORMAL_EDITORIAL_WRITER.agent_id) return "writer";
+  if (validated.agent_id !== null) return "employee";
+  if (validated.agent_role === "human_approval") return "human";
+  if (validated.agent_role !== null) return "system_capability";
+  return "unknown";
 }
 
 export type CorrectionActivityInput = Omit<InternalActivityInput, "account_id" | "action" | "corrects_activity_id">;

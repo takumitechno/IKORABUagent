@@ -213,7 +213,7 @@ describe("sanitized append-only internal activity contract", () => {
     const originalBytes = serializeInternalActivity(original, "internal");
     const next = activityInput({
       activity_id: "activity-002", timestamp: "2026-09-23T13:00:00Z",
-      decision_summary: "Corrected decision summary", evidence_refs: ["source:report-2"],
+      decision_summary: "corrected_decision_summary", evidence_refs: ["source:report-2"],
     });
     const { account_id: _account, action: _action, corrects_activity_id: _corrects, ...correctionInput } = next;
     const correction = createCorrectionActivity(original, correctionInput);
@@ -231,7 +231,7 @@ describe("sanitized append-only internal activity contract", () => {
     const first = appendInternalActivity([], activityInput());
     expect(first).toHaveLength(1);
     expect(Object.isFrozen(first)).toBe(true);
-    expect(() => appendInternalActivity(first, activityInput({ decision_summary: "different payload" })))
+    expect(() => appendInternalActivity(first, activityInput({ decision_summary: "different_payload" })))
       .toThrow("append-only history cannot be overwritten");
     const second = appendInternalActivity(first, activityInput({ activity_id: "activity-002" }));
     expect(second.map((entry) => entry.activity_id)).toEqual(["activity-001", "activity-002"]);
