@@ -9,39 +9,111 @@ import { icon } from "./icons";
 import { baseComponents, designTokens } from "./design-tokens";
 import type { CustomerWorkspaceView } from "../lib/customer-workspaces";
 
-export const DASHBOARD_STYLESHEET_VERSION = "stage-b-20260923";
+export const DASHBOARD_STYLESHEET_VERSION = "editorial-rail-20260923";
 
 export function dashboardStylesheetHref(): string {
   return `/styles.css?v=${DASHBOARD_STYLESHEET_VERSION}`;
 }
 
-interface NavItem {
+export type NavCurrent = "location" | "page";
+
+export interface NavItem {
+  key: string;
   href: string;
   label: string;
   iconName: string;
   badge?: number | string;
   active?: boolean;
+  current?: NavCurrent;
   children?: NavItem[];
 }
 
-interface NavSection {
+export interface NavSection {
   label?: string;
   items: NavItem[];
 }
 
-function buildNav(currentPath: string, badges: { approvals: number; running: number }): NavSection[] {
+export const CUSTOMER_HOME_NAV = [
+  { key: "today", href: "/#today", label: "今日", iconName: "activity" },
+  { key: "schedule", href: "/#schedule", label: "投稿予定", iconName: "clock" },
+  { key: "performance", href: "/#performance", label: "投稿と実績", iconName: "list" },
+  { key: "ai-improvement", href: "/#ai-improvement", label: "AI改善", iconName: "zap" },
+  { key: "manual-analysis", href: "/#manual-analysis", label: "公開済み投稿", iconName: "knowledge" },
+] as const;
+
+export function resolveCustomerNavKey(pathname: string, hash: string): string | null {
+  if (pathname === "/improvement") return "improvement-report";
+  if (pathname !== "/" && pathname !== "") return null;
+  const requested = hash.replace(/^#/, "");
+  return CUSTOMER_HOME_NAV.some((item) => item.key === requested) ? requested : "today";
+}
+
+export function buildCustomerNav(currentPath: string): NavSection[] {
   const pathOnly = currentPath.split("?")[0];
+  const activeKey = resolveCustomerNavKey(pathOnly, "");
   return [
     {
       items: [
-        { href: "/#overview",   label: "運用サマリー",   iconName: "activity",  active: pathOnly === "/" },
-        { href: "/#pipeline",   label: "投稿パイプライン", iconName: "list" },
-        { href: "/#morning-report", label: "投稿実績・KPI", iconName: "activity" },
-        { href: "/improvement", label: "AI改善レポート",  iconName: "zap", active: pathOnly === "/improvement" },
-        { href: "/#operations", label: "次回テスト",      iconName: "knowledge" },
+        ...CUSTOMER_HOME_NAV.map((item) => ({
+          ...item,
+          active: item.key === activeKey,
+          current: item.key === activeKey ? "location" as const : undefined,
+        })),
+        {
+          key: "improvement-report", href: "/improvement", label: "改善レポート", iconName: "zap",
+          active: activeKey === "improvement-report",
+          current: activeKey === "improvement-report" ? "page" : undefined,
+        },
       ],
     },
   ];
+}
+
+export function buildHqNav(currentPath: string): NavSection[] {
+  const pathOnly = currentPath.split("?")[0];
+  const section = (label: string, items: Array<Omit<NavItem, "active" | "current">>): NavSection => ({
+    label,
+    items: items.map((item) => ({
+      ...item,
+      active: item.href === pathOnly,
+      current: item.href === pathOnly ? "page" : undefined,
+    })),
+  });
+  return [
+    section("編集部", [
+      { key: "agents", href: "/agents", label: "エージェント", iconName: "agents" },
+      { key: "schedules", href: "/schedules", label: "スケジュール", iconName: "clock" },
+    ]),
+    section("運用記録", [
+      { key: "logs", href: "/logs", label: "行動ログ", iconName: "activity" },
+      { key: "reflections", href: "/reflections", label: "振り返り", iconName: "routines" },
+      { key: "reports", href: "/reports", label: "日報", iconName: "list" },
+    ]),
+    section("改善", [
+      { key: "hypotheses", href: "/hypotheses", label: "仮説検証", iconName: "goals" },
+      { key: "improvements", href: "/improvements", label: "自律改善", iconName: "zap" },
+      { key: "knowledge", href: "/knowledge", label: "ナレッジ", iconName: "knowledge" },
+    ]),
+    section("管理", [
+      { key: "costs", href: "/costs", label: "コスト", iconName: "costs" },
+    ]),
+  ];
+}
+
+function renderNavSections(nav: NavSection[], kind: "customer" | "hq"): string {
+  return nav.map((section) => `
+    ${section.label ? `<div class="nav-section-label">${escapeHtml(section.label)}</div>` : ""}
+    <div class="nav-section">
+      ${section.items.map((item) => `<a href="${item.href}" class="nav-item ${item.active ? "active" : ""}" data-nav="${item.iconName}" data-${kind}-nav="${item.key}"${item.current ? ` aria-current="${item.current}"` : ""}>
+        <span class="nav-icon-chip">${icon(item.iconName, "size-4")}</span>
+        <span class="nav-label">${escapeHtml(item.label)}</span>
+        ${item.badge ? `<span class="nav-badge">${escapeHtml(String(item.badge))}</span>` : ""}
+      </a>${item.children && item.children.length > 0 ? `<div class="nav-children">${item.children.map((child) => `<a href="${child.href}" class="nav-child ${child.active ? "active" : ""}"${child.current ? ` aria-current="${child.current}"` : ""}>
+        <span class="nav-icon-chip nav-icon-chip-sm">${icon(child.iconName, "size-4")}</span>
+        <span class="nav-label">${escapeHtml(child.label)}</span>
+      </a>`).join("")}</div>` : ""}`).join("")}
+    </div>
+  `).join("");
 }
 
 export interface LayoutOpts {
@@ -68,11 +140,16 @@ export interface LayoutOpts {
 }
 
 export function renderLayout(opts: LayoutOpts): string {
-  const badges = opts.badges || { approvals: 0, running: 0 };
-  const nav = buildNav(opts.currentPath, badges);
   const pathOnly = opts.currentPath.split("?")[0];
   const isCustomerDashboard = pathOnly === "/" || pathOnly === "/improvement";
   const isInternalOperations = pathOnly === "/internal";
+  const nav = isCustomerDashboard
+    ? buildCustomerNav(opts.currentPath)
+    : buildHqNav(opts.currentPath);
+  const navMarkup = renderNavSections(nav, isCustomerDashboard ? "customer" : "hq");
+  const activeHqLabel = isInternalOperations
+    ? "Mission Control"
+    : nav.flatMap((section) => section.items).find((item) => item.active)?.label ?? "HQメニュー";
   const internalHomeButton = isCustomerDashboard
     ? opts.internalAccessAllowed
       ? `<a href="/internal" class="nav-item office-back-button" data-nav="home">
@@ -131,47 +208,8 @@ export function renderLayout(opts: LayoutOpts): string {
       </a>
       ${internalHomeButton}
       ${workspaceSwitcher}
-      <nav class="sidebar-nav">
-        ${nav
-          .map(
-            (section) => `
-          ${section.label ? `<div class="nav-section-label">${escapeHtml(section.label)}</div>` : ""}
-          <div class="nav-section">
-            ${section.items
-              .map(
-                (item) => `<a href="${item.href}" class="nav-item ${item.active ? "active" : ""}" data-nav="${item.iconName}">
-                  <span class="nav-icon-chip">${icon(item.iconName, "size-4")}</span>
-                  <span class="nav-label">${escapeHtml(item.label)}</span>
-                  ${item.badge ? `<span class="nav-badge">${escapeHtml(String(item.badge))}</span>` : ""}
-                </a>${
-                  item.children && item.children.length > 0
-                    ? `<div class="nav-children">${item.children
-                        .map(
-                          (c) => `<a href="${c.href}" class="nav-child ${c.active ? "active" : ""}">
-                          <span class="nav-icon-chip nav-icon-chip-sm">${icon(c.iconName, "size-4")}</span>
-                          <span class="nav-label">${escapeHtml(c.label)}</span>
-                        </a>`,
-                        )
-                        .join("")}</div>`
-                    : ""
-                }`,
-              )
-              .join("")}
-          </div>
-        `,
-          )
-          .join("")}
-      </nav>
-      <div class="sidebar-footer">
-        <div class="sys-status-card">
-          <span class="sys-status-mark" style="background:#dcfce7;color:#166534;">${icon("activity", "size-4")}</span>
-          <div class="sys-status-body">
-            <div class="sys-status-label">${isCustomerDashboard ? "運用ステータス" : "AI運用"}</div>
-            <div class="sys-status-state">${isCustomerDashboard ? "画面内で確認" : '<span class="sys-status-dot"></span> 稼働中'}</div>
-          </div>
-        </div>
-        ${isCustomerDashboard ? "" : '<div class="env-pill"><span class="dot dot-on"></span> Threads 接続済み</div>'}
-      </div>
+      <nav class="sidebar-nav" aria-label="${isCustomerDashboard ? "運用セクション" : "HQナビゲーション"}">${navMarkup}</nav>
+      ${isCustomerDashboard ? "" : `<details class="hq-mobile-nav"><summary>現在地 · ${escapeHtml(activeHqLabel)}</summary><nav class="hq-mobile-nav-panel" aria-label="HQモバイルナビゲーション">${navMarkup}</nav></details>`}
     </aside>
     <main class="main" id="main">
       ${opts.flash ? `<div class="flash ${opts.flash.type}">${escapeHtml(opts.flash.msg)}</div>` : ""}
@@ -180,9 +218,53 @@ export function renderLayout(opts: LayoutOpts): string {
   </div>
   ${opts.csrfToken ? `<meta name="csrf-token" content="${escapeHtml(opts.csrfToken)}">` : ""}
   ${opts.csrfToken ? `<script>${internalSecurityScript(opts.csrfToken)}</script>` : ""}
-  ${isCustomerDashboard ? "" : `<script>${liveScript(opts.currentPath)}</script>`}
+  ${isCustomerDashboard ? `<script>${customerEditorialNavScript()}</script>` : `<script>${liveScript(opts.currentPath)}</script>`}
 </body>
 </html>`;
+}
+
+export function customerEditorialNavScript(): string {
+  const homeKeys = Object.fromEntries(CUSTOMER_HOME_NAV.map((item) => [`#${item.key}`, item.key]));
+  return `
+(() => {
+  const rail = document.querySelector('.customer-shell .sidebar-nav');
+  if (!rail) return;
+  const links = Array.from(rail.querySelectorAll('[data-customer-nav]'));
+  const homeKeys = ${JSON.stringify(homeKeys)};
+  function requestedKey(pathname, hash) {
+    if (pathname === '/improvement') return 'improvement-report';
+    if (pathname !== '/' && pathname !== '') return null;
+    return homeKeys[hash] || 'today';
+  }
+  function applyKey(key) {
+    let active = null;
+    links.forEach(link => {
+      const selected = active === null && link.dataset.customerNav === key;
+      link.classList.toggle('active', selected);
+      if (selected) {
+        const target = new URL(link.href, location.origin);
+        link.setAttribute('aria-current', target.hash ? 'location' : 'page');
+        active = link;
+      } else {
+        link.removeAttribute('aria-current');
+      }
+    });
+    if (active && matchMedia('(max-width: 700px)').matches) {
+      active.scrollIntoView({ behavior: 'auto', block: 'nearest', inline: 'nearest' });
+    }
+  }
+  function sync() { applyKey(requestedKey(location.pathname, location.hash)); }
+  rail.addEventListener('click', event => {
+    if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+    const link = event.target.closest('[data-customer-nav]');
+    if (!link) return;
+    const target = new URL(link.href, location.origin);
+    applyKey(requestedKey(target.pathname, target.hash));
+  });
+  addEventListener('hashchange', sync);
+  addEventListener('popstate', sync);
+  sync();
+})();`;
 }
 
 function internalSecurityScript(token: string): string {

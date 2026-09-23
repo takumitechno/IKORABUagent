@@ -1040,17 +1040,20 @@ strong, b { font-weight: 700; color: #000; }
 .nav-item {
   display: flex; align-items: center; gap: 12px;
   padding: 10px 12px;
+  border-left: 3px solid transparent;
   border-radius: 12px;
-  color: #0f172a;                  /* slate-900 */
+  color: var(--t-ink-2);
   font-size: 12.15px;              /* -10% (user指定維持) */
   font-weight: 700;                /* font-bold */
   letter-spacing: -0.005em;
-  transition: background 0.15s ease, color 0.15s ease;
+  transition: background-color 0.16s ease, color 0.16s ease, border-color 0.16s ease;
 }
-.nav-item:hover { background: #f1f5f9; color: #0f172a; }   /* slate-100 */
+.nav-item:hover { background: var(--t-surface-2); color: var(--t-ink); }
 .nav-item.active {
-  background: #0f172a;              /* slate-900 (黒系) */
-  color: #ffffff;
+  background: var(--t-brand-soft);
+  border-left-color: var(--t-brand);
+  color: var(--t-brand);
+  font-weight: 800;
 }
 
 /* nav icon — スタイルでは flat svg をそのまま表示 */
@@ -1065,7 +1068,7 @@ strong, b { font-weight: 700; color: #000; }
 .sidebar .nav-item:hover .nav-icon-chip,
 .sidebar .nav-child:hover .nav-icon-chip { color: #0f172a; }
 .sidebar .nav-item.active .nav-icon-chip,
-.sidebar .nav-child.active .nav-icon-chip { color: #ffffff; }
+.sidebar .nav-child.active .nav-icon-chip { color: var(--t-brand); }
 /* サイドバー外の icon chip (使われていれば) — colored rounded square 形式 */
 .nav-icon-chip {
   width: 28px; height: 28px;
@@ -1086,7 +1089,7 @@ strong, b { font-weight: 700; color: #000; }
 .nav-item:not(.sidebar *)[data-nav="activity"] .nav-icon-chip { background: #E0F2FE; color: #0369A1; }
 .nav-item:not(.sidebar *)[data-nav="zap"] .nav-icon-chip      { background: #FEF3C7; color: #B45309; }
 .nav-item:not(.sidebar *)[data-nav="knowledge"] .nav-icon-chip{ background: #DCFCE7; color: #166534; }
-.nav-item.active .nav-icon-chip { background: rgba(255,255,255,0.18); color: #fff; }
+.nav-item.active .nav-icon-chip { background: transparent; color: var(--t-brand); }
 
 .nav-label { flex: 1; }
 .nav-badge {
@@ -1096,7 +1099,7 @@ strong, b { font-weight: 700; color: #000; }
   min-width: 22px; text-align: center; line-height: 1.5;
   box-shadow: var(--t-e0);
 }
-.nav-item.active .nav-badge { background: #fff; color: #0f172a; }
+.nav-item.active .nav-badge { background: var(--t-brand); color: var(--t-brand-ink); }
 
 .nav-children { display: flex; flex-direction: column; gap: 2px; padding: 2px 0 6px 14px; position: relative; }
 .nav-children {
@@ -1115,44 +1118,9 @@ strong, b { font-weight: 700; color: #000; }
   transition: background 0.15s ease, color 0.15s ease;
 }
 .nav-child:hover { background: #f1f5f9; color: #0f172a; }
-.nav-child.active { background: #0f172a; color: #ffffff; }
+.nav-child.active { background: var(--t-brand-soft); color: var(--t-brand); }
 
-/* Sidebar footer — inner tile */
-.sidebar-footer {
-  padding: 14px;
-  background: #FAFAFB;
-  border-radius: var(--r-md);
-  display: flex; flex-direction: column; gap: 12px;
-}
-.sys-status-card {
-  display: flex; align-items: center; gap: 10px;
-}
-.sys-status-mark {
-  width: 40px; height: 40px; border-radius: var(--r-sm);
-  background: #FEE2E2;
-  display: inline-flex; align-items: center; justify-content: center;
-  flex-shrink: 0;
-}
-.sys-status-body { min-width: 0; }
-.sys-status-label { font-size: 12px; font-weight: 700; color: var(--muted); letter-spacing: 0.04em; text-transform: uppercase; }
-.sys-status-state { font-size: 13px; color: #000; display: flex; align-items: center; gap: 6px; margin-top: 2px; font-weight: 700; }
-.sys-status-state strong { font-weight: 800; }
-.sys-status-dot { width: 8px; height: 8px; border-radius: 50%; background: #22C55E; box-shadow: 0 0 0 3px rgba(34,197,94,0.25); }
-.sys-status-metric { padding: 0 2px; }
-.sys-status-metric-label { font-size: 12px; color: var(--muted); font-weight: 700; margin-bottom: 2px; text-transform: uppercase; letter-spacing: 0.04em; }
-.sys-status-metric-val { font-size: 24px; font-weight: 800; letter-spacing: -0.025em; color: #000; font-variant-numeric: tabular-nums; line-height: 1.1; }
-.sys-status-metric-val span { font-size: 13px; color: var(--muted-2); font-weight: 700; margin-left: 4px; }
-
-.env-pill {
-  display: inline-flex; align-items: center; gap: 7px;
-  padding: 6px 12px;
-  border-radius: var(--r-pill);
-  background: #18181b;
-  color: #fff;
-  font-size: 12px;
-  align-self: flex-start;
-  font-weight: 700;
-}
+.hq-mobile-nav { display: none; }
 .dot { width: 7px; height: 7px; border-radius: 50%; display: inline-block; }
 .dot-on { background: #22C55E; box-shadow: 0 0 0 2px rgba(34,197,94,0.35); }
 .dot-off { background: #EF4444; box-shadow: 0 0 0 2px rgba(239,68,68,0.3); }
@@ -1816,6 +1784,26 @@ input.list-sort-select { background-image: none; padding-right: 14px; }
 
 @media (max-width: 1100px) {
   .list-metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 1000px) {
+  .internal-shell .sidebar > .sidebar-nav { display: none; }
+  .internal-shell .hq-mobile-nav { display: block; margin-top: 10px; }
+  .hq-mobile-nav > summary {
+    min-height: 44px; padding: 10px 12px; border: 1px solid var(--t-line);
+    border-radius: 12px; background: var(--t-surface-2); color: var(--t-ink);
+    cursor: pointer; font-size: 13px; font-weight: 800; list-style: none;
+  }
+  .hq-mobile-nav > summary::-webkit-details-marker { display: none; }
+  .hq-mobile-nav-panel { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 4px; padding-top: 8px; }
+  .hq-mobile-nav-panel .nav-section { display: contents; }
+  .hq-mobile-nav-panel .nav-section-label { grid-column: 1 / -1; }
+  .hq-mobile-nav-panel .nav-item { min-height: 44px; }
+}
+@media (max-width: 560px) {
+  .hq-mobile-nav-panel { grid-template-columns: 1fr; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .nav-item, .nav-child { transition: none; }
 }
 `;
 }
