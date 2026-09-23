@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test";
 import type { Database } from "bun:sqlite";
 import {
-  loadCustomerPendingReviews, mutateCustomerReview, type ThreadsDashboardData,
+  addManualPostToAnalysis, loadCustomerPendingReviews, mutateCustomerReview, type ThreadsDashboardData,
 } from "../web/lib/threads-dashboard";
 import { renderOverview } from "../web/routes/overview";
 
@@ -20,6 +20,7 @@ const pendingPayload = {
     scheduled_at: null,
     status: "確認待ち",
     ai_changes: ["文章を短く整えました"],
+    origin: "ai_auto",
   }],
   meta: { schema_version: 1 },
 };
@@ -99,14 +100,14 @@ describe("customer content review experience", () => {
       contentId: "cv_review_1", version: 2, contentHash: "a".repeat(64),
       topic: "やさしい伝え方", contentRole: "trust", body: "確認してほしい投稿本文です。",
       createdAt: "2026-09-22T01:00:00Z", scheduledAt: null, status: "確認待ち",
-      aiChanges: ["文章を短く整えました"],
+      aiChanges: ["文章を短く整えました"], origin: "ai_auto" as const,
     }];
     const html = renderOverview({} as Database, dashboard, {
       reviews, canReview: true, accountId: "acct_A",
     });
     expect(html).toContain("確認が必要な投稿");
     expect(html).toContain("確認待ち 1件");
-    expect(html).toContain("承認 / 修正依頼 / 見送り");
+    expect(html).toContain("承認 / 修正または編集 / 見送り");
     expect(html).toContain("承認する");
     expect(html).toContain("修正を依頼");
     expect(html).toContain("今回は見送る");
@@ -123,7 +124,7 @@ describe("customer content review experience", () => {
       contentId: "cv_review_1", version: 2, contentHash: "a".repeat(64),
       topic: "topic", contentRole: "trust", body: "body",
       createdAt: "2026-09-22T01:00:00Z", scheduledAt: null,
-      status: "確認待ち", aiChanges: [],
+      status: "確認待ち", aiChanges: [], origin: "ai_auto" as const,
     };
     const html = renderOverview({} as Database, dashboard, {
       reviews: [review], canReview: false, accountId: "acct_A",
@@ -131,5 +132,83 @@ describe("customer content review experience", () => {
     expect(html).toContain("閲覧のみできます");
     expect(html).not.toContain("承認する");
     expect(html).not.toContain("request-revision");
+  });
+
+  test("renders direct editing only for manual drafts", () => {
+    const manual = {
+      contentId: "cv_manual_1", version: 1, contentHash: "b".repeat(64),
+      topic: "手書き案", contentRole: "trust", body: "自分で書いた本文",
+      createdAt: "2026-09-23T01:00:00Z", scheduledAt: null,
+      status: "確認待ち", aiChanges: [], origin: "human_manual" as const,
+    };
+    const html = renderOverview({} as Database, dashboard, {
+      reviews: [manual], canReview: true, accountId: "acct_A",
+    });
+    expect(html).toContain("編集する");
+    expect(html).toContain("編集内容を保存");
+    expect(html).toContain("自分で書いた本文");
+    expect(html).not.toContain("修正を依頼する");
+  });
+
+  test("posts direct manual edits with the exact binding", async () => {
+    const requests: Request[] = [];
+    await mutateCustomerReview({
+      action: "edit", accountId: "acct_A", contentId: "cv_manual_1",
+      version: 3, contentHash: "b".repeat(64), tenantUserId: "editor_A",
+      body: "直接編集した本文",
+      fetcher: (async (input: RequestInfo | URL, init?: RequestInit) => {
+        requests.push(new Request(input, init));
+        return Response.json({ status: "success" });
+      }) as typeof fetch,
+    });
+    const body = await requests[0].json() as Record<string, unknown>;
+    expect(requests[0].url).toEndWith("/api/customer/content/cv_manual_1/edit");
+    expect(body.expected_version).toBe(3);
+    expect(body.expected_content_hash).toBe("b".repeat(64));
+    expect(body.body).toBe("直接編集した本文");
+  });
+
+  test("adds a published manual post to analysis without learning", async () => {
+    const requests: Request[] = [];
+    const state = await addManualPostToAnalysis({
+      accountId: "acct_A", detectionId: "manual_1", tenantUserId: "editor_A",
+      fetcher: (async (input: RequestInfo | URL, init?: RequestInit) => {
+        requests.push(new Request(input, init));
+        return Response.json({ status: "success", analysis_state: "fetching" });
+      }) as typeof fetch,
+    });
+    expect(state).toBe("fetching");
+    expect(requests[0].url).toEndWith("/api/customer/manual-posts/manual_1/analyze");
+    expect(requests[0].headers.get("x-threads-user-id")).toBe("editor_A");
+    const body = await requests[0].json() as Record<string, unknown>;
+    expect(body.account_id).toBe("acct_A");
+    expect(body.human_confirmed).toBe(true);
+    expect(body.learn_enabled).toBeUndefined();
+  });
+
+  test("shows manual analysis as unadded, fetching, analyzed, and retryable", () => {
+    const base = {
+      externalId: "external-1", body: "公開済み手動投稿", publishedAt: "2026-09-23T01:00:00Z",
+      origin: "human_manual" as const, learnEnabled: false, topic: null, contentRole: null,
+      hypothesis: null, trackingState: "tracked" as const, logicalThreadId: "thread-1",
+      rootExternalId: "external-1", replyToExternalId: null, partIndex: 0, partCount: 1,
+      parts: [],
+    };
+    const html = renderOverview({} as Database, {
+      ...dashboard,
+      manualPosts: [
+        { ...base, detectionId: "manual-unadded", analyzeEnabled: false, threadMetrics: {} },
+        { ...base, detectionId: "manual-fetching", analyzeEnabled: true, threadMetrics: {} },
+        { ...base, detectionId: "manual-analyzed", analyzeEnabled: true, threadMetrics: { views: 12 } },
+      ],
+    }, {
+      reviews: [], canReview: true, accountId: "acct_A", manualAnalysisNotice: "failed",
+    });
+    expect(html).toContain("未追加");
+    expect(html).toContain("取得中");
+    expect(html).toContain("分析済み");
+    expect(html).toContain("分析に追加");
+    expect(html).toContain("取得できませんでした。再試行してください。");
+    expect(html).toContain("改善学習には使わない");
   });
 });

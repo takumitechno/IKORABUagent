@@ -53,7 +53,7 @@ import {
   type ResolvedTenantIdentity,
 } from "./lib/dashboard-tenant";
 import {
-  configureManualPostPolicy, getCustomerPendingReviews, getThreadsAccounts, getThreadsDashboard,
+  addManualPostToAnalysis, configureManualPostPolicy, getCustomerPendingReviews, getThreadsAccounts, getThreadsDashboard,
   loadThreadsAccounts, mutateCustomerReview,
 } from "./lib/threads-dashboard";
 import { sseHandler } from "./sse";
@@ -356,7 +356,7 @@ const server = Bun.serve({
             },
           });
         }
-        const customerMatch = path.match(/^\/api\/customer\/content\/([^/]+)\/(approve|reject|request-revision)$/);
+        const customerMatch = path.match(/^\/api\/customer\/content\/([^/]+)\/(approve|reject|request-revision|edit)$/);
         if (customerMatch) {
           const trustedTenant = requireTenantSelection(tenantIdentity);
           if (!tenantEnforced || !tenantCan(trustedTenant, "content:review")) {
@@ -378,7 +378,7 @@ const server = Bun.serve({
           }
           try {
             await mutateCustomerReview({
-              action: customerMatch[2] as "approve" | "reject" | "request-revision",
+              action: customerMatch[2] as "approve" | "reject" | "request-revision" | "edit",
               accountId,
               contentId: decodeURIComponent(customerMatch[1]),
               version: Number(form.get("version")),
@@ -386,6 +386,7 @@ const server = Bun.serve({
               tenantUserId: trustedTenant.userId,
               reason: String(form.get("reason") || ""),
               feedback: String(form.get("feedback") || ""),
+              body: String(form.get("body") || ""),
             });
             return redirect(`/?review=${customerMatch[2]}`);
           } catch (error) {
@@ -393,6 +394,37 @@ const server = Bun.serve({
               return new Response("投稿案が更新されています。最新案を確認してください。", { status: 409 });
             }
             return new Response("投稿案の更新に失敗しました。内容を確認してもう一度お試しください。", { status: 502 });
+          }
+        }
+        const manualAnalysisMatch = path.match(/^\/api\/customer\/manual-posts\/([^/]+)\/analyze$/);
+        if (manualAnalysisMatch) {
+          const trustedTenant = requireTenantSelection(tenantIdentity);
+          if (!tenantEnforced || !tenantCan(trustedTenant, "content:review")) {
+            return new Response("Forbidden", { status: 403 });
+          }
+          const form = await req.formData();
+          const accountId = String(form.get("account_id") || "");
+          const currentAccounts = await authorizedCustomerAccounts(
+            trustedTenant.userId, exactCanaryAccount,
+          );
+          if (!currentAccounts.some((account) => account.accountId === accountId)) {
+            return new Response("Forbidden", { status: 403 });
+          }
+          const selection = await internalAccount(
+            accountId, trustedTenant.userId, true, exactCanaryAccount, false,
+          );
+          if (selection.rejected || selection.selected !== accountId) {
+            return new Response("Forbidden", { status: 403 });
+          }
+          try {
+            const state = await addManualPostToAnalysis({
+              accountId,
+              detectionId: decodeURIComponent(manualAnalysisMatch[1]),
+              tenantUserId: trustedTenant.userId,
+            });
+            return redirect(`/?manual_analysis=${state}`);
+          } catch {
+            return redirect("/?manual_analysis=failed");
           }
         }
         if (path === "/api/internal/manual-policy") {
@@ -748,6 +780,7 @@ const server = Bun.serve({
           canReview: tenantCan(trustedTenant, "content:review"),
           accountId: selection.selected.accountId,
           notice: url.searchParams.get("review"),
+          manualAnalysisNotice: url.searchParams.get("manual_analysis"),
         }), routeCsrf, workspaces);
       }
       if (path === "/improvement") {

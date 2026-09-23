@@ -171,9 +171,10 @@ export interface CustomerReviewItem {
   status: string;
   scheduledAt: string | null;
   aiChanges: string[];
+  origin: "ai_auto" | "ai_manual" | "human_manual";
 }
 
-export type CustomerReviewAction = "approve" | "reject" | "request-revision";
+export type CustomerReviewAction = "approve" | "reject" | "request-revision" | "edit";
 
 type FetchLike = typeof fetch;
 
@@ -706,6 +707,8 @@ export async function loadCustomerPendingReviews(options: {
           status: text(row.status) ?? "確認待ち",
           scheduledAt: text(row.scheduled_at),
           aiChanges: Array.isArray(row.ai_changes) ? row.ai_changes.map(text).filter((v): v is string => Boolean(v)) : [],
+          origin: normalizeOrigin(row.origin) === "human_manual" ? "human_manual"
+            : normalizeOrigin(row.origin) === "ai_manual" ? "ai_manual" : "ai_auto",
         };
       }).filter((row): row is CustomerReviewItem => row !== null);
   } finally {
@@ -733,6 +736,7 @@ export async function mutateCustomerReview(input: {
   tenantUserId: string;
   reason?: string;
   feedback?: string;
+  body?: string;
   fetcher?: FetchLike;
 }): Promise<void> {
   if (!/^[a-zA-Z0-9_-]+$/.test(input.contentId) || !/^[0-9a-f]{64}$/i.test(input.contentHash)) {
@@ -749,8 +753,9 @@ export async function mutateCustomerReview(input: {
       expected_content_hash: input.contentHash,
       request_id: `customer-${crypto.randomUUID()}`,
       human_confirmed: true,
-      reason: input.reason,
-      feedback: input.feedback,
+      ...(input.action === "reject" ? { reason: input.reason } : {}),
+      ...(input.action === "request-revision" ? { feedback: input.feedback } : {}),
+      ...(input.action === "edit" ? { body: input.body } : {}),
     }),
   });
   if (!response.ok) {
@@ -760,6 +765,42 @@ export async function mutateCustomerReview(input: {
   }
   customerReviewCache.delete(`${tenantCacheKey(input.tenantUserId)}:${input.accountId}`);
   dashboardCache.delete(`${tenantCacheKey(input.tenantUserId)}:${input.accountId}`);
+}
+
+export async function addManualPostToAnalysis(input: {
+  accountId: string;
+  detectionId: string;
+  tenantUserId: string;
+  fetcher?: FetchLike;
+}): Promise<"fetching" | "analyzed"> {
+  if (!/^acct_[a-zA-Z0-9_-]+$/.test(input.accountId)
+    || !/^[a-zA-Z0-9_-]+$/.test(input.detectionId)) {
+    throw new Error("invalid manual post binding");
+  }
+  const origin = safeOrigin(process.env.THREADS_BRIDGE_URL ?? DEFAULT_BRIDGE_URL);
+  const apiKey = process.env.THREADS_BRIDGE_API_KEY ?? "";
+  const response = await (input.fetcher ?? fetch)(
+    `${origin}/api/customer/manual-posts/${encodeURIComponent(input.detectionId)}/analyze`,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json", ...bridgeRequestHeaders(apiKey, input.tenantUserId) },
+      body: JSON.stringify({
+        account_id: input.accountId,
+        request_id: `customer-analysis-${crypto.randomUUID()}`,
+        human_confirmed: true,
+      }),
+    },
+  );
+  if (!response.ok) {
+    const error = new Error(`manual analysis add failed (${response.status})`);
+    Object.assign(error, { status: response.status });
+    throw error;
+  }
+  const payload = record(await response.json());
+  const state = text(payload?.analysis_state);
+  if (state !== "fetching" && state !== "analyzed") throw new Error("invalid manual analysis response");
+  dashboardCache.delete(`${tenantCacheKey(input.tenantUserId)}:${input.accountId}`);
+  return state;
 }
 
 export async function configureManualPostPolicy(input: {

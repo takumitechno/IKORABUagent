@@ -190,8 +190,8 @@ describe("read-only Threads dashboard connector", () => {
     })]);
     expect(requests.every((request) => request.method === "GET")).toBe(true);
     const html = renderOverview({} as Database, data);
-    expect(html).toContain("自分で投稿した内容も分析できます");
-    expect(html).toContain("分析に使う");
+    expect(html).toContain("必要なものだけ分析に追加できます");
+    expect(html).toContain("分析済み");
     expect(html).toContain("改善学習には使わない");
     expect(html).toContain("スレッド投稿 1/3〜3/3");
     expect(html).toContain("スレッドの本文と実績を見る");
