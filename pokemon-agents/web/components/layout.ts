@@ -6,6 +6,7 @@
  */
 
 import { icon } from "./icons";
+import type { CustomerWorkspaceView } from "../lib/customer-workspaces";
 
 interface NavItem {
   href: string;
@@ -43,6 +44,8 @@ export interface LayoutOpts {
   internalAccessAllowed?: boolean;
   /** Server-issued token for authenticated internal mutation requests only. */
   csrfToken?: string;
+  /** Sanitized, server-authorized customer workspaces. */
+  customerWorkspaces?: CustomerWorkspaceView[];
   flash?: { type: "ok" | "err"; msg: string };
   currentPath: string;
   badges?: {
@@ -83,6 +86,12 @@ export function renderLayout(opts: LayoutOpts): string {
   const brandMarkSrc = isCustomerDashboard
     ? "/brand/takumi-mark-compact.png?v=brand03"
     : "/brand/takumi-mark.png";
+  const currentWorkspace = opts.customerWorkspaces?.find((workspace) => workspace.current);
+  const workspaceSwitcher = isCustomerDashboard && currentWorkspace
+    ? `<details class="customer-workspace"${opts.customerWorkspaces!.length === 1 ? " open" : ""}>
+        <summary><small>現在のアカウント</small><span class="customer-workspace-current">${escapeHtml(currentWorkspace.displayName)}</span>${currentWorkspace.handle ? `<span class="customer-workspace-handle">${escapeHtml(currentWorkspace.handle)}</span>` : ""}</summary>
+        ${opts.customerWorkspaces!.length > 1 ? `<div class="customer-workspace-list">${opts.customerWorkspaces!.map((workspace) => `<form method="post" action="/api/customer/workspaces/select"><input type="hidden" name="selector" value="${escapeHtml(workspace.selector)}"><input type="hidden" name="csrf_token" value="${escapeHtml(opts.csrfToken || "")}"><button type="submit"${workspace.current ? " disabled aria-current=\"true\"" : ""}><b>${escapeHtml(workspace.displayName)}</b>${workspace.handle ? `<span>${escapeHtml(workspace.handle)}</span>` : ""}</button></form>`).join("")}</div>` : ""}
+      </details>` : "";
 
   return `<!DOCTYPE html>
 <html lang="ja">
@@ -130,6 +139,7 @@ export function renderLayout(opts: LayoutOpts): string {
         <div class="brand-sub">${brandContext}</div>
       </a>
       ${internalHomeButton}
+      ${workspaceSwitcher}
       <nav class="sidebar-nav">
         ${nav
           .map(

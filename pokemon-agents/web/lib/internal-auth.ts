@@ -22,7 +22,7 @@ export interface CustomerCsrfIdentity {
   role: "viewer" | "editor" | "admin";
 }
 
-const PUBLIC_PATHS = new Set(["/", "/improvement", "/styles.css", "/health"]);
+const PUBLIC_PATHS = new Set(["/login", "/", "/improvement", "/styles.css", "/health"]);
 const PUBLIC_PREFIXES = ["/brand/", "/bg/", "/hero/"];
 const LOOPBACK_HOSTS = new Set(["127.0.0.1", "::1", "localhost", "[::1]"]);
 

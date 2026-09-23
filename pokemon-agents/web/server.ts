@@ -38,6 +38,13 @@ import {
   resolveCustomerIdentity, resolveInternalIdentity,
 } from "./lib/internal-auth";
 import {
+  clearCustomerWorkspaceCookie, customerWorkspaceCookie, customerWorkspaceStyles,
+  customerSessionContract, customerWorkspacesContract, customerWorkspaceViews,
+  renderCustomerLogin, renderWorkspaceChoice,
+  selectCustomerWorkspace, verifyWorkspaceSelector,
+  type CustomerWorkspaceView,
+} from "./lib/customer-workspaces";
+import {
   canaryAccountForIdentity, createBridgeTenantDirectory, createDashboardTenantConfig,
   resolveTrustedTenantIdentity,
   dashboardTenantShadowSnapshot, evaluateDashboardTenantShadow,
@@ -47,7 +54,7 @@ import {
 } from "./lib/dashboard-tenant";
 import {
   configureManualPostPolicy, getCustomerPendingReviews, getThreadsAccounts, getThreadsDashboard,
-  mutateCustomerReview,
+  loadThreadsAccounts, mutateCustomerReview,
 } from "./lib/threads-dashboard";
 import { sseHandler } from "./sse";
 import { ensureRuntimeDb, resolveAgentsDbPath } from "../runtime/db-path";
@@ -128,16 +135,25 @@ async function internalAccount(
 
 function tenantIdentityRequired(path: string): boolean {
   return path === "/" || path === "/improvement" || path === "/internal"
-    || path === "/api/internal/manual-policy" || path.startsWith("/api/customer/content/");
+    || path === "/api/internal/manual-policy" || path.startsWith("/api/customer/");
 }
 
 function customerIdentityRequired(path: string): boolean {
-  return path === "/" || path === "/improvement" || path.startsWith("/api/customer/content/");
+  return path === "/" || path === "/improvement" || path.startsWith("/api/customer/");
 }
 
 function requireTenantSelection(identity: ResolvedTenantIdentity | null): ResolvedTenantIdentity {
   if (!identity) throw new Error("tenant identity unavailable");
   return identity;
+}
+
+async function authorizedCustomerAccounts(
+  tenantUserId: string, exactCanaryAccount: string | null,
+) {
+  // Do not use the short dashboard cache here: every customer request must
+  // revalidate the current Bridge membership before exposing account data.
+  return (await loadThreadsAccounts({ tenantUserId })).filter((account) =>
+    !exactCanaryAccount || account.accountId === exactCanaryAccount);
 }
 
 const db = new Database(DB_PATH);
@@ -314,6 +330,32 @@ const server = Bun.serve({
       }
       // POST: approve / reject / schedule / budget actions / hook ingestion
       if (req.method === "POST") {
+        if (path === "/api/customer/workspaces/select") {
+          const trustedTenant = requireTenantSelection(tenantIdentity);
+          if (!(await customerMutationAllowed(req, trustedTenant, INTERNAL_AUTH))) {
+            return new Response("Forbidden", { status: 403 });
+          }
+          const form = await req.formData();
+          const selector = String(form.get("selector") || "");
+          const accounts = await authorizedCustomerAccounts(
+            trustedTenant.userId, exactCanaryAccount,
+          );
+          const accountId = verifyWorkspaceSelector(
+            selector, trustedTenant, INTERNAL_AUTH.csrfSecret,
+          );
+          if (!accountId || !accounts.some((account) => account.accountId === accountId)) {
+            return new Response("Forbidden", { status: 403 });
+          }
+          return new Response(null, {
+            status: 303,
+            headers: {
+              Location: "/",
+              "Set-Cookie": customerWorkspaceCookie(
+                selector, INTERNAL_AUTH.mode === "cloudflare-access",
+              ),
+            },
+          });
+        }
         const customerMatch = path.match(/^\/api\/customer\/content\/([^/]+)\/(approve|reject|request-revision)$/);
         if (customerMatch) {
           const trustedTenant = requireTenantSelection(tenantIdentity);
@@ -322,6 +364,12 @@ const server = Bun.serve({
           }
           const form = await req.formData();
           const accountId = String(form.get("account_id") || "");
+          const currentAccounts = await authorizedCustomerAccounts(
+            trustedTenant.userId, exactCanaryAccount,
+          );
+          if (!currentAccounts.some((account) => account.accountId === accountId)) {
+            return new Response("Forbidden", { status: 403 });
+          }
           const selection = await internalAccount(
             accountId, trustedTenant.userId, true, exactCanaryAccount, false,
           );
@@ -499,9 +547,41 @@ const server = Bun.serve({
           headers: { "Content-Type": "application/json" },
         });
       }
+      if (path === "/login") {
+        return new Response(renderCustomerLogin(), {
+          headers: {
+            "Content-Type": "text/html; charset=utf-8",
+            "Cache-Control": "public, max-age=300",
+          },
+        });
+      }
+      if (req.method === "GET" && (path === "/api/customer/workspaces"
+        || path === "/api/customer/session")) {
+        const trustedTenant = requireTenantSelection(tenantIdentity);
+        const accounts = await authorizedCustomerAccounts(
+          trustedTenant.userId, exactCanaryAccount,
+        );
+        const selection = selectCustomerWorkspace(
+          req, trustedTenant, accounts, INTERNAL_AUTH.csrfSecret,
+        );
+        if (selection.rejected) return new Response("Forbidden", { status: 403 });
+        const views = customerWorkspaceViews(
+          accounts, selection.selected?.accountId ?? null,
+          trustedTenant, INTERNAL_AUTH.csrfSecret,
+        );
+        const body = path === "/api/customer/workspaces"
+          ? customerWorkspacesContract(views)
+          : customerSessionContract(views, selection.expired);
+        return new Response(JSON.stringify(body), {
+          headers: {
+            "Content-Type": "application/json; charset=utf-8",
+            "Cache-Control": "no-store",
+          },
+        });
+      }
       // Static styles
       if (path === "/styles.css") {
-        return new Response(stylesheet(), {
+        return new Response(stylesheet() + customerWorkspaceStyles, {
           headers: { "Content-Type": "text/css" },
         });
       }
@@ -597,7 +677,10 @@ const server = Bun.serve({
 
       const badges = getBadges(db);
       const currentPath = path + (url.search || "");
-      const lay = (title: string, body: string, routeCsrfToken?: string) =>
+      const lay = (
+        title: string, body: string, routeCsrfToken?: string,
+        customerWorkspaces?: CustomerWorkspaceView[], responseHeaders?: HeadersInit,
+      ) =>
         html(renderLayout({
           title,
           body,
@@ -606,7 +689,8 @@ const server = Bun.serve({
           internalAccessAllowed: internalAccessAllowed(req),
           csrfToken: routeCsrfToken
             ?? (internalIdentity ? csrfToken(internalIdentity, INTERNAL_AUTH) : undefined),
-        }));
+          customerWorkspaces,
+        }), 200, responseHeaders);
 
       // ===== 4-menu structure =====
       if (path === "/internal") {
@@ -630,33 +714,75 @@ const server = Bun.serve({
       if (path === "/" || path === "") {
         if (!tenantEnforced) return lay("Dashboard", renderOverview(db, await getThreadsDashboard()));
         const trustedTenant = requireTenantSelection(tenantIdentity);
-        const selection = await internalAccount(
-          null, trustedTenant.userId, tenantEnforced, exactCanaryAccount, false,
+        const accounts = await authorizedCustomerAccounts(
+          trustedTenant.userId, exactCanaryAccount,
         );
-        if (!selection.selected) return new Response("Forbidden", { status: 403 });
+        const selection = selectCustomerWorkspace(
+          req, trustedTenant, accounts, INTERNAL_AUTH.csrfSecret,
+        );
+        if (selection.rejected) return new Response("Forbidden", { status: 403 });
+        const routeCsrf = customerCsrfToken(trustedTenant, INTERNAL_AUTH);
+        const workspaces = customerWorkspaceViews(
+          accounts, selection.selected?.accountId ?? null,
+          trustedTenant, INTERNAL_AUTH.csrfSecret,
+        );
+        if (!selection.selected) {
+          return lay(
+            "アカウントを選ぶ",
+            renderWorkspaceChoice(workspaces, routeCsrf, selection.expired),
+            routeCsrf,
+            workspaces,
+            selection.expired ? {
+              "Set-Cookie": clearCustomerWorkspaceCookie(
+                INTERNAL_AUTH.mode === "cloudflare-access",
+              ),
+            } : undefined,
+          );
+        }
         const [dashboard, reviews] = await Promise.all([
-          getThreadsDashboard(selection.selected, trustedTenant.userId),
-          getCustomerPendingReviews(selection.selected, trustedTenant.userId),
+          getThreadsDashboard(selection.selected.accountId, trustedTenant.userId),
+          getCustomerPendingReviews(selection.selected.accountId, trustedTenant.userId),
         ]);
         return lay("Dashboard", renderOverview(db, dashboard, {
           reviews,
           canReview: tenantCan(trustedTenant, "content:review"),
-          accountId: selection.selected,
+          accountId: selection.selected.accountId,
           notice: url.searchParams.get("review"),
-        }), customerCsrfToken(trustedTenant, INTERNAL_AUTH));
+        }), routeCsrf, workspaces);
       }
       if (path === "/improvement") {
         if (!tenantEnforced) {
           return lay("AI改善レポート", renderImprovementReport(await getThreadsDashboard()));
         }
         const trustedTenant = requireTenantSelection(tenantIdentity);
-        const selection = await internalAccount(
-          null, trustedTenant.userId, tenantEnforced, exactCanaryAccount, false,
+        const accounts = await authorizedCustomerAccounts(
+          trustedTenant.userId, exactCanaryAccount,
         );
-        if (!selection.selected) return new Response("Forbidden", { status: 403 });
+        const selection = selectCustomerWorkspace(
+          req, trustedTenant, accounts, INTERNAL_AUTH.csrfSecret,
+        );
+        if (selection.rejected) return new Response("Forbidden", { status: 403 });
+        const routeCsrf = customerCsrfToken(trustedTenant, INTERNAL_AUTH);
+        const workspaces = customerWorkspaceViews(
+          accounts, selection.selected?.accountId ?? null,
+          trustedTenant, INTERNAL_AUTH.csrfSecret,
+        );
+        if (!selection.selected) {
+          return lay(
+            "アカウントを選ぶ",
+            renderWorkspaceChoice(workspaces, routeCsrf, selection.expired),
+            routeCsrf,
+            workspaces,
+            selection.expired ? {
+              "Set-Cookie": clearCustomerWorkspaceCookie(
+                INTERNAL_AUTH.mode === "cloudflare-access",
+              ),
+            } : undefined,
+          );
+        }
         return lay("AI改善レポート", renderImprovementReport(
-          await getThreadsDashboard(selection.selected, trustedTenant.userId),
-        ), customerCsrfToken(trustedTenant, INTERNAL_AUTH));
+          await getThreadsDashboard(selection.selected.accountId, trustedTenant.userId),
+        ), routeCsrf, workspaces);
       }
       // ===== Flat URL = DB table name =====
       // /agents       (table: agents)         一覧 (default) — ?view=org で組織図
@@ -774,10 +900,12 @@ import("./lib/daily-report").then(({ dailyReportTask }) => {
   };
 });
 
-function html(body: string, status = 200): Response {
+function html(body: string, status = 200, extraHeaders?: HeadersInit): Response {
+  const headers = new Headers(extraHeaders);
+  headers.set("Content-Type", "text/html; charset=utf-8");
   return new Response(body, {
     status,
-    headers: { "Content-Type": "text/html; charset=utf-8" },
+    headers,
   });
 }
 
