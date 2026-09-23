@@ -124,8 +124,9 @@ describe("CUSTOMER-AUTH01 customer UX", () => {
     expect(pixelSizes.length).toBeGreaterThan(0);
     expect(pixelSizes.every((size) => size >= 12)).toBe(true);
     expect(customerWorkspaceStyles).toContain(
-      ".customer-workspace>small{display:block;font-size:var(--t-type-caption-size,12px)",
+      ".customer-workspace summary>small{display:block;font-size:var(--t-type-caption-size,12px)",
     );
+    expect(customerWorkspaceStyles).not.toContain(".customer-workspace>small{");
     expect(customerWorkspaceStyles).toContain(
       ".customer-workspace-list button span{font-size:var(--t-type-caption-size,12px)",
     );
