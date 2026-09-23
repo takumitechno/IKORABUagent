@@ -3,7 +3,10 @@ import { readFileSync, readdirSync } from "node:fs";
 import { resolve } from "node:path";
 import { baseComponents, designTokens } from "../web/components/design-tokens";
 import { customerDashboardStyles } from "../web/components/customer-dashboard-visuals";
-import { renderLayout, statusBadge as legacyStatusBadge } from "../web/components/layout";
+import {
+  DASHBOARD_STYLESHEET_VERSION, dashboardStylesheetHref, renderLayout,
+  statusBadge as legacyStatusBadge,
+} from "../web/components/layout";
 
 const root = resolve(import.meta.dir, "..", "..");
 const serverSource = readFileSync(resolve(root, "pokemon-agents/web/server.ts"), "utf8");
@@ -69,6 +72,23 @@ describe("PRODUCT-UI-REDESIGN01 design system", () => {
     expect(internal).toContain("Mission Control");
     expect(customer.toLowerCase()).not.toContain("capsell");
     expect(internal.toLowerCase()).not.toContain("capsell");
+  });
+
+  test("uses one deterministic versioned stylesheet URL across customer and internal shells", () => {
+    const customer = renderLayout({ title: "Customer", body: "", currentPath: "/" });
+    const internal = renderLayout({ title: "Internal", body: "", currentPath: "/internal" });
+    const href = dashboardStylesheetHref();
+
+    expect(DASHBOARD_STYLESHEET_VERSION).toMatch(/^[a-z0-9-]+$/);
+    expect(dashboardStylesheetHref()).toBe(href);
+    expect(new URL(href, "https://dashboard.example.test").pathname).toBe("/styles.css");
+    expect(customer).toContain(`href="${href}"`);
+    expect(internal).toContain(`href="${href}"`);
+    expect(customer).not.toContain('href="/styles.css"');
+    expect(internal).not.toContain('href="/styles.css"');
+    expect(serverSource).toContain('const path = url.pathname');
+    expect(serverSource).toContain('if (path === "/styles.css")');
+    expect(serverSource).toContain('"Cache-Control": "no-cache, must-revalidate"');
   });
 
   test("keeps legacy status output accessible with icon and label", () => {

@@ -614,7 +614,10 @@ const server = Bun.serve({
       // Static styles
       if (path === "/styles.css") {
         return new Response(stylesheet() + customerWorkspaceStyles, {
-          headers: { "Content-Type": "text/css" },
+          headers: {
+            "Content-Type": "text/css",
+            "Cache-Control": "no-cache, must-revalidate",
+          },
         });
       }
       // Static assets under public/. internal-assets/* shares the /internal

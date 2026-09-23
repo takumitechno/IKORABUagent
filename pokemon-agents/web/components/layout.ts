@@ -9,6 +9,12 @@ import { icon } from "./icons";
 import { baseComponents, designTokens } from "./design-tokens";
 import type { CustomerWorkspaceView } from "../lib/customer-workspaces";
 
+export const DASHBOARD_STYLESHEET_VERSION = "stage-b-20260923";
+
+export function dashboardStylesheetHref(): string {
+  return `/styles.css?v=${DASHBOARD_STYLESHEET_VERSION}`;
+}
+
 interface NavItem {
   href: string;
   label: string;
@@ -109,7 +115,7 @@ export function renderLayout(opts: LayoutOpts): string {
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=LINE+Seed+JP:wght@400;700&display=swap">
   <script src="https://cdn.jsdelivr.net/npm/marked@12.0.2/marked.min.js"></script>
   <style>${designTokens}${baseComponents}</style>
-  <link rel="stylesheet" href="/styles.css">
+  <link rel="stylesheet" href="${dashboardStylesheetHref()}">
 </head>
 <body class="${isCustomerDashboard ? "customer-shell" : "internal-shell"}">
   <div class="app">
