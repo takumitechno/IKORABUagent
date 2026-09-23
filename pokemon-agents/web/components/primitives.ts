@@ -42,8 +42,8 @@ export function emptyState(options: { title: string; description: string }): str
   return `<section class="t-empty"><strong class="t-empty__title">${escapeHtml(options.title)}</strong><div class="t-empty__description">${escapeHtml(options.description)}</div></section>`;
 }
 
-export function sectionHeader(options: { title: string; description?: string; eyebrow?: string }): string {
-  return `<header class="t-section-header"><div>${options.eyebrow ? `<p class="t-section-header__eyebrow">${escapeHtml(options.eyebrow)}</p>` : ""}<h2 class="t-section-header__title">${escapeHtml(options.title)}</h2>${options.description ? `<p class="t-section-header__description">${escapeHtml(options.description)}</p>` : ""}</div></header>`;
+export function sectionHeader(options: { title: string; description?: string; eyebrow?: string; id?: string }): string {
+  return `<header class="t-section-header"><div>${options.eyebrow ? `<p class="t-section-header__eyebrow">${escapeHtml(options.eyebrow)}</p>` : ""}<h2${options.id ? ` id="${escapeHtml(options.id)}"` : ""} class="t-section-header__title">${escapeHtml(options.title)}</h2>${options.description ? `<p class="t-section-header__description">${escapeHtml(options.description)}</p>` : ""}</div></header>`;
 }
 
 export function actionBar(options: { label?: string; actions: ButtonOptions[] }): string {

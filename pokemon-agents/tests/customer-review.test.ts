@@ -165,9 +165,9 @@ describe("customer content review experience", () => {
     const html = renderOverview({} as Database, dashboard, {
       reviews, canReview: true, accountId: "acct_A",
     });
-    expect(html).toContain("確認が必要な投稿");
+    expect(html).toContain("確認が必要な操作");
     expect(html).toContain("確認待ち 1件");
-    expect(html).toContain("承認 / 修正または編集 / 見送り");
+    expect(html).toContain("AI案は修正を依頼でき、手動案は本文を直接編集できます。");
     expect(html).toContain("承認する");
     expect(html).toContain("修正を依頼");
     expect(html).toContain("今回は見送る");

@@ -202,11 +202,11 @@ describe("read-only Threads dashboard connector", () => {
     expect(html).toContain("シェア</b>取得不可");
     expect(html).toContain("最終取得");
     expect(html).toContain('id="theme-toggle"');
-    expect(html).toContain("実績を図で確認");
+    expect(html).toContain("投稿と実績");
     expect(html).toContain("投稿ごとの表示数");
     expect(html).toContain("投稿状態の内訳");
     expect(html).toContain("conic-gradient");
-    expect(html).toContain("summary-icon");
+    expect(html).toContain("home-chart-grid");
     expect(html).not.toContain("must-not-surface");
     expect(html).not.toContain("internal-thread-id");
     expect(html).toContain('href="/improvement"');
@@ -322,12 +322,12 @@ describe("read-only Threads dashboard connector", () => {
     const html = renderOverview({} as Database, data);
     expect(html).toContain("接続待ち");
     expect(html).toContain("実データは表示していません");
-    expect(html).toContain("投稿実績とKPI");
+    expect(html).toContain("投稿と実績");
     expect(html).toContain("推定値やデモ値は表示しません");
     expect(html).toContain("表示データを計測中");
     expect(html).toContain("投稿データを待っています");
     expect(html).not.toContain("デモ補助");
-    expect(html.match(/class="pipeline-row post-row"/g)).toBeNull();
+    expect(html.match(/data-post-index=/g)).toBeNull();
     expect(html).not.toContain("secret transport detail");
     const report = renderImprovementReport(data);
     expect(report).toContain("接続待ち");
@@ -368,7 +368,7 @@ describe("read-only Threads dashboard connector", () => {
     expect(html).toContain("計測中");
     expect(html).not.toContain("勝ち投稿");
     expect(html).not.toContain("最適解です");
-    expect(html.match(/class="pipeline-row post-row"/g)).toHaveLength(1);
+    expect(html.match(/data-post-index=/g)).toHaveLength(1);
     expect(html).not.toContain('name="account_id"');
     for (const forbidden of ["request_id", "content_hash", "DB path", "capability", "kiara-executor", "iori-validator", "sashihara-orchestrator"]) {
       expect(html).not.toContain(forbidden);
