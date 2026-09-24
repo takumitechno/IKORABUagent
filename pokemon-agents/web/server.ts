@@ -62,6 +62,7 @@ import { assertAgentActivityLedgerSchema } from "./lib/agent-activity-ledger";
 import { assertThreadsActivityProjectorSchema } from "./lib/threads-activity-projector";
 import { readThreadsActivityProjectionStatus } from "./lib/threads-activity-consumer";
 import { embeddedSchedulerEnabled } from "./lib/scheduler-startup";
+import { assertAiCostAccountingSchema } from "./lib/ai-cost-accounting";
 
 function getBadges(db: Database): {
   approvals: number;
@@ -170,6 +171,7 @@ const db = new Database(DB_PATH);
 db.exec("PRAGMA journal_mode = WAL");
 db.exec("PRAGMA foreign_keys = ON");
 assertAgentActivityLedgerSchema(db);
+assertAiCostAccountingSchema(db);
 assertThreadsActivityProjectorSchema(db);
 
 const schedulerEnabled = embeddedSchedulerEnabled(process.env.POKEMON_AGENTS_SCHEDULER);

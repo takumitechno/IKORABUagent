@@ -69,6 +69,24 @@ TIMEOUT_SEC="${AGENT_TIMEOUT:-$DEFAULT_TIMEOUT}"
 # 共通ヘルパー scripts/start-reflection.sh を使う (subagent も同じヘルパーを使うので統一)
 RUN_ID=$(bash "$REPO_ROOT/scripts/start-reflection.sh" --slug "$AGENT_NAME" --trigger launchd)
 export AGENT_RUN_ID="$RUN_ID"
+export AGENT_LOOKUP_SLUG="$AGENT_NAME"
+AGENT_DB_ID=$(python3 -c "import os,sqlite3; c=sqlite3.connect(os.environ['AGENTS_DB_PATH']); r=c.execute('SELECT id FROM agents WHERE slug=? LIMIT 1',(os.environ['AGENT_LOOKUP_SLUG'],)).fetchone(); print(r[0] if r else '')")
+if [ -z "$AGENT_DB_ID" ]; then
+    echo "[run-agent] ERROR: agent not registered" >&2
+    sqlite3 "$AGENTS_DB_PATH" "UPDATE reflections SET status='failed', error_message='agent_not_registered', ended_at=datetime('now','localtime') WHERE id=$RUN_ID;"
+    exit 1
+fi
+CALL_ID="agent-${RUN_ID}"
+STARTED_AT=$(date -u '+%Y-%m-%dT%H:%M:%SZ')
+if ! bun "$REPO_ROOT/pokemon-agents/scripts/ai-usage-cli.ts" start \
+  --agent-db-id "$AGENT_DB_ID" --period "$(date -u '+%Y-%m')" --call-id "$CALL_ID" \
+  --started-at "$STARTED_AT" --agent-id "$AGENT_NAME" --model "${MODEL:-unknown}" \
+  --operation legacy_agent_cli --task-ref "reflection:${RUN_ID}" --run-id "reflection:${RUN_ID}" \
+  --data-origin production; then
+    echo "[run-agent] ERROR: AI usage budget/schema guard refused the run" >&2
+    sqlite3 "$AGENTS_DB_PATH" "UPDATE reflections SET status='budget_halted', error_message='ai_usage_budget_or_schema_not_ready', ended_at=datetime('now','localtime') WHERE id=$RUN_ID;"
+    exit 1
+fi
 
 # macOS互換タイムアウト（バックグラウンド+wait+kill方式）
 TMPOUT=$(mktemp)
@@ -84,12 +102,12 @@ EXIT_CODE=$?
 kill $WATCHDOG_PID 2>/dev/null; wait $WATCHDOG_PID 2>/dev/null
 
 OUTPUT=$(cat "$TMPOUT")
-rm -f "$TMPOUT"
 
 # シグナルで死んだ場合（143=SIGTERM, 137=SIGKILL）
+TIMED_OUT=0
 if [ $EXIT_CODE -eq 143 ] || [ $EXIT_CODE -eq 137 ]; then
     echo "[run-agent] TIMEOUT: $AGENT_NAME が${TIMEOUT_SEC}秒でタイムアウト"
-    OUTPUT='{"total_cost_usd":0,"usage":{},"duration_ms":'$((TIMEOUT_SEC*1000))',"num_turns":0,"result":"timeout after '${TIMEOUT_SEC}'s","stop_reason":"timeout","is_error":true}'
+    TIMED_OUT=1
 fi
 
 # JSON解析を1回で済ませる
@@ -98,21 +116,24 @@ import sys, json
 try:
     d = json.load(sys.stdin)
 except:
-    d = {}
-u = d.get('usage', {})
+    d = None
+if d is None:
+    print(json.dumps({'cost':None,'input_tokens':None,'output_tokens':None,'cache_read':None,'cache_create':None,'duration':None,'turns':None,'result':'parse error','stop_reason':'error','is_error':True}))
+    raise SystemExit
+u = d.get('usage', {}) or {}
 print(json.dumps({
-    'cost': d.get('total_cost_usd', 0),
-    'input_tokens': u.get('input_tokens', 0),
-    'output_tokens': u.get('output_tokens', 0),
-    'cache_read': u.get('cache_read_input_tokens', 0),
-    'cache_create': u.get('cache_creation_input_tokens', 0),
-    'duration': d.get('duration_ms', 0),
-    'turns': d.get('num_turns', 0),
+    'cost': d.get('total_cost_usd') if isinstance(d.get('total_cost_usd'), (int,float)) else None,
+    'input_tokens': u.get('input_tokens') if isinstance(u.get('input_tokens'), int) else None,
+    'output_tokens': u.get('output_tokens') if isinstance(u.get('output_tokens'), int) else None,
+    'cache_read': u.get('cache_read_input_tokens') if isinstance(u.get('cache_read_input_tokens'), int) else None,
+    'cache_create': u.get('cache_creation_input_tokens') if isinstance(u.get('cache_creation_input_tokens'), int) else None,
+    'duration': d.get('duration_ms') if isinstance(d.get('duration_ms'), int) else None,
+    'turns': d.get('num_turns') if isinstance(d.get('num_turns'), int) else None,
     'result': (d.get('result', '') or '')[:500],
     'stop_reason': d.get('stop_reason', 'unknown'),
     'is_error': d.get('is_error', False),
 }))
-" 2>/dev/null || echo '{"cost":0,"input_tokens":0,"output_tokens":0,"cache_read":0,"cache_create":0,"duration":0,"turns":0,"result":"parse error","stop_reason":"error","is_error":true}')
+" 2>/dev/null || echo '{"cost":null,"input_tokens":null,"output_tokens":null,"cache_read":null,"cache_create":null,"duration":null,"turns":null,"result":"parse error","stop_reason":"error","is_error":true}')
 
 COST=$(echo "$PARSED" | python3 -c "import sys,json; print(json.load(sys.stdin)['cost'])")
 INPUT_TOKENS=$(echo "$PARSED" | python3 -c "import sys,json; print(json.load(sys.stdin)['input_tokens'])")
@@ -131,6 +152,7 @@ if [ "$IS_ERROR" = "True" ] || [ "$STOP_REASON" = "error" ]; then
 else
     STATUS="success"
 fi
+if [ "$TIMED_OUT" = "1" ]; then STATUS="timeout"; fi
 
 # 偽陽性チェック: resultに認証エラー系キーワードが含まれていたらerrorに変更
 if [ "$STATUS" = "success" ]; then
@@ -140,6 +162,18 @@ if [ "$STATUS" = "success" ]; then
         echo "[run-agent] 偽陽性検出: $AGENT_NAME のstatusをerrorに修正"
     fi
 fi
+
+ENDED_AT=$(date -u '+%Y-%m-%dT%H:%M:%SZ')
+LEDGER_STATUS="failed"
+if [ "$STATUS" = "success" ]; then LEDGER_STATUS="succeeded"; fi
+if [ "$STATUS" = "timeout" ]; then LEDGER_STATUS="timeout"; fi
+if ! bun "$REPO_ROOT/pokemon-agents/scripts/ai-usage-cli.ts" complete \
+  --agent-db-id "$AGENT_DB_ID" --call-id "$CALL_ID" --status "$LEDGER_STATUS" \
+  --output "$TMPOUT" --ended-at "$ENDED_AT"; then
+    STATUS="error"
+    RESULT="ai_usage_completion_record_failed"
+fi
+rm -f "$TMPOUT"
 
 # SQLite に記録: 値は全て環境変数で渡す (シェル文字列埋め込み禁止)
 # 過去バージョンは (1) $RESULT を Python コード文字列展開 → ' で SyntaxError、
@@ -170,13 +204,15 @@ try:
     preview = result[:500]
 
     agent = os.environ["PA_AGENT"]
-    cost = float(os.environ.get("PA_COST") or 0)
-    input_tokens = int(os.environ.get("PA_INPUT_TOKENS") or 0)
-    output_tokens = int(os.environ.get("PA_OUTPUT_TOKENS") or 0)
-    cache_read = int(os.environ.get("PA_CACHE_READ") or 0)
-    cache_create = int(os.environ.get("PA_CACHE_CREATE") or 0)
-    duration = int(os.environ.get("PA_DURATION") or 0)
-    num_turns = int(os.environ.get("PA_NUM_TURNS") or 0)
+    optional_float = lambda value: float(value) if value not in (None, "", "None", "null") else None
+    optional_int = lambda value: int(value) if value not in (None, "", "None", "null") else None
+    cost = optional_float(os.environ.get("PA_COST"))
+    input_tokens = optional_int(os.environ.get("PA_INPUT_TOKENS"))
+    output_tokens = optional_int(os.environ.get("PA_OUTPUT_TOKENS"))
+    cache_read = optional_int(os.environ.get("PA_CACHE_READ"))
+    cache_create = optional_int(os.environ.get("PA_CACHE_CREATE"))
+    duration = optional_int(os.environ.get("PA_DURATION"))
+    num_turns = optional_int(os.environ.get("PA_NUM_TURNS"))
     status = os.environ.get("PA_STATUS") or "success"
     run_id = int(os.environ.get("PA_RUN_ID") or 0)
 
@@ -212,7 +248,8 @@ try:
                  updated_at = datetime('now','localtime')
                WHERE id = ?""",
             (status, num_turns, num_turns, error_msg,
-             input_tokens + cache_read, output_tokens, cost, duration, metadata, result, run_id),
+             (input_tokens + cache_read) if input_tokens is not None and cache_read is not None else input_tokens,
+             output_tokens, cost, duration, metadata, result, run_id),
         )
     conn.commit()
     conn.close()

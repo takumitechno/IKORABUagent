@@ -102,24 +102,27 @@ if [[ "$AGENT_MD_PATH" == .claude/agents/* ]]; then
 fi
 
 # ------------------------------------------------------------------
-# 3. Budget hard stop check
+# 3. Budget hard stop + canonical usage start
 # ------------------------------------------------------------------
-PERIOD=$(date '+%Y-%m')
-BUDGET_STATUS=$(sql "
-  SELECT status FROM agent_budgets
-  WHERE agent_id=$AGENT_ID AND period='$PERIOD'
-  LIMIT 1;
-")
-if [ "$BUDGET_STATUS" = "halted" ]; then
-  log "budget halted for period $PERIOD, exit without running"
+PERIOD=$(date -u '+%Y-%m')
+CALL_ID="task-${TASK_ID}"
+STARTED_AT=$(date -u '+%Y-%m-%dT%H:%M:%SZ')
+DATA_ORIGIN="production"
+if [ "${PLATFORM_DRY_RUN:-0}" = "1" ]; then DATA_ORIGIN="demo"; fi
+if ! bun "$REPO_ROOT/pokemon-agents/scripts/ai-usage-cli.ts" start \
+  --agent-db-id "$AGENT_ID" --period "$PERIOD" --call-id "$CALL_ID" \
+  --started-at "$STARTED_AT" --agent-id "$AGENT_SLUG" --model "$AGENT_MODEL" \
+  --operation legacy_task_cli --task-ref "task:${TASK_ID}" --run-id "task:${TASK_ID}" \
+  --data-origin "$DATA_ORIGIN"; then
+  log "AI usage budget/schema guard refused the run"
   sql "
     UPDATE reflections
     SET status='budget_halted',
-        error_message='budget_halted_$PERIOD',
+        error_message='ai_usage_budget_or_schema_not_ready',
         ended_at=datetime('now','localtime')
     WHERE id=$TASK_ID;
   "
-  exit 0
+  exit 1
 fi
 
 # ------------------------------------------------------------------
@@ -183,22 +186,24 @@ import sys, json
 try:
     d = json.load(open('$OUTPUT_LOG'))
 except Exception as e:
-    print(json.dumps({'error': str(e), 'cost': 0, 'tokens_in': 0, 'tokens_out': 0, 'result': '', 'is_error': True}))
+    print(json.dumps({'error': str(e), 'cost': None, 'tokens_in': None, 'tokens_out': None, 'result': '', 'is_error': True}))
     sys.exit(0)
 u = d.get('usage', {}) or {}
 print(json.dumps({
-    'cost': d.get('total_cost_usd', 0) or 0,
-    'tokens_in': (u.get('input_tokens', 0) or 0) + (u.get('cache_read_input_tokens', 0) or 0),
-    'tokens_out': u.get('output_tokens', 0) or 0,
+    'cost': d.get('total_cost_usd') if isinstance(d.get('total_cost_usd'), (int, float)) else None,
+    'tokens_in': ((u.get('input_tokens') + u.get('cache_read_input_tokens'))
+                  if isinstance(u.get('input_tokens'), int) and isinstance(u.get('cache_read_input_tokens'), int)
+                  else u.get('input_tokens') if isinstance(u.get('input_tokens'), int) else None),
+    'tokens_out': u.get('output_tokens') if isinstance(u.get('output_tokens'), int) else None,
     'result': (d.get('result', '') or '')[:500],
     'stop_reason': d.get('stop_reason', 'unknown'),
     'is_error': bool(d.get('is_error', False)),
 }))
 " 2>/dev/null)
 
-COST=$(echo "$PARSED" | python3 -c "import sys,json; print(json.load(sys.stdin).get('cost',0))" 2>/dev/null || echo 0)
-TOKENS_IN=$(echo "$PARSED" | python3 -c "import sys,json; print(json.load(sys.stdin).get('tokens_in',0))" 2>/dev/null || echo 0)
-TOKENS_OUT=$(echo "$PARSED" | python3 -c "import sys,json; print(json.load(sys.stdin).get('tokens_out',0))" 2>/dev/null || echo 0)
+COST=$(echo "$PARSED" | python3 -c "import sys,json; v=json.load(sys.stdin).get('cost'); print('NULL' if v is None else v)" 2>/dev/null || echo NULL)
+TOKENS_IN=$(echo "$PARSED" | python3 -c "import sys,json; v=json.load(sys.stdin).get('tokens_in'); print('NULL' if v is None else v)" 2>/dev/null || echo NULL)
+TOKENS_OUT=$(echo "$PARSED" | python3 -c "import sys,json; v=json.load(sys.stdin).get('tokens_out'); print('NULL' if v is None else v)" 2>/dev/null || echo NULL)
 RESULT_SUMMARY=$(echo "$PARSED" | python3 -c "import sys,json; print(json.load(sys.stdin).get('result','')[:400])" 2>/dev/null | sql_escape)
 IS_ERROR=$(echo "$PARSED" | python3 -c "import sys,json; print('1' if json.load(sys.stdin).get('is_error',False) else '0')" 2>/dev/null || echo 0)
 
@@ -215,6 +220,16 @@ else
   ERROR_MSG="'exit=${EXIT_CODE} is_error=${IS_ERROR}: ${ERR_SHORT}'"
 fi
 
+ENDED_AT=$(date -u '+%Y-%m-%dT%H:%M:%SZ')
+LEDGER_STATUS="$FINAL_STATUS"
+if [ "$FINAL_STATUS" = "completed" ]; then LEDGER_STATUS="succeeded"; fi
+if ! bun "$REPO_ROOT/pokemon-agents/scripts/ai-usage-cli.ts" complete \
+  --agent-db-id "$AGENT_ID" --call-id "$CALL_ID" --status "$LEDGER_STATUS" \
+  --output "$OUTPUT_LOG" --ended-at "$ENDED_AT"; then
+  FINAL_STATUS="failed"
+  ERROR_MSG="'ai_usage_completion_record_failed'"
+fi
+
 sql "
   UPDATE reflections
   SET status='$FINAL_STATUS',
@@ -228,27 +243,6 @@ sql "
   WHERE id=$TASK_ID;
 "
 
-# Budget 加算
-COST_CENTS=$(python3 -c "print(int(round(float('$COST') * 100)))")
-PERIOD=$(date '+%Y-%m')
-sql "
-  UPDATE agent_budgets
-  SET used_cents = used_cents + $COST_CENTS,
-      updated_at = datetime('now','localtime')
-  WHERE (agent_id=$AGENT_ID OR agent_id IS NULL) AND period='$PERIOD';
-  -- 80% 超過で警告 status へ
-  UPDATE agent_budgets
-  SET status='warning'
-  WHERE (agent_id=$AGENT_ID OR agent_id IS NULL) AND period='$PERIOD'
-    AND status='active'
-    AND used_cents * 100 >= budget_cents * COALESCE(warning_threshold_pct, 80);
-  -- 100% 超過で halt
-  UPDATE agent_budgets
-  SET status='halted', halted_at=datetime('now','localtime')
-  WHERE (agent_id=$AGENT_ID OR agent_id IS NULL) AND period='$PERIOD'
-    AND status IN ('active','warning')
-    AND used_cents >= budget_cents;
-"
 log "cost=\$$COST tokens_in=$TOKENS_IN tokens_out=$TOKENS_OUT"
 
 # ------------------------------------------------------------------

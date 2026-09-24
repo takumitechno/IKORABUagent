@@ -10,6 +10,9 @@
 
 import type { Database } from "bun:sqlite";
 import { spawn } from "bun";
+import {
+  appendAiUsageEvent, assertAiUsageBudgetAllowsRun, recordAiUsageBudgetOutcome, usdToMicros,
+} from "./ai-cost-accounting";
 
 const RAW_LOG_RETENTION_DAYS = 7;
 const CLAUDE_TIMEOUT_MS = 120_000; // 2 分
@@ -19,7 +22,8 @@ interface ReportMeta {
   prompt_count: number;
   event_count: number;
   reflection_count: number;
-  cost_usd: number;
+  cost_usd: number | null;
+  unknown_cost_count: number;
   agents_used: string[];
 }
 
@@ -92,10 +96,10 @@ export async function generateReportForDate(db: Database, date: string): Promise
 
   const costRow = db
     .prepare(
-      `SELECT COALESCE(SUM(cost_usd), 0) as cost FROM agent_costs
+      `SELECT SUM(cost_usd) as cost, COUNT(CASE WHEN cost_usd IS NULL THEN 1 END) as unknown_count FROM agent_costs
        WHERE data_origin='production' AND date(created_at,'localtime') = ?`,
     )
-    .get(date) as { cost: number };
+    .get(date) as { cost: number | null; unknown_count: number };
 
   const agentsUsed = [...agentTotals.keys()];
 
@@ -106,7 +110,8 @@ export async function generateReportForDate(db: Database, date: string): Promise
       tom_prompts: promptRow.c,
       agent_reflections: reflRow.c,
       raw_events: eventRow.c,
-      total_cost_usd: Number(costRow.cost.toFixed(4)),
+      total_cost_usd: costRow.cost === null ? null : Number(costRow.cost.toFixed(4)),
+      unknown_cost_count: costRow.unknown_count,
       agents_count: agentsUsed.length,
     },
     tom_prompts: prompts.map((p) => (p.prompt || "").replace(/\s+/g, " ").trim().slice(0, 300)).filter(Boolean),
@@ -128,7 +133,7 @@ export async function generateReportForDate(db: Database, date: string): Promise
 
   // 1) Claude で要約を試みる
   try {
-    md = await summarizeViaClaude(rawData);
+    md = await summarizeViaClaude(db, date, rawData);
     if (md) console.log(`[daily-report] LLM summary OK for ${date} (${md.length} chars)`);
   } catch (err) {
     console.error(`[daily-report] LLM summary failed for ${date}:`, err);
@@ -141,18 +146,19 @@ export async function generateReportForDate(db: Database, date: string): Promise
   }
 
   const write = db.run(
-    `INSERT INTO daily_reports (date, summary_md, prompt_count, event_count, reflection_count, cost_usd, agents_used, data_origin)
-     VALUES (?, ?, ?, ?, ?, ?, ?, 'production')
+    `INSERT INTO daily_reports (date, summary_md, prompt_count, event_count, reflection_count, cost_usd, unknown_cost_count, agents_used, data_origin)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'production')
      ON CONFLICT(date) DO UPDATE SET
        summary_md = excluded.summary_md,
        prompt_count = excluded.prompt_count,
        event_count = excluded.event_count,
        reflection_count = excluded.reflection_count,
        cost_usd = excluded.cost_usd,
+       unknown_cost_count = excluded.unknown_cost_count,
        agents_used = excluded.agents_used,
        created_at = datetime('now','localtime')
      WHERE daily_reports.data_origin='production'`,
-    [date, md, promptRow.c, eventRow.c, reflRow.c, costRow.cost, JSON.stringify(agentsUsed)],
+    [date, md, promptRow.c, eventRow.c, reflRow.c, costRow.cost, costRow.unknown_count, JSON.stringify(agentsUsed)],
   );
   if (write.changes !== 1) {
     throw new Error(`daily report ${date} is occupied by demo or legacy_unknown data`);
@@ -164,6 +170,7 @@ export async function generateReportForDate(db: Database, date: string): Promise
     event_count: eventRow.c,
     reflection_count: reflRow.c,
     cost_usd: costRow.cost,
+    unknown_cost_count: costRow.unknown_count,
     agents_used: agentsUsed,
   };
 }
@@ -171,7 +178,7 @@ export async function generateReportForDate(db: Database, date: string): Promise
 /**
  * Claude Code CLI (claude -p) で日報 markdown を要約生成
  */
-async function summarizeViaClaude(rawData: unknown): Promise<string | null> {
+async function summarizeViaClaude(db: Database, date: string, rawData: unknown): Promise<string | null> {
   const PROMPT = `あなたは =LOVE Agent OS Control Plane の日報執筆者です。
 以下の生データから、その日の Tom (人間オペレーター) と AI エージェントの動きを
 **400-700 字程度** の日本語 markdown で要約してください。
@@ -201,6 +208,21 @@ ${JSON.stringify(rawData, null, 2)}
 \`\`\`
 `;
 
+  const agent = db.query<{ id: number }, []>("SELECT id FROM agents WHERE slug='shoko-reporter'").get();
+  if (!agent) throw new Error("shoko-reporter is not registered");
+  const startedAt = new Date().toISOString();
+  const callId = `daily-report-${date}-${crypto.randomUUID()}`;
+  assertAiUsageBudgetAllowsRun(db, agent.id, date.slice(0, 7));
+  appendAiUsageEvent(db, {
+    usage_event_id: `${callId}:started`, call_id: callId, event_kind: "started", scope_kind: "internal",
+    account_id: null, agent_id: "shoko-reporter", provider: "anthropic", model: null,
+    operation: "daily_report_summary", feature: "reporting", task_ref: `report:${date}`,
+    correlation_id: null, run_id: null, input_tokens: null, output_tokens: null,
+    cache_read_tokens: null, cache_creation_tokens: null, cost_amount_micros: null, currency: null,
+    cost_basis: "unknown", unknown_reason: null, terminal_status: null, started_at: startedAt,
+    ended_at: null, data_origin: "production",
+  });
+
   const proc = spawn(
     [
       "claude",
@@ -208,7 +230,6 @@ ${JSON.stringify(rawData, null, 2)}
       PROMPT,
       "--output-format",
       "json",
-      "--dangerously-skip-permissions",
     ],
     {
       stdout: "pipe",
@@ -217,21 +238,58 @@ ${JSON.stringify(rawData, null, 2)}
   );
 
   // タイムアウト
+  let timedOut = false;
   const timer = setTimeout(() => {
+    timedOut = true;
     try { proc.kill(); } catch (_) {}
   }, CLAUDE_TIMEOUT_MS);
+  let completedRecorded = false;
 
   try {
     const text = await new Response(proc.stdout).text();
-    await proc.exited;
+    const exitCode = await proc.exited;
     clearTimeout(timer);
-    if (!text) return null;
-    const parsed = JSON.parse(text) as { result?: string; is_error?: boolean };
-    if (parsed.is_error) return null;
-    const md = (parsed.result || "").trim();
+    let parsed: Record<string, unknown> | null = null;
+    try { parsed = JSON.parse(text) as Record<string, unknown>; } catch (_) {}
+    const usage = parsed?.usage && typeof parsed.usage === "object" ? parsed.usage as Record<string, unknown> : {};
+    const cost = usdToMicros(parsed?.total_cost_usd);
+    const terminal = timedOut ? "timeout" : exitCode === 0 && !parsed?.is_error ? "succeeded" : "failed";
+    const unknownReason = cost !== null ? null : timedOut ? "timeout" : !parsed ? "parse_failure"
+      : terminal === "failed" ? "provider_error" : "missing_provider_usage";
+    const usageInt = (value: unknown) => typeof value === "number" && Number.isSafeInteger(value) && value >= 0 ? value : null;
+    appendAiUsageEvent(db, {
+      usage_event_id: `${callId}:completed`, call_id: callId, event_kind: "completed", scope_kind: "internal",
+      account_id: null, agent_id: "shoko-reporter", provider: "anthropic", model: null,
+      operation: "daily_report_summary", feature: "reporting", task_ref: `report:${date}`,
+      correlation_id: null, run_id: null, input_tokens: usageInt(usage.input_tokens),
+      output_tokens: usageInt(usage.output_tokens), cache_read_tokens: usageInt(usage.cache_read_input_tokens),
+      cache_creation_tokens: usageInt(usage.cache_creation_input_tokens), cost_amount_micros: cost,
+      currency: cost === null ? null : "USD", cost_basis: cost === null ? "unknown" : "actual",
+      unknown_reason: unknownReason, terminal_status: terminal, started_at: startedAt,
+      ended_at: new Date().toISOString(), data_origin: "production",
+    });
+    completedRecorded = true;
+    recordAiUsageBudgetOutcome(db, agent.id, date.slice(0, 7), cost, callId);
+    if (!parsed || terminal !== "succeeded") return null;
+    const md = typeof parsed.result === "string" ? parsed.result.trim() : "";
     return md.length > 0 ? md : null;
   } catch (err) {
     clearTimeout(timer);
+    if (!completedRecorded) {
+      try {
+        appendAiUsageEvent(db, {
+          usage_event_id: `${callId}:completed`, call_id: callId, event_kind: "completed", scope_kind: "internal",
+          account_id: null, agent_id: "shoko-reporter", provider: "anthropic", model: null,
+          operation: "daily_report_summary", feature: "reporting", task_ref: `report:${date}`,
+          correlation_id: null, run_id: null, input_tokens: null, output_tokens: null,
+          cache_read_tokens: null, cache_creation_tokens: null, cost_amount_micros: null, currency: null,
+          cost_basis: "unknown", unknown_reason: timedOut ? "timeout" : "provider_error",
+          terminal_status: timedOut ? "timeout" : "failed", started_at: startedAt,
+          ended_at: new Date().toISOString(), data_origin: "production",
+        });
+        recordAiUsageBudgetOutcome(db, agent.id, date.slice(0, 7), null, callId);
+      } catch (_) {}
+    }
     throw err;
   }
 }
@@ -239,11 +297,12 @@ ${JSON.stringify(rawData, null, 2)}
 /**
  * フォールバック: 純集計の markdown
  */
-function buildFallbackMarkdown(date: string, raw: { stats: { tom_prompts: number; agent_reflections: number; raw_events: number; total_cost_usd: number; agents_count: number; }; tom_prompts: string[]; agent_activity: Array<{ agent: string; role: string | null; total: number; ok: number; fail: number }>; tool_usage: { tool_name: string; c: number }[]; errors: Array<{ agent: string; message: string }>; }): string {
+function buildFallbackMarkdown(date: string, raw: { stats: { tom_prompts: number; agent_reflections: number; raw_events: number; total_cost_usd: number | null; unknown_cost_count: number; agents_count: number; }; tom_prompts: string[]; agent_activity: Array<{ agent: string; role: string | null; total: number; ok: number; fail: number }>; tool_usage: { tool_name: string; c: number }[]; errors: Array<{ agent: string; message: string }>; }): string {
   const lines: string[] = [];
   lines.push(`# ${date} の活動日報 (集計のみ)`);
   lines.push("## 概要");
-  lines.push(`- Tom からの指示 ${raw.stats.tom_prompts} 件 / エージェント実行 ${raw.stats.agent_reflections} 件 / コスト $${raw.stats.total_cost_usd.toFixed(2)}`);
+  const knownCost = raw.stats.total_cost_usd === null ? "既知額なし" : `$${raw.stats.total_cost_usd.toFixed(2)}`;
+  lines.push(`- Tom からの指示 ${raw.stats.tom_prompts} 件 / エージェント実行 ${raw.stats.agent_reflections} 件 / コスト ${knownCost} + 不明 ${raw.stats.unknown_cost_count} 件`);
   if (raw.tom_prompts.length > 0) {
     lines.push("## Tom の指示");
     for (const p of raw.tom_prompts.slice(0, 20)) lines.push(`- ${p}`);

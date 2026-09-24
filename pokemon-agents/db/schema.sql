@@ -23,11 +23,11 @@ CREATE TABLE seo_daily_snapshots (
 CREATE TABLE IF NOT EXISTS "agent_costs" (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     agent TEXT NOT NULL,
-    cost_usd REAL DEFAULT 0,
-    input_tokens INTEGER DEFAULT 0,
-    output_tokens INTEGER DEFAULT 0,
-    cache_read_tokens INTEGER DEFAULT 0,
-    cache_creation_tokens INTEGER DEFAULT 0,
+    cost_usd REAL,
+    input_tokens INTEGER,
+    output_tokens INTEGER,
+    cache_read_tokens INTEGER,
+    cache_creation_tokens INTEGER,
     duration_ms INTEGER DEFAULT 0,
     num_turns INTEGER DEFAULT 0,
     created_at TEXT DEFAULT (datetime('now', 'localtime')),
@@ -193,6 +193,8 @@ CREATE TABLE agent_budgets (
   period TEXT NOT NULL,
   budget_cents INTEGER NOT NULL,
   used_cents INTEGER DEFAULT 0,
+  unknown_run_count INTEGER NOT NULL DEFAULT 0 CHECK (unknown_run_count >= 0),
+  unknown_run_limit INTEGER NOT NULL DEFAULT 3 CHECK (unknown_run_limit >= 1),
   warning_threshold_pct INTEGER DEFAULT 80,
   status TEXT DEFAULT 'active' CHECK (status IN ('active','warning','halted','expired')),
   halted_at TEXT,
@@ -324,7 +326,8 @@ CREATE TABLE daily_reports (
   prompt_count INTEGER DEFAULT 0,
   event_count INTEGER DEFAULT 0,
   reflection_count INTEGER DEFAULT 0,
-  cost_usd REAL DEFAULT 0,
+  cost_usd REAL,
+  unknown_cost_count INTEGER CHECK (unknown_cost_count IS NULL OR unknown_cost_count >= 0),
   agents_used TEXT,
   created_at TEXT DEFAULT (datetime('now','localtime')),
   data_origin TEXT NOT NULL DEFAULT 'legacy_unknown' CHECK (data_origin IN ('production','demo','legacy_unknown'))
@@ -363,6 +366,84 @@ CREATE INDEX idx_reflections_agent   ON reflections(agent_id);
 CREATE INDEX idx_reflections_status  ON reflections(status);
 CREATE INDEX idx_reflections_checkout ON reflections(checkout_expires_at);
 CREATE INDEX idx_daily_reports_date ON daily_reports(date);
+CREATE TABLE ai_usage_events (
+  sequence INTEGER PRIMARY KEY AUTOINCREMENT,
+  usage_event_id TEXT NOT NULL UNIQUE,
+  call_id TEXT NOT NULL,
+  event_kind TEXT NOT NULL CHECK (event_kind IN ('started','completed')),
+  scope_kind TEXT NOT NULL CHECK (scope_kind IN ('internal','account')),
+  account_id TEXT REFERENCES agent_activity_accounts(account_id),
+  agent_id TEXT,
+  provider TEXT NOT NULL,
+  model TEXT,
+  operation TEXT NOT NULL,
+  feature TEXT,
+  task_ref TEXT,
+  correlation_id TEXT,
+  run_id TEXT,
+  input_tokens INTEGER CHECK (input_tokens IS NULL OR input_tokens >= 0),
+  output_tokens INTEGER CHECK (output_tokens IS NULL OR output_tokens >= 0),
+  cache_read_tokens INTEGER CHECK (cache_read_tokens IS NULL OR cache_read_tokens >= 0),
+  cache_creation_tokens INTEGER CHECK (cache_creation_tokens IS NULL OR cache_creation_tokens >= 0),
+  cost_amount_micros INTEGER CHECK (cost_amount_micros IS NULL OR cost_amount_micros >= 0),
+  currency TEXT,
+  cost_basis TEXT NOT NULL CHECK (cost_basis IN ('actual','unknown')),
+  unknown_reason TEXT,
+  terminal_status TEXT CHECK (terminal_status IN ('succeeded','failed','timeout','cancelled')),
+  started_at TEXT NOT NULL,
+  ended_at TEXT,
+  data_origin TEXT NOT NULL CHECK (data_origin IN ('production','demo','legacy_unknown')),
+  payload_hash TEXT NOT NULL,
+  created_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ','now')),
+  UNIQUE(call_id, event_kind),
+  CHECK ((scope_kind='internal' AND account_id IS NULL) OR (scope_kind='account' AND account_id IS NOT NULL)),
+  CHECK ((event_kind='started' AND terminal_status IS NULL AND ended_at IS NULL
+          AND input_tokens IS NULL AND output_tokens IS NULL AND cache_read_tokens IS NULL
+          AND cache_creation_tokens IS NULL AND cost_amount_micros IS NULL AND currency IS NULL
+          AND cost_basis='unknown' AND unknown_reason IS NULL)
+      OR (event_kind='completed' AND terminal_status IS NOT NULL AND ended_at IS NOT NULL
+          AND ((cost_amount_micros IS NULL AND cost_basis='unknown' AND unknown_reason IS NOT NULL)
+            OR (cost_amount_micros IS NOT NULL AND cost_basis='actual' AND currency IS NOT NULL AND unknown_reason IS NULL))))
+);
+CREATE INDEX idx_ai_usage_events_period ON ai_usage_events(data_origin, event_kind, started_at);
+CREATE INDEX idx_ai_usage_events_scope ON ai_usage_events(scope_kind, account_id, started_at);
+CREATE INDEX idx_ai_usage_events_attribution ON ai_usage_events(agent_id, model, task_ref, run_id);
+CREATE TRIGGER ai_usage_events_no_update
+BEFORE UPDATE ON ai_usage_events BEGIN SELECT RAISE(ABORT, 'ai_usage_events is append-only'); END;
+CREATE TRIGGER ai_usage_events_no_delete
+BEFORE DELETE ON ai_usage_events BEGIN SELECT RAISE(ABORT, 'ai_usage_events is append-only'); END;
+CREATE TRIGGER ai_usage_scope_active
+BEFORE INSERT ON ai_usage_events
+WHEN NEW.scope_kind='account' AND NOT EXISTS (
+  SELECT 1 FROM agent_activity_accounts WHERE account_id=NEW.account_id AND status='active'
+) BEGIN SELECT RAISE(ABORT, 'ai_usage account scope is not active'); END;
+CREATE TRIGGER ai_usage_completed_requires_start
+BEFORE INSERT ON ai_usage_events
+WHEN NEW.event_kind='completed' AND NOT EXISTS (
+  SELECT 1 FROM ai_usage_events started
+  WHERE started.call_id=NEW.call_id AND started.event_kind='started'
+    AND started.scope_kind=NEW.scope_kind AND started.account_id IS NEW.account_id
+    AND started.agent_id IS NEW.agent_id AND started.provider=NEW.provider AND started.model IS NEW.model
+    AND started.operation=NEW.operation AND started.feature IS NEW.feature AND started.task_ref IS NEW.task_ref
+    AND started.correlation_id IS NEW.correlation_id AND started.run_id IS NEW.run_id
+    AND started.started_at=NEW.started_at AND started.data_origin=NEW.data_origin
+) BEGIN SELECT RAISE(ABORT, 'ai_usage completion has no matching start'); END;
+CREATE TABLE ai_usage_budget_charges (
+  call_id TEXT PRIMARY KEY,
+  agent_db_id INTEGER NOT NULL,
+  period TEXT NOT NULL,
+  cost_amount_micros INTEGER CHECK (cost_amount_micros IS NULL OR cost_amount_micros >= 0),
+  created_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ','now'))
+);
+CREATE TRIGGER ai_usage_budget_charges_no_update
+BEFORE UPDATE ON ai_usage_budget_charges BEGIN SELECT RAISE(ABORT, 'ai_usage_budget_charges is append-only'); END;
+CREATE TRIGGER ai_usage_budget_charges_no_delete
+BEFORE DELETE ON ai_usage_budget_charges BEGIN SELECT RAISE(ABORT, 'ai_usage_budget_charges is append-only'); END;
+CREATE TRIGGER ai_usage_budget_charge_requires_completion
+BEFORE INSERT ON ai_usage_budget_charges
+WHEN NOT EXISTS (SELECT 1 FROM ai_usage_events WHERE call_id=NEW.call_id AND event_kind='completed'
+  AND cost_amount_micros IS NEW.cost_amount_micros)
+BEGIN SELECT RAISE(ABORT, 'budget charge must match completed usage'); END;
 CREATE TRIGGER knowledge_hypothesis_writer_guard
 BEFORE INSERT ON knowledge
 FOR EACH ROW

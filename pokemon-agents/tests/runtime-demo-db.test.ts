@@ -53,6 +53,10 @@ describe("runtime demo DB regeneration", () => {
       expect(db.query<{ n: number }, []>("SELECT COUNT(*) n FROM threads_activity_projector_checkpoints").get()!.n).toBe(0);
       expect(db.query<{ n: number }, []>("SELECT COUNT(*) n FROM sqlite_master WHERE type='table' AND name='threads_activity_projection_sources'").get()!.n).toBe(1);
       expect(db.query<{ n: number }, []>("SELECT COUNT(*) n FROM threads_activity_projection_sources").get()!.n).toBe(0);
+      expect(db.query<{ n: number }, []>("SELECT COUNT(*) n FROM sqlite_master WHERE type='table' AND name='ai_usage_events'").get()!.n).toBe(1);
+      expect(db.query<{ n: number }, []>("SELECT COUNT(*) n FROM sqlite_master WHERE type='table' AND name='ai_usage_budget_charges'").get()!.n).toBe(1);
+      expect(db.query<{ n: number }, [string]>("SELECT COUNT(*) n FROM schema_migrations WHERE version=?").get("20260924_ai_cost_accounting_v1")!.n).toBe(1);
+      expect(db.query<{ n: number }, []>("SELECT COUNT(*) n FROM ai_usage_events").get()!.n).toBe(0);
       expect(db.query<{ integrity_check: string }, []>("PRAGMA integrity_check").get()!.integrity_check).toBe("ok");
       db.close();
     }

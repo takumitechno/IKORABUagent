@@ -117,8 +117,8 @@ db.transaction(() => {
   }
   db.run(
     `INSERT INTO daily_reports
-     (date, summary_md, prompt_count, event_count, reflection_count, cost_usd, agents_used, created_at, data_origin)
-     VALUES (date('now','localtime'), ?, 1, 18, ?, 0.38, ?, ?, 'demo')`,
+     (date, summary_md, prompt_count, event_count, reflection_count, cost_usd, unknown_cost_count, agents_used, created_at, data_origin)
+     VALUES (date('now','localtime'), ?, 1, 18, ?, 0.38, 0, ?, ?, 'demo')`,
     ["# Control Plane 日報\n\n通常運用と自己改善のhandoffは安全境界内で完了。",
       reflections, JSON.stringify([...ids.keys()]), stamp()],
   );

@@ -14,6 +14,7 @@ import { migrateImprovementExecution } from "../web/lib/improvement-execution";
 import { migrateThreadsActivityProjector } from "../web/lib/threads-activity-projector";
 import { migrateThreadsActivityConsumer } from "../web/lib/threads-activity-consumer";
 import { migrateDataProvenance } from "../web/lib/data-provenance";
+import { migrateAiCostAccounting } from "../web/lib/ai-cost-accounting";
 
 const root = resolve(import.meta.dir, "..", "..");
 const runtimeRoot = resolve(root, ".runtime");
@@ -66,6 +67,7 @@ try {
     schemaDb.exec(readFileSync(schemaPath, "utf8"));
     migrateDataProvenance(schemaDb);
     migrateAgentActivityLedger(schemaDb);
+    migrateAiCostAccounting(schemaDb);
     migrateImprovementExecution(schemaDb);
     migrateThreadsActivityProjector(schemaDb);
     migrateThreadsActivityConsumer(schemaDb);

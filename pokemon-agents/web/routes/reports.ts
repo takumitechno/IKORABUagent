@@ -6,7 +6,8 @@ interface ReportRow {
   prompt_count: number;
   event_count: number;
   reflection_count: number;
-  cost_usd: number;
+  cost_usd: number | null;
+  unknown_cost_count: number | null;
   agents_used: string | null;
   summary_md: string;
   created_at: string;
@@ -17,7 +18,7 @@ export function renderReports(db: Database, params: URLSearchParams): string {
 
   const rows = db
     .query<ReportRow, []>(
-      `SELECT date, prompt_count, event_count, reflection_count, cost_usd, agents_used, summary_md, created_at
+      `SELECT date, prompt_count, event_count, reflection_count, cost_usd, unknown_cost_count, agents_used, summary_md, created_at
        FROM daily_reports WHERE data_origin='production' ORDER BY date DESC LIMIT 60`,
     )
     .all();
@@ -48,7 +49,7 @@ ${
                 <div class="report-item-stats">
                   <span>指示 ${r.prompt_count}</span>
                   <span>実行 ${r.reflection_count}</span>
-                  <span>$${r.cost_usd.toFixed(2)}</span>
+                  <span>${r.cost_usd === null ? "既知額なし" : `$${r.cost_usd.toFixed(2)}`} + ${r.unknown_cost_count === null ? "不明数未記録" : `不明 ${r.unknown_cost_count}`}</span>
                 </div>
               </a>`,
             )

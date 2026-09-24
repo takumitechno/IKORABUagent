@@ -1,6 +1,6 @@
 import type { Database } from "bun:sqlite";
-import { escapeHtml, fmtCents } from "../components/layout";
-import { q1 } from "../lib/db-helpers";
+import { escapeHtml } from "../components/layout";
+import { buildMirinyaCostReadModel } from "../lib/ai-cost-accounting";
 
 /**
  * Costs Dashboard
@@ -40,15 +40,10 @@ export function renderCosts(db: Database, params?: URLSearchParams): string {
     : "30d";
 
   // ===== KPIs (常時計算) =====
-  const totalAll = q1(db, `SELECT COALESCE(SUM(cost_usd),0) FROM agent_costs WHERE data_origin='production'`);
-  const totalMonth = q1(
-    db,
-    `SELECT COALESCE(SUM(cost_usd),0) FROM agent_costs WHERE data_origin='production' AND date(created_at) >= date('now','start of month','localtime')`,
-  );
-  const totalWeek = q1(
-    db,
-    `SELECT COALESCE(SUM(cost_usd),0) FROM agent_costs WHERE data_origin='production' AND date(created_at) >= date('now','-6 days','localtime')`,
-  );
+  const nullableSum = (sql: string): number | null => db.query<{ value: number | null }, []>(sql).get()?.value ?? null;
+  const totalAll = nullableSum(`SELECT SUM(cost_usd) value FROM agent_costs WHERE data_origin='production'`);
+  const totalMonth = nullableSum(`SELECT SUM(cost_usd) value FROM agent_costs WHERE data_origin='production' AND date(created_at) >= date('now','start of month','localtime')`);
+  const totalWeek = nullableSum(`SELECT SUM(cost_usd) value FROM agent_costs WHERE data_origin='production' AND date(created_at) >= date('now','-6 days','localtime')`);
   const last7Days = db
     .query<{ d: string; cost: number }, []>(
       `SELECT date(created_at,'localtime') as d, SUM(cost_usd) as cost
@@ -56,7 +51,20 @@ export function renderCosts(db: Database, params?: URLSearchParams): string {
        GROUP BY d`,
     )
     .all();
-  const dailyAvg = last7Days.length > 0 ? totalWeek / last7Days.length : 0;
+  const dailyAvg = last7Days.length > 0 && totalWeek !== null ? totalWeek / last7Days.length : null;
+  const unknownLegacy = db.query<{ n: number }, []>(
+    `SELECT COUNT(*) n FROM agent_costs WHERE data_origin='production' AND cost_usd IS NULL`,
+  ).get()?.n ?? 0;
+
+  const today = new Date();
+  today.setUTCHours(0, 0, 0, 0);
+  const tomorrow = new Date(today); tomorrow.setUTCDate(tomorrow.getUTCDate() + 1);
+  const accountId = params?.get("account_id") || null;
+  const live = buildMirinyaCostReadModel(db, {
+    from: today.toISOString(), to: tomorrow.toISOString(),
+    scopeKind: accountId ? "account" : "internal", accountId,
+  });
+  const micros = (value: number | null) => value === null ? "not connected" : `${live.currency ?? "USD"} ${(value / 1_000_000).toFixed(4)}`;
 
   // ===== Agent metadata =====
   const agentMetas = db
@@ -72,7 +80,7 @@ export function renderCosts(db: Database, params?: URLSearchParams): string {
   const grouped = db
     .query<{ bucket: string; agent: string; cost: number }, []>(
       `SELECT ${bucketKey} as bucket, agent, SUM(cost_usd) as cost
-       FROM agent_costs ${rangeWhere}
+       FROM agent_costs ${rangeWhere} AND cost_usd IS NOT NULL
        GROUP BY bucket, agent
        ORDER BY bucket ASC`,
     )
@@ -82,7 +90,7 @@ export function renderCosts(db: Database, params?: URLSearchParams): string {
   const rankRows = db
     .query<{ agent: string; total: number; cnt: number }, []>(
       `SELECT agent, SUM(cost_usd) as total, COUNT(*) as cnt
-       FROM agent_costs ${rangeWhere}
+       FROM agent_costs ${rangeWhere} AND cost_usd IS NOT NULL
        GROUP BY agent ORDER BY total DESC`,
     )
     .all();
@@ -114,6 +122,19 @@ export function renderCosts(db: Database, params?: URLSearchParams): string {
   </div>
 </div>
 
+<div class="metric-grid">
+  ${kpiCard("AI COST TODAY", micros(live.control_plane_ai_cost_known_micros), `${live.scope.kind} · UTC`)}
+  ${kpiCard("THREADS AI COST", micros(live.threads_ai_cost_known_micros), live.threads_status.replace("_", " "))}
+  ${kpiCard("UNKNOWN COST CALLS", String(live.unknown_cost_calls), live.null_reason)}
+  ${kpiCard("RETRY / FAILURE WASTE", micros(live.waste_known_micros), `${live.waste_count} calls`)}
+  ${kpiCard("REVENUE", "not connected", "margin: not connected")}
+</div>
+
+<div class="section compact">
+  <div class="section-header"><h2>MODEL MIX · TODAY (UTC)</h2></div>
+  ${live.model_mix.length === 0 ? `<div class="empty muted">記録なし</div>` : `<table class="runs-table"><thead><tr><th>Model</th><th>Calls</th><th>Known cost</th></tr></thead><tbody>${live.model_mix.map((row) => `<tr><td class="mono">${escapeHtml(row.model)}</td><td>${row.calls}</td><td class="mono">${micros(row.known_cost_micros)}</td></tr>`).join("")}</tbody></table>`}
+</div>
+
 <div class="list-toolbar">
   <div class="list-tabs">
     ${rangeTab("30d", "過去30日", range)}
@@ -124,10 +145,10 @@ export function renderCosts(db: Database, params?: URLSearchParams): string {
 </div>
 
 <div class="metric-grid">
-  ${kpiCard("累計コスト", `$${totalAll.toFixed(2)}`, `全期間合計`)}
-  ${kpiCard("今月", `$${totalMonth.toFixed(2)}`, "1日〜本日")}
-  ${kpiCard("今週", `$${totalWeek.toFixed(2)}`, "直近7日")}
-  ${kpiCard("平均日次", `$${dailyAvg.toFixed(2)}`, "直近7日の平均")}
+  ${kpiCard("Legacy 累計既知額", totalAll === null ? "既知額なし" : `$${totalAll.toFixed(2)}`, `不明 ${unknownLegacy} 件`)}
+  ${kpiCard("Legacy 今月既知額", totalMonth === null ? "既知額なし" : `$${totalMonth.toFixed(2)}`, "1日〜本日")}
+  ${kpiCard("Legacy 今週既知額", totalWeek === null ? "既知額なし" : `$${totalWeek.toFixed(2)}`, "直近7日")}
+  ${kpiCard("Legacy 平均日次", dailyAvg === null ? "既知額なし" : `$${dailyAvg.toFixed(2)}`, "既知額のみ")}
 </div>
 
 <div class="section">
