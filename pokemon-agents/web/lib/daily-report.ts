@@ -1,8 +1,8 @@
 /**
  * Daily Report Generator + Log Purge
  *
- * - 1 日分の活動を **claude -p で LLM 要約** → daily_reports に保存
- * - 失敗時は純集計 markdown にフォールバック
+ * - 1 日分の活動を deterministic な集計 markdown → daily_reports に保存
+ * - legacy Claude 要約は明示 opt-in のみ
  * - 日報がある日付の生ログ (logs) は 7 日以上前なら安全に削除
  *
  * 自動実行: server.ts boot 時 + 6 時間ごとの setInterval (Tom の指示不要)
@@ -16,6 +16,10 @@ import {
 
 const RAW_LOG_RETENTION_DAYS = 7;
 const CLAUDE_TIMEOUT_MS = 120_000; // 2 分
+
+export function dailyReportLlmEnabled(): boolean {
+  return process.env.IKORABU_DAILY_REPORT_LLM_ENABLED === "true";
+}
 
 interface ReportMeta {
   date: string;
@@ -59,12 +63,12 @@ export async function generateReportForDate(db: Database, date: string): Promise
     .prepare(
       `SELECT agent_slug, status, COUNT(*) as c
        FROM reflections WHERE (session_id IS NULL OR session_id NOT LIKE 'demo-%') AND (work_dir IS NULL OR work_dir <> '/demo') AND date(created_at,'localtime') = ?
-       GROUP BY agent_slug, status ORDER BY c DESC`,
+       GROUP BY agent_slug, status ORDER BY c DESC, agent_slug ASC, status ASC`,
     )
     .all(date) as { agent_slug: string; status: string; c: number }[];
 
   const agentNames = db
-    .prepare(`SELECT slug, pokemon_jp, role_label FROM agents`)
+    .prepare(`SELECT slug, pokemon_jp, role_label FROM agents ORDER BY slug ASC`)
     .all() as { slug: string; pokemon_jp: string; role_label: string | null }[];
   const nameBy = new Map(agentNames.map((a) => [a.slug, a]));
 
@@ -82,7 +86,7 @@ export async function generateReportForDate(db: Database, date: string): Promise
       `SELECT agent_slug, error_message
        FROM reflections WHERE (session_id IS NULL OR session_id NOT LIKE 'demo-%') AND (work_dir IS NULL OR work_dir <> '/demo') AND date(created_at,'localtime') = ?
          AND status IN ('failed','timeout','error') AND error_message IS NOT NULL
-       LIMIT 30`,
+       ORDER BY created_at ASC, agent_slug ASC LIMIT 30`,
     )
     .all(date) as { agent_slug: string; error_message: string }[];
 
@@ -90,7 +94,7 @@ export async function generateReportForDate(db: Database, date: string): Promise
     .prepare(
       `SELECT tool_name, COUNT(*) as c FROM logs
        WHERE (session_id IS NULL OR session_id NOT LIKE 'demo-%') AND date(ts,'localtime') = ? AND tool_name IS NOT NULL
-       GROUP BY tool_name ORDER BY c DESC LIMIT 15`,
+       GROUP BY tool_name ORDER BY c DESC, tool_name ASC LIMIT 15`,
     )
     .all(date) as { tool_name: string; c: number }[];
 
@@ -130,18 +134,21 @@ export async function generateReportForDate(db: Database, date: string): Promise
   };
 
   let md: string | null = null;
+  const llmEnabled = dailyReportLlmEnabled();
 
-  // 1) Claude で要約を試みる
-  try {
-    md = await summarizeViaClaude(db, date, rawData);
-    if (md) console.log(`[daily-report] LLM summary OK for ${date} (${md.length} chars)`);
-  } catch (err) {
-    console.error(`[daily-report] LLM summary failed for ${date}:`, err);
+  // Legacy LLM mode is intentionally opt-in; routine report cost stays zero.
+  if (llmEnabled) {
+    try {
+      md = await summarizeViaClaude(db, date, rawData);
+      if (md) console.log(`[daily-report] LLM summary OK for ${date} (${md.length} chars)`);
+    } catch (err) {
+      console.error(`[daily-report] LLM summary failed for ${date}:`, err);
+    }
   }
 
-  // 2) フォールバック: 集計テンプレ
+  // Default: deterministic aggregation.
   if (!md) {
-    console.warn(`[daily-report] falling back to plain aggregation for ${date}`);
+    if (llmEnabled) console.warn(`[daily-report] falling back to plain aggregation for ${date}`);
     md = buildFallbackMarkdown(date, rawData);
   }
 

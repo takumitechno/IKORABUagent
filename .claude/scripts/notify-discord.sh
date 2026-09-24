@@ -17,6 +17,11 @@ if [ "${1:-}" = "--decision-run" ]; then
   exec bun pokemon-agents/scripts/deliver-risa-notification.ts --decision-run "$DECISION_RUN" --apply
 fi
 
+if [ "${IKORABU_NOTIFICATION_TRANSPORT_ENABLED:-}" != "true" ]; then
+  echo "notify-discord: transport is disabled" >&2
+  exit 5
+fi
+
 if ! command -v jq &>/dev/null; then
   echo "notify-discord: jq is required" >&2
   exit 2

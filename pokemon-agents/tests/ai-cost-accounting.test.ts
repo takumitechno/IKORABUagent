@@ -143,14 +143,21 @@ describe("legacy compatibility", () => {
         ('known',1.25,'2026-09-24 12:00:00','production'),
         ('unknown',NULL,'2026-09-24 12:01:00','production');`);
     const priorError = console.error, priorWarn = console.warn;
+    const priorLlmFlag = process.env.IKORABU_DAILY_REPORT_LLM_ENABLED;
+    delete process.env.IKORABU_DAILY_REPORT_LLM_ENABLED;
     console.error = () => {}; console.warn = () => {};
     let report;
     try { report = await generateReportForDate(db, "2026-09-24"); }
-    finally { console.error = priorError; console.warn = priorWarn; }
+    finally {
+      console.error = priorError; console.warn = priorWarn;
+      if (priorLlmFlag === undefined) delete process.env.IKORABU_DAILY_REPORT_LLM_ENABLED;
+      else process.env.IKORABU_DAILY_REPORT_LLM_ENABLED = priorLlmFlag;
+    }
     expect(report).toMatchObject({ cost_usd: 1.25, unknown_cost_count: 1 });
     expect(db.query<{ cost_usd: number | null; unknown_cost_count: number }, []>(
       "SELECT cost_usd,unknown_cost_count FROM daily_reports",
     ).get()).toEqual({ cost_usd: 1.25, unknown_cost_count: 1 });
+    expect(db.query<{ c: number }, []>("SELECT COUNT(*) AS c FROM ai_usage_events").get()?.c).toBe(0);
     db.close();
   });
 });

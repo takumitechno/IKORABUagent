@@ -15,7 +15,7 @@ async function notify(webhook: string, stateFile: string, state = "active") {
     "--cooldown-seconds", "21600", "fixture message",
   ], {
     cwd: root,
-    env: { ...process.env, DISCORD_WEBHOOK_URL: webhook, DISCORD_NOTIFY_STATE_FILE: stateFile },
+    env: { ...process.env, IKORABU_NOTIFICATION_TRANSPORT_ENABLED: "true", DISCORD_WEBHOOK_URL: webhook, DISCORD_NOTIFY_STATE_FILE: stateFile },
     stdout: "pipe", stderr: "pipe",
   });
   const code = await child.exited;
@@ -83,10 +83,54 @@ describe("Control Plane CRITICAL monitor", () => {
     expect(got.body.alerts.some((row: { code: string }) => row.code === "backup_failure")).toBeTrue();
   });
 
+  test("monitors multiple accounts with code plus entity identities and deterministic digest", () => {
+    const common = {
+      bridge_healthy: false, dashboard_healthy: true, account_available: true,
+      readiness: { status: "active", ready_for_dry_run: true }, self_reply_sync: "active",
+      canary_available: true, tenant_canary: { unexpected_allow: 0, unexpected_deny: 0, recent: [] },
+      backup_age_hours: 2, backup_valid: true, legacy_5735_pid: null,
+    };
+    const got = runFixture("multi-account", { accounts: [
+      { ...common, account_id: "acct_b", night_items: [], insights_age_minutes: 361 },
+      { ...common, account_id: "acct_a", night_items: [], insights_age_minutes: 361 },
+    ] });
+    expect(got.body.accounts).toEqual(["acct_a", "acct_b"]);
+    expect(got.body.alerts.map((row: { code: string; entity: string }) => `${row.code}:${row.entity}`)).toEqual([
+      "bridge_unhealthy:system:bridge", "runner_stale:acct_a:insights", "runner_stale:acct_b:insights",
+    ]);
+    expect(got.body.daily_digest).toMatchObject({ schema_version: "attention-digest.v1", account_count: 2, critical_count: 3 });
+    expect(got.body.daily_digest.alert_identities).toEqual([
+      "bridge_unhealthy:system:bridge", "runner_stale:acct_a:insights", "runner_stale:acct_b:insights",
+    ]);
+  });
+
+  test("detects OAuth expiry and does not classify cancelled NIGHT work as missed", () => {
+    const got = runFixture("oauth-night", {
+      account_id: "acct_alpha", bridge_healthy: true, dashboard_healthy: true, account_available: true,
+      night_items: [
+        { item_id: "cancelled", status: "blocked", batch_status: "cancelled", block_reason: "scheduled_window_expired", scheduled_at: "2026-09-22T05:00:00Z" },
+        { item_id: "missed", status: "blocked", batch_status: "approved", block_reason: "scheduled_window_expired", scheduled_at: "2026-09-22T05:00:00Z" },
+      ],
+      readiness: { status: "active", ready_for_dry_run: true },
+      credential_readiness_available: true,
+      credential_readiness: {
+        publish: { ready: true, expires_at: "2026-09-22T07:00:00Z" },
+        insights: { ready: true, expires_at: "2026-11-22T07:00:00Z" },
+      },
+      self_reply_sync: "active", canary_available: true,
+      tenant_canary: { unexpected_allow: 0, unexpected_deny: 0, recent: [] },
+      backup_age_hours: 2, backup_valid: true, legacy_5735_pid: null,
+    });
+    expect(got.body.alerts.some((row: { code: string }) => row.code === "oauth_expiring")).toBeTrue();
+    expect(got.body.alerts.filter((row: { code: string }) => row.code === "night_missed")).toHaveLength(1);
+    expect(got.body.daily_digest).toMatchObject({ night_cancelled_count: 1, night_missed_count: 1 });
+  });
+
   test("notifier is strict, deduplicated, cooldown-aware, and recovery-aware", () => {
     const monitorSource = readFileSync(monitor, "utf8");
     expect(monitorSource).toContain('parser.add_argument("--scope", required=True)');
-    expect(monitorSource).toContain('parser.add_argument("--account-id")');
+    expect(monitorSource).toContain('parser.add_argument("--account-id", action="append")');
+    expect(monitorSource).toContain('parser.add_argument("--all-accounts", action="store_true")');
     expect(monitorSource).not.toContain('default="acct_8ssana"');
     expect(notifier).toContain("set -euo pipefail");
     expect(notifier).toContain("DISCORD_WEBHOOK_URL is not configured");
@@ -95,6 +139,7 @@ describe("Control Plane CRITICAL monitor", () => {
     expect(notifier).toContain("COOLDOWN_SECONDS=21600");
     expect(notifier).toContain("duplicate suppressed");
     expect(notifier).toContain("recovery suppressed");
+    expect(notifier).toContain('IKORABU_NOTIFICATION_TRANSPORT_ENABLED:-}');
     expect(notifier).toContain('message="${message:0:1900}"');
     expect(notifier).not.toContain('echo "$WEBHOOK_URL"');
   });
@@ -121,5 +166,15 @@ describe("Control Plane CRITICAL monitor", () => {
     } finally {
       server.stop(true);
     }
+  });
+
+  test("notification transport is disabled by default", async () => {
+    if (!bash) return;
+    const child = Bun.spawn([bash, notifierPath, "fixture message"], {
+      cwd: root, env: { ...process.env, IKORABU_NOTIFICATION_TRANSPORT_ENABLED: "", DISCORD_WEBHOOK_URL: "http://127.0.0.1/never" },
+      stdout: "pipe", stderr: "pipe",
+    });
+    expect(await child.exited).toBe(5);
+    expect(await new Response(child.stderr).text()).toContain("transport is disabled");
   });
 });
