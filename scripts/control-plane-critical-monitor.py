@@ -24,6 +24,7 @@ NIGHT_MISS_LOOKBACK_HOURS = 96
 DENIAL_WINDOW_MINUTES = 10
 DENIAL_SPIKE_THRESHOLD = 5
 OAUTH_EXPIRY_WARNING_HOURS = 72
+RUNNER_HEARTBEAT_STALE_MINUTES = 120
 FRESHNESS = {
     "insights_freshness": (180, 360),
     "editorial_freshness": (180, 360),
@@ -42,6 +43,16 @@ def parse_time(value: Any) -> datetime | None:
         return parsed if parsed.tzinfo else parsed.replace(tzinfo=timezone.utc)
     except ValueError:
         return None
+
+
+def credential_states(value: Any) -> dict[str, dict[str, Any]] | None:
+    if not isinstance(value, dict):
+        return None
+    states = {purpose: value.get(purpose) for purpose in ("publish", "insights")}
+    return states if all(
+        isinstance(state, dict) and isinstance(state.get("ready"), bool)
+        for state in states.values()
+    ) else None
 
 
 def user_environment(name: str) -> str:
@@ -129,11 +140,40 @@ def latest_backup_status(directory: Path, now: datetime) -> tuple[float | None, 
     return age, valid
 
 
-def collect_snapshots(args: argparse.Namespace, now: datetime) -> list[dict[str, Any]]:
+def collect_snapshots(
+    args: argparse.Namespace, now: datetime,
+) -> tuple[list[dict[str, Any]], list[dict[str, str]]]:
     api_key = user_environment("AUTOPILOT_BRIDGE_API_KEY")
     headers = {"Accept": "application/json", "X-Threads-User-ID": args.tenant_user_id}
     if api_key:
         headers["X-API-Key"] = api_key
+    collection_alerts: list[dict[str, str]] = []
+    account_ids = sorted(set(args.account_id or []))
+    if args.all_accounts:
+        accounts_ok, accounts = request_json(f"{args.bridge_url}/operator/accounts", headers)
+        rows = accounts.get("accounts") if accounts_ok and isinstance(accounts, dict) else None
+        valid_rows = isinstance(rows, list) and all(
+            isinstance(row, dict) and isinstance(row.get("account_id"), str)
+            and bool(row["account_id"]) and isinstance(row.get("account_status"), str)
+            for row in rows
+        )
+        if not valid_rows:
+            collection_alerts.append({
+                "code": "account_discovery_unavailable",
+                "entity": "system:account-discovery",
+                "detail": "Active account discovery could not be read",
+            })
+        else:
+            active_ids = [row["account_id"] for row in rows if row["account_status"] == "active"]
+            if not active_ids:
+                collection_alerts.append({
+                    "code": "account_discovery_empty",
+                    "entity": "system:account-discovery",
+                    "detail": "Account discovery returned zero active accounts",
+                })
+            account_ids = sorted(set(account_ids + active_ids))
+    if not account_ids:
+        return [], collection_alerts
     bridge_ok, bridge_health = request_json(f"{args.bridge_url}/health", {})
     dashboard_ok, dashboard_health = request_json(f"{args.dashboard_url}/health", {})
     canary_ok, canary = request_json(f"{args.bridge_url}/operator/tenant-canary", headers)
@@ -154,16 +194,6 @@ def collect_snapshots(args: argparse.Namespace, now: datetime) -> list[dict[str,
         "backup_valid": backup_valid,
         "legacy_5735_pid": listener_pid(args.legacy_port),
     }
-    account_ids = sorted(set(args.account_id or []))
-    if args.all_accounts:
-        accounts_ok, accounts = request_json(f"{args.bridge_url}/operator/accounts", headers)
-        if accounts_ok and isinstance(accounts, dict):
-            account_ids.extend(
-                row["account_id"] for row in accounts.get("accounts", [])
-                if isinstance(row, dict) and isinstance(row.get("account_id"), str)
-                and row.get("account_status") == "active"
-            )
-            account_ids = sorted(set(account_ids))
     snapshots: list[dict[str, Any]] = []
     for account_id in account_ids:
         account_ok, account = request_json(
@@ -192,7 +222,7 @@ def collect_snapshots(args: argparse.Namespace, now: datetime) -> list[dict[str,
             "activity_projection_age_minutes": operations.get("activity_projection_age_minutes"),
             "runner_heartbeats": operations.get("runner_heartbeats"),
         })
-    return snapshots
+    return snapshots, collection_alerts
 
 
 def structured_findings(snapshot: dict[str, Any], scope: str, now: datetime) -> dict[str, Any]:
@@ -223,13 +253,13 @@ def structured_findings(snapshot: dict[str, Any], scope: str, now: datetime) -> 
     reauth = snapshot.get("self_reply_sync") == "reauthorization_required"
     readiness = snapshot.get("readiness") or {}
     credential_available = snapshot.get("credential_readiness_available") is True
-    oauth_ok = credential_available and snapshot.get("account_available") \
+    states = credential_states(snapshot.get("credential_readiness")) if credential_available else None
+    credential_verified = states is not None
+    oauth_ok = credential_verified and snapshot.get("account_available") \
         and readiness.get("status") == "active" and readiness.get("ready_for_dry_run") is True
-    credential = snapshot.get("credential_readiness")
-    if credential_available and isinstance(credential, dict):
-        states = [credential.get(purpose) for purpose in ("publish", "insights")]
-        oauth_ok = oauth_ok and all(isinstance(state, dict) and state.get("ready") is True for state in states)
-    oauth_observed = "present" if oauth_ok else "unreadable" if not credential_available else "absent"
+    if states is not None:
+        oauth_ok = oauth_ok and all(state.get("ready") is True for state in states.values())
+    oauth_observed = "present" if oauth_ok else "unreadable" if not credential_verified else "absent"
     add("oauth_readiness", oauth_observed, 0 if oauth_ok else None,
         5, 10, f"source:monitor:{account_id}:oauth", "reauth_required" if reauth else None)
     canary = snapshot.get("tenant_canary") or {}
@@ -241,8 +271,9 @@ def structured_findings(snapshot: dict[str, Any], scope: str, now: datetime) -> 
                       ("activity_projection_freshness", "activity_projection_age_minutes")):
         age = snapshot.get(key)
         tolerance, delayed = FRESHNESS[code]
-        add(code, "present" if isinstance(age, (int, float)) else "unknown",
-            float(age) if isinstance(age, (int, float)) else None,
+        valid_age = isinstance(age, (int, float)) and not isinstance(age, bool) and age >= 0
+        add(code, "present" if valid_age else "unknown",
+            float(age) if valid_age else None,
             tolerance, delayed, f"source:monitor:{account_id}:{code}")
     scheduler_ok = snapshot.get("scheduler_registered") is True and snapshot.get("scheduler_state") in {"Ready", "Running"}
     scheduler_blocked = snapshot.get("scheduler_registered") is True and snapshot.get("scheduler_state") == "Disabled"
@@ -323,15 +354,12 @@ def evaluate(snapshot: dict[str, Any], now: datetime) -> list[dict[str, str]]:
         if snapshot.get("self_reply_sync") == "reauthorization_required":
             add("oauth_self_reply_scope_missing", "Self-Reply OAuth reauthorization is required")
 
-    credential = snapshot.get("credential_readiness")
-    if snapshot.get("credential_readiness_available") is not True:
+    states = credential_states(snapshot.get("credential_readiness")) \
+        if snapshot.get("credential_readiness_available") is True else None
+    if states is None:
         add("oauth_readiness_unavailable", "Credential readiness could not be read")
-    elif isinstance(credential, dict):
-        for purpose in ("publish", "insights"):
-            state = credential.get(purpose)
-            if not isinstance(state, dict):
-                add("oauth_readiness_degraded", f"{purpose} credential readiness is missing", f"{account_id}:{purpose}")
-                continue
+    else:
+        for purpose, state in states.items():
             entity = f"{account_id}:{purpose}"
             if state.get("ready") is not True:
                 add("oauth_readiness_degraded", f"{purpose} credential is not ready", entity)
@@ -352,17 +380,23 @@ def evaluate(snapshot: dict[str, Any], now: datetime) -> list[dict[str, str]]:
         elif age_minutes > delayed:
             add("runner_stale", f"{code} runner heartbeat is {age_minutes:.0f}m old", f"{account_id}:{code}")
     heartbeats = snapshot.get("runner_heartbeats")
-    if not isinstance(heartbeats, list):
+    if not isinstance(heartbeats, list) or not heartbeats:
         add("runner_freshness_unavailable", "Runner heartbeat telemetry is unavailable", f"{account_id}:runner_heartbeats")
         heartbeats = []
     for heartbeat in heartbeats:
         if not isinstance(heartbeat, dict):
+            add("runner_freshness_unavailable", "Runner heartbeat evidence is invalid", f"{account_id}:runner_heartbeats")
             continue
-        runner = str(heartbeat.get("runner") or heartbeat.get("name") or "unknown")
+        runner = heartbeat.get("runner") or heartbeat.get("name")
+        if not isinstance(runner, str) or not runner:
+            add("runner_freshness_unavailable", "Runner heartbeat identity is invalid", f"{account_id}:runner_heartbeats")
+            continue
         seen = parse_time(heartbeat.get("observed_at") or heartbeat.get("last_seen_at"))
-        limit = heartbeat.get("freshness_minutes", 120)
-        if not seen or not isinstance(limit, (int, float)) or (now - seen).total_seconds() / 60 > limit:
-            add("runner_heartbeat_missing", f"{runner} heartbeat is missing or stale", f"{account_id}:{runner}")
+        age_minutes = (now - seen).total_seconds() / 60 if seen else None
+        if age_minutes is None or age_minutes < 0:
+            add("runner_freshness_unavailable", f"{runner} heartbeat timestamp is invalid", f"{account_id}:{runner}")
+        elif age_minutes > RUNNER_HEARTBEAT_STALE_MINUTES:
+            add("runner_stale", f"{runner} runner heartbeat is {age_minutes:.0f}m old", f"{account_id}:{runner}")
 
     if not snapshot.get("canary_available"):
         add("tenant_canary_unavailable", "Tenant canary telemetry could not be read")
@@ -512,15 +546,19 @@ def main(argv: list[str] | None = None) -> int:
         snapshots = [dict(snapshot, account_id=snapshot.get("account_id", "acct_fixture"))
                      for snapshot in snapshots if isinstance(snapshot, dict)]
         snapshots.sort(key=lambda snapshot: str(snapshot["account_id"]))
+        collection_alerts: list[dict[str, str]] = []
     else:
-        snapshots = collect_snapshots(args, now)
-    if not snapshots:
+        snapshots, collection_alerts = collect_snapshots(args, now)
+    if not snapshots and not collection_alerts:
         parser.error("no active accounts were discovered")
-    alerts = unique_alerts([alert for snapshot in snapshots for alert in evaluate(snapshot, now)])
+    alerts = unique_alerts(collection_alerts + [
+        alert for snapshot in snapshots for alert in evaluate(snapshot, now)
+    ])
     employee_inputs = [structured_findings(snapshot, args.scope, now) for snapshot in snapshots]
     result = {"status": "CRITICAL" if alerts else "HEALTHY", "alerts": alerts,
               "accounts": [snapshot["account_id"] for snapshot in snapshots],
-              "employee_input": employee_inputs[0], "employee_inputs": employee_inputs,
+              "employee_input": employee_inputs[0] if employee_inputs else None,
+              "employee_inputs": employee_inputs,
               "daily_digest": daily_digest(snapshots, alerts, now),
               "message": aggregate(alerts, recovery=not alerts)}
     print(json.dumps(result, ensure_ascii=False, indent=2))

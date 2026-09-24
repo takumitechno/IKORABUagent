@@ -31,11 +31,23 @@ function runFixture(name: string, value: unknown) {
   return { code: result.exitCode, body: JSON.parse(new TextDecoder().decode(result.stdout)) };
 }
 
+async function runAllAccounts(bridgeUrl: string) {
+  const child = Bun.spawn([
+    "python", monitor, "--all-accounts", "--scope", "acct_takumi_hq",
+    "--bridge-url", bridgeUrl, "--dashboard-url", bridgeUrl,
+    "--backup-dir", resolve(root, ".runtime/tests/no-backups"),
+    "--now", "2026-09-22T06:00:00Z",
+  ], { cwd: root, stdout: "pipe", stderr: "pipe" });
+  const code = await child.exited;
+  const stdout = await new Response(child.stdout).text();
+  return { code, body: JSON.parse(stdout), stderr: await new Response(child.stderr).text() };
+}
+
 const freshSignals = {
   credential_readiness_available: true,
   credential_readiness: { publish: { ready: true }, insights: { ready: true } },
   insights_age_minutes: 10, editorial_age_minutes: 10, activity_projection_age_minutes: 10,
-  runner_heartbeats: [],
+  runner_heartbeats: [{ runner: "loop_runner", observed_at: "2026-09-22T05:30:00Z" }],
 };
 
 describe("Control Plane CRITICAL monitor", () => {
@@ -172,6 +184,49 @@ describe("Control Plane CRITICAL monitor", () => {
     }]);
   });
 
+  test("rejects future and empty heartbeat evidence", () => {
+    const common = {
+      bridge_healthy: true, dashboard_healthy: true, account_available: true,
+      ...freshSignals, night_items: [], readiness: { status: "active", ready_for_dry_run: true },
+      self_reply_sync: "active", canary_available: true,
+      tenant_canary: { unexpected_allow: 0, unexpected_deny: 0, recent: [] },
+      backup_age_hours: 2, backup_valid: true, legacy_5735_pid: null,
+    };
+    const future = runFixture("heartbeat-future", {
+      ...common, runner_heartbeats: [{ runner: "loop_runner", observed_at: "2026-09-22T06:01:00Z" }],
+    });
+    expect(future.body.alerts).toEqual([{
+      code: "runner_freshness_unavailable", entity: "acct_fixture:loop_runner",
+      detail: "loop_runner heartbeat timestamp is invalid",
+    }]);
+    const empty = runFixture("heartbeat-empty", { ...common, runner_heartbeats: [] });
+    expect(empty.body.alerts).toEqual([{
+      code: "runner_freshness_unavailable", entity: "acct_fixture:runner_heartbeats",
+      detail: "Runner heartbeat telemetry is unavailable",
+    }]);
+  });
+
+  test("uses the monitor-owned heartbeat threshold for fresh and stale evidence", () => {
+    const common = {
+      bridge_healthy: true, dashboard_healthy: true, account_available: true,
+      ...freshSignals, night_items: [], readiness: { status: "active", ready_for_dry_run: true },
+      self_reply_sync: "active", canary_available: true,
+      tenant_canary: { unexpected_allow: 0, unexpected_deny: 0, recent: [] },
+      backup_age_hours: 2, backup_valid: true, legacy_5735_pid: null,
+    };
+    expect(runFixture("heartbeat-fresh", common).body.alerts).toEqual([]);
+    const stale = runFixture("heartbeat-stale", {
+      ...common,
+      runner_heartbeats: [{
+        runner: "loop_runner", observed_at: "2026-09-22T03:59:00Z", freshness_minutes: 999999,
+      }],
+    });
+    expect(stale.body.alerts).toEqual([{
+      code: "runner_stale", entity: "acct_fixture:loop_runner",
+      detail: "loop_runner runner heartbeat is 121m old",
+    }]);
+  });
+
   test("retains genuine NIGHT misses for 96h and excludes expired or cancelled entries", () => {
     const got = runFixture("night-lookback", {
       account_id: "acct_alpha", bridge_healthy: true, dashboard_healthy: true, account_available: true,
@@ -197,7 +252,7 @@ describe("Control Plane CRITICAL monitor", () => {
       credential_readiness_available: false,
       credential_readiness: { credential_material: "must-not-leak" },
       insights_age_minutes: 10, editorial_age_minutes: 10, activity_projection_age_minutes: 10,
-      runner_heartbeats: [], night_items: [],
+      runner_heartbeats: freshSignals.runner_heartbeats, night_items: [],
       readiness: { status: "active", ready_for_dry_run: true }, self_reply_sync: "active",
       canary_available: true, tenant_canary: { unexpected_allow: 0, unexpected_deny: 0, recent: [] },
       backup_age_hours: 2, backup_valid: true, legacy_5735_pid: null,
@@ -206,6 +261,53 @@ describe("Control Plane CRITICAL monitor", () => {
     expect(got.body.employee_input.findings.find((row: { check_code: string }) => row.check_code === "oauth_readiness"))
       .toMatchObject({ observed: "unreadable", age_minutes: null });
     expect(JSON.stringify(got.body)).not.toContain("must-not-leak");
+  });
+
+  test("treats malformed authoritative OAuth readiness as unavailable everywhere", () => {
+    for (const [index, credential_readiness] of [
+      null, [], "invalid", 7, {}, { publish: {}, insights: {} },
+    ].entries()) {
+      const got = runFixture(`oauth-malformed-${index}`, {
+        bridge_healthy: true, dashboard_healthy: true, account_available: true,
+        ...freshSignals, credential_readiness_available: true, credential_readiness,
+        night_items: [], readiness: { status: "active", ready_for_dry_run: true },
+        self_reply_sync: "active", canary_available: true,
+        tenant_canary: { unexpected_allow: 0, unexpected_deny: 0, recent: [] },
+        backup_age_hours: 2, backup_valid: true, legacy_5735_pid: null,
+      });
+      expect(got.body.alerts.some((row: { code: string }) => row.code === "oauth_readiness_unavailable")).toBeTrue();
+      expect(got.body.employee_input.findings.find((row: { check_code: string }) => row.check_code === "oauth_readiness"))
+        .toMatchObject({ observed: "unreadable", age_minutes: null });
+    }
+  });
+
+  test("reports all-account discovery transport, parse, and empty failures as deterministic JSON", async () => {
+    const unreachable = await runAllAccounts("http://127.0.0.1:1");
+    const repeated = await runAllAccounts("http://127.0.0.1:1");
+    expect(unreachable).toEqual(repeated);
+    expect(unreachable).toMatchObject({ code: 2, stderr: "", body: {
+      status: "CRITICAL", accounts: [], employee_input: null,
+      alerts: [{
+        code: "account_discovery_unavailable", entity: "system:account-discovery",
+        detail: "Active account discovery could not be read",
+      }],
+    } });
+
+    let response = new Response("{", { status: 200 });
+    const server = Bun.serve({ port: 0, fetch() { return response; } });
+    try {
+      const bridgeUrl = `http://127.0.0.1:${server.port}`;
+      expect(await runAllAccounts(bridgeUrl)).toMatchObject({ code: 2, stderr: "", body: {
+        alerts: [{ code: "account_discovery_unavailable", entity: "system:account-discovery" }],
+      } });
+      response = Response.json({ accounts: [] });
+      expect(await runAllAccounts(bridgeUrl)).toMatchObject({ code: 2, stderr: "", body: {
+        status: "CRITICAL", accounts: [], employee_input: null,
+        alerts: [{ code: "account_discovery_empty", entity: "system:account-discovery" }],
+      } });
+    } finally {
+      server.stop(true);
+    }
   });
 
   test("produces the same digest for identical persisted inputs", () => {

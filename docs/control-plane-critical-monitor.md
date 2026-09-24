@@ -14,7 +14,17 @@ collection, the Bridge account explicitly; the monitor has no customer-account
 default:
 
 Missing runner-freshness fields fail closed as unavailable. They cannot produce
-a healthy digest, and are distinct from present-but-stale evidence.
+a healthy digest, and are distinct from present-but-stale evidence. Individual
+heartbeat rows use a monitor-owned 120-minute ceiling; empty, invalid, or future
+heartbeat evidence is unavailable rather than healthy.
+
+`--all-accounts` discovery failures and zero-active-account responses also emit
+bounded system alerts and deterministic JSON instead of terminating before the
+normal alert and optional notification path.
+
+External dependency F4 remains open: the Threads Bridge must expose the live
+freshness evidence before the monitor can verify it. This IKORABU pass does not
+change Threads while NIGHT-DOOR01 owns that repository's WRITE lane.
 
 ```text
 python scripts/control-plane-critical-monitor.py --scope acct_takumi_hq --account-id <bridge-account>
