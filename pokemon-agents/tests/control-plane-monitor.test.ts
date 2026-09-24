@@ -31,10 +31,18 @@ function runFixture(name: string, value: unknown) {
   return { code: result.exitCode, body: JSON.parse(new TextDecoder().decode(result.stdout)) };
 }
 
+const freshSignals = {
+  credential_readiness_available: true,
+  credential_readiness: { publish: { ready: true }, insights: { ready: true } },
+  insights_age_minutes: 10, editorial_age_minutes: 10, activity_projection_age_minutes: 10,
+  runner_heartbeats: [],
+};
+
 describe("Control Plane CRITICAL monitor", () => {
   test("reports a healthy snapshot without leaking source values", () => {
     const got = runFixture("healthy", {
       bridge_healthy: true, dashboard_healthy: true, account_available: true,
+      ...freshSignals,
       night_items: [], readiness: { status: "active", ready_for_dry_run: true },
       self_reply_sync: "active", canary_available: true,
       tenant_canary: { unexpected_allow: 0, unexpected_deny: 0, recent: [] },
@@ -55,6 +63,7 @@ describe("Control Plane CRITICAL monitor", () => {
     const recent = Array.from({ length: 5 }, () => ({ decision: "deny", timestamp: "2026-09-22T05:55:00Z" }));
     const got = runFixture("critical", {
       bridge_healthy: false, dashboard_healthy: false, account_available: true,
+      ...freshSignals,
       night_items: [{ status: "pending", scheduled_at: "2026-09-22T05:00:00Z" }],
       readiness: { status: "active", ready_for_dry_run: true },
       self_reply_sync: "reauthorization_required", canary_available: true,
@@ -75,6 +84,7 @@ describe("Control Plane CRITICAL monitor", () => {
   test("treats a corrupt latest backup as a backup failure", () => {
     const got = runFixture("bad-backup", {
       bridge_healthy: true, dashboard_healthy: true, account_available: true,
+      ...freshSignals,
       night_items: [], readiness: { status: "active", ready_for_dry_run: true },
       self_reply_sync: "active", canary_available: true,
       tenant_canary: { unexpected_allow: 0, unexpected_deny: 0, recent: [] },
@@ -86,6 +96,7 @@ describe("Control Plane CRITICAL monitor", () => {
   test("monitors multiple accounts with code plus entity identities and deterministic digest", () => {
     const common = {
       bridge_healthy: false, dashboard_healthy: true, account_available: true,
+      ...freshSignals,
       readiness: { status: "active", ready_for_dry_run: true }, self_reply_sync: "active",
       canary_available: true, tenant_canary: { unexpected_allow: 0, unexpected_deny: 0, recent: [] },
       backup_age_hours: 2, backup_valid: true, legacy_5735_pid: null,
@@ -107,12 +118,12 @@ describe("Control Plane CRITICAL monitor", () => {
   test("detects OAuth expiry and does not classify cancelled NIGHT work as missed", () => {
     const got = runFixture("oauth-night", {
       account_id: "acct_alpha", bridge_healthy: true, dashboard_healthy: true, account_available: true,
+      ...freshSignals,
       night_items: [
         { item_id: "cancelled", status: "blocked", batch_status: "cancelled", block_reason: "scheduled_window_expired", scheduled_at: "2026-09-22T05:00:00Z" },
         { item_id: "missed", status: "blocked", batch_status: "approved", block_reason: "scheduled_window_expired", scheduled_at: "2026-09-22T05:00:00Z" },
       ],
       readiness: { status: "active", ready_for_dry_run: true },
-      credential_readiness_available: true,
       credential_readiness: {
         publish: { ready: true, expires_at: "2026-09-22T07:00:00Z" },
         insights: { ready: true, expires_at: "2026-11-22T07:00:00Z" },
@@ -124,6 +135,94 @@ describe("Control Plane CRITICAL monitor", () => {
     expect(got.body.alerts.some((row: { code: string }) => row.code === "oauth_expiring")).toBeTrue();
     expect(got.body.alerts.filter((row: { code: string }) => row.code === "night_missed")).toHaveLength(1);
     expect(got.body.daily_digest).toMatchObject({ night_cancelled_count: 1, night_missed_count: 1 });
+  });
+
+  test("fails closed when live runner freshness evidence is unavailable", () => {
+    const got = runFixture("freshness-unavailable", {
+      bridge_healthy: true, dashboard_healthy: true, account_available: true,
+      credential_readiness_available: true,
+      credential_readiness: { publish: { ready: true }, insights: { ready: true } },
+      night_items: [], readiness: { status: "active", ready_for_dry_run: true },
+      self_reply_sync: "active", canary_available: true,
+      tenant_canary: { unexpected_allow: 0, unexpected_deny: 0, recent: [] },
+      backup_age_hours: 2, backup_valid: true, legacy_5735_pid: null,
+    });
+    expect(got.code).toBe(2);
+    expect(got.body.status).toBe("CRITICAL");
+    expect(got.body.alerts.map((row: { code: string; entity: string }) => `${row.code}:${row.entity}`)).toEqual([
+      "runner_freshness_unavailable:acct_fixture:activity_projection",
+      "runner_freshness_unavailable:acct_fixture:editorial",
+      "runner_freshness_unavailable:acct_fixture:insights",
+      "runner_freshness_unavailable:acct_fixture:runner_heartbeats",
+    ]);
+    expect(got.body.daily_digest.critical_count).toBe(4);
+  });
+
+  test("distinguishes stale runner evidence from unavailable evidence", () => {
+    const got = runFixture("freshness-stale", {
+      bridge_healthy: true, dashboard_healthy: true, account_available: true,
+      ...freshSignals, insights_age_minutes: 361,
+      night_items: [], readiness: { status: "active", ready_for_dry_run: true },
+      self_reply_sync: "active", canary_available: true,
+      tenant_canary: { unexpected_allow: 0, unexpected_deny: 0, recent: [] },
+      backup_age_hours: 2, backup_valid: true, legacy_5735_pid: null,
+    });
+    expect(got.body.alerts).toEqual([{
+      code: "runner_stale", entity: "acct_fixture:insights", detail: "insights runner heartbeat is 361m old",
+    }]);
+  });
+
+  test("retains genuine NIGHT misses for 96h and excludes expired or cancelled entries", () => {
+    const got = runFixture("night-lookback", {
+      account_id: "acct_alpha", bridge_healthy: true, dashboard_healthy: true, account_available: true,
+      ...freshSignals,
+      night_items: [
+        { item_id: "inside", status: "blocked", block_reason: "scheduled_window_expired", scheduled_at: "2026-09-18T22:00:00Z" },
+        { item_id: "outside", status: "blocked", block_reason: "scheduled_window_expired", scheduled_at: "2026-09-18T05:00:00Z" },
+        { item_id: "cancelled", status: "blocked", block_reason: "batch_cancelled", scheduled_at: "2026-09-18T22:00:00Z" },
+      ],
+      readiness: { status: "active", ready_for_dry_run: true }, self_reply_sync: "active",
+      canary_available: true, tenant_canary: { unexpected_allow: 0, unexpected_deny: 0, recent: [] },
+      backup_age_hours: 2, backup_valid: true, legacy_5735_pid: null,
+    });
+    expect(got.body.alerts.filter((row: { code: string }) => row.code === "night_missed")).toEqual([{
+      code: "night_missed", entity: "night:inside", detail: "A NIGHT item expired without an attempt",
+    }]);
+    expect(got.body.daily_digest).toMatchObject({ night_cancelled_count: 1, night_missed_count: 1 });
+  });
+
+  test("keeps OAuth unavailable in both top-level alerts and employee findings", () => {
+    const got = runFixture("oauth-unavailable", {
+      bridge_healthy: true, dashboard_healthy: true, account_available: true,
+      credential_readiness_available: false,
+      credential_readiness: { credential_material: "must-not-leak" },
+      insights_age_minutes: 10, editorial_age_minutes: 10, activity_projection_age_minutes: 10,
+      runner_heartbeats: [], night_items: [],
+      readiness: { status: "active", ready_for_dry_run: true }, self_reply_sync: "active",
+      canary_available: true, tenant_canary: { unexpected_allow: 0, unexpected_deny: 0, recent: [] },
+      backup_age_hours: 2, backup_valid: true, legacy_5735_pid: null,
+    });
+    expect(got.body.alerts.some((row: { code: string }) => row.code === "oauth_readiness_unavailable")).toBeTrue();
+    expect(got.body.employee_input.findings.find((row: { check_code: string }) => row.check_code === "oauth_readiness"))
+      .toMatchObject({ observed: "unreadable", age_minutes: null });
+    expect(JSON.stringify(got.body)).not.toContain("must-not-leak");
+  });
+
+  test("produces the same digest for identical persisted inputs", () => {
+    const fixture = {
+      accounts: [
+        { account_id: "acct_b", bridge_healthy: true, dashboard_healthy: true, account_available: true,
+          ...freshSignals, night_items: [], readiness: { status: "active", ready_for_dry_run: true }, self_reply_sync: "active",
+          canary_available: true, tenant_canary: { unexpected_allow: 0, unexpected_deny: 0, recent: [] },
+          backup_age_hours: 2, backup_valid: true, legacy_5735_pid: null },
+        { account_id: "acct_a", bridge_healthy: true, dashboard_healthy: true, account_available: true,
+          ...freshSignals, night_items: [], readiness: { status: "active", ready_for_dry_run: true }, self_reply_sync: "active",
+          canary_available: true, tenant_canary: { unexpected_allow: 0, unexpected_deny: 0, recent: [] },
+          backup_age_hours: 2, backup_valid: true, legacy_5735_pid: null },
+      ],
+    };
+    expect(runFixture("digest-one", fixture).body.daily_digest)
+      .toEqual(runFixture("digest-two", fixture).body.daily_digest);
   });
 
   test("notifier is strict, deduplicated, cooldown-aware, and recovery-aware", () => {

@@ -1,7 +1,7 @@
 # Control Plane CRITICAL monitor
 
 `scripts/control-plane-critical-monitor.py` performs read-only checks for NIGHT
-misses, backups older than 26 hours, tenant denial anomalies, OAuth readiness
+misses over a bounded 96-hour lookback, backups older than 26 hours, tenant denial anomalies, OAuth readiness
 and expiry, runner freshness, Bridge/Dashboard health, and a stale listener on
 legacy port 5735. Cancelled NIGHT work is counted separately from a real miss.
 OAuth checks use the Bridge's secret-free `/operator/readiness/accounts/{id}`
@@ -12,6 +12,9 @@ Insights, Editorial, activity-projection, and Windows Task Scheduler freshness
 evidence. The caller must pass both the intended employee scope and, for live
 collection, the Bridge account explicitly; the monitor has no customer-account
 default:
+
+Missing runner-freshness fields fail closed as unavailable. They cannot produce
+a healthy digest, and are distinct from present-but-stale evidence.
 
 ```text
 python scripts/control-plane-critical-monitor.py --scope acct_takumi_hq --account-id <bridge-account>

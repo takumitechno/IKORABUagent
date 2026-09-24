@@ -20,6 +20,7 @@ from typing import Any
 MAX_MESSAGE_CHARS = 1900
 NIGHT_STALE_MINUTES = 20
 BACKUP_STALE_HOURS = 26
+NIGHT_MISS_LOOKBACK_HOURS = 96
 DENIAL_WINDOW_MINUTES = 10
 DENIAL_SPIKE_THRESHOLD = 5
 OAUTH_EXPIRY_WARNING_HOURS = 72
@@ -189,7 +190,7 @@ def collect_snapshots(args: argparse.Namespace, now: datetime) -> list[dict[str,
             "insights_age_minutes": operations.get("insights_age_minutes"),
             "editorial_age_minutes": operations.get("editorial_age_minutes"),
             "activity_projection_age_minutes": operations.get("activity_projection_age_minutes"),
-            "runner_heartbeats": operations.get("runner_heartbeats", []),
+            "runner_heartbeats": operations.get("runner_heartbeats"),
         })
     return snapshots
 
@@ -221,12 +222,15 @@ def structured_findings(snapshot: dict[str, Any], scope: str, now: datetime) -> 
         NIGHT_STALE_MINUTES, NIGHT_STALE_MINUTES * 2, f"source:monitor:{account_id}:night")
     reauth = snapshot.get("self_reply_sync") == "reauthorization_required"
     readiness = snapshot.get("readiness") or {}
-    oauth_ok = snapshot.get("account_available") and readiness.get("status") == "active" and readiness.get("ready_for_dry_run") is True
+    credential_available = snapshot.get("credential_readiness_available") is True
+    oauth_ok = credential_available and snapshot.get("account_available") \
+        and readiness.get("status") == "active" and readiness.get("ready_for_dry_run") is True
     credential = snapshot.get("credential_readiness")
-    if snapshot.get("credential_readiness_available") is True and isinstance(credential, dict):
+    if credential_available and isinstance(credential, dict):
         states = [credential.get(purpose) for purpose in ("publish", "insights")]
         oauth_ok = oauth_ok and all(isinstance(state, dict) and state.get("ready") is True for state in states)
-    add("oauth_readiness", "present" if oauth_ok else "absent", 0 if oauth_ok else None,
+    oauth_observed = "present" if oauth_ok else "unreadable" if not credential_available else "absent"
+    add("oauth_readiness", oauth_observed, 0 if oauth_ok else None,
         5, 10, f"source:monitor:{account_id}:oauth", "reauth_required" if reauth else None)
     canary = snapshot.get("tenant_canary") or {}
     tenant_ok = snapshot.get("canary_available") and int(canary.get("unexpected_allow", 0) or 0) == 0
@@ -280,7 +284,7 @@ def evaluate(snapshot: dict[str, Any], now: datetime) -> list[dict[str, str]]:
         add("backup_stale", f"Latest backup is {age:.1f}h old", "system:backup")
 
     stale_before = now - timedelta(minutes=NIGHT_STALE_MINUTES)
-    recent_before = now - timedelta(hours=BACKUP_STALE_HOURS)
+    recent_before = now - timedelta(hours=NIGHT_MISS_LOOKBACK_HOURS)
     for item in snapshot.get("night_items", []):
         if not isinstance(item, dict):
             continue
@@ -320,7 +324,7 @@ def evaluate(snapshot: dict[str, Any], now: datetime) -> list[dict[str, str]]:
             add("oauth_self_reply_scope_missing", "Self-Reply OAuth reauthorization is required")
 
     credential = snapshot.get("credential_readiness")
-    if snapshot.get("credential_readiness_available") is False:
+    if snapshot.get("credential_readiness_available") is not True:
         add("oauth_readiness_unavailable", "Credential readiness could not be read")
     elif isinstance(credential, dict):
         for purpose in ("publish", "insights"):
@@ -343,9 +347,15 @@ def evaluate(snapshot: dict[str, Any], now: datetime) -> list[dict[str, str]]:
                       ("activity_projection", "activity_projection_age_minutes")):
         age_minutes = snapshot.get(key)
         delayed = FRESHNESS[f"{code}_freshness"][1]
-        if isinstance(age_minutes, (int, float)) and age_minutes > delayed:
+        if not isinstance(age_minutes, (int, float)) or isinstance(age_minutes, bool) or age_minutes < 0:
+            add("runner_freshness_unavailable", f"{code} runner freshness is unavailable", f"{account_id}:{code}")
+        elif age_minutes > delayed:
             add("runner_stale", f"{code} runner heartbeat is {age_minutes:.0f}m old", f"{account_id}:{code}")
-    for heartbeat in snapshot.get("runner_heartbeats", []):
+    heartbeats = snapshot.get("runner_heartbeats")
+    if not isinstance(heartbeats, list):
+        add("runner_freshness_unavailable", "Runner heartbeat telemetry is unavailable", f"{account_id}:runner_heartbeats")
+        heartbeats = []
+    for heartbeat in heartbeats:
         if not isinstance(heartbeat, dict):
             continue
         runner = str(heartbeat.get("runner") or heartbeat.get("name") or "unknown")
