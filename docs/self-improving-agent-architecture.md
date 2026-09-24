@@ -4,23 +4,25 @@
 
 Agentは「何を・いつ・なぜ」を決め、Capabilityは「どう実行するか」を担います。Agent定義にはHTTP、SQL、provider SDK、SNS投稿実装を含めません。
 
+組織契約の唯一の正本は `pokemon-agents/web/lib/agent-role-registry.ts` です。identity Markdownはその実行/persona表現で、テストとseed時検証によりdriftを拒否します。
+
 ## 通常運用
 
-1. 指原が目的・対象・成功条件・安全境界を定義する。
-2. 衣織が出典、期間、欠損、矛盾を検証する。
-3. 舞香が検証済みEvidenceから反証可能な仮説を作る。
-4. 瞳が価値、根拠、リスク、コストで採否を決める。
-5. 採用案だけを承認済みCapabilityへ渡す。
+1. しょうこが資料とprovenanceを収集する。
+2. 衣織が出典、鮮度、欠損、矛盾を検証し、舞香とさなつんへ渡す。
+3. 舞香が検証済みEvidenceから反証可能な一変数仮説を作る。
+4. 瞳がOfferとStrategyをadopt / hold / rejectし、locked briefをWriterへ渡す。
+5. Writer、system QA、人間承認の境界を順に通す。
+6. 指原は専門判断を代行せず、次行動、優先度、担当、hold/stop、競合裁定だけを行う。
 
 指原自身は計測、仮説生成、戦略選定をしません。前段の出力が不足すれば後段へ進みません。
 
 ## 自己改善
 
-1. 杏奈がログ、失敗、品質、コストを監査する。
-2. 改善案を `auto_apply` / `human_gate` / `forbidden` に分類する。
-3. 承認済み `auto_apply` だけを樹愛羅へ渡す。
-4. 樹愛羅は隔離された作業領域で適用・テストする。
-5. 成功時はapply可能と報告し、失敗時はrevert可能な状態を保つ。
+1. 杏奈がEvidenceから範囲限定・可逆な改善案を作る。
+2. target、base hash、artifact hash、test、revert条件を人間承認へ渡す。
+3. 承認はbindingを記録するだけで、対象ファイルを変更しない。
+4. 樹愛羅の実行契約は将来packageで実装する。
 
 提案者と実行者を分離し、credential、公開、不可逆操作は自動適用しません。
 
@@ -30,10 +32,12 @@ Agentは「何を・いつ・なぜ」を決め、Capabilityは「どう実行�
 - 横断4 Agent:
 - りさ: 通知要否と内容を決める。送信は将来の `notify.send` Capability。
 - はな: scheduleの期待状態を監視する。scheduler engineではない。
-- しょうこ: 読者別の報告構成を決める。DB集計実装ではない。
-- みりにゃ: 使用量とコストを評価する。課金や契約は行わない。
+- しょうこ: Research取得とprovenance。検証やOffer選定は行わない。
+- みりにゃ: Revenue、Conversion、AI/商業Cost、Margin、Unit Economics、Wasteを評価する。unknownを0にしない。
 
 ## Scheduling
+
+以下はseedされた表示用scheduleであり、存在だけでは実行されない。embedded schedulerは `POKEMON_AGENTS_SCHEDULER=on` の完全一致でのみ起動し、未設定・`off`・その他の値では停止する。このpackageではemployee producerを有効化しない。
 
 - 指原: 毎日 02:00
 - 杏奈: 毎日 05:00
@@ -44,7 +48,7 @@ Agentは「何を・いつ・なぜ」を決め、Capabilityは「どう実行�
 
 ## Data model
 
-`agents` と `agent_edges` がロスターと関係の正本です。legacy列名はDB互換のため維持し、UIは個別Agent名をハードコードしません。schema sourceはfresh/demo DB向けであり、本番DBの自動migrationは行いません。
+role registryがロスター、ownership、handoff、action allowlistの正本です。`agents` と `agent_edges` はruntime projectionです。legacy列名はDB互換のため維持します。
 
 ## Threads Data Plane integration
 

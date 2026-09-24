@@ -215,7 +215,7 @@ function extractAgentFromPrompt(prompt: string): string | null {
 hydrateSessionSource(db);
 
 // サーバ起動時に agents を agent.md から自動 seed (DB-native)
-// agent.md frontmatter が SSOT、DB は自動 derive
+// Role registry が組織SSOT。agent.mdは検証済みの実行/persona表現、DBはそこからderiveする。
 try {
   const seedScript = resolve(REPO_ROOT, "pokemon-agents/scripts/seed-agents-from-md.ts");
   const proc = Bun.spawnSync(["bun", seedScript], {

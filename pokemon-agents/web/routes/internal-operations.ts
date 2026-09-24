@@ -77,20 +77,6 @@ const agentVisuals: Record<string, { icon: string; accent: string }> = {
   "sanatsun-knowledge-editor": { icon: "knowledge", accent: "indigo" },
 };
 
-const heroRoleLabels: Record<string, string> = {
-  "sashihara-orchestrator": "総監督",
-  "anna-supervisor": "改善司令",
-  "maika-hypothesizer": "仮説・分析",
-  "hitomi-selector": "戦略選定",
-  "iori-validator": "根拠監修",
-  "kiara-executor": "改善実行",
-  "hana-heartbeat": "稼働監視",
-  "risa-notifier": "通知判断",
-  "shoko-reporter": "レポート",
-  "mirinya-cost-analyst": "コスト分析",
-  "sanatsun-knowledge-editor": "知識編集",
-};
-
 type OfficeZone = "command" | "center" | "operations";
 
 const officePositions: Record<string, { left: number; top: number; zone: OfficeZone }> = {
@@ -292,7 +278,7 @@ function renderAgents(db: Database, selector: string, connected: boolean, fetche
     const hierarchyClass = agent.slug === "sashihara-orchestrator"
       ? " is-commander"
       : agent.slug === "sanatsun-knowledge-editor" ? " is-center" : "";
-    const heroRole = heroRoleLabels[agent.slug] || agent.role_label || agent.slug;
+    const heroRole = agent.role_label || agent.slug;
     return `<article class="hq-person accent-${visual.accent} state-${state.tone}${hierarchyClass}" data-agent="${escapeHtml(agent.slug)}" data-zone="${position.zone}" data-avatar="${characterImage ? "image" : "fallback"}" style="--agent-left:${position.left}%;--agent-top:${position.top}%">${popup}<div class="hq-person-avatar">${avatar}</div><div class="hq-person-name"><b>${escapeHtml(name)}</b><span data-hero-role="${escapeHtml(heroRole)}">${escapeHtml(heroRole)}</span></div></article>`;
   }).join("");
   const detailCards = rows.map((agent, index) => {

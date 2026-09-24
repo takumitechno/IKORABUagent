@@ -48,13 +48,20 @@ describe("HQ02 =LOVE Control Plane", () => {
     expect(config.jobs.find((j: any) => j.agent === "sanatsun-knowledge-editor").schedule).toBe("毎週月曜 3:00");
   });
 
-  test("keeps the two formal handoff boundaries", () => {
-    const sashihara = readFileSync(resolve(agentsDir, "sashihara-orchestrator.md"), "utf8");
-    expect(sashihara).toContain("iori-validator");
-    expect(sashihara).toContain("maika-hypothesizer");
-    expect(sashihara).toContain("hitomi-selector");
+  test("keeps the canonical specialist and approval handoff boundaries", () => {
+    const shoko = readFileSync(resolve(agentsDir, "shoko-reporter.md"), "utf8");
+    const iori = readFileSync(resolve(agentsDir, "iori-validator.md"), "utf8");
+    const maika = readFileSync(resolve(agentsDir, "maika-hypothesizer.md"), "utf8");
+    const hitomi = readFileSync(resolve(agentsDir, "hitomi-selector.md"), "utf8");
+    const risa = readFileSync(resolve(agentsDir, "risa-notifier.md"), "utf8");
+    expect(shoko).toContain("iori-validator");
+    expect(iori).toContain("maika-hypothesizer");
+    expect(iori).toContain("sanatsun-knowledge-editor");
+    expect(maika).toContain("hitomi-selector");
+    expect(hitomi).toContain("editorial-writer");
+    expect(risa).toContain("sashihara-orchestrator");
     const anna = readFileSync(resolve(agentsDir, "anna-supervisor.md"), "utf8");
-    expect(anna).toContain("kiara-executor");
+    expect(anna).toContain("human:approval");
     for (const slug of retired) expect(readdirSync(agentsDir)).not.toContain(`${slug}.md`);
   });
 

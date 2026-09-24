@@ -26,17 +26,17 @@ function agentDb(): Database {
     CREATE TABLE issues (id INTEGER PRIMARY KEY, assignee_agent_id INTEGER, title TEXT, status TEXT, priority INTEGER, updated_at TEXT);
     CREATE TABLE reflections (id INTEGER PRIMARY KEY, agent_id INTEGER, agent_slug TEXT, status TEXT, created_at TEXT, session_id TEXT, work_dir TEXT);
     INSERT INTO agents VALUES
-      (1,'指原 (sashihara-orchestrator)','指原',NULL,'sashihara-orchestrator','総監督','orchestrator','active'),
-      (2,'衣織 (iori-validator)','衣織',NULL,'iori-validator','Evidence検証','validator','active'),
-      (3,'舞香 (maika-hypothesizer)','舞香',NULL,'maika-hypothesizer','仮説・分析','worker','active'),
-      (4,'瞳 (hitomi-selector)','瞳',NULL,'hitomi-selector','戦略選定','worker','active'),
-      (5,'杏奈 (anna-supervisor)','杏奈',NULL,'anna-supervisor','改善司令','supervisor','active'),
-      (6,'樹愛羅 (kiara-executor)','樹愛羅',NULL,'kiara-executor','改善実行','worker','active'),
-      (7,'はな (hana-heartbeat)','はな',NULL,'hana-heartbeat','稼働監視','worker','active'),
-      (8,'りさ (risa-notifier)','りさ',NULL,'risa-notifier','通知判断','worker','active'),
-      (9,'しょうこ (shoko-reporter)','しょうこ',NULL,'shoko-reporter','報告判断','worker','active'),
-      (10,'みりにゃ (mirinya-cost-analyst)','みりにゃ',NULL,'mirinya-cost-analyst','コスト分析','worker','active'),
-      (11,'さなつん (sanatsun-knowledge-editor)','さなつん',NULL,'sanatsun-knowledge-editor','知識編集','worker','active');
+      (1,'指原 (sashihara-orchestrator)','指原',NULL,'sashihara-orchestrator','Chief Operating Editor','orchestrator','active'),
+      (2,'衣織 (iori-validator)','衣織',NULL,'iori-validator','Evidence Validator','validator','active'),
+      (3,'舞香 (maika-hypothesizer)','舞香',NULL,'maika-hypothesizer','Hypothesis & Experiment Designer','hypothesizer','active'),
+      (4,'瞳 (hitomi-selector)','瞳',NULL,'hitomi-selector','Offer & Strategy Selector','selector','active'),
+      (5,'杏奈 (anna-supervisor)','杏奈',NULL,'anna-supervisor','Bounded Improvement Proposer','supervisor','active'),
+      (6,'樹愛羅 (kiara-executor)','樹愛羅',NULL,'kiara-executor','Exact Approved Artifact Executor','executor','active'),
+      (7,'はな (hana-heartbeat)','はな',NULL,'hana-heartbeat','Expected vs Observed Reliability Monitor','auditor','active'),
+      (8,'りさ (risa-notifier)','りさ',NULL,'risa-notifier','Notification Policy Owner','solo','active'),
+      (9,'しょうこ (shoko-reporter)','しょうこ',NULL,'shoko-reporter','Research Collector / Research Correspondent','researcher','active'),
+      (10,'みりにゃ (mirinya-cost-analyst)','みりにゃ',NULL,'mirinya-cost-analyst','Revenue / Conversion / Cost / Margin / Unit Economics','auditor','active'),
+      (11,'さなつん (sanatsun-knowledge-editor)','さなつん',NULL,'sanatsun-knowledge-editor','Verified Knowledge Lifecycle Editor','solo','active');
     INSERT INTO issues VALUES (1,1,'Bridge接続を確認','in_progress',1,'2026-09-21T00:00:00Z');
     INSERT INTO issues VALUES (2,2,'Evidenceの再確認','blocked',1,'2026-09-21T00:00:00Z');
     INSERT INTO reflections (id,agent_id,agent_slug,status,created_at)
@@ -147,8 +147,8 @@ describe("internal operations dashboard", () => {
     expect(html.match(/<article class="hq-person [^>]+data-zone="center"/g)).toHaveLength(1);
     expect(html.match(/<article class="hq-person [^>]+data-zone="operations"/g)).toHaveLength(4);
     expect(html.match(/data-hero-role=/g)).toHaveLength(11);
-    for (const role of ["総監督", "改善司令", "仮説・分析", "戦略選定", "根拠監修", "改善実行", "稼働監視", "通知判断", "レポート", "コスト分析", "知識編集"]) {
-      expect(html).toContain(`data-hero-role="${role}"`);
+    for (const role of ["Chief Operating Editor", "Bounded Improvement Proposer", "Hypothesis & Experiment Designer", "Offer & Strategy Selector", "Evidence Validator", "Exact Approved Artifact Executor", "Expected vs Observed Reliability Monitor", "Notification Policy Owner", "Research Collector / Research Correspondent", "Revenue / Conversion / Cost / Margin / Unit Economics", "Verified Knowledge Lifecycle Editor"]) {
+      expect(html).toContain(`data-hero-role="${role.replaceAll("&", "&amp;")}"`);
     }
     expect(html).toContain('m3 7 4.5 4L12 4l4.5 7L21 7l-2 11H5L3 7Z');
     expect(html.indexOf("＝LOVE Agent OSの事務所")).toBeLessThan(html.indexOf("MISSION CONTROL"));

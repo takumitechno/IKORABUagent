@@ -2,6 +2,7 @@ import { createHash } from "node:crypto";
 import type { Database } from "bun:sqlite";
 import {
   ACTIVITY_MESSAGE_CODES,
+  ACTIVITY_ACTION_CODES,
   EMPLOYEE_ROLE_REGISTRY,
   FORMAL_EDITORIAL_QA,
   FORMAL_EDITORIAL_WRITER,
@@ -17,9 +18,11 @@ import {
   type InternalActivity,
 } from "./agent-role-registry";
 
-export const AGENT_ACTIVITY_LEDGER_MIGRATION_ID = "20260924_agent_activity_ledger_v2_message_codes";
+const AGENT_ACTIVITY_LEDGER_V2_ID = "20260924_agent_activity_ledger_v2_message_codes";
+export const AGENT_ACTIVITY_LEDGER_MIGRATION_ID = "20260924_agent_activity_ledger_v3_role_codes";
 export const AGENT_ACTIVITY_LEDGER_MIGRATION_IDS = Object.freeze([
   "20260924_agent_activity_ledger_v1",
+  AGENT_ACTIVITY_LEDGER_V2_ID,
   AGENT_ACTIVITY_LEDGER_MIGRATION_ID,
 ]);
 const DEFAULT_PAGE_SIZE = 50;
@@ -36,6 +39,11 @@ const canonicalEmployeeSql = EMPLOYEE_ROLE_REGISTRY
   .join(" OR ");
 const canonicalSystemRolesSql = SYSTEM_CAPABILITY_ROLES.map(sqlLiteral).join(",");
 const activityMessageCodesSql = ACTIVITY_MESSAGE_CODES.map(sqlLiteral).join(",");
+const activityActionCodesSql = ACTIVITY_ACTION_CODES.map(sqlLiteral).join(",");
+const canonicalEmployeeIdsSql = EMPLOYEE_ROLE_REGISTRY.map((employee) => sqlLiteral(employee.agent_id)).join(",");
+const employeeActionSql = EMPLOYEE_ROLE_REGISTRY.map((employee) =>
+  `(NEW.agent_id = ${sqlLiteral(employee.agent_id)} AND NEW.action IN (${employee.allowed_actions.map(sqlLiteral).join(",")}))`
+).join(" OR ");
 const canonicalNextOwnersSql = [
   ...EMPLOYEE_ROLE_REGISTRY.map((employee) => employee.agent_id),
   FORMAL_EDITORIAL_WRITER.agent_id,
@@ -159,6 +167,14 @@ WHEN (NEW.decision_summary IS NOT NULL AND NEW.decision_summary NOT IN (${activi
   OR (NEW.confidence_basis IS NOT NULL AND NEW.confidence_basis NOT IN (${activityMessageCodesSql}))
 BEGIN
   SELECT RAISE(ABORT, 'agent activity text must use an approved message code');
+END;
+
+CREATE TRIGGER IF NOT EXISTS agent_activity_action_codes
+BEFORE INSERT ON agent_activity_ledger
+WHEN NEW.action NOT IN (${activityActionCodesSql})
+  OR (NEW.actor_type = 'employee' AND NEW.agent_id IN (${canonicalEmployeeIdsSql}) AND NOT (${employeeActionSql}))
+BEGIN
+  SELECT RAISE(ABORT, 'agent activity action is not allowed for actor');
 END;
 
 CREATE TRIGGER IF NOT EXISTS agent_activity_payload_sanitized
@@ -390,7 +406,7 @@ export function migrateAgentActivityLedger(db: Database): boolean {
     const pending = AGENT_ACTIVITY_LEDGER_MIGRATION_IDS.filter((version) => !db.query<{ version: string }, [string]>(
       "SELECT version FROM schema_migrations WHERE version = ?",
     ).get(version));
-    const upgradingV1 = pending.includes(AGENT_ACTIVITY_LEDGER_MIGRATION_ID)
+    const upgradingV1 = pending.includes(AGENT_ACTIVITY_LEDGER_V2_ID)
       && !pending.includes(AGENT_ACTIVITY_LEDGER_MIGRATION_IDS[0]);
     if (upgradingV1) {
       try {
@@ -398,6 +414,18 @@ export function migrateAgentActivityLedger(db: Database): boolean {
       } catch {
         throw new ActivityLedgerSchemaError("v1 activity ledger contains rows incompatible with v2 sanitization");
       }
+    }
+    const upgradingRoleCodes = pending.includes(AGENT_ACTIVITY_LEDGER_MIGRATION_ID)
+      && !pending.includes(AGENT_ACTIVITY_LEDGER_MIGRATION_IDS[0]);
+    if (upgradingRoleCodes) {
+      try {
+        for (const row of db.query<LedgerRow, []>("SELECT * FROM agent_activity_ledger").all()) rowToActivity(row);
+      } catch {
+        throw new ActivityLedgerSchemaError("activity ledger contains rows incompatible with role action codes");
+      }
+      db.exec(`DROP TRIGGER IF EXISTS agent_activity_actor_canonical;
+        DROP TRIGGER IF EXISTS agent_activity_message_codes;
+        DROP TRIGGER IF EXISTS agent_activity_action_codes;`);
     }
     db.exec(AGENT_ACTIVITY_LEDGER_SCHEMA_SQL);
     for (const version of pending) {
@@ -412,13 +440,13 @@ export function assertAgentActivityLedgerSchema(db: Database): void {
   const rows = db.query<{ name: string }, []>(
     `SELECT name FROM sqlite_master
      WHERE (type='table' AND name IN ('agent_activity_accounts','agent_activity_ledger'))
-        OR (type='trigger' AND name IN ('agent_activity_ledger_no_update','agent_activity_ledger_no_delete','agent_activity_ledger_no_duplicate_insert','agent_activity_actor_canonical','agent_activity_message_codes','agent_activity_payload_sanitized','agent_activity_correction_same_account'))`,
+        OR (type='trigger' AND name IN ('agent_activity_ledger_no_update','agent_activity_ledger_no_delete','agent_activity_ledger_no_duplicate_insert','agent_activity_actor_canonical','agent_activity_message_codes','agent_activity_action_codes','agent_activity_payload_sanitized','agent_activity_correction_same_account'))`,
   ).all();
   const names = new Set(rows.map((row) => row.name));
   for (const required of [
     "agent_activity_accounts", "agent_activity_ledger", "agent_activity_ledger_no_update",
     "agent_activity_ledger_no_delete", "agent_activity_ledger_no_duplicate_insert",
-    "agent_activity_actor_canonical", "agent_activity_message_codes", "agent_activity_payload_sanitized",
+    "agent_activity_actor_canonical", "agent_activity_message_codes", "agent_activity_action_codes", "agent_activity_payload_sanitized",
     "agent_activity_correction_same_account",
   ]) {
     if (!names.has(required)) throw new ActivityLedgerSchemaError(`missing activity ledger schema object: ${required}`);

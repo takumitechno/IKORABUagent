@@ -285,6 +285,24 @@ describe("append-only agent activity ledger", () => {
     db.close();
   });
 
+  test("enforces employee action allowlists at service and database boundaries", () => {
+    const db = ledgerDb();
+    expect(() => appendActivity(db, input({ action: "offer_adopted" }))).toThrow("not allowed");
+    expect(appendActivity(db, input({ decision_summary: "stale_fact" })).decision_summary).toBe("stale_fact");
+    expect(() => db.query(`INSERT INTO agent_activity_ledger (
+      activity_id, timestamp, actor_type, agent_id, agent_role, account_id, action, evidence_refs,
+      decision_status, decision_summary, next_action_owner, next_action, due_at,
+      confidence_level, confidence_basis, sample_size, result_status, artifact_ref,
+      cycle_id, experiment_id, correlation_id, corrects_activity_id, payload_hash
+    ) SELECT
+      'activity-forbidden-role', timestamp, actor_type, agent_id, agent_role, account_id, 'offer_adopted', evidence_refs,
+      decision_status, decision_summary, next_action_owner, next_action, due_at,
+      confidence_level, confidence_basis, sample_size, result_status, artifact_ref,
+      cycle_id, experiment_id, correlation_id, NULL, payload_hash
+    FROM agent_activity_ledger WHERE activity_id='activity-001'`).run()).toThrow("not allowed for actor");
+    db.close();
+  });
+
   test("upgrades populated v1 ledgers only when every existing row satisfies v2 sanitization", () => {
     const compatible = ledgerDb();
     appendActivity(compatible, input());

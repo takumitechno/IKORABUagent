@@ -4,6 +4,8 @@ import { resolve } from "node:path";
 import { isPublicDashboardPath } from "../web/lib/internal-auth";
 import {
   EMPLOYEE_ROLE_REGISTRY,
+  ACTIVITY_ACTION_CODES,
+  ACTIVITY_MESSAGE_CODES,
   FORMAL_EDITORIAL_QA,
   FORMAL_EDITORIAL_WRITER,
   HUMAN_AUTHORITY_CONTRACTS,
@@ -15,6 +17,7 @@ import {
   mapThreadsActor,
   serializeInternalActivity,
   validateOrganizationTopology,
+  validateIdentityContract,
   type InternalActivityInput,
 } from "../web/lib/agent-role-registry";
 
@@ -59,7 +62,7 @@ describe("formal employee and role registry", () => {
     expect([...ids].sort()).toEqual(markdownIds);
     for (const employee of EMPLOYEE_ROLE_REGISTRY) {
       const source = readFileSync(resolve(root, employee.identity_source), "utf8");
-      expect(source).toContain(`name: ${employee.agent_id}`);
+      expect(validateIdentityContract(employee, source)).toBe(true);
       expect(employee.status).toBe("active");
       expect(employee.runnable).toBe(true);
       expect(employee.owns.length).toBeGreaterThan(0);
@@ -71,11 +74,13 @@ describe("formal employee and role registry", () => {
 
   test("formalizes the target organization and inactive locked-brief Writer contract", () => {
     const byName = Object.fromEntries(EMPLOYEE_ROLE_REGISTRY.map((entry) => [entry.display_name, entry]));
-    expect(byName.Sashihara.owns).toEqual(expect.arrayContaining(["next_action", "work_ordering", "owner_assignment", "stop_decision"]));
+    expect(byName.Sashihara.owns).toEqual(expect.arrayContaining(["next_action", "priority", "owner_assignment", "hold_decision", "stop_decision", "arbitration"]));
     expect(byName.Shoko.handoff_to).toEqual(["iori-validator"]);
-    expect(byName.Maika.owns).toEqual(expect.arrayContaining(["hypothesis", "alternative_hypothesis", "test_design"]));
+    expect(byName.Iori.handoff_to).toEqual(["maika-hypothesizer", "sanatsun-knowledge-editor"]);
+    expect(byName.Maika.owns).toEqual(expect.arrayContaining(["hypothesis", "alternative_hypothesis", "one_variable_experiment"]));
     expect(byName.Hitomi.owns).toEqual(expect.arrayContaining(["offer_selection", "strategy_selection"]));
     expect(byName.Hana.handoff_to).toEqual(["risa-notifier"]);
+    expect(byName.Risa.handoff_to).toEqual(["human:ceo", "sashihara-orchestrator"]);
     expect(byName.Anna.handoff_to).toContain("human:approval");
     expect(byName.Kiara.owns).toContain("approved_exact_execution");
     expect(TARGET_ORGANIZATION).toEqual({
@@ -111,6 +116,41 @@ describe("formal employee and role registry", () => {
     const schedules = readFileSync(resolve(root, ".claude", "launchd.json"), "utf8");
     expect(schedules).not.toContain("editorial-writer");
   });
+
+  test("fails deterministically when identity metadata or structured sections drift", () => {
+    const employee = EMPLOYEE_ROLE_REGISTRY.find((entry) => entry.agent_id === "hitomi-selector")!;
+    const source = readFileSync(resolve(root, employee.identity_source), "utf8");
+    expect(() => validateIdentityContract(employee, source.replace(
+      "canonical_role: offer_strategy_selector", "canonical_role: strategy_selector",
+    ))).toThrow("canonical_role drift");
+    expect(() => validateIdentityContract(employee, source.replace(
+      "- `test_variable_selection`", "- `experiment_metric_evaluation`",
+    ))).toThrow("sections drift");
+  });
+
+  test("enforces bounded per-employee action allowlists", () => {
+    expect(new Set(ACTIVITY_ACTION_CODES).size).toBe(ACTIVITY_ACTION_CODES.length);
+    for (const employee of EMPLOYEE_ROLE_REGISTRY) {
+      expect(employee.allowed_actions.length).toBeGreaterThan(0);
+      for (const action of employee.allowed_actions) expect(ACTIVITY_ACTION_CODES).toContain(action);
+    }
+    const employeeInput = (agent_id: string, agent_role: string, action: string) =>
+      activityInput({ agent_id: agent_id as any, agent_role, action });
+    expect(() => createInternalActivity(employeeInput("shoko-reporter", "research_collector", "offer_adopted"))).toThrow("not allowed");
+    expect(() => createInternalActivity(employeeInput("iori-validator", "evidence_validator", "strategy_selected"))).toThrow("not allowed");
+    expect(() => createInternalActivity(employeeInput("maika-hypothesizer", "strategy_hypothesizer", "editorial_cycle_approved"))).toThrow("not allowed");
+    expect(() => createInternalActivity(employeeInput("hitomi-selector", "offer_strategy_selector", "experiment_evaluated"))).toThrow("not allowed");
+    expect(() => createInternalActivity(employeeInput("mirinya-cost-analyst", "revenue_analyst", "offer_adopted"))).toThrow("not allowed");
+    expect(() => createInternalActivity(employeeInput("hana-heartbeat", "reliability_monitor", "notification_decided"))).toThrow("not allowed");
+    expect(() => createInternalActivity(employeeInput("risa-notifier", "notification_policy_owner", "reliability_observed"))).toThrow("not allowed");
+    expect(() => createInternalActivity(employeeInput("anna-supervisor", "improvement_supervisor", "approved_change_executed"))).toThrow("not allowed");
+    expect(() => createInternalActivity(employeeInput("kiara-executor", "approved_change_executor", "improvement_proposed"))).toThrow("not allowed");
+    expect(() => createInternalActivity(employeeInput("sashihara-orchestrator", "chief_operating_editor", "evidence_validated"))).toThrow("not allowed");
+    expect(createInternalActivity(employeeInput("shoko-reporter", "research_collector", "source_collected")).action).toBe("source_collected");
+    for (const code of ["stale_fact", "offer_unapproved", "hash_drift", "status_missing", "notify_suppressed", "evidence_missing", "scope_violation", "human_gate_required", "next_action_selected", "hold_conflict"]) {
+      expect(ACTIVITY_MESSAGE_CODES).toContain(code);
+    }
+  });
 });
 
 describe("Threads actor mapping boundary", () => {
@@ -118,7 +158,11 @@ describe("Threads actor mapping boundary", () => {
     expect(mapThreadsActor("sashihara-orchestrator")).toMatchObject({ actor_kind: "employee", agent_id: "sashihara-orchestrator" });
     expect(mapThreadsActor("Writer")).toMatchObject({ actor_kind: "formal_role", agent_id: "editorial-writer", agent_role: "editorial_writer" });
     expect(mapThreadsActor("Human")).toMatchObject({ actor_kind: "human", agent_id: null, agent_role: "human_approval" });
-    for (const actor of ["EditorialRunner", "Editorial Critic", "Performance Learner", "Voice Judge", "Theme Diversity Judge", "Experiment Planner", "QA"]) {
+    for (const actor of [
+      "EditorialRunner", "Editorial Critic", "Performance Learner", "Voice Judge",
+      "Theme Diversity Judge", "Experiment Planner", "QA", "NIGHT", "InsightsRunner",
+      "Backup", "monitor", "projector", "notification transport",
+    ]) {
       const mapped = mapThreadsActor(actor);
       expect(mapped.actor_kind).toBe("system_capability");
       expect(mapped.agent_id).toBeNull();

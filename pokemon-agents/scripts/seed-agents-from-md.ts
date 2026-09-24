@@ -12,6 +12,7 @@ import { createHash } from "crypto";
 import { resolve, dirname, relative } from "path";
 import { fileURLToPath } from "url";
 import { findAgentCharacter } from "../web/lib/agent-character-images";
+import { EMPLOYEE_ROLE_REGISTRY, validateIdentityContract } from "../web/lib/agent-role-registry";
 import { resolveAgentsDbPath } from "../runtime/db-path";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -59,45 +60,6 @@ function parseFrontmatter(content: string): { fm: Frontmatter; body: string } {
   return { fm, body: m[2] };
 }
 
-function normalizeRole(raw: string | undefined, slug: string): string {
-  const r = (raw || "").toLowerCase();
-  const s = slug.toLowerCase();
-
-  // frontmatter で明示された主要 role はそのまま尊重 (slug 推定より優先)
-  if (["reviewer", "orchestrator", "supervisor", "solo"].includes(r)) return r;
-
-  // slug に明確に含まれるキーワードを優先 (frontmatter が "worker" のまま残ってるケースが多い)
-  if (s.includes("reviewer") || s.includes("review")) return "reviewer";
-  if (s.includes("orchestrator") || s.includes("-sync")) return "orchestrator";
-  if (s.includes("writer")) return "writer";
-  if (s.includes("publisher")) return "publisher";
-  if (s.includes("validator")) return "validator";
-  if (s.includes("hypothesizer")) return "hypothesizer";
-  if (s.includes("selector")) return "selector";
-  if (s.includes("supervisor")) return "supervisor";
-  if (s.includes("executor")) return "executor";
-  if (s.includes("research")) return "researcher";
-  if (s.includes("optimizer") || s.includes("refine")) return "optimizer";
-  if (s.includes("outreach")) return "outreach";
-  if (s.includes("audit") || s.includes("monitor")) return "auditor";
-
-  // slug に該当なしなら frontmatter の role を使う
-  if (["writer", "worker"].includes(r)) return "writer";
-  if (r === "reviewer") return "reviewer";
-  if (r === "publisher") return "publisher";
-  if (["orchestrator", "leader"].includes(r)) return "orchestrator";
-  if (r === "validator" || r === "stage1") return "validator";
-  if (r === "hypothesizer" || r === "stage2") return "hypothesizer";
-  if (r === "selector" || r === "stage3") return "selector";
-  if (r === "supervisor") return "supervisor";
-  if (r === "executor") return "executor";
-  if (r === "researcher") return "researcher";
-  if (r === "optimizer") return "optimizer";
-  if (r === "outreach") return "outreach";
-  if (r === "auditor") return "auditor";
-  return "solo";
-}
-
 function listAgentMdPaths(root: string): string[] {
   const result: string[] = [];
   // フラット定義: root 直下の <name>.md (例: butterfree-subsidy-sync.md)
@@ -127,20 +89,6 @@ function avatarUrlFor(identitySlug: string): string | null {
   return findAgentCharacter({ slug: identitySlug })?.imagePath ?? null;
 }
 
-const ROLE_LABELS: Record<string, string> = {
-  "sashihara-orchestrator": "総監督 / Orchestrator",
-  "iori-validator": "Evidence検証 / Validator",
-  "maika-hypothesizer": "仮説・分析 / Hypothesizer",
-  "hitomi-selector": "戦略選定 / Selector",
-  "anna-supervisor": "改善司令 / Supervisor",
-  "kiara-executor": "改善実行 / Executor",
-  "sanatsun-knowledge-editor": "知識編集 / Knowledge Editor",
-  "risa-notifier": "通知判断 / Notifier",
-  "hana-heartbeat": "稼働監視 / Heartbeat",
-  "shoko-reporter": "報告判断 / Reporter",
-  "mirinya-cost-analyst": "コスト分析 / Cost Analyst",
-};
-
 interface AgentDef {
   slug: string;
   pokemon_slug: string;
@@ -164,11 +112,11 @@ function parseAgentMd(mdPath: string): AgentDef {
   const parts = rel.split("/"); // .claude/agents/<slug>.md または <slug>/agent.md
   const dirSlug = parts[2] || "";
   const slug = fm.name || dirSlug;
-  // department は frontmatter が SSOT (フラット化前は path から推定してた)
-  const dept = (fm.department || "").replace(/^_/, "");
+  const contract = EMPLOYEE_ROLE_REGISTRY.find((employee) => employee.agent_id === slug);
+  if (!contract) throw new Error(`agent identity is not in the canonical role registry: ${slug}`);
+  validateIdentityContract(contract, content);
   const pokemon_slug = fm.pokemon_slug || slug.split("-")[0];
   const pokemon_jp = fm.pokemon_jp || pokemon_slug;
-  const role = normalizeRole(fm.role, slug);
   const model = fm.model || "sonnet";
   // Git may materialize the same definition as LF or CRLF. Hash the canonical
   // form so a line-ending-only checkout never creates an agent revision.
@@ -178,9 +126,9 @@ function parseAgentMd(mdPath: string): AgentDef {
     pokemon_slug,
     pokemon_jp,
     display_name: `${pokemon_jp} (${slug})`,
-    role,
-    role_label: fm.role_label || null,
-    department: dept,
+    role: contract.runtime_role,
+    role_label: contract.role_label,
+    department: contract.department,
     model,
     source_md_path: rel,
     instructions: content,

@@ -1,11 +1,9 @@
 /**
  * Formal organization contracts for Internal HQ.
  *
- * Employee identity and runtime capability metadata remain canonical in
- * `.claude/agents/*.md` and the `agents` table seeded from those files. The
- * `role` and `department` below are organizational contracts, not runtime
- * authorization or scheduler roles. This module adds ownership and handoff
- * contracts keyed by canonical IDs; it is not an activation mechanism.
+ * This registry is the sole organizational source of truth. Identity Markdown
+ * is an execution/persona representation and is deterministically checked
+ * against this contract. Nothing here activates a scheduler or producer.
  */
 
 export type EmploymentStatus = "active" | "inactive";
@@ -14,10 +12,13 @@ export interface EmployeeRoleContract {
   readonly agent_id: string;
   readonly display_name: string;
   readonly role: string;
+  readonly role_label: string;
+  readonly runtime_role: string;
   readonly department: string;
   readonly owns: readonly string[];
   readonly does_not_own: readonly string[];
   readonly handoff_to: readonly string[];
+  readonly allowed_actions: readonly string[];
   readonly status: EmploymentStatus;
   readonly identity_source: string;
   readonly runnable: true;
@@ -34,95 +35,149 @@ function deepFreeze<T>(value: T): T {
 export const EMPLOYEE_ROLE_REGISTRY = deepFreeze([
   {
     agent_id: "sashihara-orchestrator", display_name: "Sashihara",
-    role: "chief_operating_editor", department: "control-plane",
-    owns: ["next_action", "work_ordering", "owner_assignment", "stop_decision"],
-    does_not_own: ["evidence_collection", "hypothesis_creation", "offer_selection", "writing", "self_qa", "human_approval", "publication"],
+    role: "chief_operating_editor", role_label: "Chief Operating Editor", runtime_role: "orchestrator", department: "control-plane",
+    owns: ["next_action", "priority", "owner_assignment", "hold_decision", "stop_decision", "arbitration"],
+    does_not_own: ["specialist_analysis", "evidence_collection", "evidence_validation", "hypothesis_creation", "offer_selection", "writing", "self_qa", "human_approval", "publication"],
     handoff_to: ["shoko-reporter", "maika-hypothesizer", "editorial-writer", "mirinya-cost-analyst", "sanatsun-knowledge-editor", "hana-heartbeat"],
+    allowed_actions: ["next_action_selected", "priority_assigned", "owner_assigned", "work_held", "work_stopped", "conflict_arbitrated", "correction"],
     status: "active", identity_source: ".claude/agents/sashihara-orchestrator.md", runnable: true,
   },
   {
     agent_id: "shoko-reporter", display_name: "Shoko",
-    role: "research_collector", department: "research",
+    role: "research_collector", role_label: "Research Collector / Research Correspondent", runtime_role: "researcher", department: "research",
     owns: ["external_material_collection", "source_provenance"],
     does_not_own: ["evidence_validation", "hypothesis_creation", "strategy_selection", "publication"],
     handoff_to: ["iori-validator"], status: "active",
+    allowed_actions: ["source_collected", "provenance_recorded", "research_gap_reported", "correction"],
     identity_source: ".claude/agents/shoko-reporter.md", runnable: true,
   },
   {
     agent_id: "iori-validator", display_name: "Iori",
-    role: "evidence_validator", department: "research",
-    owns: ["evidence_validation", "provenance_validation", "data_quality_status"],
+    role: "evidence_validator", role_label: "Evidence Validator", runtime_role: "validator", department: "research",
+    owns: ["evidence_validation", "freshness_validation", "contradiction_detection", "data_quality_status"],
     does_not_own: ["external_material_collection", "hypothesis_creation", "strategy_selection", "publication"],
-    handoff_to: ["maika-hypothesizer"], status: "active",
+    handoff_to: ["maika-hypothesizer", "sanatsun-knowledge-editor"], status: "active",
+    allowed_actions: ["evidence_validated", "evidence_rejected", "evidence_insufficient", "contradiction_detected", "freshness_checked", "correction"],
     identity_source: ".claude/agents/iori-validator.md", runnable: true,
   },
   {
     agent_id: "maika-hypothesizer", display_name: "Maika",
-    role: "strategy_hypothesizer", department: "strategy",
-    owns: ["hypothesis", "alternative_hypothesis", "test_design"],
-    does_not_own: ["evidence_collection", "offer_selection", "writing", "publication"],
+    role: "strategy_hypothesizer", role_label: "Hypothesis & Experiment Designer", runtime_role: "hypothesizer", department: "strategy",
+    owns: ["hypothesis", "alternative_hypothesis", "one_variable_experiment"],
+    does_not_own: ["evidence_collection", "evaluator_verdict", "offer_selection", "writing", "publication"],
     handoff_to: ["hitomi-selector"], status: "active",
+    allowed_actions: ["hypothesis_proposed", "alternative_hypothesis_proposed", "experiment_variable_selected", "correction"],
     identity_source: ".claude/agents/maika-hypothesizer.md", runnable: true,
   },
   {
     agent_id: "hitomi-selector", display_name: "Hitomi",
-    role: "offer_strategy_selector", department: "strategy",
-    owns: ["offer_selection", "strategy_selection"],
+    role: "offer_strategy_selector", role_label: "Offer & Strategy Selector", runtime_role: "selector", department: "strategy",
+    owns: ["audience_selection", "problem_selection", "benefit_selection", "proof_selection", "objection_selection", "cta_selection", "offer_selection", "strategy_selection"],
     does_not_own: ["test_variable_selection", "writing", "self_qa", "human_approval", "publication"],
     handoff_to: ["editorial-writer"], status: "active",
+    allowed_actions: ["offer_adopted", "offer_held", "offer_rejected", "strategy_selected", "correction"],
     identity_source: ".claude/agents/hitomi-selector.md", runnable: true,
   },
   {
     agent_id: "mirinya-cost-analyst", display_name: "Mirinya",
-    role: "revenue_analyst", department: "intelligence",
-    owns: ["revenue_analysis", "conversion_analysis", "cost_analysis", "margin_analysis"],
+    role: "revenue_analyst", role_label: "Revenue / Conversion / Cost / Margin / Unit Economics", runtime_role: "auditor", department: "intelligence",
+    owns: ["revenue_analysis", "conversion_analysis", "ai_cost_analysis", "commercial_cost_analysis", "margin_analysis", "unit_economics", "waste_analysis"],
     does_not_own: ["offer_selection", "billing_mutation", "publication"],
     handoff_to: ["sashihara-orchestrator"], status: "active",
+    allowed_actions: ["revenue_analyzed", "conversion_analyzed", "cost_analyzed", "margin_analyzed", "unit_economics_analyzed", "commercial_waste_flagged", "correction"],
     identity_source: ".claude/agents/mirinya-cost-analyst.md", runnable: true,
   },
   {
     agent_id: "sanatsun-knowledge-editor", display_name: "Sanatsun",
-    role: "verified_knowledge_editor", department: "intelligence",
-    owns: ["verified_knowledge_lifecycle", "offer_facts_lifecycle"],
-    does_not_own: ["external_material_collection", "offer_selection", "writing", "publication"],
+    role: "verified_knowledge_editor", role_label: "Verified Knowledge Lifecycle Editor", runtime_role: "solo", department: "intelligence",
+    owns: ["verified_knowledge_lifecycle", "knowledge_version", "knowledge_expiry", "knowledge_supersession", "knowledge_staleness"],
+    does_not_own: ["external_material_collection", "evidence_validation_verdict", "offer_selection", "writing", "publication"],
     handoff_to: ["sashihara-orchestrator"], status: "active",
+    allowed_actions: ["knowledge_versioned", "knowledge_expired", "knowledge_superseded", "knowledge_marked_stale", "correction"],
     identity_source: ".claude/agents/sanatsun-knowledge-editor.md", runnable: true,
   },
   {
     agent_id: "hana-heartbeat", display_name: "Hana",
-    role: "reliability_monitor", department: "operations",
-    owns: ["reliability_status", "system_pulse"],
+    role: "reliability_monitor", role_label: "Expected vs Observed Reliability Monitor", runtime_role: "auditor", department: "operations",
+    owns: ["expected_observed_comparison", "reliability_status", "system_pulse"],
     does_not_own: ["scheduler_creation", "retry_execution", "notification_delivery"],
     handoff_to: ["risa-notifier"], status: "active",
+    allowed_actions: ["reliability_observed", "status_missing_detected", "schedule_drift_detected", "correction"],
     identity_source: ".claude/agents/hana-heartbeat.md", runnable: true,
   },
   {
     agent_id: "risa-notifier", display_name: "Risa",
-    role: "notification_policy_owner", department: "operations",
-    owns: ["notification_policy", "notification_dedup", "notification_recipient"],
+    role: "notification_policy_owner", role_label: "Notification Policy Owner", runtime_role: "solo", department: "operations",
+    owns: ["notification_severity", "notification_recipient", "notification_dedup", "notification_suppression", "notification_escalation"],
     does_not_own: ["system_health_classification", "credential_management", "notification_transport"],
-    handoff_to: ["human:ceo"], status: "active",
+    handoff_to: ["human:ceo", "sashihara-orchestrator"], status: "active",
+    allowed_actions: ["notification_decided", "notification_suppressed", "notification_escalated", "correction"],
     identity_source: ".claude/agents/risa-notifier.md", runnable: true,
   },
   {
     agent_id: "anna-supervisor", display_name: "Anna",
-    role: "improvement_supervisor", department: "self-improvement",
+    role: "improvement_supervisor", role_label: "Bounded Improvement Proposer", runtime_role: "supervisor", department: "self-improvement",
     owns: ["improvement_proposal", "bounded_change_definition", "human_gate_request"],
     does_not_own: ["human_approval", "unbounded_change", "exact_execution", "publication"],
     handoff_to: ["human:approval"], status: "active",
+    allowed_actions: ["improvement_proposed", "bounded_change_defined", "human_gate_requested", "correction"],
     identity_source: ".claude/agents/anna-supervisor.md", runnable: true,
   },
   {
     agent_id: "kiara-executor", display_name: "Kiara",
-    role: "approved_change_executor", department: "self-improvement",
+    role: "approved_change_executor", role_label: "Exact Approved Artifact Executor", runtime_role: "executor", department: "self-improvement",
     owns: ["approved_exact_execution", "bounded_test", "revert_readiness"],
     does_not_own: ["improvement_proposal", "scope_expansion", "human_approval", "publication"],
     handoff_to: ["anna-supervisor"], status: "active",
+    allowed_actions: ["approved_change_executed", "approved_change_tested", "approved_change_reverted", "correction"],
     identity_source: ".claude/agents/kiara-executor.md", runnable: true,
   },
 ] as const satisfies readonly EmployeeRoleContract[]);
 
 export type EmployeeId = typeof EMPLOYEE_ROLE_REGISTRY[number]["agent_id"];
+
+const IDENTITY_SECTIONS = Object.freeze([
+  "ROLE", "MISSION", "OWNS", "DOES NOT OWN", "INPUTS", "SOURCE OF TRUTH",
+  "DECISION RULES", "OUTPUT CONTRACT", "HANDOFF TO", "KPI", "FAIL-CLOSED CONDITIONS",
+]);
+
+function identitySection(source: string, heading: string): string {
+  const match = `${source}\n## __END__`.match(new RegExp(`^## ${heading}\\r?$([\\s\\S]*?)(?=^## )`, "m"));
+  if (!match) throw new Error(`identity contract is missing section: ${heading}`);
+  return match[1].trim();
+}
+
+function identityCodes(source: string, heading: string): string[] {
+  return [...identitySection(source, heading).matchAll(/^- `([^`]+)`\r?$/gm)].map((match) => match[1]);
+}
+
+export function validateIdentityContract(employee: EmployeeRoleContract, source: string): true {
+  const frontmatter = source.match(/^---\r?\n([\s\S]*?)\r?\n---/)?.[1];
+  if (!frontmatter) throw new Error(`identity contract has no frontmatter: ${employee.agent_id}`);
+  const fields = new Map(
+    frontmatter.split(/\r?\n/).map((line) => {
+      const separator = line.indexOf(":");
+      return separator < 0 ? [line, ""] : [line.slice(0, separator), line.slice(separator + 1).trim()];
+    }),
+  );
+  for (const [field, expected] of Object.entries({
+    name: employee.agent_id,
+    department: employee.department,
+    role: employee.runtime_role,
+    role_label: employee.role_label,
+    canonical_role: employee.role,
+  })) {
+    if (fields.get(field) !== expected) throw new Error(`identity ${field} drift: ${employee.agent_id}`);
+  }
+  for (const heading of IDENTITY_SECTIONS) identitySection(source, heading);
+  if (identitySection(source, "ROLE") !== `\`${employee.role}\``
+    || identityCodes(source, "OWNS").join() !== employee.owns.join()
+    || identityCodes(source, "DOES NOT OWN").join() !== employee.does_not_own.join()
+    || identityCodes(source, "HANDOFF TO").join() !== employee.handoff_to.join()) {
+    throw new Error(`identity sections drift from role registry: ${employee.agent_id}`);
+  }
+  return true;
+}
 
 /** Human/CEO is an external authority, not a runnable Agent identity. */
 export const TARGET_ORGANIZATION = deepFreeze({
@@ -213,6 +268,8 @@ export function validateOrganizationTopology(): true {
   }
   const byId = new Map(EMPLOYEE_ROLE_REGISTRY.map((entry) => [entry.agent_id, entry]));
   if (HUMAN_AUTHORITY_CONTRACTS.ceo.handoff_to[0] !== "sashihara-orchestrator"
+    || byId.get("iori-validator")?.handoff_to.join() !== "maika-hypothesizer,sanatsun-knowledge-editor"
+    || byId.get("risa-notifier")?.handoff_to.join() !== "human:ceo,sashihara-orchestrator"
     || byId.get("anna-supervisor")?.handoff_to.join() !== "human:approval"
     || HUMAN_AUTHORITY_CONTRACTS.approval_gate.handoff_to.join() !== "kiara-executor"
     || FORMAL_EDITORIAL_WRITER.handoff_to.join() !== "system:editorial-qa"
@@ -250,6 +307,12 @@ const SYSTEM_ACTORS: Readonly<Record<string, { role: string; label: string }>> =
   "experiment planner": { role: "experiment_planner", label: "Experiment Planner" },
   "qa": { role: "editorial_qa", label: "Editorial QA" },
   "night": { role: "night_scheduler", label: "NIGHT" },
+  "insightsrunner": { role: "insights_runner", label: "Insights Runner" },
+  "insights runner": { role: "insights_runner", label: "Insights Runner" },
+  "backup": { role: "backup", label: "Backup" },
+  "monitor": { role: "monitor", label: "Monitor" },
+  "projector": { role: "projector", label: "Projector" },
+  "notification transport": { role: "notification_transport", label: "Notification Transport" },
 });
 export const SYSTEM_CAPABILITY_ROLES = Object.freeze([
   ...new Set(Object.values(SYSTEM_ACTORS).map((entry) => entry.role)),
@@ -365,6 +428,20 @@ const ACCOUNT_PATTERN = /^acct_[A-Za-z0-9_-]{1,128}$/;
 const REF_PATTERN = /^(?:activity|artifact|content|cycle|experiment|metric|source):[A-Za-z0-9][A-Za-z0-9._:\/-]{0,499}$/;
 const ISO_PATTERN = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{1,6})?Z$/;
 const ACTION_PATTERN = /^[a-z][a-z0-9._:-]{0,159}$/;
+export const SYSTEM_ACTIVITY_ACTION_CODES = Object.freeze([
+  "baseline_cta_declared", "editorial_cycle_waiting", "editorial_experiment_decided",
+  "editorial_draft_ready", "editorial_cycle_approved", "experiment_observation_ready",
+  "experiment_evaluated", "experiment_inconclusive", "learning_outcome_recorded",
+  "next_experiment_selected", "experiment_completed", "insights_collected",
+  "writer_canary_pending", "human_approval", "safety_state", "workflow_checked", "correction",
+] as const);
+export const ACTIVITY_ACTION_CODES = Object.freeze([
+  ...new Set([
+    ...EMPLOYEE_ROLE_REGISTRY.flatMap((employee) => employee.allowed_actions),
+    ...SYSTEM_ACTIVITY_ACTION_CODES,
+  ]),
+]);
+const ACTIVITY_ACTION_CODE_SET = new Set<string>(ACTIVITY_ACTION_CODES);
 export const ACTIVITY_MESSAGE_CODES = Object.freeze([
   "evidence_verified",
   "source_verified",
@@ -384,6 +461,16 @@ export const ACTIVITY_MESSAGE_CODES = Object.freeze([
   "corrected_summary",
   "corrected_decision_summary",
   "different_result",
+  "stale_fact",
+  "offer_unapproved",
+  "hash_drift",
+  "status_missing",
+  "notify_suppressed",
+  "evidence_missing",
+  "scope_violation",
+  "human_gate_required",
+  "next_action_selected",
+  "hold_conflict",
 ] as const);
 const ACTIVITY_MESSAGE_CODE_SET = new Set<string>(ACTIVITY_MESSAGE_CODES);
 const MAX_EVIDENCE_REFS = 50;
@@ -438,7 +525,9 @@ function nullableSanitizedSummary(value: unknown, field: string): string | null 
 
 function actionCode(value: unknown): string {
   const action = requiredString(value, "action", 160);
-  if (!ACTION_PATTERN.test(action)) throw new Error("action must be a sanitized action code");
+  if (!ACTION_PATTERN.test(action) || !ACTIVITY_ACTION_CODE_SET.has(action)) {
+    throw new Error("action must be an approved action code");
+  }
   return action;
 }
 
@@ -512,6 +601,13 @@ export function createInternalActivity(input: unknown): InternalActivity {
   const accountId = requiredString(input.account_id, "account_id", 140);
   if (!ACCOUNT_PATTERN.test(accountId)) throw new Error("account_id is invalid");
   const actor = validateAgent(input.agent_id, input.agent_role);
+  const action = actionCode(input.action);
+  const employee = actor.agent_id === null
+    ? undefined
+    : EMPLOYEE_ROLE_REGISTRY.find((entry) => entry.agent_id === actor.agent_id);
+  if (employee && !(employee.allowed_actions as readonly string[]).includes(action)) {
+    throw new Error(`action is not allowed for ${employee.agent_id}`);
+  }
   if (!Array.isArray(input.evidence_refs)) throw new Error("evidence_refs must be an array");
   const evidenceRefs = [...new Set(input.evidence_refs.map((ref, index) => {
     const value = requiredString(ref, `evidence_refs[${index}]`, 520);
@@ -531,7 +627,7 @@ export function createInternalActivity(input: unknown): InternalActivity {
     agent_id: actor.agent_id,
     agent_role: actor.agent_role,
     account_id: accountId,
-    action: actionCode(input.action),
+    action,
     evidence_refs: Object.freeze(evidenceRefs),
     decision_status: oneOf(input.decision_status, "decision_status", ["not_applicable", "pending", "approved", "rejected", "blocked", "unknown"]),
     decision_summary: nullableSanitizedSummary(input.decision_summary, "decision_summary"),

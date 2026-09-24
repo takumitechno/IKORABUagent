@@ -6,23 +6,23 @@ AI SNS運用システムのためのローカルControl Planeです。Agentは�
 
 | Agent | 担当 |
 |---|---|
-| 指原 (`sashihara-orchestrator`) | 通常運用の統括 |
+| 指原 (`sashihara-orchestrator`) | Chief Operating Editor（次行動・優先度・担当・hold/stop・裁定） |
 | 衣織 (`iori-validator`) | Evidence検証 |
 | 舞香 (`maika-hypothesizer`) | 仮説・分析 |
-| 瞳 (`hitomi-selector`) | 戦略選定 |
-| 杏奈 (`anna-supervisor`) | システム監査・改善司令 |
-| 樹愛羅 (`kiara-executor`) | 承認済み改善の実行・検証・revert |
-| さなつん (`sanatsun-knowledge-editor`) | ドメイン知識・ブランド規則の編集 |
-| りさ (`risa-notifier`) | 通知判断 |
-| はな (`hana-heartbeat`) | 稼働・schedule監視 |
-| しょうこ (`shoko-reporter`) | 報告判断・要約 |
-| みりにゃ (`mirinya-cost-analyst`) | 使用量・コスト分析 |
+| 瞳 (`hitomi-selector`) | Offer & Strategy選定 |
+| 杏奈 (`anna-supervisor`) | 範囲限定・可逆な改善提案 |
+| 樹愛羅 (`kiara-executor`) | 承認済み完全一致artifactの実行境界（未稼働） |
+| さなつん (`sanatsun-knowledge-editor`) | 検証済み知識のversion・expiry・supersession管理 |
+| りさ (`risa-notifier`) | severity・recipient・dedupe・suppression・escalation判断 |
+| はな (`hana-heartbeat`) | expected vs observed reliability判定 |
+| しょうこ (`shoko-reporter`) | Research収集・provenance |
+| みりにゃ (`mirinya-cost-analyst`) | Revenue・Conversion・Cost・Margin・Unit Economics |
 
 ## Formal workflows
 
-通常運用: `指原 → 衣織 → 舞香 → 瞳 → approved Capability`
+通常運用: `しょうこ → 衣織 → 舞香 → 瞳 → Editorial Writer → system QA → Human`
 
-自己改善: `杏奈 → 樹愛羅 → test → apply / revert`
+自己改善: `杏奈 → Human approval → 樹愛羅 → 杏奈`。このpackageでは承認までで、樹愛羅の実行は未実装です。
 
 ドメイン知識: さなつん。横断4 Agent: りさ、はな、しょうこ、みりにゃ。新設4 Agentは対応Capabilityが確立するまで定期実行しません。
 
@@ -37,7 +37,7 @@ bash pokemon-agents/scripts/setup-demo.sh
 AGENTS_DB_PATH=.runtime/db/agents-demo.db bun pokemon-agents/web/server.ts
 ```
 
-`http://localhost:5733/` を開きます。ダッシュボードのAgent表示はDBの `agents` / `agent_edges` が正本です。既存schemaの `pokemon_slug` / `pokemon_jp` は互換性のため列名だけ保持しています。
+`http://localhost:5733/` を開きます。組織契約の正本は `pokemon-agents/web/lib/agent-role-registry.ts` です。identity MarkdownとDBは検証済み表現であり、独立した役割定義ではありません。既存schemaの `pokemon_slug` / `pokemon_jp` は互換性のため列名だけ保持しています。
 
 拓実本人用の内部運用画面は `http://localhost:5733/internal` です。Threadsの実値は
 `THREADS_BRIDGE_URL` の既存Bridge/APIだけから取得し、Bridge未接続時はデモ値に
@@ -56,7 +56,7 @@ production Bridge (`127.0.0.1:8000`) とdashboard (`127.0.0.1:5733`) が既に�
 `.runtime/db/agents-demo.db` が未作成ならschemaとseed資産から生成し、既存なら整合性を検証してそのまま使います。旧Bridge用の8765番は起動しません。
 
 通常のdashboard、scheduler、agent runtimeはこのruntime DBだけを既定で使用します。未作成なら起動時に生成し、既存DBは整合性と11 Agent seedを検証してそのまま利用します。破損やschema不整合があれば自動上書きせず停止します。tracked legacy DB（`.claude/db/agents.db` / `.claude/db/agents-demo.db`）を`AGENTS_DB_PATH`に指定した起動は拒否されます。
-runtime demoのscheduleは画面確認用で、Windows launcherから自動実行はしません。
+runtime demoのscheduleは画面確認用で、存在するだけでは実行されません。embedded schedulerは `POKEMON_AGENTS_SCHEDULER=on` の完全一致でのみ起動し、未設定・`off`・その他の値では停止したままです。このpackageはscheduleやemployee producerを有効化しません。
 状態確認だけを行う場合は次を実行します。
 
 ```powershell
