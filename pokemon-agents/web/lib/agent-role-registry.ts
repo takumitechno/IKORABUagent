@@ -138,9 +138,11 @@ export type EmployeeId = typeof EMPLOYEE_ROLE_REGISTRY[number]["agent_id"];
 /** Executable deterministic contracts. These lists create no schedule. */
 export const B1_DETERMINISTIC_EMPLOYEE_IDS = Object.freeze(["hana-heartbeat", "risa-notifier"] as const);
 export const B2A_DETERMINISTIC_EMPLOYEE_IDS = Object.freeze(["anna-supervisor", "kiara-executor"] as const);
+export const B2B_DETERMINISTIC_EMPLOYEE_IDS = Object.freeze(["mirinya-cost-analyst", "sashihara-orchestrator"] as const);
 export const DETERMINISTIC_EMPLOYEE_IDS = Object.freeze([
   ...B1_DETERMINISTIC_EMPLOYEE_IDS,
   ...B2A_DETERMINISTIC_EMPLOYEE_IDS,
+  ...B2B_DETERMINISTIC_EMPLOYEE_IDS,
 ] as const);
 
 const IDENTITY_SECTIONS = Object.freeze([

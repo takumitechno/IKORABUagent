@@ -6,6 +6,17 @@ cd "$(git rev-parse --show-toplevel)" 2>/dev/null || true
 REPO_ROOT="$(pwd)"
 source "$REPO_ROOT/scripts/lib/runtime-db.sh"
 
+# B2B mode accepts only a persisted Risa decision identity. The Bun capability
+# owns feature gating, trusted destination mapping, idempotency, and delivery ledger writes.
+if [ "${1:-}" = "--decision-run" ]; then
+  DECISION_RUN="${2:-}"
+  [ -n "$DECISION_RUN" ] || { echo "notify-discord: decision run is required" >&2; exit 1; }
+  shift 2
+  [ "${1:-}" = "--apply" ] || { echo "notify-discord: --apply is required for delivery" >&2; exit 1; }
+  [ $# -eq 1 ] || { echo "notify-discord: unknown option" >&2; exit 1; }
+  exec bun pokemon-agents/scripts/deliver-risa-notification.ts --decision-run "$DECISION_RUN" --apply
+fi
+
 if ! command -v jq &>/dev/null; then
   echo "notify-discord: jq is required" >&2
   exit 2

@@ -77,7 +77,7 @@ CREATE TABLE IF NOT EXISTS employee_run_packets (
   account_id TEXT NOT NULL REFERENCES agent_activity_accounts(account_id),
   task_ref TEXT NOT NULL,
   correlation_id TEXT NOT NULL,
-  implementation_type TEXT NOT NULL CHECK (implementation_type IN ('deterministic_hana','deterministic_risa','deterministic_anna_contract','deterministic_kiara')),
+  implementation_type TEXT NOT NULL CHECK (implementation_type IN ('deterministic_hana','deterministic_risa','deterministic_anna_contract','deterministic_kiara','deterministic_mirinya','deterministic_sashihara')),
   started_at TEXT NOT NULL,
   ended_at TEXT NOT NULL,
   input_packet_refs TEXT NOT NULL CHECK (json_valid(input_packet_refs) AND json_type(input_packet_refs)='array'),
@@ -109,7 +109,7 @@ END;
 CREATE TRIGGER IF NOT EXISTS employee_run_packets_canonical
 BEFORE INSERT ON employee_run_packets
 WHEN NOT (${deterministicEmployeePacketSql})
-  OR NEW.account_id <> 'acct_takumi_hq'
+  OR (NEW.agent_id IN ('hana-heartbeat','risa-notifier','anna-supervisor','kiara-executor') AND NEW.account_id <> 'acct_takumi_hq')
   OR NEW.correlation_id GLOB '${eightDigitsGlob}'
   OR NEW.task_ref NOT GLOB 'source:[A-Za-z0-9]*'
   OR NEW.task_ref GLOB '*[^A-Za-z0-9._:/-]*'
@@ -131,6 +131,8 @@ WHEN NOT (${deterministicEmployeePacketSql})
   OR (NEW.agent_id='risa-notifier' AND json_extract(NEW.output_packet, '$.schema_version') IS NOT 'risa-output.v1')
   OR (NEW.agent_id='anna-supervisor' AND json_extract(NEW.output_packet, '$.schema_version') IS NOT 'anna-proposal-output.v1')
   OR (NEW.agent_id='kiara-executor' AND json_extract(NEW.output_packet, '$.schema_version') IS NOT 'kiara-execution-output.v1')
+  OR (NEW.agent_id='mirinya-cost-analyst' AND json_extract(NEW.output_packet, '$.schema_version') IS NOT 'mirinya-economics-output.v1')
+  OR (NEW.agent_id='sashihara-orchestrator' AND json_extract(NEW.output_packet, '$.schema_version') IS NOT 'sashihara-next-action-output.v1')
 BEGIN
   SELECT RAISE(ABORT, 'employee run packet is not canonical or sanitized');
 END;
