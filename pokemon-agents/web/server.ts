@@ -60,6 +60,7 @@ import { sseHandler } from "./sse";
 import { ensureRuntimeDb, resolveAgentsDbPath } from "../runtime/db-path";
 import { assertAgentActivityLedgerSchema } from "./lib/agent-activity-ledger";
 import { assertThreadsActivityProjectorSchema } from "./lib/threads-activity-projector";
+import { readThreadsActivityProjectionStatus } from "./lib/threads-activity-consumer";
 
 function getBadges(db: Database): {
   approvals: number;
@@ -137,7 +138,9 @@ async function internalAccount(
 
 function tenantIdentityRequired(path: string): boolean {
   return path === "/" || path === "/improvement" || path === "/internal"
-    || path === "/api/internal/manual-policy" || path.startsWith("/api/customer/");
+    || path === "/api/internal/manual-policy"
+    || path === "/api/internal/threads-activity-projection"
+    || path.startsWith("/api/customer/");
 }
 
 function customerIdentityRequired(path: string): boolean {
@@ -645,6 +648,36 @@ const server = Bun.serve({
         return new Response(JSON.stringify(dashboardTenantShadowSnapshot()), {
           headers: { "Content-Type": "application/json" },
         });
+      }
+      if (path === "/api/internal/threads-activity-projection") {
+        const accountId = url.searchParams.get("account_id");
+        if (!accountId || !/^acct_[A-Za-z0-9_-]{1,128}$/.test(accountId)) {
+          return new Response(JSON.stringify({ error: "invalid_account_id" }), {
+            status: 400, headers: { "Content-Type": "application/json" },
+          });
+        }
+        // Reuse the internal account allowlist and return the same response for
+        // unknown and out-of-scope accounts to avoid an existence oracle.
+        if (!accountAllowed(accountId, INTERNAL_AUTH)) {
+          return new Response(JSON.stringify({ error: "not_found" }), {
+            status: 404, headers: { "Content-Type": "application/json" },
+          });
+        }
+        try {
+          const status = readThreadsActivityProjectionStatus(db, accountId);
+          if (!status) {
+            return new Response(JSON.stringify({ error: "not_found" }), {
+              status: 404, headers: { "Content-Type": "application/json" },
+            });
+          }
+          return new Response(JSON.stringify({ schema_version: 1, projection: status }), {
+            headers: { "Content-Type": "application/json", "Cache-Control": "no-store" },
+          });
+        } catch {
+          return new Response(JSON.stringify({ error: "projection_status_unavailable" }), {
+            status: 503, headers: { "Content-Type": "application/json", "Cache-Control": "no-store" },
+          });
+        }
       }
       // Live fragments (SSE 受信時に部分 swap で取得)
       if (path === "/api/fragments/heartbeat") {

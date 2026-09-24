@@ -45,6 +45,8 @@ describe("runtime demo DB regeneration", () => {
       expect(db.query<{ n: number }, []>("SELECT COUNT(*) n FROM sqlite_master WHERE type='table' AND name='threads_activity_projector_checkpoints'").get()!.n).toBe(1);
       expect(db.query<{ n: number }, [string]>("SELECT COUNT(*) n FROM schema_migrations WHERE version=?").get("20260924_threads_activity_projector_v1")!.n).toBe(1);
       expect(db.query<{ n: number }, []>("SELECT COUNT(*) n FROM threads_activity_projector_checkpoints").get()!.n).toBe(0);
+      expect(db.query<{ n: number }, []>("SELECT COUNT(*) n FROM sqlite_master WHERE type='table' AND name='threads_activity_projection_sources'").get()!.n).toBe(1);
+      expect(db.query<{ n: number }, []>("SELECT COUNT(*) n FROM threads_activity_projection_sources").get()!.n).toBe(0);
       expect(db.query<{ integrity_check: string }, []>("PRAGMA integrity_check").get()!.integrity_check).toBe("ok");
       db.close();
     }
