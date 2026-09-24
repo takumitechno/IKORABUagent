@@ -10,6 +10,11 @@ import {
   assertAgentActivityLedgerSchema,
   migrateAgentActivityLedger,
 } from "../web/lib/agent-activity-ledger";
+import {
+  IMPROVEMENT_EXECUTION_MIGRATION_ID,
+  assertImprovementExecutionSchema,
+  migrateImprovementExecution,
+} from "../web/lib/improvement-execution";
 
 if (!process.argv.includes("--apply")) {
   console.error("[org03] refused: pass --apply after tests and deployment approval");
@@ -66,7 +71,9 @@ try {
 
   const sha256 = createHash("sha256").update(readFileSync(backup)).digest("hex");
   const applied = migrateAgentActivityLedger(db);
+  const improvementApplied = migrateImprovementExecution(db);
   assertAgentActivityLedgerSchema(db);
+  assertImprovementExecutionSchema(db);
   const after = inspect(db);
   if (after.integrity !== "ok" || after.foreignKeys !== 0) {
     throw new Error(`source DB postflight failed: integrity=${after.integrity} foreign_keys=${after.foreignKeys}`);
@@ -75,6 +82,7 @@ try {
   console.log(`[org03] backup_sha256=${sha256}`);
   console.log(`[org03] backup_integrity=ok backup_foreign_keys=0`);
   console.log(`[org03] migration=${AGENT_ACTIVITY_LEDGER_MIGRATION_ID} applied=${applied}`);
+  console.log(`[b2a] migration=${IMPROVEMENT_EXECUTION_MIGRATION_ID} applied=${improvementApplied}`);
   console.log(`[org03] source_integrity=ok source_foreign_keys=0`);
 } catch (error) {
   console.error(`[org03] failed: ${error instanceof Error ? error.message : String(error)}`);

@@ -10,6 +10,7 @@ import {
 } from "node:fs";
 import { dirname, isAbsolute, relative, resolve, sep } from "node:path";
 import { migrateAgentActivityLedger } from "../web/lib/agent-activity-ledger";
+import { migrateImprovementExecution } from "../web/lib/improvement-execution";
 import { migrateThreadsActivityProjector } from "../web/lib/threads-activity-projector";
 import { migrateThreadsActivityConsumer } from "../web/lib/threads-activity-consumer";
 import { migrateDataProvenance } from "../web/lib/data-provenance";
@@ -65,6 +66,7 @@ try {
     schemaDb.exec(readFileSync(schemaPath, "utf8"));
     migrateDataProvenance(schemaDb);
     migrateAgentActivityLedger(schemaDb);
+    migrateImprovementExecution(schemaDb);
     migrateThreadsActivityProjector(schemaDb);
     migrateThreadsActivityConsumer(schemaDb);
   } finally {

@@ -44,8 +44,10 @@ describe("runtime demo DB regeneration", () => {
       }
       expect(db.query<{ n: number }, []>("SELECT COUNT(*) n FROM sqlite_master WHERE type='table' AND name='agent_activity_ledger'").get()!.n).toBe(1);
       expect(db.query<{ n: number }, []>("SELECT COUNT(*) n FROM sqlite_master WHERE type='table' AND name='employee_run_packets'").get()!.n).toBe(1);
+      expect(db.query<{ n: number }, []>("SELECT COUNT(*) n FROM sqlite_master WHERE type='table' AND name IN ('improvement_patch_artifacts','improvement_proposals','improvement_approval_requests','improvement_approval_decisions','improvement_execution_results')").get()!.n).toBe(5);
       expect(db.query<{ n: number }, []>("SELECT COUNT(*) n FROM sqlite_master WHERE type='trigger' AND name IN ('employee_run_packets_no_update','employee_run_packets_no_delete','employee_run_packets_canonical','agent_activity_ledger_no_update','agent_activity_ledger_no_delete','agent_activity_ledger_no_duplicate_insert','agent_activity_actor_canonical','agent_activity_message_codes','agent_activity_action_codes','agent_activity_employee_run_binding','agent_activity_payload_sanitized','agent_activity_correction_same_account')").get()!.n).toBe(12);
       expect(db.query<{ n: number }, [string, string, string, string]>("SELECT COUNT(*) n FROM schema_migrations WHERE version IN (?,?,?,?)").get("20260924_agent_activity_ledger_v1", "20260924_agent_activity_ledger_v2_message_codes", "20260924_agent_activity_ledger_v3_role_codes", "20260924_employee_run_packets_v1")!.n).toBe(4);
+      expect(db.query<{ n: number }, [string]>("SELECT COUNT(*) n FROM schema_migrations WHERE version=?").get("20260924_improvement_execution_v1")!.n).toBe(1);
       expect(db.query<{ n: number }, []>("SELECT COUNT(*) n FROM sqlite_master WHERE type='table' AND name='threads_activity_projector_checkpoints'").get()!.n).toBe(1);
       expect(db.query<{ n: number }, [string]>("SELECT COUNT(*) n FROM schema_migrations WHERE version=?").get("20260924_threads_activity_projector_v1")!.n).toBe(1);
       expect(db.query<{ n: number }, []>("SELECT COUNT(*) n FROM threads_activity_projector_checkpoints").get()!.n).toBe(0);

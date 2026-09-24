@@ -135,8 +135,13 @@ export const EMPLOYEE_ROLE_REGISTRY = deepFreeze([
 ] as const satisfies readonly EmployeeRoleContract[]);
 
 export type EmployeeId = typeof EMPLOYEE_ROLE_REGISTRY[number]["agent_id"];
-/** B1's only executable deterministic contracts. This list creates no schedule. */
-export const DETERMINISTIC_EMPLOYEE_IDS = Object.freeze(["hana-heartbeat", "risa-notifier"] as const);
+/** Executable deterministic contracts. These lists create no schedule. */
+export const B1_DETERMINISTIC_EMPLOYEE_IDS = Object.freeze(["hana-heartbeat", "risa-notifier"] as const);
+export const B2A_DETERMINISTIC_EMPLOYEE_IDS = Object.freeze(["anna-supervisor", "kiara-executor"] as const);
+export const DETERMINISTIC_EMPLOYEE_IDS = Object.freeze([
+  ...B1_DETERMINISTIC_EMPLOYEE_IDS,
+  ...B2A_DETERMINISTIC_EMPLOYEE_IDS,
+] as const);
 
 const IDENTITY_SECTIONS = Object.freeze([
   "ROLE", "MISSION", "OWNS", "DOES NOT OWN", "INPUTS", "SOURCE OF TRUTH",

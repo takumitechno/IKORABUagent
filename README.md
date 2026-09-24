@@ -22,7 +22,7 @@ AI SNS運用システムのためのローカルControl Planeです。Agentは�
 
 通常運用: `しょうこ → 衣織 → 舞香 → 瞳 → Editorial Writer → system QA → Human`
 
-自己改善: `杏奈 → Human approval → 樹愛羅 → 杏奈`。このpackageでは承認までで、樹愛羅の実行は未実装です。
+自己改善: `杏奈 proposal → Human approval → 樹愛羅 exact patch execution → 杏奈`。承認は記録だけで、対象ファイルを変更しません。樹愛羅は clean な linked worktree で、承認済み byte 列と allowlist 済みテストだけを実行し、commit・merge・push は行いません。
 
 ドメイン知識: さなつん。横断4 Agent: りさ、はな、しょうこ、みりにゃ。新設4 Agentは対応Capabilityが確立するまで定期実行しません。
 

@@ -22,7 +22,7 @@ Agentは「何を・いつ・なぜ」を決め、Capabilityは「どう実行�
 1. 杏奈がEvidenceから範囲限定・可逆な改善案を作る。
 2. target、base hash、artifact hash、test、revert条件を人間承認へ渡す。
 3. 承認はbindingを記録するだけで、対象ファイルを変更しない。
-4. 樹愛羅の実行契約は将来packageで実装する。
+4. 樹愛羅は承認済み proposal/base/patch/test binding を再検証し、clean な linked worktree に exact patch だけを適用する。失敗時は元の clean state に戻し、commit・merge・push は行わない。
 
 提案者と実行者を分離し、credential、公開、不可逆操作は自動適用しません。
 

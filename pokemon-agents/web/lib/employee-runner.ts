@@ -1,10 +1,10 @@
 import { createHash } from "node:crypto";
 import type { Database } from "bun:sqlite";
 import { appendActivity, appendEmployeeActivity, type LedgerActivity } from "./agent-activity-ledger";
-import { DETERMINISTIC_EMPLOYEE_IDS, EMPLOYEE_ROLE_REGISTRY, type DecisionStatus, type InternalActivityInput, type ResultStatus } from "./agent-role-registry";
+import { B1_DETERMINISTIC_EMPLOYEE_IDS, EMPLOYEE_ROLE_REGISTRY, type DecisionStatus, type InternalActivityInput, type ResultStatus } from "./agent-role-registry";
 
 export const EMPLOYEE_RUN_SCHEMA_VERSION = "employee-run.v1" as const;
-export const B1_EMPLOYEE_IDS = DETERMINISTIC_EMPLOYEE_IDS;
+export const B1_EMPLOYEE_IDS = B1_DETERMINISTIC_EMPLOYEE_IDS;
 export const INTERNAL_HQ_SCOPE = "acct_takumi_hq" as const;
 
 const ID = /^[A-Za-z0-9][A-Za-z0-9._:-]{0,199}$/;

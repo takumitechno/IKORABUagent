@@ -77,7 +77,7 @@ CREATE TABLE IF NOT EXISTS employee_run_packets (
   account_id TEXT NOT NULL REFERENCES agent_activity_accounts(account_id),
   task_ref TEXT NOT NULL,
   correlation_id TEXT NOT NULL,
-  implementation_type TEXT NOT NULL CHECK (implementation_type IN ('deterministic_hana','deterministic_risa')),
+  implementation_type TEXT NOT NULL CHECK (implementation_type IN ('deterministic_hana','deterministic_risa','deterministic_anna_contract','deterministic_kiara')),
   started_at TEXT NOT NULL,
   ended_at TEXT NOT NULL,
   input_packet_refs TEXT NOT NULL CHECK (json_valid(input_packet_refs) AND json_type(input_packet_refs)='array'),
@@ -129,6 +129,8 @@ WHEN NOT (${deterministicEmployeePacketSql})
   OR (NEW.agent_id='hana-heartbeat' AND json_extract(NEW.output_packet, '$.scope') IS NOT NEW.account_id)
   OR (NEW.agent_id='hana-heartbeat' AND json_extract(NEW.output_packet, '$.schema_version') IS NOT 'hana-output.v1')
   OR (NEW.agent_id='risa-notifier' AND json_extract(NEW.output_packet, '$.schema_version') IS NOT 'risa-output.v1')
+  OR (NEW.agent_id='anna-supervisor' AND json_extract(NEW.output_packet, '$.schema_version') IS NOT 'anna-proposal-output.v1')
+  OR (NEW.agent_id='kiara-executor' AND json_extract(NEW.output_packet, '$.schema_version') IS NOT 'kiara-execution-output.v1')
 BEGIN
   SELECT RAISE(ABORT, 'employee run packet is not canonical or sanitized');
 END;
