@@ -20,6 +20,8 @@ export function fetchReflectionsSince(db: Database, sinceId: number, limit: numb
     `SELECT r.id, r.agent_slug, NULL AS pokemon_jp, NULL AS avatar_url, NULL AS role_label,
             r.status, r.what_done, r.result_summary, r.error_message, r.created_at
      FROM reflections r WHERE r.id > ${Number(sinceId) || 0}
+       AND (r.session_id IS NULL OR r.session_id NOT LIKE 'demo-%')
+       AND (r.work_dir IS NULL OR r.work_dir <> '/demo')
      ORDER BY r.id DESC LIMIT ${Math.max(1, Math.min(100, Number(limit) || 30))}`,
   ).all();
 }

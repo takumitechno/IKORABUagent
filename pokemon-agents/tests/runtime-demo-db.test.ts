@@ -37,8 +37,11 @@ describe("runtime demo DB regeneration", () => {
       const db = new Database(output, { readonly: true });
       expect(db.query<{ n: number }, []>("SELECT COUNT(*) n FROM agents WHERE status='active'").get()!.n).toBe(11);
       expect(db.query<{ n: number }, []>("SELECT COUNT(*) n FROM agent_edges").get()!.n).toBe(11);
-      expect(db.query<{ n: number }, []>("SELECT COUNT(*) n FROM agent_schedules WHERE enabled=1").get()!.n).toBe(3);
-      expect(db.query<{ n: number }, []>("SELECT COUNT(*) n FROM approvals WHERE status='pending'").get()!.n).toBeGreaterThan(0);
+      expect(db.query<{ n: number }, []>("SELECT COUNT(*) n FROM agent_schedules WHERE data_origin='demo' AND enabled=1").get()!.n).toBe(3);
+      expect(db.query<{ n: number }, []>("SELECT COUNT(*) n FROM approvals WHERE data_origin='demo' AND status='pending'").get()!.n).toBeGreaterThan(0);
+      for (const table of ["hypotheses", "improvements", "approvals", "agent_costs", "agent_schedules", "daily_reports"]) {
+        expect(db.query<{ n: number }, []>(`SELECT COUNT(*) n FROM ${table} WHERE data_origin<>'demo'`).get()!.n).toBe(0);
+      }
       expect(db.query<{ n: number }, []>("SELECT COUNT(*) n FROM sqlite_master WHERE type='table' AND name='agent_activity_ledger'").get()!.n).toBe(1);
       expect(db.query<{ n: number }, []>("SELECT COUNT(*) n FROM sqlite_master WHERE type='trigger' AND name IN ('agent_activity_ledger_no_update','agent_activity_ledger_no_delete','agent_activity_ledger_no_duplicate_insert','agent_activity_actor_canonical','agent_activity_message_codes','agent_activity_payload_sanitized')").get()!.n).toBe(6);
       expect(db.query<{ n: number }, [string, string]>("SELECT COUNT(*) n FROM schema_migrations WHERE version IN (?,?)").get("20260924_agent_activity_ledger_v1", "20260924_agent_activity_ledger_v2_message_codes")!.n).toBe(2);

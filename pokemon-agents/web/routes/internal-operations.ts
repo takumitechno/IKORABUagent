@@ -171,9 +171,11 @@ function agents(db: Database): AgentOpsRow[] {
        AND i.status IN ('todo','in_progress','in_review','blocked')
        ORDER BY CASE i.status WHEN 'blocked' THEN 0 WHEN 'in_progress' THEN 1 ELSE 2 END,
        i.priority,i.updated_at DESC LIMIT 1) AS current_task_status,
-      (SELECT r.status FROM reflections r WHERE r.agent_id=a.id OR r.agent_slug=a.slug
+      (SELECT r.status FROM reflections r WHERE (r.agent_id=a.id OR r.agent_slug=a.slug)
+       AND (r.session_id IS NULL OR r.session_id NOT LIKE 'demo-%') AND (r.work_dir IS NULL OR r.work_dir <> '/demo')
        ORDER BY r.created_at DESC LIMIT 1) AS last_status,
-      (SELECT r.created_at FROM reflections r WHERE r.agent_id=a.id OR r.agent_slug=a.slug
+      (SELECT r.created_at FROM reflections r WHERE (r.agent_id=a.id OR r.agent_slug=a.slug)
+       AND (r.session_id IS NULL OR r.session_id NOT LIKE 'demo-%') AND (r.work_dir IS NULL OR r.work_dir <> '/demo')
        ORDER BY r.created_at DESC LIMIT 1) AS last_at
     FROM agents a ORDER BY CASE a.role WHEN 'orchestrator' THEN 0 WHEN 'supervisor' THEN 1 ELSE 2 END,a.id
   `).all();

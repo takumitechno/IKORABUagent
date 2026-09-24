@@ -66,7 +66,7 @@ export function startScheduler(opts: { db: Database; repoRoot: string }) {
       .query<DueSchedule, [string]>(
         `SELECT id, agent_id, interval_sec, cron_expr, payload_template
          FROM agent_schedules
-         WHERE enabled=1 AND trigger_type='timer' AND next_run_at <= ?
+         WHERE data_origin='production' AND enabled=1 AND trigger_type='timer' AND next_run_at <= ?
          LIMIT 32`,
       )
       .all(now);
@@ -85,7 +85,7 @@ export function startScheduler(opts: { db: Database; repoRoot: string }) {
 
       const next = computeNext(sched.interval_sec, sched.cron_expr);
       db.run(
-        `UPDATE agent_schedules SET last_fired_at=?, next_run_at=?, updated_at=? WHERE id=?`,
+        `UPDATE agent_schedules SET last_fired_at=?, next_run_at=?, updated_at=? WHERE id=? AND data_origin='production'`,
         [now, next, now, sched.id],
       );
 
@@ -100,7 +100,7 @@ export function startScheduler(opts: { db: Database; repoRoot: string }) {
       .query<DueSchedule, [string]>(
         `SELECT id, agent_id, interval_sec, cron_expr, payload_template
          FROM agent_schedules
-         WHERE enabled=1 AND trigger_type='automation' AND next_run_at IS NOT NULL AND next_run_at <= ?
+         WHERE data_origin='production' AND enabled=1 AND trigger_type='automation' AND next_run_at IS NOT NULL AND next_run_at <= ?
          LIMIT 32`,
       )
       .all(now);
@@ -117,7 +117,7 @@ export function startScheduler(opts: { db: Database; repoRoot: string }) {
       if (!result) continue;
 
       db.run(
-        `UPDATE agent_schedules SET last_fired_at=?, next_run_at=NULL, updated_at=? WHERE id=?`,
+        `UPDATE agent_schedules SET last_fired_at=?, next_run_at=NULL, updated_at=? WHERE id=? AND data_origin='production'`,
         [now, now, sched.id],
       );
 

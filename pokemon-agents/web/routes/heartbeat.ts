@@ -15,7 +15,8 @@ export function renderHeartbeat(db: Database): string {
     >(
       `SELECT t.id, a.slug as agent_slug, a.pokemon_jp, t.trigger, t.started_at
        FROM reflections t JOIN agents a ON a.id=t.agent_id
-       WHERE t.status='running' ORDER BY t.started_at ASC`,
+       WHERE t.status='running' AND (t.session_id IS NULL OR t.session_id NOT LIKE 'demo-%')
+         AND (t.work_dir IS NULL OR t.work_dir <> '/demo') ORDER BY t.started_at ASC`,
     )
     .all();
 
@@ -32,7 +33,7 @@ export function renderHeartbeat(db: Database): string {
     >(
       `SELECT a.slug as agent_slug, a.pokemon_jp, s.trigger_type, s.next_run_at, s.enabled
        FROM agent_schedules s JOIN agents a ON a.id=s.agent_id
-       WHERE s.enabled=1 AND s.next_run_at IS NOT NULL
+       WHERE s.data_origin='production' AND s.enabled=1 AND s.next_run_at IS NOT NULL
        ORDER BY s.next_run_at ASC LIMIT 20`,
     )
     .all();
@@ -55,6 +56,8 @@ export function renderHeartbeat(db: Database): string {
               t.duration_ms, t.cost_usd, t.ended_at, t.error_message
        FROM reflections t JOIN agents a ON a.id=t.agent_id
        WHERE t.status != 'running' AND t.status != 'queued'
+         AND (t.session_id IS NULL OR t.session_id NOT LIKE 'demo-%')
+         AND (t.work_dir IS NULL OR t.work_dir <> '/demo')
        ORDER BY t.id DESC LIMIT 20`,
     )
     .all();

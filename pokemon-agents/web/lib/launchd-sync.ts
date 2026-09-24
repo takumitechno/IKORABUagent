@@ -48,13 +48,13 @@ export function syncLaunchdToDb(db: Database): { scanned: number; synced: number
   const slugToId = new Map(agents.map((a) => [a.slug, a.id]));
 
   // 既存の launchd 由来スケジュールを一旦削除 (plist SSOT で rebuild)
-  db.run(`DELETE FROM agent_schedules WHERE payload_template LIKE '%launchd%'`);
+  db.run(`DELETE FROM agent_schedules WHERE data_origin='production' AND payload_template LIKE '%launchd%'`);
 
   let synced = 0;
   let skipped = 0;
   const upsert = db.prepare(`
-    INSERT INTO agent_schedules (agent_id, trigger_type, interval_sec, cron_expr, enabled, payload_template, created_at, updated_at)
-    VALUES (?, 'timer', ?, ?, ?, ?, datetime('now','localtime'), datetime('now','localtime'))
+    INSERT INTO agent_schedules (agent_id, trigger_type, interval_sec, cron_expr, enabled, payload_template, created_at, updated_at, data_origin)
+    VALUES (?, 'timer', ?, ?, ?, ?, datetime('now','localtime'), datetime('now','localtime'), 'production')
   `);
 
   for (const file of plistFiles) {

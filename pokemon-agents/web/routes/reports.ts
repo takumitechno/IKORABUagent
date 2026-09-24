@@ -18,7 +18,7 @@ export function renderReports(db: Database, params: URLSearchParams): string {
   const rows = db
     .query<ReportRow, []>(
       `SELECT date, prompt_count, event_count, reflection_count, cost_usd, agents_used, summary_md, created_at
-       FROM daily_reports ORDER BY date DESC LIMIT 60`,
+       FROM daily_reports WHERE data_origin='production' ORDER BY date DESC LIMIT 60`,
     )
     .all();
 

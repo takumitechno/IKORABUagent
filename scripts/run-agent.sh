@@ -183,8 +183,8 @@ try:
     conn = sqlite3.connect(os.environ["AGENTS_DB_PATH"])
     conn.execute(
         """INSERT INTO agent_costs (agent, cost_usd, input_tokens, output_tokens,
-             cache_read_tokens, cache_creation_tokens, duration_ms, num_turns)
-           VALUES (?, ?, ?, ?, ?, ?, ?, ?)""",
+             cache_read_tokens, cache_creation_tokens, duration_ms, num_turns, data_origin)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'production')""",
         (agent, cost, input_tokens, output_tokens, cache_read, cache_create, duration, num_turns),
     )
 

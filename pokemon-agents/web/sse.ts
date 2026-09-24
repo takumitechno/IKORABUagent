@@ -29,18 +29,21 @@ function computeHash(db: Database): string {
               SUM(CASE WHEN status='running' THEN 1 ELSE 0 END) as running,
               SUM(CASE WHEN status='queued' THEN 1 ELSE 0 END) as queued,
               SUM(CASE WHEN status IN ('failed','timeout') THEN 1 ELSE 0 END) as failed
-       FROM reflections`,
+       FROM reflections
+       WHERE (session_id IS NULL OR session_id NOT LIKE 'demo-%')
+         AND (work_dir IS NULL OR work_dir <> '/demo')`,
     )
     .get() as { c: number; max_id: number | null; running: number; queued: number; failed: number } | null;
   const r2 = db
     .query<{ c: number; max_id: number | null }, []>(
-      `SELECT COUNT(*) as c, MAX(id) as max_id FROM approvals WHERE status='pending'`,
+      `SELECT COUNT(*) as c, MAX(id) as max_id FROM approvals WHERE data_origin='production' AND status='pending'`,
     )
     .get() as { c: number; max_id: number | null } | null;
   // 既存 agents.db の events も監視対象に (Claude Code hooks が書く)
   const r3 = db
     .query<{ c: number; max_id: number | null }, []>(
-      `SELECT COUNT(*) as c, MAX(id) as max_id FROM logs`,
+      `SELECT COUNT(*) as c, MAX(id) as max_id FROM logs
+       WHERE session_id IS NULL OR session_id NOT LIKE 'demo-%'`,
     )
     .get() as { c: number; max_id: number | null } | null;
   return [

@@ -56,7 +56,7 @@ function approveAndApply(db: Database, approvalId: number): { ok: boolean; error
         body: string | null;
       },
       [number]
-    >(`SELECT id, entity_type, entity_id, diff_text, body FROM approvals WHERE id=? AND status='pending'`)
+    >(`SELECT id, entity_type, entity_id, diff_text, body FROM approvals WHERE id=? AND data_origin='production' AND status='pending'`)
     .get(approvalId);
 
   if (!approval) return { ok: false, error: "approval not found or already processed" };
@@ -123,7 +123,8 @@ function approveAndApply(db: Database, approvalId: number): { ok: boolean; error
 
     db.run(
       `UPDATE approvals SET status='applied', reviewed_by=?, reviewed_at=datetime('now','localtime'),
-         applied_at=datetime('now','localtime'), updated_at=datetime('now','localtime') WHERE id=?`,
+         applied_at=datetime('now','localtime'), updated_at=datetime('now','localtime')
+       WHERE id=? AND data_origin='production' AND status='pending'`,
       [REVIEWER, approvalId],
     );
 
@@ -137,7 +138,7 @@ function reject(db: Database, approvalId: number): { ok: boolean; error?: string
   const result = db.run(
     `UPDATE approvals SET status='rejected', reviewed_by=?, reviewed_at=datetime('now','localtime'),
        rejection_reason='rejected by reviewer', updated_at=datetime('now','localtime')
-     WHERE id=? AND status='pending'`,
+     WHERE id=? AND data_origin='production' AND status='pending'`,
     [REVIEWER, approvalId],
   );
   if (result.changes === 0) return { ok: false, error: "approval not found or already processed" };

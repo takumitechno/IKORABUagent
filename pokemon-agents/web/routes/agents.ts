@@ -293,7 +293,7 @@ interface TimelineRow {
 function renderScheduleTimeline(db: Database, agents: AgentRow[]): string {
   const schedules = db
     .query<ScheduleRow, []>(
-      `SELECT id, agent_id, trigger_type, interval_sec, cron_expr, next_run_at, last_fired_at, enabled FROM agent_schedules`,
+      `SELECT id, agent_id, trigger_type, interval_sec, cron_expr, next_run_at, last_fired_at, enabled FROM agent_schedules WHERE data_origin='production'`,
     )
     .all();
 
@@ -814,6 +814,7 @@ function renderListTable(db: Database, agents: AgentRow[], params?: URLSearchPar
         COALESCE(SUM(duration_ms),0) AS dur
        FROM reflections
        WHERE date(created_at,'localtime') >= date('now','-1 day','localtime')
+         AND (session_id IS NULL OR session_id NOT LIKE 'demo-%') AND (work_dir IS NULL OR work_dir <> '/demo')
        GROUP BY window`,
     )
     .all();
@@ -846,6 +847,7 @@ function renderListTable(db: Database, agents: AgentRow[], params?: URLSearchPar
               COALESCE(SUM(duration_ms),0) AS dur
        FROM reflections
        WHERE date(created_at,'localtime') >= date('now','-6 days','localtime')
+         AND (session_id IS NULL OR session_id NOT LIKE 'demo-%') AND (work_dir IS NULL OR work_dir <> '/demo')
        GROUP BY day ORDER BY day ASC`,
     )
     .all();
@@ -853,7 +855,7 @@ function renderListTable(db: Database, agents: AgentRow[], params?: URLSearchPar
   // ===== Schedules =====
   const schedules = db
     .query<ScheduleRow, []>(
-      `SELECT id, agent_id, trigger_type, interval_sec, cron_expr, next_run_at, last_fired_at, enabled FROM agent_schedules`,
+      `SELECT id, agent_id, trigger_type, interval_sec, cron_expr, next_run_at, last_fired_at, enabled FROM agent_schedules WHERE data_origin='production'`,
     )
     .all();
 
@@ -867,7 +869,7 @@ function renderListTable(db: Database, agents: AgentRow[], params?: URLSearchPar
   const lastFireRows = db
     .query<{ agent_id: number; last_at: string }, []>(
       `SELECT agent_id, MAX(created_at) AS last_at FROM reflections
-       WHERE agent_id IS NOT NULL GROUP BY agent_id`,
+       WHERE agent_id IS NOT NULL AND (session_id IS NULL OR session_id NOT LIKE 'demo-%') AND (work_dir IS NULL OR work_dir <> '/demo') GROUP BY agent_id`,
     )
     .all();
   const lastFireByAgent = new Map(lastFireRows.map((r) => [r.agent_id, r.last_at]));

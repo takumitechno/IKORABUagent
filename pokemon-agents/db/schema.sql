@@ -30,7 +30,8 @@ CREATE TABLE IF NOT EXISTS "agent_costs" (
     cache_creation_tokens INTEGER DEFAULT 0,
     duration_ms INTEGER DEFAULT 0,
     num_turns INTEGER DEFAULT 0,
-    created_at TEXT DEFAULT (datetime('now', 'localtime'))
+    created_at TEXT DEFAULT (datetime('now', 'localtime')),
+    data_origin TEXT NOT NULL DEFAULT 'legacy_unknown' CHECK (data_origin IN ('production','demo','legacy_unknown'))
 );
 CREATE TABLE IF NOT EXISTS "logs" (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -142,7 +143,8 @@ CREATE TABLE agent_schedules (
   enabled INTEGER DEFAULT 1,
   payload_template TEXT DEFAULT '{}',
   created_at TEXT DEFAULT (datetime('now','localtime')),
-  updated_at TEXT DEFAULT (datetime('now','localtime'))
+  updated_at TEXT DEFAULT (datetime('now','localtime')),
+  data_origin TEXT NOT NULL DEFAULT 'legacy_unknown' CHECK (data_origin IN ('production','demo','legacy_unknown'))
 );
 CREATE TABLE issues (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -182,7 +184,8 @@ CREATE TABLE approvals (
   rejection_reason TEXT,
   expires_at TEXT,
   created_at TEXT DEFAULT (datetime('now','localtime')),
-  updated_at TEXT DEFAULT (datetime('now','localtime'))
+  updated_at TEXT DEFAULT (datetime('now','localtime')),
+  data_origin TEXT NOT NULL DEFAULT 'legacy_unknown' CHECK (data_origin IN ('production','demo','legacy_unknown'))
 );
 CREATE TABLE agent_budgets (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -272,7 +275,8 @@ CREATE TABLE hypotheses (
   -- 実行者
   executor_agent TEXT,
   started_at TEXT,
-  ended_at TEXT
+  ended_at TEXT,
+  data_origin TEXT NOT NULL DEFAULT 'legacy_unknown' CHECK (data_origin IN ('production','demo','legacy_unknown'))
 );
 CREATE TABLE knowledge_index (
   path TEXT PRIMARY KEY,
@@ -311,7 +315,8 @@ CREATE TABLE improvements (
   target_agent TEXT,                           -- 例: abra-seo-report
   executor_agent TEXT,                         -- 実行担当 (通常はミューツー)
   started_at TEXT,
-  ended_at TEXT
+  ended_at TEXT,
+  data_origin TEXT NOT NULL DEFAULT 'legacy_unknown' CHECK (data_origin IN ('production','demo','legacy_unknown'))
 );
 CREATE TABLE daily_reports (
   date TEXT PRIMARY KEY,                 -- 'YYYY-MM-DD'
@@ -321,7 +326,8 @@ CREATE TABLE daily_reports (
   reflection_count INTEGER DEFAULT 0,
   cost_usd REAL DEFAULT 0,
   agents_used TEXT,
-  created_at TEXT DEFAULT (datetime('now','localtime'))
+  created_at TEXT DEFAULT (datetime('now','localtime')),
+  data_origin TEXT NOT NULL DEFAULT 'legacy_unknown' CHECK (data_origin IN ('production','demo','legacy_unknown'))
 );
 CREATE INDEX idx_agent_costs_created ON agent_costs(created_at);
 CREATE INDEX idx_knowledge_kind ON knowledge(kind);

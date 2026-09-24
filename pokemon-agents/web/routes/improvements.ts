@@ -59,11 +59,11 @@ export function renderImprovements(db: Database, params: URLSearchParams): strin
       : "all";
 
   const cnts = {
-    all: q1(db, `SELECT COUNT(*) FROM improvements`),
-    pending: q1(db, `SELECT COUNT(*) FROM improvements WHERE status='pending_review'`),
-    running: q1(db, `SELECT COUNT(*) FROM improvements WHERE status='running'`),
-    won: q1(db, `SELECT COUNT(*) FROM improvements WHERE status='validated'`),
-    lost: q1(db, `SELECT COUNT(*) FROM improvements WHERE status='falsified'`),
+    all: q1(db, `SELECT COUNT(*) FROM improvements WHERE data_origin='production'`),
+    pending: q1(db, `SELECT COUNT(*) FROM improvements WHERE data_origin='production' AND status='pending_review'`),
+    running: q1(db, `SELECT COUNT(*) FROM improvements WHERE data_origin='production' AND status='running'`),
+    won: q1(db, `SELECT COUNT(*) FROM improvements WHERE data_origin='production' AND status='validated'`),
+    lost: q1(db, `SELECT COUNT(*) FROM improvements WHERE data_origin='production' AND status='falsified'`),
   };
 
   const tabLinks = [
@@ -89,7 +89,7 @@ export function renderImprovements(db: Database, params: URLSearchParams): strin
     </div>
   </div>`;
 
-  const where = tab === "all" ? "" : `WHERE i.status = '${tab}'`;
+  const where = tab === "all" ? "WHERE i.data_origin='production'" : `WHERE i.data_origin='production' AND i.status = '${tab}'`;
   const rows = db
     .query<Improvement, []>(
       `SELECT i.*,

@@ -49,7 +49,7 @@ export function renderReflections(db: Database, params: URLSearchParams): string
   const minScore = params.get("min_score");
   const onlyWithRefl = params.get("only_refl") === "1";
 
-  const where: string[] = [];
+  const where: string[] = ["(r.session_id IS NULL OR r.session_id NOT LIKE 'demo-%')", "(r.work_dir IS NULL OR r.work_dir <> '/demo')"];
   const args: unknown[] = [];
   if (agentFilter) {
     where.push("r.agent_slug = ?");
@@ -92,7 +92,7 @@ export function renderReflections(db: Database, params: URLSearchParams): string
 
   const stats = db
     .query<{ total: number; refl: number }, []>(
-      `SELECT COUNT(*) as total, SUM(CASE WHEN self_score IS NOT NULL THEN 1 ELSE 0 END) as refl FROM reflections`,
+      `SELECT COUNT(*) as total, SUM(CASE WHEN self_score IS NOT NULL THEN 1 ELSE 0 END) as refl FROM reflections WHERE (session_id IS NULL OR session_id NOT LIKE 'demo-%') AND (work_dir IS NULL OR work_dir <> '/demo')`,
     )
     .get() as { total: number; refl: number } | null;
 
@@ -101,13 +101,14 @@ export function renderReflections(db: Database, params: URLSearchParams): string
       `SELECT r.agent_slug, COUNT(*) as c, a.pokemon_jp
        FROM reflections r
        LEFT JOIN agents a ON a.slug = r.agent_slug OR a.pokemon_slug = r.agent_slug
+       WHERE (r.session_id IS NULL OR r.session_id NOT LIKE 'demo-%') AND (r.work_dir IS NULL OR r.work_dir <> '/demo')
        GROUP BY r.agent_slug ORDER BY c DESC LIMIT 30`,
     )
     .all();
 
   const statusList = db
     .query<{ status: string; c: number }, []>(
-      `SELECT status, COUNT(*) as c FROM reflections GROUP BY status ORDER BY c DESC LIMIT 15`,
+      `SELECT status, COUNT(*) as c FROM reflections WHERE (session_id IS NULL OR session_id NOT LIKE 'demo-%') AND (work_dir IS NULL OR work_dir <> '/demo') GROUP BY status ORDER BY c DESC LIMIT 15`,
     )
     .all();
 

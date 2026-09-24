@@ -12,6 +12,7 @@ import { dirname, isAbsolute, relative, resolve, sep } from "node:path";
 import { migrateAgentActivityLedger } from "../web/lib/agent-activity-ledger";
 import { migrateThreadsActivityProjector } from "../web/lib/threads-activity-projector";
 import { migrateThreadsActivityConsumer } from "../web/lib/threads-activity-consumer";
+import { migrateDataProvenance } from "../web/lib/data-provenance";
 
 const root = resolve(import.meta.dir, "..", "..");
 const runtimeRoot = resolve(root, ".runtime");
@@ -62,6 +63,7 @@ try {
   try {
     schemaDb.exec("PRAGMA foreign_keys=ON");
     schemaDb.exec(readFileSync(schemaPath, "utf8"));
+    migrateDataProvenance(schemaDb);
     migrateAgentActivityLedger(schemaDb);
     migrateThreadsActivityProjector(schemaDb);
     migrateThreadsActivityConsumer(schemaDb);
@@ -79,8 +81,8 @@ try {
     const integrity = verifyDb.query<{ integrity_check: string }, []>("PRAGMA integrity_check").get();
     const activeAgents = scalar("SELECT COUNT(*) FROM agents WHERE status='active'");
     const edges = scalar("SELECT COUNT(*) FROM agent_edges");
-    const schedules = scalar("SELECT COUNT(*) FROM agent_schedules WHERE enabled=1");
-    const approvals = scalar("SELECT COUNT(*) FROM approvals WHERE status='pending'");
+    const schedules = scalar("SELECT COUNT(*) FROM agent_schedules WHERE data_origin='demo' AND enabled=1");
+    const approvals = scalar("SELECT COUNT(*) FROM approvals WHERE data_origin='demo' AND status='pending'");
     if (integrity?.integrity_check !== "ok") throw new Error("SQLite integrity_check failed");
     if (activeAgents !== 11) throw new Error(`expected 11 active agents, found ${activeAgents}`);
     if (edges !== 11) throw new Error(`expected 11 agent edges, found ${edges}`);

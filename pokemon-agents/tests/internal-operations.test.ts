@@ -24,7 +24,7 @@ function agentDb(): Database {
   db.exec(`
     CREATE TABLE agents (id INTEGER PRIMARY KEY, display_name TEXT, pokemon_jp TEXT, avatar_url TEXT, slug TEXT, role_label TEXT, role TEXT, status TEXT);
     CREATE TABLE issues (id INTEGER PRIMARY KEY, assignee_agent_id INTEGER, title TEXT, status TEXT, priority INTEGER, updated_at TEXT);
-    CREATE TABLE reflections (id INTEGER PRIMARY KEY, agent_id INTEGER, agent_slug TEXT, status TEXT, created_at TEXT);
+    CREATE TABLE reflections (id INTEGER PRIMARY KEY, agent_id INTEGER, agent_slug TEXT, status TEXT, created_at TEXT, session_id TEXT, work_dir TEXT);
     INSERT INTO agents VALUES
       (1,'指原 (sashihara-orchestrator)','指原',NULL,'sashihara-orchestrator','総監督','orchestrator','active'),
       (2,'衣織 (iori-validator)','衣織',NULL,'iori-validator','Evidence検証','validator','active'),
@@ -39,7 +39,8 @@ function agentDb(): Database {
       (11,'さなつん (sanatsun-knowledge-editor)','さなつん',NULL,'sanatsun-knowledge-editor','知識編集','worker','active');
     INSERT INTO issues VALUES (1,1,'Bridge接続を確認','in_progress',1,'2026-09-21T00:00:00Z');
     INSERT INTO issues VALUES (2,2,'Evidenceの再確認','blocked',1,'2026-09-21T00:00:00Z');
-    INSERT INTO reflections VALUES (1,1,'sashihara-orchestrator','completed','2026-09-21T00:00:00Z');
+    INSERT INTO reflections (id,agent_id,agent_slug,status,created_at)
+      VALUES (1,1,'sashihara-orchestrator','completed','2026-09-21T00:00:00Z');
   `);
   return db;
 }

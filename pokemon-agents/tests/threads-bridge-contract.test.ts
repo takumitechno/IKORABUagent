@@ -53,7 +53,7 @@ function internalDb(): Database {
   db.exec(`
     CREATE TABLE agents (id INTEGER PRIMARY KEY, display_name TEXT, pokemon_jp TEXT, avatar_url TEXT, slug TEXT, role_label TEXT, role TEXT, status TEXT);
     CREATE TABLE issues (id INTEGER PRIMARY KEY, assignee_agent_id INTEGER, title TEXT, status TEXT, priority INTEGER, updated_at TEXT);
-    CREATE TABLE reflections (id INTEGER PRIMARY KEY, agent_id INTEGER, agent_slug TEXT, status TEXT, created_at TEXT);
+    CREATE TABLE reflections (id INTEGER PRIMARY KEY, agent_id INTEGER, agent_slug TEXT, status TEXT, created_at TEXT, session_id TEXT, work_dir TEXT);
   `);
   return db;
 }

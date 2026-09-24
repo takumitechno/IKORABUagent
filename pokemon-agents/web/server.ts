@@ -61,6 +61,7 @@ import { ensureRuntimeDb, resolveAgentsDbPath } from "../runtime/db-path";
 import { assertAgentActivityLedgerSchema } from "./lib/agent-activity-ledger";
 import { assertThreadsActivityProjectorSchema } from "./lib/threads-activity-projector";
 import { readThreadsActivityProjectionStatus } from "./lib/threads-activity-consumer";
+import { embeddedSchedulerEnabled } from "./lib/scheduler-startup";
 
 function getBadges(db: Database): {
   approvals: number;
@@ -72,22 +73,26 @@ function getBadges(db: Database): {
   events24h: number;
   errors7d: number;
 } {
-  const a = db.query<{ c: number }, []>(`SELECT COUNT(*) as c FROM approvals WHERE status='pending'`).get() as
+  const a = db.query<{ c: number }, []>(`SELECT COUNT(*) as c FROM approvals WHERE data_origin='production' AND status='pending'`).get() as
     | { c: number } | null;
-  const r = db.query<{ c: number }, []>(`SELECT COUNT(*) as c FROM reflections WHERE status='running'`).get() as
+  const r = db.query<{ c: number }, []>(`SELECT COUNT(*) as c FROM reflections WHERE status='running' AND (session_id IS NULL OR session_id NOT LIKE 'demo-%') AND (work_dir IS NULL OR work_dir <> '/demo')`).get() as
     | { c: number } | null;
   const t = db.query<{ c: number }, []>(`SELECT COUNT(*) as c FROM agents`).get() as { c: number } | null;
   const ac = db.query<{ c: number }, []>(`SELECT COUNT(*) as c FROM agents WHERE status='active'`).get() as
     | { c: number } | null;
   const ev = db.query<{ c: number }, []>(
-    `SELECT COUNT(*) as c FROM logs WHERE ts >= datetime('now','-24 hours','localtime')`,
+    `SELECT COUNT(*) as c FROM logs
+     WHERE ts >= datetime('now','-24 hours','localtime')
+       AND (session_id IS NULL OR session_id NOT LIKE 'demo-%')`,
   ).get() as { c: number } | null;
   const health = db
     .query<{ total: number; success: number; failed: number }, []>(
       `SELECT COUNT(*) as total,
               SUM(CASE WHEN status IN ('completed','success','validated','applied','approved','fixed') THEN 1 ELSE 0 END) as success,
               SUM(CASE WHEN status IN ('failed','error','timeout','failure','falsified') THEN 1 ELSE 0 END) as failed
-       FROM reflections WHERE created_at >= date('now','-7 days','localtime')`,
+       FROM reflections WHERE created_at >= date('now','-7 days','localtime')
+         AND (session_id IS NULL OR session_id NOT LIKE 'demo-%')
+         AND (work_dir IS NULL OR work_dir <> '/demo')`,
     )
     .get() as { total: number; success: number; failed: number } | null;
   const total = health?.total ?? 0;
@@ -167,8 +172,8 @@ db.exec("PRAGMA foreign_keys = ON");
 assertAgentActivityLedgerSchema(db);
 assertThreadsActivityProjectorSchema(db);
 
-// scheduler を同プロセスで開始 (環境変数で抑止可)
-if (process.env.POKEMON_AGENTS_SCHEDULER !== "off") {
+const schedulerEnabled = embeddedSchedulerEnabled(process.env.POKEMON_AGENTS_SCHEDULER);
+if (schedulerEnabled) {
   startScheduler({ db, repoRoot: REPO_ROOT });
 }
 
@@ -568,8 +573,8 @@ const server = Bun.serve({
           const next =
             triggerType === "timer" ? nowPlusSec(intervalSec) : null;
           db.run(
-            `INSERT INTO agent_schedules (agent_id, trigger_type, interval_sec, enabled, next_run_at)
-             VALUES (?, ?, ?, ?, ?)`,
+            `INSERT INTO agent_schedules (agent_id, trigger_type, interval_sec, enabled, next_run_at, data_origin)
+             VALUES (?, ?, ?, ?, ?, 'production')`,
             [agentId, triggerType, triggerType === "timer" ? intervalSec : null, enabled, next],
           );
           return redirect("/agents?view=list");
@@ -923,7 +928,7 @@ const server = Bun.serve({
 
 console.log(`[=LOVE Agent OS] dashboard ready at http://${HOST}:${server.port}/`);
 console.log(`[=LOVE Agent OS] db: ${DB_PATH}`);
-console.log(`[=LOVE Agent OS] scheduler: ${process.env.POKEMON_AGENTS_SCHEDULER === "off" ? "DISABLED" : "running"}`);
+console.log(`[=LOVE Agent OS] scheduler: ${schedulerEnabled ? "running" : "DISABLED"}`);
 
 // ゾンビ reflection の自動回収 (process 死亡 + DB が running のまま放置されたもの)
 //   ・boot 時に 1 回 + 30 分毎の定期スキャン

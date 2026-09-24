@@ -48,11 +48,11 @@ export function renderHypotheses(db: Database, params: URLSearchParams): string 
 
   // 件数集計
   const cnts = {
-    all: q1(db, `SELECT COUNT(*) FROM hypotheses`),
-    pending: q1(db, `SELECT COUNT(*) FROM hypotheses WHERE status='pending_review'`),
-    running: q1(db, `SELECT COUNT(*) FROM hypotheses WHERE status='running'`),
-    won: q1(db, `SELECT COUNT(*) FROM hypotheses WHERE status='validated'`),
-    lost: q1(db, `SELECT COUNT(*) FROM hypotheses WHERE status='falsified'`),
+    all: q1(db, `SELECT COUNT(*) FROM hypotheses WHERE data_origin='production'`),
+    pending: q1(db, `SELECT COUNT(*) FROM hypotheses WHERE data_origin='production' AND status='pending_review'`),
+    running: q1(db, `SELECT COUNT(*) FROM hypotheses WHERE data_origin='production' AND status='running'`),
+    won: q1(db, `SELECT COUNT(*) FROM hypotheses WHERE data_origin='production' AND status='validated'`),
+    lost: q1(db, `SELECT COUNT(*) FROM hypotheses WHERE data_origin='production' AND status='falsified'`),
   };
 
   const tabLinks = [
@@ -79,7 +79,7 @@ export function renderHypotheses(db: Database, params: URLSearchParams): string 
   </div>`;
 
   // クエリ
-  const where = tab === "all" ? "" : `WHERE h.status = '${tab}'`;
+  const where = tab === "all" ? "WHERE h.data_origin='production'" : `WHERE h.data_origin='production' AND h.status = '${tab}'`;
   const rows = db
     .query<Hypothesis, []>(
       `SELECT h.*,

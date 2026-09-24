@@ -40,19 +40,19 @@ export function renderCosts(db: Database, params?: URLSearchParams): string {
     : "30d";
 
   // ===== KPIs (常時計算) =====
-  const totalAll = q1(db, `SELECT COALESCE(SUM(cost_usd),0) FROM agent_costs`);
+  const totalAll = q1(db, `SELECT COALESCE(SUM(cost_usd),0) FROM agent_costs WHERE data_origin='production'`);
   const totalMonth = q1(
     db,
-    `SELECT COALESCE(SUM(cost_usd),0) FROM agent_costs WHERE date(created_at) >= date('now','start of month','localtime')`,
+    `SELECT COALESCE(SUM(cost_usd),0) FROM agent_costs WHERE data_origin='production' AND date(created_at) >= date('now','start of month','localtime')`,
   );
   const totalWeek = q1(
     db,
-    `SELECT COALESCE(SUM(cost_usd),0) FROM agent_costs WHERE date(created_at) >= date('now','-6 days','localtime')`,
+    `SELECT COALESCE(SUM(cost_usd),0) FROM agent_costs WHERE data_origin='production' AND date(created_at) >= date('now','-6 days','localtime')`,
   );
   const last7Days = db
     .query<{ d: string; cost: number }, []>(
       `SELECT date(created_at,'localtime') as d, SUM(cost_usd) as cost
-       FROM agent_costs WHERE date(created_at) >= date('now','-6 days','localtime')
+       FROM agent_costs WHERE data_origin='production' AND date(created_at) >= date('now','-6 days','localtime')
        GROUP BY d`,
     )
     .all();
@@ -216,10 +216,10 @@ function kpiCard(label: string, value: string, desc: string): string {
 }
 
 function bucketWhere(range: Range): string {
-  if (range === "30d") return `WHERE date(created_at) >= date('now','-29 days','localtime')`;
-  if (range === "12w") return `WHERE date(created_at) >= date('now','-83 days','localtime')`;
-  if (range === "12m") return `WHERE date(created_at) >= date('now','-365 days','localtime')`;
-  return "";
+  if (range === "30d") return `WHERE data_origin='production' AND date(created_at) >= date('now','-29 days','localtime')`;
+  if (range === "12w") return `WHERE data_origin='production' AND date(created_at) >= date('now','-83 days','localtime')`;
+  if (range === "12m") return `WHERE data_origin='production' AND date(created_at) >= date('now','-365 days','localtime')`;
+  return `WHERE data_origin='production'`;
 }
 
 function buildBuckets(range: Range): { buckets: string[]; bucketLabel: (b: string) => string; bucketKey: string } {

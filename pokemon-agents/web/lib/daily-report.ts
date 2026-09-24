@@ -30,23 +30,23 @@ interface ReportMeta {
 export async function generateReportForDate(db: Database, date: string): Promise<ReportMeta | null> {
   // 該当日に活動があるか確認 (logs OR reflections)
   const eventRow = db
-    .prepare(`SELECT COUNT(*) as c FROM logs WHERE date(ts,'localtime') = ?`)
+    .prepare(`SELECT COUNT(*) as c FROM logs WHERE (session_id IS NULL OR session_id NOT LIKE 'demo-%') AND date(ts,'localtime') = ?`)
     .get(date) as { c: number };
   const reflRow = db
-    .prepare(`SELECT COUNT(*) as c FROM reflections WHERE date(created_at,'localtime') = ?`)
+    .prepare(`SELECT COUNT(*) as c FROM reflections WHERE (session_id IS NULL OR session_id NOT LIKE 'demo-%') AND (work_dir IS NULL OR work_dir <> '/demo') AND date(created_at,'localtime') = ?`)
     .get(date) as { c: number };
   if (eventRow.c === 0 && reflRow.c === 0) return null;
 
   const promptRow = db
     .prepare(
-      `SELECT COUNT(*) as c FROM logs WHERE date(ts,'localtime') = ? AND hook_event = 'UserPromptSubmit'`,
+      `SELECT COUNT(*) as c FROM logs WHERE (session_id IS NULL OR session_id NOT LIKE 'demo-%') AND date(ts,'localtime') = ? AND hook_event = 'UserPromptSubmit'`,
     )
     .get(date) as { c: number };
 
   const prompts = db
     .prepare(
       `SELECT DISTINCT prompt FROM logs
-       WHERE date(ts,'localtime') = ? AND hook_event = 'UserPromptSubmit' AND prompt IS NOT NULL
+       WHERE (session_id IS NULL OR session_id NOT LIKE 'demo-%') AND date(ts,'localtime') = ? AND hook_event = 'UserPromptSubmit' AND prompt IS NOT NULL
        ORDER BY ts ASC`,
     )
     .all(date) as { prompt: string }[];
@@ -54,7 +54,7 @@ export async function generateReportForDate(db: Database, date: string): Promise
   const agentReflections = db
     .prepare(
       `SELECT agent_slug, status, COUNT(*) as c
-       FROM reflections WHERE date(created_at,'localtime') = ?
+       FROM reflections WHERE (session_id IS NULL OR session_id NOT LIKE 'demo-%') AND (work_dir IS NULL OR work_dir <> '/demo') AND date(created_at,'localtime') = ?
        GROUP BY agent_slug, status ORDER BY c DESC`,
     )
     .all(date) as { agent_slug: string; status: string; c: number }[];
@@ -76,7 +76,7 @@ export async function generateReportForDate(db: Database, date: string): Promise
   const errors = db
     .prepare(
       `SELECT agent_slug, error_message
-       FROM reflections WHERE date(created_at,'localtime') = ?
+       FROM reflections WHERE (session_id IS NULL OR session_id NOT LIKE 'demo-%') AND (work_dir IS NULL OR work_dir <> '/demo') AND date(created_at,'localtime') = ?
          AND status IN ('failed','timeout','error') AND error_message IS NOT NULL
        LIMIT 30`,
     )
@@ -85,7 +85,7 @@ export async function generateReportForDate(db: Database, date: string): Promise
   const tools = db
     .prepare(
       `SELECT tool_name, COUNT(*) as c FROM logs
-       WHERE date(ts,'localtime') = ? AND tool_name IS NOT NULL
+       WHERE (session_id IS NULL OR session_id NOT LIKE 'demo-%') AND date(ts,'localtime') = ? AND tool_name IS NOT NULL
        GROUP BY tool_name ORDER BY c DESC LIMIT 15`,
     )
     .all(date) as { tool_name: string; c: number }[];
@@ -93,7 +93,7 @@ export async function generateReportForDate(db: Database, date: string): Promise
   const costRow = db
     .prepare(
       `SELECT COALESCE(SUM(cost_usd), 0) as cost FROM agent_costs
-       WHERE date(created_at,'localtime') = ?`,
+       WHERE data_origin='production' AND date(created_at,'localtime') = ?`,
     )
     .get(date) as { cost: number };
 
@@ -140,9 +140,9 @@ export async function generateReportForDate(db: Database, date: string): Promise
     md = buildFallbackMarkdown(date, rawData);
   }
 
-  db.run(
-    `INSERT INTO daily_reports (date, summary_md, prompt_count, event_count, reflection_count, cost_usd, agents_used)
-     VALUES (?, ?, ?, ?, ?, ?, ?)
+  const write = db.run(
+    `INSERT INTO daily_reports (date, summary_md, prompt_count, event_count, reflection_count, cost_usd, agents_used, data_origin)
+     VALUES (?, ?, ?, ?, ?, ?, ?, 'production')
      ON CONFLICT(date) DO UPDATE SET
        summary_md = excluded.summary_md,
        prompt_count = excluded.prompt_count,
@@ -150,9 +150,13 @@ export async function generateReportForDate(db: Database, date: string): Promise
        reflection_count = excluded.reflection_count,
        cost_usd = excluded.cost_usd,
        agents_used = excluded.agents_used,
-       created_at = datetime('now','localtime')`,
+       created_at = datetime('now','localtime')
+     WHERE daily_reports.data_origin='production'`,
     [date, md, promptRow.c, eventRow.c, reflRow.c, costRow.cost, JSON.stringify(agentsUsed)],
   );
+  if (write.changes !== 1) {
+    throw new Error(`daily report ${date} is occupied by demo or legacy_unknown data`);
+  }
 
   return {
     date,
@@ -262,7 +266,8 @@ export async function generateMissingReports(db: Database, lookbackDays = 30): P
   const existing = db
     .prepare(
       `SELECT date FROM daily_reports
-       WHERE date >= date('now','-${lookbackDays} days','localtime')
+       WHERE data_origin='production'
+         AND date >= date('now','-${lookbackDays} days','localtime')
          AND date < date('now','localtime')`,
     )
     .all() as { date: string }[];
@@ -290,7 +295,8 @@ export function purgeOldLogs(db: Database): number {
   const r = db.run(
     `DELETE FROM logs
      WHERE date(ts,'localtime') < date('now','-${RAW_LOG_RETENTION_DAYS} days','localtime')
-       AND date(ts,'localtime') IN (SELECT date FROM daily_reports)`,
+       AND (session_id IS NULL OR session_id NOT LIKE 'demo-%')
+       AND date(ts,'localtime') IN (SELECT date FROM daily_reports WHERE data_origin='production')`,
   );
   if (r.changes > 0) console.log(`[daily-report] purged ${r.changes} log rows (replaced by daily reports)`);
   return r.changes;

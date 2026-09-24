@@ -1,6 +1,7 @@
 #!/usr/bin/env bun
 /** Seed a safe, compact =LOVE Agent OS dashboard demo. */
 import { Database } from "bun:sqlite";
+import { clearDemoProvenanceRows } from "../web/lib/data-provenance";
 import { resolve } from "node:path";
 import { resolveAgentsDbPath } from "../runtime/db-path";
 
@@ -35,11 +36,7 @@ if (!clearOnly && nonDemo > 0 && !force) {
 function clearDemo(): void {
   db.run("DELETE FROM logs WHERE session_id LIKE 'demo-%'");
   db.run("DELETE FROM reflections WHERE session_id LIKE 'demo-%'");
-  if (nonDemo === 0 || force) {
-    for (const table of ["hypotheses", "improvements", "agent_costs", "agent_schedules", "daily_reports", "approvals"]) {
-      db.run(`DELETE FROM ${table}`);
-    }
-  }
+  clearDemoProvenanceRows(db);
 }
 
 clearDemo();
@@ -58,8 +55,8 @@ db.transaction(() => {
   ]) {
     db.run(
       `INSERT INTO agent_schedules
-       (agent_id, trigger_type, cron_expr, enabled, next_run_at, created_at, updated_at)
-       VALUES (?, 'timer', ?, 1, ?, ?, ?)`,
+       (agent_id, trigger_type, cron_expr, enabled, next_run_at, created_at, updated_at, data_origin)
+       VALUES (?, 'timer', ?, 1, ?, ?, ?, 'demo')`,
       [id(slug), cron, stamp(-1), stamp(14), stamp()],
     );
   }
@@ -90,38 +87,38 @@ db.transaction(() => {
   db.run(
     `INSERT INTO hypotheses
      (title, proposal, rationale, expected_impact, verification_method,
-      verification_period_days, status, priority, executor_agent, started_at, created_at, updated_at)
-     VALUES (?, ?, ?, ?, ?, 7, 'running', 2, ?, ?, ?, ?)`,
+      verification_period_days, status, priority, executor_agent, started_at, created_at, updated_at, data_origin)
+     VALUES (?, ?, ?, ?, ?, 7, 'running', 2, ?, ?, ?, ?, 'demo')`,
     ["投稿時間帯の検証", "同一content roleで時間帯を比較する", "検証済みEvidenceに差がある",
       "保存率の方向性を判定", "同条件で7日比較", "approved-capability", stamp(), stamp(), stamp()],
   );
   db.run(
     `INSERT INTO improvements
      (title, proposal, rationale, expected_impact, verification_method, status, priority,
-      target_agent, executor_agent, started_at, created_at, updated_at)
-     VALUES (?, ?, ?, ?, ?, 'pending_review', 2, ?, ?, ?, ?, ?)`,
+      target_agent, executor_agent, started_at, created_at, updated_at, data_origin)
+     VALUES (?, ?, ?, ?, ?, 'pending_review', 2, ?, ?, ?, ?, ?, 'demo')`,
     ["handoff形式の統一", "Evidenceと未確実性を必須項目にする", "監査で欠落を検出",
       "判断追跡性の向上", "fixtureで必須項目を検証", "sashihara-orchestrator",
       "kiara-executor", stamp(), stamp(), stamp()],
   );
   db.run(
     `INSERT INTO approvals
-     (entity_type, entity_id, title, body, requested_by_agent_id, status, expires_at, created_at, updated_at)
-     VALUES ('control_apply', 1, ?, ?, ?, 'pending', ?, ?, ?)`,
+     (entity_type, entity_id, title, body, requested_by_agent_id, status, expires_at, created_at, updated_at, data_origin)
+     VALUES ('control_apply', 1, ?, ?, ?, 'pending', ?, ?, ?, 'demo')`,
     ["handoff形式の改善承認", "樹愛羅は承認前に実行しない", id("anna-supervisor"), stamp(-7), stamp(), stamp()],
   );
 
   for (const slug of ids.keys()) {
     db.run(
-      `INSERT INTO agent_costs (agent, cost_usd, input_tokens, output_tokens, duration_ms, num_turns, created_at)
-       VALUES (?, ?, 2400, 600, 90000, 3, ?)`,
+      `INSERT INTO agent_costs (agent, cost_usd, input_tokens, output_tokens, duration_ms, num_turns, created_at, data_origin)
+       VALUES (?, ?, 2400, 600, 90000, 3, ?, 'demo')`,
       [slug, slug === "sashihara-orchestrator" || slug === "anna-supervisor" ? 0.08 : 0.03, stamp()],
     );
   }
   db.run(
     `INSERT INTO daily_reports
-     (date, summary_md, prompt_count, event_count, reflection_count, cost_usd, agents_used, created_at)
-     VALUES (date('now','localtime'), ?, 1, 18, ?, 0.38, ?, ?)`,
+     (date, summary_md, prompt_count, event_count, reflection_count, cost_usd, agents_used, created_at, data_origin)
+     VALUES (date('now','localtime'), ?, 1, 18, ?, 0.38, ?, ?, 'demo')`,
     ["# Control Plane 日報\n\n通常運用と自己改善のhandoffは安全境界内で完了。",
       reflections, JSON.stringify([...ids.keys()]), stamp()],
   );

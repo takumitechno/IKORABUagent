@@ -251,7 +251,7 @@ if [ $EXIT_CODE -eq 0 ]; then
     sql "
       UPDATE agent_schedules
       SET next_run_at=datetime('now','localtime')
-      WHERE id=$HOOK_SCHED_ID AND enabled=1;
+      WHERE id=$HOOK_SCHED_ID AND data_origin='production' AND enabled=1;
     "
     log "automation chain: triggered schedule id=$HOOK_SCHED_ID"
   done
