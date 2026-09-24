@@ -282,7 +282,8 @@ describe("internal operations dashboard", () => {
     const attributed = renderInternalOperations(db, {
       ...data, editorial: { ...data.editorial, currentAgent: "maika-hypothesizer" },
     });
-    expect(agentCard(attributed, "maika-hypothesizer")).toContain("Maika が担当中");
+    expect(agentCard(attributed, "maika-hypothesizer")).not.toContain("Maika が担当中");
+    expect(agentCard(attributed, "maika-hypothesizer")).toContain("待機");
     expect(agentCard(attributed, "sashihara-orchestrator")).not.toContain("Maika が担当中");
 
     const unknown = renderInternalOperations(db, {

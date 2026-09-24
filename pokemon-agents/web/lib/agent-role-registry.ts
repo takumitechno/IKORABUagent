@@ -135,6 +135,8 @@ export const EMPLOYEE_ROLE_REGISTRY = deepFreeze([
 ] as const satisfies readonly EmployeeRoleContract[]);
 
 export type EmployeeId = typeof EMPLOYEE_ROLE_REGISTRY[number]["agent_id"];
+/** B1's only executable deterministic contracts. This list creates no schedule. */
+export const DETERMINISTIC_EMPLOYEE_IDS = Object.freeze(["hana-heartbeat", "risa-notifier"] as const);
 
 const IDENTITY_SECTIONS = Object.freeze([
   "ROLE", "MISSION", "OWNS", "DOES NOT OWN", "INPUTS", "SOURCE OF TRUTH",
@@ -313,6 +315,7 @@ const SYSTEM_ACTORS: Readonly<Record<string, { role: string; label: string }>> =
   "monitor": { role: "monitor", label: "Monitor" },
   "projector": { role: "projector", label: "Projector" },
   "notification transport": { role: "notification_transport", label: "Notification Transport" },
+  "employee runner": { role: "employee_runner", label: "Employee Runner" },
 });
 export const SYSTEM_CAPABILITY_ROLES = Object.freeze([
   ...new Set(Object.values(SYSTEM_ACTORS).map((entry) => entry.role)),
@@ -334,12 +337,10 @@ export function mapThreadsActor(sourceActor: string | null | undefined): Threads
     return Object.freeze({ actor_kind: "unknown", agent_id: null, agent_role: null, display_name: "未帰属", source_actor: null });
   }
   const key = source.toLowerCase();
-  const employee = employeeAliases.get(key);
-  if (employee) {
-    return Object.freeze({
-      actor_kind: "employee", agent_id: employee.agent_id as EmployeeId,
-      agent_role: employee.role, display_name: employee.display_name, source_actor: source,
-    });
+  // A name is not proof of execution. Only the employee runner may construct
+  // employee-attributed activity after persisting a validated run packet.
+  if (employeeAliases.has(key)) {
+    return Object.freeze({ actor_kind: "unknown", agent_id: null, agent_role: null, display_name: "未帰属", source_actor: source });
   }
   if (key === "writer") {
     return Object.freeze({
@@ -433,7 +434,8 @@ export const SYSTEM_ACTIVITY_ACTION_CODES = Object.freeze([
   "editorial_draft_ready", "editorial_cycle_approved", "experiment_observation_ready",
   "experiment_evaluated", "experiment_inconclusive", "learning_outcome_recorded",
   "next_experiment_selected", "experiment_completed", "insights_collected",
-  "writer_canary_pending", "human_approval", "safety_state", "workflow_checked", "correction",
+  "writer_canary_pending", "human_approval", "publication_state", "safety_state",
+  "workflow_checked", "employee_run_failed", "correction",
 ] as const);
 export const ACTIVITY_ACTION_CODES = Object.freeze([
   ...new Set([
@@ -471,6 +473,7 @@ export const ACTIVITY_MESSAGE_CODES = Object.freeze([
   "human_gate_required",
   "next_action_selected",
   "hold_conflict",
+  "contract_validation_failed",
 ] as const);
 const ACTIVITY_MESSAGE_CODE_SET = new Set<string>(ACTIVITY_MESSAGE_CODES);
 const MAX_EVIDENCE_REFS = 50;

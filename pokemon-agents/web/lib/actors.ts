@@ -59,7 +59,7 @@ export function classifyActor(
     transcript_path?: string | null;
     source?: string | null;
   },
-  agentLookup?: Map<string, AgentMeta>,
+  _agentLookup?: Map<string, AgentMeta>,
 ): Actor {
   // UserPromptSubmit 自体 = 人間
   // ただし scheduled セッションの UserPromptSubmit は claude -p の起動 prompt なので人間扱いしない
@@ -69,74 +69,22 @@ export function classifyActor(
 
   // サブエージェント (Task/Agent tool で spawn): transcript path が /subagents/agent-*
   if (event.transcript_path && event.transcript_path.includes("/subagents/agent-")) {
-    if (event.agent) {
-      const meta = lookupAgent(event.agent, agentLookup);
-      if (meta) {
-        return {
-          kind: "subagent",
-          name: meta.pokemon_jp,
-          icon: "",
-          avatar: meta.avatar_url ?? undefined,
-          slug: meta.pokemon_slug,
-        };
-      }
-      return { kind: "subagent", name: event.agent, icon: "theater", slug: normalizeKey(event.agent) };
-    }
-    return { kind: "subagent", name: "サブエージェント", icon: "theater" };
+    return { kind: "subagent", name: "未帰属 Claude subagent", icon: "theater" };
   }
 
   // scheduled 起動 (launchd → run-agent.sh → claude -p): session attribution が scheduled
   if (event.source === "scheduled") {
-    if (event.agent) {
-      const meta = lookupAgent(event.agent, agentLookup);
-      if (meta) {
-        return {
-          kind: "scheduled",
-          name: meta.pokemon_jp,
-          icon: "",
-          avatar: meta.avatar_url ?? undefined,
-          slug: meta.pokemon_slug,
-        };
-      }
-      return { kind: "scheduled", name: event.agent, icon: "bot", slug: normalizeKey(event.agent) };
-    }
-    return { kind: "scheduled", name: "scheduled", icon: "bot" };
+    return { kind: "subagent", name: "未帰属 Claude subagent", icon: "theater" };
   }
 
   // 既存の prompt 由来判定 (過去データ互換)
   if (event.prompt && event.prompt.includes(".claude/agents/")) {
-    const m = event.prompt.match(/\.claude\/agents\/(?:_[a-z-]+\/)?([a-z][a-z0-9-]+)\/agent\.md/);
-    if (m) {
-      const meta = lookupAgent(m[1], agentLookup);
-      if (meta) {
-        return {
-          kind: "scheduled",
-          name: meta.pokemon_jp,
-          icon: "",
-          avatar: meta.avatar_url ?? undefined,
-          slug: meta.pokemon_slug,
-        };
-      }
-      return { kind: "scheduled", name: m[1], icon: "bot", slug: normalizeKey(m[1]) };
-    }
+    return { kind: "subagent", name: "未帰属 Claude subagent", icon: "theater" };
   }
 
   // agent カラムにslugが入っている場合 (Task tool 経由の subagent)
   if (event.agent) {
-    const meta = lookupAgent(event.agent, agentLookup);
-    if (meta) {
-      return {
-        kind: "subagent",
-        name: meta.pokemon_jp,
-        icon: "",
-        avatar: meta.avatar_url ?? undefined,
-        slug: meta.pokemon_slug,
-      };
-    }
-    if (["general-purpose", "Explore", "Plan"].includes(event.agent)) {
-      return { kind: "subagent", name: event.agent, icon: "theater", slug: event.agent };
-    }
-    return { kind: "subagent", name: event.agent, icon: "theater", slug: normalizeKey(event.agent) };
+    return { kind: "subagent", name: "未帰属 Claude subagent", icon: "theater" };
   }
 
   // それ以外 = 対話中の Claude Code (私と人間の会話)
@@ -146,19 +94,6 @@ export function classifyActor(
 /**
  * agent文字列からAgentMetaを引く。full slug → legacy identity keyの順で試す。
  */
-function lookupAgent(agent: string, lookup?: Map<string, AgentMeta>): AgentMeta | null {
-  if (!lookup) return null;
-  const direct = lookup.get(agent);
-  if (direct) return direct;
-  const head = normalizeKey(agent);
-  return lookup.get(head) ?? null;
-}
-
-function normalizeKey(agent: string): string {
-  // full slug → identity prefix
-  return agent.split("-")[0].toLowerCase();
-}
-
 /**
  * Tool input/prompt から人間が読みやすい要約を生成
  */

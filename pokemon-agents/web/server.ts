@@ -206,12 +206,6 @@ function hydrateSessionSource(db: Database): void {
   console.log(`[hook] hydrated ${rows.length} scheduled sessions`);
 }
 
-function extractAgentFromPrompt(prompt: string): string | null {
-  // prompt例: ".claude/agents/iori-validator.md を読み..."
-  const m = prompt.match(/\.claude\/agents\/(?:_[a-z-]+\/)?([a-z][a-z0-9-]+)(?:\/agent)?\.md/);
-  return m ? m[1] : null;
-}
-
 hydrateSessionSource(db);
 
 // サーバ起動時に agents を agent.md から自動 seed (DB-native)
@@ -274,11 +268,7 @@ function resolveSessionAttribution(
 
   // 初回: UserPromptSubmit / SessionStart の prompt から推定
   if (hookEvent === "UserPromptSubmit" || hookEvent === "SessionStart") {
-    const prompt = (payload?.prompt as string) || "";
-    const slug = extractAgentFromPrompt(prompt);
-    const info: SessionInfo = slug
-      ? { agentSlug: slug, source: "scheduled" }
-      : { agentSlug: null, source: "claude" };
+    const info: SessionInfo = { agentSlug: null, source: "claude" };
     sessionSource.set(sid, info);
     return info;
   }

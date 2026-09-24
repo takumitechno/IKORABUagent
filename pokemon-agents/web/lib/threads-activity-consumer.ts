@@ -285,9 +285,10 @@ const MAPPINGS: Readonly<Record<string, {
   next_experiment_selected: { type: "next_experiment_selected", actor: "Experiment Planner", decision: "approved", result: "succeeded" },
   experiment_completed: { type: "experiment_completed", actor: "Experiment Planner", decision: "not_applicable", result: "succeeded" },
   insights_collected: { type: "insights_collected", actor: "Performance Learner", decision: "not_applicable", result: "succeeded" },
-  publication_state: { type: "publication_state", actor: null, decision: "not_applicable", result: "succeeded" },
+  publication_state: { type: "publication_state", actor: "Editorial Runner", decision: "not_applicable", result: "succeeded" },
   safety_state: { type: "safety_state", actor: "QA", decision: "not_applicable", result: "succeeded" },
 });
+export const THREADS_PROJECTABLE_AUDIT_EVENT_TYPES = Object.freeze(Object.keys(MAPPINGS));
 
 export function mapBridgeAuditEvent(account: string, event: BridgeAuditEventV1): ThreadsActivityEvent {
   const mapping = MAPPINGS[event.event_type];

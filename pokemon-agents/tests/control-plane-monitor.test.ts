@@ -27,7 +27,7 @@ function runFixture(name: string, value: unknown) {
   mkdirSync(dir, { recursive: true });
   const fixture = resolve(dir, `${name}.json`);
   writeFileSync(fixture, JSON.stringify(value));
-  const result = Bun.spawnSync(["python", monitor, "--fixture", fixture, "--now", "2026-09-22T06:00:00Z"]);
+  const result = Bun.spawnSync(["python", monitor, "--fixture", fixture, "--scope", "acct_takumi_hq", "--now", "2026-09-22T06:00:00Z"]);
   return { code: result.exitCode, body: JSON.parse(new TextDecoder().decode(result.stdout)) };
 }
 
@@ -42,6 +42,12 @@ describe("Control Plane CRITICAL monitor", () => {
     });
     expect(got.code).toBe(0);
     expect(got.body.status).toBe("HEALTHY");
+    expect(got.body.employee_input).toMatchObject({ schema_version: "monitor-findings.v1", scope: "acct_takumi_hq" });
+    expect(got.body.employee_input.findings.map((row: { check_code: string }) => row.check_code)).toEqual([
+      "bridge_health", "dashboard_health", "backup_freshness", "night_freshness", "oauth_readiness",
+      "tenant_isolation", "insights_freshness", "editorial_freshness", "activity_projection_freshness",
+      "task_scheduler_state",
+    ]);
     expect(got.body.message.length).toBeLessThanOrEqual(1900);
   });
 
@@ -78,6 +84,10 @@ describe("Control Plane CRITICAL monitor", () => {
   });
 
   test("notifier is strict, deduplicated, cooldown-aware, and recovery-aware", () => {
+    const monitorSource = readFileSync(monitor, "utf8");
+    expect(monitorSource).toContain('parser.add_argument("--scope", required=True)');
+    expect(monitorSource).toContain('parser.add_argument("--account-id")');
+    expect(monitorSource).not.toContain('default="acct_8ssana"');
     expect(notifier).toContain("set -euo pipefail");
     expect(notifier).toContain("DISCORD_WEBHOOK_URL is not configured");
     expect(notifier).toContain("exit 3");

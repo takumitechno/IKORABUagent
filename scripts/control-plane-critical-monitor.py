@@ -20,6 +20,11 @@ NIGHT_STALE_MINUTES = 20
 BACKUP_STALE_HOURS = 26
 DENIAL_WINDOW_MINUTES = 10
 DENIAL_SPIKE_THRESHOLD = 5
+FRESHNESS = {
+    "insights_freshness": (180, 360),
+    "editorial_freshness": (180, 360),
+    "activity_projection_freshness": (30, 120),
+}
 
 if hasattr(sys.stdout, "reconfigure"):
     sys.stdout.reconfigure(encoding="utf-8")
@@ -78,6 +83,26 @@ def listener_pid(port: int) -> int | None:
         return None
 
 
+def scheduled_task_state(name: str) -> tuple[bool, str | None]:
+    """Read-only Windows Task Scheduler evidence; never registers or changes a task."""
+    if os.name != "nt":
+        return False, None
+    safe_name = name.replace("'", "''")
+    command = (
+        f"$t=Get-ScheduledTask -TaskName '{safe_name}' -ErrorAction SilentlyContinue;"
+        "if($t){[Console]::Out.Write($t.State)}"
+    )
+    try:
+        result = subprocess.run(
+            ["powershell.exe", "-NoProfile", "-NonInteractive", "-Command", command],
+            capture_output=True, text=True, timeout=5, check=False,
+        )
+        state = result.stdout.strip()
+        return bool(state), state or None
+    except (OSError, subprocess.TimeoutExpired):
+        return False, None
+
+
 def latest_backup_status(directory: Path, now: datetime) -> tuple[float | None, bool]:
     try:
         files = [p for p in directory.glob("*.db") if p.is_file() and p.stat().st_size > 0]
@@ -111,20 +136,75 @@ def collect_snapshot(args: argparse.Namespace, now: datetime) -> dict[str, Any]:
         f"{args.bridge_url}/operator/accounts/{args.account_id}", headers)
     canary_ok, canary = request_json(f"{args.bridge_url}/operator/tenant-canary", headers)
     backup_age, backup_valid = latest_backup_status(Path(args.backup_dir), now)
+    scheduler_registered, scheduler_state = scheduled_task_state(args.scheduler_task_name)
+    operations = account.get("operations", {}) if account_ok else {}
     return {
         "observed_at": now.isoformat(),
         "bridge_healthy": bridge_ok and bridge_health.get("status") == "ok",
         "dashboard_healthy": dashboard_ok and dashboard_health.get("status") == "ok",
         "account_available": account_ok,
-        "night_items": account.get("operations", {}).get("night_batch_items", []) if account_ok else [],
+        "night_items": operations.get("night_batch_items", []) if account_ok else [],
         "readiness": account.get("readiness", {}) if account_ok else {},
-        "self_reply_sync": account.get("operations", {}).get("features", {}).get("self_reply_sync") if account_ok else None,
+        "self_reply_sync": operations.get("features", {}).get("self_reply_sync") if account_ok else None,
+        "insights_age_minutes": operations.get("insights_age_minutes"),
+        "editorial_age_minutes": operations.get("editorial_age_minutes"),
+        "activity_projection_age_minutes": operations.get("activity_projection_age_minutes"),
+        "scheduler_registered": scheduler_registered,
+        "scheduler_state": scheduler_state,
         "canary_available": canary_ok,
         "tenant_canary": canary if canary_ok else {},
         "backup_age_hours": backup_age,
         "backup_valid": backup_valid,
         "legacy_5735_pid": listener_pid(args.legacy_port),
     }
+
+
+def structured_findings(snapshot: dict[str, Any], scope: str, now: datetime) -> dict[str, Any]:
+    """Produce the bounded, code-only input contract consumed by Hana."""
+    findings: list[dict[str, Any]] = []
+
+    def add(code: str, observed: str, age: float | None, tolerance: int,
+            delayed: int, evidence: str, block: str | None = None) -> None:
+        findings.append({
+            "check_code": code, "observed": observed, "age_minutes": age,
+            "tolerance_minutes": tolerance, "delayed_window_minutes": delayed,
+            "block_reason": block, "evidence_ref": evidence,
+        })
+
+    add("bridge_health", "present" if snapshot.get("bridge_healthy") else "unreadable",
+        0 if snapshot.get("bridge_healthy") else None, 5, 10, "source:monitor:bridge")
+    add("dashboard_health", "present" if snapshot.get("dashboard_healthy") else "unreadable",
+        0 if snapshot.get("dashboard_healthy") else None, 5, 10, "source:monitor:dashboard")
+    backup_age = snapshot.get("backup_age_hours")
+    backup_ok = isinstance(backup_age, (int, float)) and snapshot.get("backup_valid") is True
+    add("backup_freshness", "present" if backup_ok else "unreadable",
+        float(backup_age) * 60 if backup_ok else None, BACKUP_STALE_HOURS * 60,
+        (BACKUP_STALE_HOURS + 6) * 60, "source:monitor:backup")
+    night_alert = any(row["code"].startswith("night_") for row in evaluate(snapshot, now))
+    add("night_freshness", "absent" if night_alert else "present", None if night_alert else 0,
+        NIGHT_STALE_MINUTES, NIGHT_STALE_MINUTES * 2, "source:monitor:night")
+    reauth = snapshot.get("self_reply_sync") == "reauthorization_required"
+    readiness = snapshot.get("readiness") or {}
+    oauth_ok = snapshot.get("account_available") and readiness.get("status") == "active" and readiness.get("ready_for_dry_run") is True
+    add("oauth_readiness", "present" if oauth_ok else "absent", 0 if oauth_ok else None,
+        5, 10, "source:monitor:oauth", "reauth_required" if reauth else None)
+    canary = snapshot.get("tenant_canary") or {}
+    tenant_ok = snapshot.get("canary_available") and int(canary.get("unexpected_allow", 0) or 0) == 0
+    add("tenant_isolation", "present" if tenant_ok else "absent", 0 if tenant_ok else None,
+        5, 10, "source:monitor:tenant", "dependency" if snapshot.get("canary_available") and not tenant_ok else None)
+    for code, key in (("insights_freshness", "insights_age_minutes"),
+                      ("editorial_freshness", "editorial_age_minutes"),
+                      ("activity_projection_freshness", "activity_projection_age_minutes")):
+        age = snapshot.get(key)
+        tolerance, delayed = FRESHNESS[code]
+        add(code, "present" if isinstance(age, (int, float)) else "unknown",
+            float(age) if isinstance(age, (int, float)) else None,
+            tolerance, delayed, f"source:monitor:{code}")
+    scheduler_ok = snapshot.get("scheduler_registered") is True and snapshot.get("scheduler_state") in {"Ready", "Running"}
+    scheduler_blocked = snapshot.get("scheduler_registered") is True and snapshot.get("scheduler_state") == "Disabled"
+    add("task_scheduler_state", "present" if scheduler_ok else "absent", 0 if scheduler_ok else None,
+        5, 10, "source:monitor:task-scheduler", "kill_switch" if scheduler_blocked else None)
+    return {"schema_version": "monitor-findings.v1", "scope": scope, "findings": findings}
 
 
 def evaluate(snapshot: dict[str, Any], now: datetime) -> list[dict[str, str]]:
@@ -228,10 +308,12 @@ def main(argv: list[str] | None = None) -> int:
     repo = Path(__file__).resolve().parents[1]
     parser.add_argument("--bridge-url", default="http://127.0.0.1:8000")
     parser.add_argument("--dashboard-url", default="http://127.0.0.1:5733")
-    parser.add_argument("--account-id", default="acct_8ssana")
+    parser.add_argument("--scope", required=True)
+    parser.add_argument("--account-id")
     parser.add_argument("--tenant-user-id", default="usr_takumi_owner")
     parser.add_argument("--backup-dir", default=str(Path.home() / "Threads-" / "data" / "backups"))
     parser.add_argument("--legacy-port", type=int, default=5735)
+    parser.add_argument("--scheduler-task-name", default="Threads-NIGHT04")
     parser.add_argument("--fixture", type=Path)
     parser.add_argument("--now")
     parser.add_argument("--notify", action="store_true")
@@ -239,9 +321,12 @@ def main(argv: list[str] | None = None) -> int:
     now = parse_time(args.now) if args.now else datetime.now(timezone.utc)
     if now is None:
         parser.error("--now must be ISO-8601")
+    if not args.fixture and not args.account_id:
+        parser.error("--account-id is required for live collection")
     snapshot = json.loads(args.fixture.read_text(encoding="utf-8")) if args.fixture else collect_snapshot(args, now)
     alerts = evaluate(snapshot, now)
     result = {"status": "CRITICAL" if alerts else "HEALTHY", "alerts": alerts,
+              "employee_input": structured_findings(snapshot, args.scope, now),
               "message": aggregate(alerts, recovery=not alerts)}
     print(json.dumps(result, ensure_ascii=False, indent=2))
     if args.notify:

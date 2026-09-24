@@ -3,6 +3,7 @@ import type { Database } from "bun:sqlite";
 import {
   ACTIVITY_MESSAGE_CODES,
   ACTIVITY_ACTION_CODES,
+  DETERMINISTIC_EMPLOYEE_IDS,
   EMPLOYEE_ROLE_REGISTRY,
   FORMAL_EDITORIAL_QA,
   FORMAL_EDITORIAL_WRITER,
@@ -19,10 +20,12 @@ import {
 } from "./agent-role-registry";
 
 const AGENT_ACTIVITY_LEDGER_V2_ID = "20260924_agent_activity_ledger_v2_message_codes";
-export const AGENT_ACTIVITY_LEDGER_MIGRATION_ID = "20260924_agent_activity_ledger_v3_role_codes";
+const AGENT_ACTIVITY_LEDGER_V3_ID = "20260924_agent_activity_ledger_v3_role_codes";
+export const AGENT_ACTIVITY_LEDGER_MIGRATION_ID = "20260924_employee_run_packets_v1";
 export const AGENT_ACTIVITY_LEDGER_MIGRATION_IDS = Object.freeze([
   "20260924_agent_activity_ledger_v1",
   AGENT_ACTIVITY_LEDGER_V2_ID,
+  AGENT_ACTIVITY_LEDGER_V3_ID,
   AGENT_ACTIVITY_LEDGER_MIGRATION_ID,
 ]);
 const DEFAULT_PAGE_SIZE = 50;
@@ -44,6 +47,10 @@ const canonicalEmployeeIdsSql = EMPLOYEE_ROLE_REGISTRY.map((employee) => sqlLite
 const employeeActionSql = EMPLOYEE_ROLE_REGISTRY.map((employee) =>
   `(NEW.agent_id = ${sqlLiteral(employee.agent_id)} AND NEW.action IN (${employee.allowed_actions.map(sqlLiteral).join(",")}))`
 ).join(" OR ");
+const deterministicEmployeePacketSql = EMPLOYEE_ROLE_REGISTRY
+  .filter((employee) => (DETERMINISTIC_EMPLOYEE_IDS as readonly string[]).includes(employee.agent_id))
+  .map((employee) => `(NEW.agent_id = ${sqlLiteral(employee.agent_id)} AND NEW.role = ${sqlLiteral(employee.role)})`)
+  .join(" OR ");
 const canonicalNextOwnersSql = [
   ...EMPLOYEE_ROLE_REGISTRY.map((employee) => employee.agent_id),
   FORMAL_EDITORIAL_WRITER.agent_id,
@@ -62,6 +69,69 @@ CREATE TABLE IF NOT EXISTS agent_activity_accounts (
   CHECK (account_id GLOB 'acct_*'),
   CHECK (length(authority_ref) BETWEEN 3 AND 520)
 );
+
+CREATE TABLE IF NOT EXISTS employee_run_packets (
+  run_id TEXT PRIMARY KEY,
+  agent_id TEXT NOT NULL,
+  role TEXT NOT NULL,
+  account_id TEXT NOT NULL REFERENCES agent_activity_accounts(account_id),
+  task_ref TEXT NOT NULL,
+  correlation_id TEXT NOT NULL,
+  implementation_type TEXT NOT NULL CHECK (implementation_type IN ('deterministic_hana','deterministic_risa')),
+  started_at TEXT NOT NULL,
+  ended_at TEXT NOT NULL,
+  input_packet_refs TEXT NOT NULL CHECK (json_valid(input_packet_refs) AND json_type(input_packet_refs)='array'),
+  output_packet TEXT NOT NULL CHECK (json_valid(output_packet) AND json_type(output_packet)='object'),
+  packet_sha256 TEXT NOT NULL CHECK (length(packet_sha256)=64 AND packet_sha256 NOT GLOB '*[^0-9a-f]*'),
+  schema_version TEXT NOT NULL CHECK (schema_version='employee-run.v1'),
+  decision_status TEXT NOT NULL CHECK (decision_status IN ('not_applicable','pending','approved','rejected','blocked','unknown')),
+  result_status TEXT NOT NULL CHECK (result_status IN ('succeeded','failed','blocked')),
+  next_action_owner TEXT,
+  next_action TEXT,
+  evidence_refs TEXT NOT NULL CHECK (json_valid(evidence_refs) AND json_type(evidence_refs)='array'),
+  created_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ','now')),
+  UNIQUE (packet_sha256),
+  CHECK (length(run_id) BETWEEN 1 AND 200 AND run_id NOT GLOB '*[^A-Za-z0-9._:-]*'),
+  CHECK (length(correlation_id) BETWEEN 1 AND 200 AND correlation_id NOT GLOB '*[^A-Za-z0-9._:-]*'),
+  CHECK (length(started_at)=24 AND substr(started_at,20,1)='.' AND substr(started_at,-1,1)='Z' AND datetime(started_at) IS NOT NULL),
+  CHECK (length(ended_at)=24 AND substr(ended_at,20,1)='.' AND substr(ended_at,-1,1)='Z' AND datetime(ended_at) IS NOT NULL),
+  CHECK (ended_at >= started_at)
+);
+
+CREATE TRIGGER IF NOT EXISTS employee_run_packets_no_update
+BEFORE UPDATE ON employee_run_packets BEGIN
+  SELECT RAISE(ABORT, 'employee run packets are append-only');
+END;
+CREATE TRIGGER IF NOT EXISTS employee_run_packets_no_delete
+BEFORE DELETE ON employee_run_packets BEGIN
+  SELECT RAISE(ABORT, 'employee run packets are append-only');
+END;
+CREATE TRIGGER IF NOT EXISTS employee_run_packets_canonical
+BEFORE INSERT ON employee_run_packets
+WHEN NOT (${deterministicEmployeePacketSql})
+  OR NEW.account_id <> 'acct_takumi_hq'
+  OR NEW.correlation_id GLOB '${eightDigitsGlob}'
+  OR NEW.task_ref NOT GLOB 'source:[A-Za-z0-9]*'
+  OR NEW.task_ref GLOB '*[^A-Za-z0-9._:/-]*'
+  OR NEW.task_ref GLOB '${eightDigitsGlob}'
+  OR json_array_length(NEW.input_packet_refs) > 50
+  OR json_array_length(NEW.evidence_refs) > 50
+  OR EXISTS (SELECT 1 FROM json_each(NEW.input_packet_refs) ref
+    WHERE ref.type <> 'text' OR ref.value NOT GLOB 'source:[A-Za-z0-9]*'
+      OR ref.value GLOB '*[^A-Za-z0-9._:/-]*' OR ref.value GLOB '${eightDigitsGlob}')
+  OR EXISTS (SELECT 1 FROM json_each(NEW.evidence_refs) ref
+    WHERE ref.type <> 'text' OR NOT (
+      ref.value GLOB 'activity:[A-Za-z0-9]*' OR ref.value GLOB 'artifact:[A-Za-z0-9]*'
+      OR ref.value GLOB 'content:[A-Za-z0-9]*' OR ref.value GLOB 'cycle:[A-Za-z0-9]*'
+      OR ref.value GLOB 'experiment:[A-Za-z0-9]*' OR ref.value GLOB 'metric:[A-Za-z0-9]*'
+      OR ref.value GLOB 'source:[A-Za-z0-9]*')
+      OR ref.value GLOB '*[^A-Za-z0-9._:/-]*' OR ref.value GLOB '${eightDigitsGlob}')
+  OR (NEW.agent_id='hana-heartbeat' AND json_extract(NEW.output_packet, '$.scope') IS NOT NEW.account_id)
+  OR (NEW.agent_id='hana-heartbeat' AND json_extract(NEW.output_packet, '$.schema_version') IS NOT 'hana-output.v1')
+  OR (NEW.agent_id='risa-notifier' AND json_extract(NEW.output_packet, '$.schema_version') IS NOT 'risa-output.v1')
+BEGIN
+  SELECT RAISE(ABORT, 'employee run packet is not canonical or sanitized');
+END;
 
 CREATE TABLE IF NOT EXISTS agent_activity_ledger (
   sequence INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -86,6 +156,7 @@ CREATE TABLE IF NOT EXISTS agent_activity_ledger (
   cycle_id TEXT,
   experiment_id TEXT,
   correlation_id TEXT,
+  run_ref TEXT REFERENCES employee_run_packets(run_id),
   corrects_activity_id TEXT REFERENCES agent_activity_ledger(activity_id),
   payload_hash TEXT NOT NULL CHECK (length(payload_hash) = 64),
   created_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ','now')),
@@ -98,6 +169,7 @@ CREATE TABLE IF NOT EXISTS agent_activity_ledger (
     (actor_type = 'system_capability' AND agent_id IS NULL AND agent_role IS NOT NULL AND agent_role <> 'human_approval') OR
     (actor_type = 'unknown' AND agent_id IS NULL AND agent_role IS NULL)
   ),
+  CHECK ((actor_type = 'employee' AND run_ref IS NOT NULL) OR (actor_type <> 'employee' AND run_ref IS NULL)),
   CHECK (
     (action = 'correction' AND corrects_activity_id IS NOT NULL) OR
     (action <> 'correction' AND corrects_activity_id IS NULL)
@@ -121,6 +193,8 @@ CREATE INDEX IF NOT EXISTS idx_agent_activity_experiment
   ON agent_activity_ledger(experiment_id, sequence DESC);
 CREATE INDEX IF NOT EXISTS idx_agent_activity_correlation
   ON agent_activity_ledger(correlation_id, sequence DESC);
+CREATE UNIQUE INDEX IF NOT EXISTS idx_agent_activity_employee_run
+  ON agent_activity_ledger(run_ref) WHERE run_ref IS NOT NULL;
 CREATE INDEX IF NOT EXISTS idx_agent_activity_correction
   ON agent_activity_ledger(corrects_activity_id);
 
@@ -175,6 +249,20 @@ WHEN NEW.action NOT IN (${activityActionCodesSql})
   OR (NEW.actor_type = 'employee' AND NEW.agent_id IN (${canonicalEmployeeIdsSql}) AND NOT (${employeeActionSql}))
 BEGIN
   SELECT RAISE(ABORT, 'agent activity action is not allowed for actor');
+END;
+
+CREATE TRIGGER IF NOT EXISTS agent_activity_employee_run_binding
+BEFORE INSERT ON agent_activity_ledger
+WHEN NEW.actor_type = 'employee' AND NOT EXISTS (
+  SELECT 1 FROM employee_run_packets packet
+  WHERE packet.run_id = NEW.run_ref
+    AND packet.agent_id = NEW.agent_id
+    AND packet.role = NEW.agent_role
+    AND packet.account_id = NEW.account_id
+    AND packet.correlation_id = NEW.correlation_id
+)
+BEGIN
+  SELECT RAISE(ABORT, 'employee activity requires matching persisted run packet');
 END;
 
 CREATE TRIGGER IF NOT EXISTS agent_activity_payload_sanitized
@@ -280,6 +368,7 @@ export class ActivityLedgerSchemaError extends Error {
 
 export interface LedgerActivity extends InternalActivity {
   readonly actor_type: ActivityActorType;
+  readonly run_ref: string | null;
   readonly created_at: string;
 }
 
@@ -326,13 +415,10 @@ interface LedgerRow {
   cycle_id: string | null;
   experiment_id: string | null;
   correlation_id: string | null;
+  run_ref: string | null;
   corrects_activity_id: string | null;
   payload_hash: string;
   created_at: string;
-}
-
-function payloadHash(activity: InternalActivity): string {
-  return createHash("sha256").update(serializeInternalActivity(activity, "internal"), "utf8").digest("hex");
 }
 
 function activityCore(activity: LedgerActivity | InternalActivity): InternalActivity {
@@ -393,7 +479,7 @@ function rowToActivity(row: LedgerRow): LedgerActivity {
   });
   if (row.actor_type !== classifyActivityActor(activity)) throw new ActivityLedgerSchemaError("stored actor_type does not match activity identity");
   validateIso(row.created_at, "created_at");
-  return Object.freeze({ ...activity, actor_type: row.actor_type, created_at: row.created_at });
+  return Object.freeze({ ...activity, actor_type: row.actor_type, run_ref: row.run_ref, created_at: row.created_at });
 }
 
 export function migrateAgentActivityLedger(db: Database): boolean {
@@ -415,7 +501,7 @@ export function migrateAgentActivityLedger(db: Database): boolean {
         throw new ActivityLedgerSchemaError("v1 activity ledger contains rows incompatible with v2 sanitization");
       }
     }
-    const upgradingRoleCodes = pending.includes(AGENT_ACTIVITY_LEDGER_MIGRATION_ID)
+    const upgradingRoleCodes = pending.includes(AGENT_ACTIVITY_LEDGER_V3_ID)
       && !pending.includes(AGENT_ACTIVITY_LEDGER_MIGRATION_IDS[0]);
     if (upgradingRoleCodes) {
       try {
@@ -426,6 +512,19 @@ export function migrateAgentActivityLedger(db: Database): boolean {
       db.exec(`DROP TRIGGER IF EXISTS agent_activity_actor_canonical;
         DROP TRIGGER IF EXISTS agent_activity_message_codes;
         DROP TRIGGER IF EXISTS agent_activity_action_codes;`);
+    }
+    const upgradingEmployeeRuns = pending.includes(AGENT_ACTIVITY_LEDGER_MIGRATION_ID)
+      && !pending.includes(AGENT_ACTIVITY_LEDGER_MIGRATION_IDS[0]);
+    if (upgradingEmployeeRuns) {
+      const employees = db.query<{ n: number }, []>(
+        "SELECT COUNT(*) n FROM agent_activity_ledger WHERE actor_type='employee'",
+      ).get()?.n ?? 0;
+      if (employees > 0) throw new ActivityLedgerSchemaError("existing employee activity has no canonical run packet");
+      const columns = db.query<{ name: string }, []>("PRAGMA table_info(agent_activity_ledger)").all();
+      if (!columns.some((column) => column.name === "run_ref")) {
+        db.exec("ALTER TABLE agent_activity_ledger ADD COLUMN run_ref TEXT REFERENCES employee_run_packets(run_id)");
+      }
+      db.exec("DROP TRIGGER IF EXISTS agent_activity_action_codes; DROP TRIGGER IF EXISTS agent_activity_employee_run_binding;");
     }
     db.exec(AGENT_ACTIVITY_LEDGER_SCHEMA_SQL);
     for (const version of pending) {
@@ -439,14 +538,15 @@ export function migrateAgentActivityLedger(db: Database): boolean {
 export function assertAgentActivityLedgerSchema(db: Database): void {
   const rows = db.query<{ name: string }, []>(
     `SELECT name FROM sqlite_master
-     WHERE (type='table' AND name IN ('agent_activity_accounts','agent_activity_ledger'))
-        OR (type='trigger' AND name IN ('agent_activity_ledger_no_update','agent_activity_ledger_no_delete','agent_activity_ledger_no_duplicate_insert','agent_activity_actor_canonical','agent_activity_message_codes','agent_activity_action_codes','agent_activity_payload_sanitized','agent_activity_correction_same_account'))`,
+     WHERE (type='table' AND name IN ('agent_activity_accounts','employee_run_packets','agent_activity_ledger'))
+        OR (type='trigger' AND name IN ('employee_run_packets_no_update','employee_run_packets_no_delete','employee_run_packets_canonical','agent_activity_ledger_no_update','agent_activity_ledger_no_delete','agent_activity_ledger_no_duplicate_insert','agent_activity_actor_canonical','agent_activity_message_codes','agent_activity_action_codes','agent_activity_employee_run_binding','agent_activity_payload_sanitized','agent_activity_correction_same_account'))`,
   ).all();
   const names = new Set(rows.map((row) => row.name));
   for (const required of [
-    "agent_activity_accounts", "agent_activity_ledger", "agent_activity_ledger_no_update",
+    "agent_activity_accounts", "employee_run_packets", "employee_run_packets_no_update", "employee_run_packets_no_delete", "employee_run_packets_canonical",
+    "agent_activity_ledger", "agent_activity_ledger_no_update",
     "agent_activity_ledger_no_delete", "agent_activity_ledger_no_duplicate_insert",
-    "agent_activity_actor_canonical", "agent_activity_message_codes", "agent_activity_action_codes", "agent_activity_payload_sanitized",
+    "agent_activity_actor_canonical", "agent_activity_message_codes", "agent_activity_action_codes", "agent_activity_employee_run_binding", "agent_activity_payload_sanitized",
     "agent_activity_correction_same_account",
   ]) {
     if (!names.has(required)) throw new ActivityLedgerSchemaError(`missing activity ledger schema object: ${required}`);
@@ -470,17 +570,25 @@ export function registerActivityAccount(db: Database, accountId: string, authori
   write.immediate();
 }
 
-export function appendActivity(db: Database, input: unknown): LedgerActivity {
+function appendActivityWithRunRef(db: Database, input: unknown, runRef: string | null): LedgerActivity {
   const activity = createInternalActivity(input);
-  const serialized = serializeInternalActivity(activity, "internal");
-  const hash = payloadHash(activity);
   const actorType = classifyActivityActor(activity);
+  if (actorType === "employee" && runRef === null) {
+    throw new ActivityLedgerSchemaError("employee activity requires the employee runner");
+  }
+  if (actorType !== "employee" && runRef !== null) {
+    throw new ActivityLedgerSchemaError("only employee activity may have a run_ref");
+  }
+  if (runRef !== null && !ID_PATTERN.test(runRef)) throw new ActivityLedgerSchemaError("run_ref is invalid");
+  const serialized = serializeInternalActivity(activity, "internal");
+  const hash = createHash("sha256").update(`${serialized}\n${runRef ?? ""}`, "utf8").digest("hex");
   const append = db.transaction(() => {
     const existing = db.query<LedgerRow, [string]>(
       "SELECT * FROM agent_activity_ledger WHERE activity_id = ?",
     ).get(activity.activity_id);
     if (existing) {
-      if (existing.payload_hash === hash && serializeInternalActivity(activityCore(rowToActivity(existing)), "internal") === serialized) {
+      if (existing.payload_hash === hash && existing.run_ref === runRef
+        && serializeInternalActivity(activityCore(rowToActivity(existing)), "internal") === serialized) {
         return rowToActivity(existing);
       }
       throw new ActivityLedgerConflictError("activity_id already exists with a different payload");
@@ -508,14 +616,14 @@ export function appendActivity(db: Database, input: unknown): LedgerActivity {
       activity_id, timestamp, actor_type, agent_id, agent_role, account_id, action, evidence_refs,
       decision_status, decision_summary, next_action_owner, next_action, due_at,
       confidence_level, confidence_basis, sample_size, result_status, artifact_ref,
-      cycle_id, experiment_id, correlation_id, corrects_activity_id, payload_hash
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`).run(
+      cycle_id, experiment_id, correlation_id, run_ref, corrects_activity_id, payload_hash
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`).run(
       activity.activity_id, activity.timestamp, actorType, activity.agent_id, activity.agent_role,
       activity.account_id, activity.action, JSON.stringify(activity.evidence_refs),
       activity.decision_status, activity.decision_summary, activity.next_action_owner,
       activity.next_action, activity.due_at, activity.confidence_level, activity.confidence_basis,
       activity.sample_size, activity.result_status, activity.artifact_ref, activity.cycle_id,
-      activity.experiment_id, activity.correlation_id, activity.corrects_activity_id, hash,
+      activity.experiment_id, activity.correlation_id, runRef, activity.corrects_activity_id, hash,
     );
     const inserted = db.query<LedgerRow, [string]>(
       "SELECT * FROM agent_activity_ledger WHERE activity_id = ?",
@@ -524,6 +632,15 @@ export function appendActivity(db: Database, input: unknown): LedgerActivity {
     return rowToActivity(inserted);
   });
   return append.immediate();
+}
+
+export function appendActivity(db: Database, input: unknown): LedgerActivity {
+  return appendActivityWithRunRef(db, input, null);
+}
+
+/** Employee-only write primitive. The database requires a matching persisted packet. */
+export function appendEmployeeActivity(db: Database, input: unknown, runRef: string): LedgerActivity {
+  return appendActivityWithRunRef(db, input, runRef);
 }
 
 export function appendCorrection(
@@ -580,7 +697,7 @@ export function readActivities(
 }
 
 export const LEDGER_ACTIVITY_FIELDS = Object.freeze([
-  ...INTERNAL_ACTIVITY_FIELDS.slice(0, 4), "actor_type", ...INTERNAL_ACTIVITY_FIELDS.slice(4), "created_at",
+  ...INTERNAL_ACTIVITY_FIELDS.slice(0, 4), "actor_type", ...INTERNAL_ACTIVITY_FIELDS.slice(4), "run_ref", "created_at",
 ] as const);
 
 export function serializeLedgerActivity(activity: LedgerActivity, audience: "internal"): string {

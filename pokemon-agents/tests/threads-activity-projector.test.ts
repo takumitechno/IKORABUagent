@@ -78,13 +78,9 @@ describe("ORG04A fixture-based Threads activity projector", () => {
   });
 
   test("maps only explicitly proven employees and keeps unknown actors unknown", () => {
-    const explicit = normalizeThreadsActivityEvent(event({
-      source_event_id: "event-employee",
-      actor_type: "employee",
-      actor_id: "iori-validator",
-    }));
-    expect(explicit.agent_id).toBe("iori-validator");
-    expect(explicit.agent_role).toBe("evidence_validator");
+    expect(() => normalizeThreadsActivityEvent(event({
+      source_event_id: "event-employee", actor_type: "employee", actor_id: "iori-validator",
+    }))).toThrow("employee runner");
 
     const generic = normalizeThreadsActivityEvent(event({
       source_event_id: "event-generic",
@@ -110,7 +106,7 @@ describe("ORG04A fixture-based Threads activity projector", () => {
       source_event_id: "event-fake-employee",
       actor_type: "employee",
       actor_id: "fake-employee",
-    }))).toThrow("not canonical");
+    }))).toThrow("employee runner");
   });
 
   test("maps the allowlisted system capabilities without inventing employees", () => {

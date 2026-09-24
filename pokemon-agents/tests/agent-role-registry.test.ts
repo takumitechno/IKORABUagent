@@ -155,7 +155,7 @@ describe("formal employee and role registry", () => {
 
 describe("Threads actor mapping boundary", () => {
   test("maps only exact known identities and keeps functional actors out of employee identity", () => {
-    expect(mapThreadsActor("sashihara-orchestrator")).toMatchObject({ actor_kind: "employee", agent_id: "sashihara-orchestrator" });
+    expect(mapThreadsActor("sashihara-orchestrator")).toMatchObject({ actor_kind: "unknown", agent_id: null });
     expect(mapThreadsActor("Writer")).toMatchObject({ actor_kind: "formal_role", agent_id: "editorial-writer", agent_role: "editorial_writer" });
     expect(mapThreadsActor("Human")).toMatchObject({ actor_kind: "human", agent_id: null, agent_role: "human_approval" });
     for (const actor of [

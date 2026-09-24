@@ -4,7 +4,6 @@ import {
   type LedgerActivity,
 } from "./agent-activity-ledger";
 import {
-  EMPLOYEE_ROLE_REGISTRY,
   mapThreadsActor,
   type DecisionStatus,
   type InternalActivityInput,
@@ -243,9 +242,7 @@ function validateEventState(event: ThreadsActivityEvent): void {
 
 function actorAttribution(event: ThreadsActivityEvent): ThreadsActorAttribution {
   if (event.actor_type === "employee") {
-    const employee = EMPLOYEE_ROLE_REGISTRY.find((candidate) => candidate.agent_id === event.actor_id);
-    if (!employee) throw new ThreadsActivityContractError("employee attribution is not canonical");
-    return mapThreadsActor(employee.agent_id);
+    throw new ThreadsActivityContractError("employee attribution requires the employee runner");
   }
   if (event.actor_type === "writer") {
     if (!event.actor_id || (event.actor_id !== "Writer" && !/^writer_canary_[a-z0-9_-]{1,60}$/.test(event.actor_id))) {

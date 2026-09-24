@@ -87,6 +87,20 @@ fi
 
 log "resolved agent: $AGENT_SLUG (id=$AGENT_ID, model=$AGENT_MODEL)"
 
+# Canonical employees never enter the legacy Claude runner. B1 employees use
+# run-employee.ts; other employees remain inactive until they get a producer.
+CONTRACT_STATUS=$(bun "$REPO_ROOT/pokemon-agents/scripts/check-employee-contract.ts" "$AGENT_SLUG" 2>/dev/null || echo none)
+if [[ "$AGENT_MD_PATH" == .claude/agents/* ]]; then
+  if [ "$CONTRACT_STATUS" = "none" ]; then
+    log "ERROR: employee contract missing"
+    sql "UPDATE reflections SET status='failed', error_message='employee_contract_missing', ended_at=datetime('now','localtime') WHERE id=$TASK_ID;"
+  else
+    log "ERROR: canonical employee must use the deterministic employee runner"
+    sql "UPDATE reflections SET status='failed', error_message='employee_requires_run_employee', ended_at=datetime('now','localtime') WHERE id=$TASK_ID;"
+  fi
+  exit 1
+fi
+
 # ------------------------------------------------------------------
 # 3. Budget hard stop check
 # ------------------------------------------------------------------
@@ -243,8 +257,11 @@ log "cost=\$$COST tokens_in=$TOKENS_IN tokens_out=$TOKENS_OUT"
 if [ $EXIT_CODE -eq 0 ]; then
   # このエージェントから triggered される schedule を取得
   HOOKS=$(sql "
-    SELECT target_schedule_id FROM task_completion_hooks
-    WHERE source_agent_id=$AGENT_ID AND enabled=1;
+    SELECT h.target_schedule_id FROM task_completion_hooks h
+    JOIN agent_schedules s ON s.id=h.target_schedule_id
+    JOIN agents target ON target.id=s.agent_id
+    WHERE h.source_agent_id=$AGENT_ID AND h.enabled=1
+      AND target.source_md_path NOT LIKE '.claude/agents/%';
   ")
   for HOOK_SCHED_ID in $HOOKS; do
     # target schedule を fire: next_run_at=now にして scheduler が次 tick で拾う

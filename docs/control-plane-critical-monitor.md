@@ -4,6 +4,20 @@
 misses, backups older than 26 hours, tenant denial anomalies, OAuth readiness,
 Bridge/Dashboard health, and a stale listener on legacy port 5735.
 
+The JSON also contains a bounded `monitor-findings.v1` packet for Hana with
+Insights, Editorial, activity-projection, and Windows Task Scheduler freshness
+evidence. The caller must pass both the intended employee scope and, for live
+collection, the Bridge account explicitly; the monitor has no customer-account
+default:
+
+```text
+python scripts/control-plane-critical-monitor.py --scope acct_takumi_hq --account-id <bridge-account>
+```
+
+This remains read-only. It does not run Hana, register or change a scheduled
+task, rerun a job, restart a service, or send anything unless the existing
+operator-controlled `--notify` transport flag is separately supplied.
+
 Run without `--notify` to inspect JSON only. Add `--notify` to reuse
 `.claude/scripts/notify-discord.sh`. The notifier accepts only HTTP 2xx as
 success, aggregates messages to at most 1900 characters, suppresses duplicate

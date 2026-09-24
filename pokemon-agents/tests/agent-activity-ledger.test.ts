@@ -22,14 +22,14 @@ function input(overrides: Partial<InternalActivityInput> = {}): InternalActivity
   return {
     activity_id: "activity-001",
     timestamp: "2026-09-24T01:00:00Z",
-    agent_id: "iori-validator",
-    agent_role: "evidence_validator",
+    agent_id: null,
+    agent_role: "monitor",
     account_id: "acct_alpha",
-    action: "evidence_validated",
+    action: "workflow_checked",
     evidence_refs: ["source:report-1", "metric:observation-1"],
     decision_status: "not_applicable",
     decision_summary: "evidence_verified",
-    next_action_owner: "maika-hypothesizer",
+    next_action_owner: "system:monitor",
     next_action: "create_testable_hypothesis",
     due_at: null,
     confidence_level: "medium",
@@ -63,10 +63,12 @@ function count(db: Database): number {
 describe("append-only agent activity ledger", () => {
   test("appends the sanitized ORG02 contract and derives canonical actor types", () => {
     const db = ledgerDb();
-    const employee = appendActivity(db, input());
-    expect(employee.actor_type).toBe("employee");
-    expect(employee.account_id).toBe("acct_alpha");
-    expect(employee.created_at).toMatch(/^2026-|^20\d\d-/);
+    expect(() => appendActivity(db, input({ agent_id: "iori-validator", agent_role: "evidence_validator", action: "evidence_validated" })))
+      .toThrow("employee runner");
+    const monitor = appendActivity(db, input());
+    expect(monitor.actor_type).toBe("system_capability");
+    expect(monitor.account_id).toBe("acct_alpha");
+    expect(monitor.created_at).toMatch(/^2026-|^20\d\d-/);
 
     const writer = mapThreadsActor("Writer");
     expect(appendActivity(db, input({
@@ -209,9 +211,9 @@ describe("append-only agent activity ledger", () => {
     expect(page2.items.map((item) => item.activity_id)).toEqual(["activity-001"]);
     expect(page2.next_cursor).toBeNull();
     expect(readActivities(db, { account_id: "acct_beta" }).items).toHaveLength(1);
-    expect(readActivities(db, { agent_id: "iori-validator" }).items).toHaveLength(2);
-    expect(readActivities(db, { actor_type: "system_capability" }).items).toHaveLength(1);
-    expect(readActivities(db, { action: "workflow_checked" }).items).toHaveLength(1);
+    expect(readActivities(db, { agent_id: "iori-validator" }).items).toHaveLength(0);
+    expect(readActivities(db, { actor_type: "system_capability" }).items).toHaveLength(3);
+    expect(readActivities(db, { action: "workflow_checked" }).items).toHaveLength(3);
     expect(readActivities(db, { result_status: "blocked" }).items).toHaveLength(1);
     expect(readActivities(db, { since: "2026-09-24T01:30:00Z", until: "2026-09-24T02:30:00Z" }).items).toHaveLength(1);
     expect(readActivities(db, { cycle_id: "cycle-2" }).items).toHaveLength(1);
@@ -236,7 +238,7 @@ describe("append-only agent activity ledger", () => {
       decision_status, decision_summary, next_action_owner, next_action, due_at,
       confidence_level, confidence_basis, sample_size, result_status, artifact_ref,
       cycle_id, experiment_id, correlation_id, NULL, payload_hash
-    FROM agent_activity_ledger WHERE activity_id='activity-001'`).run()).toThrow("not canonical");
+    FROM agent_activity_ledger WHERE activity_id='activity-001'`).run()).toThrow("persisted run packet");
     expect(() => db.query(`INSERT INTO agent_activity_ledger (
       activity_id, timestamp, actor_type, agent_id, agent_role, account_id, action, evidence_refs,
       decision_status, decision_summary, next_action_owner, next_action, due_at,
@@ -287,7 +289,12 @@ describe("append-only agent activity ledger", () => {
 
   test("enforces employee action allowlists at service and database boundaries", () => {
     const db = ledgerDb();
-    expect(() => appendActivity(db, input({ action: "offer_adopted" }))).toThrow("not allowed");
+    expect(() => appendActivity(db, input({
+      agent_id: "iori-validator", agent_role: "evidence_validator", action: "offer_adopted",
+    }))).toThrow("not allowed");
+    expect(() => appendActivity(db, input({
+      agent_id: "iori-validator", agent_role: "evidence_validator", action: "evidence_validated",
+    }))).toThrow("employee runner");
     expect(appendActivity(db, input({ decision_summary: "stale_fact" })).decision_summary).toBe("stale_fact");
     expect(() => db.query(`INSERT INTO agent_activity_ledger (
       activity_id, timestamp, actor_type, agent_id, agent_role, account_id, action, evidence_refs,
@@ -295,11 +302,11 @@ describe("append-only agent activity ledger", () => {
       confidence_level, confidence_basis, sample_size, result_status, artifact_ref,
       cycle_id, experiment_id, correlation_id, corrects_activity_id, payload_hash
     ) SELECT
-      'activity-forbidden-role', timestamp, actor_type, agent_id, agent_role, account_id, 'offer_adopted', evidence_refs,
+      'activity-forbidden-role', timestamp, 'employee', 'iori-validator', 'evidence_validator', account_id, 'offer_adopted', evidence_refs,
       decision_status, decision_summary, next_action_owner, next_action, due_at,
       confidence_level, confidence_basis, sample_size, result_status, artifact_ref,
       cycle_id, experiment_id, correlation_id, NULL, payload_hash
-    FROM agent_activity_ledger WHERE activity_id='activity-001'`).run()).toThrow("not allowed for actor");
+    FROM agent_activity_ledger WHERE activity_id='activity-001'`).run()).toThrow("persisted run packet");
     db.close();
   });
 
@@ -340,7 +347,7 @@ describe("append-only agent activity ledger", () => {
     const activity = appendActivity(db, input());
     const serialized = serializeLedgerActivity(activity, "internal");
     expect(JSON.parse(serialized)).toMatchObject({
-      activity_id: "activity-001", actor_type: "employee", created_at: activity.created_at,
+      activity_id: "activity-001", actor_type: "system_capability", run_ref: null, created_at: activity.created_at,
     });
     expect(() => serializeLedgerActivity(activity, "customer" as "internal")).toThrow("internal-only");
     const server = readFileSync(resolve(root, "pokemon-agents/web/server.ts"), "utf8");
