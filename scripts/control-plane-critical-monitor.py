@@ -25,10 +25,10 @@ DENIAL_WINDOW_MINUTES = 10
 DENIAL_SPIKE_THRESHOLD = 5
 OAUTH_EXPIRY_WARNING_HOURS = 72
 RUNNER_HEARTBEAT_STALE_MINUTES = 120
-FRESHNESS = {
-    "insights_freshness": (180, 360),
-    "editorial_freshness": (180, 360),
-    "activity_projection_freshness": (30, 120),
+RUNNER_FINDINGS = {
+    "insights": "insights_freshness",
+    "outcome": "editorial_freshness",
+    "night_batch": "activity_projection_freshness",
 }
 
 if hasattr(sys.stdout, "reconfigure"):
@@ -43,6 +43,63 @@ def parse_time(value: Any) -> datetime | None:
         return parsed if parsed.tzinfo else parsed.replace(tzinfo=timezone.utc)
     except ValueError:
         return None
+
+
+def runner_evidence(
+    snapshot: dict[str, Any], now: datetime,
+) -> tuple[dict[str, tuple[str, float | None]], bool]:
+    """Validate the fixed sealed heartbeat set and derive freshness from timestamps."""
+    evidence = {runner: ("missing", None) for runner in RUNNER_FINDINGS}
+    heartbeats = snapshot.get("runner_heartbeats")
+    if not isinstance(heartbeats, list):
+        return evidence, True
+    invalid_identity = False
+    seen: set[str] = set()
+    for heartbeat in heartbeats:
+        if not isinstance(heartbeat, dict):
+            invalid_identity = True
+            continue
+        runner = heartbeat.get("runner_name")
+        if not isinstance(runner, str) or runner not in RUNNER_FINDINGS:
+            invalid_identity = True
+            continue
+        if runner in seen:
+            evidence[runner] = ("unsupported", None)
+            continue
+        seen.add(runner)
+        state = heartbeat.get("state")
+        run_status = heartbeat.get("run_status")
+        age_seconds = heartbeat.get("age_seconds")
+        if (state not in ("fresh", "stale", "missing", "invalid", "future")
+                or run_status not in ("succeeded", "failed", None)
+                or heartbeat.get("expected") != "unknown"
+                or not isinstance(heartbeat.get("healthy"), bool)
+                or (age_seconds is not None and (
+                    not isinstance(age_seconds, int) or isinstance(age_seconds, bool)
+                    or age_seconds < 0
+                ))):
+            evidence[runner] = ("unsupported", None)
+            continue
+        raw_seen = heartbeat.get("last_run_at")
+        seen_at = parse_time(raw_seen)
+        if (not isinstance(raw_seen, str)
+                or not re.search(r"(?:Z|[+-]\d{2}:\d{2})$", raw_seen)
+                or seen_at is None or seen_at > now
+                or state in {"missing", "invalid", "future"}):
+            evidence[runner] = ("invalid_timestamp", None)
+            continue
+        age_minutes = (now - seen_at).total_seconds() / 60
+        if run_status is None:
+            evidence[runner] = ("result_unavailable", age_minutes)
+        elif run_status == "failed":
+            evidence[runner] = ("failed", age_minutes)
+        elif state == "stale" or age_minutes > RUNNER_HEARTBEAT_STALE_MINUTES:
+            evidence[runner] = ("stale", age_minutes)
+        elif heartbeat["healthy"] is not True:
+            evidence[runner] = ("unhealthy", age_minutes)
+        else:
+            evidence[runner] = ("fresh", age_minutes)
+    return evidence, invalid_identity
 
 
 def credential_states(value: Any) -> dict[str, dict[str, Any]] | None:
@@ -227,9 +284,6 @@ def collect_snapshots(
             "self_reply_sync": features.get("self_reply_sync"),
             "night_attention": operations.get("night_attention"),
             "insights_quarantine": operations.get("insights_quarantine"),
-            "insights_age_minutes": operations.get("insights_age_minutes"),
-            "editorial_age_minutes": operations.get("editorial_age_minutes"),
-            "activity_projection_age_minutes": operations.get("activity_projection_age_minutes"),
             "runner_heartbeats": operations.get("runner_heartbeats"),
         })
     return snapshots, collection_alerts
@@ -276,15 +330,13 @@ def structured_findings(snapshot: dict[str, Any], scope: str, now: datetime) -> 
     tenant_ok = snapshot.get("canary_available") and int(canary.get("unexpected_allow", 0) or 0) == 0
     add("tenant_isolation", "present" if tenant_ok else "absent", 0 if tenant_ok else None,
         5, 10, "source:monitor:tenant", "dependency" if snapshot.get("canary_available") and not tenant_ok else None)
-    for code, key in (("insights_freshness", "insights_age_minutes"),
-                      ("editorial_freshness", "editorial_age_minutes"),
-                      ("activity_projection_freshness", "activity_projection_age_minutes")):
-        age = snapshot.get(key)
-        tolerance, delayed = FRESHNESS[code]
-        valid_age = isinstance(age, (int, float)) and not isinstance(age, bool) and age >= 0
-        add(code, "present" if valid_age else "unknown",
-            float(age) if valid_age else None,
-            tolerance, delayed, f"source:monitor:{account_id}:{code}")
+    heartbeat_states, _ = runner_evidence(snapshot, now)
+    for runner, code in RUNNER_FINDINGS.items():
+        state, age = heartbeat_states[runner]
+        add(code, "present" if state == "fresh" else "unknown" if state in {
+            "missing", "unsupported", "invalid_timestamp", "result_unavailable"
+        } else "absent", age, RUNNER_HEARTBEAT_STALE_MINUTES,
+            RUNNER_HEARTBEAT_STALE_MINUTES, f"source:monitor:{account_id}:{runner}")
     scheduler_ok = snapshot.get("scheduler_registered") is True and snapshot.get("scheduler_state") in {"Ready", "Running"}
     scheduler_blocked = snapshot.get("scheduler_registered") is True and snapshot.get("scheduler_state") == "Disabled"
     add("task_scheduler_state", "present" if scheduler_ok else "absent", 0 if scheduler_ok else None,
@@ -391,51 +443,23 @@ def evaluate(snapshot: dict[str, Any], now: datetime) -> list[dict[str, str]]:
                 elif remaining <= OAUTH_EXPIRY_WARNING_HOURS:
                     add("oauth_expiring", f"{purpose} credential expires in {remaining:.1f}h", entity)
 
-    for code, key in (("insights", "insights_age_minutes"), ("editorial", "editorial_age_minutes"),
-                      ("activity_projection", "activity_projection_age_minutes")):
-        age_minutes = snapshot.get(key)
-        delayed = FRESHNESS[f"{code}_freshness"][1]
-        if not isinstance(age_minutes, (int, float)) or isinstance(age_minutes, bool) or age_minutes < 0:
-            add("runner_freshness_unavailable", f"{code} runner freshness is unavailable", f"{account_id}:{code}")
-        elif age_minutes > delayed:
-            add("runner_stale", f"{code} runner heartbeat is {age_minutes:.0f}m old", f"{account_id}:{code}")
-    heartbeats = snapshot.get("runner_heartbeats")
-    if not isinstance(heartbeats, list) or not heartbeats:
-        add("runner_freshness_unavailable", "Runner heartbeat telemetry is unavailable", f"{account_id}:runner_heartbeats")
-        heartbeats = []
-    for heartbeat in heartbeats:
-        if not isinstance(heartbeat, dict):
-            add("runner_freshness_unavailable", "Runner heartbeat evidence is invalid", f"{account_id}:runner_heartbeats")
-            continue
-        runner = heartbeat.get("runner_name")
-        if not isinstance(runner, str) or runner not in ("insights", "outcome", "night_batch"):
-            add("runner_freshness_unavailable", "Runner heartbeat identity is invalid", f"{account_id}:runner_heartbeats")
-            continue
-        state = heartbeat.get("state")
-        run_status = heartbeat.get("run_status")
-        if (not isinstance(state, str)
-                or state not in ("fresh", "stale", "missing", "invalid", "future")
-                or run_status not in ("succeeded", "failed", None)
-                or heartbeat.get("expected") != "unknown"
-                or not isinstance(heartbeat.get("healthy"), bool)):
+    heartbeat_states, invalid_identity = runner_evidence(snapshot, now)
+    if invalid_identity:
+        add("runner_freshness_unavailable", "Runner heartbeat identity is invalid", f"{account_id}:runner_heartbeats")
+    for runner, (state, age_minutes) in heartbeat_states.items():
+        if state == "missing":
+            add("runner_freshness_unavailable", f"Required {runner} heartbeat is missing", f"{account_id}:{runner}")
+        elif state == "unsupported":
             add("runner_freshness_unavailable", f"{runner} heartbeat enum is unsupported", f"{account_id}:{runner}")
-            continue
-        raw_seen = heartbeat.get("last_run_at")
-        seen = parse_time(raw_seen)
-        if seen is not None and isinstance(raw_seen, str):
-            parsed_seen = datetime.fromisoformat(raw_seen.replace("Z", "+00:00"))
-            if parsed_seen.tzinfo is None or parsed_seen.utcoffset() is None:
-                seen = None
-        age_minutes = (now - seen).total_seconds() / 60 if seen else None
-        if state in {"missing", "invalid", "future"} or age_minutes is None or age_minutes < 0:
+        elif state == "invalid_timestamp":
             add("runner_freshness_unavailable", f"{runner} heartbeat timestamp is invalid", f"{account_id}:{runner}")
-        elif run_status is None:
+        elif state == "result_unavailable":
             add("runner_freshness_unavailable", f"{runner} heartbeat result is unavailable", f"{account_id}:{runner}")
-        elif state == "stale" or age_minutes > RUNNER_HEARTBEAT_STALE_MINUTES:
-            add("runner_stale", f"{runner} runner heartbeat is {age_minutes:.0f}m old", f"{account_id}:{runner}")
-        elif run_status == "failed":
+        elif state == "failed":
             add("runner_failed", f"{runner} runner last run failed", f"{account_id}:{runner}")
-        elif heartbeat["healthy"] is not True:
+        elif state == "stale":
+            add("runner_stale", f"{runner} runner heartbeat is {age_minutes:.0f}m old", f"{account_id}:{runner}")
+        elif state == "unhealthy":
             add("runner_unhealthy", f"{runner} runner is not healthy", f"{account_id}:{runner}")
 
     if not snapshot.get("canary_available"):

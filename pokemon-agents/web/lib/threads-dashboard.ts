@@ -340,7 +340,8 @@ function operationsFrom(value: unknown): ThreadsOperations {
   const selfReply = text(features?.self_reply_sync);
   const attention = record(source.night_attention);
   const quarantine = record(source.insights_quarantine);
-  const coverage = (value: unknown) => value === "complete" || value === "partial" ? value : "unknown";
+  const coverage = (value: unknown, truncated: boolean) => truncated && value === "complete"
+    ? "partial" : value === "complete" || value === "partial" ? value : "unknown";
   const nightBatchItems = Array.isArray(source.night_batch_items)
     ? source.night_batch_items.map(record).filter((row): row is Record<string, unknown> => row !== null)
       .map((row): NightBatchItem | null => {
@@ -364,7 +365,7 @@ function operationsFrom(value: unknown): ThreadsOperations {
       total: nonNegativeInt(attention?.total) ?? 0,
       byReason: (record(attention?.by_reason) as Record<string, number> | null) ?? {},
       itemsTruncated: attention?.items_truncated === true,
-      coverage: coverage(attention?.coverage),
+      coverage: coverage(attention?.coverage, attention?.items_truncated === true),
     },
     insightsQuarantine: {
       total: nonNegativeInt(quarantine?.total) ?? 0,
@@ -374,7 +375,7 @@ function operationsFrom(value: unknown): ThreadsOperations {
           lastFailedAt: text(row.last_failed_at)!, errorCode: text(row.error_code)!,
         })) : [],
       itemsTruncated: quarantine?.items_truncated === true,
-      coverage: coverage(quarantine?.coverage),
+      coverage: coverage(quarantine?.coverage, quarantine?.items_truncated === true),
     },
     runnerHeartbeats: Array.isArray(source.runner_heartbeats) ? source.runner_heartbeats.map(record)
       .filter((row): row is Record<string, unknown> => row !== null).map((row) => {

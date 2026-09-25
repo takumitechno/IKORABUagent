@@ -421,7 +421,7 @@ export interface MirinyaCostReadModel {
   waste_count: number;
   attribution_coverage: { attributed: number; total: number; ratio: number | null };
   unallocated_known_micros: number;
-  model_mix: ReadonlyArray<{ model: string; calls: number; known_cost_micros: number }>;
+  model_mix: ReadonlyArray<{ model: string; calls: number; known_cost_micros: number | null }>;
   currency: string | null;
   threads_status: ThreadsAiUsageSummary["status"];
   revenue: null;
@@ -454,36 +454,47 @@ export function buildMirinyaCostReadModel(db: Database, options: {
   const attributed = rows.filter((row) => row.model && row.provider && row.operation && (row.agent_id || row.task_ref)).length;
   const unallocatedKnown = rows.filter((row) => !(row.model && row.provider && row.operation && (row.agent_id || row.task_ref)))
     .reduce((sum, row) => sum + (row.cost_amount_micros ?? 0), 0);
-  const mixMap = new Map<string, { calls: number; known: number }>();
+  const mixMap = new Map<string, { calls: number; known: number | null }>();
   for (const row of rows) {
     const model = row.model ?? "unknown";
     const current = mixMap.get(model) ?? { calls: 0, known: 0 };
-    current.calls++; current.known += row.cost_amount_micros ?? 0; mixMap.set(model, current);
+    current.calls++;
+    current.known = current.known === null || row.cost_amount_micros === null
+      ? null : current.known + row.cost_amount_micros;
+    mixMap.set(model, current);
   }
   const threads = options.threadsSummary ?? disconnectedThreads(accountId ?? "internal", from.slice(0, 10), to.slice(0, 10), "not_connected");
+  const threadsCalls = threads.status === "connected"
+    ? threads.model_mix.reduce((sum, row) => sum + row.calls, 0) : 0;
+  const threadsUnknownCalls = threads.status === "connected" ? Math.max(
+    threads.unknown_cost_calls,
+    threads.model_mix.filter((row) => row.known_cost_micros === null).reduce((sum, row) => sum + row.calls, 0),
+    threads.known_cost_micros === null && threadsCalls > 0 ? threadsCalls : 0,
+  ) : 0;
   if (threads.status === "connected") {
     for (const row of threads.model_mix) {
       const current = mixMap.get(row.model) ?? { calls: 0, known: 0 };
       current.calls += row.calls;
-      current.known += row.known_cost_micros ?? 0;
+      current.known = current.known === null || row.known_cost_micros === null
+        ? null : current.known + row.known_cost_micros;
       mixMap.set(row.model, current);
     }
   }
   const mixed = currencies.size > 1 || (threads.status === "connected" && threads.currency !== null && currencies.size === 1 && !currencies.has(threads.currency));
-  const unknownComponents = unknown + (threads.status === "connected" ? threads.unknown_cost_calls : 0) > 0;
+  const unknownComponents = unknown + threadsUnknownCalls > 0;
   const currency = mixed ? null : (currencies.values().next().value ?? threads.currency ?? null);
   return Object.freeze({
     period: Object.freeze({ from, to }), scope: Object.freeze({ kind: options.scopeKind, account_id: accountId }),
     control_plane_ai_cost_known_micros: known,
     threads_ai_cost_known_micros: threads.status === "connected" ? threads.known_cost_micros : null,
-    unknown_cost_calls: unknown + (threads.status === "connected" ? threads.unknown_cost_calls : 0),
+    unknown_cost_calls: unknown + threadsUnknownCalls,
     waste_known_micros: wasteRows.reduce((sum, row) => sum + (row.cost_amount_micros ?? 0), 0)
       + (threads.status === "connected" ? threads.waste_known_micros ?? 0 : 0),
     waste_count: wasteRows.length + (threads.status === "connected" ? threads.waste_count : 0),
     attribution_coverage: Object.freeze({ attributed, total: rows.length, ratio: rows.length ? attributed / rows.length : null }),
     unallocated_known_micros: options.scopeKind === "internal" ? known + (threads.status === "connected" ? threads.known_cost_micros ?? 0 : 0) : unallocatedKnown,
     model_mix: Object.freeze([...mixMap.entries()].map(([model, value]) => Object.freeze({ model, calls: value.calls, known_cost_micros: value.known }))
-      .sort((a, b) => b.known_cost_micros - a.known_cost_micros || a.model.localeCompare(b.model))),
+      .sort((a, b) => (b.known_cost_micros ?? -1) - (a.known_cost_micros ?? -1) || a.model.localeCompare(b.model))),
     currency, threads_status: threads.status, revenue: null, margin: null,
     null_reason: mixed ? "mixed_currency" : unknownComponents ? "unknown_component" : "not_connected",
   });

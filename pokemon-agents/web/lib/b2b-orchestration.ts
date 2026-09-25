@@ -168,7 +168,7 @@ export interface MirinyaOutputPacket {
   readonly unknown_cost_calls: number;
   readonly waste_known_micros: number | null;
   readonly waste_call_count: number;
-  readonly model_mix: ReadonlyArray<{ readonly model: string; readonly calls: number; readonly known_cost_micros: number }>;
+  readonly model_mix: ReadonlyArray<{ readonly model: string; readonly calls: number; readonly known_cost_micros: number | null }>;
   readonly attribution_coverage: { readonly attributed: number; readonly total: number; readonly ratio: number | null };
   readonly unresolved_attribution_calls: number;
   readonly unallocated_cost_known_micros: number | null;
@@ -212,7 +212,8 @@ export function buildMirinyaOutput(db: Database, options: {
   else if (model.scope.kind === "internal") nullReason = "internal_shared_cost_unallocated";
   else margin = revenue.revenue_known_micros - revenue.refund_known_micros - revenue.commercial_cost_known_micros - aiKnown;
   const dataStatus = reasons.length ? "action_required" : revenue.status === "unavailable" || model.threads_status === "unavailable"
-    ? "unavailable" : revenue.status === "connected" && model.threads_status === "connected" ? "complete" : "partial";
+    ? "unavailable" : revenue.status === "connected" && model.threads_status === "connected"
+      && model.unknown_cost_calls === 0 ? "complete" : "partial";
   return Object.freeze({
     schema_version: "mirinya-economics-output.v1", period: model.period, scope: model.scope,
     control_plane_ai_cost_known_micros: model.control_plane_ai_cost_known_micros,

@@ -3,6 +3,11 @@ import { describe, expect, test } from "bun:test";
 import { createHash } from "node:crypto";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
+import {
+  PRODUCER_CONTRACT_REVISION,
+  canonicalContractText,
+  renderContract,
+} from "../scripts/generate-threads-bridge-contract";
 import { loadThreadsDashboard } from "../web/lib/threads-dashboard";
 import { renderImprovementReport } from "../web/routes/improvement-report";
 import { renderInternalOperations } from "../web/routes/internal-operations";
@@ -14,6 +19,7 @@ import {
   editorialCycleV1,
   editorialInternalV1,
   recentContentV1,
+  runnerHeartbeatsV1,
   safetyResponseV1,
 } from "./threads-bridge-v1-fixtures";
 
@@ -60,14 +66,23 @@ function internalDb(): Database {
 }
 
 describe("Threads Bridge response contract v1", () => {
-  test("uses checked-in generated types derived from the sealed producer artifact", () => {
+  test("uses deterministic generated types from the canonical sealed producer artifact", () => {
     const source = readFileSync(resolve(import.meta.dir, "../web/lib/threads-bridge-contract-v1.generated.ts"), "utf8");
-    const artifact = readFileSync(resolve(import.meta.dir, "../contracts/bridge_contract_v1.json"));
+    const artifact = readFileSync(resolve(import.meta.dir, "../contracts/bridge_contract_v1.json"), "utf8");
+    const canonical = canonicalContractText(artifact);
+    const expectedHash = "14ed73d33a02b3f8877a3045d226f23b7d9e7686f9dc2c8ef595aeae934fa3dc";
     expect(source).toContain("GENERATED FILE — DO NOT EDIT BY HAND");
     expect(source).toContain("pokemon-agents/contracts/bridge_contract_v1.json");
-    expect(source).toContain("78c640cb5eeb203ecac6d8177d00638091259f79");
+    expect(PRODUCER_CONTRACT_REVISION).toBe("10a071390daea91c9c687bc60fff4da8cee4c061");
+    expect(source).toContain(`Producer contract revision: ${PRODUCER_CONTRACT_REVISION}`);
     expect(source).toContain("THREADS_BRIDGE_SCHEMA_VERSION = 1");
-    expect(source).toContain(createHash("sha256").update(artifact).digest("hex"));
+    expect(createHash("sha256").update(canonical, "utf8").digest("hex")).toBe(expectedHash);
+    expect(source).toContain(`Artifact SHA-256: ${expectedHash}`);
+    expect(renderContract(artifact)).toBe(source);
+    expect(renderContract(canonical.replace(/\n/g, "\r\n"))).toBe(source);
+    expect(renderContract(artifact)).not.toBe(`${source}// drift\n`);
+    const check = Bun.spawnSync(["bun", resolve(import.meta.dir, "../scripts/generate-threads-bridge-contract.ts"), "--check"]);
+    expect(check.exitCode).toBe(0);
   });
 
   test("accepts valid schema v1 and unknown additive fields", async () => {
@@ -83,11 +98,10 @@ describe("Threads Bridge response contract v1", () => {
 
   test("validates and normalizes sealed operations semantics", async () => {
     const account = accountResponseV1({ operations: {
-      runner_heartbeats: [{
-        runner_name: "insights", state: "fresh", run_status: "succeeded",
-        last_run_at: "2026-09-21T00:00:00Z", age_seconds: 10,
-        expected: "unknown", healthy: true,
-      }],
+      runner_heartbeats: runnerHeartbeatsV1({ insights: {
+        state: "fresh", run_status: "succeeded", last_run_at: "2026-09-21T00:00:00Z",
+        age_seconds: 10, expected: "unknown", healthy: true,
+      } }),
       night_attention: { window_hours: 96, total: 101, by_reason: { blocked: 1 }, items_truncated: true, coverage: "partial" },
       insights_quarantine: { total: 51, items: [], items_truncated: true, coverage: "partial" },
     } });
@@ -107,11 +121,10 @@ describe("Threads Bridge response contract v1", () => {
     expect((await loadThreadsDashboard({ bridgeUrl, fetcher: fixtureFetcher({ account: missingExpected }) })).bridgeStatus)
       .toBe("MALFORMED_RESPONSE");
 
-    const unknownState = accountResponseV1({ operations: { runner_heartbeats: [{
-      runner_name: "insights", state: "disabled", run_status: "succeeded",
-      last_run_at: "2026-09-21T00:00:00Z", age_seconds: 10,
-      expected: "unknown", healthy: true,
-    }] } });
+    const unknownState = accountResponseV1({ operations: { runner_heartbeats: runnerHeartbeatsV1({ insights: {
+      state: "disabled", run_status: "succeeded", last_run_at: "2026-09-21T00:00:00Z",
+      age_seconds: 10, expected: "unknown", healthy: true,
+    } }) } });
     expect((await loadThreadsDashboard({ bridgeUrl, fetcher: fixtureFetcher({ account: unknownState }) })).bridgeStatus)
       .toBe("MALFORMED_RESPONSE");
 
@@ -129,11 +142,26 @@ describe("Threads Bridge response contract v1", () => {
       runner_name: "night_batch", state: "fresh", run_status: "succeeded",
       last_run_at: "2999-01-01T00:00:00Z", age_seconds: 0, expected: "unknown", healthy: true,
     }]) {
-      const account = accountResponseV1({ operations: { runner_heartbeats: [heartbeat] } });
+      const account = accountResponseV1({ operations: { runner_heartbeats: runnerHeartbeatsV1({ night_batch: heartbeat }) } });
       const data = await loadThreadsDashboard({ bridgeUrl, fetcher: fixtureFetcher({ account }) });
       expect(data.connected).toBe(true);
       expect(data.operations.runnerHeartbeats[0].available).toBe(false);
       expect(data.operations.runnerHeartbeats[0].healthy).toBe(false);
+    }
+  });
+
+  test("requires every sealed runner and rejects incoherent complete coverage", async () => {
+    const omitted = accountResponseV1();
+    omitted.operations.runner_heartbeats = omitted.operations.runner_heartbeats.filter((row) => row.runner_name !== "outcome");
+    expect((await loadThreadsDashboard({ bridgeUrl, fetcher: fixtureFetcher({ account: omitted }) })).bridgeStatus)
+      .toBe("MALFORMED_RESPONSE");
+
+    for (const key of ["night_attention", "insights_quarantine"] as const) {
+      const account = accountResponseV1();
+      account.operations[key].items_truncated = true;
+      account.operations[key].coverage = "complete";
+      expect((await loadThreadsDashboard({ bridgeUrl, fetcher: fixtureFetcher({ account }) })).bridgeStatus)
+        .toBe("MALFORMED_RESPONSE");
     }
   });
 

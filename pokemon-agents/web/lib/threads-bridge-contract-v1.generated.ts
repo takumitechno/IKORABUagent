@@ -1,8 +1,8 @@
 /**
  * GENERATED FILE — DO NOT EDIT BY HAND.
  * Source: pokemon-agents/contracts/bridge_contract_v1.json
- * Accepted producer base: 78c640cb5eeb203ecac6d8177d00638091259f79
- * Artifact SHA-256: 4e765419b3bbf453434c383a71972665174cee98ebf0f044d88816f9985353a1
+ * Producer contract revision: 10a071390daea91c9c687bc60fff4da8cee4c061
+ * Artifact SHA-256: 14ed73d33a02b3f8877a3045d226f23b7d9e7686f9dc2c8ef595aeae934fa3dc
  */
 
 export const THREADS_BRIDGE_SCHEMA_VERSION = 1 as const;

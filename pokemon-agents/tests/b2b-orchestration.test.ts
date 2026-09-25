@@ -94,6 +94,49 @@ describe("B2B deterministic control-plane chain", () => {
     database.close();
   });
 
+  test("distinguishes unknown Threads cost from explicit zero across Mirinya states", () => {
+    const revenue = { status: "connected" as const, revenue_known_micros: 10_000,
+      refund_known_micros: 0, commercial_cost_known_micros: 1_000, currency: "USD" };
+    const summary = (known: number | null, unknown: number, calls: number, modelKnown: number | null) => ({
+      status: "connected" as const, account_id: "acct_client", from: "2026-09-01", to: "2026-10-01",
+      known_cost_micros: known, unknown_cost_calls: unknown, waste_known_micros: 0,
+      waste_count: 0, currency: "USD", model_mix: calls
+        ? [{ model: "paid-model", calls, known_cost_micros: modelKnown }] : [],
+    });
+
+    const database = db();
+    const unknownNull = buildMirinyaOutput(database, { from, to, scopeKind: "account", accountId: "acct_client",
+      revenue, threadsSummary: summary(null, 0, 2, null) });
+    expect(unknownNull).toMatchObject({ threads_ai_cost_known_micros: null, unknown_cost_calls: 2,
+      contribution_margin_micros: null, margin_null_reason: "unknown_component", data_status: "partial" });
+    expect(unknownNull.model_mix).toEqual([{ model: "paid-model", calls: 2, known_cost_micros: null }]);
+
+    const explicitZero = buildMirinyaOutput(database, { from, to, scopeKind: "account", accountId: "acct_client",
+      revenue, threadsSummary: summary(0, 0, 2, 0) });
+    expect(explicitZero).toMatchObject({ threads_ai_cost_known_micros: 0, unknown_cost_calls: 0,
+      contribution_margin_micros: 9_000, margin_null_reason: null, data_status: "complete" });
+
+    const positive = buildMirinyaOutput(database, { from, to, scopeKind: "account", accountId: "acct_client",
+      revenue, threadsSummary: summary(100, 0, 2, 100) });
+    expect(positive).toMatchObject({ threads_ai_cost_known_micros: 100, unknown_cost_calls: 0,
+      contribution_margin_micros: 8_900, margin_null_reason: null, data_status: "complete" });
+
+    const declaredUnknown = buildMirinyaOutput(database, { from, to, scopeKind: "account", accountId: "acct_client",
+      revenue, threadsSummary: summary(100, 1, 2, 100) });
+    expect(declaredUnknown).toMatchObject({ unknown_cost_calls: 1, contribution_margin_micros: null,
+      margin_null_reason: "unknown_component", data_status: "partial" });
+
+    const noCalls = buildMirinyaOutput(database, { from, to, scopeKind: "account", accountId: "acct_client",
+      revenue, threadsSummary: summary(null, 0, 0, null) });
+    expect(noCalls).toMatchObject({ threads_ai_cost_known_micros: null, unknown_cost_calls: 0,
+      contribution_margin_micros: 9_000, data_status: "complete" });
+
+    const disconnected = buildMirinyaOutput(database, { from, to, scopeKind: "account", accountId: "acct_client", revenue });
+    expect(disconnected).toMatchObject({ threads_ai_cost_known_micros: null, contribution_margin_micros: null,
+      margin_null_reason: "unknown_component", data_status: "partial" });
+    database.close();
+  });
+
   test("Mirinya hands off only actionable economics packets and persists a canonical run", () => {
     const database = db();
     usage(database, "call:u1", null, null); usage(database, "call:u2", null, null); usage(database, "call:u3", null, null);

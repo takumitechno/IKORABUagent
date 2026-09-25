@@ -266,12 +266,14 @@ function validateOperations(value: unknown, path: string): void {
   nonNegativeInteger(attention.window_hours, `${path}.night_attention.window_hours`);
   nonNegativeInteger(attention.total, `${path}.night_attention.total`);
   countMap(attention.by_reason, `${path}.night_attention.by_reason`);
-  boolean(attention.items_truncated, `${path}.night_attention.items_truncated`);
-  oneOf(attention.coverage, `${path}.night_attention.coverage`, ["complete", "partial", "unknown"] as const);
+  const attentionTruncated = boolean(attention.items_truncated, `${path}.night_attention.items_truncated`);
+  const attentionCoverage = oneOf(attention.coverage, `${path}.night_attention.coverage`, ["complete", "partial", "unknown"] as const);
+  if (attentionTruncated && attentionCoverage === "complete") malformed(`${path}.night_attention.coverage:truncated-complete`);
   const quarantine = object(got.insights_quarantine, `${path}.insights_quarantine`);
   nonNegativeInteger(quarantine.total, `${path}.insights_quarantine.total`);
-  boolean(quarantine.items_truncated, `${path}.insights_quarantine.items_truncated`);
-  oneOf(quarantine.coverage, `${path}.insights_quarantine.coverage`, ["complete", "partial", "unknown"] as const);
+  const quarantineTruncated = boolean(quarantine.items_truncated, `${path}.insights_quarantine.items_truncated`);
+  const quarantineCoverage = oneOf(quarantine.coverage, `${path}.insights_quarantine.coverage`, ["complete", "partial", "unknown"] as const);
+  if (quarantineTruncated && quarantineCoverage === "complete") malformed(`${path}.insights_quarantine.coverage:truncated-complete`);
   array(quarantine.items, `${path}.insights_quarantine.items`).forEach((item, index) => {
     const row = object(item, `${path}.insights_quarantine.items[${index}]`);
     string(row.content_id, `${path}.insights_quarantine.items[${index}].content_id`);
@@ -279,9 +281,12 @@ function validateOperations(value: unknown, path: string): void {
     timestamp(row.last_failed_at, `${path}.insights_quarantine.items[${index}].last_failed_at`);
     string(row.error_code, `${path}.insights_quarantine.items[${index}].error_code`);
   });
+  const runnerNames = new Set<string>();
   array(got.runner_heartbeats, `${path}.runner_heartbeats`).forEach((item, index) => {
     const row = object(item, `${path}.runner_heartbeats[${index}]`);
-    oneOf(row.runner_name, `${path}.runner_heartbeats[${index}].runner_name`, ["insights", "outcome", "night_batch"] as const);
+    const runnerName = oneOf(row.runner_name, `${path}.runner_heartbeats[${index}].runner_name`, ["insights", "outcome", "night_batch"] as const);
+    if (runnerNames.has(runnerName)) malformed(`${path}.runner_heartbeats[${index}].runner_name:duplicate`);
+    runnerNames.add(runnerName);
     const state = oneOf(row.state, `${path}.runner_heartbeats[${index}].state`, ["fresh", "stale", "missing", "invalid", "future"] as const);
     if (row.run_status !== null) oneOf(row.run_status, `${path}.runner_heartbeats[${index}].run_status`, ["succeeded", "failed"] as const);
     const lastRunAt = nullableString(row.last_run_at, `${path}.runner_heartbeats[${index}].last_run_at`);
@@ -294,6 +299,9 @@ function validateOperations(value: unknown, path: string): void {
     oneOf(row.expected, `${path}.runner_heartbeats[${index}].expected`, ["unknown"] as const);
     boolean(row.healthy, `${path}.runner_heartbeats[${index}].healthy`);
   });
+  for (const runnerName of ["insights", "outcome", "night_batch"] as const) {
+    if (!runnerNames.has(runnerName)) malformed(`${path}.runner_heartbeats:${runnerName}:missing`);
+  }
   const usage = object(got.rolling_usage, `${path}.rolling_usage`);
   nonNegativeInteger(usage.publications_last_hour, `${path}.rolling_usage.publications_last_hour`);
   nonNegativeInteger(usage.publications_last_24h, `${path}.rolling_usage.publications_last_24h`);

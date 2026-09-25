@@ -1,6 +1,11 @@
 import { describe, expect, test } from "bun:test";
 import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { resolve } from "node:path";
+import { loadThreadsDashboard } from "../web/lib/threads-dashboard";
+import {
+  accountResponseV1, editorialCustomerV1, editorialInternalV1,
+  safetyResponseV1,
+} from "./threads-bridge-v1-fixtures";
 
 const root = resolve(import.meta.dir, "..", "..");
 const monitor = resolve(root, "scripts/control-plane-critical-monitor.py");
@@ -43,15 +48,18 @@ async function runAllAccounts(bridgeUrl: string) {
   return { code, body: JSON.parse(stdout), stderr: await new Response(child.stderr).text() };
 }
 
+function freshHeartbeats(overrides: Partial<Record<"insights" | "outcome" | "night_batch", Record<string, unknown>>> = {}) {
+  return (["insights", "outcome", "night_batch"] as const).map((runner_name) => ({
+    runner_name, state: "fresh", run_status: "succeeded",
+    last_run_at: "2026-09-22T05:30:00Z", age_seconds: 1800,
+    expected: "unknown", healthy: true, ...overrides[runner_name],
+  }));
+}
+
 const freshSignals = {
   credential_readiness_available: true,
   credential_readiness: { publish: { ready: true }, insights: { ready: true } },
-  insights_age_minutes: 10, editorial_age_minutes: 10, activity_projection_age_minutes: 10,
-  runner_heartbeats: [{
-    runner_name: "insights", state: "fresh", run_status: "succeeded",
-    last_run_at: "2026-09-22T05:30:00Z", age_seconds: 1800,
-    expected: "unknown", healthy: true,
-  }],
+  runner_heartbeats: freshHeartbeats(),
   night_attention: { total: 0, items_truncated: false, coverage: "complete" },
   insights_quarantine: { total: 0, items: [], items_truncated: false, coverage: "complete" },
 };
@@ -75,6 +83,38 @@ describe("Control Plane CRITICAL monitor", () => {
       "task_scheduler_state",
     ]);
     expect(got.body.message.length).toBeLessThanOrEqual(1900);
+  });
+
+  test("carries one contract-valid producer payload through validation, normalization, and ATTENTION", async () => {
+    const account = accountResponseV1({ account_id: "acct_fixture", operations: {
+      runner_heartbeats: freshHeartbeats(),
+      night_attention: { window_hours: 96, total: 0, by_reason: {}, items_truncated: false, coverage: "complete" },
+      insights_quarantine: { total: 0, items: [], items_truncated: false, coverage: "complete" },
+    } });
+    const data = await loadThreadsDashboard({
+      bridgeUrl: "http://127.0.0.1:8765", accountId: "acct_fixture",
+      fetcher: (async (input: RequestInfo | URL) => {
+        const url = String(input);
+        if (url.includes("/autopilot/v2/safety/status")) return Response.json(safetyResponseV1({ account_id: "acct_fixture" }));
+        if (url.includes("/editorial/internal")) return Response.json(editorialInternalV1({ account_id: "acct_fixture" }));
+        if (url.includes("/editorial/customer")) return Response.json(editorialCustomerV1({ account_id: "acct_fixture" }));
+        return Response.json(account);
+      }) as typeof fetch,
+    });
+    expect(data.connected).toBe(true);
+    expect(data.operations.runnerHeartbeats).toHaveLength(3);
+    expect(data.operations.runnerHeartbeats.every((row) => row.available && row.expected === "unknown")).toBe(true);
+    const got = runFixture("sealed-e2e", {
+      bridge_healthy: true, dashboard_healthy: true, account_available: true,
+      ...freshSignals, runner_heartbeats: account.operations.runner_heartbeats,
+      night_attention: account.operations.night_attention,
+      insights_quarantine: account.operations.insights_quarantine,
+      night_items: [], readiness: { status: "active", ready_for_dry_run: true },
+      self_reply_sync: "active", canary_available: true,
+      tenant_canary: { unexpected_allow: 0, unexpected_deny: 0, recent: [] },
+      backup_age_hours: 2, backup_valid: true, legacy_5735_pid: null,
+    });
+    expect(got.body).toMatchObject({ status: "HEALTHY", alerts: [] });
   });
 
   test("aggregates all critical classes and includes legacy PID", () => {
@@ -120,8 +160,12 @@ describe("Control Plane CRITICAL monitor", () => {
       backup_age_hours: 2, backup_valid: true, legacy_5735_pid: null,
     };
     const got = runFixture("multi-account", { accounts: [
-      { ...common, account_id: "acct_b", night_items: [], insights_age_minutes: 361 },
-      { ...common, account_id: "acct_a", night_items: [], insights_age_minutes: 361 },
+      { ...common, account_id: "acct_b", night_items: [], runner_heartbeats: freshHeartbeats({ insights: {
+        state: "stale", last_run_at: "2026-09-21T23:59:00Z", age_seconds: 21660, healthy: false,
+      } }) },
+      { ...common, account_id: "acct_a", night_items: [], runner_heartbeats: freshHeartbeats({ insights: {
+        state: "stale", last_run_at: "2026-09-21T23:59:00Z", age_seconds: 21660, healthy: false,
+      } }) },
     ] });
     expect(got.body.accounts).toEqual(["acct_a", "acct_b"]);
     expect(got.body.alerts.map((row: { code: string; entity: string }) => `${row.code}:${row.entity}`)).toEqual([
@@ -170,9 +214,9 @@ describe("Control Plane CRITICAL monitor", () => {
     expect(got.code).toBe(2);
     expect(got.body.status).toBe("CRITICAL");
     expect(got.body.alerts.map((row: { code: string; entity: string }) => `${row.code}:${row.entity}`)).toEqual([
-      "runner_freshness_unavailable:acct_fixture:activity_projection",
-      "runner_freshness_unavailable:acct_fixture:editorial",
       "runner_freshness_unavailable:acct_fixture:insights",
+      "runner_freshness_unavailable:acct_fixture:night_batch",
+      "runner_freshness_unavailable:acct_fixture:outcome",
       "runner_freshness_unavailable:acct_fixture:runner_heartbeats",
     ]);
     expect(got.body.daily_digest.critical_count).toBe(4);
@@ -181,7 +225,9 @@ describe("Control Plane CRITICAL monitor", () => {
   test("distinguishes stale runner evidence from unavailable evidence", () => {
     const got = runFixture("freshness-stale", {
       bridge_healthy: true, dashboard_healthy: true, account_available: true,
-      ...freshSignals, insights_age_minutes: 361,
+      ...freshSignals, runner_heartbeats: freshHeartbeats({ insights: {
+        state: "stale", last_run_at: "2026-09-21T23:59:00Z", age_seconds: 21660, healthy: false,
+      } }),
       night_items: [], readiness: { status: "active", ready_for_dry_run: true },
       self_reply_sync: "active", canary_available: true,
       tenant_canary: { unexpected_allow: 0, unexpected_deny: 0, recent: [] },
@@ -201,17 +247,19 @@ describe("Control Plane CRITICAL monitor", () => {
       backup_age_hours: 2, backup_valid: true, legacy_5735_pid: null,
     };
     const future = runFixture("heartbeat-future", {
-      ...common, runner_heartbeats: [{ runner_name: "night_batch", state: "future", run_status: "succeeded", last_run_at: "2026-09-22T06:01:00Z", age_seconds: null, expected: "unknown", healthy: false }],
+      ...common, runner_heartbeats: freshHeartbeats({ night_batch: {
+        state: "future", run_status: "succeeded", last_run_at: "2026-09-22T06:01:00Z",
+        age_seconds: null, expected: "unknown", healthy: false,
+      } }),
     });
     expect(future.body.alerts).toEqual([{
       code: "runner_freshness_unavailable", entity: "acct_fixture:night_batch",
       detail: "night_batch heartbeat timestamp is invalid",
     }]);
     const empty = runFixture("heartbeat-empty", { ...common, runner_heartbeats: [] });
-    expect(empty.body.alerts).toEqual([{
-      code: "runner_freshness_unavailable", entity: "acct_fixture:runner_heartbeats",
-      detail: "Runner heartbeat telemetry is unavailable",
-    }]);
+    expect(empty.body.alerts.map((row: { entity: string }) => row.entity)).toEqual([
+      "acct_fixture:insights", "acct_fixture:night_batch", "acct_fixture:outcome",
+    ]);
   });
 
   test("uses the monitor-owned heartbeat threshold for fresh and stale evidence", () => {
@@ -225,15 +273,43 @@ describe("Control Plane CRITICAL monitor", () => {
     expect(runFixture("heartbeat-fresh", common).body.alerts).toEqual([]);
     const stale = runFixture("heartbeat-stale", {
       ...common,
-      runner_heartbeats: [{
-        runner_name: "outcome", state: "stale", run_status: "succeeded",
-        last_run_at: "2026-09-22T03:59:00Z", age_seconds: 7260,
-        expected: "unknown", healthy: false,
-      }],
+      runner_heartbeats: freshHeartbeats({ outcome: {
+        state: "stale", run_status: "succeeded", last_run_at: "2026-09-22T03:59:00Z",
+        age_seconds: 7260, expected: "unknown", healthy: false,
+      } }),
     });
     expect(stale.body.alerts).toEqual([{
       code: "runner_stale", entity: "acct_fixture:outcome",
       detail: "outcome runner heartbeat is 121m old",
+    }]);
+  });
+
+  test("fails closed for an omitted runner, naive timestamp, and failed run", () => {
+    const common = {
+      bridge_healthy: true, dashboard_healthy: true, account_available: true,
+      ...freshSignals, night_items: [], readiness: { status: "active", ready_for_dry_run: true },
+      self_reply_sync: "active", canary_available: true,
+      tenant_canary: { unexpected_allow: 0, unexpected_deny: 0, recent: [] },
+      backup_age_hours: 2, backup_valid: true, legacy_5735_pid: null,
+    };
+    const omitted = runFixture("heartbeat-omitted", {
+      ...common, runner_heartbeats: freshHeartbeats().filter((row) => row.runner_name !== "outcome"),
+    });
+    expect(omitted.body.alerts).toEqual([{
+      code: "runner_freshness_unavailable", entity: "acct_fixture:outcome",
+      detail: "Required outcome heartbeat is missing",
+    }]);
+    const naive = runFixture("heartbeat-naive", { ...common, runner_heartbeats: freshHeartbeats({ insights: {
+      last_run_at: "2026-09-22T05:30:00", healthy: true,
+    } }) });
+    expect(naive.body.alerts[0]).toMatchObject({
+      code: "runner_freshness_unavailable", entity: "acct_fixture:insights",
+    });
+    const failed = runFixture("heartbeat-failed", { ...common, runner_heartbeats: freshHeartbeats({ insights: {
+      run_status: "failed", healthy: false,
+    } }) });
+    expect(failed.body.alerts).toEqual([{
+      code: "runner_failed", entity: "acct_fixture:insights", detail: "insights runner last run failed",
     }]);
   });
 
@@ -245,19 +321,18 @@ describe("Control Plane CRITICAL monitor", () => {
       tenant_canary: { unexpected_allow: 0, unexpected_deny: 0, recent: [] },
       backup_age_hours: 2, backup_valid: true, legacy_5735_pid: null,
     };
-    const malformed = runFixture("heartbeat-malformed", { ...common, runner_heartbeats: [{
-      runner_name: "insights", state: "invalid", run_status: "failed", last_run_at: "bad",
+    const malformed = runFixture("heartbeat-malformed", { ...common, runner_heartbeats: freshHeartbeats({ insights: {
+      state: "invalid", run_status: "failed", last_run_at: "bad",
       age_seconds: null, expected: "unknown", healthy: false,
-    }] });
+    } }) });
     expect(malformed.body.alerts).toEqual([{
       code: "runner_freshness_unavailable", entity: "acct_fixture:insights",
       detail: "insights heartbeat timestamp is invalid",
     }]);
-    const disabled = runFixture("heartbeat-disabled", { ...common, runner_heartbeats: [{
-      runner_name: "insights", state: "disabled", run_status: "succeeded",
-      last_run_at: "2026-09-22T05:30:00Z", age_seconds: 1800,
-      expected: "unknown", healthy: true,
-    }] });
+    const disabled = runFixture("heartbeat-disabled", { ...common, runner_heartbeats: freshHeartbeats({ insights: {
+      state: "disabled", run_status: "succeeded", last_run_at: "2026-09-22T05:30:00Z",
+      age_seconds: 1800, expected: "unknown", healthy: true,
+    } }) });
     expect(disabled.body.alerts).toEqual([{
       code: "runner_freshness_unavailable", entity: "acct_fixture:insights",
       detail: "insights heartbeat enum is unsupported",
@@ -305,7 +380,6 @@ describe("Control Plane CRITICAL monitor", () => {
       bridge_healthy: true, dashboard_healthy: true, account_available: true,
       credential_readiness_available: false,
       credential_readiness: { credential_material: "must-not-leak" },
-      insights_age_minutes: 10, editorial_age_minutes: 10, activity_projection_age_minutes: 10,
       runner_heartbeats: freshSignals.runner_heartbeats, night_items: [],
       night_attention: freshSignals.night_attention,
       insights_quarantine: freshSignals.insights_quarantine,

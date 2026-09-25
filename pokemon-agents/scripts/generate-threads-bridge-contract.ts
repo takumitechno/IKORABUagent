@@ -17,7 +17,15 @@ type Schema = {
 const root = resolve(import.meta.dir, "..", "..");
 const source = resolve(root, "pokemon-agents/contracts/bridge_contract_v1.json");
 const output = resolve(root, "pokemon-agents/web/lib/threads-bridge-contract-v1.generated.ts");
-const contract = JSON.parse(readFileSync(source, "utf8")) as {
+export const PRODUCER_CONTRACT_REVISION = "10a071390daea91c9c687bc60fff4da8cee4c061";
+
+export function canonicalContractText(value: string): string {
+  return value.replace(/\r\n?/g, "\n");
+}
+
+export function renderContract(sourceText: string): string {
+const canonicalSource = canonicalContractText(sourceText);
+const contract = JSON.parse(canonicalSource) as {
   schema_version: number;
   schemas: Record<string, Schema>;
 };
@@ -69,13 +77,13 @@ const aliases: Record<string, string> = {
   BridgeEditorialCustomerResponseV1: "EditorialCustomerResponse",
 };
 
-const checksum = createHash("sha256").update(readFileSync(source)).digest("hex");
+const checksum = createHash("sha256").update(canonicalSource, "utf8").digest("hex");
 const definitions = Object.entries(contract.schemas).sort(([a], [b]) => a.localeCompare(b))
   .map(([name, schema]) => `export type ${name} = ${typeOf(schema)};`).join("\n\n");
 const rendered = `/**
  * GENERATED FILE — DO NOT EDIT BY HAND.
  * Source: pokemon-agents/contracts/bridge_contract_v1.json
- * Accepted producer base: 78c640cb5eeb203ecac6d8177d00638091259f79
+ * Producer contract revision: ${PRODUCER_CONTRACT_REVISION}
  * Artifact SHA-256: ${checksum}
  */
 
@@ -87,9 +95,14 @@ ${definitions}
 
 ${Object.entries(aliases).map(([alias, target]) => `export type ${alias} = ${target};`).join("\n")}
 `;
+return rendered;
+}
 
-if (process.argv.includes("--check")) {
-  if (readFileSync(output, "utf8") !== rendered) throw new Error(`generated contract is stale: ${output}`);
-} else {
-  writeFileSync(output, rendered);
+if (import.meta.main) {
+  const rendered = renderContract(readFileSync(source, "utf8"));
+  if (process.argv.includes("--check")) {
+    if (readFileSync(output, "utf8") !== rendered) throw new Error(`generated contract is stale: ${output}`);
+  } else {
+    writeFileSync(output, rendered, "utf8");
+  }
 }

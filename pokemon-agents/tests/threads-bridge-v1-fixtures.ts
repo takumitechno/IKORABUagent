@@ -133,11 +133,7 @@ export function operationsV1(overrides: Record<string, unknown> = {}) {
     night_batch_items: [],
     night_attention: { window_hours: 96, total: 0, by_reason: {}, items_truncated: false, coverage: "complete" },
     insights_quarantine: { total: 0, items: [], items_truncated: false, coverage: "complete" },
-    runner_heartbeats: [
-      { runner_name: "insights", state: "missing", run_status: null, last_run_at: null, age_seconds: null, expected: "unknown", healthy: false },
-      { runner_name: "outcome", state: "missing", run_status: null, last_run_at: null, age_seconds: null, expected: "unknown", healthy: false },
-      { runner_name: "night_batch", state: "missing", run_status: null, last_run_at: null, age_seconds: null, expected: "unknown", healthy: false },
-    ],
+    runner_heartbeats: runnerHeartbeatsV1(),
     rolling_usage: { publications_last_hour: 0, publications_last_24h: 0 },
     features: { manual_post_sync: true, self_reply_sync: "not_available" },
   };
@@ -147,6 +143,16 @@ export function operationsV1(overrides: Record<string, unknown> = {}) {
     rolling_usage: { ...base.rolling_usage, ...((overrides.rolling_usage as Record<string, unknown>) ?? {}) },
     features: { ...base.features, ...((overrides.features as Record<string, unknown>) ?? {}) },
   };
+}
+
+type RunnerName = "insights" | "outcome" | "night_batch";
+
+export function runnerHeartbeatsV1(overrides: Partial<Record<RunnerName, Record<string, unknown>>> = {}) {
+  return (["insights", "outcome", "night_batch"] as const).map((runner_name) => ({
+    runner_name, state: "missing", run_status: null, last_run_at: null,
+    age_seconds: null, expected: "unknown", healthy: false,
+    ...overrides[runner_name],
+  }));
 }
 
 export function accountResponseV1(overrides: Record<string, unknown> = {}) {
