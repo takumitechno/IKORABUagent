@@ -113,6 +113,29 @@ export interface ThreadsSafetyStatus {
 
 export interface ThreadsOperations {
   nightBatchItems: NightBatchItem[];
+  nightAttention: {
+    windowHours: number;
+    total: number;
+    byReason: Record<string, number>;
+    itemsTruncated: boolean;
+    coverage: "complete" | "partial" | "unknown";
+  };
+  insightsQuarantine: {
+    total: number;
+    items: Array<{ contentId: string; failureCount: number; lastFailedAt: string; errorCode: string }>;
+    itemsTruncated: boolean;
+    coverage: "complete" | "partial" | "unknown";
+  };
+  runnerHeartbeats: Array<{
+    runnerName: "insights" | "outcome" | "night_batch";
+    state: "fresh" | "stale" | "missing" | "invalid" | "future";
+    runStatus: "succeeded" | "failed" | null;
+    lastRunAt: string | null;
+    ageSeconds: number | null;
+    expected: "unknown";
+    available: boolean;
+    healthy: boolean;
+  }>;
   publicationsLastHour: number | null;
   publicationsLast24h: number | null;
   manualPostSyncAvailable: boolean;
@@ -179,7 +202,10 @@ export type CustomerReviewAction = "approve" | "reject" | "request-revision" | "
 type FetchLike = typeof fetch;
 
 const EMPTY_OPERATIONS: ThreadsOperations = {
-  nightBatchItems: [], publicationsLastHour: null, publicationsLast24h: null,
+  nightBatchItems: [],
+  nightAttention: { windowHours: 0, total: 0, byReason: {}, itemsTruncated: false, coverage: "unknown" },
+  insightsQuarantine: { total: 0, items: [], itemsTruncated: false, coverage: "unknown" },
+  runnerHeartbeats: [], publicationsLastHour: null, publicationsLast24h: null,
   manualPostSyncAvailable: false, selfReplySync: "unknown",
 };
 
@@ -312,6 +338,9 @@ function operationsFrom(value: unknown): ThreadsOperations {
   const usage = record(source.rolling_usage);
   const features = record(source.features);
   const selfReply = text(features?.self_reply_sync);
+  const attention = record(source.night_attention);
+  const quarantine = record(source.insights_quarantine);
+  const coverage = (value: unknown) => value === "complete" || value === "partial" ? value : "unknown";
   const nightBatchItems = Array.isArray(source.night_batch_items)
     ? source.night_batch_items.map(record).filter((row): row is Record<string, unknown> => row !== null)
       .map((row): NightBatchItem | null => {
@@ -330,6 +359,38 @@ function operationsFrom(value: unknown): ThreadsOperations {
     : [];
   return {
     nightBatchItems,
+    nightAttention: {
+      windowHours: nonNegativeInt(attention?.window_hours) ?? 0,
+      total: nonNegativeInt(attention?.total) ?? 0,
+      byReason: (record(attention?.by_reason) as Record<string, number> | null) ?? {},
+      itemsTruncated: attention?.items_truncated === true,
+      coverage: coverage(attention?.coverage),
+    },
+    insightsQuarantine: {
+      total: nonNegativeInt(quarantine?.total) ?? 0,
+      items: Array.isArray(quarantine?.items) ? quarantine.items.map(record)
+        .filter((row): row is Record<string, unknown> => row !== null).map((row) => ({
+          contentId: text(row.content_id)!, failureCount: nonNegativeInt(row.failure_count)!,
+          lastFailedAt: text(row.last_failed_at)!, errorCode: text(row.error_code)!,
+        })) : [],
+      itemsTruncated: quarantine?.items_truncated === true,
+      coverage: coverage(quarantine?.coverage),
+    },
+    runnerHeartbeats: Array.isArray(source.runner_heartbeats) ? source.runner_heartbeats.map(record)
+      .filter((row): row is Record<string, unknown> => row !== null).map((row) => {
+        const state = row.state as ThreadsOperations["runnerHeartbeats"][number]["state"];
+        const lastRunAt = text(row.last_run_at);
+        const timestamp = lastRunAt === null ? NaN : Date.parse(lastRunAt);
+        const available = (state === "fresh" || state === "stale")
+          && lastRunAt !== null && /(?:Z|[+-]\d{2}:\d{2})$/.test(lastRunAt)
+          && Number.isFinite(timestamp) && timestamp <= Date.now() && row.run_status !== null;
+        return {
+          runnerName: row.runner_name as ThreadsOperations["runnerHeartbeats"][number]["runnerName"],
+          state, runStatus: row.run_status as "succeeded" | "failed" | null,
+          lastRunAt, ageSeconds: nonNegativeInt(row.age_seconds), expected: "unknown" as const,
+          available, healthy: available && row.healthy === true,
+        };
+      }) : [],
     publicationsLastHour: nonNegativeInt(usage?.publications_last_hour),
     publicationsLast24h: nonNegativeInt(usage?.publications_last_24h),
     manualPostSyncAvailable: features?.manual_post_sync === true,

@@ -47,7 +47,13 @@ const freshSignals = {
   credential_readiness_available: true,
   credential_readiness: { publish: { ready: true }, insights: { ready: true } },
   insights_age_minutes: 10, editorial_age_minutes: 10, activity_projection_age_minutes: 10,
-  runner_heartbeats: [{ runner: "loop_runner", observed_at: "2026-09-22T05:30:00Z" }],
+  runner_heartbeats: [{
+    runner_name: "insights", state: "fresh", run_status: "succeeded",
+    last_run_at: "2026-09-22T05:30:00Z", age_seconds: 1800,
+    expected: "unknown", healthy: true,
+  }],
+  night_attention: { total: 0, items_truncated: false, coverage: "complete" },
+  insights_quarantine: { total: 0, items: [], items_truncated: false, coverage: "complete" },
 };
 
 describe("Control Plane CRITICAL monitor", () => {
@@ -154,6 +160,8 @@ describe("Control Plane CRITICAL monitor", () => {
       bridge_healthy: true, dashboard_healthy: true, account_available: true,
       credential_readiness_available: true,
       credential_readiness: { publish: { ready: true }, insights: { ready: true } },
+      night_attention: freshSignals.night_attention,
+      insights_quarantine: freshSignals.insights_quarantine,
       night_items: [], readiness: { status: "active", ready_for_dry_run: true },
       self_reply_sync: "active", canary_available: true,
       tenant_canary: { unexpected_allow: 0, unexpected_deny: 0, recent: [] },
@@ -193,11 +201,11 @@ describe("Control Plane CRITICAL monitor", () => {
       backup_age_hours: 2, backup_valid: true, legacy_5735_pid: null,
     };
     const future = runFixture("heartbeat-future", {
-      ...common, runner_heartbeats: [{ runner: "loop_runner", observed_at: "2026-09-22T06:01:00Z" }],
+      ...common, runner_heartbeats: [{ runner_name: "night_batch", state: "future", run_status: "succeeded", last_run_at: "2026-09-22T06:01:00Z", age_seconds: null, expected: "unknown", healthy: false }],
     });
     expect(future.body.alerts).toEqual([{
-      code: "runner_freshness_unavailable", entity: "acct_fixture:loop_runner",
-      detail: "loop_runner heartbeat timestamp is invalid",
+      code: "runner_freshness_unavailable", entity: "acct_fixture:night_batch",
+      detail: "night_batch heartbeat timestamp is invalid",
     }]);
     const empty = runFixture("heartbeat-empty", { ...common, runner_heartbeats: [] });
     expect(empty.body.alerts).toEqual([{
@@ -218,13 +226,59 @@ describe("Control Plane CRITICAL monitor", () => {
     const stale = runFixture("heartbeat-stale", {
       ...common,
       runner_heartbeats: [{
-        runner: "loop_runner", observed_at: "2026-09-22T03:59:00Z", freshness_minutes: 999999,
+        runner_name: "outcome", state: "stale", run_status: "succeeded",
+        last_run_at: "2026-09-22T03:59:00Z", age_seconds: 7260,
+        expected: "unknown", healthy: false,
       }],
     });
     expect(stale.body.alerts).toEqual([{
-      code: "runner_stale", entity: "acct_fixture:loop_runner",
-      detail: "loop_runner runner heartbeat is 121m old",
+      code: "runner_stale", entity: "acct_fixture:outcome",
+      detail: "outcome runner heartbeat is 121m old",
     }]);
+  });
+
+  test("rejects malformed or unsupported sealed heartbeat evidence", () => {
+    const common = {
+      bridge_healthy: true, dashboard_healthy: true, account_available: true,
+      ...freshSignals, night_items: [], readiness: { status: "active", ready_for_dry_run: true },
+      self_reply_sync: "active", canary_available: true,
+      tenant_canary: { unexpected_allow: 0, unexpected_deny: 0, recent: [] },
+      backup_age_hours: 2, backup_valid: true, legacy_5735_pid: null,
+    };
+    const malformed = runFixture("heartbeat-malformed", { ...common, runner_heartbeats: [{
+      runner_name: "insights", state: "invalid", run_status: "failed", last_run_at: "bad",
+      age_seconds: null, expected: "unknown", healthy: false,
+    }] });
+    expect(malformed.body.alerts).toEqual([{
+      code: "runner_freshness_unavailable", entity: "acct_fixture:insights",
+      detail: "insights heartbeat timestamp is invalid",
+    }]);
+    const disabled = runFixture("heartbeat-disabled", { ...common, runner_heartbeats: [{
+      runner_name: "insights", state: "disabled", run_status: "succeeded",
+      last_run_at: "2026-09-22T05:30:00Z", age_seconds: 1800,
+      expected: "unknown", healthy: true,
+    }] });
+    expect(disabled.body.alerts).toEqual([{
+      code: "runner_freshness_unavailable", entity: "acct_fixture:insights",
+      detail: "insights heartbeat enum is unsupported",
+    }]);
+  });
+
+  test("never reports truncated NIGHT or quarantine coverage as complete", () => {
+    const got = runFixture("partial-coverage", {
+      bridge_healthy: true, dashboard_healthy: true, account_available: true,
+      ...freshSignals,
+      night_attention: { total: 101, items_truncated: true, coverage: "partial" },
+      insights_quarantine: { total: 51, items: [], items_truncated: true, coverage: "partial" },
+      night_items: [], readiness: { status: "active", ready_for_dry_run: true },
+      self_reply_sync: "active", canary_available: true,
+      tenant_canary: { unexpected_allow: 0, unexpected_deny: 0, recent: [] },
+      backup_age_hours: 2, backup_valid: true, legacy_5735_pid: null,
+    });
+    expect(got.body.alerts).toEqual([
+      { code: "collection_coverage_partial", entity: "acct_fixture:insights_quarantine", detail: "insights quarantine coverage is partial" },
+      { code: "collection_coverage_partial", entity: "acct_fixture:night_attention", detail: "NIGHT coverage is partial" },
+    ]);
   });
 
   test("retains genuine NIGHT misses for 96h and excludes expired or cancelled entries", () => {
@@ -253,6 +307,8 @@ describe("Control Plane CRITICAL monitor", () => {
       credential_readiness: { credential_material: "must-not-leak" },
       insights_age_minutes: 10, editorial_age_minutes: 10, activity_projection_age_minutes: 10,
       runner_heartbeats: freshSignals.runner_heartbeats, night_items: [],
+      night_attention: freshSignals.night_attention,
+      insights_quarantine: freshSignals.insights_quarantine,
       readiness: { status: "active", ready_for_dry_run: true }, self_reply_sync: "active",
       canary_available: true, tenant_canary: { unexpected_allow: 0, unexpected_deny: 0, recent: [] },
       backup_age_hours: 2, backup_valid: true, legacy_5735_pid: null,
@@ -300,7 +356,7 @@ describe("Control Plane CRITICAL monitor", () => {
       expect(await runAllAccounts(bridgeUrl)).toMatchObject({ code: 2, stderr: "", body: {
         alerts: [{ code: "account_discovery_unavailable", entity: "system:account-discovery" }],
       } });
-      response = Response.json({ accounts: [] });
+      response = Response.json({ accounts: [], meta: { schema_version: 1 } });
       expect(await runAllAccounts(bridgeUrl)).toMatchObject({ code: 2, stderr: "", body: {
         status: "CRITICAL", accounts: [], employee_input: null,
         alerts: [{ code: "account_discovery_empty", entity: "system:account-discovery" }],

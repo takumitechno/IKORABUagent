@@ -1,5 +1,6 @@
 import { Database } from "bun:sqlite";
 import { describe, expect, test } from "bun:test";
+import { createHash } from "node:crypto";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { loadThreadsDashboard } from "../web/lib/threads-dashboard";
@@ -59,11 +60,14 @@ function internalDb(): Database {
 }
 
 describe("Threads Bridge response contract v1", () => {
-  test("uses checked-in generated types derived from the CONTRACT02A fixture", () => {
+  test("uses checked-in generated types derived from the sealed producer artifact", () => {
     const source = readFileSync(resolve(import.meta.dir, "../web/lib/threads-bridge-contract-v1.generated.ts"), "utf8");
+    const artifact = readFileSync(resolve(import.meta.dir, "../contracts/bridge_contract_v1.json"));
     expect(source).toContain("GENERATED FILE — DO NOT EDIT BY HAND");
-    expect(source).toContain("Threads-/tests/fixtures/bridge_contract_v1.json");
+    expect(source).toContain("pokemon-agents/contracts/bridge_contract_v1.json");
+    expect(source).toContain("78c640cb5eeb203ecac6d8177d00638091259f79");
     expect(source).toContain("THREADS_BRIDGE_SCHEMA_VERSION = 1");
+    expect(source).toContain(createHash("sha256").update(artifact).digest("hex"));
   });
 
   test("accepts valid schema v1 and unknown additive fields", async () => {
@@ -75,6 +79,62 @@ describe("Threads Bridge response contract v1", () => {
     expect(data.connected).toBe(true);
     expect(data.bridgeStatus).toBe("HEALTHY");
     expect(data.contents[0].body).toBe("contract body");
+  });
+
+  test("validates and normalizes sealed operations semantics", async () => {
+    const account = accountResponseV1({ operations: {
+      runner_heartbeats: [{
+        runner_name: "insights", state: "fresh", run_status: "succeeded",
+        last_run_at: "2026-09-21T00:00:00Z", age_seconds: 10,
+        expected: "unknown", healthy: true,
+      }],
+      night_attention: { window_hours: 96, total: 101, by_reason: { blocked: 1 }, items_truncated: true, coverage: "partial" },
+      insights_quarantine: { total: 51, items: [], items_truncated: true, coverage: "partial" },
+    } });
+    const data = await loadThreadsDashboard({ bridgeUrl, fetcher: fixtureFetcher({ account }) });
+    expect(data.connected).toBe(true);
+    expect(data.operations.runnerHeartbeats[0]).toMatchObject({
+      runnerName: "insights", lastRunAt: "2026-09-21T00:00:00Z",
+      expected: "unknown", available: true, healthy: true,
+    });
+    expect(data.operations.nightAttention.coverage).toBe("partial");
+    expect(data.operations.insightsQuarantine.coverage).toBe("partial");
+  });
+
+  test("fails closed on missing safety evidence and unknown heartbeat enums", async () => {
+    const missingExpected = accountResponseV1();
+    delete (missingExpected.operations as Record<string, unknown>).runner_heartbeats;
+    expect((await loadThreadsDashboard({ bridgeUrl, fetcher: fixtureFetcher({ account: missingExpected }) })).bridgeStatus)
+      .toBe("MALFORMED_RESPONSE");
+
+    const unknownState = accountResponseV1({ operations: { runner_heartbeats: [{
+      runner_name: "insights", state: "disabled", run_status: "succeeded",
+      last_run_at: "2026-09-21T00:00:00Z", age_seconds: 10,
+      expected: "unknown", healthy: true,
+    }] } });
+    expect((await loadThreadsDashboard({ bridgeUrl, fetcher: fixtureFetcher({ account: unknownState }) })).bridgeStatus)
+      .toBe("MALFORMED_RESPONSE");
+
+    const safety = safetyResponseV1();
+    delete safety.global_stop;
+    expect((await loadThreadsDashboard({ bridgeUrl, fetcher: fixtureFetcher({ safety }) })).bridgeStatus)
+      .toBe("MALFORMED_RESPONSE");
+  });
+
+  test("keeps malformed and future heartbeat evidence unavailable", async () => {
+    for (const heartbeat of [{
+      runner_name: "night_batch", state: "invalid", run_status: "failed",
+      last_run_at: "not-a-time", age_seconds: null, expected: "unknown", healthy: false,
+    }, {
+      runner_name: "night_batch", state: "fresh", run_status: "succeeded",
+      last_run_at: "2999-01-01T00:00:00Z", age_seconds: 0, expected: "unknown", healthy: true,
+    }]) {
+      const account = accountResponseV1({ operations: { runner_heartbeats: [heartbeat] } });
+      const data = await loadThreadsDashboard({ bridgeUrl, fetcher: fixtureFetcher({ account }) });
+      expect(data.connected).toBe(true);
+      expect(data.operations.runnerHeartbeats[0].available).toBe(false);
+      expect(data.operations.runnerHeartbeats[0].healthy).toBe(false);
+    }
   });
 
   test("detects removed required fields and wrong field types", async () => {

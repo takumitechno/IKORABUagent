@@ -131,6 +131,13 @@ export function manualThreadV1(overrides: Record<string, unknown> = {}) {
 export function operationsV1(overrides: Record<string, unknown> = {}) {
   const base = {
     night_batch_items: [],
+    night_attention: { window_hours: 96, total: 0, by_reason: {}, items_truncated: false, coverage: "complete" },
+    insights_quarantine: { total: 0, items: [], items_truncated: false, coverage: "complete" },
+    runner_heartbeats: [
+      { runner_name: "insights", state: "missing", run_status: null, last_run_at: null, age_seconds: null, expected: "unknown", healthy: false },
+      { runner_name: "outcome", state: "missing", run_status: null, last_run_at: null, age_seconds: null, expected: "unknown", healthy: false },
+      { runner_name: "night_batch", state: "missing", run_status: null, last_run_at: null, age_seconds: null, expected: "unknown", healthy: false },
+    ],
     rolling_usage: { publications_last_hour: 0, publications_last_24h: 0 },
     features: { manual_post_sync: true, self_reply_sync: "not_available" },
   };

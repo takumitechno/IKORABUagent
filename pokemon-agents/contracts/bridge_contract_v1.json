@@ -1,0 +1,2377 @@
+{
+  "endpoints": {
+    "GET /autopilot/v2/editorial/customer": {
+      "$ref": "#/components/schemas/EditorialCustomerResponse"
+    },
+    "GET /autopilot/v2/editorial/internal": {
+      "$ref": "#/components/schemas/EditorialInternalResponse"
+    },
+    "GET /autopilot/v2/safety/status": {
+      "$ref": "#/components/schemas/SafetyStatusResponse"
+    },
+    "GET /operator/accounts": {
+      "$ref": "#/components/schemas/OperatorAccountsResponse"
+    },
+    "GET /operator/accounts/{account_id}": {
+      "$ref": "#/components/schemas/OperatorAccountResponse"
+    },
+    "GET /operator/accounts/{account_id}/contents/{content_id}": {
+      "$ref": "#/components/schemas/OperatorContentResponse"
+    },
+    "POST /autopilot/v2/editorial/run-once": {
+      "anyOf": [
+        {
+          "$ref": "#/components/schemas/EditorialRunOnceCycleResponse"
+        },
+        {
+          "$ref": "#/components/schemas/EditorialRunOnceSimpleResponse"
+        }
+      ],
+      "title": "Response Editorial Run Once Autopilot V2 Editorial Run Once Post"
+    },
+    "POST /autopilot/v2/tenant/resolve-identity": {
+      "$ref": "#/components/schemas/TenantIdentityResponse"
+    }
+  },
+  "schema_version": 1,
+  "schemas": {
+    "AccountPipelineStatus": {
+      "additionalProperties": true,
+      "properties": {
+        "contents_by_state": {
+          "additionalProperties": {
+            "minimum": 0.0,
+            "type": "integer"
+          },
+          "title": "Contents By State",
+          "type": "object"
+        },
+        "has_learning_snapshot": {
+          "title": "Has Learning Snapshot",
+          "type": "boolean"
+        },
+        "n_audit_events": {
+          "minimum": 0.0,
+          "title": "N Audit Events",
+          "type": "integer"
+        },
+        "n_contents": {
+          "minimum": 0.0,
+          "title": "N Contents",
+          "type": "integer"
+        },
+        "n_metrics": {
+          "minimum": 0.0,
+          "title": "N Metrics",
+          "type": "integer"
+        },
+        "n_publications": {
+          "minimum": 0.0,
+          "title": "N Publications",
+          "type": "integer"
+        },
+        "publications_by_mode": {
+          "additionalProperties": {
+            "minimum": 0.0,
+            "type": "integer"
+          },
+          "title": "Publications By Mode",
+          "type": "object"
+        }
+      },
+      "required": [
+        "n_contents",
+        "contents_by_state",
+        "n_publications",
+        "publications_by_mode",
+        "n_metrics",
+        "has_learning_snapshot",
+        "n_audit_events"
+      ],
+      "title": "AccountPipelineStatus",
+      "type": "object"
+    },
+    "AccountReadiness": {
+      "additionalProperties": true,
+      "properties": {
+        "blocking": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Blocking",
+          "type": "array"
+        },
+        "config_ok": {
+          "title": "Config Ok",
+          "type": "boolean"
+        },
+        "config_problems": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Config Problems",
+          "type": "array"
+        },
+        "has_style_profile": {
+          "title": "Has Style Profile",
+          "type": "boolean"
+        },
+        "n_plans": {
+          "minimum": 0.0,
+          "title": "N Plans",
+          "type": "integer"
+        },
+        "n_research_posts": {
+          "minimum": 0.0,
+          "title": "N Research Posts",
+          "type": "integer"
+        },
+        "n_verified_facts": {
+          "minimum": 0.0,
+          "title": "N Verified Facts",
+          "type": "integer"
+        },
+        "persona_provenance": {
+          "title": "Persona Provenance",
+          "type": "string"
+        },
+        "persona_usable_for_generation": {
+          "title": "Persona Usable For Generation",
+          "type": "boolean"
+        },
+        "ready_for_dry_run": {
+          "title": "Ready For Dry Run",
+          "type": "boolean"
+        },
+        "requires_owner_oauth_before_live": {
+          "title": "Requires Owner Oauth Before Live",
+          "type": "boolean"
+        },
+        "status": {
+          "title": "Status",
+          "type": "string"
+        },
+        "style_profile_version": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Style Profile Version"
+        },
+        "verified_fact_keys": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Verified Fact Keys",
+          "type": "array"
+        }
+      },
+      "required": [
+        "config_ok",
+        "config_problems",
+        "n_research_posts",
+        "has_style_profile",
+        "style_profile_version",
+        "persona_provenance",
+        "persona_usable_for_generation",
+        "n_verified_facts",
+        "verified_fact_keys",
+        "n_plans",
+        "status",
+        "ready_for_dry_run",
+        "blocking",
+        "requires_owner_oauth_before_live"
+      ],
+      "title": "AccountReadiness",
+      "type": "object"
+    },
+    "ApprovalQueueItem": {
+      "additionalProperties": true,
+      "properties": {
+        "attempt": {
+          "title": "Attempt",
+          "type": "integer"
+        },
+        "content_hash": {
+          "title": "Content Hash",
+          "type": "string"
+        },
+        "content_id": {
+          "title": "Content Id",
+          "type": "string"
+        },
+        "plan_id": {
+          "title": "Plan Id",
+          "type": "string"
+        },
+        "preview_chars": {
+          "minimum": 0.0,
+          "title": "Preview Chars",
+          "type": "integer"
+        },
+        "version": {
+          "title": "Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "content_id",
+        "version",
+        "plan_id",
+        "attempt",
+        "content_hash",
+        "preview_chars"
+      ],
+      "title": "ApprovalQueueItem",
+      "type": "object"
+    },
+    "CapabilityError": {
+      "properties": {
+        "code": {
+          "title": "Code",
+          "type": "string"
+        },
+        "message": {
+          "title": "Message",
+          "type": "string"
+        }
+      },
+      "required": [
+        "code",
+        "message"
+      ],
+      "title": "CapabilityError",
+      "type": "object"
+    },
+    "ContentApprovalEvent": {
+      "additionalProperties": true,
+      "properties": {
+        "action": {
+          "title": "Action",
+          "type": "string"
+        },
+        "actor": {
+          "title": "Actor",
+          "type": "string"
+        },
+        "created_at": {
+          "format": "date-time",
+          "title": "Created At",
+          "type": "string"
+        },
+        "matches_current_body": {
+          "title": "Matches Current Body",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "action",
+        "actor",
+        "created_at",
+        "matches_current_body"
+      ],
+      "title": "ContentApprovalEvent",
+      "type": "object"
+    },
+    "ContentGeneration": {
+      "additionalProperties": true,
+      "properties": {
+        "attempt": {
+          "title": "Attempt",
+          "type": "integer"
+        },
+        "contract_version": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Contract Version"
+        },
+        "created_at": {
+          "format": "date-time",
+          "title": "Created At",
+          "type": "string"
+        },
+        "model": {
+          "title": "Model",
+          "type": "string"
+        },
+        "provider": {
+          "title": "Provider",
+          "type": "string"
+        },
+        "provider_request_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Provider Request Id"
+        },
+        "qa_verdict": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Qa Verdict"
+        },
+        "request_fingerprint": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Request Fingerprint"
+        },
+        "semantic_findings": {
+          "items": {
+            "additionalProperties": true,
+            "type": "object"
+          },
+          "title": "Semantic Findings",
+          "type": "array"
+        },
+        "style_profile_version": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Style Profile Version"
+        },
+        "verified_fact_keys": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Verified Fact Keys",
+          "type": "array"
+        }
+      },
+      "required": [
+        "attempt",
+        "provider",
+        "model",
+        "provider_request_id",
+        "style_profile_version",
+        "verified_fact_keys",
+        "contract_version",
+        "request_fingerprint",
+        "qa_verdict",
+        "semantic_findings",
+        "created_at"
+      ],
+      "title": "ContentGeneration",
+      "type": "object"
+    },
+    "ContentPublication": {
+      "additionalProperties": true,
+      "properties": {
+        "attempts": {
+          "minimum": 0.0,
+          "title": "Attempts",
+          "type": "integer"
+        },
+        "created_at": {
+          "format": "date-time",
+          "title": "Created At",
+          "type": "string"
+        },
+        "external_publish_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "External Publish Id"
+        },
+        "matches_current_body": {
+          "title": "Matches Current Body",
+          "type": "boolean"
+        },
+        "mode": {
+          "title": "Mode",
+          "type": "string"
+        },
+        "parts_state": {
+          "items": {
+            "additionalProperties": true,
+            "type": "object"
+          },
+          "title": "Parts State",
+          "type": "array"
+        },
+        "permalink": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Permalink"
+        },
+        "published_at": {
+          "anyOf": [
+            {
+              "format": "date-time",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Published At"
+        },
+        "status": {
+          "title": "Status",
+          "type": "string"
+        },
+        "updated_at": {
+          "anyOf": [
+            {
+              "format": "date-time",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Updated At"
+        }
+      },
+      "required": [
+        "mode",
+        "status",
+        "external_publish_id",
+        "permalink",
+        "published_at",
+        "attempts",
+        "parts_state",
+        "matches_current_body",
+        "created_at",
+        "updated_at"
+      ],
+      "title": "ContentPublication",
+      "type": "object"
+    },
+    "ContentQaDetail": {
+      "additionalProperties": true,
+      "properties": {
+        "created_at": {
+          "format": "date-time",
+          "title": "Created At",
+          "type": "string"
+        },
+        "findings": {
+          "items": {
+            "additionalProperties": true,
+            "type": "object"
+          },
+          "title": "Findings",
+          "type": "array"
+        },
+        "n_results": {
+          "minimum": 0.0,
+          "title": "N Results",
+          "type": "integer"
+        },
+        "verdict": {
+          "title": "Verdict",
+          "type": "string"
+        }
+      },
+      "required": [
+        "verdict",
+        "findings",
+        "created_at",
+        "n_results"
+      ],
+      "title": "ContentQaDetail",
+      "type": "object"
+    },
+    "ContentQaSummary": {
+      "additionalProperties": true,
+      "properties": {
+        "findings": {
+          "items": {
+            "additionalProperties": true,
+            "type": "object"
+          },
+          "title": "Findings",
+          "type": "array"
+        },
+        "verdict": {
+          "title": "Verdict",
+          "type": "string"
+        }
+      },
+      "required": [
+        "verdict",
+        "findings"
+      ],
+      "title": "ContentQaSummary",
+      "type": "object"
+    },
+    "ContractMeta": {
+      "additionalProperties": true,
+      "properties": {
+        "schema_version": {
+          "const": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "schema_version"
+      ],
+      "title": "ContractMeta",
+      "type": "object"
+    },
+    "EditorialCustomerResponse": {
+      "additionalProperties": true,
+      "properties": {
+        "account_id": {
+          "title": "Account Id",
+          "type": "string"
+        },
+        "meta": {
+          "$ref": "#/components/schemas/ContractMeta"
+        },
+        "summary": {
+          "anyOf": [
+            {
+              "$ref": "#/components/schemas/EditorialCustomerSummary"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "account_id",
+        "summary",
+        "meta"
+      ],
+      "title": "EditorialCustomerResponse",
+      "type": "object"
+    },
+    "EditorialCustomerSummary": {
+      "additionalProperties": true,
+      "properties": {
+        "今回試したこと": {
+          "title": "今回試したこと",
+          "type": "string"
+        },
+        "次回変えること": {
+          "title": "次回変えること",
+          "type": "string"
+        },
+        "確認できた事実": {
+          "items": {
+            "type": "string"
+          },
+          "title": "確認できた事実",
+          "type": "array"
+        }
+      },
+      "required": [
+        "今回試したこと",
+        "確認できた事実",
+        "次回変えること"
+      ],
+      "title": "EditorialCustomerSummary",
+      "type": "object"
+    },
+    "EditorialCycle": {
+      "additionalProperties": true,
+      "properties": {
+        "account_id": {
+          "title": "Account Id",
+          "type": "string"
+        },
+        "brief": {
+          "anyOf": [
+            {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Brief"
+        },
+        "config": {
+          "additionalProperties": true,
+          "title": "Config",
+          "type": "object"
+        },
+        "content_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Content Id"
+        },
+        "created_at": {
+          "format": "date-time",
+          "title": "Created At",
+          "type": "string"
+        },
+        "current_agent": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Current Agent"
+        },
+        "cycle_id": {
+          "title": "Cycle Id",
+          "type": "string"
+        },
+        "cycle_key": {
+          "title": "Cycle Key",
+          "type": "string"
+        },
+        "draft": {
+          "anyOf": [
+            {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Draft"
+        },
+        "source_content_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Source Content Ids",
+          "type": "array"
+        },
+        "state": {
+          "title": "State",
+          "type": "string"
+        },
+        "status": {
+          "title": "Status",
+          "type": "string"
+        },
+        "summary": {
+          "additionalProperties": true,
+          "title": "Summary",
+          "type": "object"
+        },
+        "updated_at": {
+          "format": "date-time",
+          "title": "Updated At",
+          "type": "string"
+        },
+        "waiting_reason": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Waiting Reason"
+        }
+      },
+      "required": [
+        "cycle_id",
+        "account_id",
+        "cycle_key",
+        "state",
+        "status",
+        "current_agent",
+        "waiting_reason",
+        "source_content_ids",
+        "config",
+        "summary",
+        "brief",
+        "draft",
+        "content_id",
+        "created_at",
+        "updated_at"
+      ],
+      "title": "EditorialCycle",
+      "type": "object"
+    },
+    "EditorialExperiment": {
+      "additionalProperties": true,
+      "properties": {
+        "account_id": {
+          "title": "Account Id",
+          "type": "string"
+        },
+        "constants": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Constants",
+          "type": "array"
+        },
+        "created_at": {
+          "format": "date-time",
+          "title": "Created At",
+          "type": "string"
+        },
+        "cycle_id": {
+          "title": "Cycle Id",
+          "type": "string"
+        },
+        "decision": {
+          "additionalProperties": true,
+          "title": "Decision",
+          "type": "object"
+        },
+        "evidence_level": {
+          "title": "Evidence Level",
+          "type": "string"
+        },
+        "experiment_id": {
+          "title": "Experiment Id",
+          "type": "string"
+        },
+        "failure_signal": {
+          "additionalProperties": true,
+          "title": "Failure Signal",
+          "type": "object"
+        },
+        "hypothesis": {
+          "additionalProperties": true,
+          "title": "Hypothesis",
+          "type": "object"
+        },
+        "minimum_sample": {
+          "additionalProperties": true,
+          "title": "Minimum Sample",
+          "type": "object"
+        },
+        "result_summary": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Result Summary"
+        },
+        "source_content_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Source Content Ids",
+          "type": "array"
+        },
+        "status": {
+          "title": "Status",
+          "type": "string"
+        },
+        "success_signal": {
+          "additionalProperties": true,
+          "title": "Success Signal",
+          "type": "object"
+        },
+        "test_variable": {
+          "title": "Test Variable",
+          "type": "string"
+        }
+      },
+      "required": [
+        "experiment_id",
+        "account_id",
+        "cycle_id",
+        "created_at",
+        "source_content_ids",
+        "hypothesis",
+        "test_variable",
+        "constants",
+        "success_signal",
+        "failure_signal",
+        "minimum_sample",
+        "status",
+        "decision",
+        "result_summary",
+        "evidence_level"
+      ],
+      "title": "EditorialExperiment",
+      "type": "object"
+    },
+    "EditorialInternalResponse": {
+      "additionalProperties": true,
+      "properties": {
+        "account_id": {
+          "title": "Account Id",
+          "type": "string"
+        },
+        "cycle": {
+          "anyOf": [
+            {
+              "$ref": "#/components/schemas/EditorialCycle"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "experiments": {
+          "items": {
+            "$ref": "#/components/schemas/EditorialExperiment"
+          },
+          "title": "Experiments",
+          "type": "array"
+        },
+        "meta": {
+          "$ref": "#/components/schemas/ContractMeta"
+        },
+        "private_chain_of_thought_stored": {
+          "default": false,
+          "title": "Private Chain Of Thought Stored",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "account_id",
+        "cycle",
+        "experiments",
+        "meta"
+      ],
+      "title": "EditorialInternalResponse",
+      "type": "object"
+    },
+    "EditorialRunOnceCycleResponse": {
+      "additionalProperties": true,
+      "properties": {
+        "account_id": {
+          "title": "Account Id",
+          "type": "string"
+        },
+        "brief": {
+          "anyOf": [
+            {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Brief"
+        },
+        "config": {
+          "additionalProperties": true,
+          "title": "Config",
+          "type": "object"
+        },
+        "content_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Content Id"
+        },
+        "created_at": {
+          "format": "date-time",
+          "title": "Created At",
+          "type": "string"
+        },
+        "current_agent": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Current Agent"
+        },
+        "cycle_id": {
+          "title": "Cycle Id",
+          "type": "string"
+        },
+        "cycle_key": {
+          "title": "Cycle Key",
+          "type": "string"
+        },
+        "draft": {
+          "anyOf": [
+            {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Draft"
+        },
+        "meta": {
+          "$ref": "#/components/schemas/ContractMeta"
+        },
+        "mutated": {
+          "title": "Mutated",
+          "type": "boolean"
+        },
+        "source_content_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Source Content Ids",
+          "type": "array"
+        },
+        "state": {
+          "title": "State",
+          "type": "string"
+        },
+        "status": {
+          "title": "Status",
+          "type": "string"
+        },
+        "summary": {
+          "additionalProperties": true,
+          "title": "Summary",
+          "type": "object"
+        },
+        "updated_at": {
+          "format": "date-time",
+          "title": "Updated At",
+          "type": "string"
+        },
+        "waiting_reason": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Waiting Reason"
+        }
+      },
+      "required": [
+        "cycle_id",
+        "account_id",
+        "cycle_key",
+        "state",
+        "status",
+        "current_agent",
+        "waiting_reason",
+        "source_content_ids",
+        "config",
+        "summary",
+        "brief",
+        "draft",
+        "content_id",
+        "created_at",
+        "updated_at",
+        "mutated",
+        "meta"
+      ],
+      "title": "EditorialRunOnceCycleResponse",
+      "type": "object"
+    },
+    "EditorialRunOnceSimpleResponse": {
+      "additionalProperties": true,
+      "properties": {
+        "meta": {
+          "$ref": "#/components/schemas/ContractMeta"
+        },
+        "mutated": {
+          "title": "Mutated",
+          "type": "boolean"
+        },
+        "state": {
+          "title": "State",
+          "type": "string"
+        },
+        "status": {
+          "title": "Status",
+          "type": "string"
+        }
+      },
+      "required": [
+        "status",
+        "state",
+        "mutated",
+        "meta"
+      ],
+      "title": "EditorialRunOnceSimpleResponse",
+      "type": "object"
+    },
+    "InsightsQuarantine": {
+      "additionalProperties": true,
+      "properties": {
+        "coverage": {
+          "enum": [
+            "complete",
+            "partial",
+            "unknown"
+          ],
+          "title": "Coverage",
+          "type": "string"
+        },
+        "items": {
+          "items": {
+            "$ref": "#/components/schemas/InsightsQuarantineItem"
+          },
+          "title": "Items",
+          "type": "array"
+        },
+        "items_truncated": {
+          "title": "Items Truncated",
+          "type": "boolean"
+        },
+        "total": {
+          "minimum": 0.0,
+          "title": "Total",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "total",
+        "items",
+        "items_truncated",
+        "coverage"
+      ],
+      "title": "InsightsQuarantine",
+      "type": "object"
+    },
+    "InsightsQuarantineItem": {
+      "additionalProperties": true,
+      "properties": {
+        "content_id": {
+          "title": "Content Id",
+          "type": "string"
+        },
+        "error_code": {
+          "title": "Error Code",
+          "type": "string"
+        },
+        "failure_count": {
+          "minimum": 0.0,
+          "title": "Failure Count",
+          "type": "integer"
+        },
+        "last_failed_at": {
+          "format": "date-time",
+          "title": "Last Failed At",
+          "type": "string"
+        }
+      },
+      "required": [
+        "content_id",
+        "failure_count",
+        "last_failed_at",
+        "error_code"
+      ],
+      "title": "InsightsQuarantineItem",
+      "type": "object"
+    },
+    "ManualThread": {
+      "additionalProperties": true,
+      "properties": {
+        "analyze_enabled": {
+          "title": "Analyze Enabled",
+          "type": "boolean"
+        },
+        "body_text": {
+          "title": "Body Text",
+          "type": "string"
+        },
+        "content_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Content Id"
+        },
+        "content_role": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Content Role"
+        },
+        "cta_policy": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Cta Policy"
+        },
+        "detected_at": {
+          "format": "date-time",
+          "title": "Detected At",
+          "type": "string"
+        },
+        "detection_id": {
+          "title": "Detection Id",
+          "type": "string"
+        },
+        "external_post_id": {
+          "title": "External Post Id",
+          "type": "string"
+        },
+        "hypothesis": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Hypothesis"
+        },
+        "learn_enabled": {
+          "title": "Learn Enabled",
+          "type": "boolean"
+        },
+        "logical_thread_id": {
+          "title": "Logical Thread Id",
+          "type": "string"
+        },
+        "n_parts": {
+          "minimum": 0.0,
+          "title": "N Parts",
+          "type": "integer"
+        },
+        "origin": {
+          "title": "Origin",
+          "type": "string"
+        },
+        "part_index": {
+          "minimum": 0.0,
+          "title": "Part Index",
+          "type": "integer"
+        },
+        "parts": {
+          "items": {
+            "$ref": "#/components/schemas/ManualThreadPart"
+          },
+          "title": "Parts",
+          "type": "array"
+        },
+        "permalink": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Permalink"
+        },
+        "published_at": {
+          "format": "date-time",
+          "title": "Published At",
+          "type": "string"
+        },
+        "root_external_id": {
+          "title": "Root External Id",
+          "type": "string"
+        },
+        "thread_metric_semantics": {
+          "title": "Thread Metric Semantics",
+          "type": "string"
+        },
+        "thread_metrics": {
+          "additionalProperties": {
+            "anyOf": [
+              {
+                "minimum": 0.0,
+                "type": "integer"
+              },
+              {
+                "minimum": 0.0,
+                "type": "number"
+              }
+            ]
+          },
+          "title": "Thread Metrics",
+          "type": "object"
+        },
+        "topic": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Topic"
+        },
+        "tracking_state": {
+          "title": "Tracking State",
+          "type": "string"
+        },
+        "updated_at": {
+          "format": "date-time",
+          "title": "Updated At",
+          "type": "string"
+        }
+      },
+      "required": [
+        "detection_id",
+        "logical_thread_id",
+        "root_external_id",
+        "external_post_id",
+        "body_text",
+        "published_at",
+        "permalink",
+        "origin",
+        "analyze_enabled",
+        "learn_enabled",
+        "topic",
+        "content_role",
+        "cta_policy",
+        "hypothesis",
+        "part_index",
+        "n_parts",
+        "parts",
+        "thread_metrics",
+        "thread_metric_semantics",
+        "tracking_state",
+        "content_id",
+        "detected_at",
+        "updated_at"
+      ],
+      "title": "ManualThread",
+      "type": "object"
+    },
+    "ManualThreadPart": {
+      "additionalProperties": true,
+      "properties": {
+        "body_text": {
+          "title": "Body Text",
+          "type": "string"
+        },
+        "external_post_id": {
+          "title": "External Post Id",
+          "type": "string"
+        },
+        "metrics": {
+          "additionalProperties": {
+            "anyOf": [
+              {
+                "minimum": 0.0,
+                "type": "integer"
+              },
+              {
+                "minimum": 0.0,
+                "type": "number"
+              }
+            ]
+          },
+          "title": "Metrics",
+          "type": "object"
+        },
+        "part_index": {
+          "minimum": 0.0,
+          "title": "Part Index",
+          "type": "integer"
+        },
+        "permalink": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Permalink"
+        },
+        "published_at": {
+          "format": "date-time",
+          "title": "Published At",
+          "type": "string"
+        },
+        "reply_to_external_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Reply To External Id"
+        }
+      },
+      "required": [
+        "external_post_id",
+        "reply_to_external_id",
+        "part_index",
+        "body_text",
+        "published_at",
+        "permalink",
+        "metrics"
+      ],
+      "title": "ManualThreadPart",
+      "type": "object"
+    },
+    "MetricsObservation": {
+      "additionalProperties": true,
+      "properties": {
+        "available_keys": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Available Keys",
+          "type": "array"
+        },
+        "fetched_at": {
+          "format": "date-time",
+          "title": "Fetched At",
+          "type": "string"
+        },
+        "observed_at": {
+          "format": "date-time",
+          "title": "Observed At",
+          "type": "string"
+        },
+        "source": {
+          "title": "Source",
+          "type": "string"
+        }
+      },
+      "required": [
+        "observed_at",
+        "fetched_at",
+        "available_keys",
+        "source"
+      ],
+      "title": "MetricsObservation",
+      "type": "object"
+    },
+    "NightAttention": {
+      "additionalProperties": true,
+      "properties": {
+        "by_reason": {
+          "additionalProperties": {
+            "minimum": 0.0,
+            "type": "integer"
+          },
+          "title": "By Reason",
+          "type": "object"
+        },
+        "coverage": {
+          "enum": [
+            "complete",
+            "partial",
+            "unknown"
+          ],
+          "title": "Coverage",
+          "type": "string"
+        },
+        "items_truncated": {
+          "title": "Items Truncated",
+          "type": "boolean"
+        },
+        "total": {
+          "minimum": 0.0,
+          "title": "Total",
+          "type": "integer"
+        },
+        "window_hours": {
+          "minimum": 0.0,
+          "title": "Window Hours",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "window_hours",
+        "total",
+        "by_reason",
+        "items_truncated",
+        "coverage"
+      ],
+      "title": "NightAttention",
+      "type": "object"
+    },
+    "NightBatchItem": {
+      "additionalProperties": true,
+      "properties": {
+        "attempted_at": {
+          "anyOf": [
+            {
+              "format": "date-time",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Attempted At"
+        },
+        "batch_id": {
+          "title": "Batch Id",
+          "type": "string"
+        },
+        "batch_status": {
+          "title": "Batch Status",
+          "type": "string"
+        },
+        "block_reason": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Block Reason"
+        },
+        "content_id": {
+          "title": "Content Id",
+          "type": "string"
+        },
+        "expires_at": {
+          "format": "date-time",
+          "title": "Expires At",
+          "type": "string"
+        },
+        "item_id": {
+          "title": "Item Id",
+          "type": "string"
+        },
+        "scheduled_at": {
+          "format": "date-time",
+          "title": "Scheduled At",
+          "type": "string"
+        },
+        "status": {
+          "title": "Status",
+          "type": "string"
+        }
+      },
+      "required": [
+        "item_id",
+        "batch_id",
+        "content_id",
+        "scheduled_at",
+        "status",
+        "block_reason",
+        "attempted_at",
+        "batch_status",
+        "expires_at"
+      ],
+      "title": "NightBatchItem",
+      "type": "object"
+    },
+    "OperatorAccountResponse": {
+      "additionalProperties": true,
+      "properties": {
+        "account_id": {
+          "title": "Account Id",
+          "type": "string"
+        },
+        "account_status": {
+          "title": "Account Status",
+          "type": "string"
+        },
+        "approval_queue": {
+          "items": {
+            "$ref": "#/components/schemas/ApprovalQueueItem"
+          },
+          "title": "Approval Queue",
+          "type": "array"
+        },
+        "display_name": {
+          "title": "Display Name",
+          "type": "string"
+        },
+        "domain_id": {
+          "title": "Domain Id",
+          "type": "string"
+        },
+        "handle": {
+          "title": "Handle",
+          "type": "string"
+        },
+        "manual_posts": {
+          "items": {
+            "$ref": "#/components/schemas/ManualThread"
+          },
+          "title": "Manual Posts",
+          "type": "array"
+        },
+        "meta": {
+          "$ref": "#/components/schemas/ContractMeta"
+        },
+        "operations": {
+          "$ref": "#/components/schemas/OperatorOperations"
+        },
+        "pipeline": {
+          "$ref": "#/components/schemas/AccountPipelineStatus"
+        },
+        "readiness": {
+          "$ref": "#/components/schemas/AccountReadiness"
+        },
+        "recent_audit_events": {
+          "items": {
+            "$ref": "#/components/schemas/RecentAuditEvent"
+          },
+          "title": "Recent Audit Events",
+          "type": "array"
+        },
+        "recent_contents": {
+          "items": {
+            "$ref": "#/components/schemas/RecentContent"
+          },
+          "title": "Recent Contents",
+          "type": "array"
+        },
+        "recent_publications": {
+          "items": {
+            "$ref": "#/components/schemas/RecentPublication"
+          },
+          "title": "Recent Publications",
+          "type": "array"
+        },
+        "updated_at": {
+          "format": "date-time",
+          "title": "Updated At",
+          "type": "string"
+        }
+      },
+      "required": [
+        "account_id",
+        "handle",
+        "display_name",
+        "domain_id",
+        "account_status",
+        "updated_at",
+        "readiness",
+        "pipeline",
+        "approval_queue",
+        "recent_contents",
+        "recent_publications",
+        "recent_audit_events",
+        "manual_posts",
+        "operations",
+        "meta"
+      ],
+      "title": "OperatorAccountResponse",
+      "type": "object"
+    },
+    "OperatorAccountSummary": {
+      "additionalProperties": true,
+      "properties": {
+        "account_id": {
+          "title": "Account Id",
+          "type": "string"
+        },
+        "account_status": {
+          "title": "Account Status",
+          "type": "string"
+        },
+        "display_name": {
+          "title": "Display Name",
+          "type": "string"
+        },
+        "domain_id": {
+          "title": "Domain Id",
+          "type": "string"
+        },
+        "handle": {
+          "title": "Handle",
+          "type": "string"
+        },
+        "pipeline": {
+          "$ref": "#/components/schemas/AccountPipelineStatus"
+        },
+        "readiness": {
+          "$ref": "#/components/schemas/AccountReadiness"
+        },
+        "updated_at": {
+          "format": "date-time",
+          "title": "Updated At",
+          "type": "string"
+        }
+      },
+      "required": [
+        "account_id",
+        "handle",
+        "display_name",
+        "domain_id",
+        "account_status",
+        "updated_at",
+        "readiness",
+        "pipeline"
+      ],
+      "title": "OperatorAccountSummary",
+      "type": "object"
+    },
+    "OperatorAccountsResponse": {
+      "additionalProperties": true,
+      "properties": {
+        "accounts": {
+          "items": {
+            "$ref": "#/components/schemas/OperatorAccountSummary"
+          },
+          "title": "Accounts",
+          "type": "array"
+        },
+        "meta": {
+          "$ref": "#/components/schemas/ContractMeta"
+        }
+      },
+      "required": [
+        "accounts",
+        "meta"
+      ],
+      "title": "OperatorAccountsResponse",
+      "type": "object"
+    },
+    "OperatorContentResponse": {
+      "additionalProperties": true,
+      "properties": {
+        "account_id": {
+          "title": "Account Id",
+          "type": "string"
+        },
+        "analyze_enabled": {
+          "title": "Analyze Enabled",
+          "type": "boolean"
+        },
+        "approval_events": {
+          "items": {
+            "$ref": "#/components/schemas/ContentApprovalEvent"
+          },
+          "title": "Approval Events",
+          "type": "array"
+        },
+        "approved_for_current_body": {
+          "title": "Approved For Current Body",
+          "type": "boolean"
+        },
+        "attempt": {
+          "title": "Attempt",
+          "type": "integer"
+        },
+        "body_text": {
+          "title": "Body Text",
+          "type": "string"
+        },
+        "content_hash": {
+          "title": "Content Hash",
+          "type": "string"
+        },
+        "content_id": {
+          "title": "Content Id",
+          "type": "string"
+        },
+        "content_role": {
+          "title": "Content Role",
+          "type": "string"
+        },
+        "created_at": {
+          "format": "date-time",
+          "title": "Created At",
+          "type": "string"
+        },
+        "generation": {
+          "anyOf": [
+            {
+              "$ref": "#/components/schemas/ContentGeneration"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "learn_enabled": {
+          "title": "Learn Enabled",
+          "type": "boolean"
+        },
+        "meta": {
+          "$ref": "#/components/schemas/ContractMeta"
+        },
+        "metrics": {
+          "additionalProperties": {
+            "anyOf": [
+              {
+                "minimum": 0.0,
+                "type": "integer"
+              },
+              {
+                "minimum": 0.0,
+                "type": "number"
+              }
+            ]
+          },
+          "title": "Metrics",
+          "type": "object"
+        },
+        "metrics_observation": {
+          "anyOf": [
+            {
+              "$ref": "#/components/schemas/MetricsObservation"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "n_chars": {
+          "minimum": 0.0,
+          "title": "N Chars",
+          "type": "integer"
+        },
+        "n_parts": {
+          "minimum": 0.0,
+          "title": "N Parts",
+          "type": "integer"
+        },
+        "origin": {
+          "title": "Origin",
+          "type": "string"
+        },
+        "parts": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Parts",
+          "type": "array"
+        },
+        "plan_id": {
+          "title": "Plan Id",
+          "type": "string"
+        },
+        "plan_seq": {
+          "title": "Plan Seq",
+          "type": "integer"
+        },
+        "publications": {
+          "items": {
+            "$ref": "#/components/schemas/ContentPublication"
+          },
+          "title": "Publications",
+          "type": "array"
+        },
+        "qa": {
+          "anyOf": [
+            {
+              "$ref": "#/components/schemas/ContentQaDetail"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "state": {
+          "title": "State",
+          "type": "string"
+        },
+        "topic": {
+          "title": "Topic",
+          "type": "string"
+        },
+        "updated_at": {
+          "format": "date-time",
+          "title": "Updated At",
+          "type": "string"
+        },
+        "version": {
+          "title": "Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "account_id",
+        "content_id",
+        "plan_id",
+        "plan_seq",
+        "topic",
+        "content_role",
+        "version",
+        "attempt",
+        "state",
+        "origin",
+        "analyze_enabled",
+        "learn_enabled",
+        "content_hash",
+        "created_at",
+        "updated_at",
+        "parts",
+        "body_text",
+        "n_parts",
+        "n_chars",
+        "qa",
+        "generation",
+        "approval_events",
+        "publications",
+        "metrics",
+        "metrics_observation",
+        "approved_for_current_body",
+        "meta"
+      ],
+      "title": "OperatorContentResponse",
+      "type": "object"
+    },
+    "OperatorFeatures": {
+      "additionalProperties": true,
+      "properties": {
+        "manual_post_sync": {
+          "title": "Manual Post Sync",
+          "type": "boolean"
+        },
+        "self_reply_sync": {
+          "title": "Self Reply Sync",
+          "type": "string"
+        }
+      },
+      "required": [
+        "manual_post_sync",
+        "self_reply_sync"
+      ],
+      "title": "OperatorFeatures",
+      "type": "object"
+    },
+    "OperatorOperations": {
+      "additionalProperties": true,
+      "properties": {
+        "features": {
+          "$ref": "#/components/schemas/OperatorFeatures"
+        },
+        "insights_quarantine": {
+          "$ref": "#/components/schemas/InsightsQuarantine"
+        },
+        "night_attention": {
+          "$ref": "#/components/schemas/NightAttention"
+        },
+        "night_batch_items": {
+          "items": {
+            "$ref": "#/components/schemas/NightBatchItem"
+          },
+          "title": "Night Batch Items",
+          "type": "array"
+        },
+        "rolling_usage": {
+          "$ref": "#/components/schemas/RollingUsage"
+        },
+        "runner_heartbeats": {
+          "items": {
+            "$ref": "#/components/schemas/RunnerHeartbeat"
+          },
+          "title": "Runner Heartbeats",
+          "type": "array"
+        }
+      },
+      "required": [
+        "night_batch_items",
+        "night_attention",
+        "insights_quarantine",
+        "runner_heartbeats",
+        "rolling_usage",
+        "features"
+      ],
+      "title": "OperatorOperations",
+      "type": "object"
+    },
+    "RecentAuditEvent": {
+      "additionalProperties": true,
+      "properties": {
+        "created_at": {
+          "format": "date-time",
+          "title": "Created At",
+          "type": "string"
+        },
+        "entity_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Entity Id"
+        },
+        "entity_version": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Entity Version"
+        },
+        "event_type": {
+          "title": "Event Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "event_type",
+        "entity_id",
+        "entity_version",
+        "created_at"
+      ],
+      "title": "RecentAuditEvent",
+      "type": "object"
+    },
+    "RecentContent": {
+      "additionalProperties": true,
+      "properties": {
+        "analyze_enabled": {
+          "title": "Analyze Enabled",
+          "type": "boolean"
+        },
+        "attempt": {
+          "title": "Attempt",
+          "type": "integer"
+        },
+        "content_hash": {
+          "title": "Content Hash",
+          "type": "string"
+        },
+        "content_id": {
+          "title": "Content Id",
+          "type": "string"
+        },
+        "created_at": {
+          "format": "date-time",
+          "title": "Created At",
+          "type": "string"
+        },
+        "learn_enabled": {
+          "title": "Learn Enabled",
+          "type": "boolean"
+        },
+        "n_chars": {
+          "minimum": 0.0,
+          "title": "N Chars",
+          "type": "integer"
+        },
+        "origin": {
+          "title": "Origin",
+          "type": "string"
+        },
+        "plan_id": {
+          "title": "Plan Id",
+          "type": "string"
+        },
+        "qa": {
+          "anyOf": [
+            {
+              "$ref": "#/components/schemas/ContentQaSummary"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "state": {
+          "title": "State",
+          "type": "string"
+        },
+        "updated_at": {
+          "format": "date-time",
+          "title": "Updated At",
+          "type": "string"
+        },
+        "version": {
+          "title": "Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "content_id",
+        "plan_id",
+        "version",
+        "attempt",
+        "state",
+        "content_hash",
+        "n_chars",
+        "created_at",
+        "updated_at",
+        "origin",
+        "analyze_enabled",
+        "learn_enabled",
+        "qa"
+      ],
+      "title": "RecentContent",
+      "type": "object"
+    },
+    "RecentPublication": {
+      "additionalProperties": true,
+      "properties": {
+        "content_id": {
+          "title": "Content Id",
+          "type": "string"
+        },
+        "created_at": {
+          "format": "date-time",
+          "title": "Created At",
+          "type": "string"
+        },
+        "error": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Error"
+        },
+        "mode": {
+          "title": "Mode",
+          "type": "string"
+        },
+        "publication_id": {
+          "title": "Publication Id",
+          "type": "string"
+        },
+        "published_at": {
+          "anyOf": [
+            {
+              "format": "date-time",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Published At"
+        },
+        "status": {
+          "title": "Status",
+          "type": "string"
+        }
+      },
+      "required": [
+        "publication_id",
+        "content_id",
+        "mode",
+        "status",
+        "error",
+        "created_at",
+        "published_at"
+      ],
+      "title": "RecentPublication",
+      "type": "object"
+    },
+    "RollingUsage": {
+      "additionalProperties": true,
+      "properties": {
+        "publications_last_24h": {
+          "minimum": 0.0,
+          "title": "Publications Last 24H",
+          "type": "integer"
+        },
+        "publications_last_hour": {
+          "minimum": 0.0,
+          "title": "Publications Last Hour",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "publications_last_hour",
+        "publications_last_24h"
+      ],
+      "title": "RollingUsage",
+      "type": "object"
+    },
+    "RunnerHeartbeat": {
+      "additionalProperties": true,
+      "properties": {
+        "age_seconds": {
+          "anyOf": [
+            {
+              "minimum": 0.0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Age Seconds"
+        },
+        "expected": {
+          "const": "unknown",
+          "description": "Scheduling expectation is consumer policy, not producer fact.",
+          "title": "Expected",
+          "type": "string"
+        },
+        "healthy": {
+          "title": "Healthy",
+          "type": "boolean"
+        },
+        "last_run_at": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Raw producer timestamp; state=invalid when it is malformed.",
+          "title": "Last Run At"
+        },
+        "run_status": {
+          "anyOf": [
+            {
+              "enum": [
+                "succeeded",
+                "failed"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Run Status"
+        },
+        "runner_name": {
+          "enum": [
+            "insights",
+            "outcome",
+            "night_batch"
+          ],
+          "title": "Runner Name",
+          "type": "string"
+        },
+        "state": {
+          "enum": [
+            "fresh",
+            "stale",
+            "missing",
+            "invalid",
+            "future"
+          ],
+          "title": "State",
+          "type": "string"
+        }
+      },
+      "required": [
+        "runner_name",
+        "state",
+        "run_status",
+        "last_run_at",
+        "age_seconds",
+        "expected",
+        "healthy"
+      ],
+      "title": "RunnerHeartbeat",
+      "type": "object"
+    },
+    "SafetyStatusResponse": {
+      "additionalProperties": true,
+      "properties": {
+        "account_id": {
+          "title": "Account Id",
+          "type": "string"
+        },
+        "account_status": {
+          "title": "Account Status",
+          "type": "string"
+        },
+        "account_stop": {
+          "title": "Account Stop",
+          "type": "boolean"
+        },
+        "approval_mode": {
+          "title": "Approval Mode",
+          "type": "string"
+        },
+        "capability": {
+          "const": "threads.safety.status",
+          "default": "threads.safety.status",
+          "title": "Capability",
+          "type": "string"
+        },
+        "capability_stop": {
+          "title": "Capability Stop",
+          "type": "boolean"
+        },
+        "error": {
+          "anyOf": [
+            {
+              "$ref": "#/components/schemas/CapabilityError"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "global_stop": {
+          "title": "Global Stop",
+          "type": "boolean"
+        },
+        "meta": {
+          "$ref": "#/components/schemas/ContractMeta"
+        },
+        "publish_readiness": {
+          "anyOf": [
+            {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Publish Readiness"
+        },
+        "rate_guard_ready": {
+          "title": "Rate Guard Ready",
+          "type": "boolean"
+        },
+        "rate_policy": {
+          "additionalProperties": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "title": "Rate Policy",
+          "type": "object"
+        },
+        "request_id": {
+          "title": "Request Id",
+          "type": "string"
+        },
+        "status": {
+          "const": "success",
+          "default": "success",
+          "title": "Status",
+          "type": "string"
+        },
+        "unresolved_ambiguous_publication": {
+          "title": "Unresolved Ambiguous Publication",
+          "type": "boolean"
+        },
+        "warnings": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Warnings",
+          "type": "array"
+        }
+      },
+      "required": [
+        "request_id",
+        "account_id",
+        "account_status",
+        "global_stop",
+        "account_stop",
+        "capability_stop",
+        "approval_mode",
+        "unresolved_ambiguous_publication",
+        "rate_guard_ready",
+        "rate_policy"
+      ],
+      "title": "SafetyStatusResponse",
+      "type": "object"
+    },
+    "TenantIdentityResponse": {
+      "additionalProperties": true,
+      "properties": {
+        "meta": {
+          "$ref": "#/components/schemas/ContractMeta"
+        },
+        "org_id": {
+          "title": "Org Id",
+          "type": "string"
+        },
+        "role": {
+          "enum": [
+            "viewer",
+            "editor",
+            "admin"
+          ],
+          "title": "Role",
+          "type": "string"
+        },
+        "user_id": {
+          "title": "User Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "meta",
+        "user_id",
+        "org_id",
+        "role"
+      ],
+      "title": "TenantIdentityResponse",
+      "type": "object"
+    }
+  }
+}

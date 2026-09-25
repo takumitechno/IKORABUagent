@@ -152,7 +152,9 @@ def collect_snapshots(
     if args.all_accounts:
         accounts_ok, accounts = request_json(f"{args.bridge_url}/operator/accounts", headers)
         rows = accounts.get("accounts") if accounts_ok and isinstance(accounts, dict) else None
-        valid_rows = isinstance(rows, list) and all(
+        meta = accounts.get("meta") if isinstance(accounts, dict) else None
+        valid_rows = isinstance(meta, dict) and meta.get("schema_version") == 1 \
+            and isinstance(rows, list) and all(
             isinstance(row, dict) and isinstance(row.get("account_id"), str)
             and bool(row["account_id"]) and isinstance(row.get("account_status"), str)
             for row in rows
@@ -201,6 +203,12 @@ def collect_snapshots(
         credential_ok, live_readiness = request_json(
             f"{args.bridge_url}/operator/readiness/accounts/{account_id}", headers)
         account = account if account_ok and isinstance(account, dict) else {}
+        meta = account.get("meta") if isinstance(account, dict) else None
+        account_ok = bool(account_ok and isinstance(meta, dict)
+                          and meta.get("schema_version") == 1
+                          and account.get("account_id") == account_id)
+        if not account_ok:
+            account = {}
         live_readiness = live_readiness if credential_ok and isinstance(live_readiness, dict) else {}
         operations = account.get("operations", {})
         operations = operations if isinstance(operations, dict) else {}
@@ -217,6 +225,8 @@ def collect_snapshots(
             "credential_readiness_available": bool(credential_ok and live_readiness),
             "credential_readiness": live_readiness.get("credential_readiness", {}),
             "self_reply_sync": features.get("self_reply_sync"),
+            "night_attention": operations.get("night_attention"),
+            "insights_quarantine": operations.get("insights_quarantine"),
             "insights_age_minutes": operations.get("insights_age_minutes"),
             "editorial_age_minutes": operations.get("editorial_age_minutes"),
             "activity_projection_age_minutes": operations.get("activity_projection_age_minutes"),
@@ -316,6 +326,16 @@ def evaluate(snapshot: dict[str, Any], now: datetime) -> list[dict[str, str]]:
 
     stale_before = now - timedelta(minutes=NIGHT_STALE_MINUTES)
     recent_before = now - timedelta(hours=NIGHT_MISS_LOOKBACK_HOURS)
+    for label, key in (("NIGHT", "night_attention"),
+                       ("insights quarantine", "insights_quarantine")):
+        collection = snapshot.get(key)
+        coverage = collection.get("coverage") if isinstance(collection, dict) else None
+        truncated = collection.get("items_truncated") if isinstance(collection, dict) else None
+        entity = f"{account_id}:{key}"
+        if coverage == "partial" or truncated is True:
+            add("collection_coverage_partial", f"{label} coverage is partial", entity)
+        elif coverage != "complete" or truncated is not False:
+            add("collection_coverage_unknown", f"{label} coverage is unavailable", entity)
     for item in snapshot.get("night_items", []):
         if not isinstance(item, dict):
             continue
@@ -387,16 +407,36 @@ def evaluate(snapshot: dict[str, Any], now: datetime) -> list[dict[str, str]]:
         if not isinstance(heartbeat, dict):
             add("runner_freshness_unavailable", "Runner heartbeat evidence is invalid", f"{account_id}:runner_heartbeats")
             continue
-        runner = heartbeat.get("runner") or heartbeat.get("name")
-        if not isinstance(runner, str) or not runner:
+        runner = heartbeat.get("runner_name")
+        if not isinstance(runner, str) or runner not in ("insights", "outcome", "night_batch"):
             add("runner_freshness_unavailable", "Runner heartbeat identity is invalid", f"{account_id}:runner_heartbeats")
             continue
-        seen = parse_time(heartbeat.get("observed_at") or heartbeat.get("last_seen_at"))
+        state = heartbeat.get("state")
+        run_status = heartbeat.get("run_status")
+        if (not isinstance(state, str)
+                or state not in ("fresh", "stale", "missing", "invalid", "future")
+                or run_status not in ("succeeded", "failed", None)
+                or heartbeat.get("expected") != "unknown"
+                or not isinstance(heartbeat.get("healthy"), bool)):
+            add("runner_freshness_unavailable", f"{runner} heartbeat enum is unsupported", f"{account_id}:{runner}")
+            continue
+        raw_seen = heartbeat.get("last_run_at")
+        seen = parse_time(raw_seen)
+        if seen is not None and isinstance(raw_seen, str):
+            parsed_seen = datetime.fromisoformat(raw_seen.replace("Z", "+00:00"))
+            if parsed_seen.tzinfo is None or parsed_seen.utcoffset() is None:
+                seen = None
         age_minutes = (now - seen).total_seconds() / 60 if seen else None
-        if age_minutes is None or age_minutes < 0:
+        if state in {"missing", "invalid", "future"} or age_minutes is None or age_minutes < 0:
             add("runner_freshness_unavailable", f"{runner} heartbeat timestamp is invalid", f"{account_id}:{runner}")
-        elif age_minutes > RUNNER_HEARTBEAT_STALE_MINUTES:
+        elif run_status is None:
+            add("runner_freshness_unavailable", f"{runner} heartbeat result is unavailable", f"{account_id}:{runner}")
+        elif state == "stale" or age_minutes > RUNNER_HEARTBEAT_STALE_MINUTES:
             add("runner_stale", f"{runner} runner heartbeat is {age_minutes:.0f}m old", f"{account_id}:{runner}")
+        elif run_status == "failed":
+            add("runner_failed", f"{runner} runner last run failed", f"{account_id}:{runner}")
+        elif heartbeat["healthy"] is not True:
+            add("runner_unhealthy", f"{runner} runner is not healthy", f"{account_id}:{runner}")
 
     if not snapshot.get("canary_available"):
         add("tenant_canary_unavailable", "Tenant canary telemetry could not be read")

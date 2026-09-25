@@ -1,263 +1,509 @@
 /**
  * GENERATED FILE — DO NOT EDIT BY HAND.
- * Source contract: Threads-/tests/fixtures/bridge_contract_v1.json
- * Source schema: Threads Bridge response contract v1 (CONTRACT02A).
- *
- * These are transport shapes. Dashboard-facing camelCase view models remain
- * intentionally separate in threads-dashboard.ts.
+ * Source: pokemon-agents/contracts/bridge_contract_v1.json
+ * Accepted producer base: 78c640cb5eeb203ecac6d8177d00638091259f79
+ * Artifact SHA-256: 4e765419b3bbf453434c383a71972665174cee98ebf0f044d88816f9985353a1
  */
 
 export const THREADS_BRIDGE_SCHEMA_VERSION = 1 as const;
-
-export interface BridgeMetaV1 {
-  schema_version: typeof THREADS_BRIDGE_SCHEMA_VERSION;
-  [key: string]: unknown;
-}
-
 export type BridgeJsonObject = Record<string, unknown>;
 export type BridgeMetricMapV1 = Record<string, number>;
 
-export interface BridgeAccountReadinessV1 extends BridgeJsonObject {
-  config_ok: boolean;
-  config_problems: string[];
-  n_research_posts: number;
-  has_style_profile: boolean;
-  style_profile_version: number | null;
-  persona_provenance: string;
-  persona_usable_for_generation: boolean;
-  n_verified_facts: number;
-  verified_fact_keys: string[];
-  n_plans: number;
-  status: string;
-  ready_for_dry_run: boolean;
-  blocking: string[];
-  requires_owner_oauth_before_live: boolean;
-}
+export type AccountPipelineStatus = {
+  "contents_by_state": Record<string, number>;
+  "has_learning_snapshot": boolean;
+  "n_audit_events": number;
+  "n_contents": number;
+  "n_metrics": number;
+  "n_publications": number;
+  "publications_by_mode": Record<string, number>;
+  [key: string]: unknown;
+};
 
-export interface BridgePipelineV1 extends BridgeJsonObject {
-  n_contents: number;
-  contents_by_state: Record<string, number>;
-  n_publications: number;
-  publications_by_mode: Record<string, number>;
-  n_metrics: number;
-  has_learning_snapshot: boolean;
-  n_audit_events: number;
-}
+export type AccountReadiness = {
+  "blocking": Array<string>;
+  "config_ok": boolean;
+  "config_problems": Array<string>;
+  "has_style_profile": boolean;
+  "n_plans": number;
+  "n_research_posts": number;
+  "n_verified_facts": number;
+  "persona_provenance": string;
+  "persona_usable_for_generation": boolean;
+  "ready_for_dry_run": boolean;
+  "requires_owner_oauth_before_live": boolean;
+  "status": string;
+  "style_profile_version": number | null;
+  "verified_fact_keys": Array<string>;
+  [key: string]: unknown;
+};
 
-export interface BridgeAccountSummaryV1 extends BridgeJsonObject {
-  account_id: string;
-  handle: string;
-  display_name: string;
-  domain_id: string;
-  account_status: string;
-  updated_at: string;
-  readiness: BridgeAccountReadinessV1;
-  pipeline: BridgePipelineV1;
-}
+export type ApprovalQueueItem = {
+  "attempt": number;
+  "content_hash": string;
+  "content_id": string;
+  "plan_id": string;
+  "preview_chars": number;
+  "version": number;
+  [key: string]: unknown;
+};
 
-export interface BridgeAccountsResponseV1 extends BridgeJsonObject {
-  accounts: BridgeAccountSummaryV1[];
-  meta: BridgeMetaV1;
-}
+export type CapabilityError = {
+  "code": string;
+  "message": string;
+};
 
-export interface BridgeRecentContentV1 extends BridgeJsonObject {
-  content_id: string;
-  plan_id: string;
-  version: number;
-  attempt: number;
-  state: string;
-  content_hash: string;
-  n_chars: number;
-  created_at: string;
-  updated_at: string;
-  origin: string;
-  analyze_enabled: boolean;
-  learn_enabled: boolean;
-  qa: BridgeJsonObject | null;
-}
+export type ContentApprovalEvent = {
+  "action": string;
+  "actor": string;
+  "created_at": string;
+  "matches_current_body": boolean;
+  [key: string]: unknown;
+};
 
-export interface BridgeRecentPublicationV1 extends BridgeJsonObject {
-  publication_id: string;
-  content_id: string;
-  mode: string;
-  status: string;
-  error: string | null;
-  created_at: string;
-  published_at: string | null;
-}
+export type ContentGeneration = {
+  "attempt": number;
+  "contract_version": string | null;
+  "created_at": string;
+  "model": string;
+  "provider": string;
+  "provider_request_id": string | null;
+  "qa_verdict": string | null;
+  "request_fingerprint": string | null;
+  "semantic_findings": Array<{
+  [key: string]: unknown;
+}>;
+  "style_profile_version": number | null;
+  "verified_fact_keys": Array<string>;
+  [key: string]: unknown;
+};
 
-export interface BridgeManualThreadPartV1 extends BridgeJsonObject {
-  external_post_id: string;
-  reply_to_external_id: string | null;
-  part_index: number;
-  body_text: string;
-  published_at: string;
-  permalink: string | null;
-  metrics: BridgeMetricMapV1;
-}
+export type ContentPublication = {
+  "attempts": number;
+  "created_at": string;
+  "external_publish_id": string | null;
+  "matches_current_body": boolean;
+  "mode": string;
+  "parts_state": Array<{
+  [key: string]: unknown;
+}>;
+  "permalink": string | null;
+  "published_at": string | null;
+  "status": string;
+  "updated_at": string | null;
+  [key: string]: unknown;
+};
 
-export interface BridgeManualThreadV1 extends BridgeJsonObject {
-  detection_id: string;
-  logical_thread_id: string;
-  root_external_id: string;
-  external_post_id: string;
-  body_text: string;
-  published_at: string;
-  permalink: string | null;
-  origin: string;
-  analyze_enabled: boolean;
-  learn_enabled: boolean;
-  topic: string | null;
-  content_role: string | null;
-  hypothesis: string | null;
-  part_index: number;
-  n_parts: number;
-  parts: BridgeManualThreadPartV1[];
-  thread_metrics: BridgeMetricMapV1;
-  thread_metric_semantics: string;
-  tracking_state: string;
-  content_id: string | null;
-  detected_at: string;
-  updated_at: string;
-}
+export type ContentQaDetail = {
+  "created_at": string;
+  "findings": Array<{
+  [key: string]: unknown;
+}>;
+  "n_results": number;
+  "verdict": string;
+  [key: string]: unknown;
+};
 
-export interface BridgeNightBatchItemV1 extends BridgeJsonObject {
-  item_id: string;
-  batch_id: string;
-  content_id: string;
-  scheduled_at: string;
-  status: string;
-  block_reason: string | null;
-  attempted_at: string | null;
-  batch_status: string;
-  expires_at: string;
-}
+export type ContentQaSummary = {
+  "findings": Array<{
+  [key: string]: unknown;
+}>;
+  "verdict": string;
+  [key: string]: unknown;
+};
 
-export interface BridgeOperationsV1 extends BridgeJsonObject {
-  night_batch_items: BridgeNightBatchItemV1[];
-  rolling_usage: {
-    publications_last_hour: number;
-    publications_last_24h: number;
-    [key: string]: unknown;
-  };
-  features: {
-    manual_post_sync: boolean;
-    self_reply_sync: string;
-    [key: string]: unknown;
-  };
-}
+export type ContractMeta = {
+  "schema_version": 1;
+  [key: string]: unknown;
+};
 
-export interface BridgeAccountResponseV1 extends BridgeAccountSummaryV1 {
-  approval_queue: BridgeJsonObject[];
-  recent_contents: BridgeRecentContentV1[];
-  recent_publications: BridgeRecentPublicationV1[];
-  recent_audit_events: BridgeJsonObject[];
-  manual_posts: BridgeManualThreadV1[];
-  operations: BridgeOperationsV1;
-  meta: BridgeMetaV1;
-}
+export type EditorialCustomerResponse = {
+  "account_id": string;
+  "meta": ContractMeta;
+  "summary": EditorialCustomerSummary | null;
+  [key: string]: unknown;
+};
 
-export interface BridgeContentResponseV1 extends BridgeJsonObject {
-  account_id: string;
-  content_id: string;
-  plan_id: string;
-  plan_seq: number;
-  topic: string;
-  content_role: string;
-  version: number;
-  attempt: number;
-  state: string;
-  origin: string;
-  analyze_enabled: boolean;
-  learn_enabled: boolean;
-  content_hash: string;
-  created_at: string;
-  updated_at: string;
-  parts: string[];
-  body_text: string;
-  n_parts: number;
-  n_chars: number;
-  qa: BridgeJsonObject | null;
-  generation: BridgeJsonObject | null;
-  approval_events: BridgeJsonObject[];
-  publications: BridgeJsonObject[];
-  metrics: BridgeMetricMapV1;
-  metrics_observation: BridgeJsonObject | null;
-  approved_for_current_body: boolean;
-  meta: BridgeMetaV1;
-}
-
-export interface BridgeSafetyResponseV1 extends BridgeJsonObject {
-  status: string;
-  capability: string;
-  request_id: string;
-  account_id: string;
-  account_status: string;
-  global_stop: boolean;
-  account_stop: boolean;
-  capability_stop: boolean;
-  approval_mode: string;
-  publish_readiness: BridgeJsonObject | null;
-  unresolved_ambiguous_publication: boolean;
-  rate_guard_ready: boolean;
-  rate_policy: Record<string, number | null>;
-  warnings: string[];
-  error: BridgeJsonObject | null;
-  meta: BridgeMetaV1;
-}
-
-export interface BridgeEditorialCycleV1 extends BridgeJsonObject {
-  cycle_id: string;
-  account_id: string;
-  cycle_key: string;
-  state: string;
-  status: string;
-  current_agent: string | null;
-  waiting_reason: string | null;
-  source_content_ids: string[];
-  config: BridgeJsonObject;
-  summary: BridgeJsonObject;
-  brief: BridgeJsonObject | null;
-  draft: BridgeJsonObject | null;
-  content_id: string | null;
-  created_at: string;
-  updated_at: string;
-}
-
-export interface BridgeEditorialExperimentV1 extends BridgeJsonObject {
-  experiment_id: string;
-  account_id: string;
-  cycle_id: string;
-  created_at: string;
-  source_content_ids: string[];
-  hypothesis: BridgeJsonObject;
-  test_variable: string;
-  constants: string[];
-  success_signal: BridgeJsonObject;
-  failure_signal: BridgeJsonObject;
-  minimum_sample: BridgeJsonObject;
-  status: string;
-  decision: BridgeJsonObject;
-  result_summary: string | null;
-  evidence_level: string;
-}
-
-export interface BridgeEditorialInternalResponseV1 extends BridgeJsonObject {
-  account_id: string;
-  cycle: BridgeEditorialCycleV1 | null;
-  experiments: BridgeEditorialExperimentV1[];
-  private_chain_of_thought_stored?: boolean;
-  meta: BridgeMetaV1;
-}
-
-export interface BridgeEditorialCustomerSummaryV1 extends BridgeJsonObject {
+export type EditorialCustomerSummary = {
   "今回試したこと": string;
-  "確認できた事実": string[];
   "次回変えること": string;
-}
+  "確認できた事実": Array<string>;
+  [key: string]: unknown;
+};
 
-export interface BridgeEditorialCustomerResponseV1 extends BridgeJsonObject {
-  account_id: string;
-  summary: BridgeEditorialCustomerSummaryV1 | null;
-  meta: BridgeMetaV1;
-}
+export type EditorialCycle = {
+  "account_id": string;
+  "brief": {
+  [key: string]: unknown;
+} | null;
+  "config": {
+  [key: string]: unknown;
+};
+  "content_id": string | null;
+  "created_at": string;
+  "current_agent": string | null;
+  "cycle_id": string;
+  "cycle_key": string;
+  "draft": {
+  [key: string]: unknown;
+} | null;
+  "source_content_ids": Array<string>;
+  "state": string;
+  "status": string;
+  "summary": {
+  [key: string]: unknown;
+};
+  "updated_at": string;
+  "waiting_reason": string | null;
+  [key: string]: unknown;
+};
+
+export type EditorialExperiment = {
+  "account_id": string;
+  "constants": Array<string>;
+  "created_at": string;
+  "cycle_id": string;
+  "decision": {
+  [key: string]: unknown;
+};
+  "evidence_level": string;
+  "experiment_id": string;
+  "failure_signal": {
+  [key: string]: unknown;
+};
+  "hypothesis": {
+  [key: string]: unknown;
+};
+  "minimum_sample": {
+  [key: string]: unknown;
+};
+  "result_summary": string | null;
+  "source_content_ids": Array<string>;
+  "status": string;
+  "success_signal": {
+  [key: string]: unknown;
+};
+  "test_variable": string;
+  [key: string]: unknown;
+};
+
+export type EditorialInternalResponse = {
+  "account_id": string;
+  "cycle": EditorialCycle | null;
+  "experiments": Array<EditorialExperiment>;
+  "meta": ContractMeta;
+  "private_chain_of_thought_stored"?: boolean;
+  [key: string]: unknown;
+};
+
+export type EditorialRunOnceCycleResponse = {
+  "account_id": string;
+  "brief": {
+  [key: string]: unknown;
+} | null;
+  "config": {
+  [key: string]: unknown;
+};
+  "content_id": string | null;
+  "created_at": string;
+  "current_agent": string | null;
+  "cycle_id": string;
+  "cycle_key": string;
+  "draft": {
+  [key: string]: unknown;
+} | null;
+  "meta": ContractMeta;
+  "mutated": boolean;
+  "source_content_ids": Array<string>;
+  "state": string;
+  "status": string;
+  "summary": {
+  [key: string]: unknown;
+};
+  "updated_at": string;
+  "waiting_reason": string | null;
+  [key: string]: unknown;
+};
+
+export type EditorialRunOnceSimpleResponse = {
+  "meta": ContractMeta;
+  "mutated": boolean;
+  "state": string;
+  "status": string;
+  [key: string]: unknown;
+};
+
+export type InsightsQuarantine = {
+  "coverage": "complete" | "partial" | "unknown";
+  "items": Array<InsightsQuarantineItem>;
+  "items_truncated": boolean;
+  "total": number;
+  [key: string]: unknown;
+};
+
+export type InsightsQuarantineItem = {
+  "content_id": string;
+  "error_code": string;
+  "failure_count": number;
+  "last_failed_at": string;
+  [key: string]: unknown;
+};
+
+export type ManualThread = {
+  "analyze_enabled": boolean;
+  "body_text": string;
+  "content_id": string | null;
+  "content_role": string | null;
+  "cta_policy": string | null;
+  "detected_at": string;
+  "detection_id": string;
+  "external_post_id": string;
+  "hypothesis": string | null;
+  "learn_enabled": boolean;
+  "logical_thread_id": string;
+  "n_parts": number;
+  "origin": string;
+  "part_index": number;
+  "parts": Array<ManualThreadPart>;
+  "permalink": string | null;
+  "published_at": string;
+  "root_external_id": string;
+  "thread_metric_semantics": string;
+  "thread_metrics": Record<string, number | number>;
+  "topic": string | null;
+  "tracking_state": string;
+  "updated_at": string;
+  [key: string]: unknown;
+};
+
+export type ManualThreadPart = {
+  "body_text": string;
+  "external_post_id": string;
+  "metrics": Record<string, number | number>;
+  "part_index": number;
+  "permalink": string | null;
+  "published_at": string;
+  "reply_to_external_id": string | null;
+  [key: string]: unknown;
+};
+
+export type MetricsObservation = {
+  "available_keys": Array<string>;
+  "fetched_at": string;
+  "observed_at": string;
+  "source": string;
+  [key: string]: unknown;
+};
+
+export type NightAttention = {
+  "by_reason": Record<string, number>;
+  "coverage": "complete" | "partial" | "unknown";
+  "items_truncated": boolean;
+  "total": number;
+  "window_hours": number;
+  [key: string]: unknown;
+};
+
+export type NightBatchItem = {
+  "attempted_at": string | null;
+  "batch_id": string;
+  "batch_status": string;
+  "block_reason": string | null;
+  "content_id": string;
+  "expires_at": string;
+  "item_id": string;
+  "scheduled_at": string;
+  "status": string;
+  [key: string]: unknown;
+};
+
+export type OperatorAccountResponse = {
+  "account_id": string;
+  "account_status": string;
+  "approval_queue": Array<ApprovalQueueItem>;
+  "display_name": string;
+  "domain_id": string;
+  "handle": string;
+  "manual_posts": Array<ManualThread>;
+  "meta": ContractMeta;
+  "operations": OperatorOperations;
+  "pipeline": AccountPipelineStatus;
+  "readiness": AccountReadiness;
+  "recent_audit_events": Array<RecentAuditEvent>;
+  "recent_contents": Array<RecentContent>;
+  "recent_publications": Array<RecentPublication>;
+  "updated_at": string;
+  [key: string]: unknown;
+};
+
+export type OperatorAccountsResponse = {
+  "accounts": Array<OperatorAccountSummary>;
+  "meta": ContractMeta;
+  [key: string]: unknown;
+};
+
+export type OperatorAccountSummary = {
+  "account_id": string;
+  "account_status": string;
+  "display_name": string;
+  "domain_id": string;
+  "handle": string;
+  "pipeline": AccountPipelineStatus;
+  "readiness": AccountReadiness;
+  "updated_at": string;
+  [key: string]: unknown;
+};
+
+export type OperatorContentResponse = {
+  "account_id": string;
+  "analyze_enabled": boolean;
+  "approval_events": Array<ContentApprovalEvent>;
+  "approved_for_current_body": boolean;
+  "attempt": number;
+  "body_text": string;
+  "content_hash": string;
+  "content_id": string;
+  "content_role": string;
+  "created_at": string;
+  "generation": ContentGeneration | null;
+  "learn_enabled": boolean;
+  "meta": ContractMeta;
+  "metrics": Record<string, number | number>;
+  "metrics_observation": MetricsObservation | null;
+  "n_chars": number;
+  "n_parts": number;
+  "origin": string;
+  "parts": Array<string>;
+  "plan_id": string;
+  "plan_seq": number;
+  "publications": Array<ContentPublication>;
+  "qa": ContentQaDetail | null;
+  "state": string;
+  "topic": string;
+  "updated_at": string;
+  "version": number;
+  [key: string]: unknown;
+};
+
+export type OperatorFeatures = {
+  "manual_post_sync": boolean;
+  "self_reply_sync": string;
+  [key: string]: unknown;
+};
+
+export type OperatorOperations = {
+  "features": OperatorFeatures;
+  "insights_quarantine": InsightsQuarantine;
+  "night_attention": NightAttention;
+  "night_batch_items": Array<NightBatchItem>;
+  "rolling_usage": RollingUsage;
+  "runner_heartbeats": Array<RunnerHeartbeat>;
+  [key: string]: unknown;
+};
+
+export type RecentAuditEvent = {
+  "created_at": string;
+  "entity_id": string | null;
+  "entity_version": number | null;
+  "event_type": string;
+  [key: string]: unknown;
+};
+
+export type RecentContent = {
+  "analyze_enabled": boolean;
+  "attempt": number;
+  "content_hash": string;
+  "content_id": string;
+  "created_at": string;
+  "learn_enabled": boolean;
+  "n_chars": number;
+  "origin": string;
+  "plan_id": string;
+  "qa": ContentQaSummary | null;
+  "state": string;
+  "updated_at": string;
+  "version": number;
+  [key: string]: unknown;
+};
+
+export type RecentPublication = {
+  "content_id": string;
+  "created_at": string;
+  "error": string | null;
+  "mode": string;
+  "publication_id": string;
+  "published_at": string | null;
+  "status": string;
+  [key: string]: unknown;
+};
+
+export type RollingUsage = {
+  "publications_last_24h": number;
+  "publications_last_hour": number;
+  [key: string]: unknown;
+};
+
+export type RunnerHeartbeat = {
+  "age_seconds": number | null;
+  "expected": "unknown";
+  "healthy": boolean;
+  "last_run_at": string | null;
+  "run_status": "succeeded" | "failed" | null;
+  "runner_name": "insights" | "outcome" | "night_batch";
+  "state": "fresh" | "stale" | "missing" | "invalid" | "future";
+  [key: string]: unknown;
+};
+
+export type SafetyStatusResponse = {
+  "account_id": string;
+  "account_status": string;
+  "account_stop": boolean;
+  "approval_mode": string;
+  "capability"?: "threads.safety.status";
+  "capability_stop": boolean;
+  "error"?: CapabilityError | null;
+  "global_stop": boolean;
+  "meta"?: ContractMeta;
+  "publish_readiness"?: {
+  [key: string]: unknown;
+} | null;
+  "rate_guard_ready": boolean;
+  "rate_policy": Record<string, number | null>;
+  "request_id": string;
+  "status"?: "success";
+  "unresolved_ambiguous_publication": boolean;
+  "warnings"?: Array<string>;
+  [key: string]: unknown;
+};
+
+export type TenantIdentityResponse = {
+  "meta": ContractMeta;
+  "org_id": string;
+  "role": "viewer" | "editor" | "admin";
+  "user_id": string;
+  [key: string]: unknown;
+};
+
+export type BridgeMetaV1 = ContractMeta;
+export type BridgeAccountReadinessV1 = AccountReadiness;
+export type BridgePipelineV1 = AccountPipelineStatus;
+export type BridgeAccountSummaryV1 = OperatorAccountSummary;
+export type BridgeAccountsResponseV1 = OperatorAccountsResponse;
+export type BridgeRecentContentV1 = RecentContent;
+export type BridgeRecentPublicationV1 = RecentPublication;
+export type BridgeManualThreadPartV1 = ManualThreadPart;
+export type BridgeManualThreadV1 = ManualThread;
+export type BridgeNightBatchItemV1 = NightBatchItem;
+export type BridgeRunnerHeartbeatV1 = RunnerHeartbeat;
+export type BridgeNightAttentionV1 = NightAttention;
+export type BridgeInsightsQuarantineV1 = InsightsQuarantine;
+export type BridgeInsightsQuarantineItemV1 = InsightsQuarantineItem;
+export type BridgeOperationsV1 = OperatorOperations;
+export type BridgeAccountResponseV1 = OperatorAccountResponse;
+export type BridgeContentResponseV1 = OperatorContentResponse;
+export type BridgeSafetyResponseV1 = SafetyStatusResponse;
+export type BridgeEditorialCycleV1 = EditorialCycle;
+export type BridgeEditorialExperimentV1 = EditorialExperiment;
+export type BridgeEditorialInternalResponseV1 = EditorialInternalResponse;
+export type BridgeEditorialCustomerSummaryV1 = EditorialCustomerSummary;
+export type BridgeEditorialCustomerResponseV1 = EditorialCustomerResponse;
