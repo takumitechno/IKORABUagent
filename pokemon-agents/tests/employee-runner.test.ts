@@ -48,7 +48,7 @@ describe("B1 deterministic employee runner", () => {
     expect(classifyHanaFinding(finding({ block_reason: "reauth_required" }))).toBe("blocked");
     const output = runHana(hanaInput([
       finding(), finding({ check_code: "editorial_freshness", age_minutes: 45 }),
-      finding({ check_code: "activity_projection_freshness", observed: "absent", age_minutes: null }),
+      finding({ check_code: "activity_projection_freshness", observed: "unknown", age_minutes: null }),
       finding({ check_code: "oauth_readiness", block_reason: "reauth_required" }),
     ]));
     expect(output.findings.map((row) => row.status)).toEqual(["ok", "delayed", "missing", "blocked"]);

@@ -2,6 +2,7 @@ import { describe, expect, test } from "bun:test";
 import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { loadThreadsDashboard } from "../web/lib/threads-dashboard";
+import { runHana } from "../web/lib/employee-runner";
 import {
   accountResponseV1, editorialCustomerV1, editorialInternalV1,
   safetyResponseV1,
@@ -82,6 +83,10 @@ describe("Control Plane CRITICAL monitor", () => {
       "tenant_isolation", "insights_freshness", "editorial_freshness", "activity_projection_freshness",
       "task_scheduler_state",
     ]);
+    expect(got.body.employee_input.findings.find((row: { check_code: string }) => row.check_code === "activity_projection_freshness"))
+      .toMatchObject({ observed: "unknown", age_minutes: null, evidence_ref: "source:monitor:acct_fixture:activity_projection" });
+    expect(runHana(got.body.employee_input).findings.find((row) => row.check_code === "activity_projection_freshness")?.status)
+      .toBe("missing");
     expect(got.body.message.length).toBeLessThanOrEqual(1900);
   });
 
@@ -115,6 +120,10 @@ describe("Control Plane CRITICAL monitor", () => {
       backup_age_hours: 2, backup_valid: true, legacy_5735_pid: null,
     });
     expect(got.body).toMatchObject({ status: "HEALTHY", alerts: [] });
+    const hana = runHana(got.body.employee_input);
+    expect(hana.findings.find((row) => row.check_code === "insights_freshness")?.status).toBe("ok");
+    expect(hana.findings.find((row) => row.check_code === "editorial_freshness")?.status).toBe("ok");
+    expect(hana.findings.find((row) => row.check_code === "activity_projection_freshness")?.status).toBe("missing");
   });
 
   test("aggregates all critical classes and includes legacy PID", () => {

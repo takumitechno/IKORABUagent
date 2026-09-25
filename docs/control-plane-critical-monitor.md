@@ -7,11 +7,16 @@ legacy port 5735. Cancelled NIGHT work is counted separately from a real miss.
 OAuth checks use the Bridge's secret-free `/operator/readiness/accounts/{id}`
 view; no token or secret reference is read or persisted.
 
-The JSON also contains a bounded `monitor-findings.v1` packet for Hana with
-Insights, Editorial, activity-projection, and Windows Task Scheduler freshness
-evidence. The caller must pass both the intended employee scope and, for live
-collection, the Bridge account explicitly; the monitor has no customer-account
-default:
+The JSON also contains a bounded `monitor-findings.v1` packet for Hana. The
+sealed `insights` heartbeat supplies Insights freshness. The `outcome` heartbeat
+supplies the narrowly scoped Editorial outcome-evaluation freshness signal; it
+does not claim that every editorial process is fresh. `night_batch` remains an
+independently checked runner and never supplies activity-projection evidence.
+Because no authoritative activity-projector heartbeat exists, the monitor emits
+`activity_projection_freshness` as `unknown` with no age, which Hana classifies
+as missing. Windows Task Scheduler evidence remains separate. The caller must
+pass both the intended employee scope and, for live collection, the Bridge
+account explicitly; the monitor has no customer-account default:
 
 Missing runner-freshness fields fail closed as unavailable. They cannot produce
 a healthy digest, and are distinct from present-but-stale evidence. Individual
@@ -22,9 +27,8 @@ heartbeat evidence is unavailable rather than healthy.
 bounded system alerts and deterministic JSON instead of terminating before the
 normal alert and optional notification path.
 
-External dependency F4 remains open: the Threads Bridge must expose the live
-freshness evidence before the monitor can verify it. This IKORABU pass does not
-change Threads while NIGHT-DOOR01 owns that repository's WRITE lane.
+Activity-projection freshness remains unavailable until an authoritative source
+is sealed. The monitor does not infer it from NIGHT or fabricate a runner.
 
 ```text
 python scripts/control-plane-critical-monitor.py --scope acct_takumi_hq --account-id <bridge-account>

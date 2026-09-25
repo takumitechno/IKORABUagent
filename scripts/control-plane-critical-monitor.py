@@ -25,10 +25,10 @@ DENIAL_WINDOW_MINUTES = 10
 DENIAL_SPIKE_THRESHOLD = 5
 OAUTH_EXPIRY_WARNING_HOURS = 72
 RUNNER_HEARTBEAT_STALE_MINUTES = 120
+RUNNERS = ("insights", "outcome", "night_batch")
 RUNNER_FINDINGS = {
     "insights": "insights_freshness",
     "outcome": "editorial_freshness",
-    "night_batch": "activity_projection_freshness",
 }
 
 if hasattr(sys.stdout, "reconfigure"):
@@ -49,7 +49,7 @@ def runner_evidence(
     snapshot: dict[str, Any], now: datetime,
 ) -> tuple[dict[str, tuple[str, float | None]], bool]:
     """Validate the fixed sealed heartbeat set and derive freshness from timestamps."""
-    evidence = {runner: ("missing", None) for runner in RUNNER_FINDINGS}
+    evidence = {runner: ("missing", None) for runner in RUNNERS}
     heartbeats = snapshot.get("runner_heartbeats")
     if not isinstance(heartbeats, list):
         return evidence, True
@@ -60,7 +60,7 @@ def runner_evidence(
             invalid_identity = True
             continue
         runner = heartbeat.get("runner_name")
-        if not isinstance(runner, str) or runner not in RUNNER_FINDINGS:
+        if not isinstance(runner, str) or runner not in RUNNERS:
             invalid_identity = True
             continue
         if runner in seen:
@@ -337,6 +337,9 @@ def structured_findings(snapshot: dict[str, Any], scope: str, now: datetime) -> 
             "missing", "unsupported", "invalid_timestamp", "result_unavailable"
         } else "absent", age, RUNNER_HEARTBEAT_STALE_MINUTES,
             RUNNER_HEARTBEAT_STALE_MINUTES, f"source:monitor:{account_id}:{runner}")
+    add("activity_projection_freshness", "unknown", None,
+        RUNNER_HEARTBEAT_STALE_MINUTES, RUNNER_HEARTBEAT_STALE_MINUTES,
+        f"source:monitor:{account_id}:activity_projection")
     scheduler_ok = snapshot.get("scheduler_registered") is True and snapshot.get("scheduler_state") in {"Ready", "Running"}
     scheduler_blocked = snapshot.get("scheduler_registered") is True and snapshot.get("scheduler_state") == "Disabled"
     add("task_scheduler_state", "present" if scheduler_ok else "absent", 0 if scheduler_ok else None,
