@@ -195,7 +195,8 @@ describe("CATFOOD immutable spec and preflight", () => {
   });
 
   test("requires every frozen identity, tenant enforcement and meaningful inventory", () => {
-    expect(evaluatePreflight(preflight()).ok).toBe(true);
+    expect(evaluatePreflight(preflight()).ok).toBe(false);
+    expect(evaluatePreflight(preflight()).reasons).toContain("LEGACY_UNTRUSTED");
     expect(evaluatePreflight(preflight({ feature_multi_tenant_auth: "true" })).reasons).toContain("MULTI_TENANT_AUTH_DISABLED");
     expect(evaluatePreflight(preflight({ catfood_harness_enabled: undefined })).reasons).toContain("CATFOOD_HARNESS_DISABLED");
     expect(evaluatePreflight(preflight({ missing_identity_probe_status: 200 })).reasons).toContain("TENANT_ENFORCEMENT_NOT_PROVED");
@@ -231,11 +232,10 @@ describe("CATFOOD bounded Bridge client", () => {
     }) as typeof fetch;
     const client = new CatfoodBridgeClient("http://127.0.0.1:8000", "fixture-secret", fetcher);
     expect(await client.tenantEnforcementProbe("acct_fixture", "editorial.cycle", "user_fixture")).toEqual({ authorized_status: 200, missing_identity_status: 403 });
-    await expect(client.changeAuthority({ action: "grant", account_id: "acct_fixture", capability: "editorial.cycle", authority_ref: "run:1", spec_hash: "a".repeat(64), permit_expires_at: "2026-10-01T00:01:00.000Z" }, "user_fixture", { ok: false, reasons: ["blocked"], boundaries: [] })).rejects.toThrow("PREFLIGHT_REQUIRED");
+    await expect(client.changeAuthority({ action: "grant", account_id: "acct_fixture", capability: "editorial.cycle", authority_ref: "run:1", spec_hash: "a".repeat(64), permit_expires_at: "2026-10-01T00:01:00.000Z" }, "user_fixture", { ok: false, reasons: ["blocked"], boundaries: [] })).rejects.toThrow("LEGACY_UNTRUSTED");
     expect(calls.filter((call) => call.method === "POST")).toHaveLength(0);
-    const response = await client.changeAuthority({ action: "grant", account_id: "acct_fixture", capability: "editorial.cycle", authority_ref: "run:1", spec_hash: "a".repeat(64), permit_expires_at: "2026-10-01T00:01:00.000Z" }, "user_fixture", { ok: true, reasons: [], boundaries: [] });
-    expect(response.fencing_generation).toBe(1);
-    expect(calls.at(-1)?.url).toEndWith("/autopilot/v2/operational-authority");
+    await expect(client.changeAuthority({ action: "grant", account_id: "acct_fixture", capability: "editorial.cycle", authority_ref: "run:1", spec_hash: "a".repeat(64), permit_expires_at: "2026-10-01T00:01:00.000Z" }, "user_fixture", { ok: true, reasons: [], boundaries: [] })).rejects.toThrow("LEGACY_UNTRUSTED");
+    expect(calls.filter((call) => call.method === "POST")).toHaveLength(0);
   });
 });
 
@@ -390,7 +390,8 @@ describe("CATFOOD deterministic bundle and independent attestation", () => {
       const first = evaluateClosedBundle(text, closed.bundle_sha256);
       const second = evaluateClosedBundle(text, closed.bundle_sha256);
       expect(first).toEqual(second);
-      expect(first.result).toBe("PASS");
+      expect(first.result).toBe("BLOCKED");
+      expect(first.reason_codes).toContain("LEGACY_UNTRUSTED");
       const weak = structuredClone(closed.bundle);
       (weak.work_units as Json[]).splice(1);
       expect(evaluateClosedBundle(canonicalJson(weak)).result).toBe("BLOCKED");
@@ -415,11 +416,10 @@ describe("CATFOOD deterministic bundle and independent attestation", () => {
     const attestationPath = join(dir, "attestation.db"); writeFileSync(attestationPath, "");
     try {
       initializeAttestationStore(attestationPath);
-      const id = attestClosedRun(path, attestationPath, lease.run_id, "independent-auditor", "2026-10-02T01:00:00.000Z");
-      expect(id.startsWith("att:")).toBe(true);
+      expect(() => attestClosedRun(path, attestationPath, lease.run_id, "independent-auditor", "2026-10-02T01:00:00.000Z")).toThrow("LEGACY_UNTRUSTED");
       expect(db.query<{ n: number }, []>("SELECT COUNT(*) n FROM sqlite_master WHERE name='acceptance_attestations'").get()?.n).toBe(0);
       const attestDb = new Database(attestationPath, { readonly: true });
-      expect(attestDb.query<{ bundle_sha256: string }, []>("SELECT bundle_sha256 FROM acceptance_attestations").get()?.bundle_sha256).toBe(closed.bundle_sha256);
+      expect(attestDb.query<{ n: number }, []>("SELECT COUNT(*) n FROM acceptance_attestations").get()?.n).toBe(0);
       attestDb.close();
       expect(() => attestClosedRun(path, attestationPath, lease.run_id, "independent-auditor", "2026-10-02T01:00:01.000Z")).toThrow();
     } finally { db.close(); rmSync(dir, { recursive: true, force: true }); }
