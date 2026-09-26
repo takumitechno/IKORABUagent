@@ -5,7 +5,7 @@ import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { Worker } from "node:worker_threads";
-import { canonicalJson, sha256 } from "../web/lib/catfood-harness";
+import { canonicalJson, sha256, type OperationalBoundaryV1 } from "../web/lib/catfood-harness";
 import {
   CATFOOD_CAPABILITIES, CATFOOD_FIXED_POLICY, CATFOOD_GO_SCHEMA, CATFOOD_OPERATIONAL_CONTRACT_GAPS,
   CATFOOD_POLICY_SHA256, CATFOOD_TRUST_SCHEMA, ProtectedCatfoodCustodian, createCatfoodRunSpec,
@@ -53,6 +53,11 @@ function positive(r: Rig) {
 
 function journalBase(row: Record<string, unknown>, previous: string): Record<string, unknown> {
   return { run_id: String(row.run_id), sequence: Number(row.sequence), event_type: String(row.event_type), environment_type: String(row.environment_type), environment_instance_id: String(row.environment_instance_id), organization_id: String(row.organization_id), tenant_id: String(row.tenant_id), account_id: String(row.account_id), owner_session_id: String(row.owner_session_id), wp3_epoch: Number(row.wp3_epoch), threads_generation: row.threads_generation === null ? null : Number(row.threads_generation), source_provenance: String(row.source_provenance), claim_id: row.claim_id === null ? null : String(row.claim_id), request_id: row.request_id === null ? null : String(row.request_id), observed_at: String(row.observed_at), monotonic_ms: Number(row.monotonic_ms), boot_id: String(row.boot_id), payload_json: JSON.parse(String(row.payload_json)), previous_row_hash: previous };
+}
+
+function rehashBoundary(boundary: OperationalBoundaryV1, changes: Record<string, unknown>): OperationalBoundaryV1 {
+  const value = { ...boundary, ...changes } as Record<string, unknown>; delete value.canonical_sha256;
+  return { ...value, canonical_sha256: sha256(canonicalJson(value as never)) } as OperationalBoundaryV1;
 }
 
 describe("WP3 CATFOOD corrective adversarial plan", () => {
@@ -116,16 +121,20 @@ describe("WP3 CATFOOD corrective adversarial plan", () => {
     const db = new Database(store, { readonly: true }); const row = db.query<{ payload_json: string; signature_base64url: string; bundle_sha256: string }, [string]>("SELECT payload_json,signature_base64url,bundle_sha256 FROM independent_attestations WHERE attestation_id=?").get(id)!; db.close();
     expect(verifyIndependentAttestation(row.payload_json, row.signature_base64url, publicPem, { run_id: r.spec.run_id, bundle_sha256: row.bundle_sha256 })).toBe("PASS");
     expect(() => verifyIndependentAttestation(row.payload_json, row.signature_base64url, publicPem, { run_id: "other-run", bundle_sha256: row.bundle_sha256 })).toThrow("ATTESTATION_BINDING_MISMATCH");
+    const changed = JSON.parse(row.payload_json); changed.verdict = "FAIL"; expect(() => verifyIndependentAttestation(canonicalJson(changed), row.signature_base64url, publicPem, { run_id: r.spec.run_id, bundle_sha256: row.bundle_sha256 })).toThrow("ATTESTATION_SIGNATURE_INVALID");
   } finally { r.close(); } });
 
   test("T10-T12 stale owner, lease, epoch, generation, scope, and forged preflight reject", () => { const r = rig(); try {
-    const first = start(r); r.custodian.stop(first, "STOP"); r.clock.advance(121_000); const second = r.custodian.issueOwnerSession(r.spec.run_id); r.custodian.takeover(r.spec.run_id, second);
+    const first = start(r); r.custodian.stop(first, "STOP"); r.clock.advance(121_000); expect(() => r.custodian.preflight(first)).toThrow("LEASE_EXPIRED"); const second = r.custodian.issueOwnerSession(r.spec.run_id);
+    const originalBoundaries = r.source.boundaries.bind(r.source); r.source.boundaries = ((spec: CatfoodRunSpec) => originalBoundaries(spec).map((boundary) => rehashBoundary(boundary, { account_id: "acct_other" }))) as typeof r.source.boundaries; expect(() => r.custodian.takeover(r.spec.run_id, second)).toThrow("RESTART_THREADS_NOT_FENCED"); r.source.boundaries = originalBoundaries;
+    r.custodian.takeover(r.spec.run_id, second);
     expect(() => r.custodian.preflight(first)).toThrow("OWNER_SESSION_INVALID");
     const good = r.custodian.preflight(second); expect(() => r.custodian.activate(second, { ...good, nonce: "forged" })).toThrow("PREFLIGHT_RECEIPT_INVALID");
     r.source.setGeneration("editorial.cycle", 999); expect(() => r.custodian.activate(second, good)).toThrow();
   } finally { r.close(); } });
 
-  test("T13 unknown or failed stop evidence is not safe", () => { const r = rig(); try { const session = start(r); const original = r.source.revoke.bind(r.source); r.source.revoke = ((...args: Parameters<typeof original>) => { const transition = original(...args); return { ...transition, boundary: { ...transition.boundary, stop_acknowledgement: "UNKNOWN" } }; }) as typeof r.source.revoke; expect(() => r.custodian.stop(session, "STOP")).toThrow(); } finally { r.close(); } });
+  test("T13 unknown execution and failed/unknown stop evidence are not safe", () => { const preflightRig = rig(); try { preflightRig.custodian.createRun(preflightRig.spec, preflightRig.artifact); const owner = preflightRig.custodian.issueOwnerSession(preflightRig.spec.run_id); const original = preflightRig.source.boundaries.bind(preflightRig.source); preflightRig.source.boundaries = ((spec: CatfoodRunSpec) => original(spec).map((boundary) => rehashBoundary(boundary, { execution_state: "UNKNOWN" }))) as typeof preflightRig.source.boundaries; expect(() => preflightRig.custodian.preflight(owner)).toThrow("BOUNDARY_UNSAFE"); } finally { preflightRig.close(); }
+    for (const acknowledgement of ["FAILED", "UNKNOWN"] as const) { const r = rig(); try { const session = start(r); const original = r.source.revoke.bind(r.source); r.source.revoke = ((...args: Parameters<typeof original>) => { const transition = original(...args); return { ...transition, boundary: rehashBoundary(transition.boundary, { stop_acknowledgement: acknowledgement }) }; }) as typeof r.source.revoke; expect(() => r.custodian.stop(session, "STOP")).toThrow("STOP_UNCONFIRMED"); expect(() => r.custodian.admit(session, "editorial.cycle", "cycle:one")).toThrow(); } finally { r.close(); } } });
 
   test("T14 blocked, transport failure, precondition/noop never receive meaningful credit", () => { const r = rig(); try { const session = start(r); const ticket = r.custodian.admit(session, "editorial.cycle", "cycle:one"); r.source.complete(ticket.claim_id, { claim_status: "failed", transport_status: "FAILED", domain_result: { state: "NOOP", status: "BLOCKED" } }); r.custodian.reconcile(session, ticket.work_id); r.custodian.stop(session, "STOP"); r.clock.advance(86_400_000); expect(r.custodian.closeRun(session).verdict).not.toBe("PASS"); } finally { r.close(); } });
 
@@ -151,7 +160,8 @@ describe("WP3 CATFOOD corrective adversarial plan", () => {
 
   test("T20 future/fake duration, boot change, and incomplete coverage never PASS", () => { const r = rig(); try { positive(r); expect(r.custodian.evaluate(r.spec.run_id).verdict).toBe("PASS"); const db = new Database(r.control); db.query("UPDATE catfood_runs SET closed_boot_id='boot-forged'").run(); db.close(); expect(r.custodian.evaluate(r.spec.run_id).verdict).not.toBe("PASS"); } finally { r.close(); } });
 
-  test("T21-T22 open authority, unresolved work, missing cost coverage, and provider activity never PASS", () => { const r = rig(); try { const session = start(r); const ticket = r.custodian.admit(session, "editorial.cycle", "cycle:one"); expect(r.custodian.evaluate(r.spec.run_id).verdict).not.toBe("PASS"); r.source.complete(ticket.claim_id, { provider_invoked: true }); r.custodian.reconcile(session, ticket.work_id); r.source.runtime = { ...r.source.runtime, cost_coverage: "UNKNOWN", provider_activity_count: 1 }; expect(r.custodian.evaluate(r.spec.run_id).verdict).not.toBe("PASS"); } finally { r.close(); } });
+  test("T21-T22 open authority, unresolved work, missing cost coverage, and provider activity never PASS", () => { const r = rig(); try { const session = start(r); const ticket = r.custodian.admit(session, "editorial.cycle", "cycle:one"); expect(r.custodian.evaluate(r.spec.run_id).verdict).not.toBe("PASS"); r.source.complete(ticket.claim_id, { provider_invoked: true }); r.custodian.reconcile(session, ticket.work_id); r.source.runtime = { ...r.source.runtime, cost_coverage: "UNKNOWN", provider_activity_count: 1 }; expect(r.custodian.evaluate(r.spec.run_id).verdict).not.toBe("PASS"); } finally { r.close(); }
+    const closed = rig(); try { positive(closed); closed.source.grant(closed.spec, "editorial.cycle", "unauthorized-reopen", closed.source.generation("editorial.cycle")); expect(closed.custodian.evaluate(closed.spec.run_id).verdict).toBe("FAIL"); } finally { closed.close(); } });
 
   test("T23 complete accelerated 24h policy fixture is TEST_ONLY PASS", () => { const r = rig(); try { const { result } = positive(r); expect(result).toMatchObject({ verdict: "PASS", test_only: true, policy_sha256: CATFOOD_POLICY_SHA256 }); } finally { r.close(); } });
 
