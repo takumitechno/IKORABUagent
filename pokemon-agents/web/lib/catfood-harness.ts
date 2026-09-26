@@ -400,7 +400,10 @@ export function evaluatePreflight(input: PreflightInput): PreflightResult {
     } else if (!["MISSING", "REVOKED", "EXPIRED", "ACTIVE"].includes(boundary.authority_state)) reasons.add("AUTHORITY_STATE_INCOMPATIBLE");
   }
   if (canonicalJson([...seen].sort()) !== canonicalJson([...input.spec.capabilities].sort())) reasons.add("BOUNDARY_CAPABILITY_SET_INCOMPLETE");
-  return Object.freeze({ ok: reasons.size === 0, reasons: Object.freeze([...reasons].sort()), boundaries: Object.freeze(boundaries) });
+  // This v1 path accepted runner-supplied observations and is retained only so
+  // failed-candidate evidence remains readable. It is never authoritative.
+  reasons.add("LEGACY_UNTRUSTED");
+  return Object.freeze({ ok: false, reasons: Object.freeze([...reasons].sort()), boundaries: Object.freeze(boundaries) });
 }
 
 export interface OperationalAuthorityRequest {
@@ -489,22 +492,8 @@ export class CatfoodBridgeClient {
   }
 
   async changeAuthority(request: OperationalAuthorityRequest, tenantUserId: string, passedPreflight: PreflightResult): Promise<OperationalAuthorityResponse> {
-    if (!passedPreflight.ok) throw new CatfoodError("PREFLIGHT_REQUIRED");
-    if (!ACCOUNT.test(request.account_id) || !CATFOOD_INITIAL_CAPABILITIES.includes(request.capability)
-      || !request.authority_ref || !SHA256.test(request.spec_hash)
-      || (request.expected_generation !== undefined && (!Number.isSafeInteger(request.expected_generation) || request.expected_generation < 1))) throw new CatfoodError("AUTHORITY_REQUEST_INVALID");
-    if (request.action !== "revoke") timestamp(request.permit_expires_at, "permit_expires_at");
-    const url = new URL("/autopilot/v2/operational-authority", this.origin);
-    const raw = await boundedFetchJson(this.fetcher, url, {
-      method: "POST", headers: { ...tenantHeaders(this.apiKey, tenantUserId), "Content-Type": "application/json" }, body: canonicalJson(request),
-    });
-    const response = object(raw, "authority response");
-    exact(response, ["account_id", "authority_ref", "authority_state", "capability", "fencing_generation", "permit_expires_at", "spec_hash", "stop_acknowledgement"], "authority response");
-    if (response.account_id !== request.account_id || response.capability !== request.capability || response.authority_ref !== request.authority_ref || response.spec_hash !== request.spec_hash) throw new CatfoodError("AUTHORITY_RESPONSE_MISMATCH");
-    oneOf(response.authority_state, "authority_state", ["ACTIVE", "REVOKED"] as const);
-    oneOf(response.stop_acknowledgement, "stop_acknowledgement", ["NOT_REQUESTED", "INHIBITED"] as const);
-    integer(response.fencing_generation, "fencing_generation", 1); timestamp(response.permit_expires_at, "permit_expires_at");
-    return Object.freeze(response as unknown as OperationalAuthorityResponse);
+    void request; void tenantUserId; void passedPreflight;
+    throw new CatfoodError("LEGACY_UNTRUSTED");
   }
 }
 
@@ -809,6 +798,7 @@ export function evaluateClosedBundle(text: string, expectedDigest?: string): Eva
   const digest = sha256(canonicalJson(bundle));
   if (expectedDigest && digest !== expectedDigest) throw new CatfoodError("BUNDLE_TAMPERED");
   const reasons = new Set<string>();
+  reasons.add("LEGACY_UNTRUSTED");
   const spec = object(bundle.spec, "bundle.spec") as unknown as CatfoodRunSpec;
   const lease = object(bundle.lease, "bundle.lease");
   const authorities = Array.isArray(bundle.authorities) ? bundle.authorities.map((authority) => object(authority, "authority")) : [];
