@@ -268,6 +268,10 @@ describe("CATFOOD dedicated store, ownership and work", () => {
     try {
       expect(() => acquireLease(db, runSpec.run_id, "owner-b", "2026-10-01T00:00:01.000Z", 60)).toThrow("LEASE_HELD");
       expect(() => acquireLease(db, runSpec.run_id, "owner-b", "2026-10-01T00:06:00.000Z", 60)).toThrow("RESTART_BOUNDARY_REQUIRED");
+      db.exec("CREATE TRIGGER fixture_fail_restart BEFORE INSERT ON catfood_evidence_events BEGIN SELECT RAISE(ABORT,'fixture restart crash'); END");
+      expect(() => acquireLease(db, runSpec.run_id, "owner-b", "2026-10-01T00:06:00.000Z", 60, stoppedBoundary())).toThrow("fixture restart crash");
+      expect(db.query<{ owner_id: string; wp3_epoch: number }, []>("SELECT owner_id,wp3_epoch FROM catfood_run_leases").get()).toEqual({ owner_id: "owner-a", wp3_epoch: 1 });
+      db.exec("DROP TRIGGER fixture_fail_restart");
       const next = acquireLease(db, runSpec.run_id, "owner-b", "2026-10-01T00:06:00.000Z", 60, stoppedBoundary());
       expect(next.wp3_epoch).toBe(2);
       expect(() => setNextDue(db, { ...next, owner_id: "owner-a", wp3_epoch: 1 }, "editorial", start, "2026-10-01T00:06:01.000Z")).toThrow("STALE_WP3_EPOCH");
@@ -367,6 +371,18 @@ function buildPassingBundle() {
 }
 
 describe("CATFOOD deterministic bundle and independent attestation", () => {
+  test("rolls back an interrupted bundle close and retries with one immutable digest", () => {
+    const { dir, db, lease } = seeded();
+    try {
+      db.exec("CREATE TRIGGER fixture_fail_bundle BEFORE INSERT ON catfood_evidence_bundles BEGIN SELECT RAISE(ABORT,'fixture bundle crash'); END");
+      expect(() => closeEvidenceBundle(db, lease, "2026-10-01T00:01:00.000Z")).toThrow("fixture bundle crash");
+      expect(db.query<{ n: number }, []>("SELECT COUNT(*) n FROM catfood_evidence_bundles").get()?.n).toBe(0);
+      db.exec("DROP TRIGGER fixture_fail_bundle");
+      const closed = closeEvidenceBundle(db, lease, "2026-10-01T00:01:00.000Z");
+      expect(closeEvidenceBundle(db, lease, "2026-10-01T00:02:00.000Z").bundle_sha256).toBe(closed.bundle_sha256);
+    } finally { db.close(); rmSync(dir, { recursive: true, force: true }); }
+  });
+
   test("replays deterministically, blocks weak evidence, and detects tampering", () => {
     const { dir, db, closed } = buildPassingBundle();
     try {
