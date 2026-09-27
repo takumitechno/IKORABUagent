@@ -5,12 +5,12 @@ import { COE_LEGACY_SOURCE_FAMILIES, COE_SOURCES, type CoeRequest, type OutcomeE
 import type {
   CatfoodCapability, CatfoodRunSpec, ThreadsAuthorityTransition, ThreadsClaimRecord,
   ThreadsEvidenceSource, ThreadsInventoryItem, ThreadsRuntimeEvidence, TrustedClock,
-  TrustedClockSample,
+  TrustedClockSample, TenantProbeEvidence,
 } from "../web/lib/catfood-trust";
 
 export class TestClock implements TrustedClock {
   readonly kind = "TEST" as const;
-  constructor(public wallMs = Date.parse("2026-10-01T00:00:00.000Z"), public monotonic = 1_000, public bootId = "boot-test-1") {}
+  constructor(public wallMs = Date.parse("2026-09-30T00:00:00.000Z"), public monotonic = 1_000, public bootId = "boot-test-1") {}
   sample(): TrustedClockSample { return { wall_time: new Date(this.wallMs).toISOString(), monotonic_ms: this.monotonic, boot_id: this.bootId }; }
   advance(ms: number): void { this.wallMs += ms; this.monotonic += ms; }
 }
@@ -48,6 +48,7 @@ export class FixtureThreadsSource implements ThreadsEvidenceSource {
   }
 
   runtimeEvidence(_spec: CatfoodRunSpec): ThreadsRuntimeEvidence { return structuredClone(this.runtime); }
+  tenantProbe(spec: CatfoodRunSpec): TenantProbeEvidence { const observed_at = this.clock.sample().wall_time; return { probe_id: `probe:${spec.run_id}`, principal_ref: "principal:test-controller", credential_version_ref: "credential:test:v1", organization_id: spec.organization_id, own_account_id: spec.account_id, foreign_account_id: "acct_foreign_fixture", own_result: "EXPECTED_RESOURCE", foreign_result: "AUTHORIZATION_DENIED", foreign_status: 403, logical_runtime_id: "runtime:test", worker_boot_id: "boot-test", observed_at, receipt_id: `probe-receipt:${spec.run_id}` }; }
   inventory(_spec: CatfoodRunSpec): readonly ThreadsInventoryItem[] { return structuredClone(this.inventoryItems); }
   boundaries(spec: CatfoodRunSpec): readonly OperationalBoundaryV1[] { return spec.capabilities.map((capability) => this.boundary(spec, capability)); }
 
@@ -99,7 +100,7 @@ export class FixtureThreadsSource implements ThreadsEvidenceSource {
       producer_release_identity: { git_sha: this.source_identity.slice(0, 40), artifact_sha256: this.source_identity.slice(41) },
       scope: { account_id: request.account_id, capability: null },
       source_inventory: { version: 3, store_incarnation: "1".repeat(32), evidence_started_at_raw: request.window_start, evidence_started_at_normalized: request.window_start, evidence_started_at_status: "NORMALIZED", retention_floor_event_seq: 0, sources: [...COE_SOURCES], legacy_source_families: [...COE_LEGACY_SOURCE_FAMILIES], cursor_key_profile: "SINGLE_WORKER" },
-      coverage: { state: "COMPLETE", integrity_reason: "PROSPECTIVE_WINDOW_COMPLETE", legacy: { state: "PARTIAL", v31_claimed_complete: false, reason: "V31_COMPLETENESS_SUPERSEDED" }, prospective: { state: "COMPLETE", proof_id: "proof:test-only", proof_applicable: true, reason: "EXACT_REHEARSAL_PROOF" }, window: { assessment_mode: "LIVE", requested_window_start: request.window_start, requested_window_end: request.window_end, interval_semantics: "[start,end)", state: "COMPLETE", uncovered_reasons: [] }, cuts: { attempt: records.length, authority: 0, ai_usage: 0, publication: 0 }, scoped_count: records.length, record_set_digest: root, snapshot_identity: sha256(canonicalJson({ root, account_id: request.account_id })), unresolved_count: records.filter((row) => row.execution_state === "IN_PROGRESS").length, pagination_complete: true, page_offset: 0, page_count: records.length, client_continuity_required: true },
+      coverage: { state: "COMPLETE", integrity_reason: "PROSPECTIVE_WINDOW_COMPLETE", legacy: { state: "PARTIAL", v31_claimed_complete: false, reason: "V31_COMPLETENESS_SUPERSEDED" }, prospective: { state: "COMPLETE", proof_id: "proof:test-only", proof_applicable: true, reason: "EXACT_REHEARSAL_PROOF" }, window: { assessment_mode: request.assessment_mode, requested_window_start: request.window_start, requested_window_end: request.window_end, interval_semantics: "[start,end)", state: "COMPLETE", uncovered_reasons: [] }, cuts: { attempt: records.length, authority: 0, ai_usage: 0, publication: 0 }, scoped_count: records.length, record_set_digest: root, snapshot_identity: sha256(canonicalJson({ root, account_id: request.account_id })), unresolved_count: records.filter((row) => row.execution_state === "IN_PROGRESS").length, pagination_complete: true, page_offset: 0, page_count: records.length, client_continuity_required: true },
       records, next_cursor: null,
       prohibited_activity: { coverage: "COMPLETE", activity: "ZERO", exposure: "RESOLVED", known_cost_count: 0, unknown_cost_count: 0, pending_cost_count: 0, count_semantics: "exact_for_instrumented_sources_only", provider_attempt_count: 0, live_publication_attempt_count: 0, dry_run_preparation_count: 0, unattributed_attempt_count: 0, known_zero: true, expected_emitter_inventory_digest: "fa3ba3589c64f3116577c977f3946be618497ccf5976a109d0591edb7e6e7b1f", emitter_dispositions: [], package_proven_exclusions: [], rehearsal_required_emitters: [], uninstrumented_emitters: [], integrity_reason: "EXACT_REHEARSAL_PROOF_AND_SOURCES" },
       runtime_enforcement: { configured_auth_state: "ON", effective_auth_mode: "TENANT_ENFORCED", guard_readiness: "READY", reason: "TENANT_GUARD_ACTIVE", observed_at: stamp, freshness_identity: `1.${"3".repeat(64)}`, logical_runtime_id: "runtime:test", process_start_identity: "4".repeat(64), worker_boot_id: "boot-test", cursor_key_profile: "SINGLE_WORKER", topology_observation_status: "BOUND", topology_reason: "PROTECTED_OBSERVER", observed_execution_worker_count: 1 },

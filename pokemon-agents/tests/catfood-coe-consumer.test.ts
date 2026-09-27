@@ -4,7 +4,7 @@ import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { canonicalJson, sha256 } from "../web/lib/catfood-harness";
 import {
-  CATFOOD_THREADS_PINS, acquireCoe, assessCoe,
+  CATFOOD_THREADS_DEPENDENCY_ROOT, CATFOOD_THREADS_PINS, acquireCoe, assessCoe, assertFrozenDependencies, decodeCoeFixture, parseJsonNoDuplicateKeys,
   stableCoeEvidence, validateOutcomeEvaluationRequest, verifyGovernedWork,
   type CoeAcquisition, type CoeRequest, type CoeScope,
 } from "../web/lib/catfood-coe";
@@ -72,10 +72,24 @@ function pagedVariant(kind: "good" | "omitted" | "repeated" | "out-of-order" | "
   }};
 }
 
+function middlePartialPages() {
+  const baseSource = source();
+  const template = baseSource.operationalEvidence({ account_id: "acct_test", capability: null, assessment_mode: "LIVE", window_start: scope().requested_window_start, window_end: scope().requested_window_end, page_size: 500, cursor: null }) as any;
+  const records = [0, 1, 2].map((index) => ({ ...attempt("SUCCEEDED", `request:${index}`), event_seq: index + 1, event_id: `event:${index}`, attempt_id: `attempt:${index}`, request_id: `request:${index}`, claim_identity: `claim:${index}` }));
+  const root = sha256(canonicalJson(records));
+  return { operationalEvidence(request: Readonly<CoeRequest>) {
+    const index = request.cursor === null ? 0 : Number(request.cursor.slice(-1)); const page = structuredClone(template);
+    page.records = [records[index]]; page.coverage.scoped_count = 3; page.coverage.record_set_digest = root; page.coverage.snapshot_identity = "b".repeat(64); page.coverage.page_count = 1; page.coverage.page_offset = index;
+    page.coverage.pagination_complete = index === 2; page.next_cursor = index === 2 ? null : `cursor:${index + 1}`;
+    if (index === 1) { page.coverage.state = "PARTIAL"; page.coverage.window.state = "PARTIAL"; page.coverage.window.uncovered_reasons = ["MIDDLE_PAGE_GAP"]; page.coverage.prospective.state = "PARTIAL"; page.coverage.prospective.proof_applicable = false; page.coverage.unresolved_count = 1; page.prohibited_activity.coverage = "PARTIAL"; page.prohibited_activity.activity = "UNKNOWN"; page.prohibited_activity.exposure = "PENDING"; page.prohibited_activity.known_zero = false; page.prohibited_activity.pending_cost_count = 1; }
+    return page;
+  }};
+}
+
 describe("WP3 WP2.5 COE-v1 narrow consumer T01-T24", () => {
   test("T01 exact accepted pins and contract bytes", () => { expect(CATFOOD_THREADS_PINS).toMatchObject({ threads_sha: "875e75fce20c16c6157b5aa42f759411c52e95fe", release_sha256: "04cebd1f97928be56666e6dc82030da44aede7d5f9cb9c2efa5a40e027490e0c", coe_sha256: "50b6df97abc73384063a02cd69a7872b829d264177cad11d304678c04057db0e", schema: 33 }); expect(createHash("sha256").update(readFileSync(resolve(import.meta.dir, "../contracts/catfood-operational-evidence-v1.json"))).digest("hex")).toBe(CATFOOD_THREADS_PINS.coe_sha256); });
 
-  test("T02 old Threads/release/COE/schema rejected", () => { for (const change of [{ threads_sha: "f".repeat(40) }, { threads_release_sha256: "f".repeat(64) }, { coe_sha256: "f".repeat(64) }, { threads_schema: 30 }]) expect(() => acquireCoe(source(), { ...scope(), ...change })).toThrow("COE_PIN_MISMATCH"); });
+  test("T02 old Threads/release/COE/schema rejected", () => { for (const change of [{ threads_sha: "f".repeat(40) }, { threads_release_sha256: "f".repeat(64) }, { coe_sha256: "f".repeat(64) }, { threads_schema: 30 }, { threads_schema_fingerprint: "f".repeat(64) }]) expect(() => acquireCoe(source(), { ...scope(), ...change })).toThrow("COE_PIN_MISMATCH"); expect(() => assertFrozenDependencies({ ...scope(), wp1_sha256: "f".repeat(64) })).toThrow("COE_PIN_MISMATCH"); expect(() => assertFrozenDependencies({ ...scope(), operational_boundary_sha256: "f".repeat(64) })).toThrow("COE_PIN_MISMATCH"); });
 
   test("T03 malformed/future/unknown COE rejected", () => {
     expect(() => acquisition(mutate((p) => { p.future = true; }))).toThrow("COE_UNKNOWN_OR_MISSING_FIELD");
@@ -90,18 +104,21 @@ describe("WP3 WP2.5 COE-v1 narrow consumer T01-T24", () => {
   test("T09 HISTORICAL COMPLETE cannot satisfy LIVE", () => expect(() => acquisition(mutate((p) => { p.coverage.window.assessment_mode = "HISTORICAL"; }))).toThrow("COE_LIVE_WINDOW_MISMATCH"));
   test("T10 wrong requested window rejected", () => expect(() => acquisition(mutate((p) => { p.coverage.window.requested_window_start = "2026-09-29T00:00:00Z"; }))).toThrow("COE_LIVE_WINDOW_MISMATCH"));
   test("T11 uncovered interval blocks", () => expect(assessCoe(acquisition(mutate((p) => { p.coverage.window.uncovered_reasons = ["GAP"]; })), clock().sample().wall_time).reasons).toContain("COE_UNCOVERED_INTERVAL"));
-  test("T12 stale observation blocks while producer clock noise does not break snapshot continuity", () => { expect(assessCoe(acquisition(mutate((p) => { p.operational_observation.observed_at = "2026-09-30T00:00:00Z"; })), clock().sample().wall_time).reasons).toContain("COE_OBSERVATION_STALE"); const one = acquisition(); const two = acquisition(mutate((p) => { p.operational_observation.observed_at = "2026-10-01T00:01:00Z"; p.operational_observation.observation_id = "f".repeat(64); p.runtime_enforcement.observed_at = "2026-10-01T00:01:00Z"; })); expect(stableCoeEvidence(two)).toEqual(stableCoeEvidence(one)); });
+  test("T12 stale observation blocks while producer clock noise does not break snapshot continuity", () => { expect(assessCoe(acquisition(mutate((p) => { p.operational_observation.observed_at = "2026-09-29T00:00:00Z"; })), clock().sample().wall_time).reasons).toContain("COE_OBSERVATION_STALE"); const one = acquisition(); const two = acquisition(mutate((p) => { p.operational_observation.observed_at = "2026-10-01T00:01:00Z"; p.operational_observation.observation_id = "f".repeat(64); p.runtime_enforcement.observed_at = "2026-10-01T00:01:00Z"; })); expect(stableCoeEvidence(two)).toEqual(stableCoeEvidence(one)); });
 
   test("T13 pagination omission/repetition/order/snapshot switch rejected", () => {
     expect(acquireCoe(pagedVariant("good"), scope()).records).toHaveLength(2);
     for (const kind of ["omitted", "repeated", "out-of-order", "switch"] as const) expect(() => acquireCoe(pagedVariant(kind), scope())).toThrow();
   });
 
+  test("corrective pagination reduction retains an adverse middle page", () => { const value = acquireCoe(middlePartialPages(), scope()); expect(value.coverage).toMatchObject({ state: "PARTIAL", unresolved_count: 1, window: { state: "PARTIAL", uncovered_reasons: ["MIDDLE_PAGE_GAP"] }, prospective: { state: "PARTIAL", proof_applicable: false } }); expect(value.prohibited_activity).toMatchObject({ coverage: "PARTIAL", activity: "UNKNOWN", exposure: "PENDING", known_zero: false, pending_cost_count: 1 }); expect(assessCoe(value, clock().sample().wall_time).state).toBe("BLOCKED"); });
+
   test("T14 record-set digest mismatch rejected", () => expect(() => acquisition(mutate((p) => { p.coverage.record_set_digest = "0".repeat(64); }))).toThrow("COE_RECORD_SET_DIGEST_MISMATCH"));
   test("T15 unresolved/pending/unattributed exposure blocks", () => { const result = assessCoe(acquisition(mutate((p) => { p.prohibited_activity.exposure = "PENDING"; p.prohibited_activity.pending_cost_count = 1; p.prohibited_activity.unattributed_attempt_count = 1; })), clock().sample().wall_time); expect(result.state).toBe("BLOCKED"); expect(result.reasons).toContain("COE_COST_OR_ATTRIBUTION_UNRESOLVED"); });
 
-  test("T16 governed BLOCKED/FAILED/REPLAY units receive zero credit", () => { for (const state of ["FAILED", "REPLAYED", "REJECTED_PRECLAIM"]) { const evidence = { ...acquisition(), records: [attempt(state)] } as CoeAcquisition; expect(verifyGovernedWork(evidence, { account_id: "acct_test", capability: "editorial.cycle", claim_id: "claim:one", request_id: "request:one", authority_ref: "authority:one", generation: 1, business_identity: "article:one", material_revision: "a".repeat(64), domain_result: {} }, "e".repeat(64), "org:test")).toBe(false); } });
-  test("T17 semantic duplicate under fresh request ID receives zero credit", () => { const evidence = { ...acquisition(), records: [attempt("DUPLICATE", "request:fresh")] } as CoeAcquisition; expect(verifyGovernedWork(evidence, { account_id: "acct_test", capability: "editorial.cycle", claim_id: "claim:one", request_id: "request:fresh", authority_ref: "authority:one", generation: 1, business_identity: "article:one", material_revision: "a".repeat(64), domain_result: {} }, "e".repeat(64), "org:test")).toBe(false); });
+  test("T16 governed BLOCKED/FAILED/REPLAY units receive zero credit", () => { for (const state of ["FAILED", "REPLAYED", "REJECTED_PRECLAIM"]) { const evidence = { ...acquisition(), records: [attempt(state)] } as CoeAcquisition; expect(verifyGovernedWork(evidence, { account_id: "acct_test", capability: "editorial.cycle", claim_id: "claim:one", request_id: "request:one", authority_ref: "authority:one", generation: 1, business_identity: "article:one", material_revision: "a".repeat(64), domain_result: {} }, "e".repeat(64), "org:test").credit_eligible).toBe(false); } });
+  test("T17 semantic duplicate under fresh request ID receives zero credit", () => { const evidence = { ...acquisition(), records: [attempt("DUPLICATE", "request:fresh")] } as CoeAcquisition; expect(verifyGovernedWork(evidence, { account_id: "acct_test", capability: "editorial.cycle", claim_id: "claim:one", request_id: "request:fresh", authority_ref: "authority:one", generation: 1, business_identity: "article:one", material_revision: "a".repeat(64), domain_result: {} }, "e".repeat(64), "org:test").disposition).toBe("ZERO"); });
+  test("corrective governed result mismatch is FAIL, not an evaluator exception", () => { const evidence = { ...acquisition(), records: [attempt()] } as CoeAcquisition; expect(verifyGovernedWork(evidence, { account_id: "acct_test", capability: "editorial.cycle", claim_id: "claim:one", request_id: "request:one", authority_ref: "authority:one", generation: 1, business_identity: "article:one", material_revision: "a".repeat(64), domain_result: { state: "OTHER" } }, "e".repeat(64), "org:test")).toMatchObject({ disposition: "FAIL", reason: "COE_GOVERNED_RESULT_MISMATCH" }); });
   test("T18 only real capability classes decode", () => expect(() => acquisition(mutate((p) => { const row = attempt(); row.capability = "caller.invented"; p.records = [row]; p.coverage.scoped_count = 1; p.coverage.page_count = 1; p.coverage.record_set_digest = sha256(canonicalJson(p.records)); }))).toThrow("COE_RECORD_SCOPE_INVALID"));
 
   test("T19 outcome route preserves authority/spec/generation/idempotency", () => { const request = validateOutcomeEvaluationRequest({ account_id: "acct_test", capability: "editorial.outcome_evaluation", request_id: "stable-key", experiment_id: "experiment:one", expected_material_revision: "a".repeat(64), authority_ref: "authority:one", spec_hash: "b".repeat(64), expected_threads_generation: 7, runtime_observation_id: `1.${"c".repeat(64)}`, expected_release_git_sha: CATFOOD_THREADS_PINS.threads_sha }); expect(request).toMatchObject({ request_id: "stable-key", authority_ref: "authority:one", expected_threads_generation: 7 }); });
@@ -110,4 +127,16 @@ describe("WP3 WP2.5 COE-v1 narrow consumer T01-T24", () => {
   test("T22 negative tenant probe is a separate required future gate", () => { const value = source(); expect(value.runtimeEvidence({} as never).foreign_scope_status).toBe(403); expect(value.runtimeEvidence({} as never).own_scope_status).toBe(200); });
   test("T23 current no-operational-proof state is BLOCKED", () => { const result = assessCoe(acquisition(mutate((p) => { p.coverage.state = "PARTIAL"; p.coverage.prospective.state = "PARTIAL"; p.coverage.window.state = "UNBOUND"; p.prohibited_activity.coverage = "PARTIAL"; p.prohibited_activity.activity = "UNKNOWN"; p.prohibited_activity.exposure = "UNKNOWN"; p.prohibited_activity.known_zero = false; p.operational_observation.trust.status = "UNBOUND"; p.operational_observation.topology.status = "UNBOUND"; p.operational_observation.checkpoint.status = "UNBOUND"; p.operational_observation.coherent = false; p.operational_observation.security_revision_before = null; p.operational_observation.security_revision_after = null; p.coverage.prospective.proof_applicable = false; p.coverage.prospective.proof_id = null; })), clock().sample().wall_time); expect(result.state).toBe("BLOCKED"); expect(result.reasons).toContain("COE_OPERATIONAL_TRUST_UNBOUND"); });
   test("T24 synthetic COMPLETE is TEST_ONLY, not a real CATFOOD pass", () => { const result = assessCoe(acquisition(), clock().sample().wall_time); expect(result.state).toBe("READY"); expect(result.evidence.test_only).toBe(true); });
+
+  test("corrective literal producer fixture keeps legitimate secret-like labels and remains blocked", () => {
+    const raw = readFileSync(resolve(import.meta.dir, "../contracts/catfood-operational-evidence-v1-negative-partial.json"), "utf8");
+    const decoded = decodeCoeFixture(raw); expect(raw).toContain("access_token"); expect(raw).toContain("anthropic-api-key"); expect(raw).toContain("BRIDGE_API_KEY_MISSING");
+    expect(assessCoe(decoded, clock().sample().wall_time).state).toBe("BLOCKED"); expect(CATFOOD_THREADS_DEPENDENCY_ROOT).toHaveLength(64);
+  });
+
+  test("corrective raw decoder rejects duplicate keys and actual secret values without echo", () => {
+    expect(() => parseJsonNoDuplicateKeys('{"a":1,"a":2}')).toThrow("COE_DUPLICATE_JSON_KEY");
+    const raw = readFileSync(resolve(import.meta.dir, "../contracts/catfood-operational-evidence-v1-negative-partial.json"), "utf8").replace("BRIDGE_API_KEY_MISSING", "Bearer super-secret-material");
+    let message = ""; try { decodeCoeFixture(raw); } catch (error) { message = String(error); } expect(message).toContain("COE_SECRET_VALUE:"); expect(message).not.toContain("super-secret-material");
+  });
 });

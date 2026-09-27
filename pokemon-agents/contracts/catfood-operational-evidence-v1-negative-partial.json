@@ -1,0 +1,632 @@
+{
+  "contract": "threads.catfood-operational-evidence.v1",
+  "coverage": {
+    "client_continuity_required": true,
+    "cuts": {
+      "ai_usage": 0,
+      "attempt": 2,
+      "authority": 1,
+      "publication": 0
+    },
+    "integrity_reason": "REHEARSAL_PROOF_REQUIRED",
+    "legacy": {
+      "reason": "V31_COMPLETENESS_SUPERSEDED",
+      "state": "PARTIAL",
+      "v31_claimed_complete": true
+    },
+    "page_count": 3,
+    "page_offset": 0,
+    "pagination_complete": true,
+    "prospective": {
+      "proof_applicable": false,
+      "proof_id": null,
+      "reason": "REHEARSAL_PROOF_REQUIRED",
+      "state": "PARTIAL"
+    },
+    "record_set_digest": "5843f56afaa8a7f2bab460cc832e73a1bc76f62f8e9fd5389aef694dc38e5e7c",
+    "scoped_count": 3,
+    "snapshot_identity": "b0a7c562e99ce8df72ba990afe1b9a501beecacc36bc4be6462e2e3cf6f46f4e",
+    "state": "PARTIAL",
+    "unresolved_count": 0,
+    "window": {
+      "assessment_mode": null,
+      "interval_semantics": "[start,end)",
+      "requested_window_end": null,
+      "requested_window_start": null,
+      "state": "UNBOUND",
+      "uncovered_reasons": [
+        "AUTHORITATIVE_CONTINUITY_UNBOUND",
+        "REHEARSAL_PROOF_REQUIRED",
+        "REQUESTED_WINDOW_UNBOUND"
+      ]
+    }
+  },
+  "next_cursor": null,
+  "operational_observation": {
+    "checkpoint": {
+      "checkpoint_id": null,
+      "lineage": null,
+      "protection_provenance": null,
+      "range_end": null,
+      "range_start": null,
+      "reason": "CHECKPOINT_SOURCE_UNBOUND",
+      "root": null,
+      "status": "UNBOUND"
+    },
+    "coherent": false,
+    "observation_clock_id": "SYSTEM_UTC_UNATTESTED",
+    "observation_id": "e2b91b4ce052fff8e85dc0de57b6eb8f318c127b1fa9035cc1a6616623d4e853",
+    "observed_at": "2026-01-01T00:00:00Z",
+    "security_revision_after": null,
+    "security_revision_before": null,
+    "topology": {
+      "execution_worker_count": null,
+      "execution_worker_ids": [],
+      "observed_boot_id": "boot-00000000000000000000000000000064",
+      "observer_kind": "NONE",
+      "process_inventory_digest": null,
+      "reason": "TOPOLOGY_OBSERVER_UNBOUND",
+      "status": "UNBOUND"
+    },
+    "trust": {
+      "environment_identity": null,
+      "reason": "test_only_export_trust_unprovisioned",
+      "registry_revision": null,
+      "source_identity": null,
+      "status": "UNBOUND"
+    }
+  },
+  "outcome_evaluation_targets": [],
+  "producer_release_identity": null,
+  "prohibited_activity": {
+    "activity": "UNKNOWN",
+    "count_semantics": "exact_for_instrumented_sources_only",
+    "coverage": "PARTIAL",
+    "dry_run_preparation_count": 0,
+    "emitter_dispositions": [
+      {
+        "attempt_source": "not-universally-instrumented",
+        "completion_source": "caller-specific; legacy stores are incomplete",
+        "cost_source": "not-applicable",
+        "credential_access_profile": "threads-user-token",
+        "destinations": [
+          "graph.threads.net"
+        ],
+        "dispatch_boundary_id": "urllib.threads.default-transport",
+        "dispatch_source": "pipeline.threads_api._default_transport",
+        "disposition": "REHEARSAL_PROVEN_REQUIRED",
+        "emitter_id": "threads.graph.read-insights",
+        "entrypoints": [
+          "bridge.app.collect_insights",
+          "pipeline.insights.ThreadsInsightsCollector.collect",
+          "pipeline.preflight.run_preflight",
+          "production.insights.collect_incremental_with_credentials",
+          "production.insights_runner.run_once",
+          "production.oauth.identity_via_client",
+          "production.self_reply_thread_sync.detect"
+        ],
+        "initial_profile_policy": "isolated deployment and denied egress required",
+        "observation_granularity": "physical HTTP request",
+        "operations": [
+          "profile-read",
+          "post-read",
+          "me",
+          "insights"
+        ],
+        "process_types": [
+          "bridge",
+          "cli",
+          "runner"
+        ],
+        "proof_method": "rehearsal process/credential/egress proof",
+        "source_symbol": "pipeline.threads_api.ThreadsAPIClient._request"
+      },
+      {
+        "attempt_source": "publication_records only for production-v2; legacy path incomplete",
+        "completion_source": "publication_records and legacy posts",
+        "cost_source": "not-applicable",
+        "credential_access_profile": "threads-publish-token",
+        "destinations": [
+          "graph.threads.net"
+        ],
+        "dispatch_boundary_id": "urllib.threads.default-transport",
+        "dispatch_source": "pipeline.threads_api._default_transport",
+        "disposition": "REHEARSAL_PROVEN_REQUIRED",
+        "emitter_id": "threads.graph.publication",
+        "entrypoints": [
+          "bridge.publish_post",
+          "production.publisher.publish"
+        ],
+        "initial_profile_policy": "live publication denied; isolated deployment required",
+        "observation_granularity": "container request",
+        "operations": [
+          "container-create",
+          "container-publish"
+        ],
+        "process_types": [
+          "bridge",
+          "publisher-runner"
+        ],
+        "proof_method": "instrumented records plus rehearsal exclusion for alternate path",
+        "source_symbol": "pipeline.threads_api.ThreadsAPIClient.create_text_container/publish_container"
+      },
+      {
+        "attempt_source": "not-instrumented",
+        "completion_source": "credential mutation/audit is not dispatch-complete evidence",
+        "cost_source": "not-applicable",
+        "credential_access_profile": "threads-user-token",
+        "destinations": [
+          "graph.threads.net/refresh_access_token"
+        ],
+        "dispatch_boundary_id": "urllib.threads.default-transport",
+        "dispatch_source": "pipeline.threads_api._default_transport",
+        "disposition": "REHEARSAL_PROVEN_REQUIRED",
+        "emitter_id": "threads.graph.direct-token-refresh",
+        "entrypoints": [
+          "pipeline.accounts.refresh_account_token",
+          "cli account refresh"
+        ],
+        "initial_profile_policy": "credential inaccessible and egress denied",
+        "observation_granularity": "token refresh request",
+        "operations": [
+          "long-lived-token-refresh"
+        ],
+        "process_types": [
+          "cli",
+          "legacy-runner"
+        ],
+        "proof_method": "rehearsal exclusion",
+        "source_symbol": "pipeline.threads_api.refresh_long_lived_token"
+      },
+      {
+        "attempt_source": "not-instrumented before transport",
+        "completion_source": "oauth session/audit only",
+        "cost_source": "not-applicable",
+        "credential_access_profile": "oauth-app-secret-and-code",
+        "destinations": [
+          "graph.threads.net/oauth/access_token"
+        ],
+        "dispatch_boundary_id": "urllib.oauth.cli-transport",
+        "dispatch_source": "cli.oauth_transport via production.oauth._call",
+        "disposition": "REHEARSAL_PROVEN_REQUIRED",
+        "emitter_id": "oauth.code-exchange",
+        "entrypoints": [
+          "production.oauth.complete_authorization",
+          "production.oauth_callback.handle_callback"
+        ],
+        "initial_profile_policy": "OAuth process absent or isolated with denied egress",
+        "observation_granularity": "OAuth request",
+        "operations": [
+          "authorization-code-exchange"
+        ],
+        "process_types": [
+          "cli-oauth"
+        ],
+        "proof_method": "rehearsal exclusion",
+        "source_symbol": "production.oauth.exchange_code"
+      },
+      {
+        "attempt_source": "not-instrumented before transport",
+        "completion_source": "credential mutation/audit only",
+        "cost_source": "not-applicable",
+        "credential_access_profile": "oauth-app-secret-and-short-token",
+        "destinations": [
+          "graph.threads.net/access_token"
+        ],
+        "dispatch_boundary_id": "urllib.oauth.cli-transport",
+        "dispatch_source": "cli.oauth_transport via production.oauth._call",
+        "disposition": "REHEARSAL_PROVEN_REQUIRED",
+        "emitter_id": "oauth.long-lived-exchange",
+        "entrypoints": [
+          "production.oauth.complete_authorization"
+        ],
+        "initial_profile_policy": "OAuth process absent or isolated with denied egress",
+        "observation_granularity": "OAuth request",
+        "operations": [
+          "long-lived-token-exchange"
+        ],
+        "process_types": [
+          "cli-oauth"
+        ],
+        "proof_method": "rehearsal exclusion",
+        "source_symbol": "production.oauth.exchange_for_long_lived"
+      },
+      {
+        "attempt_source": "not-instrumented before transport",
+        "completion_source": "scope validation result only",
+        "cost_source": "not-applicable",
+        "credential_access_profile": "oauth-app-secret-and-user-token",
+        "destinations": [
+          "graph.threads.net/debug_token",
+          "graph.threads.net/oauth/access_token"
+        ],
+        "dispatch_boundary_id": "urllib.oauth.cli-transport",
+        "dispatch_source": "cli.oauth_transport via production.oauth._call",
+        "disposition": "REHEARSAL_PROVEN_REQUIRED",
+        "emitter_id": "oauth.token-debug",
+        "entrypoints": [
+          "production.oauth.complete_authorization"
+        ],
+        "initial_profile_policy": "OAuth process absent or isolated with denied egress",
+        "observation_granularity": "OAuth request",
+        "operations": [
+          "app-token",
+          "debug-token"
+        ],
+        "process_types": [
+          "cli-oauth"
+        ],
+        "proof_method": "rehearsal exclusion",
+        "source_symbol": "production.oauth._verified_scopes"
+      },
+      {
+        "attempt_source": "credential audit begins after call; dispatch not fully observed",
+        "completion_source": "credential audit",
+        "cost_source": "not-applicable",
+        "credential_access_profile": "threads-user-token-secret-store",
+        "destinations": [
+          "graph.threads.net/refresh_access_token"
+        ],
+        "dispatch_boundary_id": "urllib.oauth.cli-transport",
+        "dispatch_source": "cli.oauth_transport via production.oauth._call",
+        "disposition": "REHEARSAL_PROVEN_REQUIRED",
+        "emitter_id": "oauth.refresh",
+        "entrypoints": [
+          "production.oauth.refresh_stored",
+          "production.oauth.refresh_if_due"
+        ],
+        "initial_profile_policy": "credential runner absent or isolated with denied egress",
+        "observation_granularity": "OAuth request",
+        "operations": [
+          "stored-token-refresh"
+        ],
+        "process_types": [
+          "cli-oauth",
+          "credential-runner"
+        ],
+        "proof_method": "rehearsal exclusion",
+        "source_symbol": "production.oauth.refresh"
+      },
+      {
+        "attempt_source": "not-COE-instrumented",
+        "completion_source": "alert delivery result only",
+        "cost_source": "not-applicable",
+        "credential_access_profile": "discord-webhook-url",
+        "destinations": [
+          "configured HTTPS webhook URL; host is not code-bounded"
+        ],
+        "dispatch_boundary_id": "urllib.discord.webhook",
+        "dispatch_source": "ops.alerts._discord_transport",
+        "disposition": "REHEARSAL_PROVEN_REQUIRED",
+        "emitter_id": "ops.discord-webhook",
+        "entrypoints": [
+          "ops.alerts.AlertDispatcher.send_many"
+        ],
+        "initial_profile_policy": "alert process absent and webhook credential inaccessible",
+        "observation_granularity": "webhook request",
+        "operations": [
+          "alert-post"
+        ],
+        "process_types": [
+          "alert-runner"
+        ],
+        "proof_method": "policy-bound destination plus rehearsal process/credential/egress proof",
+        "source_symbol": "ops.alerts._discord_transport"
+      },
+      {
+        "attempt_source": "ai_usage_events where orchestrated; alternate direct call remains",
+        "completion_source": "ai_usage_events and llm_usage",
+        "cost_source": "ai_usage_events/llm_usage",
+        "credential_access_profile": "anthropic-api-key",
+        "destinations": [
+          "api.anthropic.com"
+        ],
+        "dispatch_boundary_id": "anthropic-sdk.messages-create",
+        "dispatch_source": "Anthropic SDK including SDK retries",
+        "disposition": "REHEARSAL_PROVEN_REQUIRED",
+        "emitter_id": "anthropic.research-analysis",
+        "entrypoints": [
+          "bridge.research_routes",
+          "research.pipeline analysis stages"
+        ],
+        "initial_profile_policy": "provider credential inaccessible and egress denied",
+        "observation_granularity": "logical SDK call; wire retries unknown",
+        "operations": [
+          "research-analysis",
+          "batch-analysis"
+        ],
+        "process_types": [
+          "bridge",
+          "research-cli",
+          "research-worker"
+        ],
+        "proof_method": "durable attempts plus rehearsal exclusion of alternate path",
+        "source_symbol": "research.analysis_llm.AnthropicAnalysisClient._client.messages.create"
+      },
+      {
+        "attempt_source": "ResearchDataUnavailable before dispatch",
+        "completion_source": "package exception",
+        "cost_source": "not-applicable",
+        "credential_access_profile": "none",
+        "destinations": [],
+        "dispatch_boundary_id": "none.fail-before-dispatch",
+        "dispatch_source": "none",
+        "disposition": "PACKAGE_PROVEN_EXCLUDED",
+        "emitter_id": "research.provider-fetch",
+        "entrypoints": [
+          "research routes and pipeline"
+        ],
+        "initial_profile_policy": "package path has no client",
+        "observation_granularity": "method invocation",
+        "operations": [
+          "profile-fetch",
+          "profile-post-fetch"
+        ],
+        "process_types": [
+          "research-cli",
+          "bridge"
+        ],
+        "proof_method": "package negative-path test",
+        "source_symbol": "research.providers.ThreadsResearchProvider"
+      },
+      {
+        "attempt_source": "ai_usage_events only on governed paths; legacy llm_usage follows response",
+        "completion_source": "ai_usage_events/llm_usage",
+        "cost_source": "ai_usage_events/llm_usage",
+        "credential_access_profile": "anthropic-api-key",
+        "destinations": [
+          "api.anthropic.com"
+        ],
+        "dispatch_boundary_id": "anthropic-sdk.messages-create",
+        "dispatch_source": "Anthropic SDK including SDK retries",
+        "disposition": "REHEARSAL_PROVEN_REQUIRED",
+        "emitter_id": "anthropic.wording",
+        "entrypoints": [
+          "bridge.generate_post",
+          "production.writer.WordingClientWriterProvider",
+          "cli reading"
+        ],
+        "initial_profile_policy": "provider credential inaccessible and egress denied",
+        "observation_granularity": "logical SDK call; wire retries unknown",
+        "operations": [
+          "wording",
+          "writer-generation"
+        ],
+        "process_types": [
+          "bridge",
+          "writer-runner",
+          "cli"
+        ],
+        "proof_method": "durable attempts plus rehearsal exclusion of legacy/alternate path",
+        "source_symbol": "wording.anthropic_wording.AnthropicWordingClient._client.messages.create"
+      },
+      {
+        "attempt_source": "ai_usage_events on governed writer path",
+        "completion_source": "ai_usage_events",
+        "cost_source": "ai_usage_events",
+        "credential_access_profile": "openai-api-key",
+        "destinations": [
+          "api.openai.com"
+        ],
+        "dispatch_boundary_id": "openai-sdk.responses-create",
+        "dispatch_source": "OpenAI SDK including SDK retries",
+        "disposition": "REHEARSAL_PROVEN_REQUIRED",
+        "emitter_id": "openai.wording",
+        "entrypoints": [
+          "production.writer.WordingClientWriterProvider"
+        ],
+        "initial_profile_policy": "provider credential inaccessible and egress denied",
+        "observation_granularity": "logical SDK call; wire retries unknown",
+        "operations": [
+          "writer-generation"
+        ],
+        "process_types": [
+          "writer-runner",
+          "cli"
+        ],
+        "proof_method": "durable attempts plus rehearsal exclusion of alternate path",
+        "source_symbol": "wording.openai_wording.OpenAIWordingClient._client.responses.create"
+      }
+    ],
+    "expected_emitter_inventory_digest": "fa3ba3589c64f3116577c977f3946be618497ccf5976a109d0591edb7e6e7b1f",
+    "exposure": "UNKNOWN",
+    "integrity_reason": "REHEARSAL_PROOF_REQUIRED",
+    "known_cost_count": 0,
+    "known_zero": false,
+    "live_publication_attempt_count": 0,
+    "package_proven_exclusions": [
+      "research.provider-fetch"
+    ],
+    "pending_cost_count": 0,
+    "provider_attempt_count": 0,
+    "rehearsal_required_emitters": [
+      "threads.graph.read-insights",
+      "threads.graph.publication",
+      "threads.graph.direct-token-refresh",
+      "oauth.code-exchange",
+      "oauth.long-lived-exchange",
+      "oauth.token-debug",
+      "oauth.refresh",
+      "ops.discord-webhook",
+      "anthropic.research-analysis",
+      "anthropic.wording",
+      "openai.wording"
+    ],
+    "unattributed_attempt_count": 0,
+    "uninstrumented_emitters": [
+      "threads.graph.read-insights",
+      "threads.graph.publication",
+      "threads.graph.direct-token-refresh",
+      "oauth.code-exchange",
+      "oauth.long-lived-exchange",
+      "oauth.token-debug",
+      "oauth.refresh",
+      "ops.discord-webhook",
+      "anthropic.research-analysis",
+      "anthropic.wording",
+      "openai.wording"
+    ],
+    "unknown_cost_count": 0
+  },
+  "records": [
+    {
+      "account_id": "acct_coe_fixture",
+      "actor": "TEST_ONLY-fixture",
+      "authority_ref": "fixture-authority",
+      "capability": "editorial.outcome_evaluation",
+      "event_id": "oae-00000000000000000000000000000001",
+      "event_seq": 1,
+      "event_type": "GRANTED",
+      "generation": 1,
+      "occurred_at": "2026-01-01T00:00:00+00:00",
+      "payload_hash": "233a657246051f72d882826fd20ca689ee360df1268d8e24f644d4c3b541df59",
+      "permit_expires_at": "2026-01-01T00:01:50+00:00",
+      "source": "operational_authority_events",
+      "spec_hash": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "state": "active"
+    },
+    {
+      "account_id": "acct_coe_fixture",
+      "admission_state": "ADMITTED",
+      "attempt_id": "attempt-00000000000000000000000000000002",
+      "authenticated_account_id": "acct_coe_fixture",
+      "authenticated_org_id": "org_fixture",
+      "authority_ref": "fixture-authority",
+      "business_identity": "experiment-fixture",
+      "capability": "editorial.outcome_evaluation",
+      "claim_identity": "request-identity-00000000000000000000000000000003",
+      "claimed_authority_ref": "fixture-authority",
+      "claimed_spec_hash": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "claimed_threads_generation": 1,
+      "domain_state": null,
+      "duplicate_of_request_id": null,
+      "event_id": "oev-00000000000000000000000000000004",
+      "event_seq": 1,
+      "event_type": "CLAIMED",
+      "execution_state": "IN_PROGRESS",
+      "lifecycle_revision": 1,
+      "material_revision": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+      "occurred_at": "2026-01-01T00:00:00+00:00",
+      "org_id": "org_fixture",
+      "payload_hash": "7e01fdcd9535984195e2410e0c4cab5e30b197fc879fce8d32816916391b7d1d",
+      "reason_code": null,
+      "request_fingerprint": "2034d9b599ccf5ad243600890ad03e7d41fc9779c7d7e8810810ff4d8308b9b6",
+      "request_id": "request-fixture",
+      "requested_account_id_untrusted": null,
+      "result_identity": null,
+      "result_json": null,
+      "result_revision": null,
+      "source": "operational_attempt_events",
+      "spec_hash": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "threads_generation": 1,
+      "verified_authority_ref": "fixture-authority",
+      "verified_spec_hash": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "verified_threads_generation": 1
+    },
+    {
+      "account_id": "acct_coe_fixture",
+      "admission_state": "ADMITTED",
+      "attempt_id": "attempt-00000000000000000000000000000002",
+      "authenticated_account_id": "acct_coe_fixture",
+      "authenticated_org_id": "org_fixture",
+      "authority_ref": "fixture-authority",
+      "business_identity": "experiment-fixture",
+      "capability": "editorial.outcome_evaluation",
+      "claim_identity": "request-identity-00000000000000000000000000000003",
+      "claimed_authority_ref": null,
+      "claimed_spec_hash": null,
+      "claimed_threads_generation": null,
+      "domain_state": "INCONCLUSIVE",
+      "duplicate_of_request_id": null,
+      "event_id": "oev-00000000000000000000000000000006",
+      "event_seq": 2,
+      "event_type": "SUCCEEDED",
+      "execution_state": "SUCCEEDED",
+      "lifecycle_revision": 2,
+      "material_revision": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+      "occurred_at": "2026-01-01T00:00:00+00:00",
+      "org_id": "org_fixture",
+      "payload_hash": "799ea8a32a862eda9ebfa08bed12b39b08974b2b455432eb59917f0c1ad70711",
+      "reason_code": null,
+      "request_fingerprint": "2034d9b599ccf5ad243600890ad03e7d41fc9779c7d7e8810810ff4d8308b9b6",
+      "request_id": "request-fixture",
+      "requested_account_id_untrusted": null,
+      "result_identity": "eval-fixture",
+      "result_json": "{\"native_domain_state\":\"INCONCLUSIVE\",\"result_identity\":\"eval-fixture\",\"result_revision\":\"2026-01-01T00:00:00+00:00\",\"state\":\"SUCCEEDED\"}",
+      "result_revision": "2026-01-01T00:00:00+00:00",
+      "source": "operational_attempt_events",
+      "spec_hash": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "threads_generation": 1,
+      "verified_authority_ref": "fixture-authority",
+      "verified_spec_hash": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "verified_threads_generation": 1
+    }
+  ],
+  "runtime_enforcement": {
+    "configured_auth_state": "ON",
+    "cursor_key_profile": "SINGLE_WORKER",
+    "effective_auth_mode": "NOT_ENFORCED",
+    "freshness_identity": "1767225600.63a5a84e1d025dbd9f053d566f18c499841a63ef8cf8919a0cb00622f9ec0254",
+    "guard_readiness": "NOT_READY",
+    "logical_runtime_id": "fixture-runtime-partial",
+    "observed_at": "2026-01-01T00:00:00+00:00",
+    "observed_execution_worker_count": null,
+    "process_start_identity": "66be6eeff15ef7a79c1d28054e0100256752b63f5c85e0d19ac3d891ab314929",
+    "reason": "BRIDGE_API_KEY_MISSING",
+    "topology_observation_status": "UNBOUND",
+    "topology_reason": "TOPOLOGY_OBSERVER_UNBOUND",
+    "worker_boot_id": "boot-00000000000000000000000000000064"
+  },
+  "schema_version": 1,
+  "scope": {
+    "account_id": "acct_coe_fixture",
+    "capability": null
+  },
+  "source_inventory": {
+    "cursor_key_profile": "SINGLE_WORKER",
+    "evidence_started_at_normalized": "2026-01-01T00:00:00+00:00",
+    "evidence_started_at_raw": "2026-01-01T00:00:00+00:00",
+    "evidence_started_at_status": "NORMALIZED",
+    "legacy_source_families": [
+      "capability_requests",
+      "execution_authorities",
+      "operational_authority_events",
+      "operational_attempt_events",
+      "operational_request_identities_v31",
+      "operational_semantic_work",
+      "editorial_cycles",
+      "editorial_experiments",
+      "editorial_evaluations",
+      "content_plans",
+      "content_versions",
+      "ai_usage_events",
+      "ai_usage_outcomes",
+      "ai_cost_adjustments",
+      "llm_usage",
+      "writer_canary_calls",
+      "publication_records",
+      "manual_external_posts",
+      "posts",
+      "post_metrics",
+      "account_metrics",
+      "content_metrics",
+      "account_credentials",
+      "audit_events",
+      "external_deletion_observations",
+      "external_reconciliation_runs",
+      "research_runs",
+      "benchmark_accounts",
+      "benchmark_posts",
+      "benchmark_analyses"
+    ],
+    "retention_floor_event_seq": 1,
+    "sources": [
+      "operational_authority_events",
+      "operational_attempt_events",
+      "ai_usage_events",
+      "publication_records"
+    ],
+    "store_incarnation": "11111111111111111111111111111111",
+    "version": 3
+  }
+}

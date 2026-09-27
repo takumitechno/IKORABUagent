@@ -7,6 +7,7 @@ import {
   CATFOOD_EVALUATOR_SHA256, CATFOOD_POLICY_SHA256, CatfoodTrustError, IndependentCatfoodEvaluator,
   type EvaluationResult, type ReadonlyThreadsEvidenceSource,
 } from "./catfood-trust";
+import { CATFOOD_THREADS_DEPENDENCY_ROOT } from "./catfood-coe";
 
 export const CATFOOD_ATTESTATION_SCHEMA = "catfood-independent-attestation.v1";
 export const CATFOOD_ATTESTATION_DOMAIN = "IKORABU/WP3/CATFOOD/ATTESTATION/V1";
@@ -63,19 +64,23 @@ export class IndependentCatfoodAttestationWriter {
   attest(runId: string, attestedAt: string): string {
     const evaluation = this.evaluator.evaluate(runId); const bundle = this.evaluator.rederive(runId);
     if (evaluation.rederived_bundle_sha256 !== sha256(canonicalJson(bundle))) throw new CatfoodTrustError("EVALUATOR_OUTPUT_MISMATCH");
+    const existing = this.db.query<{ attestation_id: string }, [string, string, string]>("SELECT attestation_id FROM independent_attestations WHERE run_id=? AND bundle_sha256=? AND evaluator_sha256=?").get(runId, evaluation.rederived_bundle_sha256, CATFOOD_EVALUATOR_SHA256);
+    if (existing) return existing.attestation_id;
     const spec = bundle.spec as Record<string, unknown>; const go = bundle.go as Record<string, unknown>; const checkpoint = bundle.checkpoint as Record<string, unknown>;
+    const finalSource = bundle.final_source as Record<string, unknown>;
     const scope = { run_id: runId, environment_type: spec.environment_type, environment_instance_id: spec.environment_instance_id, organization_id: spec.organization_id, tenant_id: spec.tenant_id, account_id: spec.account_id };
-    const payload = { domain: CATFOOD_ATTESTATION_DOMAIN, schema: CATFOOD_ATTESTATION_SCHEMA, run_id: runId, scope_sha256: sha256(canonicalJson(scope)), go_sha256: go.artifact_sha256, policy_sha256: CATFOOD_POLICY_SHA256, ikorabu_release_sha: spec.ikorabu_release_sha, threads_sha: spec.threads_sha, boundary_sha256: spec.operational_boundary_sha256, threads_release_sha256: spec.threads_release_sha256, threads_schema: spec.threads_schema, evaluator_sha256: CATFOOD_EVALUATOR_SHA256, checkpoint_id: checkpoint.checkpoint_id, evidence_coverage: "COMPLETE", bundle_sha256: evaluation.rederived_bundle_sha256, verdict: evaluation.verdict, reason_codes: evaluation.reason_codes, test_only: evaluation.test_only, writer_identity: this.meta.writer_identity, signing_key_id: this.meta.signing_key_id, attested_at: attestedAt };
+    const payload = { domain: CATFOOD_ATTESTATION_DOMAIN, schema: CATFOOD_ATTESTATION_SCHEMA, trust_domain: evaluation.test_only ? "TEST_ONLY" : "OPERATIONAL", run_id: runId, scope_sha256: sha256(canonicalJson(scope)), go_sha256: go.artifact_sha256, policy_sha256: CATFOOD_POLICY_SHA256, dependency_root: CATFOOD_THREADS_DEPENDENCY_ROOT, ikorabu_release_sha: spec.ikorabu_release_sha, threads_sha: spec.threads_sha, boundary_sha256: spec.operational_boundary_sha256, threads_release_sha256: spec.threads_release_sha256, threads_schema: spec.threads_schema, evaluator_sha256: CATFOOD_EVALUATOR_SHA256, checkpoint_id: checkpoint.checkpoint_id, source_digest: finalSource.digest, evidence_coverage: evaluation.evidence_coverage, bundle_sha256: evaluation.rederived_bundle_sha256, verdict: evaluation.verdict, reason_codes: evaluation.reason_codes, test_only: evaluation.test_only, writer_identity: this.meta.writer_identity, signing_key_id: this.meta.signing_key_id, attested_at: attestedAt };
     const text = canonicalJson(payload); const signature = sign(null, Buffer.from(`${CATFOOD_ATTESTATION_DOMAIN}\n${text}`), this.privateKey).toString("base64url"); const id = `att:${sha256(`${text}.${signature}`).slice(0, 32)}`;
     this.db.query("INSERT INTO independent_attestations VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)").run(id, runId, payload.scope_sha256, payload.go_sha256, payload.policy_sha256, payload.ikorabu_release_sha, payload.threads_sha, payload.boundary_sha256, payload.threads_release_sha256, payload.threads_schema, payload.evaluator_sha256, payload.checkpoint_id, payload.evidence_coverage, payload.bundle_sha256, payload.verdict, canonicalJson(payload.reason_codes), payload.test_only ? 1 : 0, payload.writer_identity, payload.signing_key_id, payload.attested_at, text, signature);
     return id;
   }
 }
 
-export function verifyIndependentAttestation(payloadJson: string, signatureBase64url: string, publicKeyPem: string, expected: { run_id: string; bundle_sha256: string }): EvaluationResult["verdict"] {
+export function verifyIndependentAttestation(payloadJson: string, signatureBase64url: string, publicKeyPem: string, expected: { run_id: string; bundle_sha256: string; allow_test_only?: boolean; writer_identity?: string; signing_key_id?: string }): EvaluationResult["verdict"] {
   const payload = JSON.parse(payloadJson) as Record<string, unknown>;
-  if (canonicalJson(payload) !== payloadJson || payload.domain !== CATFOOD_ATTESTATION_DOMAIN || payload.schema !== CATFOOD_ATTESTATION_SCHEMA || payload.evaluator_sha256 !== CATFOOD_EVALUATOR_SHA256 || payload.policy_sha256 !== CATFOOD_POLICY_SHA256) throw new CatfoodTrustError("ATTESTATION_INVALID");
+  if (canonicalJson(payload) !== payloadJson || payload.domain !== CATFOOD_ATTESTATION_DOMAIN || payload.schema !== CATFOOD_ATTESTATION_SCHEMA || payload.evaluator_sha256 !== CATFOOD_EVALUATOR_SHA256 || payload.policy_sha256 !== CATFOOD_POLICY_SHA256 || payload.dependency_root !== CATFOOD_THREADS_DEPENDENCY_ROOT || !["COMPLETE", "PARTIAL", "UNKNOWN"].includes(String(payload.evidence_coverage)) || payload.trust_domain !== (payload.test_only === true ? "TEST_ONLY" : "OPERATIONAL") || (payload.test_only === true && !expected.allow_test_only)) throw new CatfoodTrustError("ATTESTATION_INVALID");
   if (payload.run_id !== expected.run_id || payload.bundle_sha256 !== expected.bundle_sha256) throw new CatfoodTrustError("ATTESTATION_BINDING_MISMATCH");
+  if ((expected.writer_identity && payload.writer_identity !== expected.writer_identity) || (expected.signing_key_id && payload.signing_key_id !== expected.signing_key_id)) throw new CatfoodTrustError("ATTESTATION_TRUST_DOMAIN_MISMATCH");
   if (!verify(null, Buffer.from(`${CATFOOD_ATTESTATION_DOMAIN}\n${payloadJson}`), createPublicKey(publicKeyPem), Buffer.from(signatureBase64url, "base64url"))) throw new CatfoodTrustError("ATTESTATION_SIGNATURE_INVALID");
   return payload.verdict as EvaluationResult["verdict"];
 }
