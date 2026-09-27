@@ -1,14 +1,22 @@
 import { sha256, type Json } from "./catfood-harness";
 
 function canonicalJson(value: unknown): string {
-  const normalize = (item: unknown): unknown => {
-    if (item === null || typeof item === "string" || typeof item === "boolean") return item;
-    if (typeof item === "number" && Number.isFinite(item)) return item;
-    if (Array.isArray(item)) return item.map(normalize);
-    if (item && typeof item === "object") return Object.fromEntries(Object.entries(item as Record<string, unknown>).sort(([a], [b]) => a.localeCompare(b)).map(([key, child]) => [key, normalize(child)]));
+  const codePointOrder = (left: string, right: string): number => {
+    const a = [...left]; const b = [...right];
+    for (let index = 0; index < Math.min(a.length, b.length); index++) {
+      const difference = a[index]!.codePointAt(0)! - b[index]!.codePointAt(0)!;
+      if (difference) return difference;
+    }
+    return a.length - b.length;
+  };
+  const serialize = (item: unknown): string => {
+    if (item === null || typeof item === "string" || typeof item === "boolean") return JSON.stringify(item);
+    if (typeof item === "number" && Number.isFinite(item) && !Object.is(item, -0) && (item === 0 || Math.abs(item) >= 1e-6 && Math.abs(item) < 1e21) && (!Number.isInteger(item) || Number.isSafeInteger(item))) return JSON.stringify(item);
+    if (Array.isArray(item)) return `[${item.map(serialize).join(",")}]`;
+    if (item && typeof item === "object") return `{${Object.entries(item as Record<string, unknown>).sort(([a], [b]) => codePointOrder(a, b)).map(([key, child]) => `${JSON.stringify(key)}:${serialize(child)}`).join(",")}}`;
     throw new CoeError("COE_NON_JSON_VALUE");
   };
-  return JSON.stringify(normalize(value));
+  return serialize(value);
 }
 export const canonicalCoeJson = canonicalJson;
 
@@ -76,7 +84,21 @@ export interface OutcomeEvaluationRequest {
 }
 
 export interface CoePageSource {
+  readonly evidence_trust?: "OPERATIONAL" | "TEST_ONLY";
   operationalEvidence(request: Readonly<CoeRequest>): unknown;
+}
+
+export interface CoeRawPage {
+  parsed: unknown;
+  receipt: {
+    representation: "AUTHENTICATED_DECODED_BODY";
+    body_base64url: string;
+    byte_length: number;
+    body_sha256: string;
+    content_type: "application/json";
+    content_encoding: "identity";
+    source_session_id: string;
+  };
 }
 
 export interface CoeScope {
@@ -108,6 +130,8 @@ export interface CoeAcquisition {
   outcome_evaluation_targets: readonly Record<string, Json>[];
   records: readonly Record<string, Json>[];
   pages: readonly Record<string, Json>[];
+  page_receipts: readonly Record<string, Json>[];
+  representation: "AUTHENTICATED_DECODED_BODY" | "CONSUMER_RESERIALIZED";
   page_count: number;
   test_only: boolean;
   digest: string;
@@ -122,6 +146,29 @@ export interface GovernedWorkDecision {
   claim_id: string;
   source_ref: string | null;
   result_ref: string | null;
+}
+
+export interface ProtectedInvocationBinding {
+  receipt_id: string;
+  source_session_id: string;
+  principal_ref: string;
+  credential_version_ref: string;
+  organization_id: string;
+  account_id: string;
+  capability: string;
+  authority_ref: string;
+  spec_hash: string;
+  generation: number;
+}
+
+export interface FoldedAttempt {
+  namespace: string;
+  attempt_id: string;
+  first: Record<string, Json>;
+  terminal: Record<string, Json>;
+  lifecycle: readonly Record<string, Json>[];
+  first_occurred_at: string;
+  terminal_occurred_at: string;
 }
 
 export interface CoeAssessment {
@@ -151,6 +198,32 @@ const ACTIVITY = ["activity", "count_semantics", "coverage", "dry_run_preparatio
 const CAPABILITIES = ["editorial.cycle", "editorial.outcome_evaluation", "threads.publish.dry_run"];
 const ATTEMPT_FIELDS = ["account_id", "admission_state", "attempt_id", "authenticated_account_id", "authenticated_org_id", "authority_ref", "business_identity", "capability", "claim_identity", "claimed_authority_ref", "claimed_spec_hash", "claimed_threads_generation", "domain_state", "duplicate_of_request_id", "event_id", "event_seq", "event_type", "execution_state", "lifecycle_revision", "material_revision", "occurred_at", "org_id", "payload_hash", "reason_code", "request_fingerprint", "request_id", "requested_account_id_untrusted", "result_identity", "result_json", "result_revision", "source", "spec_hash", "threads_generation", "verified_authority_ref", "verified_spec_hash", "verified_threads_generation"];
 const AUTHORITY_FIELDS = ["account_id", "actor", "authority_ref", "capability", "event_id", "event_seq", "event_type", "generation", "occurred_at", "payload_hash", "permit_expires_at", "source", "spec_hash", "state"];
+const OUTCOME_TARGET_FIELDS = ["business_identity", "material_revision", "observed_through", "source"];
+const OUTCOME_TARGET_SOURCE_FIELDS = ["constants_json", "content_hash", "content_id", "content_version", "cycle_id", "experiment_created_at", "experiment_id", "failure_signal_json", "hypothesis_json", "minimum_sample_json", "observed_through", "source_content_ids_json", "success_signal_json", "test_variable"];
+
+export type CoeFieldClass = "A_IMMUTABLE_EQUAL" | "B_CONSERVATIVE" | "C_PAGE_LOCAL";
+const fields = (prefix: string, names: readonly string[], classification: CoeFieldClass) => names.map((name) => [`${prefix}.${name}`, classification] as const);
+/** Exhaustive schema registry for fixed page fields; records are classified per source and attempt revision. */
+export const COE_FIELD_REGISTRY: Readonly<Record<string, CoeFieldClass>> = Object.freeze(Object.fromEntries([
+  ...fields("top", TOP, "A_IMMUTABLE_EQUAL"),
+  ...fields("coverage", COVERAGE, "B_CONSERVATIVE"),
+  ...fields("coverage.window", WINDOW, "B_CONSERVATIVE"),
+  ...fields("coverage.prospective", PROSPECTIVE, "B_CONSERVATIVE"),
+  ...fields("source_inventory", SOURCE, "A_IMMUTABLE_EQUAL"),
+  ...fields("runtime_enforcement", RUNTIME, "B_CONSERVATIVE"),
+  ...fields("operational_observation", OBSERVATION, "B_CONSERVATIVE"),
+  ...fields("operational_observation.trust", TRUST, "B_CONSERVATIVE"),
+  ...fields("operational_observation.topology", TOPOLOGY, "B_CONSERVATIVE"),
+  ...fields("operational_observation.checkpoint", CHECKPOINT, "B_CONSERVATIVE"),
+  ...fields("prohibited_activity", ACTIVITY, "B_CONSERVATIVE"),
+  ...fields("record.operational_attempt_events", ATTEMPT_FIELDS, "A_IMMUTABLE_EQUAL"),
+  ...fields("record.operational_authority_events", AUTHORITY_FIELDS, "A_IMMUTABLE_EQUAL"),
+  ...fields("outcome_evaluation_target", OUTCOME_TARGET_FIELDS, "A_IMMUTABLE_EQUAL"),
+  ...fields("outcome_evaluation_target.source", OUTCOME_TARGET_SOURCE_FIELDS, "A_IMMUTABLE_EQUAL"),
+  ["top.records", "C_PAGE_LOCAL"], ["top.next_cursor", "C_PAGE_LOCAL"],
+  ["coverage.page_offset", "C_PAGE_LOCAL"], ["coverage.page_count", "C_PAGE_LOCAL"], ["coverage.pagination_complete", "C_PAGE_LOCAL"],
+  ["runtime_enforcement.observed_at", "C_PAGE_LOCAL"], ["operational_observation.observation_id", "C_PAGE_LOCAL"], ["operational_observation.observed_at", "C_PAGE_LOCAL"],
+]));
 export const COE_SOURCES = Object.freeze(["operational_authority_events", "operational_attempt_events", "ai_usage_events", "publication_records"]);
 export const COE_LEGACY_SOURCE_FAMILIES = Object.freeze([
   "capability_requests", "execution_authorities", "operational_authority_events", "operational_attempt_events", "operational_request_identities_v31", "operational_semantic_work",
@@ -179,25 +252,29 @@ function natural(value: unknown, code = "COE_MALFORMED"): number {
   return Number(value);
 }
 
-export function parseJsonNoDuplicateKeys(raw: string): unknown {
-  if (typeof raw !== "string" || raw.length > 8_000_000) throw new CoeError("COE_JSON_LIMIT");
-  let i = 0; const ws = () => { while (/\s/.test(raw[i] ?? "")) i++; };
-  const value = (): unknown => {
+export function parseJsonNoDuplicateKeys(raw: string, maximumBytes = 8_000_000, maximumDepth = 64): unknown {
+  if (typeof raw !== "string" || Buffer.byteLength(raw, "utf8") > maximumBytes) throw new CoeError("COE_JSON_LIMIT");
+  let i = 0; let nodes = 0; const ws = () => { while (/\s/.test(raw[i] ?? "")) i++; };
+  const value = (depth = 0): unknown => {
+    if (depth > maximumDepth || ++nodes > 200_000) throw new CoeError("COE_JSON_LIMIT");
     ws(); const start = i; const ch = raw[i];
     if (ch === '"') { i++; let escaped = false; while (i < raw.length) { const c = raw[i++]!; if (!escaped && c === '"') return JSON.parse(raw.slice(start, i)); escaped = !escaped && c === "\\"; if (c !== "\\") escaped = false; } throw new CoeError("COE_JSON_INVALID"); }
-    if (ch === "[") { i++; const out: unknown[] = []; ws(); if (raw[i] === "]") { i++; return out; } while (true) { out.push(value()); ws(); if (raw[i] === "]") { i++; return out; } if (raw[i++] !== ",") throw new CoeError("COE_JSON_INVALID"); } }
-    if (ch === "{") { i++; const out: Record<string, unknown> = {}; const seen = new Set<string>(); ws(); if (raw[i] === "}") { i++; return out; } while (true) { ws(); if (raw[i] !== '"') throw new CoeError("COE_JSON_INVALID"); const key = value(); if (typeof key !== "string") throw new CoeError("COE_JSON_INVALID"); if (seen.has(key)) throw new CoeError("COE_DUPLICATE_JSON_KEY"); seen.add(key); ws(); if (raw[i++] !== ":") throw new CoeError("COE_JSON_INVALID"); out[key] = value(); ws(); if (raw[i] === "}") { i++; return out; } if (raw[i++] !== ",") throw new CoeError("COE_JSON_INVALID"); } }
+    if (ch === "[") { i++; const out: unknown[] = []; ws(); if (raw[i] === "]") { i++; return out; } while (true) { out.push(value(depth + 1)); ws(); if (raw[i] === "]") { i++; return out; } if (raw[i++] !== ",") throw new CoeError("COE_JSON_INVALID"); } }
+    if (ch === "{") { i++; const out: Record<string, unknown> = {}; const seen = new Set<string>(); ws(); if (raw[i] === "}") { i++; return out; } while (true) { ws(); if (raw[i] !== '"') throw new CoeError("COE_JSON_INVALID"); const key = value(depth + 1); if (typeof key !== "string") throw new CoeError("COE_JSON_INVALID"); if (seen.has(key)) throw new CoeError("COE_DUPLICATE_JSON_KEY"); seen.add(key); ws(); if (raw[i++] !== ":") throw new CoeError("COE_JSON_INVALID"); out[key] = value(depth + 1); ws(); if (raw[i] === "}") { i++; return out; } if (raw[i++] !== ",") throw new CoeError("COE_JSON_INVALID"); } }
     const match = raw.slice(i).match(/^(?:-?(?:0|[1-9]\d*)(?:\.\d+)?(?:[eE][+-]?\d+)?|true|false|null)/); if (!match) throw new CoeError("COE_JSON_INVALID"); i += match[0].length; return JSON.parse(match[0]);
   };
   const parsed = value(); ws(); if (i !== raw.length) throw new CoeError("COE_JSON_INVALID"); return parsed;
 }
 
-function rejectCredentialData(value: unknown, path = "$", key = ""): void {
-  if (Array.isArray(value)) { value.forEach((item, index) => rejectCredentialData(item, `${path}[${index}]`)); return; }
-  if (value && typeof value === "object") { for (const [child, item] of Object.entries(value as Record<string, unknown>)) { if (/^(authorization|headers?|password|private_key|client_secret|api_key|access_token|refresh_token)$/i.test(child)) throw new CoeError(`COE_SENSITIVE_FIELD:${path}.${child}`); rejectCredentialData(item, `${path}.${child}`, child); } return; }
+function rejectCredentialData(value: unknown, path = "$", key = "", depth = 0): void {
+  if (depth > 64) throw new CoeError("COE_JSON_LIMIT");
+  if (Array.isArray(value)) { value.forEach((item) => rejectCredentialData(item, `${path}[*]`, "", depth + 1)); return; }
+  if (value && typeof value === "object") { for (const [child, item] of Object.entries(value as Record<string, unknown>)) { if (/^(authorization|headers?|password|private_key|client_secret|api_key|access_token|refresh_token)$/i.test(child)) throw new CoeError("COE_SENSITIVE_FIELD"); rejectCredentialData(item, `${path}.*`, child, depth + 1); } return; }
   if (typeof value !== "string" || ["credential_access_profile", "destinations", "entrypoints"].includes(key)) return;
-  if (/-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----|\bBearer\s+[A-Za-z0-9._~+/-]{8,}|\bsk-[A-Za-z0-9_-]{8,}/i.test(value)) throw new CoeError(`COE_SECRET_VALUE:${path}`);
-  try { const url = new URL(value); if (url.username || url.password || [...url.searchParams.keys()].some((name) => /token|secret|password|key/i.test(name))) throw new CoeError(`COE_CREDENTIAL_URL:${path}`); } catch (error) { if (error instanceof CoeError) throw error; }
+  let decoded = value; try { decoded = decodeURIComponent(value); } catch { /* original value remains authoritative */ }
+  if (/-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----|\bBearer\s+[A-Za-z0-9._~+/-]{8,}|\b(?:gh[pousr]_[A-Za-z0-9]{20,}|github_pat_[A-Za-z0-9_]{20,}|xox[baprs]-[A-Za-z0-9-]{10,}|AKIA[0-9A-Z]{16}|ASIA[0-9A-Z]{16}|sk-[A-Za-z0-9_-]{8,})\b|\beyJ[A-Za-z0-9_-]{8,}\.[A-Za-z0-9_-]{8,}\.[A-Za-z0-9_.-]{8,}/i.test(decoded)) throw new CoeError("COE_SECRET_VALUE:$");
+  try { const url = new URL(decoded); if (url.username || url.password || /hooks\.slack\.com\/services\/|discord(?:app)?\.com\/api\/webhooks\//i.test(url.toString()) || [...url.searchParams.keys()].some((name) => /token|secret|password|key/i.test(name))) throw new CoeError("COE_CREDENTIAL_URL"); } catch (error) { if (error instanceof CoeError) throw error; }
+  if ((key === "result_json" || key.endsWith("_json")) && /^[\s]*[\[{]/.test(value)) rejectCredentialData(parseJsonNoDuplicateKeys(value, 1_000_000, 32), "$embedded", "", depth + 1);
 }
 
 /** Decode producer-captured diagnostic fixtures without promoting unbound metadata to operational evidence. */
@@ -208,7 +285,7 @@ export function decodeCoeFixture(raw: string): CoeAcquisition {
   const window = object(coverage.window); exact(window, WINDOW); enumValue(window.state, ["COMPLETE", "PARTIAL", "UNBOUND"], "COE_WINDOW_STATE_UNKNOWN");
   const activity = object(page.prohibited_activity); exact(activity, ACTIVITY); enumValue(activity.coverage, ["COMPLETE", "PARTIAL", "UNKNOWN"], "COE_ACTIVITY_COVERAGE_UNKNOWN"); enumValue(activity.activity, ["ZERO", "NONZERO", "UNKNOWN"], "COE_ACTIVITY_UNKNOWN"); enumValue(activity.exposure, ["NONE", "PENDING", "UNKNOWN", "RESOLVED"], "COE_EXPOSURE_UNKNOWN");
   rejectCredentialData(page);
-  const result = { phase: "LIVE_ADMISSION", contract: page.contract, schema_version: page.schema_version, producer_release_identity: page.producer_release_identity, scope: page.scope, source_inventory: page.source_inventory, coverage: page.coverage, prohibited_activity: page.prohibited_activity, runtime_enforcement: page.runtime_enforcement, operational_observation: page.operational_observation, outcome_evaluation_targets: page.outcome_evaluation_targets, records: page.records, pages: [page], page_count: 1, test_only: true } as unknown as Omit<CoeAcquisition, "digest">;
+  const result = { phase: "LIVE_ADMISSION", contract: page.contract, schema_version: page.schema_version, producer_release_identity: page.producer_release_identity, scope: page.scope, source_inventory: page.source_inventory, coverage: page.coverage, prohibited_activity: page.prohibited_activity, runtime_enforcement: page.runtime_enforcement, operational_observation: page.operational_observation, outcome_evaluation_targets: page.outcome_evaluation_targets, records: page.records, pages: [page], page_receipts: [], representation: "CONSUMER_RESERIALIZED", page_count: 1, test_only: true } as unknown as Omit<CoeAcquisition, "digest">;
   return Object.freeze({ ...result, digest: sha256(canonicalJson(result as unknown as Json)) });
 }
 
@@ -273,31 +350,69 @@ function validatePage(raw: unknown, scope: CoeScope, phase: EvidencePhase): Reco
     if (!Number.isSafeInteger(record.event_seq) || record.account_id !== scope.account_id || !CAPABILITIES.includes(String(record.capability)) || !["operational_authority_events", "operational_attempt_events"].includes(String(record.source))) throw new CoeError("COE_RECORD_SCOPE_INVALID");
     if (record.source === "operational_attempt_events") {
       exact(record, ATTEMPT_FIELDS);
-      if (record.authenticated_account_id !== scope.account_id || record.authenticated_org_id !== scope.organization_id || record.org_id !== scope.organization_id) throw new CoeError("COE_TENANT_BINDING_MISMATCH");
+      if (record.authenticated_account_id !== scope.account_id || ![scope.organization_id, null].includes(record.authenticated_org_id as string | null) || ![scope.organization_id, null].includes(record.org_id as string | null)) throw new CoeError("COE_TENANT_BINDING_MISMATCH");
       enumValue(record.event_type, ["REJECTED_PRECLAIM", "CLAIMED", "REPLAYED", "DUPLICATE", "SUCCEEDED", "FAILED", "UNRESOLVED"], "COE_ATTEMPT_EVENT_UNKNOWN");
+      natural(record.lifecycle_revision); if (record.lifecycle_revision === 0) throw new CoeError("COE_LIFECYCLE_REVISION_INVALID");
     } else exact(record, AUTHORITY_FIELDS);
+  }
+  for (const targetValue of page.outcome_evaluation_targets) {
+    const target = object(targetValue); exact(target, OUTCOME_TARGET_FIELDS);
+    if (typeof target.business_identity !== "string" || !target.business_identity || !SHA256.test(String(target.material_revision)) || (target.observed_through !== null && typeof target.observed_through !== "string")) throw new CoeError("COE_OUTCOME_TARGET_INVALID");
+    const source = object(target.source); exact(source, OUTCOME_TARGET_SOURCE_FIELDS);
   }
   rejectCredentialData(page);
   return page;
 }
 
+function unwrapPage(value: unknown): { parsed: unknown; receipt: Record<string, Json> | null } {
+  if (!value || typeof value !== "object" || !("parsed" in value) || !("receipt" in value)) return { parsed: value, receipt: null };
+  const envelope = object(value); exact(envelope, ["parsed", "receipt"]); const receipt = object(envelope.receipt);
+  exact(receipt, ["body_base64url", "body_sha256", "byte_length", "content_encoding", "content_type", "representation", "source_session_id"]);
+  if (receipt.representation !== "AUTHENTICATED_DECODED_BODY" || receipt.content_type !== "application/json" || receipt.content_encoding !== "identity"
+    || typeof receipt.body_base64url !== "string" || !/^[A-Za-z0-9_-]+$/.test(receipt.body_base64url) || !SHA256.test(String(receipt.body_sha256))
+    || !Number.isSafeInteger(receipt.byte_length) || Number(receipt.byte_length) < 0 || Number(receipt.byte_length) > 512_000 || typeof receipt.source_session_id !== "string" || !receipt.source_session_id) throw new CoeError("COE_RAW_RECEIPT_INVALID");
+  const bytes = Buffer.from(receipt.body_base64url, "base64url");
+  if (bytes.toString("base64url") !== receipt.body_base64url || bytes.byteLength !== receipt.byte_length) throw new CoeError("COE_RAW_RECEIPT_INVALID");
+  let raw: string; try { raw = new TextDecoder("utf-8", { fatal: true }).decode(bytes); } catch { throw new CoeError("COE_UTF8_INVALID"); }
+  if (sha256(raw) !== receipt.body_sha256) throw new CoeError("COE_RAW_BODY_DIGEST_MISMATCH");
+  const reparsed = parseJsonNoDuplicateKeys(raw, 512_000, 64);
+  if (canonicalJson(reparsed) !== canonicalJson(envelope.parsed)) throw new CoeError("COE_RAW_BODY_PARSE_MISMATCH");
+  return { parsed: reparsed, receipt: JSON.parse(canonicalJson(receipt)) as Record<string, Json> };
+}
+
+function atPath(value: Record<string, unknown>, path: string): unknown {
+  return path.split(".").reduce<unknown>((current, key) => object(current)[key], value);
+}
+
+const CROSS_PAGE_IMMUTABLE = Object.freeze([
+  "contract", "schema_version", "producer_release_identity", "scope", "source_inventory", "outcome_evaluation_targets",
+  "coverage.cuts", "coverage.scoped_count", "coverage.record_set_digest", "coverage.snapshot_identity", "coverage.client_continuity_required",
+  "coverage.window.assessment_mode", "coverage.window.requested_window_start", "coverage.window.requested_window_end", "coverage.window.interval_semantics",
+  "coverage.prospective.proof_id", "coverage.prospective.reason",
+  "prohibited_activity.expected_emitter_inventory_digest", "prohibited_activity.count_semantics", "prohibited_activity.emitter_dispositions",
+  "prohibited_activity.package_proven_exclusions", "prohibited_activity.rehearsal_required_emitters", "prohibited_activity.uninstrumented_emitters",
+  "runtime_enforcement.cursor_key_profile", "runtime_enforcement.freshness_identity", "runtime_enforcement.logical_runtime_id", "runtime_enforcement.process_start_identity", "runtime_enforcement.worker_boot_id",
+  "operational_observation.observation_clock_id", "operational_observation.security_revision_before", "operational_observation.security_revision_after",
+  "operational_observation.trust.environment_identity", "operational_observation.trust.registry_revision", "operational_observation.trust.source_identity",
+  "operational_observation.topology.execution_worker_ids", "operational_observation.topology.observed_boot_id", "operational_observation.topology.observer_kind", "operational_observation.topology.process_inventory_digest",
+  "operational_observation.checkpoint.checkpoint_id", "operational_observation.checkpoint.lineage", "operational_observation.checkpoint.protection_provenance", "operational_observation.checkpoint.range_start", "operational_observation.checkpoint.range_end", "operational_observation.checkpoint.root",
+]);
+
 export function acquireCoe(source: CoePageSource, scope: CoeScope, phase: EvidencePhase = "LIVE_ADMISSION"): CoeAcquisition {
   validateWindow(scope, phase);
   assertFrozenDependencies(scope);
   if (scope.tenant_id !== scope.organization_id) throw new CoeError("COE_TENANT_BINDING_MISMATCH");
-  const records: Record<string, Json>[] = []; const retainedPages: Record<string, Json>[] = []; let cursor: string | null = null; let first: Record<string, unknown> | null = null; let offset = 0; let pages = 0;
+  const records: Record<string, Json>[] = []; const retainedPages: Record<string, Json>[] = []; const pageReceipts: Record<string, Json>[] = []; let rawComplete = true; let cursor: string | null = null; let first: Record<string, unknown> | null = null; let offset = 0; let pages = 0;
   const cursors = new Set<string>(); const rows = new Set<string>();
   do {
     const request: CoeRequest = { account_id: scope.account_id, capability: null, assessment_mode: phase === "LIVE_ADMISSION" ? "LIVE" : "HISTORICAL", window_start: scope.requested_window_start, window_end: scope.requested_window_end, page_size: 500, cursor };
-    const page = validatePage(source.operationalEvidence(Object.freeze(request)), scope, phase);
+    const rawPage = unwrapPage(source.operationalEvidence(Object.freeze(request))); const page = validatePage(rawPage.parsed, scope, phase);
+    if (rawPage.receipt) pageReceipts.push(rawPage.receipt); else rawComplete = false;
     retainedPages.push(JSON.parse(canonicalJson(page)));
     const coverage = object(page.coverage); const pageRecords = page.records as Record<string, Json>[];
     if (!first) first = page;
     else {
-      const initialCoverage = object(first.coverage);
-      const stable = ["record_set_digest", "snapshot_identity", "scoped_count", "cuts"].every((key) => canonicalJson(coverage[key] as Json) === canonicalJson(initialCoverage[key] as Json));
-      const stableTop = ["scope", "source_inventory", "producer_release_identity"].every((key) => canonicalJson(page[key] as Json) === canonicalJson(first![key] as Json));
-      if (!stable || !stableTop) throw new CoeError("COE_SNAPSHOT_SWITCH");
+      if (CROSS_PAGE_IMMUTABLE.some((path) => canonicalJson(atPath(page, path)) !== canonicalJson(atPath(first!, path)))) throw new CoeError("COE_SNAPSHOT_SWITCH");
     }
     if (coverage.page_offset !== offset) throw new CoeError("COE_PAGE_DISCONTINUITY");
     for (const record of pageRecords) { const key = `${record.source}:${record.event_seq}`; if (rows.has(key)) throw new CoeError("COE_RECORD_REPEATED"); rows.add(key); records.push(record); }
@@ -307,18 +422,22 @@ export function acquireCoe(source: CoePageSource, scope: CoeScope, phase: Eviden
     if (next) cursors.add(next);
     if (coverage.pagination_complete !== (next === null)) throw new CoeError("COE_PREMATURE_TERMINATION");
     cursor = next;
-    if (pages > 100 || records.length > 50_000 || canonicalJson(retainedPages).length > 8_000_000) throw new CoeError("COE_ACQUISITION_LIMIT");
+    if (pages > 100 || records.length > 50_000 || Buffer.byteLength(canonicalJson(retainedPages), "utf8") > 8_000_000 || pageReceipts.reduce((total, receipt) => total + Number(receipt.byte_length), 0) > 8_000_000) throw new CoeError("COE_ACQUISITION_LIMIT");
   } while (cursor !== null);
   const coverage = object(first!.coverage);
   if (records.length !== coverage.scoped_count || sha256(canonicalJson(records as Json)) !== coverage.record_set_digest) throw new CoeError("COE_RECORD_SET_DIGEST_MISMATCH");
   const worse = (left: string, right: string, order: readonly string[]) => order.indexOf(right) > order.indexOf(left) ? right : left;
   const conservative = retainedPages.reduce((value, page) => {
     const nextCoverage = object(page.coverage); const nextWindow = object(nextCoverage.window); const nextProspective = object(nextCoverage.prospective); const nextActivity = object(page.prohibited_activity);
-    value.coverage = worse(value.coverage, String(nextCoverage.state), ["COMPLETE", "PARTIAL", "UNKNOWN"]);
-    value.window = worse(value.window, String(nextWindow.state), ["COMPLETE", "PARTIAL", "UNBOUND"]);
-    value.prospective = worse(value.prospective, String(nextProspective.state), ["COMPLETE", "PARTIAL", "UNKNOWN"]);
+    const paginationOnly = nextCoverage.pagination_complete === false && nextProspective.proof_applicable === true && Number(nextCoverage.unresolved_count) === 0
+      && nextActivity.coverage === "COMPLETE" && nextActivity.activity === "ZERO" && nextActivity.known_zero === true && object(page.operational_observation).coherent === true;
+    if (!paginationOnly) {
+      value.coverage = worse(value.coverage, String(nextCoverage.state), ["COMPLETE", "PARTIAL", "UNKNOWN"]);
+      value.window = worse(value.window, String(nextWindow.state), ["COMPLETE", "PARTIAL", "UNBOUND"]);
+      value.prospective = worse(value.prospective, String(nextProspective.state), ["COMPLETE", "PARTIAL", "UNKNOWN"]);
+      for (const reason of nextWindow.uncovered_reasons as unknown[]) value.uncovered.add(String(reason));
+    }
     value.proofApplicable &&= nextProspective.proof_applicable === true;
-    for (const reason of nextWindow.uncovered_reasons as unknown[]) value.uncovered.add(String(reason));
     if (Number(nextCoverage.unresolved_count) > 0) value.unresolved = Math.max(value.unresolved, Number(nextCoverage.unresolved_count));
     value.activityCoverage = worse(value.activityCoverage, String(nextActivity.coverage), ["COMPLETE", "PARTIAL", "UNKNOWN"]);
     value.activity = worse(value.activity, String(nextActivity.activity), ["ZERO", "UNKNOWN", "NONZERO"]);
@@ -332,7 +451,24 @@ export function acquireCoe(source: CoePageSource, scope: CoeScope, phase: Eviden
   const finalPage = retainedPages.at(-1)!; const finalCoverage = object(finalPage.coverage); const finalActivity = object(finalPage.prohibited_activity);
   const reducedCoverage = { ...finalCoverage, state: conservative.coverage, window: { ...object(finalCoverage.window), state: conservative.window, uncovered_reasons: [...conservative.uncovered].sort() }, prospective: { ...object(finalCoverage.prospective), state: conservative.prospective, proof_applicable: conservative.prospective === "COMPLETE" && conservative.proofApplicable }, unresolved_count: conservative.unresolved, page_offset: 0, page_count: records.length, pagination_complete: true };
   const reducedActivity = { ...finalActivity, coverage: conservative.activityCoverage, activity: conservative.activity, exposure: conservative.exposure, known_zero: conservative.knownZero, pending_cost_count: conservative.pendingCost, unknown_cost_count: conservative.unknownCost, unattributed_attempt_count: conservative.unattributed };
-  const result = { phase, contract: first!.contract, schema_version: first!.schema_version, producer_release_identity: first!.producer_release_identity, scope: first!.scope, source_inventory: first!.source_inventory, coverage: reducedCoverage, prohibited_activity: reducedActivity, runtime_enforcement: finalPage.runtime_enforcement, operational_observation: finalPage.operational_observation, outcome_evaluation_targets: finalPage.outcome_evaluation_targets, records, pages: retainedPages, page_count: pages, test_only: scope.account_id.startsWith("acct_test") } as unknown as Omit<CoeAcquisition, "digest">;
+  const runtime = structuredClone(first!.runtime_enforcement) as Record<string, unknown>; const observation = structuredClone(first!.operational_observation) as Record<string, unknown>;
+  for (const page of retainedPages.slice(1)) {
+    const nextRuntime = object(page.runtime_enforcement); const nextObservation = object(page.operational_observation);
+    runtime.configured_auth_state = runtime.configured_auth_state === "ON" && nextRuntime.configured_auth_state === "ON" ? "ON" : "OFF";
+    runtime.effective_auth_mode = runtime.effective_auth_mode === "TENANT_ENFORCED" && nextRuntime.effective_auth_mode === "TENANT_ENFORCED" ? "TENANT_ENFORCED" : "NOT_ENFORCED";
+    runtime.guard_readiness = runtime.guard_readiness === "READY" && nextRuntime.guard_readiness === "READY" ? "READY" : "NOT_READY";
+    runtime.topology_observation_status = runtime.topology_observation_status === "BOUND" && nextRuntime.topology_observation_status === "BOUND" ? "BOUND" : "UNBOUND";
+    runtime.observed_execution_worker_count = Math.max(Number(runtime.observed_execution_worker_count), Number(nextRuntime.observed_execution_worker_count));
+    observation.coherent = observation.coherent === true && nextObservation.coherent === true;
+    for (const member of ["trust", "topology", "checkpoint"] as const) {
+      const current = object(observation[member]); const next = object(nextObservation[member]);
+      current.status = current.status === "BOUND" && next.status === "BOUND" ? "BOUND" : "UNBOUND";
+      if (current.status === "UNBOUND") current.reason = String(next.reason ?? current.reason);
+      if (member === "topology") current.execution_worker_count = Math.max(Number(current.execution_worker_count), Number(next.execution_worker_count));
+    }
+  }
+  runtime.observed_at = object(finalPage.runtime_enforcement).observed_at; observation.observed_at = object(finalPage.operational_observation).observed_at; observation.observation_id = object(finalPage.operational_observation).observation_id;
+  const result = { phase, contract: first!.contract, schema_version: first!.schema_version, producer_release_identity: first!.producer_release_identity, scope: first!.scope, source_inventory: first!.source_inventory, coverage: reducedCoverage, prohibited_activity: reducedActivity, runtime_enforcement: runtime, operational_observation: observation, outcome_evaluation_targets: first!.outcome_evaluation_targets, records, pages: retainedPages, page_receipts: pageReceipts, representation: rawComplete ? "AUTHENTICATED_DECODED_BODY" : "CONSUMER_RESERIALIZED", page_count: pages, test_only: !rawComplete || source.evidence_trust !== "OPERATIONAL" || scope.account_id.startsWith("acct_test") } as unknown as Omit<CoeAcquisition, "digest">;
   return Object.freeze({ ...result, digest: sha256(canonicalJson(result as unknown as Json)) });
 }
 
@@ -355,8 +491,7 @@ export function assessCoe(evidence: CoeAcquisition, now: string): CoeAssessment 
   if (checkpoint.status !== "BOUND") reasons.add("COE_CHECKPOINT_UNBOUND");
   if (observation.coherent !== true || observation.security_revision_before === null || observation.security_revision_after === null || observation.security_revision_before !== observation.security_revision_after) reasons.add("COE_SECURITY_CONTINUITY_UNPROVED");
   if (prospective.proof_applicable !== true || typeof prospective.proof_id !== "string" || !prospective.proof_id) reasons.add("COE_REHEARSAL_PROOF_UNAVAILABLE");
-  for (const reason of governedEvidenceReasons(evidence)) reasons.add(reason);
-  const knownViolation = reasons.has("COE_PROHIBITED_ACTIVITY_NONZERO") || reasons.has("COE_GOVERNED_WORK_FAILED");
+  const knownViolation = reasons.has("COE_PROHIBITED_ACTIVITY_NONZERO");
   return Object.freeze({ state: knownViolation ? "FAIL" : reasons.size ? "BLOCKED" : "READY", reasons: Object.freeze([...reasons].sort()), evidence });
 }
 
@@ -374,17 +509,53 @@ export function stableCoeEvidence(evidence: CoeAcquisition): Record<string, Json
   })) as Record<string, Json>;
 }
 
+const ATTEMPT_IMMUTABLE = Object.freeze(["account_id", "org_id", "authenticated_account_id", "authenticated_org_id", "capability", "request_id", "request_fingerprint", "claim_identity", "authority_ref", "spec_hash", "threads_generation", "claimed_authority_ref", "claimed_spec_hash", "claimed_threads_generation", "verified_authority_ref", "verified_spec_hash", "verified_threads_generation", "requested_account_id_untrusted", "business_identity", "material_revision"]);
+const TERMINAL_EVENTS = new Set(["SUCCEEDED", "FAILED", "UNRESOLVED", "DUPLICATE", "REPLAYED", "REJECTED_PRECLAIM"]);
+
+export function foldProducerAttempts(evidence: Pick<CoeAcquisition, "source_inventory" | "records">): readonly FoldedAttempt[] {
+  const incarnation = String(evidence.source_inventory.store_incarnation ?? ""); if (!incarnation) throw new CoeError("COE_STORE_INCARNATION_MISSING");
+  const groups = new Map<string, Record<string, Json>[]>();
+  for (const record of evidence.records) {
+    if (record.source !== "operational_attempt_events") continue;
+    const attemptId = String(record.attempt_id ?? ""); if (!attemptId) throw new CoeError("COE_ATTEMPT_ID_MISSING");
+    const key = `${incarnation}:${attemptId}`; const rows = groups.get(key) ?? []; rows.push(record); groups.set(key, rows);
+  }
+  return Object.freeze([...groups.entries()].map(([namespace, unsorted]) => {
+    const lifecycle = [...unsorted].sort((left, right) => Number(left.lifecycle_revision) - Number(right.lifecycle_revision));
+    const revisions = new Set<number>();
+    for (const row of lifecycle) { const revision = natural(row.lifecycle_revision, "COE_LIFECYCLE_REVISION_INVALID"); if (revision === 0 || revisions.has(revision)) throw new CoeError("COE_LIFECYCLE_REVISION_CONFLICT"); revisions.add(revision); }
+    const first = lifecycle[0]!;
+    for (const row of lifecycle.slice(1)) if (ATTEMPT_IMMUTABLE.some((field) => canonicalJson(row[field]) !== canonicalJson(first[field]))) throw new CoeError("COE_LIFECYCLE_IDENTITY_DRIFT");
+    for (let index = 1; index < lifecycle.length; index++) {
+      const previous = String(lifecycle[index - 1]!.event_type); const current = String(lifecycle[index]!.event_type);
+      const legal = previous === "CLAIMED" ? TERMINAL_EVENTS.has(current) : previous === "DUPLICATE" && current === "DUPLICATE";
+      if (!legal) throw new CoeError("COE_LIFECYCLE_TRANSITION_INVALID");
+    }
+    const terminal = lifecycle.at(-1)!; const terminalState = String(terminal.event_type);
+    if (lifecycle.length > 1 && !TERMINAL_EVENTS.has(terminalState)) throw new CoeError("COE_LIFECYCLE_TERMINAL_INVALID");
+    return Object.freeze({ namespace, attempt_id: String(first.attempt_id), first, terminal, lifecycle: Object.freeze(lifecycle), first_occurred_at: String(first.occurred_at), terminal_occurred_at: String(terminal.occurred_at) });
+  }));
+}
+
+function invocationProvesNullOrg(binding: ProtectedInvocationBinding | undefined, work: { account_id: string; capability: string; authority_ref: string; generation: number }, specHash: string, organizationId: string): boolean {
+  return !!binding && !!binding.receipt_id && !!binding.source_session_id && !!binding.principal_ref && !!binding.credential_version_ref
+    && binding.organization_id === organizationId && binding.account_id === work.account_id && binding.capability === work.capability
+    && binding.authority_ref === work.authority_ref && binding.spec_hash === specHash && binding.generation === work.generation;
+}
+
 export function verifyGovernedWork(evidence: CoeAcquisition, work: {
   account_id: string; capability: string; claim_id: string; request_id: string;
   authority_ref: string; generation: number; business_identity: string;
-  material_revision: string; domain_result: Record<string, Json>;
+  material_revision: string; domain_result: Record<string, Json>; invocation_receipt?: ProtectedInvocationBinding;
 }, specHash: string, organizationId: string): GovernedWorkDecision {
-  const matching = evidence.records.filter((record) => record.source === "operational_attempt_events" && record.request_id === work.request_id);
-  if (!matching.length) return Object.freeze({ disposition: "BLOCKED", authoritative_state: "MISSING", credit_eligible: false, reason: "COE_GOVERNED_WORK_MISSING", request_id: work.request_id, claim_id: work.claim_id, source_ref: null, result_ref: null });
-  const terminal = matching.at(-1)!;
+  let attempts: readonly FoldedAttempt[]; try { attempts = foldProducerAttempts(evidence); } catch (error) { return Object.freeze({ disposition: "FAIL", authoritative_state: "UNRESOLVED", credit_eligible: false, reason: error instanceof CoeError ? error.code : "COE_LIFECYCLE_INVALID", request_id: work.request_id, claim_id: work.claim_id, source_ref: null, result_ref: null }); }
+  const matching = attempts.filter((attempt) => attempt.first.claim_identity === work.claim_id || attempt.first.request_id === work.request_id);
+  if (matching.length !== 1) return Object.freeze({ disposition: "BLOCKED", authoritative_state: "MISSING", credit_eligible: false, reason: matching.length ? "COE_GOVERNED_WORK_AMBIGUOUS" : "COE_GOVERNED_WORK_MISSING", request_id: work.request_id, claim_id: work.claim_id, source_ref: null, result_ref: null });
+  const terminal = matching[0]!.terminal;
   let result: unknown = terminal.result_json;
-  if (typeof result === "string") try { result = JSON.parse(result); } catch { return Object.freeze({ disposition: "FAIL", authoritative_state: "UNRESOLVED", credit_eligible: false, reason: "COE_GOVERNED_RESULT_MALFORMED", request_id: work.request_id, claim_id: work.claim_id, source_ref: String(terminal.event_id ?? terminal.attempt_id ?? ""), result_ref: typeof terminal.result_identity === "string" ? terminal.result_identity : null }); }
-  if (terminal.account_id !== work.account_id || terminal.authenticated_account_id !== work.account_id || terminal.authenticated_org_id !== organizationId || terminal.org_id !== organizationId
+  if (typeof result === "string") try { result = parseJsonNoDuplicateKeys(result, 1_000_000, 32); rejectCredentialData(result); } catch { return Object.freeze({ disposition: "FAIL", authoritative_state: "UNRESOLVED", credit_eligible: false, reason: "COE_GOVERNED_RESULT_MALFORMED", request_id: work.request_id, claim_id: work.claim_id, source_ref: String(terminal.event_id ?? terminal.attempt_id ?? ""), result_ref: typeof terminal.result_identity === "string" ? terminal.result_identity : null }); }
+  const nullOrg = terminal.authenticated_org_id === null && terminal.org_id === null;
+  if (terminal.account_id !== work.account_id || terminal.authenticated_account_id !== work.account_id || !(nullOrg ? invocationProvesNullOrg(work.invocation_receipt, work, specHash, organizationId) : terminal.authenticated_org_id === organizationId && terminal.org_id === organizationId)
     || terminal.capability !== work.capability || terminal.claim_identity !== work.claim_id || terminal.authority_ref !== work.authority_ref || terminal.verified_authority_ref !== work.authority_ref
     || terminal.spec_hash !== specHash || terminal.verified_spec_hash !== specHash || terminal.threads_generation !== work.generation || terminal.verified_threads_generation !== work.generation
     || terminal.business_identity !== work.business_identity || terminal.material_revision !== work.material_revision) return Object.freeze({ disposition: "FAIL", authoritative_state: "UNRESOLVED", credit_eligible: false, reason: "COE_GOVERNED_WORK_IDENTITY_MISMATCH", request_id: work.request_id, claim_id: work.claim_id, source_ref: String(terminal.event_id ?? terminal.attempt_id ?? ""), result_ref: typeof terminal.result_identity === "string" ? terminal.result_identity : null });
@@ -395,15 +566,26 @@ export function verifyGovernedWork(evidence: CoeAcquisition, work: {
   if (state === "REJECTED_PRECLAIM") return Object.freeze({ ...base, disposition: "ZERO", authoritative_state: "REJECTED_PRECLAIM", credit_eligible: false, reason: "COE_GOVERNED_PRECLAIM_REJECTED" } as GovernedWorkDecision);
   if (state !== "SUCCEEDED" || terminal.execution_state !== "SUCCEEDED" || terminal.admission_state !== "ADMITTED") return Object.freeze({ ...base, disposition: "BLOCKED", authoritative_state: "UNRESOLVED", credit_eligible: false, reason: "COE_GOVERNED_WORK_UNRESOLVED" } as GovernedWorkDecision);
   if (typeof terminal.result_identity !== "string" || !terminal.result_identity || canonicalJson(result as Json) !== canonicalJson(work.domain_result as Json)) return Object.freeze({ ...base, disposition: "FAIL", authoritative_state: "UNRESOLVED", credit_eligible: false, reason: "COE_GOVERNED_RESULT_MISMATCH" } as GovernedWorkDecision);
+  const native = object(result); let nativeIdentity: unknown;
+  if (work.capability === "editorial.cycle") nativeIdentity = native.cycle_id;
+  else if (work.capability === "threads.publish.dry_run") nativeIdentity = native.publication_id;
+  else {
+    const evaluation = object(native.evaluation ?? {}); const decision = object(evaluation.decision_json ?? {});
+    nativeIdentity = native.result_identity ?? decision.evaluation_id;
+  }
+  if (nativeIdentity !== undefined && nativeIdentity !== terminal.result_identity) return Object.freeze({ ...base, disposition: "FAIL", authoritative_state: "UNRESOLVED", credit_eligible: false, reason: "COE_GOVERNED_NATIVE_IDENTITY_MISMATCH" } as GovernedWorkDecision);
+  if (work.capability === "editorial.outcome_evaluation") {
+    const target = evidence.outcome_evaluation_targets.find((candidate) => candidate.business_identity === work.business_identity && candidate.material_revision === work.material_revision);
+    if (!target || target.observed_through !== terminal.result_revision) return Object.freeze({ ...base, disposition: "BLOCKED", authoritative_state: "UNRESOLVED", credit_eligible: false, reason: "COE_OUTCOME_TARGET_UNBOUND" } as GovernedWorkDecision);
+  }
   return Object.freeze({ ...base, disposition: "CREDIT", authoritative_state: "SUCCEEDED", credit_eligible: true, reason: "COE_GOVERNED_WORK_QUALIFIED" } as GovernedWorkDecision);
 }
 
 export function governedEvidenceReasons(evidence: CoeAcquisition): readonly string[] {
   const reasons = new Set<string>();
-  for (const record of evidence.records) {
-    if (record.source !== "operational_attempt_events") continue;
-    if (record.event_type === "FAILED") reasons.add("COE_GOVERNED_WORK_FAILED");
-    if (["CLAIMED", "UNRESOLVED"].includes(String(record.event_type))) reasons.add("COE_GOVERNED_WORK_UNRESOLVED");
+  for (const attempt of foldProducerAttempts(evidence)) {
+    if (attempt.terminal.event_type === "FAILED") reasons.add("COE_GOVERNED_WORK_FAILED");
+    if (["CLAIMED", "UNRESOLVED"].includes(String(attempt.terminal.event_type))) reasons.add("COE_GOVERNED_WORK_UNRESOLVED");
   }
   return Object.freeze([...reasons].sort());
 }
