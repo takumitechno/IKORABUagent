@@ -2,7 +2,7 @@
   "contract": "ikorabu.catfood-consumer-integrity.v1",
   "line_endings": "LF-normalized",
   "files": [
-    { "path": "pokemon-agents/CATFOOD-OPERATIONS.md", "sha256": "ded039167359293c87125855d4505fdbc041717bcf99e3afaffbcb886e3b66fa" },
+    { "path": "pokemon-agents/CATFOOD-OPERATIONS.md", "sha256": "d19425e3fe99c4d628406f1ebf0dc56fc7b941cde0d140ebb5bd64b39394b02a" },
     { "path": "pokemon-agents/contracts/catfood-operational-evidence-v1-negative-partial.json", "sha256": "d38e10521205c3e0c8417d156173c78e7784b16b00409c069c0f4c88da15dcae" },
     { "path": "pokemon-agents/contracts/catfood-operational-evidence-v1.json", "sha256": "50b6df97abc73384063a02cd69a7872b829d264177cad11d304678c04057db0e" },
     { "path": "pokemon-agents/contracts/catfood-producer-canonical-v1.json", "sha256": "09f5375e8dc4dd5231c666a75ea0c1ed1109d643644ff19b71871941ed669e7a" },
