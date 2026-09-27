@@ -1,5 +1,7 @@
 import type { Json, OperationalBoundaryV1 } from "../web/lib/catfood-harness";
 import { canonicalSha256 } from "../web/lib/catfood-harness";
+import { canonicalJson, sha256 } from "../web/lib/catfood-harness";
+import { COE_LEGACY_SOURCE_FAMILIES, COE_SOURCES, type CoeRequest, type OutcomeEvaluationRequest } from "../web/lib/catfood-coe";
 import type {
   CatfoodCapability, CatfoodRunSpec, ThreadsAuthorityTransition, ThreadsClaimRecord,
   ThreadsEvidenceSource, ThreadsInventoryItem, ThreadsRuntimeEvidence, TrustedClock,
@@ -21,12 +23,11 @@ function hashed(value: Record<string, unknown>): OperationalBoundaryV1 {
 export class FixtureThreadsSource implements ThreadsEvidenceSource {
   readonly mode = "TEST_ONLY" as const;
   readonly source_identity: string;
-  readonly contract_gaps: readonly string[];
   readonly inventoryItems: ThreadsInventoryItem[] = [
-    { source_id: "cycle:one", capability: "editorial.cycle", business_identity: "article:one", material_revision: "rev:1" },
-    { source_id: "cycle:two", capability: "editorial.cycle", business_identity: "article:two", material_revision: "rev:1" },
-    { source_id: "outcome:one", capability: "editorial.outcome_evaluation", business_identity: "experiment:one", material_revision: "rev:1" },
-    { source_id: "dry:one", capability: "threads.publish.dry_run", business_identity: "publication:one", material_revision: "rev:1" },
+    { source_id: "cycle:one", capability: "editorial.cycle", business_identity: "article:one", material_revision: "a".repeat(64) },
+    { source_id: "cycle:two", capability: "editorial.cycle", business_identity: "article:two", material_revision: "b".repeat(64) },
+    { source_id: "outcome:one", capability: "editorial.outcome_evaluation", business_identity: "experiment:one", material_revision: "c".repeat(64) },
+    { source_id: "dry:one", capability: "threads.publish.dry_run", business_identity: "publication:one", material_revision: "d".repeat(64) },
   ];
   runtime: ThreadsRuntimeEvidence = {
     feature_multi_tenant_auth: "ON", own_scope_status: 200, foreign_scope_status: 403,
@@ -36,11 +37,14 @@ export class FixtureThreadsSource implements ThreadsEvidenceSource {
   private generations = new Map<CatfoodCapability, number>();
   private states = new Map<CatfoodCapability, "MISSING" | "ACTIVE" | "REVOKED">();
   private claims = new Map<string, ThreadsClaimRecord>();
+  private claimContexts = new Map<string, { organization_id: string; spec_hash: string }>();
   private serial = 0;
   claimBarrier: Int32Array | null = null;
+  lastOutcomeRequest: Readonly<OutcomeEvaluationRequest> | null = null;
+  coeTransform: ((page: Record<string, unknown>, request: Readonly<CoeRequest>) => unknown) | null = null;
 
-  constructor(readonly clock: TestClock, threadsSha: string, releaseSha: string, gaps: readonly string[] = []) {
-    this.source_identity = `${threadsSha}:${releaseSha}`; this.contract_gaps = [...gaps];
+  constructor(readonly clock: TestClock, threadsSha: string, releaseSha: string) {
+    this.source_identity = `${threadsSha}:${releaseSha}`;
   }
 
   runtimeEvidence(_spec: CatfoodRunSpec): ThreadsRuntimeEvidence { return structuredClone(this.runtime); }
@@ -69,10 +73,41 @@ export class FixtureThreadsSource implements ThreadsEvidenceSource {
     const claim: ThreadsClaimRecord = { ...item, claim_id: `claim:${suffix}`, request_id: `request:${suffix}`, account_id: spec.account_id,
       authority_ref: authorityRef, generation, claim_status: "in_progress", transport_status: "UNKNOWN", domain_result: {},
       provider_invoked: false, paid_cost_micros: 0, admitted_at: this.clock.sample().wall_time, completed_at: null };
-    this.claims.set(claim.claim_id, claim); return structuredClone(claim);
+    this.claims.set(claim.claim_id, claim); this.claimContexts.set(claim.claim_id, { organization_id: spec.organization_id, spec_hash: spec.spec_sha256 }); return structuredClone(claim);
   }
 
   readClaim(_spec: CatfoodRunSpec, claimId: string): ThreadsClaimRecord | null { const claim = this.claims.get(claimId); return claim ? structuredClone(claim) : null; }
+
+  outcomeEvaluation(spec: CatfoodRunSpec, request: Readonly<OutcomeEvaluationRequest>, item: ThreadsInventoryItem): ThreadsClaimRecord {
+    this.lastOutcomeRequest = structuredClone(request);
+    const claim = this.claim(spec, item, request.authority_ref, request.expected_threads_generation);
+    const bound = { ...claim, request_id: request.request_id };
+    this.claims.set(bound.claim_id, bound);
+    return structuredClone(bound);
+  }
+
+  operationalEvidence(request: Readonly<CoeRequest>): unknown {
+    if (request.cursor !== null) throw new Error("unexpected cursor");
+    const stamp = new Date(Math.floor(this.clock.wallMs / 1000) * 1000).toISOString().replace(".000Z", "Z");
+    const records: Record<string, unknown>[] = [...this.claims.values()].map((claim, index) => {
+      const context = this.claimContexts.get(claim.claim_id)!; const succeeded = claim.claim_status === "succeeded" && claim.transport_status === "SUCCEEDED";
+      return { source: "operational_attempt_events", event_seq: index + 1, event_id: `event:${index + 1}`, attempt_id: `attempt:${index + 1}`, event_type: succeeded ? "SUCCEEDED" : claim.claim_status === "failed" ? "FAILED" : "CLAIMED", account_id: claim.account_id, org_id: context.organization_id, authenticated_account_id: claim.account_id, authenticated_org_id: context.organization_id, requested_account_id_untrusted: null, capability: claim.capability, request_id: claim.request_id, claim_identity: claim.claim_id, authority_ref: claim.authority_ref, verified_authority_ref: claim.authority_ref, claimed_authority_ref: claim.authority_ref, spec_hash: context.spec_hash, verified_spec_hash: context.spec_hash, claimed_spec_hash: context.spec_hash, threads_generation: claim.generation, verified_threads_generation: claim.generation, claimed_threads_generation: claim.generation, business_identity: claim.business_identity, material_revision: claim.material_revision, admission_state: "ADMITTED", execution_state: succeeded ? "SUCCEEDED" : claim.claim_status === "failed" ? "FAILED" : "IN_PROGRESS", duplicate_of_request_id: null, result_identity: succeeded ? `result:${index + 1}` : null, result_json: succeeded ? canonicalJson(claim.domain_result) : null, result_revision: claim.completed_at, domain_state: succeeded ? String(claim.domain_result.state ?? claim.domain_result.status ?? "SUCCEEDED") : null, occurred_at: (claim.completed_at ?? claim.admitted_at).replace(".000Z", "+00:00"), payload_hash: "9".repeat(64), request_fingerprint: "a".repeat(64), reason_code: null, lifecycle_revision: succeeded ? 2 : 1 };
+    });
+    const root = sha256(canonicalJson(records));
+    const page: Record<string, unknown> = {
+      contract: "threads.catfood-operational-evidence.v1", schema_version: 1,
+      producer_release_identity: { git_sha: this.source_identity.slice(0, 40), artifact_sha256: this.source_identity.slice(41) },
+      scope: { account_id: request.account_id, capability: null },
+      source_inventory: { version: 3, store_incarnation: "1".repeat(32), evidence_started_at_raw: request.window_start, evidence_started_at_normalized: request.window_start, evidence_started_at_status: "NORMALIZED", retention_floor_event_seq: 0, sources: [...COE_SOURCES], legacy_source_families: [...COE_LEGACY_SOURCE_FAMILIES], cursor_key_profile: "SINGLE_WORKER" },
+      coverage: { state: "COMPLETE", integrity_reason: "PROSPECTIVE_WINDOW_COMPLETE", legacy: { state: "PARTIAL", v31_claimed_complete: false, reason: "V31_COMPLETENESS_SUPERSEDED" }, prospective: { state: "COMPLETE", proof_id: "proof:test-only", proof_applicable: true, reason: "EXACT_REHEARSAL_PROOF" }, window: { assessment_mode: "LIVE", requested_window_start: request.window_start, requested_window_end: request.window_end, interval_semantics: "[start,end)", state: "COMPLETE", uncovered_reasons: [] }, cuts: { attempt: records.length, authority: 0, ai_usage: 0, publication: 0 }, scoped_count: records.length, record_set_digest: root, snapshot_identity: sha256(canonicalJson({ root, account_id: request.account_id })), unresolved_count: records.filter((row) => row.execution_state === "IN_PROGRESS").length, pagination_complete: true, page_offset: 0, page_count: records.length, client_continuity_required: true },
+      records, next_cursor: null,
+      prohibited_activity: { coverage: "COMPLETE", activity: "ZERO", exposure: "RESOLVED", known_cost_count: 0, unknown_cost_count: 0, pending_cost_count: 0, count_semantics: "exact_for_instrumented_sources_only", provider_attempt_count: 0, live_publication_attempt_count: 0, dry_run_preparation_count: 0, unattributed_attempt_count: 0, known_zero: true, expected_emitter_inventory_digest: "fa3ba3589c64f3116577c977f3946be618497ccf5976a109d0591edb7e6e7b1f", emitter_dispositions: [], package_proven_exclusions: [], rehearsal_required_emitters: [], uninstrumented_emitters: [], integrity_reason: "EXACT_REHEARSAL_PROOF_AND_SOURCES" },
+      runtime_enforcement: { configured_auth_state: "ON", effective_auth_mode: "TENANT_ENFORCED", guard_readiness: "READY", reason: "TENANT_GUARD_ACTIVE", observed_at: stamp, freshness_identity: `1.${"3".repeat(64)}`, logical_runtime_id: "runtime:test", process_start_identity: "4".repeat(64), worker_boot_id: "boot-test", cursor_key_profile: "SINGLE_WORKER", topology_observation_status: "BOUND", topology_reason: "PROTECTED_OBSERVER", observed_execution_worker_count: 1 },
+      operational_observation: { observation_id: "5".repeat(64), observed_at: stamp, observation_clock_id: "TEST_ONLY", trust: { environment_identity: "test", reason: "TEST_ONLY", registry_revision: 1, source_identity: "test-registry", status: "BOUND" }, topology: { execution_worker_count: 1, execution_worker_ids: ["worker:test"], observed_boot_id: "boot-test", observer_kind: "TEST_ONLY", process_inventory_digest: "6".repeat(64), reason: "TEST_ONLY", status: "BOUND" }, checkpoint: { checkpoint_id: "checkpoint:test", lineage: "test", protection_provenance: "TEST_ONLY", range_end: stamp, range_start: request.window_start, reason: "TEST_ONLY", root: "7".repeat(64), status: "BOUND" }, security_revision_before: "8".repeat(64), security_revision_after: "8".repeat(64), coherent: true },
+      outcome_evaluation_targets: [],
+    };
+    return this.coeTransform ? this.coeTransform(structuredClone(page), request) : page;
+  }
 
   complete(claimId: string, overrides: Partial<ThreadsClaimRecord> = {}): void {
     const claim = this.claims.get(claimId); if (!claim) throw new Error("claim missing");
@@ -93,7 +128,7 @@ export class FixtureThreadsSource implements ThreadsEvidenceSource {
     return hashed({
       boundary_version: 1,
       producer_release_identity: { git_sha: spec.threads_sha, artifact_sha256: spec.threads_release_sha256 },
-      schema_version: 30, schema_fingerprint: "5".repeat(64), schema_readiness: "READY", migration_provenance_digest: "6".repeat(64),
+      schema_version: 33, schema_fingerprint: spec.threads_schema_fingerprint, schema_readiness: "READY", migration_provenance_digest: "6".repeat(64),
       account_id: spec.account_id, org_tenant_binding: { state: "bound", org_ids: [spec.organization_id] }, observed_at: this.clock.sample().wall_time,
       capability, unsupported_capability: null, execution_state: active ? "PERMITTED" : "INHIBITED",
       permit_expires_at: new Date(this.clock.wallMs + 86_400_000 * 2).toISOString(), fencing_generation: generation,

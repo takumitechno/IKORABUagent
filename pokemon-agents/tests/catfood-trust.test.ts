@@ -7,32 +7,33 @@ import { join } from "node:path";
 import { Worker } from "node:worker_threads";
 import { canonicalJson, sha256, type OperationalBoundaryV1 } from "../web/lib/catfood-harness";
 import {
-  CATFOOD_CAPABILITIES, CATFOOD_FIXED_POLICY, CATFOOD_GO_SCHEMA, CATFOOD_OPERATIONAL_CONTRACT_GAPS,
+  CATFOOD_CAPABILITIES, CATFOOD_FIXED_POLICY, CATFOOD_GO_SCHEMA,
   CATFOOD_POLICY_SHA256, CATFOOD_TRUST_SCHEMA, ProtectedCatfoodCustodian, createCatfoodRunSpec,
   IndependentCatfoodEvaluator, initializeProtectedCatfoodStores, verifyHumanGo, type CatfoodRunSpec, type CatfoodTrustConfig,
   type HumanGoPayload, type RunnerSession,
 } from "../web/lib/catfood-trust";
 import { FixtureThreadsSource, TestClock } from "./catfood-trust-fixture";
 import { IndependentCatfoodAttestationWriter, initializeIndependentAttestationStore, verifyIndependentAttestation } from "../web/lib/catfood-independent-attestation";
+import { CATFOOD_THREADS_PINS } from "../web/lib/catfood-coe";
 
-const THREADS = "f15c9235ddd62c003b8105c2a640d81defa4fb83";
+const THREADS = CATFOOD_THREADS_PINS.threads_sha;
 const BOUNDARY = "57d896aa756387048b70dc016e482274d571dd165866416e3fc480d59a97e8cf";
-const RELEASE = "799344a0a0d4a42ca160e5199d4910f7e6227836b17b9ff9a2b3a90202394d98";
+const RELEASE = CATFOOD_THREADS_PINS.release_sha256;
 const IKORABU = "c".repeat(40);
 
 type Rig = ReturnType<typeof rig>;
 
-function rig(runId = `run-${Math.random().toString(16).slice(2)}`, gaps: readonly string[] = []) {
+function rig(runId = `run-${Math.random().toString(16).slice(2)}`) {
   const dir = mkdtempSync(join(tmpdir(), "catfood-trust-")); const control = join(dir, "control.db"); const checkpoint = join(dir, "checkpoint.db");
   writeFileSync(control, ""); writeFileSync(checkpoint, "");
   const keys = generateKeyPairSync("ed25519"); const publicKey = keys.publicKey.export({ type: "spki", format: "pem" }).toString();
   const clock = new TestClock();
-  const trust: CatfoodTrustConfig = { schema: CATFOOD_TRUST_SCHEMA, custodian_identity: "custodian:test", environment_type: "test", environment_instance_id: "instance:test", organization_id: "org:test", tenant_id: "tenant:test", account_id: "acct_test", ikorabu_release_sha: IKORABU, threads_sha: THREADS, operational_boundary_sha256: BOUNDARY, threads_release_sha256: RELEASE, threads_schema: 30, source_mode: "TEST_ONLY", go_keys: [{ key_id: "go:test", public_key_pem: publicKey, trust_class: "TEST_ONLY" }] };
-  const spec = createCatfoodRunSpec({ run_id: runId, environment_type: "test", environment_instance_id: trust.environment_instance_id, organization_id: trust.organization_id, tenant_id: trust.tenant_id, account_id: trust.account_id, capabilities: CATFOOD_CAPABILITIES, effective_config_sha256: "4".repeat(64), ikorabu_release_sha: IKORABU, threads_sha: THREADS, operational_boundary_sha256: BOUNDARY, threads_release_sha256: RELEASE, threads_schema: 30 });
-  const payload: HumanGoPayload = { schema: CATFOOD_GO_SCHEMA, grant_id: `grant:${runId}`, nonce: `nonce:${runId}`, run_id: runId, spec_hash: spec.spec_sha256, environment_type: spec.environment_type, environment_instance_id: spec.environment_instance_id, organization_id: spec.organization_id, tenant_id: spec.tenant_id, account_id: spec.account_id, capabilities: CATFOOD_CAPABILITIES, valid_from: new Date(clock.wallMs - 1_000).toISOString(), valid_until: new Date(clock.wallMs + 90_000_000).toISOString(), maximum_duration_seconds: 86_400, maximum_wp3_epoch: 2, acceptance_policy_sha256: CATFOOD_POLICY_SHA256, threads_sha: THREADS, operational_boundary_sha256: BOUNDARY, threads_release_sha256: RELEASE, threads_schema: 30, ikorabu_release_sha: IKORABU, paid_provider_allowance: "ZERO" };
+  const trust: CatfoodTrustConfig = { schema: CATFOOD_TRUST_SCHEMA, custodian_identity: "custodian:test", environment_type: "test", environment_instance_id: "instance:test", organization_id: "org:test", tenant_id: "org:test", account_id: "acct_test", ikorabu_release_sha: IKORABU, threads_sha: THREADS, operational_boundary_sha256: BOUNDARY, threads_release_sha256: RELEASE, wp1_sha256: CATFOOD_THREADS_PINS.wp1_sha256, coe_sha256: CATFOOD_THREADS_PINS.coe_sha256, rehearsal_attestation_sha256: CATFOOD_THREADS_PINS.rehearsal_attestation_sha256, emitter_inventory_sha256: CATFOOD_THREADS_PINS.emitter_inventory_sha256, threads_schema: 33, threads_schema_fingerprint: CATFOOD_THREADS_PINS.schema_fingerprint, source_mode: "TEST_ONLY", go_keys: [{ key_id: "go:test", public_key_pem: publicKey, trust_class: "TEST_ONLY" }] };
+  const spec = createCatfoodRunSpec({ run_id: runId, environment_type: "test", environment_instance_id: trust.environment_instance_id, organization_id: trust.organization_id, tenant_id: trust.tenant_id, account_id: trust.account_id, capabilities: CATFOOD_CAPABILITIES, effective_config_sha256: "4".repeat(64), ikorabu_release_sha: IKORABU, threads_sha: THREADS, operational_boundary_sha256: BOUNDARY, threads_release_sha256: RELEASE, wp1_sha256: trust.wp1_sha256, coe_sha256: trust.coe_sha256, rehearsal_attestation_sha256: trust.rehearsal_attestation_sha256, emitter_inventory_sha256: trust.emitter_inventory_sha256, threads_schema: 33, threads_schema_fingerprint: trust.threads_schema_fingerprint, requested_window_start: "2026-09-30T00:00:00Z", requested_window_end: "2026-10-01T00:00:00Z" });
+  const payload: HumanGoPayload = { schema: CATFOOD_GO_SCHEMA, grant_id: `grant:${runId}`, nonce: `nonce:${runId}`, run_id: runId, spec_hash: spec.spec_sha256, environment_type: spec.environment_type, environment_instance_id: spec.environment_instance_id, organization_id: spec.organization_id, tenant_id: spec.tenant_id, account_id: spec.account_id, capabilities: CATFOOD_CAPABILITIES, valid_from: new Date(clock.wallMs - 1_000).toISOString(), valid_until: new Date(clock.wallMs + 90_000_000).toISOString(), maximum_duration_seconds: 86_400, maximum_wp3_epoch: 2, acceptance_policy_sha256: CATFOOD_POLICY_SHA256, threads_sha: THREADS, operational_boundary_sha256: BOUNDARY, threads_release_sha256: RELEASE, threads_schema: 33, ikorabu_release_sha: IKORABU, paid_provider_allowance: "ZERO" };
   const artifact = signGo(payload, keys.privateKey);
   initializeProtectedCatfoodStores(control, checkpoint, trust, clock.sample().wall_time);
-  const source = new FixtureThreadsSource(clock, THREADS, RELEASE, gaps);
+  const source = new FixtureThreadsSource(clock, THREADS, RELEASE);
   const custodian = new ProtectedCatfoodCustodian(control, checkpoint, source, clock);
   return { dir, control, checkpoint, clock, trust, spec, payload, artifact, source, custodian, privateKey: keys.privateKey, close() { try { custodian.close(); } finally { rmSync(dir, { recursive: true, force: true, maxRetries: 5, retryDelay: 20 }); } } };
 }
@@ -167,7 +168,11 @@ describe("WP3 CATFOOD corrective adversarial plan", () => {
 
   test("T24 breaking exactly the three-unit minimum never PASS", () => { const r = rig(); try { const first = start(r); work(r, first, "editorial.cycle", "cycle:one"); r.custodian.stop(first, "STOP"); r.clock.advance(121_000); const second = r.custodian.issueOwnerSession(r.spec.run_id); r.custodian.takeover(r.spec.run_id, second); const receipt = r.custodian.preflight(second); r.custodian.activate(second, receipt); work(r, second, "editorial.outcome_evaluation", "outcome:one"); r.clock.advance(86_400_000); r.custodian.stop(second, "STOP"); const result = r.custodian.closeRun(second); expect(result.verdict).not.toBe("PASS"); expect(result.reason_codes).toEqual(["MEANINGFUL_WORK_COUNT_NOT_MET"]); } finally { r.close(); } });
 
-  test("operational source gaps fail preflight closed as CONTRACT_GAP", () => { const r = rig("run-contract-gap", CATFOOD_OPERATIONAL_CONTRACT_GAPS); try { r.custodian.createRun(r.spec, r.artifact); const session = r.custodian.issueOwnerSession(r.spec.run_id); expect(() => r.custodian.preflight(session)).toThrow("THREADS_COMPLETED_GOVERNED_CLAIM_READ_INTERFACE_MISSING"); } finally { r.close(); } });
+  test("accepted COE contract with PARTIAL operational evidence fails precisely", () => { const r = rig("run-partial-coe"); try { r.source.coeTransform = (page) => { (page.coverage as Record<string, unknown>).state = "PARTIAL"; return page; }; r.custodian.createRun(r.spec, r.artifact); const session = r.custodian.issueOwnerSession(r.spec.run_id); expect(() => r.custodian.preflight(session)).toThrow("COE_COVERAGE_PARTIAL"); } finally { r.close(); } });
+
+  test("accepted runtime evidence does not replace the active known-foreign tenant probe", () => { const r = rig("run-tenant-probe"); try { r.source.runtime = { ...r.source.runtime, foreign_scope_status: 404 }; r.custodian.createRun(r.spec, r.artifact); const session = r.custodian.issueOwnerSession(r.spec.run_id); expect(() => r.custodian.preflight(session)).toThrow("ACTIVE_NEGATIVE_TENANT_PROBE_REQUIRED"); } finally { r.close(); } });
+
+  test("fresh COE observation IDs do not make an unchanged preflight receipt stale", () => { const r = rig("run-coe-clock-noise"); try { let serial = 0; r.source.coeTransform = (page) => { (page.operational_observation as Record<string, unknown>).observation_id = (++serial).toString(16).padStart(64, "0"); return page; }; expect(() => start(r)).not.toThrow(); } finally { r.close(); } });
 
   test("RFC 8032 Ed25519 vector verifies with the established crypto implementation", () => {
     const seed = Buffer.from("9d61b19deffd5a60ba844af492ec2cc44449c5697b326919703bac031cae7f60", "hex");
