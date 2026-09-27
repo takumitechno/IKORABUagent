@@ -69,6 +69,11 @@ describe("WP3 corrective02 producer composition", () => {
   test("corrective04 binds dynamic emitter membership to the accepted inventory digest", () => {
     expect(() => acquisition(mutate((page) => { page.prohibited_activity.emitter_dispositions.pop(); }))).toThrow("COE_EMITTER_INVENTORY_MISMATCH");
   });
+
+  test("corrective04 bounds producer-defined target JSON and rejects credential keys", () => {
+    expect(() => acquisition(mutate((page) => { page.outcome_evaluation_targets[0].source.hypothesis_json = canonicalJson({ id: "hook", hypothesis: "x", test_variable: "hook", evidence: "x", client_token: "plain" }); }))).toThrow();
+    expect(() => acquisition(mutate((page) => { page.outcome_evaluation_targets[0].source.source_content_ids_json = canonicalJson(["ok", { api_token: "plain" }]); }))).toThrow("COE_OUTCOME_TARGET_INVALID");
+  });
 });
 
 function source(transform?: (page: any, request: Readonly<CoeRequest>) => unknown) {
@@ -95,7 +100,7 @@ function attempt(eventType = "SUCCEEDED", requestId = "request:one") {
     claimed_spec_hash: null, threads_generation: 1, verified_threads_generation: 1, claimed_threads_generation: null,
     business_identity: "article:one", material_revision: "a".repeat(64), admission_state: "ADMITTED",
     execution_state: eventType === "SUCCEEDED" ? "SUCCEEDED" : "FAILED", duplicate_of_request_id: eventType === "DUPLICATE" ? "request:old" : null,
-    result_identity: eventType === "SUCCEEDED" ? "result:one" : null, result_json: eventType === "SUCCEEDED" ? canonicalJson({ cycle_id: "result:one", cycle_key: "article:one", state: "DRAFT", status: "READY", source_content_ids: [], config: {}, summary: {}, brief: {}, draft: {}, content_id: null, created_at: "2026-09-30T23:59:59+00:00", updated_at: "2026-10-01T00:00:00+00:00", mutated: false }) : null,
+    result_identity: eventType === "SUCCEEDED" ? "result:one" : null, result_json: eventType === "SUCCEEDED" ? canonicalJson({ cycle_id: "result:one", account_id: "acct_test", cycle_key: "article:one", state: "DRAFT", status: "READY", current_agent: "Writer", waiting_reason: null, source_content_ids: [], config: {}, summary: {}, brief: {}, draft: {}, content_id: null, created_at: "2026-09-30T23:59:59+00:00", updated_at: "2026-10-01T00:00:00+00:00", mutated: false }) : null,
     result_revision: "2026-10-01T00:00:00+00:00", domain_state: "DRAFT", occurred_at: "2026-10-01T00:00:00+00:00",
     payload_hash: "f".repeat(64), request_fingerprint: "1".repeat(64), reason_code: null, lifecycle_revision: ["SUCCEEDED", "FAILED", "UNRESOLVED"].includes(eventType) ? 2 : 1,
   };

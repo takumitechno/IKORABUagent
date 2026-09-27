@@ -222,8 +222,8 @@ const ATTEMPT_FIELDS = ["account_id", "admission_state", "attempt_id", "authenti
 const AUTHORITY_FIELDS = ["account_id", "actor", "authority_ref", "capability", "event_id", "event_seq", "event_type", "generation", "occurred_at", "payload_hash", "permit_expires_at", "source", "spec_hash", "state"];
 const OUTCOME_TARGET_FIELDS = ["business_identity", "material_revision", "observed_through", "source"];
 const OUTCOME_TARGET_SOURCE_FIELDS = ["constants_json", "content_hash", "content_id", "content_version", "cycle_id", "experiment_created_at", "experiment_id", "failure_signal_json", "hypothesis_json", "minimum_sample_json", "observed_through", "source_content_ids_json", "success_signal_json", "test_variable"];
-const EDITORIAL_CYCLE_RESULT_FIELDS = ["brief", "config", "content_id", "created_at", "cycle_id", "cycle_key", "draft", "mutated", "source_content_ids", "state", "status", "summary", "updated_at"];
-const DRY_RUN_RESULT_FIELDS = ["attempts", "duplicate", "error", "external_publish_id", "mode", "note", "parts_sent", "parts_state", "permalink", "publication_id", "requires_human", "status"];
+const EDITORIAL_CYCLE_RESULT_FIELDS = ["account_id", "brief", "config", "content_id", "created_at", "current_agent", "cycle_id", "cycle_key", "draft", "mutated", "source_content_ids", "state", "status", "summary", "updated_at", "waiting_reason"];
+const DRY_RUN_RESULT_FIELDS = ["ambiguous_parts", "attempts", "duplicate", "error", "external_publish_id", "mode", "note", "parts_sent", "parts_state", "permalink", "publication_id", "requires_human", "status"];
 const OUTCOME_RESULT_FIELDS = ["account_id", "authority_ref", "business_identity", "capability", "claim_identity", "duplicate_of_request_id", "evaluation", "material_revision", "native_domain_state", "original_state", "reason_code", "request_id", "result_identity", "result_revision", "state", "threads_generation"];
 const OUTCOME_EVALUATION_FIELDS = ["decision_json", "evidence_count", "evidence_level", "next_decision", "observed_through", "result_summary", "sample_size", "verdict"];
 const OUTCOME_DECISION_FIELDS = ["alternative_explanation", "baseline_median", "baseline_snapshot_id", "candidate_metric", "content_hash", "content_id", "evaluation_id", "metric_key", "missing_evidence", "next_evidence_needed", "possible_confounders", "publication_id", "tested_variable"];
@@ -286,7 +286,7 @@ function validateNativeResult(capability: unknown, value: unknown): void {
   const result = object(value, "COE_RESULT_SCHEMA_INVALID");
   if (capability === "editorial.cycle") {
     onlyKnown(result, EDITORIAL_CYCLE_RESULT_FIELDS);
-    if (typeof result.cycle_id !== "string" || typeof result.state !== "string" || typeof result.status !== "string" || result.mutated !== false) throw new CoeError("COE_RESULT_SCHEMA_INVALID");
+    if (EDITORIAL_CYCLE_RESULT_FIELDS.some((field) => !(field in result)) || typeof result.account_id !== "string" || typeof result.cycle_id !== "string" || typeof result.state !== "string" || typeof result.status !== "string" || result.mutated !== false) throw new CoeError("COE_RESULT_SCHEMA_INVALID");
     return;
   }
   if (capability === "threads.publish.dry_run") {
@@ -300,6 +300,21 @@ function validateNativeResult(capability: unknown, value: unknown): void {
     const evaluation = object(result.evaluation, "COE_RESULT_SCHEMA_INVALID"); onlyKnown(evaluation, OUTCOME_EVALUATION_FIELDS);
     if (evaluation.decision_json !== undefined) onlyKnown(object(evaluation.decision_json, "COE_RESULT_SCHEMA_INVALID"), OUTCOME_DECISION_FIELDS);
   }
+}
+
+function validateOutcomeTargetJson(source: Record<string, unknown>): void {
+  const decode = (field: string): unknown => {
+    const raw = source[field]; if (typeof raw !== "string") throw new CoeError("COE_OUTCOME_TARGET_INVALID");
+    return parseJsonNoDuplicateKeys(raw, 65_536, 8);
+  };
+  const ids = decode("source_content_ids_json");
+  if (!Array.isArray(ids) || ids.length > 500 || ids.some((item) => typeof item !== "string")) throw new CoeError("COE_OUTCOME_TARGET_INVALID");
+  const hypothesis = object(decode("hypothesis_json"), "COE_OUTCOME_TARGET_INVALID"); exact(hypothesis, ["evidence", "hypothesis", "id", "test_variable"]);
+  if (Object.values(hypothesis).some((item) => typeof item !== "string")) throw new CoeError("COE_OUTCOME_TARGET_INVALID");
+  const constants = decode("constants_json"); if (!Array.isArray(constants) || constants.some((item) => typeof item !== "string")) throw new CoeError("COE_OUTCOME_TARGET_INVALID");
+  for (const field of ["success_signal_json", "failure_signal_json"] as const) { const signal = object(decode(field), "COE_OUTCOME_TARGET_INVALID"); exact(signal, ["direction", "metric"]); if (typeof signal.direction !== "string" || typeof signal.metric !== "string") throw new CoeError("COE_OUTCOME_TARGET_INVALID"); }
+  const sample = object(decode("minimum_sample_json"), "COE_OUTCOME_TARGET_INVALID"); exact(sample, ["draft_candidates", "max_edit_iterations", "minimum_age_hours", "minimum_comparable_baseline", "minimum_posts", "minimum_relative_lift", "negative_theme_threshold", "recent_window", "sample_mode"]);
+  if (typeof sample.sample_mode !== "string" || Object.entries(sample).some(([key, item]) => key !== "sample_mode" && typeof item !== "number")) throw new CoeError("COE_OUTCOME_TARGET_INVALID");
 }
 
 function enumValue(value: unknown, accepted: readonly string[], code: string): string {
@@ -329,7 +344,7 @@ export function parseJsonNoDuplicateKeys(raw: string, maximumBytes = 8_000_000, 
 function rejectCredentialData(value: unknown, path = "$", key = "", depth = 0): void {
   if (depth > 64) throw new CoeError("COE_JSON_LIMIT");
   if (Array.isArray(value)) { value.forEach((item) => rejectCredentialData(item, `${path}[*]`, "", depth + 1)); return; }
-  if (value && typeof value === "object") { for (const [child, item] of Object.entries(value as Record<string, unknown>)) { if (/^(authorization|headers?|password|private_key|client_secret|api_key|access_token|refresh_token)$/i.test(child)) throw new CoeError("COE_SENSITIVE_FIELD"); rejectCredentialData(item, `${path}.*`, child, depth + 1); } return; }
+  if (value && typeof value === "object") { for (const [child, item] of Object.entries(value as Record<string, unknown>)) { if (/^(authorization|headers?|password|private_key|client_secret|client_token|api_key|api_token|access_token|refresh_token)$/i.test(child)) throw new CoeError("COE_SENSITIVE_FIELD"); rejectCredentialData(item, `${path}.*`, child, depth + 1); } return; }
   if (typeof value !== "string" || ["credential_access_profile", "destinations", "entrypoints"].includes(key)) return;
   let decoded = value; try { decoded = decodeURIComponent(value); } catch { /* original value remains authoritative */ }
   if (/-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----|\bBearer\s+[A-Za-z0-9._~+/-]{8,}|\b(?:gh[pousr]_[A-Za-z0-9]{20,}|github_pat_[A-Za-z0-9_]{20,}|xox[baprs]-[A-Za-z0-9-]{10,}|AKIA[0-9A-Z]{16}|ASIA[0-9A-Z]{16}|sk-[A-Za-z0-9_-]{8,})\b|\beyJ[A-Za-z0-9_-]{8,}\.[A-Za-z0-9_-]{8,}\.[A-Za-z0-9_.-]{8,}/i.test(decoded)) throw new CoeError("COE_SECRET_VALUE:$");
@@ -432,6 +447,7 @@ function validatePage(raw: unknown, scope: CoeScope, phase: EvidencePhase): Reco
     const target = object(targetValue); exact(target, OUTCOME_TARGET_FIELDS);
     if (typeof target.business_identity !== "string" || !target.business_identity || !SHA256.test(String(target.material_revision)) || (target.observed_through !== null && typeof target.observed_through !== "string")) throw new CoeError("COE_OUTCOME_TARGET_INVALID");
     const source = object(target.source); exact(source, OUTCOME_TARGET_SOURCE_FIELDS);
+    validateOutcomeTargetJson(source);
   }
   rejectCredentialData(page);
   return page;
