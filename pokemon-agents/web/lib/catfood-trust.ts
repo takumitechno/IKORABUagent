@@ -3,7 +3,7 @@ import { createPublicKey, randomBytes, verify } from "node:crypto";
 import { existsSync, readFileSync, statSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { canonicalJson, sha256, validateOperationalBoundaryV1, type Json, type OperationalBoundaryV1 } from "./catfood-harness";
-import { CATFOOD_THREADS_DEPENDENCY_ROOT, acquireCoe, assessCoe, assertFrozenDependencies, canonicalCoeJson, decodeCoeAcquisition, stableCoeEvidence, validateOutcomeEvaluationRequest, verifyGovernedWork, type CoeAcquisition, type CoeAssessment, type CoePageSource, type GovernedWorkDecision, type OutcomeEvaluationRequest } from "./catfood-coe";
+import { CATFOOD_THREADS_DEPENDENCY_ROOT, acquireCoe, assessCoe, assertFrozenDependencies, canonicalCoeJson, classifyRunAttempts, decodeCoeAcquisition, stableCoeEvidence, validateOutcomeEvaluationRequest, verifyGovernedWork, type AttemptMembershipDecision, type CoeAcquisition, type CoeAssessment, type CoePageSource, type GovernedWorkDecision, type OutcomeEvaluationRequest } from "./catfood-coe";
 
 export const CATFOOD_TRUST_SCHEMA = "catfood-trust.v1";
 export const CATFOOD_GO_SCHEMA = "catfood-human-go.v1";
@@ -42,7 +42,7 @@ const ACCOUNT = /^acct_[A-Za-z0-9_-]{1,128}$/;
 const UTC = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/;
 const REQUIRED_CONTROL_TABLES = Object.freeze([
   "catfood_trust_meta", "catfood_runs", "catfood_go_consumptions", "catfood_go_revocations",
-  "catfood_owner_sessions", "catfood_preflight_receipts", "catfood_authority_bindings",
+  "catfood_owner_sessions", "catfood_preflight_receipts", "catfood_authority_bindings", "catfood_authority_renewals",
   "catfood_work_admissions", "catfood_source_journal", "catfood_bundle_cache",
 ]);
 const REQUIRED_CONTROL_INDEXES = Object.freeze([
@@ -52,6 +52,7 @@ const REQUIRED_CONTROL_TRIGGERS = Object.freeze([
   "catfood_meta_no_update", "catfood_meta_no_delete", "catfood_go_no_update", "catfood_go_no_delete",
   "catfood_revocations_no_update", "catfood_revocations_no_delete", "catfood_sessions_no_update",
   "catfood_sessions_no_delete", "catfood_authority_no_update", "catfood_authority_no_delete",
+  "catfood_renewal_no_update", "catfood_renewal_no_delete",
   "catfood_work_identity_immutable", "catfood_journal_no_duplicate_insert", "catfood_journal_no_update", "catfood_journal_no_delete",
   "catfood_bundle_no_update", "catfood_bundle_no_delete",
 ]);
@@ -357,7 +358,8 @@ export interface ThreadsEvidenceSource extends CoePageSource {
   tenantProbe(spec: CatfoodRunSpec): TenantProbeEvidence;
   boundaries(spec: CatfoodRunSpec): readonly OperationalBoundaryV1[];
   inventory(spec: CatfoodRunSpec): readonly ThreadsInventoryItem[];
-  grant(spec: CatfoodRunSpec, capability: CatfoodCapability, authorityRef: string, expectedGeneration: number | null): ThreadsAuthorityTransition;
+  grant(spec: CatfoodRunSpec, capability: CatfoodCapability, authorityRef: string, expectedGeneration: number | null, permitExpiresAt: string): ThreadsAuthorityTransition;
+  renew(spec: CatfoodRunSpec, capability: CatfoodCapability, authorityRef: string, expectedGeneration: number, permitExpiresAt: string): ThreadsAuthorityTransition;
   revoke(spec: CatfoodRunSpec, capability: CatfoodCapability, authorityRef: string, expectedGeneration: number): ThreadsAuthorityTransition;
   claim(spec: CatfoodRunSpec, item: ThreadsInventoryItem, authorityRef: string, generation: number, requestId?: string): ThreadsClaimRecord;
   outcomeEvaluation(spec: CatfoodRunSpec, request: Readonly<OutcomeEvaluationRequest>, item: ThreadsInventoryItem): ThreadsClaimRecord;
@@ -384,6 +386,11 @@ export interface TestObservationPolicy {
   cadence_seconds: number;
   maximum_gap_seconds: number;
   clock_mapping: "SAME_TEST_CLOCK";
+}
+
+function requireZeroPaidRuntime(runtime: ThreadsRuntimeEvidence): void {
+  if (runtime.writer_enabled !== false || runtime.paid_generation_enabled !== false) throw new CatfoodTrustError("PAID_PATH_NOT_DISABLED");
+  if (runtime.provider_activity_count === "UNKNOWN" || runtime.paid_cost_micros === "UNKNOWN" || Number(runtime.provider_activity_count) !== 0 || Number(runtime.paid_cost_micros) !== 0 || runtime.cost_coverage !== "COMPLETE") throw new CatfoodTrustError("PAID_ACTIVITY_NOT_ZERO");
 }
 
 export interface AdmissionTicket {
@@ -424,6 +431,9 @@ CREATE INDEX catfood_receipts_unconsumed ON catfood_preflight_receipts(run_id,co
 CREATE TABLE catfood_authority_bindings (run_id TEXT NOT NULL,wp3_epoch INTEGER NOT NULL,capability TEXT NOT NULL,authority_ref TEXT NOT NULL,threads_generation INTEGER NOT NULL,boundary_sha256 TEXT NOT NULL,permit_expires_at TEXT NOT NULL,state TEXT NOT NULL,created_at TEXT NOT NULL,PRIMARY KEY(run_id,wp3_epoch,capability)) STRICT;
 CREATE TRIGGER catfood_authority_no_update BEFORE UPDATE ON catfood_authority_bindings BEGIN SELECT RAISE(ABORT,'authority bindings are immutable'); END;
 CREATE TRIGGER catfood_authority_no_delete BEFORE DELETE ON catfood_authority_bindings BEGIN SELECT RAISE(ABORT,'authority bindings are immutable'); END;
+CREATE TABLE catfood_authority_renewals (request_id TEXT PRIMARY KEY,run_id TEXT NOT NULL,wp3_epoch INTEGER NOT NULL,capability TEXT NOT NULL,authority_ref TEXT NOT NULL,threads_generation INTEGER NOT NULL,boundary_sha256 TEXT NOT NULL,permit_expires_at TEXT NOT NULL,created_at TEXT NOT NULL) STRICT;
+CREATE TRIGGER catfood_renewal_no_update BEFORE UPDATE ON catfood_authority_renewals BEGIN SELECT RAISE(ABORT,'authority renewals are append-only'); END;
+CREATE TRIGGER catfood_renewal_no_delete BEFORE DELETE ON catfood_authority_renewals BEGIN SELECT RAISE(ABORT,'authority renewals are append-only'); END;
 CREATE TABLE catfood_work_admissions (work_id TEXT PRIMARY KEY,run_id TEXT NOT NULL,wp3_epoch INTEGER NOT NULL,capability TEXT NOT NULL,claim_id TEXT NOT NULL UNIQUE,request_id TEXT NOT NULL,business_identity TEXT NOT NULL,material_revision TEXT NOT NULL,semantic_identity_sha256 TEXT NOT NULL UNIQUE,authority_ref TEXT NOT NULL,threads_generation INTEGER NOT NULL,claim_json TEXT NOT NULL CHECK(json_valid(claim_json)),status TEXT NOT NULL CHECK(status IN('ADMITTED','TERMINAL')),terminal_json TEXT CHECK(terminal_json IS NULL OR json_valid(terminal_json)),admitted_at TEXT NOT NULL,completed_at TEXT) STRICT;
 CREATE UNIQUE INDEX catfood_work_semantic_identity ON catfood_work_admissions(capability,business_identity,material_revision);
 CREATE TRIGGER catfood_work_identity_immutable BEFORE UPDATE ON catfood_work_admissions WHEN OLD.work_id IS NOT NEW.work_id OR OLD.run_id IS NOT NEW.run_id OR OLD.wp3_epoch IS NOT NEW.wp3_epoch OR OLD.capability IS NOT NEW.capability OR OLD.claim_id IS NOT NEW.claim_id OR OLD.request_id IS NOT NEW.request_id OR OLD.business_identity IS NOT NEW.business_identity OR OLD.material_revision IS NOT NEW.material_revision OR OLD.semantic_identity_sha256 IS NOT NEW.semantic_identity_sha256 OR OLD.authority_ref IS NOT NEW.authority_ref OR OLD.threads_generation IS NOT NEW.threads_generation OR OLD.claim_json IS NOT NEW.claim_json OR OLD.admitted_at IS NOT NEW.admitted_at BEGIN SELECT RAISE(ABORT,'work identity is immutable'); END;
@@ -569,6 +579,48 @@ function closedCoeSummary(coe: CoeAcquisition): Record<string, Json> {
   return { phase: coe.phase, digest: coe.digest, producer_release_identity: coe.producer_release_identity as unknown as Json, scope: coe.scope as unknown as Json, coverage: { state: coe.coverage.state as Json, unresolved_count: coe.coverage.unresolved_count as Json, snapshot_identity: coe.coverage.snapshot_identity as Json, record_set_digest: coe.coverage.record_set_digest as Json, cuts: coe.coverage.cuts as Json, window: { assessment_mode: window.assessment_mode, requested_window_start: window.requested_window_start, requested_window_end: window.requested_window_end, state: window.state }, prospective: { state: prospective.state, proof_id: prospective.proof_id, proof_applicable: prospective.proof_applicable } }, prohibited_activity: { coverage: coe.prohibited_activity.coverage as Json, activity: coe.prohibited_activity.activity as Json, exposure: coe.prohibited_activity.exposure as Json, known_zero: coe.prohibited_activity.known_zero as Json, pending_cost_count: coe.prohibited_activity.pending_cost_count as Json, unknown_cost_count: coe.prohibited_activity.unknown_cost_count as Json, unattributed_attempt_count: coe.prohibited_activity.unattributed_attempt_count as Json }, record_count: coe.records.length, page_count: coe.page_count, test_only: coe.test_only };
 }
 
+function runMembership(spec: CatfoodRunSpec, coe: CoeAcquisition, authorities: readonly Record<string, unknown>[], events: readonly Record<string, unknown>[]): readonly AttemptMembershipDecision[] {
+  const intents = events.filter((event) => ["WORK_DISPATCH_INTENT", "WORK_DISPATCH_AMBIGUOUS", "WORK_ADMITTED"].includes(String(event.event_type))).map((event) => {
+    const payload = typeof event.payload_json === "string" ? JSON.parse(event.payload_json) as Record<string, unknown> : event.payload_json as Record<string, unknown>;
+    return { request_id: String(payload.request_id ?? event.request_id ?? ""), claim_id: event.claim_id === null ? null : String(event.claim_id) };
+  }).filter((item) => item.request_id);
+  return classifyRunAttempts(coe, {
+    account_id: spec.account_id, spec_hash: spec.spec_sha256, window_start: spec.requested_window_start, window_end: spec.requested_window_end,
+    authorities: authorities.map((row) => ({ capability: String(row.capability), authority_ref: String(row.authority_ref), generation: Number(row.threads_generation) })), intents,
+  });
+}
+
+function membershipReasons(decisions: readonly AttemptMembershipDecision[], works: readonly Record<string, unknown>[], events: readonly Record<string, unknown>[]): readonly string[] {
+  const reasons = new Set<string>(); const localRequests = new Set(works.map((work) => String(work.request_id)));
+  for (const decision of decisions) {
+    if (decision.membership === "UNRESOLVED_MEMBERSHIP") { reasons.add("RUN_MEMBERSHIP_UNRESOLVED"); continue; }
+    if (decision.membership !== "IN_SCOPE") continue;
+    const state = String(decision.attempt.terminal.event_type);
+    if (state === "FAILED") reasons.add("COE_RUN_LINKED_WORK_FAILED");
+    else if (["CLAIMED", "UNRESOLVED"].includes(state)) reasons.add("COE_RUN_LINKED_WORK_UNRESOLVED");
+    else if (state === "SUCCEEDED" && !localRequests.has(String(decision.attempt.terminal.request_id))) reasons.add("COE_UNTRACKED_RUN_WORK");
+  }
+  const known = new Set(decisions.flatMap((decision) => decision.attempt.lifecycle.map((row) => String(row.request_id))));
+  for (const event of events) if (event.event_type === "WORK_DISPATCH_AMBIGUOUS" && !known.has(String(event.request_id))) reasons.add("WORK_DISPATCH_OUTCOME_UNRESOLVED");
+  return Object.freeze([...reasons].sort());
+}
+
+function verdictFromReasons(reasons: ReadonlySet<string>): Verdict {
+  if (reasons.size === 0) return "PASS";
+  const knownFailure = [...reasons].some((reason) => /TAMPER|CORRUPT|CHAIN|VIOLATION|NONZERO|FINAL_AUTHORITY_OPEN|BUNDLE_CACHE|COE_RUN_LINKED_WORK_FAILED|COE_UNTRACKED_RUN_WORK|DURATION_POLICY_NOT_MET|WORK_COMPLETED_OUTSIDE_WINDOW|MEANINGFUL_.*_NOT_MET|RESTART_.*_NOT_MET/.test(reason));
+  return knownFailure ? "FAIL" : "BLOCKED";
+}
+
+function observationCoverageReasons(journal: readonly Record<string, unknown>[], run: Record<string, unknown>, spec: Record<string, unknown>): readonly string[] {
+  const armed = journal.find((event) => event.event_type === "OBSERVATION_ARMED");
+  if (!armed) return ["OBSERVATION_PREFIX_MISSING"];
+  const payload = typeof armed.payload_json === "string" ? JSON.parse(armed.payload_json) as Record<string, unknown> : armed.payload_json as Record<string, unknown>;
+  if (String(armed.boot_id) !== String(run.closed_boot_id) || !Number.isSafeInteger(armed.monotonic_ms) || !Number.isSafeInteger(run.closed_monotonic_ms)) return ["DURATION_TRUST_UNAVAILABLE"];
+  if (Date.parse(String(armed.observed_at)) > Date.parse(String(spec.requested_window_start)) || Date.parse(String(run.closed_wall_time)) < Date.parse(String(spec.requested_window_end)) || Number(run.closed_monotonic_ms) <= Number(armed.monotonic_ms)) return ["DURATION_POLICY_NOT_MET"];
+  if (!payload.policy || typeof payload.policy !== "object") return ["POLICY_UNBOUND"];
+  return [];
+}
+
 export class ProtectedCatfoodCustodian {
   private readonly control: Database;
   private readonly checkpoints: Database;
@@ -712,6 +764,54 @@ export class ProtectedCatfoodCustodian {
     return Object.freeze({ session_id: sessionId, token, run_id: runId });
   }
 
+  renewOwnerSession(session: RunnerSession): void {
+    this.verifyAnchored(session.run_id); const sample = this.sample();
+    this.control.transaction(() => {
+      const row = this.getRun(session.run_id); this.authenticate(session, row); const go = this.verifyCurrentGo(row, sample); const spec = runSpec(row);
+      const expires = Math.min(Date.parse(sample.wall_time) + 120_000, Date.parse(spec.requested_window_end), Date.parse(go.payload.valid_until));
+      if (expires <= Date.parse(sample.wall_time)) throw new CatfoodTrustError("LEASE_WINDOW_CLOSED");
+      this.control.query("UPDATE catfood_runs SET lease_expires_at=?,state_version=state_version+1 WHERE run_id=? AND owner_session_id=? AND current_epoch=?")
+        .run(new Date(expires).toISOString(), row.run_id, session.session_id, row.current_epoch);
+      this.appendJournal(this.getRun(row.run_id), "OWNER_LEASE_RENEWED", session.session_id, "custodian", { lease_expires_at: new Date(expires).toISOString() }, null, null, null, sample);
+    }).immediate();
+    const head = this.control.query<{ sequence: number; row_hash: string }, [string]>("SELECT sequence,row_hash FROM catfood_source_journal WHERE run_id=? ORDER BY sequence DESC LIMIT 1").get(session.run_id)!; this.anchor(session.run_id, head);
+  }
+
+  renewAuthorities(session: RunnerSession): void {
+    for (const capability of CATFOOD_CAPABILITIES) {
+      this.verifyAnchored(session.run_id); const sample = this.sample(); let request!: { spec: CatfoodRunSpec; ref: string; generation: number; expires: string; request_id: string };
+      this.control.transaction(() => {
+        const row = this.getRun(session.run_id); this.authenticate(session, row); const go = this.verifyCurrentGo(row, sample); const spec = runSpec(row);
+        if (row.lifecycle !== "RUNNING" || row.admission_state !== "OPEN") throw new CatfoodTrustError("ADMISSION_CLOSED");
+        requireZeroPaidRuntime(this.source.runtimeEvidence(spec));
+        const binding = this.control.query<Record<string, unknown>, [string, number, string]>("SELECT * FROM catfood_authority_bindings WHERE run_id=? AND wp3_epoch=? AND capability=?").get(row.run_id, row.current_epoch, capability);
+        if (!binding || binding.state !== "ACTIVE") throw new CatfoodTrustError("AUTHORITY_BINDING_MISSING");
+        const expires = new Date(Math.min(Date.parse(sample.wall_time) + 120_000, Date.parse(spec.requested_window_end), Date.parse(go.payload.valid_until))).toISOString();
+        if (Date.parse(expires) <= Date.parse(sample.wall_time)) throw new CatfoodTrustError("AUTHORITY_PERMIT_WINDOW_CLOSED");
+        const request_id = `renew:${sha256(canonicalJson({ run_id: row.run_id, epoch: row.current_epoch, capability, authority_ref: binding.authority_ref, generation: binding.threads_generation, expires })).slice(0, 32)}`;
+        request = { spec, ref: String(binding.authority_ref), generation: Number(binding.threads_generation), expires, request_id };
+        this.appendJournal(row, "THREADS_AUTHORITY_RENEWAL_INTENT", session.session_id, this.source.source_identity, { capability, authority_ref: request.ref, threads_generation: request.generation, permit_expires_at: expires, request_id }, request.generation, null, request_id, sample);
+      }).immediate();
+      let head = this.control.query<{ sequence: number; row_hash: string }, [string]>("SELECT sequence,row_hash FROM catfood_source_journal WHERE run_id=? ORDER BY sequence DESC LIMIT 1").get(session.run_id)!; this.anchor(session.run_id, head, { state: "RENEWAL_INTENT_RETAINED", request_id: request.request_id });
+      let transition: ThreadsAuthorityTransition;
+      try { transition = this.source.renew(request.spec, capability, request.ref, request.generation, request.expires); }
+      catch (error) {
+        this.control.transaction(() => { const row = this.getRun(session.run_id); this.control.query("UPDATE catfood_runs SET admission_state='CLOSED',lifecycle='STOP_PENDING',state_version=state_version+1 WHERE run_id=?").run(row.run_id); this.appendJournal(this.getRun(row.run_id), "THREADS_AUTHORITY_RENEWAL_AMBIGUOUS", session.session_id, this.source.source_identity, { capability, request_id: request.request_id }, request.generation, null, request.request_id, sample); }).immediate();
+        head = this.control.query<{ sequence: number; row_hash: string }, [string]>("SELECT sequence,row_hash FROM catfood_source_journal WHERE run_id=? ORDER BY sequence DESC LIMIT 1").get(session.run_id)!; this.anchor(session.run_id, head, { state: "RENEWAL_AMBIGUOUS", request_id: request.request_id }); throw error;
+      }
+      this.control.transaction(() => {
+        const row = this.getRun(session.run_id); this.authenticate(session, row); this.verifyCurrentGo(row, sample);
+        if (row.lifecycle !== "RUNNING" || row.admission_state !== "OPEN" || transition.authority_ref !== request.ref || transition.generation !== request.generation) throw new CatfoodTrustError("AUTHORITY_RENEWAL_RACE");
+        const boundary = verifyBoundary(transition.boundary, request.spec, "ADMIT", sample.wall_time, { capability, generation: request.generation });
+        if (!boundary.permit_expires_at || Date.parse(boundary.permit_expires_at) > Date.parse(request.expires) || Date.parse(boundary.permit_expires_at) - Date.parse(sample.wall_time) > 120_000) throw new CatfoodTrustError("AUTHORITY_PERMIT_BOUND_INVALID");
+        this.control.query("INSERT INTO catfood_authority_renewals VALUES (?,?,?,?,?,?,?,?,?)")
+          .run(request.request_id, row.run_id, row.current_epoch, capability, request.ref, request.generation, boundary.canonical_sha256, boundary.permit_expires_at, sample.wall_time);
+        this.appendJournal(row, "THREADS_AUTHORITY_RENEWED", session.session_id, this.source.source_identity, { capability, authority_ref: request.ref, boundary: boundary as unknown as Json, request_id: request.request_id }, request.generation, null, request.request_id, sample);
+      }).immediate();
+      head = this.control.query<{ sequence: number; row_hash: string }, [string]>("SELECT sequence,row_hash FROM catfood_source_journal WHERE run_id=? ORDER BY sequence DESC LIMIT 1").get(session.run_id)!; this.anchor(session.run_id, head);
+    }
+  }
+
   revokeGo(runId: string, reasonCode: string): void {
     const sample = this.sample();
     this.control.transaction(() => {
@@ -763,6 +863,7 @@ export class ProtectedCatfoodCustodian {
       const spec = runSpec(row); const snapshot = this.sourceSnapshot(spec, sample.wall_time);
       if (snapshot.coeAssessment.state !== "READY") throw new CatfoodTrustError(snapshot.coeAssessment.reasons[0] ?? "COE_EVIDENCE_UNAVAILABLE", snapshot.coeAssessment.reasons.join(","));
       const runtime = snapshot.runtime; const probe = this.source.tenantProbe(spec); const coeRuntime = snapshot.coe.runtime_enforcement;
+      requireZeroPaidRuntime(runtime);
       if (probe.organization_id !== spec.organization_id || probe.own_account_id !== spec.account_id || probe.foreign_account_id === spec.account_id || probe.own_result !== "EXPECTED_RESOURCE" || probe.foreign_result !== "AUTHORIZATION_DENIED" || probe.foreign_status !== 403 || probe.logical_runtime_id !== coeRuntime.logical_runtime_id || probe.worker_boot_id !== coeRuntime.worker_boot_id || Date.parse(sample.wall_time) - Date.parse(probe.observed_at) > 120_000 || Date.parse(probe.observed_at) > Date.parse(sample.wall_time) + 5_000) throw new CatfoodTrustError("ACTIVE_NEGATIVE_TENANT_PROBE_REQUIRED");
       if (snapshot.boundaries.length !== CATFOOD_CAPABILITIES.length) throw new CatfoodTrustError("BOUNDARY_COVERAGE_INCOMPLETE");
       for (const boundary of snapshot.boundaries) {
@@ -797,17 +898,21 @@ export class ProtectedCatfoodCustodian {
   activate(session: RunnerSession, receipt: PreflightReceipt): void {
     this.verifyAnchored(session.run_id); const sample = this.sample();
     this.control.transaction(() => {
-      const row = this.getRun(session.run_id); this.authenticate(session, row); this.verifyCurrentGo(row, sample);
+      const row = this.getRun(session.run_id); this.authenticate(session, row); const go = this.verifyCurrentGo(row, sample);
       const stored = this.control.query<Record<string, unknown>, [string]>("SELECT * FROM catfood_preflight_receipts WHERE receipt_id=?").get(receipt.receipt_id);
       if (!stored || stored.run_id !== row.run_id || stored.session_id !== session.session_id || stored.consumed_at !== null || stored.nonce !== receipt.nonce || Number(stored.wp3_epoch) !== Number(row.current_epoch) || Number(stored.state_version) !== Number(row.state_version) || Date.parse(String(stored.expires_at)) <= Date.parse(sample.wall_time)) throw new CatfoodTrustError("PREFLIGHT_RECEIPT_INVALID");
       const spec = runSpec(row); const snapshot = this.sourceSnapshot(spec);
       if (snapshot.coeAssessment.state !== "READY" || snapshot.digest !== stored.source_digest) throw new CatfoodTrustError("PREFLIGHT_STALE");
+      requireZeroPaidRuntime(snapshot.runtime);
+      const permitExpiresAt = new Date(Math.min(Date.parse(sample.wall_time) + 120_000, Date.parse(spec.requested_window_end), Date.parse(go.payload.valid_until))).toISOString();
+      if (Date.parse(permitExpiresAt) <= Date.parse(sample.wall_time)) throw new CatfoodTrustError("AUTHORITY_PERMIT_WINDOW_CLOSED");
       for (const capability of CATFOOD_CAPABILITIES) {
         const current = snapshot.boundaries.find((boundary) => boundary.capability === capability);
         const expected = current?.fencing_generation ?? null;
         const ref = `${row.run_id}:wp3:${row.current_epoch}:${capability}`;
-        const transition = this.source.grant(spec, capability, ref, expected);
+        const transition = this.source.grant(spec, capability, ref, expected, permitExpiresAt);
         const boundary = verifyBoundary(transition.boundary, spec, "ADMIT", sample.wall_time, { capability, generation: transition.generation });
+        if (!boundary.permit_expires_at || Date.parse(boundary.permit_expires_at) > Date.parse(permitExpiresAt) || Date.parse(boundary.permit_expires_at) - Date.parse(sample.wall_time) > 120_000) throw new CatfoodTrustError("AUTHORITY_PERMIT_BOUND_INVALID");
         this.control.query("INSERT INTO catfood_authority_bindings VALUES (?,?,?,?,?,?,?,?,?)").run(row.run_id, row.current_epoch, capability, transition.authority_ref, transition.generation, boundary.canonical_sha256, boundary.permit_expires_at, "ACTIVE", sample.wall_time);
         this.appendJournal(row, "THREADS_AUTHORITY_GRANTED", session.session_id, this.source.source_identity, { capability, authority_ref: transition.authority_ref, boundary: boundary as unknown as Json }, transition.generation, null, null, sample);
       }
@@ -825,7 +930,7 @@ export class ProtectedCatfoodCustodian {
       const row = this.getRun(session.run_id); this.authenticate(session, row); const go = this.verifyCurrentGo(row, sample);
       if (!row.lease_expires_at || Date.parse(row.lease_expires_at) <= Date.parse(sample.wall_time) || row.lifecycle !== "RUNNING" || row.admission_state !== "OPEN") throw new CatfoodTrustError("ADMISSION_CLOSED");
       if (Number(row.current_epoch) > go.payload.maximum_wp3_epoch) throw new CatfoodTrustError("GO_EPOCH_SCOPE_EXCEEDED");
-      const spec = runSpec(row); const inventory = this.source.inventory(spec); const item = inventory.find((candidate) => candidate.source_id === sourceId && candidate.capability === capability);
+      const spec = runSpec(row); requireZeroPaidRuntime(this.source.runtimeEvidence(spec)); const inventory = this.source.inventory(spec); const item = inventory.find((candidate) => candidate.source_id === sourceId && candidate.capability === capability);
       if (!item) throw new CatfoodTrustError("SOURCE_INTENT_NOT_ELIGIBLE");
       const binding = this.control.query<Record<string, unknown>, [string, number, string]>("SELECT * FROM catfood_authority_bindings WHERE run_id=? AND wp3_epoch=? AND capability=?").get(row.run_id, row.current_epoch, capability);
       if (!binding) throw new CatfoodTrustError("AUTHORITY_BINDING_MISSING");
@@ -843,7 +948,7 @@ export class ProtectedCatfoodCustodian {
     try { this.control.transaction(() => {
       const row = this.getRun(session.run_id); this.authenticate(session, row); const go = this.verifyCurrentGo(row, sample);
       if (!row.lease_expires_at || Date.parse(row.lease_expires_at) <= Date.parse(sample.wall_time) || row.lifecycle !== "RUNNING" || row.admission_state !== "OPEN" || Number(row.current_epoch) > go.payload.maximum_wp3_epoch) throw new CatfoodTrustError("ADMISSION_CLOSED");
-      const spec = runSpec(row); const item = this.source.inventory(spec).find((candidate) => candidate.source_id === sourceId && candidate.capability === capability);
+      const spec = runSpec(row); requireZeroPaidRuntime(this.source.runtimeEvidence(spec)); const item = this.source.inventory(spec).find((candidate) => candidate.source_id === sourceId && candidate.capability === capability);
       if (!item || canonicalJson(item) !== canonicalJson(reserved.item)) throw new CatfoodTrustError("SOURCE_INTENT_CHANGED");
       const binding = this.control.query<Record<string, unknown>, [string, number, string]>("SELECT * FROM catfood_authority_bindings WHERE run_id=? AND wp3_epoch=? AND capability=?").get(row.run_id, row.current_epoch, capability);
       if (!binding || binding.authority_ref !== reserved.authorityRef || Number(binding.threads_generation) !== reserved.generation) throw new CatfoodTrustError("AUTHORITY_BINDING_CHANGED");
@@ -880,9 +985,9 @@ export class ProtectedCatfoodCustodian {
       if (!source || source.claim_id !== work.claim_id || source.request_id !== work.request_id || source.capability !== work.capability || source.business_identity !== work.business_identity || source.material_revision !== work.material_revision || source.generation !== work.threads_generation) throw new CatfoodTrustError("THREADS_RESULT_IDENTITY_MISMATCH");
       if (source.claim_status === "in_progress") throw new CatfoodTrustError("WORK_NOT_TERMINAL");
       const spec = runSpec(row);
-      if (!source.completed_at || Date.parse(source.completed_at) < Date.parse(spec.requested_window_start) || Date.parse(source.completed_at) >= Date.parse(spec.requested_window_end)) throw new CatfoodTrustError("WORK_COMPLETED_OUTSIDE_WINDOW");
-      this.control.query("UPDATE catfood_work_admissions SET status='TERMINAL',terminal_json=?,completed_at=? WHERE work_id=? AND status='ADMITTED'").run(canonicalJson(source), sample.wall_time, workId);
-      this.appendJournal(row, "WORK_RECONCILED", session.session_id, this.source.source_identity, { work_id: workId, authoritative_result: source as unknown as Json }, source.generation, source.claim_id, source.request_id, sample);
+      const inWindow = !!source.completed_at && Date.parse(source.completed_at) >= Date.parse(spec.requested_window_start) && Date.parse(source.completed_at) < Date.parse(spec.requested_window_end);
+      this.control.query("UPDATE catfood_work_admissions SET status='TERMINAL',terminal_json=?,completed_at=? WHERE work_id=? AND status='ADMITTED'").run(canonicalJson(source), source.completed_at, workId);
+      this.appendJournal(row, inWindow ? "WORK_RECONCILED" : "WORK_RECONCILED_OUTSIDE_WINDOW", session.session_id, this.source.source_identity, { work_id: workId, authoritative_result: source as unknown as Json }, source.generation, source.claim_id, source.request_id, sample);
       if (source.provider_invoked || source.paid_cost_micros === "UNKNOWN" || Number(source.paid_cost_micros) !== 0) {
         this.control.query("UPDATE catfood_runs SET admission_state='CLOSED',lifecycle='ABORTED',state_version=state_version+1 WHERE run_id=?").run(row.run_id);
         this.appendJournal(this.getRun(row.run_id), "PAID_PROVIDER_ABORT", session.session_id, this.source.source_identity, { claim_id: source.claim_id }, source.generation, source.claim_id, source.request_id, sample);
@@ -971,7 +1076,9 @@ export class ProtectedCatfoodCustodian {
       const decision = verifyGovernedWork(coe, claim, spec.spec_sha256, spec.organization_id);
       return { work_id: String(work.work_id), claim, decision };
     });
-    const coeJson = canonicalCoeJson(coe); const retainedCore = { phase: "CLOSED_RUN", dependency_root: CATFOOD_THREADS_DEPENDENCY_ROOT, coe_base64url: Buffer.from(coeJson).toString("base64url"), coe_sha256: sha256(coeJson), coeAssessment: { state: coeAssessment.state, reasons: coeAssessment.reasons }, boundaries, inventory, runtime, claims };
+    const authorities = this.control.query<Record<string, unknown>, [string]>("SELECT * FROM catfood_authority_bindings WHERE run_id=? ORDER BY wp3_epoch,capability").all(session.run_id);
+    const events = this.verifyJournal(session.run_id); const membership = runMembership(spec, coe, authorities, events);
+    const coeJson = canonicalCoeJson(coe); const retainedCore = { phase: "CLOSED_RUN", dependency_root: CATFOOD_THREADS_DEPENDENCY_ROOT, coe_base64url: Buffer.from(coeJson).toString("base64url"), coe_sha256: sha256(coeJson), coeAssessment: { state: coeAssessment.state, reasons: coeAssessment.reasons }, run_membership: membership as unknown as Json, boundaries, inventory, runtime, claims };
     const retained = { ...retainedCore, source_digest: sha256(canonicalJson(retainedCore)) };
     this.control.transaction(() => {
       const row = this.getRun(session.run_id); this.authenticate(session, row);
@@ -1028,8 +1135,11 @@ export class ProtectedCatfoodCustodian {
       return { claim, decision };
     });
     const authorities = this.control.query<Record<string, unknown>, [string]>("SELECT * FROM catfood_authority_bindings WHERE run_id=? ORDER BY wp3_epoch,capability").all(runId);
+    const recomputedAssessment = assessCoe(coe, spec.requested_window_end); const recomputedMembership = runMembership(spec, coe, authorities, events);
+    if (canonicalJson({ state: recomputedAssessment.state, reasons: recomputedAssessment.reasons }) !== canonicalJson(retained.coeAssessment as Json)) throw new CatfoodTrustError("COE_ASSESSMENT_CACHE_TAMPERED");
+    if (canonicalJson(recomputedMembership as unknown as Json) !== canonicalJson(retained.run_membership as Json)) throw new CatfoodTrustError("RUN_MEMBERSHIP_CACHE_TAMPERED");
     const checkpoint = this.checkpoints.query<Record<string, unknown>, [string]>("SELECT * FROM catfood_checkpoints WHERE run_id=? ORDER BY last_sequence DESC LIMIT 1").get(runId);
-    const finalSource = { runtime: retained.runtime, boundaries: retained.boundaries, inventory: retained.inventory, coe: closedCoeSummary(coe), coeAssessment: retained.coeAssessment, archive_sha256: retained.coe_sha256, digest: retained.source_digest, dependency_root: retained.dependency_root };
+    const finalSource = { runtime: retained.runtime, boundaries: retained.boundaries, inventory: retained.inventory, coe: closedCoeSummary(coe), coeAssessment: { state: recomputedAssessment.state, reasons: recomputedAssessment.reasons }, run_membership: recomputedMembership as unknown as Json, run_membership_reasons: membershipReasons(recomputedMembership, works, events), archive_sha256: retained.coe_sha256, digest: retained.source_digest, dependency_root: retained.dependency_root };
     return JSON.parse(canonicalJson({ schema: "catfood-rederived-bundle.v2", spec, go: { payload: go.payload as unknown as Json, artifact_sha256: go.artifact_sha256, key_id: go.key_id, trust_class: go.trust_class, action_validity_verified: verificationTimes }, run: { lifecycle: row.lifecycle, admission_state: row.admission_state, current_epoch: row.current_epoch, evidence_state: row.evidence_state, start_wall_time: row.start_wall_time as Json, start_monotonic_ms: row.start_monotonic_ms as Json, start_boot_id: row.start_boot_id as Json, closed_wall_time: row.closed_wall_time as Json, closed_monotonic_ms: row.closed_monotonic_ms as Json, closed_boot_id: row.closed_boot_id as Json }, journal: events.map((event) => ({ ...event, payload_json: JSON.parse(String(event.payload_json)) })) as unknown as Json, authorities: authorities as unknown as Json, work: works.map((work, index) => ({ ...work, claim_json: JSON.parse(String(work.claim_json)), terminal_json: authoritativeClaims[index]!.claim as unknown as Json, governed_decision: authoritativeClaims[index]!.decision as unknown as Json })) as unknown as Json, checkpoint: checkpoint as unknown as Json, final_source: finalSource as unknown as Json, source_mode: this.trust.source_mode })) as Record<string, Json>;
   }
 
@@ -1043,11 +1153,12 @@ export class ProtectedCatfoodCustodian {
     if (run.lifecycle !== "CLOSED") reasons.add("RUN_OPEN");
     if (run.evidence_state !== "ANCHORED") reasons.add("EVIDENCE_UNANCHORED");
     const spec = plain(bundle.spec, "bundle.spec");
-    if (run.start_boot_id !== run.closed_boot_id || !Number.isSafeInteger(run.start_monotonic_ms) || !Number.isSafeInteger(run.closed_monotonic_ms)) reasons.add("DURATION_TRUST_UNAVAILABLE");
-    if (Date.parse(String(run.start_wall_time)) > Date.parse(String(spec.requested_window_start)) || Date.parse(String(run.closed_wall_time)) < Date.parse(String(spec.requested_window_end))) reasons.add("DURATION_POLICY_NOT_MET");
+    for (const reason of observationCoverageReasons(journal, run, spec)) reasons.add(reason);
     if (journal.some((event) => ["PAUSE_REQUESTED", "STOP_UNCONFIRMED"].includes(String(event.event_type)))) reasons.add("CONTINUOUS_COVERAGE_BROKEN");
     if (Number(run.current_epoch) < 2 || !journal.some((event) => event.event_type === "RESTART_TAKEOVER")) reasons.add("RESTART_NOT_PROVEN");
-    const meaningful = works.filter((work) => this.meaningful(work));
+    const inWindow = (work: Record<string, unknown>) => { const claim = work.terminal_json as ThreadsClaimRecord | null; return !!claim?.completed_at && Date.parse(claim.completed_at) >= Date.parse(String(spec.requested_window_start)) && Date.parse(claim.completed_at) < Date.parse(String(spec.requested_window_end)); };
+    if (works.some((work) => work.status === "TERMINAL" && !inWindow(work))) reasons.add("WORK_COMPLETED_OUTSIDE_WINDOW");
+    const meaningful = works.filter((work) => inWindow(work) && this.meaningful(work));
     if (meaningful.length < CATFOOD_FIXED_POLICY.minimum_meaningful_units) reasons.add("MEANINGFUL_WORK_COUNT_NOT_MET");
     if (new Set(meaningful.map((work) => work.capability)).size < CATFOOD_FIXED_POLICY.minimum_capability_classes) reasons.add("MEANINGFUL_CLASS_COUNT_NOT_MET");
     if (!meaningful.some((work) => Number(work.wp3_epoch) === 1) || !meaningful.some((work) => Number(work.wp3_epoch) > 1)) reasons.add("RESTART_WORK_COVERAGE_NOT_MET");
@@ -1055,6 +1166,7 @@ export class ProtectedCatfoodCustodian {
     for (const work of works) { const decision = plain(work.governed_decision, "governed_decision"); if (decision.disposition === "FAIL" || decision.disposition === "BLOCKED") reasons.add(String(decision.reason)); }
     const finalSource = plain(bundle.final_source, "bundle.final_source"); const coeAssessment = plain(finalSource.coeAssessment, "bundle.final_source.coeAssessment");
     for (const reason of coeAssessment.reasons as unknown as string[]) reasons.add(reason);
+    for (const reason of finalSource.run_membership_reasons as unknown as string[]) reasons.add(reason);
     const finalBoundaries = finalSource.boundaries as unknown as OperationalBoundaryV1[];
     if (!Array.isArray(finalBoundaries) || finalBoundaries.some((boundary) => boundary.execution_state !== "INHIBITED" || boundary.stop_acknowledgement !== "INHIBITED" || Number((boundary.governed_in_flight as Record<string, unknown>).count) !== 0)) reasons.add("FINAL_AUTHORITY_OPEN");
     if (works.some((work) => {
@@ -1071,8 +1183,7 @@ export class ProtectedCatfoodCustodian {
     const cache = this.control.query<{ bundle_json: string; bundle_sha256: string }, [string]>("SELECT bundle_json,bundle_sha256 FROM catfood_bundle_cache WHERE run_id=?").get(runId);
     const digest = sha256(canonicalJson(bundle));
     if (cache && (cache.bundle_sha256 !== digest || canonicalJson(JSON.parse(cache.bundle_json)) !== canonicalJson(bundle))) reasons.add("BUNDLE_CACHE_TAMPERED");
-    const knownViolation = [...reasons].some((reason) => ["PROVIDER_COST_VIOLATION", "COE_PROHIBITED_ACTIVITY_NONZERO", "FINAL_AUTHORITY_OPEN", "BUNDLE_CACHE_TAMPERED"].includes(reason) || reason.includes("TAMPER"));
-    const verdict: Verdict = reasons.size === 0 ? "PASS" : knownViolation || run.lifecycle === "CLOSED" ? "FAIL" : "BLOCKED";
+    const verdict = verdictFromReasons(reasons);
     return Object.freeze({ verdict, reason_codes: Object.freeze([...reasons].sort()), rederived_bundle_sha256: digest, evaluator_sha256: CATFOOD_EVALUATOR_SHA256, policy_sha256: CATFOOD_POLICY_SHA256, test_only: this.trust.source_mode === "TEST_ONLY", evidence_coverage: coverageOf({ evidence: finalSource.coe as unknown as CoeAcquisition } as CoeAssessment) });
   }
 
@@ -1151,7 +1262,10 @@ export class IndependentCatfoodEvaluator {
       return { ...work, claim_json: JSON.parse(String(work.claim_json)), terminal_json: claim, governed_decision: decision };
     });
     const authorities = this.control.query<Record<string, unknown>, [string]>("SELECT * FROM catfood_authority_bindings WHERE run_id=? ORDER BY wp3_epoch,capability").all(runId);
-    const finalSource = { runtime: retained.runtime, boundaries: retained.boundaries, inventory: retained.inventory, coe: closedCoeSummary(coe), coeAssessment: retained.coeAssessment, archive_sha256: retained.coe_sha256, digest: retained.source_digest, dependency_root: retained.dependency_root };
+    const recomputedAssessment = assessCoe(coe, spec.requested_window_end); const recomputedMembership = runMembership(spec, coe, authorities, events);
+    if (canonicalJson({ state: recomputedAssessment.state, reasons: recomputedAssessment.reasons }) !== canonicalJson(retained.coeAssessment as Json)) throw new CatfoodTrustError("COE_ASSESSMENT_CACHE_TAMPERED");
+    if (canonicalJson(recomputedMembership as unknown as Json) !== canonicalJson(retained.run_membership as Json)) throw new CatfoodTrustError("RUN_MEMBERSHIP_CACHE_TAMPERED");
+    const finalSource = { runtime: retained.runtime, boundaries: retained.boundaries, inventory: retained.inventory, coe: closedCoeSummary(coe), coeAssessment: { state: recomputedAssessment.state, reasons: recomputedAssessment.reasons }, run_membership: recomputedMembership as unknown as Json, run_membership_reasons: membershipReasons(recomputedMembership, rawWorks, events), archive_sha256: retained.coe_sha256, digest: retained.source_digest, dependency_root: retained.dependency_root };
     return JSON.parse(canonicalJson({ schema: "catfood-rederived-bundle.v2", spec, go: { payload: go.payload as unknown as Json, artifact_sha256: go.artifact_sha256, key_id: go.key_id, trust_class: go.trust_class, action_validity_verified: verificationTimes }, run: { lifecycle: row.lifecycle, admission_state: row.admission_state, current_epoch: row.current_epoch, evidence_state: row.evidence_state, start_wall_time: row.start_wall_time as Json, start_monotonic_ms: row.start_monotonic_ms as Json, start_boot_id: row.start_boot_id as Json, closed_wall_time: row.closed_wall_time as Json, closed_monotonic_ms: row.closed_monotonic_ms as Json, closed_boot_id: row.closed_boot_id as Json }, journal: events.map((event) => ({ ...event, payload_json: JSON.parse(String(event.payload_json)) })), authorities, work: works, checkpoint: anchor, final_source: finalSource, source_mode: this.trust.source_mode })) as Record<string, Json>;
   }
 
@@ -1163,11 +1277,14 @@ export class IndependentCatfoodEvaluator {
     }
     const reasons = new Set<string>(); const run = plain(bundle.run, "run"); const work = bundle.work as unknown as Record<string, unknown>[]; const journal = bundle.journal as unknown as Record<string, unknown>[]; const source = plain(bundle.final_source, "source"); const boundaries = source.boundaries as unknown as OperationalBoundaryV1[]; const coeAssessment = plain(source.coeAssessment, "coeAssessment");
     for (const reason of coeAssessment.reasons as unknown as string[]) reasons.add(reason);
+    for (const reason of source.run_membership_reasons as unknown as string[]) reasons.add(reason);
     if (run.lifecycle !== "CLOSED") reasons.add("RUN_OPEN"); if (run.evidence_state !== "ANCHORED") reasons.add("EVIDENCE_UNANCHORED");
-    const spec = plain(bundle.spec, "spec"); if (run.start_boot_id !== run.closed_boot_id || Date.parse(String(run.start_wall_time)) > Date.parse(String(spec.requested_window_start)) || Date.parse(String(run.closed_wall_time)) < Date.parse(String(spec.requested_window_end))) reasons.add("DURATION_POLICY_NOT_MET");
+    const spec = plain(bundle.spec, "spec"); for (const reason of observationCoverageReasons(journal, run, spec)) reasons.add(reason);
     if (journal.some((event) => ["PAUSE_REQUESTED", "STOP_UNCONFIRMED"].includes(String(event.event_type)))) reasons.add("CONTINUOUS_COVERAGE_BROKEN");
     if (Number(run.current_epoch) < 2 || !journal.some((event) => event.event_type === "RESTART_TAKEOVER")) reasons.add("RESTART_NOT_PROVEN");
-    const meaningful = work.filter((item) => meaningfulClaim(item));
+    const inWindow = (item: Record<string, unknown>) => { const claim = item.terminal_json as ThreadsClaimRecord | null; return !!claim?.completed_at && Date.parse(claim.completed_at) >= Date.parse(String(spec.requested_window_start)) && Date.parse(claim.completed_at) < Date.parse(String(spec.requested_window_end)); };
+    if (work.some((item) => item.status === "TERMINAL" && !inWindow(item))) reasons.add("WORK_COMPLETED_OUTSIDE_WINDOW");
+    const meaningful = work.filter((item) => inWindow(item) && meaningfulClaim(item));
     if (meaningful.length < 3) reasons.add("MEANINGFUL_WORK_COUNT_NOT_MET"); if (new Set(meaningful.map((item) => item.capability)).size < 2) reasons.add("MEANINGFUL_CLASS_COUNT_NOT_MET");
     if (!meaningful.some((item) => Number(item.wp3_epoch) === 1) || !meaningful.some((item) => Number(item.wp3_epoch) > 1)) reasons.add("RESTART_WORK_COVERAGE_NOT_MET");
     if (work.some((item) => item.status !== "TERMINAL")) reasons.add("UNRESOLVED_WORK");
@@ -1175,8 +1292,7 @@ export class IndependentCatfoodEvaluator {
     if (boundaries.some((boundary) => boundary.execution_state !== "INHIBITED" || boundary.stop_acknowledgement !== "INHIBITED" || Number((boundary.governed_in_flight as Record<string, unknown>).count) !== 0)) reasons.add("FINAL_AUTHORITY_OPEN");
     const digest = sha256(canonicalJson(bundle)); const cache = this.control.query<{ bundle_json: string; bundle_sha256: string }, [string]>("SELECT bundle_json,bundle_sha256 FROM catfood_bundle_cache WHERE run_id=?").get(runId);
     if (cache && (cache.bundle_sha256 !== digest || canonicalJson(JSON.parse(cache.bundle_json)) !== canonicalJson(bundle))) reasons.add("BUNDLE_CACHE_TAMPERED");
-    const violation = [...reasons].some((reason) => /TAMPER|VIOLATION|NONZERO|FINAL_AUTHORITY_OPEN|BUNDLE_CACHE/.test(reason));
-    return Object.freeze({ verdict: reasons.size === 0 ? "PASS" : violation || run.lifecycle === "CLOSED" ? "FAIL" : "BLOCKED", reason_codes: Object.freeze([...reasons].sort()), rederived_bundle_sha256: digest, evaluator_sha256: CATFOOD_EVALUATOR_SHA256, policy_sha256: CATFOOD_POLICY_SHA256, test_only: this.trust.source_mode === "TEST_ONLY", evidence_coverage: String((source.coe as Record<string, unknown>).coverage && ((source.coe as Record<string, unknown>).coverage as Record<string, unknown>).state) as "COMPLETE" | "PARTIAL" | "UNKNOWN" });
+    return Object.freeze({ verdict: verdictFromReasons(reasons), reason_codes: Object.freeze([...reasons].sort()), rederived_bundle_sha256: digest, evaluator_sha256: CATFOOD_EVALUATOR_SHA256, policy_sha256: CATFOOD_POLICY_SHA256, test_only: this.trust.source_mode === "TEST_ONLY", evidence_coverage: String((source.coe as Record<string, unknown>).coverage && ((source.coe as Record<string, unknown>).coverage as Record<string, unknown>).state) as "COMPLETE" | "PARTIAL" | "UNKNOWN" });
   }
 }
 

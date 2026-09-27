@@ -44,7 +44,7 @@ function signGo(payload: HumanGoPayload | Record<string, unknown>, privateKey: R
   return canonicalJson({ algorithm: "Ed25519", key_id: "go:test", payload: bytes.toString("base64url"), signature: sign(null, bytes, privateKey).toString("base64url") });
 }
 
-function start(r: Rig): RunnerSession { r.custodian.createRun(r.spec, r.artifact); const session = r.custodian.issueOwnerSession(r.spec.run_id); const receipt = r.custodian.preflight(session); r.custodian.activate(session, receipt); return session; }
+function start(r: Rig): RunnerSession { r.custodian.createRun(r.spec, r.artifact); const session = r.custodian.issueOwnerSession(r.spec.run_id); r.custodian.armObservation(session, { kind: "TEST_ONLY_EXPLICIT", cadence_seconds: 30, maximum_gap_seconds: 60, clock_mapping: "SAME_TEST_CLOCK" }); const receipt = r.custodian.preflight(session); r.custodian.activate(session, receipt); return session; }
 function work(r: Rig, session: RunnerSession, capability: "editorial.cycle" | "editorial.outcome_evaluation" | "threads.publish.dry_run", sourceId: string) { const ticket = r.custodian.admit(session, capability, sourceId); r.source.complete(ticket.claim_id); r.custodian.reconcile(session, ticket.work_id); return ticket; }
 function positive(r: Rig) {
   const first = start(r); work(r, first, "editorial.cycle", "cycle:one"); r.custodian.stop(first, "STOP");
@@ -167,6 +167,26 @@ describe("WP3 CATFOOD corrective adversarial plan", () => {
   } finally { r.close(); } });
 
   test("T18 expired GO still permits safety stop and reconcile", () => { const r = rig(); try { const session = start(r); const ticket = r.custodian.admit(session, "editorial.cycle", "cycle:one"); r.source.complete(ticket.claim_id); r.clock.advance(90_000_001); expect(() => r.custodian.reconcile(session, ticket.work_id)).not.toThrow(); expect(() => r.custodian.stop(session, "EXPIRY")).not.toThrow(); } finally { r.close(); } });
+
+  test("corrective03 renews short authority and owner leases without changing producer generation", () => { const r = rig("run-short-renewal"); try {
+    const session = start(r); const before = CATFOOD_CAPABILITIES.map((capability) => r.source.generation(capability)); r.clock.advance(60_000);
+    r.custodian.renewOwnerSession(session); r.custodian.renewAuthorities(session);
+    expect(CATFOOD_CAPABILITIES.map((capability) => r.source.generation(capability))).toEqual(before);
+    r.clock.advance(61_000); expect(() => r.custodian.admit(session, "editorial.cycle", "cycle:one")).not.toThrow();
+    const db = new Database(r.control); const expiries = db.query<{ permit_expires_at: string }, []>("SELECT permit_expires_at FROM catfood_authority_bindings").all(); db.close();
+    expect(expiries.every((row) => Date.parse(row.permit_expires_at) - (r.clock.wallMs - 61_000) <= 120_000)).toBe(true);
+  } finally { r.close(); } });
+
+  test("corrective03 paid and writer gates apply before grant and admission", () => { const r = rig("run-paid-gate"); try {
+    r.custodian.createRun(r.spec, r.artifact); const session = r.custodian.issueOwnerSession(r.spec.run_id); r.custodian.armObservation(session, { kind: "TEST_ONLY_EXPLICIT", cadence_seconds: 30, maximum_gap_seconds: 60, clock_mapping: "SAME_TEST_CLOCK" });
+    r.source.runtime = { ...r.source.runtime, writer_enabled: true }; expect(() => r.custodian.preflight(session)).toThrow("PAID_PATH_NOT_DISABLED");
+  } finally { r.close(); } });
+
+  test("corrective03 late reconciliation retains terminal evidence before denying acceptance credit", () => { const r = rig("run-late-reconcile"); try {
+    const session = start(r); const ticket = r.custodian.admit(session, "editorial.cycle", "cycle:one"); r.clock.advance(86_400_000); r.source.complete(ticket.claim_id);
+    expect(() => r.custodian.reconcile(session, ticket.work_id)).not.toThrow(); r.custodian.stop(session, "STOP"); const result = r.custodian.closeRun(session);
+    expect(result.reason_codes).toContain("WORK_COMPLETED_OUTSIDE_WINDOW"); const db = new Database(r.control); expect(db.query<{ status: string }, [string]>("SELECT status FROM catfood_work_admissions WHERE work_id=?").get(ticket.work_id)?.status).toBe("TERMINAL"); db.close();
+  } finally { r.close(); } });
 
   test("T19 fixed policy cannot be weakened by run spec", () => { expect(CATFOOD_FIXED_POLICY.continuous_duration_seconds).toBe(86_400); expect(CATFOOD_FIXED_POLICY.minimum_meaningful_units).toBe(3); expect(CATFOOD_FIXED_POLICY.minimum_capability_classes).toBe(2); expect(() => createCatfoodRunSpec({ duration: 1 } as never)).toThrow(); });
 

@@ -110,6 +110,8 @@ export interface ThreadsSourceContext {
   credential_version_ref: string;
   source_build_sha256: string;
   protected_probe: { probe_id: string; foreign_account_id: string };
+  principal_binding: { actor: string; organization_id: string; account_id: string };
+  runtime_prohibitions: { writer_enabled: false; paid_generation_enabled: false };
   intents: readonly ThreadsInventoryItem[];
   operational_provenance?: OperationalProvenance;
 }
@@ -156,7 +158,7 @@ export class OperationalThreadsEvidenceSource implements ThreadsEvidenceSource {
   runtimeEvidence(_spec: CatfoodRunSpec): ThreadsRuntimeEvidence {
     if (!this.lastPage) throw new CatfoodTrustError("COE_ACQUISITION_REQUIRED");
     const runtime = this.lastPage.runtime_enforcement as Record<string, unknown>; const activity = this.lastPage.prohibited_activity as Record<string, unknown>;
-    return Object.freeze({ feature_multi_tenant_auth: runtime.configured_auth_state === "ON" ? "ON" : runtime.configured_auth_state === "OFF" ? "OFF" : "UNKNOWN", own_scope_status: 200, foreign_scope_status: 403, writer_enabled: "UNKNOWN", paid_generation_enabled: "UNKNOWN", provider_activity_count: Number(activity.provider_attempt_count), paid_cost_micros: Number(activity.provider_attempt_count) === 0 ? 0 : "UNKNOWN", cost_coverage: activity.coverage as ThreadsRuntimeEvidence["cost_coverage"] });
+    return Object.freeze({ feature_multi_tenant_auth: runtime.configured_auth_state === "ON" ? "ON" : runtime.configured_auth_state === "OFF" ? "OFF" : "UNKNOWN", own_scope_status: 200, foreign_scope_status: 403, writer_enabled: this.context.runtime_prohibitions.writer_enabled, paid_generation_enabled: this.context.runtime_prohibitions.paid_generation_enabled, provider_activity_count: Number(activity.provider_attempt_count), paid_cost_micros: Number(activity.provider_attempt_count) === 0 ? 0 : "UNKNOWN", cost_coverage: activity.coverage as ThreadsRuntimeEvidence["cost_coverage"] });
   }
 
   tenantProbe(spec: CatfoodRunSpec): TenantProbeEvidence {
@@ -175,16 +177,20 @@ export class OperationalThreadsEvidenceSource implements ThreadsEvidenceSource {
     return structuredClone(this.context.intents);
   }
 
-  grant(spec: CatfoodRunSpec, capability: CatfoodCapability, authorityRef: string, expectedGeneration: number | null): ThreadsAuthorityTransition {
-    return this.authority(spec, capability, authorityRef, expectedGeneration, "grant");
+  grant(spec: CatfoodRunSpec, capability: CatfoodCapability, authorityRef: string, expectedGeneration: number | null, permitExpiresAt: string): ThreadsAuthorityTransition {
+    return this.authority(spec, capability, authorityRef, expectedGeneration, "grant", permitExpiresAt);
+  }
+
+  renew(spec: CatfoodRunSpec, capability: CatfoodCapability, authorityRef: string, expectedGeneration: number, permitExpiresAt: string): ThreadsAuthorityTransition {
+    return this.authority(spec, capability, authorityRef, expectedGeneration, "renew", permitExpiresAt);
   }
 
   revoke(spec: CatfoodRunSpec, capability: CatfoodCapability, authorityRef: string, expectedGeneration: number): ThreadsAuthorityTransition {
     return this.authority(spec, capability, authorityRef, expectedGeneration, "revoke");
   }
 
-  private authority(spec: CatfoodRunSpec, capability: CatfoodCapability, authorityRef: string, expectedGeneration: number | null, action: "grant" | "revoke"): ThreadsAuthorityTransition {
-    const value = this.adapter.changeAuthority({ action, account_id: spec.account_id, capability, authority_ref: authorityRef, spec_hash: spec.spec_sha256, expected_generation: expectedGeneration, permit_expires_at: action === "grant" ? spec.requested_window_end : null }) as Record<string, unknown>;
+  private authority(spec: CatfoodRunSpec, capability: CatfoodCapability, authorityRef: string, expectedGeneration: number | null, action: "grant" | "renew" | "revoke", permitExpiresAt: string | null = null): ThreadsAuthorityTransition {
+    const value = this.adapter.changeAuthority({ action, account_id: spec.account_id, capability, authority_ref: authorityRef, spec_hash: spec.spec_sha256, expected_generation: expectedGeneration, permit_expires_at: action === "revoke" ? null : permitExpiresAt }) as Record<string, unknown>;
     const expected = ["account_id", "authority_ref", "authority_state", "capability", "fencing_generation", "permit_expires_at", "spec_hash", "stop_acknowledgement"];
     if (Object.keys(value).sort().join() !== expected.sort().join() || value.account_id !== spec.account_id || value.capability !== capability || value.authority_ref !== authorityRef || value.spec_hash !== spec.spec_sha256 || !Number.isSafeInteger(value.fencing_generation)) throw new CatfoodTrustError("THREADS_AUTHORITY_RESPONSE_INVALID");
     return Object.freeze({ boundary: this.adapter.boundary(spec.account_id, capability), authority_ref: authorityRef, generation: Number(value.fencing_generation) });
@@ -224,6 +230,9 @@ export class OperationalThreadsEvidenceSource implements ThreadsEvidenceSource {
   private project(spec: CatfoodRunSpec, evidence: CoeAcquisition, first: Record<string, Json>, terminal: Record<string, Json>): ThreadsClaimRecord {
     const state = String(terminal.event_type); const result = attemptResult(terminal); const complete = ["SUCCEEDED", "FAILED", "UNRESOLVED", "DUPLICATE", "REPLAYED", "REJECTED_PRECLAIM"].includes(state);
     const providerCount = Number(evidence.prohibited_activity.provider_attempt_count);
-    return Object.freeze({ source_id: String(first.request_id), capability: String(first.capability) as CatfoodCapability, business_identity: String(first.business_identity), material_revision: String(first.material_revision), claim_id: String(first.claim_identity), request_id: String(first.request_id), account_id: String(first.account_id), authority_ref: String(first.authority_ref), generation: Number(first.threads_generation), claim_status: !complete ? "in_progress" : state === "SUCCEEDED" ? "succeeded" : "failed", transport_status: "SUCCEEDED", domain_result: result, provider_invoked: providerCount !== 0, paid_cost_micros: providerCount === 0 ? 0 : "UNKNOWN", admitted_at: producerTimestamp(first.occurred_at), completed_at: complete ? producerTimestamp(terminal.occurred_at) : null, invocation_receipt: { receipt_id: `invoke:${String(first.event_id)}`, source_session_id: evidence.page_receipts[0]?.source_session_id as string ?? `source:${evidence.digest}`, principal_ref: this.context.principal_ref, credential_version_ref: this.context.credential_version_ref, organization_id: spec.organization_id, account_id: String(first.authenticated_account_id), capability: String(first.capability), authority_ref: String(first.verified_authority_ref), spec_hash: String(first.verified_spec_hash), generation: Number(first.verified_threads_generation) } });
+    const authority = evidence.records.find((row) => row.source === "operational_authority_events" && row.event_type === "GRANTED" && row.actor === this.context.principal_binding.actor && row.account_id === this.context.principal_binding.account_id && row.capability === first.capability && row.authority_ref === first.verified_authority_ref && row.spec_hash === first.verified_spec_hash && row.generation === first.verified_threads_generation && Date.parse(String(row.occurred_at)) <= Date.parse(String(first.occurred_at)));
+    const invocation_receipt = authority ? { receipt_id: `invoke:${String(first.event_id)}`, source_session_id: evidence.page_receipts[0]?.source_session_id as string ?? `source:${evidence.digest}`, principal_ref: this.context.principal_ref, credential_version_ref: this.context.credential_version_ref, organization_id: this.context.principal_binding.organization_id, account_id: this.context.principal_binding.account_id, capability: String(first.capability), authority_ref: String(first.verified_authority_ref), spec_hash: String(first.verified_spec_hash), generation: Number(first.verified_threads_generation), authority_event_id: String(authority.event_id), authority_actor: String(authority.actor), authority_occurred_at: producerTimestamp(authority.occurred_at) } : undefined;
+    if (this.context.principal_binding.organization_id !== spec.organization_id || this.context.principal_binding.account_id !== spec.account_id) throw new CatfoodTrustError("THREADS_PRINCIPAL_BINDING_MISMATCH");
+    return Object.freeze({ source_id: String(first.request_id), capability: String(first.capability) as CatfoodCapability, business_identity: String(first.business_identity), material_revision: String(first.material_revision), claim_id: String(first.claim_identity), request_id: String(first.request_id), account_id: String(first.account_id), authority_ref: String(first.authority_ref), generation: Number(first.threads_generation), claim_status: !complete ? "in_progress" : state === "SUCCEEDED" ? "succeeded" : "failed", transport_status: "SUCCEEDED", domain_result: result, provider_invoked: providerCount !== 0, paid_cost_micros: providerCount === 0 ? 0 : "UNKNOWN", admitted_at: producerTimestamp(first.occurred_at), completed_at: complete ? producerTimestamp(terminal.occurred_at) : null, ...(invocation_receipt ? { invocation_receipt } : {}) });
   }
 }
