@@ -270,7 +270,7 @@ describe("WP3 CATFOOD corrective adversarial plan", () => {
   } finally { r.close(); } });
 
   test("corrective02 operational roots/build remain unprovisioned and relabelled fixtures cannot cross the boundary", () => {
-    expect(() => openOperationalCatfoodCustodian()).toThrow("OPERATIONAL_BOOTSTRAP_UNPROVISIONED"); const r = rig("run-relabel"); try { Object.defineProperty(r.source, "mode", { value: "OPERATIONAL" }); expect(() => new ProtectedCatfoodCustodian(r.control, r.checkpoint, r.source, r.clock)).toThrow("THREADS_SOURCE_IDENTITY_MISMATCH"); } finally { r.close(); }
+    expect(() => openOperationalCatfoodCustodian()).toThrow("OPERATIONAL_SUPERVISOR_ENROLLMENT_UNAVAILABLE"); const r = rig("run-relabel"); try { Object.defineProperty(r.source, "mode", { value: "OPERATIONAL" }); expect(() => new ProtectedCatfoodCustodian(r.control, r.checkpoint, r.source, r.clock)).toThrow("THREADS_SOURCE_IDENTITY_MISMATCH"); } finally { r.close(); }
   });
 
   test("RFC 8032 Ed25519 vector verifies with the established crypto implementation", () => {

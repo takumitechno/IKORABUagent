@@ -1177,7 +1177,7 @@ export class ProtectedCatfoodCustodian {
   }
 
   evaluate(runId: string): EvaluationResult {
-    const reasons = new Set<string>(); let bundle: Record<string, Json>;
+    let bundle: Record<string, Json>;
     try { bundle = this.rederive(runId); } catch (error) {
       const code = error instanceof CatfoodTrustError ? error.code : "REDERIVATION_FAILED";
       return Object.freeze({ verdict: code.includes("TAMPER") || code.includes("CORRUPT") || code.includes("CHAIN") ? "FAIL" : "BLOCKED", reason_codes: Object.freeze([code]), rederived_bundle_sha256: "", evaluator_sha256: CATFOOD_EVALUATOR_SHA256, policy_sha256: CATFOOD_POLICY_SHA256, test_only: this.trust.source_mode === "TEST_ONLY", evidence_coverage: "UNKNOWN" });
@@ -1187,54 +1187,6 @@ export class ProtectedCatfoodCustodian {
       const digest = sha256(canonicalJson(bundle)); const cacheValid = !cache || cache.bundle_sha256 === digest && canonicalJson(JSON.parse(cache.bundle_json)) === canonicalJson(bundle);
       return evaluateCatfoodAcceptance(bundle, this.trust.source_mode === "TEST_ONLY", cacheValid);
     }
-    /* istanbul ignore next -- retained only until the next schema-breaking cleanup */
-    const run = plain(bundle.run, "bundle.run"); const works = bundle.work as unknown as Record<string, unknown>[]; const authorities = bundle.authorities as unknown as Record<string, unknown>[]; const journal = bundle.journal as unknown as Record<string, unknown>[];
-    if (run.lifecycle !== "CLOSED") reasons.add("RUN_OPEN");
-    if (run.evidence_state !== "ANCHORED") reasons.add("EVIDENCE_UNANCHORED");
-    const spec = plain(bundle.spec, "bundle.spec");
-    for (const reason of observationCoverageReasons(journal, run, spec)) reasons.add(reason);
-    if (journal.some((event) => ["PAUSE_REQUESTED", "STOP_UNCONFIRMED"].includes(String(event.event_type)))) reasons.add("CONTINUOUS_COVERAGE_BROKEN");
-    if (Number(run.current_epoch) < 2 || !journal.some((event) => event.event_type === "RESTART_TAKEOVER")) reasons.add("RESTART_NOT_PROVEN");
-    const inWindow = (work: Record<string, unknown>) => { const claim = work.terminal_json as ThreadsClaimRecord | null; return !!claim?.completed_at && Date.parse(claim.completed_at) >= Date.parse(String(spec.requested_window_start)) && Date.parse(claim.completed_at) < Date.parse(String(spec.requested_window_end)); };
-    if (works.some((work) => work.status === "TERMINAL" && !inWindow(work))) reasons.add("WORK_COMPLETED_OUTSIDE_WINDOW");
-    const meaningful = works.filter((work) => inWindow(work) && this.meaningful(work));
-    if (meaningful.length < CATFOOD_FIXED_POLICY.minimum_meaningful_units) reasons.add("MEANINGFUL_WORK_COUNT_NOT_MET");
-    if (new Set(meaningful.map((work) => work.capability)).size < CATFOOD_FIXED_POLICY.minimum_capability_classes) reasons.add("MEANINGFUL_CLASS_COUNT_NOT_MET");
-    if (!meaningful.some((work) => Number(work.wp3_epoch) === 1) || !meaningful.some((work) => Number(work.wp3_epoch) > 1)) reasons.add("RESTART_WORK_COVERAGE_NOT_MET");
-    if (works.some((work) => work.status !== "TERMINAL")) reasons.add("UNRESOLVED_WORK");
-    for (const work of works) { const decision = plain(work.governed_decision, "governed_decision"); if (decision.disposition === "FAIL" || decision.disposition === "BLOCKED") reasons.add(String(decision.reason)); }
-    const finalSource = plain(bundle.final_source, "bundle.final_source"); const coeAssessment = plain(finalSource.coeAssessment, "bundle.final_source.coeAssessment");
-    for (const reason of coeAssessment.reasons as unknown as string[]) reasons.add(reason);
-    for (const reason of finalSource.run_membership_reasons as unknown as string[]) reasons.add(reason);
-    const finalBoundaries = finalSource.boundaries as unknown as OperationalBoundaryV1[];
-    if (!Array.isArray(finalBoundaries) || finalBoundaries.some((boundary) => boundary.execution_state !== "INHIBITED" || boundary.stop_acknowledgement !== "INHIBITED" || Number((boundary.governed_in_flight as Record<string, unknown>).count) !== 0)) reasons.add("FINAL_AUTHORITY_OPEN");
-    if (works.some((work) => {
-      const result = work.terminal_json ? (typeof work.terminal_json === "string" ? JSON.parse(work.terminal_json) : work.terminal_json) as ThreadsClaimRecord : null;
-      return result && (result.provider_invoked || result.paid_cost_micros === "UNKNOWN" || Number(result.paid_cost_micros) !== 0);
-    })) reasons.add("PROVIDER_COST_VIOLATION");
-    for (const capability of new Set(authorities.map((authority) => String(authority.capability)))) {
-      const last = [...journal].reverse().find((event) => {
-        const payload = typeof event.payload_json === "string" ? JSON.parse(event.payload_json) : event.payload_json as Record<string, unknown>;
-        return event.event_type === "THREADS_AUTHORITY_REVOKED" && payload.capability === capability;
-      });
-      if (!last) reasons.add("FINAL_AUTHORITY_OPEN");
-    }
-    const cache = this.control.query<{ bundle_json: string; bundle_sha256: string }, [string]>("SELECT bundle_json,bundle_sha256 FROM catfood_bundle_cache WHERE run_id=?").get(runId);
-    const digest = sha256(canonicalJson(bundle));
-    if (cache && (cache.bundle_sha256 !== digest || canonicalJson(JSON.parse(cache.bundle_json)) !== canonicalJson(bundle))) reasons.add("BUNDLE_CACHE_TAMPERED");
-    const verdict = verdictFromReasons(reasons);
-    return Object.freeze({ verdict, reason_codes: Object.freeze([...reasons].sort()), rederived_bundle_sha256: digest, evaluator_sha256: CATFOOD_EVALUATOR_SHA256, policy_sha256: CATFOOD_POLICY_SHA256, test_only: this.trust.source_mode === "TEST_ONLY", evidence_coverage: coverageOf({ evidence: finalSource.coe as unknown as CoeAcquisition } as CoeAssessment) });
-  }
-
-  private meaningful(work: Record<string, unknown>): boolean {
-    if (work.status !== "TERMINAL" || !work.terminal_json || plain(work.governed_decision, "governed_decision").disposition !== "CREDIT") return false;
-    const claim = (typeof work.terminal_json === "string" ? JSON.parse(work.terminal_json) : work.terminal_json) as ThreadsClaimRecord;
-    if (claim.claim_status !== "succeeded" || claim.transport_status !== "SUCCEEDED" || claim.provider_invoked || claim.paid_cost_micros === "UNKNOWN" || Number(claim.paid_cost_micros) !== 0) return false;
-    const result = claim.domain_result;
-    if (claim.capability === "editorial.cycle") return result.state === "DRAFT" && result.status === "READY" && result.mutated === false && typeof result.cycle_id === "string";
-    if (claim.capability === "editorial.outcome_evaluation") return result.state === "SUCCEEDED" && typeof result.result_identity === "string" && ["SUCCESS", "FAILURE", "INVALID_EXPERIMENT"].includes(String(result.native_domain_state));
-    if (claim.capability === "threads.publish.dry_run") return result.status === "succeeded" && result.mode === "dry_run" && result.duplicate === false;
-    return false;
   }
 }
 
@@ -1319,25 +1271,6 @@ export class IndependentCatfoodEvaluator {
       const digest = sha256(canonicalJson(bundle)); const cacheValid = !cache || cache.bundle_sha256 === digest && canonicalJson(JSON.parse(cache.bundle_json)) === canonicalJson(bundle);
       return evaluateCatfoodAcceptance(bundle, this.trust.source_mode === "TEST_ONLY", cacheValid);
     }
-    /* istanbul ignore next -- retained only until the next schema-breaking cleanup */
-    const reasons = new Set<string>(); const run = plain(bundle.run, "run"); const work = bundle.work as unknown as Record<string, unknown>[]; const journal = bundle.journal as unknown as Record<string, unknown>[]; const source = plain(bundle.final_source, "source"); const boundaries = source.boundaries as unknown as OperationalBoundaryV1[]; const coeAssessment = plain(source.coeAssessment, "coeAssessment");
-    for (const reason of coeAssessment.reasons as unknown as string[]) reasons.add(reason);
-    for (const reason of source.run_membership_reasons as unknown as string[]) reasons.add(reason);
-    if (run.lifecycle !== "CLOSED") reasons.add("RUN_OPEN"); if (run.evidence_state !== "ANCHORED") reasons.add("EVIDENCE_UNANCHORED");
-    const spec = plain(bundle.spec, "spec"); for (const reason of observationCoverageReasons(journal, run, spec)) reasons.add(reason);
-    if (journal.some((event) => ["PAUSE_REQUESTED", "STOP_UNCONFIRMED"].includes(String(event.event_type)))) reasons.add("CONTINUOUS_COVERAGE_BROKEN");
-    if (Number(run.current_epoch) < 2 || !journal.some((event) => event.event_type === "RESTART_TAKEOVER")) reasons.add("RESTART_NOT_PROVEN");
-    const inWindow = (item: Record<string, unknown>) => { const claim = item.terminal_json as ThreadsClaimRecord | null; return !!claim?.completed_at && Date.parse(claim.completed_at) >= Date.parse(String(spec.requested_window_start)) && Date.parse(claim.completed_at) < Date.parse(String(spec.requested_window_end)); };
-    if (work.some((item) => item.status === "TERMINAL" && !inWindow(item))) reasons.add("WORK_COMPLETED_OUTSIDE_WINDOW");
-    const meaningful = work.filter((item) => inWindow(item) && meaningfulClaim(item));
-    if (meaningful.length < 3) reasons.add("MEANINGFUL_WORK_COUNT_NOT_MET"); if (new Set(meaningful.map((item) => item.capability)).size < 2) reasons.add("MEANINGFUL_CLASS_COUNT_NOT_MET");
-    if (!meaningful.some((item) => Number(item.wp3_epoch) === 1) || !meaningful.some((item) => Number(item.wp3_epoch) > 1)) reasons.add("RESTART_WORK_COVERAGE_NOT_MET");
-    if (work.some((item) => item.status !== "TERMINAL")) reasons.add("UNRESOLVED_WORK");
-    for (const item of work) { const decision = plain(item.governed_decision, "governed_decision"); if (decision.disposition === "FAIL" || decision.disposition === "BLOCKED") reasons.add(String(decision.reason)); }
-    if (boundaries.some((boundary) => boundary.execution_state !== "INHIBITED" || boundary.stop_acknowledgement !== "INHIBITED" || Number((boundary.governed_in_flight as Record<string, unknown>).count) !== 0)) reasons.add("FINAL_AUTHORITY_OPEN");
-    const digest = sha256(canonicalJson(bundle)); const cache = this.control.query<{ bundle_json: string; bundle_sha256: string }, [string]>("SELECT bundle_json,bundle_sha256 FROM catfood_bundle_cache WHERE run_id=?").get(runId);
-    if (cache && (cache.bundle_sha256 !== digest || canonicalJson(JSON.parse(cache.bundle_json)) !== canonicalJson(bundle))) reasons.add("BUNDLE_CACHE_TAMPERED");
-    return Object.freeze({ verdict: verdictFromReasons(reasons), reason_codes: Object.freeze([...reasons].sort()), rederived_bundle_sha256: digest, evaluator_sha256: CATFOOD_EVALUATOR_SHA256, policy_sha256: CATFOOD_POLICY_SHA256, test_only: this.trust.source_mode === "TEST_ONLY", evidence_coverage: String((source.coe as Record<string, unknown>).coverage && ((source.coe as Record<string, unknown>).coverage as Record<string, unknown>).state) as "COMPLETE" | "PARTIAL" | "UNKNOWN" });
   }
 }
 
