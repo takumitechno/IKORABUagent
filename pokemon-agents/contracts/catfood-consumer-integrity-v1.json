@@ -4,11 +4,13 @@
   "files": [
     { "path": "pokemon-agents/contracts/catfood-operational-evidence-v1-negative-partial.json", "sha256": "d38e10521205c3e0c8417d156173c78e7784b16b00409c069c0f4c88da15dcae" },
     { "path": "pokemon-agents/contracts/catfood-operational-evidence-v1.json", "sha256": "50b6df97abc73384063a02cd69a7872b829d264177cad11d304678c04057db0e" },
+    { "path": "pokemon-agents/contracts/catfood-producer-canonical-v1.json", "sha256": "09f5375e8dc4dd5231c666a75ea0c1ed1109d643644ff19b71871941ed669e7a" },
     { "path": "pokemon-agents/scripts/check-catfood-consumer-integrity.ts", "sha256": "f95552a4849f77f2b45173f4d2aaa99b810f6b7c77ef4256c4422b4848b42ca6" },
-    { "path": "pokemon-agents/web/lib/catfood-coe.ts", "sha256": "2761ca893d3f9327fd533aafd67d7206862eea710e761923b579da47f931056b" },
+    { "path": "pokemon-agents/web/lib/catfood-coe.ts", "sha256": "891377b1e2ac2c93b2d5e923a87577368d74e5283e6c81eb535d7414c07d7ee5" },
     { "path": "pokemon-agents/web/lib/catfood-harness.ts", "sha256": "e6fa726dfa4c352a00d56342ded0a1c2a6d55a0969fa96bb32d40a088feb114a" },
     { "path": "pokemon-agents/web/lib/catfood-independent-attestation.ts", "sha256": "5c150cff17c8a41ea23f036527e4780228e1cbb81d0d789e30f5aa9e2d147f30" },
-    { "path": "pokemon-agents/web/lib/catfood-threads-http.ts", "sha256": "7200ce576534b7bd204ccce1366a4cf7257b39b93dd877c8000e9b7673f46d29" },
-    { "path": "pokemon-agents/web/lib/catfood-trust.ts", "sha256": "2b2a91a0e4d3e8bbea2f022a6e63218e70e8d6800aa37f6cd9dfe265897b5d9c" }
+    { "path": "pokemon-agents/web/lib/catfood-operational-bootstrap.ts", "sha256": "e0fc94ecb3e4e59e93476c6a808cae43137e9f31bd3ae57957e983cce92dba98" },
+    { "path": "pokemon-agents/web/lib/catfood-threads-http.ts", "sha256": "2c3ac9a21cacaf4ec52960d154d34eb76fb9eccaaa2a92d3a6ad44cfa8153dd1" },
+    { "path": "pokemon-agents/web/lib/catfood-trust.ts", "sha256": "0984876b6e38bccea058a437dfe75d13b18d5f78e56e5678ca9f2289587d32cd" }
   ]
 }

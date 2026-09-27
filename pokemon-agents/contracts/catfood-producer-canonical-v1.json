@@ -1,0 +1,30 @@
+{
+  "producer": "threads_autopilot.production.operational_evidence._json",
+  "threads_sha": "875e75fce20c16c6157b5aa42f759411c52e95fe",
+  "cases": [
+    {
+      "name": "mixed-keys",
+      "value": { "a": 1, "A": 2, "10": 3, "2": 4, "é": 5, "😀": 6, "": 7 },
+      "canonical_utf8_base64url": "eyIxMCI6MywiMiI6NCwiQSI6MiwiYSI6MSwiw6kiOjUsIu6AgCI6Nywi8J-YgCI6Nn0",
+      "sha256": "92e760aed2c10ca54718f4dca28b72afe541f2768821d056a9e911e41c6c12d5"
+    },
+    {
+      "name": "escaping",
+      "value": { "text": "line\nquote\"slash\\ tab\t", "unicode": "雪😀" },
+      "canonical_utf8_base64url": "eyJ0ZXh0IjoibGluZVxucXVvdGVcInNsYXNoXFwgdGFiXHQiLCJ1bmljb2RlIjoi6Zuq8J-YgCJ9",
+      "sha256": "8a097bd4018575e58982d1d84b71ee29d36388b6ab4923ec5990a447a07dc080"
+    },
+    {
+      "name": "arrays-nulls-numbers",
+      "value": { "array": [null, true, false, 0, -7, 1.25, 1000], "nested": { "z": null, "a": [] } },
+      "canonical_utf8_base64url": "eyJhcnJheSI6W251bGwsdHJ1ZSxmYWxzZSwwLC03LDEuMjUsMTAwMF0sIm5lc3RlZCI6eyJhIjpbXSwieiI6bnVsbH19",
+      "sha256": "2dc608828a5e0f2bb2104a2737dc82aa402a7fec0376469ba086fef9ab5465fc"
+    },
+    {
+      "name": "record-order",
+      "value": [{ "source": "z", "event_seq": 2 }, { "source": "a", "event_seq": 1 }],
+      "canonical_utf8_base64url": "W3siZXZlbnRfc2VxIjoyLCJzb3VyY2UiOiJ6In0seyJldmVudF9zZXEiOjEsInNvdXJjZSI6ImEifV0",
+      "sha256": "93745d9e1f397fcc0bf6ba774c8113be19a579250a3654cdacc3a5a4e429aabb"
+    }
+  ]
+}

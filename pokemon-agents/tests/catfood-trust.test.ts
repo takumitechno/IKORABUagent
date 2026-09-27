@@ -15,6 +15,7 @@ import {
 import { FixtureThreadsSource, TestClock } from "./catfood-trust-fixture";
 import { IndependentCatfoodAttestationWriter, initializeIndependentAttestationStore, verifyIndependentAttestation } from "../web/lib/catfood-independent-attestation";
 import { CATFOOD_THREADS_PINS } from "../web/lib/catfood-coe";
+import { openOperationalCatfoodCustodian } from "../web/lib/catfood-operational-bootstrap";
 
 const THREADS = CATFOOD_THREADS_PINS.threads_sha;
 const BOUNDARY = "57d896aa756387048b70dc016e482274d571dd165866416e3fc480d59a97e8cf";
@@ -198,6 +199,17 @@ describe("WP3 CATFOOD corrective adversarial plan", () => {
   } finally { r.close(); } });
 
   test("corrective open run has no closed archive and cannot be evaluated as PASS", () => { const r = rig("run-unsealed"); try { start(r); expect(r.custodian.evaluate(r.spec.run_id)).toMatchObject({ verdict: "BLOCKED", reason_codes: ["CLOSED_SOURCE_ARCHIVE_MISSING"] }); } finally { r.close(); } });
+
+  test("corrective02 observation arm is non-permitting and active stop records BLOCKED without PREFLIGHT_PASSED", () => { const r = rig("run-arm-stop"); try {
+    r.custodian.createRun(r.spec, r.artifact); const owner = r.custodian.issueOwnerSession(r.spec.run_id); r.custodian.armObservation(owner, { kind: "TEST_ONLY_EXPLICIT", cadence_seconds: 30, maximum_gap_seconds: 60, clock_mapping: "SAME_TEST_CLOCK" });
+    const original = r.source.boundaries.bind(r.source); r.source.boundaries = ((spec: CatfoodRunSpec) => original(spec).map((boundary) => rehashBoundary(boundary, { effective_safety_controls: { global_stop: true, account_stop: false, capability_stop: true, reasons: ["global_stop"] } }))) as typeof r.source.boundaries;
+    expect(() => r.custodian.preflight(owner)).toThrow("BOUNDARY_STOP_ACTIVE"); const db = new Database(r.control); const types = db.query<{ event_type: string }, []>("SELECT event_type FROM catfood_source_journal ORDER BY sequence").all().map((row) => row.event_type); db.close();
+    expect(types).toContain("OBSERVATION_ARMED"); expect(types).toContain("PREPARATION_OBSERVED"); expect(types).toContain("ADMISSION_BLOCKED"); expect(types).not.toContain("PREFLIGHT_PASSED"); expect(r.source.generation("editorial.cycle")).toBeNull();
+  } finally { r.close(); } });
+
+  test("corrective02 operational roots/build remain unprovisioned and relabelled fixtures cannot cross the boundary", () => {
+    expect(() => openOperationalCatfoodCustodian()).toThrow("OPERATIONAL_BOOTSTRAP_UNPROVISIONED"); const r = rig("run-relabel"); try { Object.defineProperty(r.source, "mode", { value: "OPERATIONAL" }); expect(() => new ProtectedCatfoodCustodian(r.control, r.checkpoint, r.source, r.clock)).toThrow("THREADS_SOURCE_IDENTITY_MISMATCH"); } finally { r.close(); }
+  });
 
   test("RFC 8032 Ed25519 vector verifies with the established crypto implementation", () => {
     const seed = Buffer.from("9d61b19deffd5a60ba844af492ec2cc44449c5697b326919703bac031cae7f60", "hex");

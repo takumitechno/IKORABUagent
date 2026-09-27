@@ -4,7 +4,7 @@ import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { canonicalJson, sha256 } from "../web/lib/catfood-harness";
 import {
-  CATFOOD_THREADS_DEPENDENCY_ROOT, CATFOOD_THREADS_PINS, acquireCoe, assessCoe, assertFrozenDependencies, decodeCoeFixture, parseJsonNoDuplicateKeys,
+  CATFOOD_THREADS_DEPENDENCY_ROOT, CATFOOD_THREADS_PINS, COE_FIELD_REGISTRY, acquireCoe, assessCoe, assertFrozenDependencies, canonicalCoeJson, decodeCoeFixture, foldProducerAttempts, governedEvidenceReasons, parseJsonNoDuplicateKeys,
   stableCoeEvidence, validateOutcomeEvaluationRequest, verifyGovernedWork,
   type CoeAcquisition, type CoeRequest, type CoeScope,
 } from "../web/lib/catfood-coe";
@@ -22,6 +22,39 @@ const scope = (): CoeScope => ({
   emitter_inventory_sha256: CATFOOD_THREADS_PINS.emitter_inventory_sha256,
   requested_window_start: "2026-09-30T00:00:00Z",
   requested_window_end: "2026-10-01T00:00:00Z",
+});
+
+describe("WP3 corrective02 producer composition", () => {
+  test("T01-T03 folds producer lifecycle revisions without arrival-order credit", () => {
+    const succeeded = attempt(); const claimed = { ...succeeded, event_seq: 0, event_id: "event:claim", event_type: "CLAIMED", execution_state: "IN_PROGRESS", lifecycle_revision: 1, result_identity: null, result_json: null, result_revision: null, domain_state: null, occurred_at: "2026-09-30T23:59:59+00:00" };
+    const evidence = { ...acquisition(), records: [succeeded, claimed] } as CoeAcquisition; const folded = foldProducerAttempts(evidence);
+    expect(folded).toHaveLength(1); expect(folded[0]!.lifecycle.map((row) => row.lifecycle_revision)).toEqual([1, 2]); expect(folded[0]!.terminal.event_type).toBe("SUCCEEDED"); expect(governedEvidenceReasons(evidence)).not.toContain("COE_GOVERNED_WORK_UNRESOLVED");
+    expect(() => foldProducerAttempts({ ...evidence, records: [claimed, { ...succeeded, lifecycle_revision: 1 }] })).toThrow("COE_LIFECYCLE_REVISION_CONFLICT");
+    expect(() => foldProducerAttempts({ ...evidence, records: [claimed, { ...succeeded, account_id: "acct_other" }] })).toThrow("COE_LIFECYCLE_IDENTITY_DRIFT");
+  });
+
+  test("T05-T08 null org requires the protected invocation binding and unrelated failures do not poison COE health", () => {
+    const row = { ...attempt(), org_id: null, authenticated_org_id: null }; const evidence = { ...acquisition(), records: [row] } as CoeAcquisition;
+    const work = { account_id: "acct_test", capability: "editorial.cycle", claim_id: "claim:one", request_id: "request:one", authority_ref: "authority:one", generation: 1, business_identity: "article:one", material_revision: "a".repeat(64), domain_result: { state: "DRAFT", status: "READY" } };
+    expect(verifyGovernedWork(evidence, work, "e".repeat(64), "org:test").reason).toBe("COE_GOVERNED_WORK_IDENTITY_MISMATCH");
+    const invocation_receipt = { receipt_id: "receipt:one", source_session_id: "source:one", principal_ref: "principal:one", credential_version_ref: "credential:v1", organization_id: "org:test", account_id: "acct_test", capability: "editorial.cycle", authority_ref: "authority:one", spec_hash: "e".repeat(64), generation: 1 };
+    expect(verifyGovernedWork(evidence, { ...work, invocation_receipt }, "e".repeat(64), "org:test").disposition).toBe("CREDIT");
+    const unrelated = { ...attempt("FAILED", "request:old"), claim_identity: "claim:old", attempt_id: "attempt:old", event_id: "event:old", occurred_at: "2020-01-01T00:00:00+00:00" };
+    expect(assessCoe({ ...acquisition(), records: [unrelated] } as CoeAcquisition, clock().sample().wall_time).state).toBe("READY");
+  });
+
+  test("T10/T23 registry is explicit and frozen producer canonical vectors are independent", () => {
+    expect(Object.keys(COE_FIELD_REGISTRY).length).toBeGreaterThan(100); expect(Object.values(COE_FIELD_REGISTRY)).toContain("A_IMMUTABLE_EQUAL"); expect(Object.values(COE_FIELD_REGISTRY)).toContain("B_CONSERVATIVE"); expect(Object.values(COE_FIELD_REGISTRY)).toContain("C_PAGE_LOCAL");
+    const vectors = JSON.parse(readFileSync(resolve(import.meta.dir, "../contracts/catfood-producer-canonical-v1.json"), "utf8"));
+    for (const vector of vectors.cases) { const canonical = canonicalCoeJson(vector.value); expect(Buffer.from(vector.canonical_utf8_base64url, "base64url").toString("utf8")).toBe(canonical); expect(sha256(canonical)).toBe(vector.sha256); }
+  });
+
+  test("T23 preserves exact response bytes separately from semantic record roots", () => {
+    const template = source().operationalEvidence({ account_id: "acct_test", capability: null, assessment_mode: "LIVE", window_start: scope().requested_window_start, window_end: scope().requested_window_end, page_size: 500, cursor: null });
+    const captured = (raw: string) => ({ operationalEvidence: () => ({ parsed: JSON.parse(raw), receipt: { representation: "AUTHENTICATED_DECODED_BODY", body_base64url: Buffer.from(raw).toString("base64url"), byte_length: Buffer.byteLength(raw), body_sha256: sha256(raw), content_type: "application/json", content_encoding: "identity", source_session_id: "source:test" } }) });
+    const compact = JSON.stringify(template); const spaced = JSON.stringify(template, null, 2); const one = acquireCoe(captured(compact), scope()); const two = acquireCoe(captured(spaced), scope());
+    expect(one.coverage.record_set_digest).toBe(two.coverage.record_set_digest); expect(one.page_receipts[0]!.body_sha256).not.toBe(two.page_receipts[0]!.body_sha256); expect(one.representation).toBe("AUTHENTICATED_DECODED_BODY");
+  });
 });
 
 function source(transform?: (page: any, request: Readonly<CoeRequest>) => unknown) {
