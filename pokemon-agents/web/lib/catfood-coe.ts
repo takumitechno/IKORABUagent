@@ -159,16 +159,37 @@ export interface ProtectedInvocationBinding {
   authority_ref: string;
   spec_hash: string;
   generation: number;
+  authority_event_id: string;
+  authority_actor: string;
+  authority_occurred_at: string;
 }
 
 export interface FoldedAttempt {
   namespace: string;
   attempt_id: string;
   first: Record<string, Json>;
+  claim_origin: Record<string, Json> | null;
   terminal: Record<string, Json>;
   lifecycle: readonly Record<string, Json>[];
   first_occurred_at: string;
   terminal_occurred_at: string;
+}
+
+export type RunMembership = "IN_SCOPE" | "PROVEN_OUT_OF_SCOPE" | "UNRESOLVED_MEMBERSHIP";
+export interface AttemptMembershipDecision {
+  namespace: string;
+  membership: RunMembership;
+  reason: string;
+  source_refs: readonly string[];
+  attempt: FoldedAttempt;
+}
+export interface RunMembershipContext {
+  account_id: string;
+  spec_hash: string;
+  window_start: string;
+  window_end: string;
+  authorities: readonly Readonly<{ capability: string; authority_ref: string; generation: number }>[];
+  intents: readonly Readonly<{ request_id: string; claim_id?: string | null }>[];
 }
 
 export interface CoeAssessment {
@@ -195,6 +216,7 @@ const TRUST = ["environment_identity", "reason", "registry_revision", "source_id
 const TOPOLOGY = ["execution_worker_count", "execution_worker_ids", "observed_boot_id", "observer_kind", "process_inventory_digest", "reason", "status"];
 const CHECKPOINT = ["checkpoint_id", "lineage", "protection_provenance", "range_end", "range_start", "reason", "root", "status"];
 const ACTIVITY = ["activity", "count_semantics", "coverage", "dry_run_preparation_count", "emitter_dispositions", "expected_emitter_inventory_digest", "exposure", "integrity_reason", "known_cost_count", "known_zero", "live_publication_attempt_count", "package_proven_exclusions", "pending_cost_count", "provider_attempt_count", "rehearsal_required_emitters", "unattributed_attempt_count", "uninstrumented_emitters", "unknown_cost_count"];
+const EMITTER = ["attempt_source", "completion_source", "cost_source", "credential_access_profile", "destinations", "dispatch_boundary_id", "dispatch_source", "disposition", "emitter_id", "entrypoints", "initial_profile_policy", "observation_granularity", "operations", "process_types", "proof_method", "source_symbol"];
 const CAPABILITIES = ["editorial.cycle", "editorial.outcome_evaluation", "threads.publish.dry_run"];
 const ATTEMPT_FIELDS = ["account_id", "admission_state", "attempt_id", "authenticated_account_id", "authenticated_org_id", "authority_ref", "business_identity", "capability", "claim_identity", "claimed_authority_ref", "claimed_spec_hash", "claimed_threads_generation", "domain_state", "duplicate_of_request_id", "event_id", "event_seq", "event_type", "execution_state", "lifecycle_revision", "material_revision", "occurred_at", "org_id", "payload_hash", "reason_code", "request_fingerprint", "request_id", "requested_account_id_untrusted", "result_identity", "result_json", "result_revision", "source", "spec_hash", "threads_generation", "verified_authority_ref", "verified_spec_hash", "verified_threads_generation"];
 const AUTHORITY_FIELDS = ["account_id", "actor", "authority_ref", "capability", "event_id", "event_seq", "event_type", "generation", "occurred_at", "payload_hash", "permit_expires_at", "source", "spec_hash", "state"];
@@ -223,7 +245,16 @@ export const COE_FIELD_REGISTRY: Readonly<Record<string, CoeFieldClass>> = Objec
   ["top.records", "C_PAGE_LOCAL"], ["top.next_cursor", "C_PAGE_LOCAL"],
   ["coverage.page_offset", "C_PAGE_LOCAL"], ["coverage.page_count", "C_PAGE_LOCAL"], ["coverage.pagination_complete", "C_PAGE_LOCAL"],
   ["runtime_enforcement.observed_at", "C_PAGE_LOCAL"], ["operational_observation.observation_id", "C_PAGE_LOCAL"], ["operational_observation.observed_at", "C_PAGE_LOCAL"],
+  ...["coverage.cuts", "coverage.scoped_count", "coverage.record_set_digest", "coverage.snapshot_identity", "coverage.client_continuity_required", "coverage.window.assessment_mode", "coverage.window.requested_window_start", "coverage.window.requested_window_end", "coverage.window.interval_semantics", "coverage.prospective.proof_id", "coverage.prospective.reason", "prohibited_activity.expected_emitter_inventory_digest", "prohibited_activity.count_semantics", "prohibited_activity.emitter_dispositions", "prohibited_activity.package_proven_exclusions", "prohibited_activity.rehearsal_required_emitters", "prohibited_activity.uninstrumented_emitters", "runtime_enforcement.cursor_key_profile", "runtime_enforcement.freshness_identity", "runtime_enforcement.logical_runtime_id", "runtime_enforcement.process_start_identity", "runtime_enforcement.worker_boot_id", "operational_observation.observation_clock_id", "operational_observation.security_revision_before", "operational_observation.security_revision_after", "operational_observation.trust.environment_identity", "operational_observation.trust.registry_revision", "operational_observation.trust.source_identity", "operational_observation.topology.execution_worker_ids", "operational_observation.topology.observed_boot_id", "operational_observation.topology.observer_kind", "operational_observation.topology.process_inventory_digest", "operational_observation.checkpoint.checkpoint_id", "operational_observation.checkpoint.lineage", "operational_observation.checkpoint.protection_provenance", "operational_observation.checkpoint.range_start", "operational_observation.checkpoint.range_end", "operational_observation.checkpoint.root"].map((path) => [path, "A_IMMUTABLE_EQUAL"] as const),
+  ...["coverage.legacy.state", "coverage.legacy.v31_claimed_complete", "coverage.state", "coverage.unresolved_count", "coverage.window.state", "coverage.window.uncovered_reasons", "coverage.prospective.state", "coverage.prospective.proof_applicable"].map((path) => [path, "B_CONSERVATIVE"] as const),
 ]));
+export const COE_B_REDUCTION_RULES = Object.freeze({
+  "coverage.legacy": "RECURSIVE", "coverage.legacy.state": "ASSURANCE_MEET", "coverage.legacy.v31_claimed_complete": "AND", "coverage.state": "ASSURANCE_MEET", "coverage.unresolved_count": "MAX", "coverage.window": "RECURSIVE", "coverage.window.state": "ASSURANCE_MEET", "coverage.window.uncovered_reasons": "CANONICAL_UNION", "coverage.prospective": "RECURSIVE", "coverage.prospective.state": "ASSURANCE_MEET", "coverage.prospective.proof_applicable": "AND",
+  "runtime_enforcement": "RECURSIVE", "runtime_enforcement.configured_auth_state": "AND", "runtime_enforcement.effective_auth_mode": "AND", "runtime_enforcement.guard_readiness": "AND", "runtime_enforcement.reason": "PRESERVE_ADVERSE", "runtime_enforcement.topology_observation_status": "AND", "runtime_enforcement.topology_reason": "PRESERVE_ADVERSE", "runtime_enforcement.observed_execution_worker_count": "MAX",
+  "operational_observation": "RECURSIVE", "operational_observation.coherent": "AND", "operational_observation.trust": "RECURSIVE", "operational_observation.trust.status": "AND", "operational_observation.trust.reason": "PRESERVE_ADVERSE", "operational_observation.topology": "RECURSIVE", "operational_observation.topology.status": "AND", "operational_observation.topology.reason": "PRESERVE_ADVERSE", "operational_observation.topology.execution_worker_count": "MAX", "operational_observation.checkpoint": "RECURSIVE", "operational_observation.checkpoint.status": "AND", "operational_observation.checkpoint.reason": "PRESERVE_ADVERSE",
+  "prohibited_activity": "RECURSIVE", "prohibited_activity.coverage": "ASSURANCE_MEET", "prohibited_activity.activity": "ADVERSE_OR", "prohibited_activity.exposure": "ASSURANCE_MEET", "prohibited_activity.known_zero": "AND", "prohibited_activity.known_cost_count": "MAX", "prohibited_activity.unknown_cost_count": "MAX", "prohibited_activity.pending_cost_count": "MAX", "prohibited_activity.provider_attempt_count": "MAX", "prohibited_activity.live_publication_attempt_count": "MAX", "prohibited_activity.dry_run_preparation_count": "MAX", "prohibited_activity.unattributed_attempt_count": "MAX", "prohibited_activity.integrity_reason": "PRESERVE_ADVERSE",
+  "coverage.integrity_reason": "PRESERVE_ADVERSE", "coverage.legacy.reason": "PRESERVE_ADVERSE",
+} as const);
 export const COE_SOURCES = Object.freeze(["operational_authority_events", "operational_attempt_events", "ai_usage_events", "publication_records"]);
 export const COE_LEGACY_SOURCE_FAMILIES = Object.freeze([
   "capability_requests", "execution_authorities", "operational_authority_events", "operational_attempt_events", "operational_request_identities_v31", "operational_semantic_work",
@@ -342,6 +373,14 @@ function validatePage(raw: unknown, scope: CoeScope, phase: EvidencePhase): Reco
   enumValue(activity.activity, ["ZERO", "NONZERO", "UNKNOWN"], "COE_ACTIVITY_UNKNOWN");
   enumValue(activity.exposure, ["NONE", "PENDING", "UNKNOWN", "RESOLVED"], "COE_EXPOSURE_UNKNOWN");
   if (activity.expected_emitter_inventory_digest !== scope.emitter_inventory_sha256) throw new CoeError("COE_EMITTER_INVENTORY_MISMATCH");
+  for (const field of ["known_cost_count", "unknown_cost_count", "pending_cost_count", "provider_attempt_count", "live_publication_attempt_count", "dry_run_preparation_count", "unattributed_attempt_count"] as const) natural(activity[field]);
+  if (!Array.isArray(activity.emitter_dispositions)) throw new CoeError("COE_EMITTER_INVENTORY_MALFORMED");
+  const emitterIds = new Set<string>();
+  for (const value of activity.emitter_dispositions) {
+    const emitter = object(value); exact(emitter, EMITTER); if (typeof emitter.emitter_id !== "string" || !emitter.emitter_id || emitterIds.has(emitter.emitter_id)) throw new CoeError("COE_EMITTER_INVENTORY_MALFORMED"); emitterIds.add(emitter.emitter_id);
+    for (const field of ["entrypoints", "process_types", "destinations", "operations"] as const) if (!Array.isArray(emitter[field]) || (emitter[field] as unknown[]).some((item) => typeof item !== "string")) throw new CoeError("COE_EMITTER_INVENTORY_MALFORMED");
+  }
+  for (const field of ["package_proven_exclusions", "rehearsal_required_emitters", "uninstrumented_emitters"] as const) if (!Array.isArray(activity[field]) || (activity[field] as unknown[]).some((item) => typeof item !== "string" || !emitterIds.has(item))) throw new CoeError("COE_EMITTER_INVENTORY_MALFORMED");
   if (!Array.isArray(page.records) || !Array.isArray(page.outcome_evaluation_targets)) throw new CoeError("COE_MALFORMED");
   natural(coverage.page_offset); natural(coverage.page_count); natural(coverage.scoped_count); natural(coverage.unresolved_count);
   if (coverage.page_count !== page.records.length || !SHA256.test(String(coverage.record_set_digest)) || !SHA256.test(String(coverage.snapshot_identity)) || typeof coverage.pagination_complete !== "boolean" || coverage.client_continuity_required !== true || (page.next_cursor !== null && typeof page.next_cursor !== "string")) throw new CoeError("COE_PAGINATION_MALFORMED");
@@ -353,6 +392,12 @@ function validatePage(raw: unknown, scope: CoeScope, phase: EvidencePhase): Reco
       if (record.authenticated_account_id !== scope.account_id || ![scope.organization_id, null].includes(record.authenticated_org_id as string | null) || ![scope.organization_id, null].includes(record.org_id as string | null)) throw new CoeError("COE_TENANT_BINDING_MISMATCH");
       enumValue(record.event_type, ["REJECTED_PRECLAIM", "CLAIMED", "REPLAYED", "DUPLICATE", "SUCCEEDED", "FAILED", "UNRESOLVED"], "COE_ATTEMPT_EVENT_UNKNOWN");
       natural(record.lifecycle_revision); if (record.lifecycle_revision === 0) throw new CoeError("COE_LIFECYCLE_REVISION_INVALID");
+      if (record.result_json !== null) {
+        const result = object(typeof record.result_json === "string" ? parseJsonNoDuplicateKeys(record.result_json, 1_000_000, 32) : record.result_json, "COE_RESULT_SCHEMA_INVALID");
+        const allowed = record.capability === "editorial.cycle" ? ["cycle_id", "mutated", "state", "status"] : record.capability === "threads.publish.dry_run" ? ["content_hash", "duplicate", "mode", "publication_id", "reason", "status", "version"] : ["account_id", "authority_ref", "business_identity", "capability", "claim_identity", "evaluation", "material_revision", "native_domain_state", "request_id", "result_identity", "result_revision", "state", "threads_generation"];
+        if (Object.keys(result).some((key) => !allowed.includes(key))) throw new CoeError("COE_RESULT_SCHEMA_INVALID");
+        if (record.capability === "editorial.outcome_evaluation" && result.evaluation !== undefined) { const evaluation = object(result.evaluation, "COE_RESULT_SCHEMA_INVALID"); if (Object.keys(evaluation).some((key) => !["decision_json", "evidence_count", "evidence_level", "next_decision", "observed_through", "result_summary", "sample_size", "verdict"].includes(key))) throw new CoeError("COE_RESULT_SCHEMA_INVALID"); if (evaluation.decision_json !== undefined) { const decision = object(evaluation.decision_json, "COE_RESULT_SCHEMA_INVALID"); if (Object.keys(decision).some((key) => !["alternative_explanation", "evaluation_id", "missing_evidence", "next_evidence_needed", "possible_confounders", "tested_variable"].includes(key))) throw new CoeError("COE_RESULT_SCHEMA_INVALID"); } }
+      }
     } else exact(record, AUTHORITY_FIELDS);
   }
   for (const targetValue of page.outcome_evaluation_targets) {
@@ -429,14 +474,15 @@ export function acquireCoe(source: CoePageSource, scope: CoeScope, phase: Eviden
   const worse = (left: string, right: string, order: readonly string[]) => order.indexOf(right) > order.indexOf(left) ? right : left;
   const conservative = retainedPages.reduce((value, page) => {
     const nextCoverage = object(page.coverage); const nextWindow = object(nextCoverage.window); const nextProspective = object(nextCoverage.prospective); const nextActivity = object(page.prohibited_activity);
-    const paginationOnly = nextCoverage.pagination_complete === false && nextProspective.proof_applicable === true && Number(nextCoverage.unresolved_count) === 0
-      && nextActivity.coverage === "COMPLETE" && nextActivity.activity === "ZERO" && nextActivity.known_zero === true && object(page.operational_observation).coherent === true;
-    if (!paginationOnly) {
-      value.coverage = worse(value.coverage, String(nextCoverage.state), ["COMPLETE", "PARTIAL", "UNKNOWN"]);
-      value.window = worse(value.window, String(nextWindow.state), ["COMPLETE", "PARTIAL", "UNBOUND"]);
-      value.prospective = worse(value.prospective, String(nextProspective.state), ["COMPLETE", "PARTIAL", "UNKNOWN"]);
-      for (const reason of nextWindow.uncovered_reasons as unknown[]) value.uncovered.add(String(reason));
-    }
+    const nextLegacy = object(nextCoverage.legacy);
+    value.coverage = worse(value.coverage, String(nextCoverage.state), ["COMPLETE", "PARTIAL", "UNKNOWN"]);
+    value.window = worse(value.window, String(nextWindow.state), ["COMPLETE", "PARTIAL", "UNBOUND"]);
+    value.prospective = worse(value.prospective, String(nextProspective.state), ["COMPLETE", "PARTIAL", "UNKNOWN"]);
+    value.legacy = worse(value.legacy, String(nextLegacy.state), ["COMPLETE", "PARTIAL", "UNKNOWN"]);
+    value.v31Complete &&= nextLegacy.v31_claimed_complete === true;
+    if (nextCoverage.state !== "COMPLETE") value.coverageReason = String(nextCoverage.integrity_reason);
+    if (nextLegacy.state !== "COMPLETE") value.legacyReason = String(nextLegacy.reason);
+    for (const reason of nextWindow.uncovered_reasons as unknown[]) value.uncovered.add(String(reason));
     value.proofApplicable &&= nextProspective.proof_applicable === true;
     if (Number(nextCoverage.unresolved_count) > 0) value.unresolved = Math.max(value.unresolved, Number(nextCoverage.unresolved_count));
     value.activityCoverage = worse(value.activityCoverage, String(nextActivity.coverage), ["COMPLETE", "PARTIAL", "UNKNOWN"]);
@@ -446,18 +492,26 @@ export function acquireCoe(source: CoePageSource, scope: CoeScope, phase: Eviden
     value.pendingCost = Math.max(value.pendingCost, Number(nextActivity.pending_cost_count));
     value.unknownCost = Math.max(value.unknownCost, Number(nextActivity.unknown_cost_count));
     value.unattributed = Math.max(value.unattributed, Number(nextActivity.unattributed_attempt_count));
+    value.knownCost = Math.max(value.knownCost, Number(nextActivity.known_cost_count));
+    value.providerAttempts = Math.max(value.providerAttempts, Number(nextActivity.provider_attempt_count));
+    value.livePublications = Math.max(value.livePublications, Number(nextActivity.live_publication_attempt_count));
+    value.dryRuns = Math.max(value.dryRuns, Number(nextActivity.dry_run_preparation_count));
+    if (nextActivity.coverage !== "COMPLETE" || nextActivity.activity !== "ZERO" || nextActivity.known_zero !== true) value.activityReason = String(nextActivity.integrity_reason);
     return value;
-  }, { coverage: "COMPLETE", window: "COMPLETE", prospective: "COMPLETE", proofApplicable: true, uncovered: new Set<string>(), unresolved: 0, activityCoverage: "COMPLETE", activity: "ZERO", exposure: "NONE", knownZero: true, pendingCost: 0, unknownCost: 0, unattributed: 0 });
-  const finalPage = retainedPages.at(-1)!; const finalCoverage = object(finalPage.coverage); const finalActivity = object(finalPage.prohibited_activity);
-  const reducedCoverage = { ...finalCoverage, state: conservative.coverage, window: { ...object(finalCoverage.window), state: conservative.window, uncovered_reasons: [...conservative.uncovered].sort() }, prospective: { ...object(finalCoverage.prospective), state: conservative.prospective, proof_applicable: conservative.prospective === "COMPLETE" && conservative.proofApplicable }, unresolved_count: conservative.unresolved, page_offset: 0, page_count: records.length, pagination_complete: true };
-  const reducedActivity = { ...finalActivity, coverage: conservative.activityCoverage, activity: conservative.activity, exposure: conservative.exposure, known_zero: conservative.knownZero, pending_cost_count: conservative.pendingCost, unknown_cost_count: conservative.unknownCost, unattributed_attempt_count: conservative.unattributed };
+  }, { coverage: "COMPLETE", window: "COMPLETE", prospective: "COMPLETE", legacy: "COMPLETE", v31Complete: true, coverageReason: null as string | null, legacyReason: null as string | null, activityReason: null as string | null, proofApplicable: true, uncovered: new Set<string>(), unresolved: 0, activityCoverage: "COMPLETE", activity: "ZERO", exposure: "NONE", knownZero: true, pendingCost: 0, unknownCost: 0, unattributed: 0, knownCost: 0, providerAttempts: 0, livePublications: 0, dryRuns: 0 });
+  const finalPage = retainedPages.at(-1)!;
+  const initialCoverage = object(first!.coverage); const initialActivity = object(first!.prohibited_activity);
+  const reducedCoverage = { ...initialCoverage, state: conservative.coverage, integrity_reason: conservative.coverageReason ?? initialCoverage.integrity_reason, legacy: { ...object(initialCoverage.legacy), state: conservative.legacy, v31_claimed_complete: conservative.v31Complete, reason: conservative.legacyReason ?? object(initialCoverage.legacy).reason }, window: { ...object(initialCoverage.window), state: conservative.window, uncovered_reasons: [...conservative.uncovered].sort() }, prospective: { ...object(initialCoverage.prospective), state: conservative.prospective, proof_applicable: conservative.prospective === "COMPLETE" && conservative.proofApplicable }, unresolved_count: conservative.unresolved, page_offset: 0, page_count: records.length, pagination_complete: true };
+  const reducedActivity = { ...initialActivity, coverage: conservative.activityCoverage, activity: conservative.activity, exposure: conservative.exposure, integrity_reason: conservative.activityReason ?? initialActivity.integrity_reason, known_zero: conservative.knownZero, pending_cost_count: conservative.pendingCost, unknown_cost_count: conservative.unknownCost, unattributed_attempt_count: conservative.unattributed, known_cost_count: conservative.knownCost, provider_attempt_count: conservative.providerAttempts, live_publication_attempt_count: conservative.livePublications, dry_run_preparation_count: conservative.dryRuns };
   const runtime = structuredClone(first!.runtime_enforcement) as Record<string, unknown>; const observation = structuredClone(first!.operational_observation) as Record<string, unknown>;
   for (const page of retainedPages.slice(1)) {
     const nextRuntime = object(page.runtime_enforcement); const nextObservation = object(page.operational_observation);
     runtime.configured_auth_state = runtime.configured_auth_state === "ON" && nextRuntime.configured_auth_state === "ON" ? "ON" : "OFF";
     runtime.effective_auth_mode = runtime.effective_auth_mode === "TENANT_ENFORCED" && nextRuntime.effective_auth_mode === "TENANT_ENFORCED" ? "TENANT_ENFORCED" : "NOT_ENFORCED";
     runtime.guard_readiness = runtime.guard_readiness === "READY" && nextRuntime.guard_readiness === "READY" ? "READY" : "NOT_READY";
+    if (runtime.configured_auth_state !== "ON" || runtime.effective_auth_mode !== "TENANT_ENFORCED" || runtime.guard_readiness !== "READY") runtime.reason = nextRuntime.reason;
     runtime.topology_observation_status = runtime.topology_observation_status === "BOUND" && nextRuntime.topology_observation_status === "BOUND" ? "BOUND" : "UNBOUND";
+    if (runtime.topology_observation_status !== "BOUND") runtime.topology_reason = nextRuntime.topology_reason;
     runtime.observed_execution_worker_count = Math.max(Number(runtime.observed_execution_worker_count), Number(nextRuntime.observed_execution_worker_count));
     observation.coherent = observation.coherent === true && nextObservation.coherent === true;
     for (const member of ["trust", "topology", "checkpoint"] as const) {
@@ -509,7 +563,7 @@ export function stableCoeEvidence(evidence: CoeAcquisition): Record<string, Json
   })) as Record<string, Json>;
 }
 
-const ATTEMPT_IMMUTABLE = Object.freeze(["account_id", "org_id", "authenticated_account_id", "authenticated_org_id", "capability", "request_id", "request_fingerprint", "claim_identity", "authority_ref", "spec_hash", "threads_generation", "claimed_authority_ref", "claimed_spec_hash", "claimed_threads_generation", "verified_authority_ref", "verified_spec_hash", "verified_threads_generation", "requested_account_id_untrusted", "business_identity", "material_revision"]);
+const ATTEMPT_IMMUTABLE = Object.freeze(["account_id", "org_id", "authenticated_account_id", "authenticated_org_id", "capability", "request_id", "request_fingerprint", "claim_identity", "authority_ref", "spec_hash", "threads_generation", "verified_authority_ref", "verified_spec_hash", "verified_threads_generation", "requested_account_id_untrusted", "business_identity", "material_revision"]);
 const TERMINAL_EVENTS = new Set(["SUCCEEDED", "FAILED", "UNRESOLVED", "DUPLICATE", "REPLAYED", "REJECTED_PRECLAIM"]);
 
 export function foldProducerAttempts(evidence: Pick<CoeAcquisition, "source_inventory" | "records">): readonly FoldedAttempt[] {
@@ -524,21 +578,49 @@ export function foldProducerAttempts(evidence: Pick<CoeAcquisition, "source_inve
     const lifecycle = [...unsorted].sort((left, right) => Number(left.lifecycle_revision) - Number(right.lifecycle_revision));
     const revisions = new Set<number>();
     for (const row of lifecycle) { const revision = natural(row.lifecycle_revision, "COE_LIFECYCLE_REVISION_INVALID"); if (revision === 0 || revisions.has(revision)) throw new CoeError("COE_LIFECYCLE_REVISION_CONFLICT"); revisions.add(revision); }
+    if (Number(lifecycle[0]!.lifecycle_revision) !== 1 || lifecycle.some((row, index) => Number(row.lifecycle_revision) !== index + 1)) throw new CoeError("COE_LIFECYCLE_REVISION_GAP");
     const first = lifecycle[0]!;
     for (const row of lifecycle.slice(1)) if (ATTEMPT_IMMUTABLE.some((field) => canonicalJson(row[field]) !== canonicalJson(first[field]))) throw new CoeError("COE_LIFECYCLE_IDENTITY_DRIFT");
     for (let index = 1; index < lifecycle.length; index++) {
       const previous = String(lifecycle[index - 1]!.event_type); const current = String(lifecycle[index]!.event_type);
-      const legal = previous === "CLAIMED" ? TERMINAL_EVENTS.has(current) : previous === "DUPLICATE" && current === "DUPLICATE";
+      const legal = previous === "CLAIMED" ? ["SUCCEEDED", "FAILED", "UNRESOLVED"].includes(current) : previous === "DUPLICATE" && current === "DUPLICATE";
       if (!legal) throw new CoeError("COE_LIFECYCLE_TRANSITION_INVALID");
     }
     const terminal = lifecycle.at(-1)!; const terminalState = String(terminal.event_type);
     if (lifecycle.length > 1 && !TERMINAL_EVENTS.has(terminalState)) throw new CoeError("COE_LIFECYCLE_TERMINAL_INVALID");
-    return Object.freeze({ namespace, attempt_id: String(first.attempt_id), first, terminal, lifecycle: Object.freeze(lifecycle), first_occurred_at: String(first.occurred_at), terminal_occurred_at: String(terminal.occurred_at) });
+    const firstState = String(first.event_type);
+    if (!["CLAIMED", "DUPLICATE", "REPLAYED", "REJECTED_PRECLAIM"].includes(firstState)) throw new CoeError("COE_LIFECYCLE_ORIGIN_INVALID");
+    if (lifecycle.length > 1 && firstState !== "CLAIMED" && firstState !== "DUPLICATE") throw new CoeError("COE_LIFECYCLE_TRANSITION_INVALID");
+    const claimOrigin = firstState === "CLAIMED" ? first : null;
+    if (claimOrigin && terminal !== claimOrigin) {
+      if ([terminal.claimed_authority_ref, terminal.claimed_spec_hash, terminal.claimed_threads_generation].some((value) => value !== null)) throw new CoeError("COE_TERMINAL_CLAIM_FIELD_PRESENT");
+      if (!terminal.verified_authority_ref || !terminal.verified_spec_hash || !Number.isSafeInteger(terminal.verified_threads_generation)) throw new CoeError("COE_TERMINAL_AUTHORITY_MISSING");
+    }
+    return Object.freeze({ namespace, attempt_id: String(first.attempt_id), first, claim_origin: claimOrigin, terminal, lifecycle: Object.freeze(lifecycle), first_occurred_at: String(first.occurred_at), terminal_occurred_at: String(terminal.occurred_at) });
+  }));
+}
+
+export function classifyRunAttempts(evidence: Pick<CoeAcquisition, "source_inventory" | "records">, context: RunMembershipContext): readonly AttemptMembershipDecision[] {
+  const authorityKeys = new Set(context.authorities.map((item) => `${item.capability}\u0000${item.authority_ref}\u0000${item.generation}`));
+  const requestIds = new Set(context.intents.map((item) => item.request_id));
+  const claimIds = new Set(context.intents.flatMap((item) => item.claim_id ? [item.claim_id] : []));
+  return Object.freeze(foldProducerAttempts(evidence).map((attempt) => {
+    const origin = attempt.claim_origin ?? attempt.first; const terminal = attempt.terminal;
+    const refs = Object.freeze(attempt.lifecycle.map((row) => String(row.event_id)));
+    const linkedIntent = requestIds.has(String(origin.request_id)) || claimIds.has(String(origin.claim_identity));
+    const linkedAuthority = origin.account_id === context.account_id && origin.verified_spec_hash === context.spec_hash
+      && authorityKeys.has(`${String(origin.capability)}\u0000${String(origin.verified_authority_ref)}\u0000${Number(origin.verified_threads_generation)}`);
+    if (linkedIntent || linkedAuthority) return Object.freeze({ namespace: attempt.namespace, membership: "IN_SCOPE", reason: linkedIntent && linkedAuthority ? "RUN_INTENT_AND_AUTHORITY" : linkedIntent ? "RUN_INTENT_IDENTITY" : "RUN_AUTHORITY_SCOPE", source_refs: refs, attempt });
+    const terminalAt = Date.parse(attempt.terminal_occurred_at); const beforeWindow = Number.isFinite(terminalAt) && terminalAt < Date.parse(context.window_start);
+    const finalized = TERMINAL_EVENTS.has(String(terminal.event_type)) && !["UNRESOLVED"].includes(String(terminal.event_type));
+    const foreignBinding = origin.verified_spec_hash !== context.spec_hash && !context.authorities.some((item) => item.authority_ref === origin.verified_authority_ref && item.generation === origin.verified_threads_generation);
+    if (beforeWindow && finalized && foreignBinding) return Object.freeze({ namespace: attempt.namespace, membership: "PROVEN_OUT_OF_SCOPE", reason: "FINALIZED_PRE_WINDOW_FOREIGN_BINDING", source_refs: refs, attempt });
+    return Object.freeze({ namespace: attempt.namespace, membership: "UNRESOLVED_MEMBERSHIP", reason: "RUN_MEMBERSHIP_NOT_PROVEN", source_refs: refs, attempt });
   }));
 }
 
 function invocationProvesNullOrg(binding: ProtectedInvocationBinding | undefined, work: { account_id: string; capability: string; authority_ref: string; generation: number }, specHash: string, organizationId: string): boolean {
-  return !!binding && !!binding.receipt_id && !!binding.source_session_id && !!binding.principal_ref && !!binding.credential_version_ref
+  return !!binding && !!binding.receipt_id && !!binding.source_session_id && !!binding.principal_ref && !!binding.credential_version_ref && !!binding.authority_event_id && !!binding.authority_actor && !!binding.authority_occurred_at
     && binding.organization_id === organizationId && binding.account_id === work.account_id && binding.capability === work.capability
     && binding.authority_ref === work.authority_ref && binding.spec_hash === specHash && binding.generation === work.generation;
 }
@@ -552,13 +634,16 @@ export function verifyGovernedWork(evidence: CoeAcquisition, work: {
   const matching = attempts.filter((attempt) => attempt.first.claim_identity === work.claim_id || attempt.first.request_id === work.request_id);
   if (matching.length !== 1) return Object.freeze({ disposition: "BLOCKED", authoritative_state: "MISSING", credit_eligible: false, reason: matching.length ? "COE_GOVERNED_WORK_AMBIGUOUS" : "COE_GOVERNED_WORK_MISSING", request_id: work.request_id, claim_id: work.claim_id, source_ref: null, result_ref: null });
   const terminal = matching[0]!.terminal;
+  const origin = matching[0]!.claim_origin ?? matching[0]!.first;
   let result: unknown = terminal.result_json;
   if (typeof result === "string") try { result = parseJsonNoDuplicateKeys(result, 1_000_000, 32); rejectCredentialData(result); } catch { return Object.freeze({ disposition: "FAIL", authoritative_state: "UNRESOLVED", credit_eligible: false, reason: "COE_GOVERNED_RESULT_MALFORMED", request_id: work.request_id, claim_id: work.claim_id, source_ref: String(terminal.event_id ?? terminal.attempt_id ?? ""), result_ref: typeof terminal.result_identity === "string" ? terminal.result_identity : null }); }
   const nullOrg = terminal.authenticated_org_id === null && terminal.org_id === null;
+  const authorityEvent = nullOrg && work.invocation_receipt ? evidence.records.find((record) => record.source === "operational_authority_events" && record.event_id === work.invocation_receipt!.authority_event_id && record.actor === work.invocation_receipt!.authority_actor && record.occurred_at === work.invocation_receipt!.authority_occurred_at && record.event_type === "GRANTED" && record.account_id === work.account_id && record.capability === work.capability && record.authority_ref === work.authority_ref && record.spec_hash === specHash && record.generation === work.generation) : null;
   if (terminal.account_id !== work.account_id || terminal.authenticated_account_id !== work.account_id || !(nullOrg ? invocationProvesNullOrg(work.invocation_receipt, work, specHash, organizationId) : terminal.authenticated_org_id === organizationId && terminal.org_id === organizationId)
     || terminal.capability !== work.capability || terminal.claim_identity !== work.claim_id || terminal.authority_ref !== work.authority_ref || terminal.verified_authority_ref !== work.authority_ref
     || terminal.spec_hash !== specHash || terminal.verified_spec_hash !== specHash || terminal.threads_generation !== work.generation || terminal.verified_threads_generation !== work.generation
-    || terminal.business_identity !== work.business_identity || terminal.material_revision !== work.material_revision) return Object.freeze({ disposition: "FAIL", authoritative_state: "UNRESOLVED", credit_eligible: false, reason: "COE_GOVERNED_WORK_IDENTITY_MISMATCH", request_id: work.request_id, claim_id: work.claim_id, source_ref: String(terminal.event_id ?? terminal.attempt_id ?? ""), result_ref: typeof terminal.result_identity === "string" ? terminal.result_identity : null });
+    || terminal.business_identity !== work.business_identity || terminal.material_revision !== work.material_revision || (nullOrg && !authorityEvent)
+    || (matching[0]!.claim_origin && (origin.claimed_authority_ref !== work.authority_ref || origin.claimed_spec_hash !== specHash || origin.claimed_threads_generation !== work.generation))) return Object.freeze({ disposition: "FAIL", authoritative_state: "UNRESOLVED", credit_eligible: false, reason: "COE_GOVERNED_WORK_IDENTITY_MISMATCH", request_id: work.request_id, claim_id: work.claim_id, source_ref: String(terminal.event_id ?? terminal.attempt_id ?? ""), result_ref: typeof terminal.result_identity === "string" ? terminal.result_identity : null });
   const state = String(terminal.event_type);
   const base = { request_id: work.request_id, claim_id: work.claim_id, source_ref: String(terminal.event_id ?? terminal.attempt_id ?? ""), result_ref: typeof terminal.result_identity === "string" ? terminal.result_identity : null };
   if (["DUPLICATE", "REPLAYED"].includes(state) || terminal.duplicate_of_request_id !== null) return Object.freeze({ ...base, disposition: "ZERO", authoritative_state: state === "REPLAYED" ? "REPLAYED" : "DUPLICATE", credit_eligible: false, reason: `COE_GOVERNED_${state === "REPLAYED" ? "REPLAYED" : "DUPLICATE"}` } as GovernedWorkDecision);

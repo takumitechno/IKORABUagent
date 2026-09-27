@@ -4,7 +4,7 @@ import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { canonicalJson, sha256 } from "../web/lib/catfood-harness";
 import {
-  CATFOOD_THREADS_DEPENDENCY_ROOT, CATFOOD_THREADS_PINS, COE_FIELD_REGISTRY, acquireCoe, assessCoe, assertFrozenDependencies, canonicalCoeJson, decodeCoeFixture, foldProducerAttempts, governedEvidenceReasons, parseJsonNoDuplicateKeys,
+  CATFOOD_THREADS_DEPENDENCY_ROOT, CATFOOD_THREADS_PINS, COE_B_REDUCTION_RULES, COE_FIELD_REGISTRY, acquireCoe, assessCoe, assertFrozenDependencies, canonicalCoeJson, decodeCoeFixture, foldProducerAttempts, governedEvidenceReasons, parseJsonNoDuplicateKeys,
   stableCoeEvidence, validateOutcomeEvaluationRequest, verifyGovernedWork,
   type CoeAcquisition, type CoeRequest, type CoeScope,
 } from "../web/lib/catfood-coe";
@@ -26,7 +26,7 @@ const scope = (): CoeScope => ({
 
 describe("WP3 corrective02 producer composition", () => {
   test("T01-T03 folds producer lifecycle revisions without arrival-order credit", () => {
-    const succeeded = attempt(); const claimed = { ...succeeded, event_seq: 0, event_id: "event:claim", event_type: "CLAIMED", execution_state: "IN_PROGRESS", lifecycle_revision: 1, result_identity: null, result_json: null, result_revision: null, domain_state: null, occurred_at: "2026-09-30T23:59:59+00:00" };
+    const succeeded = attempt(); const claimed = claimFor(succeeded);
     const evidence = { ...acquisition(), records: [succeeded, claimed] } as CoeAcquisition; const folded = foldProducerAttempts(evidence);
     expect(folded).toHaveLength(1); expect(folded[0]!.lifecycle.map((row) => row.lifecycle_revision)).toEqual([1, 2]); expect(folded[0]!.terminal.event_type).toBe("SUCCEEDED"); expect(governedEvidenceReasons(evidence)).not.toContain("COE_GOVERNED_WORK_UNRESOLVED");
     expect(() => foldProducerAttempts({ ...evidence, records: [claimed, { ...succeeded, lifecycle_revision: 1 }] })).toThrow("COE_LIFECYCLE_REVISION_CONFLICT");
@@ -34,17 +34,18 @@ describe("WP3 corrective02 producer composition", () => {
   });
 
   test("T05-T08 null org requires the protected invocation binding and unrelated failures do not poison COE health", () => {
-    const row = { ...attempt(), org_id: null, authenticated_org_id: null }; const evidence = { ...acquisition(), records: [row] } as CoeAcquisition;
+    const row = { ...attempt(), org_id: null, authenticated_org_id: null }; const claimed = { ...claimFor(row), org_id: null, authenticated_org_id: null }; const evidence = { ...acquisition(), records: [claimed, row, authorityFor(row)] } as CoeAcquisition;
     const work = { account_id: "acct_test", capability: "editorial.cycle", claim_id: "claim:one", request_id: "request:one", authority_ref: "authority:one", generation: 1, business_identity: "article:one", material_revision: "a".repeat(64), domain_result: { state: "DRAFT", status: "READY" } };
     expect(verifyGovernedWork(evidence, work, "e".repeat(64), "org:test").reason).toBe("COE_GOVERNED_WORK_IDENTITY_MISMATCH");
-    const invocation_receipt = { receipt_id: "receipt:one", source_session_id: "source:one", principal_ref: "principal:one", credential_version_ref: "credential:v1", organization_id: "org:test", account_id: "acct_test", capability: "editorial.cycle", authority_ref: "authority:one", spec_hash: "e".repeat(64), generation: 1 };
+    const invocation_receipt = { receipt_id: "receipt:one", source_session_id: "source:one", principal_ref: "principal:one", credential_version_ref: "credential:v1", organization_id: "org:test", account_id: "acct_test", capability: "editorial.cycle", authority_ref: "authority:one", spec_hash: "e".repeat(64), generation: 1, authority_event_id: "authority:event:one", authority_actor: "principal:one", authority_occurred_at: "2026-09-30T23:59:58+00:00" };
     expect(verifyGovernedWork(evidence, { ...work, invocation_receipt }, "e".repeat(64), "org:test").disposition).toBe("CREDIT");
-    const unrelated = { ...attempt("FAILED", "request:old"), claim_identity: "claim:old", attempt_id: "attempt:old", event_id: "event:old", occurred_at: "2020-01-01T00:00:00+00:00" };
-    expect(assessCoe({ ...acquisition(), records: [unrelated] } as CoeAcquisition, clock().sample().wall_time).state).toBe("READY");
+    const unrelated = { ...attempt("FAILED", "request:old"), claim_identity: "claim:old", attempt_id: "attempt:old", event_id: "event:old", occurred_at: "2020-01-01T00:00:01+00:00" };
+    expect(assessCoe({ ...acquisition(), records: [{ ...claimFor(unrelated), event_id: "event:old:claim", occurred_at: "2020-01-01T00:00:00+00:00" }, unrelated] } as CoeAcquisition, clock().sample().wall_time).state).toBe("READY");
   });
 
   test("T10/T23 registry is explicit and frozen producer canonical vectors are independent", () => {
     expect(Object.keys(COE_FIELD_REGISTRY).length).toBeGreaterThan(100); expect(Object.values(COE_FIELD_REGISTRY)).toContain("A_IMMUTABLE_EQUAL"); expect(Object.values(COE_FIELD_REGISTRY)).toContain("B_CONSERVATIVE"); expect(Object.values(COE_FIELD_REGISTRY)).toContain("C_PAGE_LOCAL");
+    expect(Object.entries(COE_FIELD_REGISTRY).filter(([, kind]) => kind === "B_CONSERVATIVE").every(([path]) => path in COE_B_REDUCTION_RULES)).toBe(true);
     const vectors = JSON.parse(readFileSync(resolve(import.meta.dir, "../contracts/catfood-producer-canonical-v1.json"), "utf8"));
     for (const vector of vectors.cases) { const canonical = canonicalCoeJson(vector.value); expect(Buffer.from(vector.canonical_utf8_base64url, "base64url").toString("utf8")).toBe(canonical); expect(sha256(canonical)).toBe(vector.sha256); }
   });
@@ -77,14 +78,22 @@ function attempt(eventType = "SUCCEEDED", requestId = "request:one") {
     event_type: eventType, account_id: "acct_test", org_id: "org:test", authenticated_account_id: "acct_test",
     authenticated_org_id: "org:test", requested_account_id_untrusted: null, capability: "editorial.cycle",
     request_id: requestId, claim_identity: "claim:one", authority_ref: "authority:one", verified_authority_ref: "authority:one",
-    claimed_authority_ref: "authority:one", spec_hash: "e".repeat(64), verified_spec_hash: "e".repeat(64),
-    claimed_spec_hash: "e".repeat(64), threads_generation: 1, verified_threads_generation: 1, claimed_threads_generation: 1,
+    claimed_authority_ref: null, spec_hash: "e".repeat(64), verified_spec_hash: "e".repeat(64),
+    claimed_spec_hash: null, threads_generation: 1, verified_threads_generation: 1, claimed_threads_generation: null,
     business_identity: "article:one", material_revision: "a".repeat(64), admission_state: "ADMITTED",
     execution_state: eventType === "SUCCEEDED" ? "SUCCEEDED" : "FAILED", duplicate_of_request_id: eventType === "DUPLICATE" ? "request:old" : null,
     result_identity: eventType === "SUCCEEDED" ? "result:one" : null, result_json: eventType === "SUCCEEDED" ? canonicalJson({ state: "DRAFT", status: "READY" }) : null,
     result_revision: "2026-10-01T00:00:00+00:00", domain_state: "DRAFT", occurred_at: "2026-10-01T00:00:00+00:00",
-    payload_hash: "f".repeat(64), request_fingerprint: "1".repeat(64), reason_code: null, lifecycle_revision: 2,
+    payload_hash: "f".repeat(64), request_fingerprint: "1".repeat(64), reason_code: null, lifecycle_revision: ["SUCCEEDED", "FAILED", "UNRESOLVED"].includes(eventType) ? 2 : 1,
   };
+}
+
+function claimFor(terminal: ReturnType<typeof attempt>) {
+  return { ...terminal, event_seq: 0, event_id: `${terminal.event_id}:claim`, event_type: "CLAIMED", admission_state: "ADMITTED", execution_state: "IN_PROGRESS", lifecycle_revision: 1, claimed_authority_ref: terminal.authority_ref, claimed_spec_hash: terminal.spec_hash, claimed_threads_generation: terminal.threads_generation, result_identity: null, result_json: null, result_revision: null, domain_state: null, occurred_at: "2026-09-30T23:59:59+00:00" };
+}
+
+function authorityFor(row: ReturnType<typeof attempt>) {
+  return { source: "operational_authority_events", event_seq: 99, event_id: "authority:event:one", account_id: row.account_id, capability: row.capability, event_type: "GRANTED", authority_ref: row.authority_ref, spec_hash: row.spec_hash, generation: row.threads_generation, state: "active", permit_expires_at: "2026-10-01T00:01:00+00:00", actor: "principal:one", occurred_at: "2026-09-30T23:59:58+00:00", payload_hash: "2".repeat(64) };
 }
 
 function pagedVariant(kind: "good" | "omitted" | "repeated" | "out-of-order" | "switch") {
@@ -114,6 +123,7 @@ function middlePartialPages() {
     const index = request.cursor === null ? 0 : Number(request.cursor.slice(-1)); const page = structuredClone(template);
     page.records = [records[index]]; page.coverage.scoped_count = 3; page.coverage.record_set_digest = root; page.coverage.snapshot_identity = "b".repeat(64); page.coverage.page_count = 1; page.coverage.page_offset = index;
     page.coverage.pagination_complete = index === 2; page.next_cursor = index === 2 ? null : `cursor:${index + 1}`;
+    if (index === 0) { page.coverage.window.state = "UNBOUND"; page.coverage.window.uncovered_reasons = ["EARLY_SECURITY_GAP"]; page.prohibited_activity.activity = "NONZERO"; page.prohibited_activity.known_zero = false; page.prohibited_activity.provider_attempt_count = 2; page.prohibited_activity.known_cost_count = 3; }
     if (index === 1) { page.coverage.state = "PARTIAL"; page.coverage.window.state = "PARTIAL"; page.coverage.window.uncovered_reasons = ["MIDDLE_PAGE_GAP"]; page.coverage.prospective.state = "PARTIAL"; page.coverage.prospective.proof_applicable = false; page.coverage.unresolved_count = 1; page.prohibited_activity.coverage = "PARTIAL"; page.prohibited_activity.activity = "UNKNOWN"; page.prohibited_activity.exposure = "PENDING"; page.prohibited_activity.known_zero = false; page.prohibited_activity.pending_cost_count = 1; }
     return page;
   }};
@@ -144,14 +154,14 @@ describe("WP3 WP2.5 COE-v1 narrow consumer T01-T24", () => {
     for (const kind of ["omitted", "repeated", "out-of-order", "switch"] as const) expect(() => acquireCoe(pagedVariant(kind), scope())).toThrow();
   });
 
-  test("corrective pagination reduction retains an adverse middle page", () => { const value = acquireCoe(middlePartialPages(), scope()); expect(value.coverage).toMatchObject({ state: "PARTIAL", unresolved_count: 1, window: { state: "PARTIAL", uncovered_reasons: ["MIDDLE_PAGE_GAP"] }, prospective: { state: "PARTIAL", proof_applicable: false } }); expect(value.prohibited_activity).toMatchObject({ coverage: "PARTIAL", activity: "UNKNOWN", exposure: "PENDING", known_zero: false, pending_cost_count: 1 }); expect(assessCoe(value, clock().sample().wall_time).state).toBe("BLOCKED"); });
+  test("corrective pagination reduction retains every adverse page and positive snapshot total", () => { const value = acquireCoe(middlePartialPages(), scope()); expect(value.coverage).toMatchObject({ state: "PARTIAL", unresolved_count: 1, window: { state: "UNBOUND", uncovered_reasons: ["EARLY_SECURITY_GAP", "MIDDLE_PAGE_GAP"] }, prospective: { state: "PARTIAL", proof_applicable: false } }); expect(value.prohibited_activity).toMatchObject({ coverage: "PARTIAL", activity: "NONZERO", exposure: "PENDING", known_zero: false, pending_cost_count: 1, provider_attempt_count: 2, known_cost_count: 3 }); expect(assessCoe(value, clock().sample().wall_time).state).toBe("FAIL"); });
 
   test("T14 record-set digest mismatch rejected", () => expect(() => acquisition(mutate((p) => { p.coverage.record_set_digest = "0".repeat(64); }))).toThrow("COE_RECORD_SET_DIGEST_MISMATCH"));
   test("T15 unresolved/pending/unattributed exposure blocks", () => { const result = assessCoe(acquisition(mutate((p) => { p.prohibited_activity.exposure = "PENDING"; p.prohibited_activity.pending_cost_count = 1; p.prohibited_activity.unattributed_attempt_count = 1; })), clock().sample().wall_time); expect(result.state).toBe("BLOCKED"); expect(result.reasons).toContain("COE_COST_OR_ATTRIBUTION_UNRESOLVED"); });
 
-  test("T16 governed BLOCKED/FAILED/REPLAY units receive zero credit", () => { for (const state of ["FAILED", "REPLAYED", "REJECTED_PRECLAIM"]) { const evidence = { ...acquisition(), records: [attempt(state)] } as CoeAcquisition; expect(verifyGovernedWork(evidence, { account_id: "acct_test", capability: "editorial.cycle", claim_id: "claim:one", request_id: "request:one", authority_ref: "authority:one", generation: 1, business_identity: "article:one", material_revision: "a".repeat(64), domain_result: {} }, "e".repeat(64), "org:test").credit_eligible).toBe(false); } });
+  test("T16 governed BLOCKED/FAILED/REPLAY units receive zero credit", () => { for (const state of ["FAILED", "REPLAYED", "REJECTED_PRECLAIM"]) { const terminal = attempt(state); const records = state === "FAILED" ? [claimFor(terminal), terminal] : [terminal]; const evidence = { ...acquisition(), records } as CoeAcquisition; expect(verifyGovernedWork(evidence, { account_id: "acct_test", capability: "editorial.cycle", claim_id: "claim:one", request_id: "request:one", authority_ref: "authority:one", generation: 1, business_identity: "article:one", material_revision: "a".repeat(64), domain_result: {} }, "e".repeat(64), "org:test").credit_eligible).toBe(false); } });
   test("T17 semantic duplicate under fresh request ID receives zero credit", () => { const evidence = { ...acquisition(), records: [attempt("DUPLICATE", "request:fresh")] } as CoeAcquisition; expect(verifyGovernedWork(evidence, { account_id: "acct_test", capability: "editorial.cycle", claim_id: "claim:one", request_id: "request:fresh", authority_ref: "authority:one", generation: 1, business_identity: "article:one", material_revision: "a".repeat(64), domain_result: {} }, "e".repeat(64), "org:test").disposition).toBe("ZERO"); });
-  test("corrective governed result mismatch is FAIL, not an evaluator exception", () => { const evidence = { ...acquisition(), records: [attempt()] } as CoeAcquisition; expect(verifyGovernedWork(evidence, { account_id: "acct_test", capability: "editorial.cycle", claim_id: "claim:one", request_id: "request:one", authority_ref: "authority:one", generation: 1, business_identity: "article:one", material_revision: "a".repeat(64), domain_result: { state: "OTHER" } }, "e".repeat(64), "org:test")).toMatchObject({ disposition: "FAIL", reason: "COE_GOVERNED_RESULT_MISMATCH" }); });
+  test("corrective governed result mismatch is FAIL, not an evaluator exception", () => { const terminal = attempt(); const evidence = { ...acquisition(), records: [claimFor(terminal), terminal] } as CoeAcquisition; expect(verifyGovernedWork(evidence, { account_id: "acct_test", capability: "editorial.cycle", claim_id: "claim:one", request_id: "request:one", authority_ref: "authority:one", generation: 1, business_identity: "article:one", material_revision: "a".repeat(64), domain_result: { state: "OTHER" } }, "e".repeat(64), "org:test")).toMatchObject({ disposition: "FAIL", reason: "COE_GOVERNED_RESULT_MISMATCH" }); });
   test("T18 only real capability classes decode", () => expect(() => acquisition(mutate((p) => { const row = attempt(); row.capability = "caller.invented"; p.records = [row]; p.coverage.scoped_count = 1; p.coverage.page_count = 1; p.coverage.record_set_digest = sha256(canonicalJson(p.records)); }))).toThrow("COE_RECORD_SCOPE_INVALID"));
 
   test("T19 outcome route preserves authority/spec/generation/idempotency", () => { const request = validateOutcomeEvaluationRequest({ account_id: "acct_test", capability: "editorial.outcome_evaluation", request_id: "stable-key", experiment_id: "experiment:one", expected_material_revision: "a".repeat(64), authority_ref: "authority:one", spec_hash: "b".repeat(64), expected_threads_generation: 7, runtime_observation_id: `1.${"c".repeat(64)}`, expected_release_git_sha: CATFOOD_THREADS_PINS.threads_sha }); expect(request).toMatchObject({ request_id: "stable-key", authority_ref: "authority:one", expected_threads_generation: 7 }); });
