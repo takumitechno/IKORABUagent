@@ -1,4 +1,7 @@
 import { describe, expect, test } from "bun:test";
+import { createHash } from "node:crypto";
+import { readFileSync } from "node:fs";
+import { resolve } from "node:path";
 import { canonicalJson, sha256 } from "../web/lib/catfood-harness";
 import {
   CATFOOD_THREADS_PINS, acquireCoe, assessCoe,
@@ -70,7 +73,7 @@ function pagedVariant(kind: "good" | "omitted" | "repeated" | "out-of-order" | "
 }
 
 describe("WP3 WP2.5 COE-v1 narrow consumer T01-T24", () => {
-  test("T01 exact accepted pins", () => expect(CATFOOD_THREADS_PINS).toMatchObject({ threads_sha: "875e75fce20c16c6157b5aa42f759411c52e95fe", release_sha256: "04cebd1f97928be56666e6dc82030da44aede7d5f9cb9c2efa5a40e027490e0c", coe_sha256: "50b6df97abc73384063a02cd69a7872b829d264177cad11d304678c04057db0e", schema: 33 }));
+  test("T01 exact accepted pins and contract bytes", () => { expect(CATFOOD_THREADS_PINS).toMatchObject({ threads_sha: "875e75fce20c16c6157b5aa42f759411c52e95fe", release_sha256: "04cebd1f97928be56666e6dc82030da44aede7d5f9cb9c2efa5a40e027490e0c", coe_sha256: "50b6df97abc73384063a02cd69a7872b829d264177cad11d304678c04057db0e", schema: 33 }); expect(createHash("sha256").update(readFileSync(resolve(import.meta.dir, "../contracts/catfood-operational-evidence-v1.json"))).digest("hex")).toBe(CATFOOD_THREADS_PINS.coe_sha256); });
 
   test("T02 old Threads/release/COE/schema rejected", () => { for (const change of [{ threads_sha: "f".repeat(40) }, { threads_release_sha256: "f".repeat(64) }, { coe_sha256: "f".repeat(64) }, { threads_schema: 30 }]) expect(() => acquireCoe(source(), { ...scope(), ...change })).toThrow("COE_PIN_MISMATCH"); });
 
