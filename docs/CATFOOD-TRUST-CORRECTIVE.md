@@ -1,56 +1,37 @@
 # CATFOOD trust corrective architecture
 
-Status: implementation and deterministic test fixture only. This document does not authorize or report a real CATFOOD run.
+Status: consumer implementation and synthetic verification only. Producer acceptance does not authorize a CATFOOD run, and operational prerequisites remain blocked.
 
-## Frozen identities
+## Frozen dependency set
 
-- Failed predecessor: `0340e11d8f6ae2014dd6e0f4a05133b00b02ffe7`
-- Accepted IKORABU base: `e2db047385ef3262786cc009c3c50d87a06dcde8`
-- Threads: `f15c9235ddd62c003b8105c2a640d81defa4fb83`
-- WP1 contract: `14ed73d33a02b3f8877a3045d226f23b7d9e7686f9dc2c8ef595aeae934fa3dc`
-- Operational Boundary v1: `57d896aa756387048b70dc016e482274d571dd165866416e3fc480d59a97e8cf`
-- Threads release: `799344a0a0d4a42ca160e5199d4910f7e6227836b17b9ff9a2b3a90202394d98`
-- Threads schema: v30
+The consumer accepts one indivisible Threads dependency set: commit `875e75fce20c16c6157b5aa42f759411c52e95fe`, release `04cebd1f97928be56666e6dc82030da44aede7d5f9cb9c2efa5a40e027490e0c`, WP1 `14ed73d33a02b3f8877a3045d226f23b7d9e7686f9dc2c8ef595aeae934fa3dc`, Operational Boundary v1 `57d896aa756387048b70dc016e482274d571dd165866416e3fc480d59a97e8cf`, COE v1 `50b6df97abc73384063a02cd69a7872b829d264177cad11d304678c04057db0e`, rehearsal contract `dbcd6da118b41d53e86747927f562037545ad617958c90abbee9577662df0b5b`, emitter inventory `fa3ba3589c64f3116577c977f3946be618497ccf5976a109d0591edb7e6e7b1f`, schema v33, and fingerprint `79e3bc10353b8a7859abf4e71ea04bf9ad6485e842275f7cf1237c223d65cc10`.
 
-## Read-only source binding
+`CATFOOD_THREADS_DEPENDENCY_ROOT` canonically hashes those nine values. Run-spec construction, trust-store initialization, LIVE acquisition, CLOSED verification, checkpoints, and attestations bind the fixed values or their root. The IKORABU consumer identity remains separate and must be supplied by the eventual approved build and GO.
 
-The frozen Threads checkout binds authority and generation to `threads_autopilot/production/safety.py`: `change_execution_authority` and `claim_governed_mutation` serialize with `BEGIN IMMEDIATE`; migration 0030 owns `execution_authorities` and governed `capability_requests`; revocation advances generation and installs the capability stop atomically. `bridge/operational_boundary.py` exposes boundary reads and authority changes.
+## Evidence phases
 
-The real capability mappings are:
+`LIVE_ADMISSION` requests a current, bounded 120-second observation ending at trusted now. It independently checks COE, Operational Boundary, runtime enforcement, GO/lease/epoch/generation, and a principal-bound own/known-foreign tenant probe before positive action. It never asks the producer to prove the future 24-hour run.
 
-| Capability | Authoritative source | Meaningful terminal result |
-|---|---|---|
-| `editorial.cycle` | `threads_autopilot/production/editorial.py`; governed request plus editorial domain row | `claim_status=succeeded`, transport `SUCCEEDED`, domain `state=DRAFT,status=READY` |
-| `editorial.outcome_evaluation` | `threads_autopilot/production/outcome_runner.py`; governed request plus outcome record | `claim_status=succeeded`, transport `SUCCEEDED`, domain `state=COMPLETED,status=RECORDED,recorded=true`, verdict `SUCCESS`, `FAILURE`, or `INVALID_EXPERIMENT` |
-| `threads.publish.dry_run` | `/autopilot/v2/publish`; governed request plus publication response | `claim_status=succeeded`, transport `SUCCEEDED`, domain `status=succeeded,mode=dry_run,duplicate=false` |
+`CLOSED_RUN` requests `HISTORICAL` evidence for the immutable `[s,e)` 24-hour window only after `e` and safe quiescence. Exact producer acquisition pages are retained as canonical bytes in the append-only source journal, addressed by SHA-256 and anchored by the external checkpoint. Final boundaries, claims, governed-work decisions, probe receipts, pins, and source references are sealed with them. Both evaluators use only that retained archive; later wall time, runtime restarts, and unrelated rows do not trigger LIVE reads or change the acceptance core.
 
-Semantic credit is keyed by capability, authoritative business identity, and material revision. Request IDs, run IDs, retry counts, time, and epoch do not create fresh credit.
+## Work, window, and boundary rules
 
-## Contract gaps
+Only the exhaustive governed-work decision can grant credit. Successful authoritative joins can be `CREDIT`; duplicate/replay/preclaim rejection are zero-credit; unresolved or missing evidence is `BLOCKED`; identity/result/generation contradictions and terminal failed governed attempts are run failures. Both evaluators consume the same decision for credit and verdict while retaining independent read-only journal/checkpoint verification.
 
-The frozen Threads contract does not expose all evidence needed by an operational WP3 adapter:
+Admission and authoritative admission/completion timestamps must be inside `[s,e)`. Start is bound to the approved window, no work is admitted at or after `e`, and close occurs at or after `e` after safety-only stop/reconciliation. Stop remains available after GO/lease/window expiry. Boundary predicates are operation-specific: PREPARE accepts known safe pre-authority state, ADMIT requires exact active permit/generation with no applicable stop, and FINAL requires inhibited authority with zero in-flight work.
 
-1. completed governed claim/request reads are not exposed by Bridge;
-2. outcome evaluation has no Bridge mutation route;
-3. effective `FEATURE_MULTI_TENANT_AUTH` state is not exposed as authoritative runtime evidence;
-4. complete relevant provider non-use coverage is not exposed.
+## Interoperability and operational block
 
-Therefore the operational path is `CONTRACT_GAP` and cannot mint a preflight receipt, grant authority, evaluate PASS, or attest PASS. Threads is not modified to compensate. The deterministic source is explicitly `TEST_ONLY`.
+The concrete HTTP adapter implements the accepted COE GET, Boundary GET, authority POST, outcome-evaluation POST, and bound own/foreign Boundary probe with fixed origin/auth, no redirects, bounded time/body/page/record limits, duplicate-key rejection, exact error handling, and no blind retry after ambiguous mutation.
 
-## Trust and evidence path
+`PRE_REHEARSAL_CONTRACT_GAP`: the accepted Bridge still has no single supported operational API that supplies the full three-capability source inventory and authoritative completed-claim reads required by the synchronous custodian for editorial cycle and publish dry-run. Historical COE plus protected retention is sufficient for later verification, but it does not itself provide the pre-dispatch intent adapter for those two capabilities. No direct database bypass or invented endpoint is used. Operational CATFOOD remains blocked until an accepted composition can demonstrate those bindings.
 
-An Ed25519 Human GO is canonical, exact-field, key-pinned, single-run, single-consumption, revocable, and bound to scope, capabilities, release pins, zero paid/provider allowance, the fixed policy digest, and maximum epoch. The private GO key is not part of the runner API.
+## Secret, attestation, and separation rules
 
-The protected custodian assigns owner sessions, lease, epoch, trusted observation time, journal sequence, and row hashes. Ownership, lease, lifecycle, GO, epoch, and authority binding checks occur under one immediate write transaction. Positive work is admitted only from authoritative inventory and only against the current Threads authority/generation. Safety stop and reconciliation remain available after GO or lease expiry.
+COE decoding is schema-aware. Exact producer labels such as `graph.threads.net/access_token`, `anthropic-api-key`, and `BRIDGE_API_KEY_MISSING` are metadata, while duplicate JSON keys, credential containers, bearer values, private keys, secret-bearing URLs, and unknown fields are rejected before persistence. Original accepted COE bytes are retained; display summaries are separate.
 
-Every source-journal append is followed by a create-only checkpoint in a separate store before acknowledgement. A checkpoint failure latches `UNANCHORED`, closes admission, and blocks PASS. Startup verifies schema identity, required indexes and triggers, SQLite safety settings, integrity, trust configuration, journal hashes, checkpoint links, checkpoint high water, and frozen pins.
+Attestations derive coverage from evaluation, bind the dependency root and retained source digest, and distinguish `TEST_ONLY` from `OPERATIONAL` trust domains. The operational verifier rejects TEST_ONLY PASS. Custodian, read-only evaluator, and attestation writer/store remain separate. No production keys, GO, probe, provider call, rehearsal, or CATFOOD action is included here.
 
-The independent evaluator opens the evidence and checkpoint stores read-only, re-reads authoritative claims and final runtime/boundary evidence, re-verifies every admitted action against the signed GO window, and applies the fixed 24-hour/3-unit/2-class/restart policy. The closed bundle is only a cache and is compared with the independently re-derived bundle.
+## Historical documents
 
-The attestation writer has no verdict or evaluator-identity input. Its store pins writer identity, evaluator digest, policy digest, and a separate Ed25519 public key. It runs the pinned evaluator, binds the actual verdict and source identities, signs a domain-separated payload, and inserts a create-only record. Test keys and `test_only=true` attestations are never operational trust roots.
-
-## Separation status
-
-Logical separation is implemented between custodian, read-only evaluator, and attestation writer/store. Same-user local tests do not prove deployment isolation. Runner denial of protected DB/WAL/SHM directories, trust configuration, evaluator artifact, private keys, and attestation store is `REHEARSAL_REQUIRED` in a production-shaped environment.
-
-Default production scheduler, notifications, writer, paid generation, provider activity, and live publication remain off. NIGHT is `UNEXERCISED_EXCLUDED`.
+`docs/catfood-harness01.md` and earlier references to Threads `f15c923`, schema v30/v32, or the pre-COE contract-gap analysis are historical provenance only. This document supersedes them for the operative WP3 consumer design; they do not supply runtime pins.

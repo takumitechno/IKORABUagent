@@ -1,5 +1,7 @@
 # CATFOOD harness v1
 
+> **HISTORICAL:** this v30/f15c923 design is superseded by `CATFOOD-TRUST-CORRECTIVE.md` and must not be used as an operative pin source.
+
 This package is machinery for a future, separately authorized CATFOOD run. It
 does not schedule work and has no command that performs a CATFOOD run.
 
