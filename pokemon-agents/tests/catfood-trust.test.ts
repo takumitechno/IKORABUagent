@@ -77,7 +77,7 @@ describe("WP3 CATFOOD corrective adversarial plan", () => {
   test("T02 expired, revoked, reused, and wrong-environment GO reject", () => { const r = rig(); try {
     expect(() => verifyHumanGo(signGo({ ...r.payload, valid_until: new Date(r.clock.wallMs).toISOString() }, r.privateKey), r.spec, r.trust, r.clock.sample().wall_time)).toThrow("GO_NOT_CURRENT");
     r.custodian.createRun(r.spec, r.artifact); expect(() => r.custodian.createRun(r.spec, r.artifact)).toThrow(); r.custodian.revokeGo(r.spec.run_id, "operator-revoke");
-    const session = r.custodian.issueOwnerSession(r.spec.run_id); expect(() => r.custodian.preflight(session)).toThrow("GO_REVOKED");
+    expect(() => r.custodian.issueOwnerSession(r.spec.run_id)).toThrow("RUN_FINALIZED");
     const wrong = { ...r.spec, environment_type: "staging" } as CatfoodRunSpec; expect(() => verifyHumanGo(r.artifact, wrong, r.trust, r.clock.sample().wall_time)).toThrow();
   } finally { r.close(); } });
 
@@ -167,6 +167,13 @@ describe("WP3 CATFOOD corrective adversarial plan", () => {
   } finally { r.close(); } });
 
   test("T18 expired GO still permits safety stop and reconcile", () => { const r = rig(); try { const session = start(r); const ticket = r.custodian.admit(session, "editorial.cycle", "cycle:one"); r.source.complete(ticket.claim_id); r.clock.advance(90_000_001); expect(() => r.custodian.reconcile(session, ticket.work_id)).not.toThrow(); expect(() => r.custodian.stop(session, "EXPIRY")).not.toThrow(); } finally { r.close(); } });
+
+  test("corrective04 ABORT is sticky, repeated stop is idempotent, and safe closure remains FAIL", () => { const r = rig("run-sticky-abort"); try {
+    const session = start(r); r.custodian.stop(session, "ABORT"); expect(() => r.custodian.stop(session, "STOP")).not.toThrow();
+    r.clock.advance(121_000); expect(() => r.custodian.issueOwnerSession(r.spec.run_id)).toThrow("RUN_FINALIZED"); expect(() => r.custodian.preflight(session)).toThrow("RUN_FINALIZED");
+    r.clock.advance(86_400_000); const result = r.custodian.closeRun(session); expect(result.verdict).toBe("FAIL"); expect(result.reason_codes).toContain("RUN_ABORTED");
+    expect(() => r.custodian.stop(session, "STOP")).toThrow("RUN_CLOSED");
+  } finally { r.close(); } });
 
   test("owner lease repair T1/T12 renews only a live owner without changing epoch or producer generation", () => { const r = rig("run-short-renewal"); try {
     const session = start(r); const before = CATFOOD_CAPABILITIES.map((capability) => r.source.generation(capability)); const db = new Database(r.control); const initial = db.query<Record<string, unknown>, []>("SELECT current_epoch,lease_expires_at FROM catfood_runs").get()!; db.close(); r.clock.advance(60_000);

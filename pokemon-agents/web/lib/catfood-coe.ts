@@ -222,6 +222,11 @@ const ATTEMPT_FIELDS = ["account_id", "admission_state", "attempt_id", "authenti
 const AUTHORITY_FIELDS = ["account_id", "actor", "authority_ref", "capability", "event_id", "event_seq", "event_type", "generation", "occurred_at", "payload_hash", "permit_expires_at", "source", "spec_hash", "state"];
 const OUTCOME_TARGET_FIELDS = ["business_identity", "material_revision", "observed_through", "source"];
 const OUTCOME_TARGET_SOURCE_FIELDS = ["constants_json", "content_hash", "content_id", "content_version", "cycle_id", "experiment_created_at", "experiment_id", "failure_signal_json", "hypothesis_json", "minimum_sample_json", "observed_through", "source_content_ids_json", "success_signal_json", "test_variable"];
+const EDITORIAL_CYCLE_RESULT_FIELDS = ["brief", "config", "content_id", "created_at", "cycle_id", "cycle_key", "draft", "mutated", "source_content_ids", "state", "status", "summary", "updated_at"];
+const DRY_RUN_RESULT_FIELDS = ["attempts", "duplicate", "error", "external_publish_id", "mode", "note", "parts_sent", "parts_state", "permalink", "publication_id", "requires_human", "status"];
+const OUTCOME_RESULT_FIELDS = ["account_id", "authority_ref", "business_identity", "capability", "claim_identity", "duplicate_of_request_id", "evaluation", "material_revision", "native_domain_state", "original_state", "reason_code", "request_id", "result_identity", "result_revision", "state", "threads_generation"];
+const OUTCOME_EVALUATION_FIELDS = ["decision_json", "evidence_count", "evidence_level", "next_decision", "observed_through", "result_summary", "sample_size", "verdict"];
+const OUTCOME_DECISION_FIELDS = ["alternative_explanation", "baseline_median", "baseline_snapshot_id", "candidate_metric", "content_hash", "content_id", "evaluation_id", "metric_key", "missing_evidence", "next_evidence_needed", "possible_confounders", "publication_id", "tested_variable"];
 
 export type CoeFieldClass = "A_IMMUTABLE_EQUAL" | "B_CONSERVATIVE" | "C_PAGE_LOCAL";
 const fields = (prefix: string, names: readonly string[], classification: CoeFieldClass) => names.map((name) => [`${prefix}.${name}`, classification] as const);
@@ -271,6 +276,30 @@ function object(value: unknown, code = "COE_MALFORMED"): Record<string, unknown>
 function exact(value: Record<string, unknown>, keys: readonly string[]): void {
   const got = Object.keys(value).sort(); const want = [...keys].sort();
   if (got.length !== want.length || got.some((key, index) => key !== want[index])) throw new CoeError("COE_UNKNOWN_OR_MISSING_FIELD");
+}
+
+function onlyKnown(value: Record<string, unknown>, keys: readonly string[]): void {
+  if (Object.keys(value).some((key) => !keys.includes(key))) throw new CoeError("COE_RESULT_SCHEMA_INVALID");
+}
+
+function validateNativeResult(capability: unknown, value: unknown): void {
+  const result = object(value, "COE_RESULT_SCHEMA_INVALID");
+  if (capability === "editorial.cycle") {
+    onlyKnown(result, EDITORIAL_CYCLE_RESULT_FIELDS);
+    if (typeof result.cycle_id !== "string" || typeof result.state !== "string" || typeof result.status !== "string" || result.mutated !== false) throw new CoeError("COE_RESULT_SCHEMA_INVALID");
+    return;
+  }
+  if (capability === "threads.publish.dry_run") {
+    onlyKnown(result, DRY_RUN_RESULT_FIELDS);
+    if (typeof result.publication_id !== "string" || result.mode !== "dry_run" || typeof result.status !== "string" || typeof result.duplicate !== "boolean") throw new CoeError("COE_RESULT_SCHEMA_INVALID");
+    return;
+  }
+  onlyKnown(result, OUTCOME_RESULT_FIELDS);
+  if (typeof result.request_id !== "string" || typeof result.state !== "string" || typeof result.native_domain_state !== "string") throw new CoeError("COE_RESULT_SCHEMA_INVALID");
+  if (result.evaluation !== undefined) {
+    const evaluation = object(result.evaluation, "COE_RESULT_SCHEMA_INVALID"); onlyKnown(evaluation, OUTCOME_EVALUATION_FIELDS);
+    if (evaluation.decision_json !== undefined) onlyKnown(object(evaluation.decision_json, "COE_RESULT_SCHEMA_INVALID"), OUTCOME_DECISION_FIELDS);
+  }
 }
 
 function enumValue(value: unknown, accepted: readonly string[], code: string): string {
@@ -380,6 +409,7 @@ function validatePage(raw: unknown, scope: CoeScope, phase: EvidencePhase): Reco
     const emitter = object(value); exact(emitter, EMITTER); if (typeof emitter.emitter_id !== "string" || !emitter.emitter_id || emitterIds.has(emitter.emitter_id)) throw new CoeError("COE_EMITTER_INVENTORY_MALFORMED"); emitterIds.add(emitter.emitter_id);
     for (const field of ["entrypoints", "process_types", "destinations", "operations"] as const) if (!Array.isArray(emitter[field]) || (emitter[field] as unknown[]).some((item) => typeof item !== "string")) throw new CoeError("COE_EMITTER_INVENTORY_MALFORMED");
   }
+  if (sha256(canonicalJson(activity.emitter_dispositions)) !== activity.expected_emitter_inventory_digest) throw new CoeError("COE_EMITTER_INVENTORY_MISMATCH");
   for (const field of ["package_proven_exclusions", "rehearsal_required_emitters", "uninstrumented_emitters"] as const) if (!Array.isArray(activity[field]) || (activity[field] as unknown[]).some((item) => typeof item !== "string" || !emitterIds.has(item))) throw new CoeError("COE_EMITTER_INVENTORY_MALFORMED");
   if (!Array.isArray(page.records) || !Array.isArray(page.outcome_evaluation_targets)) throw new CoeError("COE_MALFORMED");
   natural(coverage.page_offset); natural(coverage.page_count); natural(coverage.scoped_count); natural(coverage.unresolved_count);
@@ -394,9 +424,7 @@ function validatePage(raw: unknown, scope: CoeScope, phase: EvidencePhase): Reco
       natural(record.lifecycle_revision); if (record.lifecycle_revision === 0) throw new CoeError("COE_LIFECYCLE_REVISION_INVALID");
       if (record.result_json !== null) {
         const result = object(typeof record.result_json === "string" ? parseJsonNoDuplicateKeys(record.result_json, 1_000_000, 32) : record.result_json, "COE_RESULT_SCHEMA_INVALID");
-        const allowed = record.capability === "editorial.cycle" ? ["cycle_id", "mutated", "state", "status"] : record.capability === "threads.publish.dry_run" ? ["content_hash", "duplicate", "mode", "publication_id", "reason", "status", "version"] : ["account_id", "authority_ref", "business_identity", "capability", "claim_identity", "evaluation", "material_revision", "native_domain_state", "request_id", "result_identity", "result_revision", "state", "threads_generation"];
-        if (Object.keys(result).some((key) => !allowed.includes(key))) throw new CoeError("COE_RESULT_SCHEMA_INVALID");
-        if (record.capability === "editorial.outcome_evaluation" && result.evaluation !== undefined) { const evaluation = object(result.evaluation, "COE_RESULT_SCHEMA_INVALID"); if (Object.keys(evaluation).some((key) => !["decision_json", "evidence_count", "evidence_level", "next_decision", "observed_through", "result_summary", "sample_size", "verdict"].includes(key))) throw new CoeError("COE_RESULT_SCHEMA_INVALID"); if (evaluation.decision_json !== undefined) { const decision = object(evaluation.decision_json, "COE_RESULT_SCHEMA_INVALID"); if (Object.keys(decision).some((key) => !["alternative_explanation", "evaluation_id", "missing_evidence", "next_evidence_needed", "possible_confounders", "tested_variable"].includes(key))) throw new CoeError("COE_RESULT_SCHEMA_INVALID"); } }
+        validateNativeResult(record.capability, result);
       }
     } else exact(record, AUTHORITY_FIELDS);
   }
@@ -580,22 +608,24 @@ export function foldProducerAttempts(evidence: Pick<CoeAcquisition, "source_inve
     for (const row of lifecycle) { const revision = natural(row.lifecycle_revision, "COE_LIFECYCLE_REVISION_INVALID"); if (revision === 0 || revisions.has(revision)) throw new CoeError("COE_LIFECYCLE_REVISION_CONFLICT"); revisions.add(revision); }
     if (Number(lifecycle[0]!.lifecycle_revision) !== 1 || lifecycle.some((row, index) => Number(row.lifecycle_revision) !== index + 1)) throw new CoeError("COE_LIFECYCLE_REVISION_GAP");
     const first = lifecycle[0]!;
-    for (const row of lifecycle.slice(1)) if (ATTEMPT_IMMUTABLE.some((field) => canonicalJson(row[field]) !== canonicalJson(first[field]))) throw new CoeError("COE_LIFECYCLE_IDENTITY_DRIFT");
+    for (const row of lifecycle.slice(1)) if (ATTEMPT_IMMUTABLE.some((field) => row[field] !== null && row[field] !== undefined && canonicalJson(row[field]) !== canonicalJson(first[field]))) throw new CoeError("COE_LIFECYCLE_IDENTITY_DRIFT");
     for (let index = 1; index < lifecycle.length; index++) {
       const previous = String(lifecycle[index - 1]!.event_type); const current = String(lifecycle[index]!.event_type);
-      const legal = previous === "CLAIMED" ? ["SUCCEEDED", "FAILED", "UNRESOLVED"].includes(current) : previous === "DUPLICATE" && current === "DUPLICATE";
+      const legal = previous === "CLAIMED" ? ["SUCCEEDED", "FAILED", "UNRESOLVED"].includes(current) : previous === "DUPLICATE" && ["DUPLICATE", "FAILED", "UNRESOLVED"].includes(current);
       if (!legal) throw new CoeError("COE_LIFECYCLE_TRANSITION_INVALID");
     }
-    const terminal = lifecycle.at(-1)!; const terminalState = String(terminal.event_type);
+    const rawTerminal = lifecycle.at(-1)!; const terminalState = String(rawTerminal.event_type);
     if (lifecycle.length > 1 && !TERMINAL_EVENTS.has(terminalState)) throw new CoeError("COE_LIFECYCLE_TERMINAL_INVALID");
     const firstState = String(first.event_type);
     if (!["CLAIMED", "DUPLICATE", "REPLAYED", "REJECTED_PRECLAIM"].includes(firstState)) throw new CoeError("COE_LIFECYCLE_ORIGIN_INVALID");
     if (lifecycle.length > 1 && firstState !== "CLAIMED" && firstState !== "DUPLICATE") throw new CoeError("COE_LIFECYCLE_TRANSITION_INVALID");
     const claimOrigin = firstState === "CLAIMED" ? first : null;
-    if (claimOrigin && terminal !== claimOrigin) {
-      if ([terminal.claimed_authority_ref, terminal.claimed_spec_hash, terminal.claimed_threads_generation].some((value) => value !== null)) throw new CoeError("COE_TERMINAL_CLAIM_FIELD_PRESENT");
-      if (!terminal.verified_authority_ref || !terminal.verified_spec_hash || !Number.isSafeInteger(terminal.verified_threads_generation)) throw new CoeError("COE_TERMINAL_AUTHORITY_MISSING");
+    if (claimOrigin && rawTerminal !== claimOrigin) {
+      if ([rawTerminal.claimed_authority_ref, rawTerminal.claimed_spec_hash, rawTerminal.claimed_threads_generation].some((value) => value !== null)) throw new CoeError("COE_TERMINAL_CLAIM_FIELD_PRESENT");
+      if (!rawTerminal.verified_authority_ref || !rawTerminal.verified_spec_hash || !Number.isSafeInteger(rawTerminal.verified_threads_generation)) throw new CoeError("COE_TERMINAL_AUTHORITY_MISSING");
     }
+    const terminal = { ...rawTerminal };
+    for (const field of ATTEMPT_IMMUTABLE) if (terminal[field] === null || terminal[field] === undefined) terminal[field] = first[field] as Json;
     return Object.freeze({ namespace, attempt_id: String(first.attempt_id), first, claim_origin: claimOrigin, terminal, lifecycle: Object.freeze(lifecycle), first_occurred_at: String(first.occurred_at), terminal_occurred_at: String(terminal.occurred_at) });
   }));
 }

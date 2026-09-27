@@ -35,7 +35,7 @@ describe("WP3 corrective02 producer composition", () => {
 
   test("T05-T08 null org requires the protected invocation binding and unrelated failures do not poison COE health", () => {
     const row = { ...attempt(), org_id: null, authenticated_org_id: null }; const claimed = { ...claimFor(row), org_id: null, authenticated_org_id: null }; const evidence = { ...acquisition(), records: [claimed, row, authorityFor(row)] } as CoeAcquisition;
-    const work = { account_id: "acct_test", capability: "editorial.cycle", claim_id: "claim:one", request_id: "request:one", authority_ref: "authority:one", generation: 1, business_identity: "article:one", material_revision: "a".repeat(64), domain_result: { state: "DRAFT", status: "READY" } };
+    const work = { account_id: "acct_test", capability: "editorial.cycle", claim_id: "claim:one", request_id: "request:one", authority_ref: "authority:one", generation: 1, business_identity: "article:one", material_revision: "a".repeat(64), domain_result: JSON.parse(String(row.result_json)) };
     expect(verifyGovernedWork(evidence, work, "e".repeat(64), "org:test").reason).toBe("COE_GOVERNED_WORK_IDENTITY_MISMATCH");
     const invocation_receipt = { receipt_id: "receipt:one", source_session_id: "source:one", principal_ref: "principal:one", credential_version_ref: "credential:v1", organization_id: "org:test", account_id: "acct_test", capability: "editorial.cycle", authority_ref: "authority:one", spec_hash: "e".repeat(64), generation: 1, authority_event_id: "authority:event:one", authority_actor: "principal:one", authority_occurred_at: "2026-09-30T23:59:58+00:00" };
     expect(verifyGovernedWork(evidence, { ...work, invocation_receipt }, "e".repeat(64), "org:test").disposition).toBe("CREDIT");
@@ -55,6 +55,19 @@ describe("WP3 corrective02 producer composition", () => {
     const captured = (raw: string) => ({ operationalEvidence: () => ({ parsed: JSON.parse(raw), receipt: { representation: "AUTHENTICATED_DECODED_BODY", body_base64url: Buffer.from(raw).toString("base64url"), byte_length: Buffer.byteLength(raw), body_sha256: sha256(raw), content_type: "application/json", content_encoding: "identity", source_session_id: "source:test" } }) });
     const compact = JSON.stringify(template); const spaced = JSON.stringify(template, null, 2); const one = acquireCoe(captured(compact), scope()); const two = acquireCoe(captured(spaced), scope());
     expect(one.coverage.record_set_digest).toBe(two.coverage.record_set_digest); expect(one.page_receipts[0]!.body_sha256).not.toBe(two.page_receipts[0]!.body_sha256); expect(one.representation).toBe("AUTHENTICATED_DECODED_BODY");
+  });
+
+  test("corrective04 folds producer duplicate origins with intentional terminal nulls", () => {
+    const first = attempt("DUPLICATE", "request:fresh");
+    const duplicate = { ...first, event_id: "event:2", event_seq: 2, lifecycle_revision: 2, authority_ref: null, spec_hash: null, threads_generation: null };
+    expect(foldProducerAttempts({ ...acquisition(), records: [first, duplicate] } as CoeAcquisition)[0]!.terminal.authority_ref).toBe("authority:one");
+    const failed = { ...duplicate, event_type: "FAILED", execution_state: "FAILED", reason_code: "canonical_projection_failed" };
+    expect(foldProducerAttempts({ ...acquisition(), records: [first, failed] } as CoeAcquisition)[0]!.terminal.event_type).toBe("FAILED");
+    expect(() => foldProducerAttempts({ ...acquisition(), records: [first, { ...duplicate, account_id: "acct_other" }] } as CoeAcquisition)).toThrow("COE_LIFECYCLE_IDENTITY_DRIFT");
+  });
+
+  test("corrective04 binds dynamic emitter membership to the accepted inventory digest", () => {
+    expect(() => acquisition(mutate((page) => { page.prohibited_activity.emitter_dispositions.pop(); }))).toThrow("COE_EMITTER_INVENTORY_MISMATCH");
   });
 });
 
@@ -82,7 +95,7 @@ function attempt(eventType = "SUCCEEDED", requestId = "request:one") {
     claimed_spec_hash: null, threads_generation: 1, verified_threads_generation: 1, claimed_threads_generation: null,
     business_identity: "article:one", material_revision: "a".repeat(64), admission_state: "ADMITTED",
     execution_state: eventType === "SUCCEEDED" ? "SUCCEEDED" : "FAILED", duplicate_of_request_id: eventType === "DUPLICATE" ? "request:old" : null,
-    result_identity: eventType === "SUCCEEDED" ? "result:one" : null, result_json: eventType === "SUCCEEDED" ? canonicalJson({ state: "DRAFT", status: "READY" }) : null,
+    result_identity: eventType === "SUCCEEDED" ? "result:one" : null, result_json: eventType === "SUCCEEDED" ? canonicalJson({ cycle_id: "result:one", cycle_key: "article:one", state: "DRAFT", status: "READY", source_content_ids: [], config: {}, summary: {}, brief: {}, draft: {}, content_id: null, created_at: "2026-09-30T23:59:59+00:00", updated_at: "2026-10-01T00:00:00+00:00", mutated: false }) : null,
     result_revision: "2026-10-01T00:00:00+00:00", domain_state: "DRAFT", occurred_at: "2026-10-01T00:00:00+00:00",
     payload_hash: "f".repeat(64), request_fingerprint: "1".repeat(64), reason_code: null, lifecycle_revision: ["SUCCEEDED", "FAILED", "UNRESOLVED"].includes(eventType) ? 2 : 1,
   };
