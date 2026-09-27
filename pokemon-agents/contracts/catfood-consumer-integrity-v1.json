@@ -12,6 +12,6 @@
     { "path": "pokemon-agents/web/lib/catfood-independent-attestation.ts", "sha256": "10e44b4429c0c276bf74fa113effde6d1451fd2231ae4274b79706616f9469b0" },
     { "path": "pokemon-agents/web/lib/catfood-operational-bootstrap.ts", "sha256": "f471cc507cbed5293297504f9525b0de803d39fe2386122188ddb61a72107d34" },
     { "path": "pokemon-agents/web/lib/catfood-threads-http.ts", "sha256": "2b62a278b0ef275c47ea8641c5c6c4867acec1b8fe9ba455bc9d5690cb5e7a04" },
-    { "path": "pokemon-agents/web/lib/catfood-trust.ts", "sha256": "d74f90d29345ce8a9d1ce9ad9ed7eab742e34a82e17526e218fdc02e04c69b5c" }
+    { "path": "pokemon-agents/web/lib/catfood-trust.ts", "sha256": "66ee82ad43a1d0eb2d91761e08596728ce5284490ac28d6eb9f221dd674e0bff" }
   ]
 }

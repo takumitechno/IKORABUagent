@@ -768,10 +768,12 @@ export class ProtectedCatfoodCustodian {
     this.verifyAnchored(session.run_id); const sample = this.sample();
     this.control.transaction(() => {
       const row = this.getRun(session.run_id); this.authenticate(session, row); const go = this.verifyCurrentGo(row, sample); const spec = runSpec(row);
+      this.requireLiveOwnerMaintenance(row, sample);
       const expires = Math.min(Date.parse(sample.wall_time) + 120_000, Date.parse(spec.requested_window_end), Date.parse(go.payload.valid_until));
       if (expires <= Date.parse(sample.wall_time)) throw new CatfoodTrustError("LEASE_WINDOW_CLOSED");
-      this.control.query("UPDATE catfood_runs SET lease_expires_at=?,state_version=state_version+1 WHERE run_id=? AND owner_session_id=? AND current_epoch=?")
-        .run(new Date(expires).toISOString(), row.run_id, session.session_id, row.current_epoch);
+      const renewed = this.control.query("UPDATE catfood_runs SET lease_expires_at=?,state_version=state_version+1 WHERE run_id=? AND owner_session_id=? AND current_epoch=? AND lease_expires_at=? AND lease_expires_at>? AND ((lifecycle='READY' AND admission_state='CLOSED') OR (lifecycle='RUNNING' AND admission_state='OPEN'))")
+        .run(new Date(expires).toISOString(), row.run_id, session.session_id, row.current_epoch, row.lease_expires_at, sample.wall_time);
+      if (renewed.changes !== 1) throw new CatfoodTrustError("OWNER_LEASE_RENEWAL_FENCED");
       this.appendJournal(this.getRun(row.run_id), "OWNER_LEASE_RENEWED", session.session_id, "custodian", { lease_expires_at: new Date(expires).toISOString() }, null, null, null, sample);
     }).immediate();
     const head = this.control.query<{ sequence: number; row_hash: string }, [string]>("SELECT sequence,row_hash FROM catfood_source_journal WHERE run_id=? ORDER BY sequence DESC LIMIT 1").get(session.run_id)!; this.anchor(session.run_id, head);
@@ -782,6 +784,7 @@ export class ProtectedCatfoodCustodian {
       this.verifyAnchored(session.run_id); const sample = this.sample(); let request!: { spec: CatfoodRunSpec; ref: string; generation: number; expires: string; request_id: string };
       this.control.transaction(() => {
         const row = this.getRun(session.run_id); this.authenticate(session, row); const go = this.verifyCurrentGo(row, sample); const spec = runSpec(row);
+        this.requireLiveOwnerMaintenance(row, sample);
         if (row.lifecycle !== "RUNNING" || row.admission_state !== "OPEN") throw new CatfoodTrustError("ADMISSION_CLOSED");
         requireZeroPaidRuntime(this.source.runtimeEvidence(spec));
         const binding = this.control.query<Record<string, unknown>, [string, number, string]>("SELECT * FROM catfood_authority_bindings WHERE run_id=? AND wp3_epoch=? AND capability=?").get(row.run_id, row.current_epoch, capability);
@@ -828,6 +831,11 @@ export class ProtectedCatfoodCustodian {
   private verifyCurrentGo(row: RunRow, sample: TrustedClockSample): VerifiedHumanGo {
     if (this.control.query("SELECT 1 FROM catfood_go_revocations WHERE grant_id=?").get(row.grant_id)) throw new CatfoodTrustError("GO_REVOKED");
     return verifyHumanGo(row.go_artifact, runSpec(row), this.trust, sample.wall_time);
+  }
+
+  private requireLiveOwnerMaintenance(row: RunRow, sample: TrustedClockSample): void {
+    if (!row.lease_expires_at || Date.parse(sample.wall_time) >= Date.parse(row.lease_expires_at)) throw new CatfoodTrustError("LEASE_EXPIRED");
+    if (row.lifecycle !== "READY" && row.lifecycle !== "RUNNING") throw new CatfoodTrustError("OWNER_MAINTENANCE_NOT_ALLOWED");
   }
 
   private sourceSnapshot(spec: CatfoodRunSpec, now = this.sample().wall_time): { runtime: ThreadsRuntimeEvidence; boundaries: readonly OperationalBoundaryV1[]; inventory: readonly ThreadsInventoryItem[]; coe: CoeAcquisition; stableCoe: Record<string, Json>; coeAssessment: CoeAssessment; digest: string } {

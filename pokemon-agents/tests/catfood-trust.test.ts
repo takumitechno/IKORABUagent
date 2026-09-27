@@ -168,13 +168,48 @@ describe("WP3 CATFOOD corrective adversarial plan", () => {
 
   test("T18 expired GO still permits safety stop and reconcile", () => { const r = rig(); try { const session = start(r); const ticket = r.custodian.admit(session, "editorial.cycle", "cycle:one"); r.source.complete(ticket.claim_id); r.clock.advance(90_000_001); expect(() => r.custodian.reconcile(session, ticket.work_id)).not.toThrow(); expect(() => r.custodian.stop(session, "EXPIRY")).not.toThrow(); } finally { r.close(); } });
 
-  test("corrective03 renews short authority and owner leases without changing producer generation", () => { const r = rig("run-short-renewal"); try {
-    const session = start(r); const before = CATFOOD_CAPABILITIES.map((capability) => r.source.generation(capability)); r.clock.advance(60_000);
+  test("owner lease repair T1/T12 renews only a live owner without changing epoch or producer generation", () => { const r = rig("run-short-renewal"); try {
+    const session = start(r); const before = CATFOOD_CAPABILITIES.map((capability) => r.source.generation(capability)); const db = new Database(r.control); const initial = db.query<Record<string, unknown>, []>("SELECT current_epoch,lease_expires_at FROM catfood_runs").get()!; db.close(); r.clock.advance(60_000);
     r.custodian.renewOwnerSession(session); r.custodian.renewAuthorities(session);
     expect(CATFOOD_CAPABILITIES.map((capability) => r.source.generation(capability))).toEqual(before);
     r.clock.advance(61_000); expect(() => r.custodian.admit(session, "editorial.cycle", "cycle:one")).not.toThrow();
-    const db = new Database(r.control); const expiries = db.query<{ permit_expires_at: string }, []>("SELECT permit_expires_at FROM catfood_authority_bindings").all(); db.close();
+    const renewedDb = new Database(r.control); const renewed = renewedDb.query<Record<string, unknown>, []>("SELECT current_epoch,lease_expires_at FROM catfood_runs").get()!; const expiries = renewedDb.query<{ permit_expires_at: string }, []>("SELECT permit_expires_at FROM catfood_authority_bindings").all(); renewedDb.close();
+    expect(renewed.current_epoch).toBe(initial.current_epoch); expect(Date.parse(String(renewed.lease_expires_at))).toBeGreaterThan(Date.parse(String(initial.lease_expires_at)));
     expect(expiries.every((row) => Date.parse(row.permit_expires_at) - (r.clock.wallMs - 61_000) <= 120_000)).toBe(true);
+  } finally { r.close(); } });
+
+  test("owner lease repair T2-T5/T9 rejects boundary-expired and stale owners without mutation", () => {
+    for (const delta of [120_000, 120_001]) { const r = rig(`run-expired-${delta}`); try {
+      const session = start(r); const db = new Database(r.control); const before = db.query<Record<string, unknown>, []>("SELECT owner_session_id,current_epoch,lease_expires_at,state_version FROM catfood_runs").get()!; const events = db.query<{ n: number }, []>("SELECT COUNT(*) n FROM catfood_source_journal").get()!.n; db.close();
+      r.clock.advance(delta); expect(() => r.custodian.renewOwnerSession(session)).toThrow("LEASE_EXPIRED");
+      const afterDb = new Database(r.control); expect(afterDb.query<Record<string, unknown>, []>("SELECT owner_session_id,current_epoch,lease_expires_at,state_version FROM catfood_runs").get()).toEqual(before); expect(afterDb.query<{ n: number }, []>("SELECT COUNT(*) n FROM catfood_source_journal").get()!.n).toBe(events); afterDb.close();
+    } finally { r.close(); } }
+    const stale = rig("run-stale-owner-renewal"); try {
+      const first = start(stale); stale.custodian.stop(first, "STOP"); stale.clock.advance(121_000); const second = stale.custodian.issueOwnerSession(stale.spec.run_id); stale.custodian.takeover(stale.spec.run_id, second);
+      const db = new Database(stale.control); const before = db.query<Record<string, unknown>, []>("SELECT owner_session_id,current_epoch,lease_expires_at,state_version FROM catfood_runs").get()!; db.close(); expect(() => stale.custodian.renewOwnerSession(first)).toThrow("OWNER_SESSION_INVALID");
+      const afterDb = new Database(stale.control); expect(afterDb.query<Record<string, unknown>, []>("SELECT owner_session_id,current_epoch,lease_expires_at,state_version FROM catfood_runs").get()).toEqual(before); afterDb.close();
+    } finally { stale.close(); }
+  });
+
+  test("owner lease repair T6-T8 serializes renewal behind expiry, takeover, and stop fences", async () => {
+    for (const race of ["expiry", "takeover", "stop"] as const) { const r = rig(`run-renewal-race-${race}`); try {
+      const session = start(r); const now = r.clock.sample().wall_time;
+      const worker = new Worker(`const {parentPort,workerData}=require('node:worker_threads');const {Database}=require('bun:sqlite');const db=new Database(workerData.path);db.exec('PRAGMA busy_timeout=5000; BEGIN IMMEDIATE');if(workerData.race==='expiry')db.query('UPDATE catfood_runs SET lease_expires_at=?').run(workerData.now);if(workerData.race==='takeover')db.query(\"UPDATE catfood_runs SET owner_session_id='ses:replacement',current_epoch=current_epoch+1,lease_expires_at=?,lifecycle='READY',admission_state='CLOSED'\").run(new Date(Date.parse(workerData.now)+120000).toISOString());if(workerData.race==='stop')db.exec(\"UPDATE catfood_runs SET admission_state='CLOSED',lifecycle='STOP_PENDING'\");parentPort.postMessage('locked');setTimeout(()=>{db.exec('COMMIT');db.close();parentPort.postMessage('done')},150);`, { eval: true, workerData: { path: r.control, race, now } });
+      await new Promise<void>((resolve) => worker.once("message", () => resolve())); const exited = new Promise<void>((resolve) => worker.once("exit", () => resolve()));
+      expect(() => r.custodian.renewOwnerSession(session)).toThrow(race === "takeover" ? "OWNER_SESSION_INVALID" : race === "stop" ? "OWNER_MAINTENANCE_NOT_ALLOWED" : "LEASE_EXPIRED"); await exited;
+      const db = new Database(r.control); const row = db.query<Record<string, unknown>, []>("SELECT owner_session_id,current_epoch,lease_expires_at,lifecycle FROM catfood_runs").get()!; db.close();
+      if (race === "expiry") expect(row.lease_expires_at).toBe(now); if (race === "takeover") expect(row).toMatchObject({ owner_session_id: "ses:replacement", current_epoch: 2 }); if (race === "stop") expect(row.lifecycle).toBe("STOP_PENDING");
+    } finally { r.close(); } }
+  });
+
+  test("owner lease repair T10 safety-only reconciliation and stop remain available after expiry", () => { const r = rig("run-expired-safety"); try {
+    const session = start(r); const ticket = r.custodian.admit(session, "editorial.cycle", "cycle:one"); r.source.complete(ticket.claim_id); r.clock.advance(121_000);
+    expect(() => r.custodian.reconcile(session, ticket.work_id)).not.toThrow(); expect(() => r.custodian.stop(session, "EXPIRY")).not.toThrow();
+  } finally { r.close(); } });
+
+  test("owner lease repair T11 Threads permit renewal cannot resurrect expired IKORABU ownership", () => { const r = rig("run-expired-permit-renewal"); try {
+    const session = start(r); const db = new Database(r.control); const before = db.query<Record<string, unknown>, []>("SELECT owner_session_id,current_epoch,lease_expires_at,state_version FROM catfood_runs").get()!; const permits = db.query<Record<string, unknown>, []>("SELECT capability,permit_expires_at FROM catfood_authority_bindings ORDER BY capability").all(); db.close(); r.clock.advance(120_000);
+    expect(() => r.custodian.renewAuthorities(session)).toThrow("LEASE_EXPIRED"); const afterDb = new Database(r.control); expect(afterDb.query<Record<string, unknown>, []>("SELECT owner_session_id,current_epoch,lease_expires_at,state_version FROM catfood_runs").get()).toEqual(before); expect(afterDb.query<Record<string, unknown>, []>("SELECT capability,permit_expires_at FROM catfood_authority_bindings ORDER BY capability").all()).toEqual(permits); afterDb.close();
   } finally { r.close(); } });
 
   test("corrective03 paid and writer gates apply before grant and admission", () => { const r = rig("run-paid-gate"); try {
