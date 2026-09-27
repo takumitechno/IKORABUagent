@@ -137,6 +137,7 @@ export class OperationalThreadsEvidenceSource implements ThreadsEvidenceSource {
   private lastPage: Record<string, unknown> | null = null;
   private lastAcquisition: CoeAcquisition | null = null;
   private constructor(readonly mode: "OPERATIONAL" | "TEST_ONLY", private readonly context: Readonly<ThreadsSourceContext>, private readonly adapter: OperationalThreadsHttpAdapter, private readonly now: () => Date) {
+    if (mode === "OPERATIONAL") throw new CatfoodTrustError("OPERATIONAL_SUPERVISOR_ENROLLMENT_UNAVAILABLE");
     this.source_identity = context.source_identity;
     this.operational_provenance = context.operational_provenance;
     this.evidence_trust = mode;
@@ -147,8 +148,8 @@ export class OperationalThreadsEvidenceSource implements ThreadsEvidenceSource {
   }
 
   static operational(context: Readonly<ThreadsSourceContext>): OperationalThreadsEvidenceSource {
-    if (!context.operational_provenance) throw new CatfoodTrustError("OPERATIONAL_BOOTSTRAP_UNPROVISIONED");
-    return new OperationalThreadsEvidenceSource("OPERATIONAL", Object.freeze(structuredClone(context)), new OperationalThreadsHttpAdapter(context), () => new Date());
+    void context;
+    throw new CatfoodTrustError("OPERATIONAL_SUPERVISOR_ENROLLMENT_UNAVAILABLE");
   }
 
   operationalEvidence(request: Readonly<CoeRequest>): CoeRawPage {

@@ -9,13 +9,14 @@ import { canonicalJson, sha256, type OperationalBoundaryV1 } from "../web/lib/ca
 import {
   CATFOOD_CAPABILITIES, CATFOOD_FIXED_POLICY, CATFOOD_GO_SCHEMA,
   CATFOOD_POLICY_SHA256, CATFOOD_TRUST_SCHEMA, ProtectedCatfoodCustodian, createCatfoodRunSpec,
-  IndependentCatfoodEvaluator, initializeProtectedCatfoodStores, verifyHumanGo, type CatfoodRunSpec, type CatfoodTrustConfig,
+  IndependentCatfoodEvaluator, evaluateCatfoodAcceptance, initializeProtectedCatfoodStores, verifyHumanGo, type CatfoodRunSpec, type CatfoodTrustConfig,
   type HumanGoPayload, type RunnerSession,
 } from "../web/lib/catfood-trust";
 import { FixtureThreadsSource, TestClock } from "./catfood-trust-fixture";
 import { IndependentCatfoodAttestationWriter, initializeIndependentAttestationStore, verifyIndependentAttestation } from "../web/lib/catfood-independent-attestation";
 import { CATFOOD_THREADS_PINS } from "../web/lib/catfood-coe";
-import { openOperationalCatfoodCustodian } from "../web/lib/catfood-operational-bootstrap";
+import { openOperationalCatfoodCustodian, verifyOperationalIndependentAttestation } from "../web/lib/catfood-operational-bootstrap";
+import { OperationalThreadsEvidenceSource } from "../web/lib/catfood-threads-http";
 
 const THREADS = CATFOOD_THREADS_PINS.threads_sha;
 const BOUNDARY = "57d896aa756387048b70dc016e482274d571dd165866416e3fc480d59a97e8cf";
@@ -242,6 +243,22 @@ describe("WP3 CATFOOD corrective adversarial plan", () => {
 
   test("T24 breaking exactly the three-unit minimum never PASS", () => { const r = rig(); try { const first = start(r); work(r, first, "editorial.cycle", "cycle:one"); r.custodian.stop(first, "STOP"); r.clock.advance(121_000); const second = r.custodian.issueOwnerSession(r.spec.run_id); r.custodian.takeover(r.spec.run_id, second); const receipt = r.custodian.preflight(second); r.custodian.activate(second, receipt); work(r, second, "editorial.outcome_evaluation", "outcome:one"); r.clock.advance(86_400_000); r.custodian.stop(second, "STOP"); const result = r.custodian.closeRun(second); expect(result.verdict).not.toBe("PASS"); expect(result.reason_codes).toEqual(["MEANINGFUL_WORK_COUNT_NOT_MET"]); } finally { r.close(); } });
 
+  test("corrective04 three admitted requests with only two producer outcomes cannot satisfy semantic credit", () => { const r = rig("run-two-outcomes"); try {
+    const first = start(r); const a = r.custodian.admit(first, "editorial.cycle", "cycle:one"); r.source.complete(a.claim_id); const resultA = r.source.readClaim(r.spec, a.claim_id)!.domain_result; r.custodian.reconcile(first, a.work_id); r.custodian.stop(first, "STOP");
+    r.clock.advance(121_000); const second = r.custodian.issueOwnerSession(r.spec.run_id); r.custodian.takeover(r.spec.run_id, second); const receipt = r.custodian.preflight(second); r.custodian.activate(second, receipt);
+    const b = r.custodian.admit(second, "editorial.cycle", "cycle:two"); r.source.complete(b.claim_id, { domain_result: structuredClone(resultA) }); r.custodian.reconcile(second, b.work_id); work(r, second, "threads.publish.dry_run", "dry:one");
+    r.clock.advance(86_400_000); r.custodian.stop(second, "STOP"); const result = r.custodian.closeRun(second);
+    expect(result.verdict).toBe("FAIL"); expect(result.reason_codes).toContain("MEANINGFUL_WORK_COUNT_NOT_MET");
+  } finally { r.close(); } });
+
+  test("corrective04 three distinct producer outcomes still satisfy the TEST_ONLY minimum", () => { const r = rig("run-three-outcomes"); try {
+    const { result } = positive(r); expect(result).toMatchObject({ verdict: "PASS", test_only: true });
+  } finally { r.close(); } });
+
+  test("corrective04 TEST_ONLY ancestry cannot be relabelled by the pure-kernel argument", () => { const r = rig("run-taint"); try {
+    positive(r); const bundle = r.custodian.rederive(r.spec.run_id); expect(evaluateCatfoodAcceptance(bundle, false)).toMatchObject({ test_only: true });
+  } finally { r.close(); } });
+
   test("accepted COE contract with PARTIAL operational evidence fails precisely", () => { const r = rig("run-partial-coe"); try { r.source.coeTransform = (page) => { (page.coverage as Record<string, unknown>).state = "PARTIAL"; return page; }; r.custodian.createRun(r.spec, r.artifact); const session = r.custodian.issueOwnerSession(r.spec.run_id); expect(() => r.custodian.preflight(session)).toThrow("COE_COVERAGE_PARTIAL"); } finally { r.close(); } });
 
   test("accepted runtime evidence does not replace the active known-foreign tenant probe", () => { const r = rig("run-tenant-probe"); try { const original = r.source.tenantProbe.bind(r.source); r.source.tenantProbe = ((spec: CatfoodRunSpec) => ({ ...original(spec), foreign_status: 404 as 403 })) as typeof r.source.tenantProbe; r.custodian.createRun(r.spec, r.artifact); const session = r.custodian.issueOwnerSession(r.spec.run_id); expect(() => r.custodian.preflight(session)).toThrow("ACTIVE_NEGATIVE_TENANT_PROBE_REQUIRED"); } finally { r.close(); } });
@@ -272,6 +289,21 @@ describe("WP3 CATFOOD corrective adversarial plan", () => {
 
   test("corrective02 operational roots/build remain unprovisioned and relabelled fixtures cannot cross the boundary", () => {
     expect(() => openOperationalCatfoodCustodian()).toThrow("OPERATIONAL_SUPERVISOR_ENROLLMENT_UNAVAILABLE"); const r = rig("run-relabel"); try { Object.defineProperty(r.source, "mode", { value: "OPERATIONAL" }); expect(() => new ProtectedCatfoodCustodian(r.control, r.checkpoint, r.source, r.clock)).toThrow("THREADS_SOURCE_IDENTITY_MISMATCH"); } finally { r.close(); }
+  });
+
+  test("corrective04 operational constructors, Reflect.construct, source factory, verifier, and hydration fail closed", () => {
+    expect(() => verifyOperationalIndependentAttestation("{}", "x", { run_id: "run", bundle_sha256: "0".repeat(64) })).toThrow("OPERATIONAL_VERIFIER_ENROLLMENT_UNAVAILABLE");
+    expect(() => OperationalThreadsEvidenceSource.operational({} as never)).toThrow("OPERATIONAL_SUPERVISOR_ENROLLMENT_UNAVAILABLE");
+    expect(() => Reflect.construct(OperationalThreadsEvidenceSource as unknown as Function, ["OPERATIONAL", {}, {}, () => new Date()])).toThrow("OPERATIONAL_SUPERVISOR_ENROLLMENT_UNAVAILABLE");
+    const init = rig("run-operational-init"); try {
+      expect(() => initializeProtectedCatfoodStores(join(init.dir, "missing-control.db"), join(init.dir, "missing-checkpoint.db"), { ...init.trust, environment_type: "production", source_mode: "OPERATIONAL", go_keys: [{ ...init.trust.go_keys[0]!, trust_class: "OPERATIONAL" }] }, init.clock.sample().wall_time)).toThrow("OPERATIONAL_SUPERVISOR_ENROLLMENT_UNAVAILABLE");
+    } finally { init.close(); }
+    const hydrated = rig("run-operational-hydration"); try {
+      hydrated.custodian.close(); const db = new Database(hydrated.control); db.exec("DROP TRIGGER catfood_meta_no_update"); const meta = db.query<{ trust_config_json: string }, []>("SELECT trust_config_json FROM catfood_trust_meta WHERE singleton=1").get()!; const trust = { ...JSON.parse(meta.trust_config_json), environment_type: "production", source_mode: "OPERATIONAL", go_keys: [{ ...hydrated.trust.go_keys[0], trust_class: "OPERATIONAL" }] }; const raw = canonicalJson(trust); db.query("UPDATE catfood_trust_meta SET trust_config_json=?,trust_config_sha256=? WHERE singleton=1").run(raw, sha256(raw)); db.exec("CREATE TRIGGER catfood_meta_no_update BEFORE UPDATE ON catfood_trust_meta BEGIN SELECT RAISE(ABORT,'trust metadata is immutable'); END"); db.close();
+      expect(() => new ProtectedCatfoodCustodian(hydrated.control, hydrated.checkpoint, hydrated.source, hydrated.clock)).toThrow("OPERATIONAL_SUPERVISOR_ENROLLMENT_UNAVAILABLE");
+      expect(() => Reflect.construct(ProtectedCatfoodCustodian, [hydrated.control, hydrated.checkpoint, hydrated.source, hydrated.clock])).toThrow("OPERATIONAL_SUPERVISOR_ENROLLMENT_UNAVAILABLE");
+      expect(() => new IndependentCatfoodEvaluator(hydrated.control, hydrated.checkpoint, hydrated.source)).toThrow("OPERATIONAL_VERIFIER_ENROLLMENT_UNAVAILABLE");
+    } finally { try { hydrated.custodian.close(); } catch {} rmSync(hydrated.dir, { recursive: true, force: true, maxRetries: 5, retryDelay: 20 }); }
   });
 
   test("RFC 8032 Ed25519 vector verifies with the established crypto implementation", () => {

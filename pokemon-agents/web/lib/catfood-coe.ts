@@ -227,6 +227,11 @@ const DRY_RUN_RESULT_FIELDS = ["ambiguous_parts", "attempts", "duplicate", "erro
 const OUTCOME_RESULT_FIELDS = ["account_id", "authority_ref", "business_identity", "capability", "claim_identity", "duplicate_of_request_id", "evaluation", "material_revision", "native_domain_state", "original_state", "reason_code", "request_id", "result_identity", "result_revision", "state", "threads_generation"];
 const OUTCOME_EVALUATION_FIELDS = ["decision_json", "evidence_count", "evidence_level", "next_decision", "observed_through", "result_summary", "sample_size", "verdict"];
 const OUTCOME_DECISION_FIELDS = ["alternative_explanation", "baseline_median", "baseline_snapshot_id", "candidate_metric", "content_hash", "content_id", "evaluation_id", "metric_key", "missing_evidence", "next_evidence_needed", "possible_confounders", "publication_id", "tested_variable"];
+const EDITORIAL_DISABLED_FIELDS = ["mutated", "state", "status"];
+const WRITER_CANARY_RESULT_FIELDS = ["attempt", "content_hash", "content_id", "cycle_id", "experiment_id", "history", "model", "ok", "provider", "state", "version"];
+const WRITER_CANARY_HISTORY_FIELDS = ["attempt", "content_id", "verdict"];
+const OUTCOME_RUNNER_FIELDS = ["account_id", "experiment_id", "failed", "recorded", "state", "status", "verdict"];
+const DRY_RUN_PART_FIELDS = ["error", "external_id", "index", "permalink", "published_at", "reply_to", "status"];
 
 export type CoeFieldClass = "A_IMMUTABLE_EQUAL" | "B_CONSERVATIVE" | "C_PAGE_LOCAL";
 const fields = (prefix: string, names: readonly string[], classification: CoeFieldClass) => names.map((name) => [`${prefix}.${name}`, classification] as const);
@@ -282,24 +287,80 @@ function onlyKnown(value: Record<string, unknown>, keys: readonly string[]): voi
   if (Object.keys(value).some((key) => !keys.includes(key))) throw new CoeError("COE_RESULT_SCHEMA_INVALID");
 }
 
+function exactResult(value: Record<string, unknown>, keys: readonly string[]): boolean {
+  const got = Object.keys(value).sort(); const want = [...keys].sort();
+  return got.length === want.length && got.every((key, index) => key === want[index]);
+}
+
+function nullableString(value: unknown): boolean { return value === null || typeof value === "string"; }
+
+function validateOutcomeEvaluation(value: unknown): void {
+  const evaluation = object(value, "COE_RESULT_SCHEMA_INVALID"); exact(evaluation, OUTCOME_EVALUATION_FIELDS);
+  if (!["SUCCESS", "FAILURE", "INCONCLUSIVE", "INSUFFICIENT_DATA", "INVALID_EXPERIMENT"].includes(String(evaluation.verdict))
+    || typeof evaluation.evidence_level !== "string" || !Number.isSafeInteger(evaluation.evidence_count) || Number(evaluation.evidence_count) < 0
+    || !Number.isSafeInteger(evaluation.sample_size) || Number(evaluation.sample_size) < 0 || typeof evaluation.observed_through !== "string"
+    || typeof evaluation.result_summary !== "string" || typeof evaluation.next_decision !== "string") throw new CoeError("COE_RESULT_SCHEMA_INVALID");
+  const decision = object(evaluation.decision_json, "COE_RESULT_SCHEMA_INVALID"); onlyKnown(decision, OUTCOME_DECISION_FIELDS);
+  for (const field of ["tested_variable", "alternative_explanation", "next_evidence_needed"] as const) if (typeof decision[field] !== "string") throw new CoeError("COE_RESULT_SCHEMA_INVALID");
+  for (const field of ["possible_confounders", "missing_evidence"] as const) if (!Array.isArray(decision[field]) || (decision[field] as unknown[]).some((item) => typeof item !== "string")) throw new CoeError("COE_RESULT_SCHEMA_INVALID");
+  for (const field of ["evaluation_id", "baseline_snapshot_id", "metric_key", "content_id", "content_hash", "publication_id"] as const) if (field in decision && !nullableString(decision[field])) throw new CoeError("COE_RESULT_SCHEMA_INVALID");
+  for (const field of ["candidate_metric", "baseline_median"] as const) if (field in decision && decision[field] !== null && typeof decision[field] !== "number") throw new CoeError("COE_RESULT_SCHEMA_INVALID");
+}
+
+function validateDryRunResult(result: Record<string, unknown>): void {
+  onlyKnown(result, DRY_RUN_RESULT_FIELDS);
+  if (typeof result.publication_id !== "string" || result.mode !== "dry_run" || !["in_progress", "succeeded", "failed", "partial", "ambiguous", "authorization_required"].includes(String(result.status))
+    || typeof result.duplicate !== "boolean" || !Number.isSafeInteger(result.attempts) || Number(result.attempts) < 0 || !Array.isArray(result.parts_state)) throw new CoeError("COE_RESULT_SCHEMA_INVALID");
+  for (const field of ["external_publish_id", "permalink", "error"] as const) if (field in result && !nullableString(result[field])) throw new CoeError("COE_RESULT_SCHEMA_INVALID");
+  if ("requires_human" in result && typeof result.requires_human !== "boolean") throw new CoeError("COE_RESULT_SCHEMA_INVALID");
+  if ("note" in result && typeof result.note !== "string") throw new CoeError("COE_RESULT_SCHEMA_INVALID");
+  for (const field of ["parts_sent", "ambiguous_parts"] as const) if (field in result && (!Array.isArray(result[field]) || (result[field] as unknown[]).some((item) => !Number.isSafeInteger(item) || Number(item) < 0))) throw new CoeError("COE_RESULT_SCHEMA_INVALID");
+  for (const partValue of result.parts_state) {
+    const part = object(partValue, "COE_RESULT_SCHEMA_INVALID"); onlyKnown(part, DRY_RUN_PART_FIELDS);
+    if (!Number.isSafeInteger(part.index) || Number(part.index) < 0 || !["pending", "succeeded", "failed", "ambiguous"].includes(String(part.status)) || !nullableString(part.external_id) || !nullableString(part.permalink)) throw new CoeError("COE_RESULT_SCHEMA_INVALID");
+    for (const field of ["reply_to", "published_at", "error"] as const) if (field in part && !nullableString(part[field])) throw new CoeError("COE_RESULT_SCHEMA_INVALID");
+  }
+}
+
 function validateNativeResult(capability: unknown, value: unknown): void {
   const result = object(value, "COE_RESULT_SCHEMA_INVALID");
   if (capability === "editorial.cycle") {
-    onlyKnown(result, EDITORIAL_CYCLE_RESULT_FIELDS);
-    if (EDITORIAL_CYCLE_RESULT_FIELDS.some((field) => !(field in result)) || typeof result.account_id !== "string" || typeof result.cycle_id !== "string" || typeof result.state !== "string" || typeof result.status !== "string" || result.mutated !== false) throw new CoeError("COE_RESULT_SCHEMA_INVALID");
+    if (exactResult(result, EDITORIAL_DISABLED_FIELDS)) {
+      if (result.status !== "DISABLED" || result.state !== "OBSERVE" || result.mutated !== false) throw new CoeError("COE_RESULT_SCHEMA_INVALID");
+      return;
+    }
+    if (exactResult(result, WRITER_CANARY_RESULT_FIELDS)) {
+      if (result.ok !== true || typeof result.content_id !== "string" || !Number.isSafeInteger(result.version) || Number(result.version) < 1 || typeof result.content_hash !== "string"
+        || !Number.isSafeInteger(result.attempt) || Number(result.attempt) < 1 || typeof result.state !== "string" || typeof result.provider !== "string" || typeof result.model !== "string"
+        || typeof result.cycle_id !== "string" || typeof result.experiment_id !== "string" || !Array.isArray(result.history)) throw new CoeError("COE_RESULT_SCHEMA_INVALID");
+      for (const historyValue of result.history) { const history = object(historyValue, "COE_RESULT_SCHEMA_INVALID"); exact(history, WRITER_CANARY_HISTORY_FIELDS); if (typeof history.content_id !== "string" || !Number.isSafeInteger(history.attempt) || typeof history.verdict !== "string") throw new CoeError("COE_RESULT_SCHEMA_INVALID"); }
+      return;
+    }
+    exact(result, EDITORIAL_CYCLE_RESULT_FIELDS);
+    if (typeof result.account_id !== "string" || typeof result.cycle_id !== "string" || typeof result.cycle_key !== "string" || typeof result.state !== "string" || typeof result.status !== "string"
+      || !nullableString(result.current_agent) || !nullableString(result.waiting_reason) || !nullableString(result.content_id) || typeof result.created_at !== "string" || typeof result.updated_at !== "string"
+      || !Array.isArray(result.source_content_ids) || result.source_content_ids.some((item) => typeof item !== "string") || !result.config || typeof result.config !== "object" || Array.isArray(result.config)
+      || !result.summary || typeof result.summary !== "object" || Array.isArray(result.summary) || (result.brief !== null && (typeof result.brief !== "object" || Array.isArray(result.brief)))
+      || (result.draft !== null && (typeof result.draft !== "object" || Array.isArray(result.draft))) || result.mutated !== false) throw new CoeError("COE_RESULT_SCHEMA_INVALID");
     return;
   }
   if (capability === "threads.publish.dry_run") {
-    onlyKnown(result, DRY_RUN_RESULT_FIELDS);
-    if (typeof result.publication_id !== "string" || result.mode !== "dry_run" || typeof result.status !== "string" || typeof result.duplicate !== "boolean") throw new CoeError("COE_RESULT_SCHEMA_INVALID");
+    validateDryRunResult(result);
+    return;
+  }
+  if (exactResult(result, ["evaluation"])) { validateOutcomeEvaluation(result.evaluation); return; }
+  if (exactResult(result, OUTCOME_RUNNER_FIELDS)) {
+    if (typeof result.account_id !== "string" || !nullableString(result.experiment_id) || typeof result.state !== "string" || typeof result.status !== "string"
+      || !nullableString(result.verdict) || typeof result.recorded !== "boolean" || typeof result.failed !== "boolean") throw new CoeError("COE_RESULT_SCHEMA_INVALID");
     return;
   }
   onlyKnown(result, OUTCOME_RESULT_FIELDS);
-  if (typeof result.request_id !== "string" || typeof result.state !== "string" || typeof result.native_domain_state !== "string") throw new CoeError("COE_RESULT_SCHEMA_INVALID");
-  if (result.evaluation !== undefined) {
-    const evaluation = object(result.evaluation, "COE_RESULT_SCHEMA_INVALID"); onlyKnown(evaluation, OUTCOME_EVALUATION_FIELDS);
-    if (evaluation.decision_json !== undefined) onlyKnown(object(evaluation.decision_json, "COE_RESULT_SCHEMA_INVALID"), OUTCOME_DECISION_FIELDS);
-  }
+  if (typeof result.account_id !== "string" || result.capability !== "editorial.outcome_evaluation" || typeof result.request_id !== "string" || typeof result.claim_identity !== "string"
+    || typeof result.business_identity !== "string" || typeof result.material_revision !== "string" || !["SUCCEEDED", "UNRESOLVED", "DUPLICATE"].includes(String(result.state)) || typeof result.native_domain_state !== "string") throw new CoeError("COE_RESULT_SCHEMA_INVALID");
+  if (result.state === "SUCCEEDED" && (typeof result.authority_ref !== "string" || !Number.isSafeInteger(result.threads_generation) || typeof result.result_identity !== "string" || typeof result.result_revision !== "string" || !("evaluation" in result))) throw new CoeError("COE_RESULT_SCHEMA_INVALID");
+  if (result.state === "DUPLICATE" && (typeof result.duplicate_of_request_id !== "string" || typeof result.original_state !== "string" || typeof result.result_identity !== "string" || typeof result.result_revision !== "string" || !("evaluation" in result))) throw new CoeError("COE_RESULT_SCHEMA_INVALID");
+  if (result.state === "UNRESOLVED" && typeof result.reason_code !== "string") throw new CoeError("COE_RESULT_SCHEMA_INVALID");
+  if (result.evaluation !== undefined) validateOutcomeEvaluation(result.evaluation);
 }
 
 function validateOutcomeTargetJson(source: Record<string, unknown>): void {

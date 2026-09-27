@@ -74,6 +74,31 @@ describe("WP3 corrective02 producer composition", () => {
     expect(() => acquisition(mutate((page) => { page.outcome_evaluation_targets[0].source.hypothesis_json = canonicalJson({ id: "hook", hypothesis: "x", test_variable: "hook", evidence: "x", client_token: "plain" }); }))).toThrow();
     expect(() => acquisition(mutate((page) => { page.outcome_evaluation_targets[0].source.source_content_ids_json = canonicalJson(["ok", { api_token: "plain" }]); }))).toThrow("COE_OUTCOME_TARGET_INVALID");
   });
+
+  test("corrective04 decodes the closed frozen-producer editorial and publisher result union", () => {
+    const editorialView = JSON.parse(String(attempt().result_json));
+    const writerCanary = { ok: true, content_id: "cv-one", version: 1, content_hash: "a".repeat(64), attempt: 1, state: "human_approval_pending", provider: "fixture", model: "fixture", history: [{ content_id: "cv-one", attempt: 1, verdict: "PASS" }], cycle_id: "cycle:one", experiment_id: "experiment:one" };
+    const successfulDryRun = { publication_id: "pub:one", status: "succeeded", duplicate: false, mode: "dry_run", attempts: 1, external_publish_id: "dryrun:one:0", permalink: "dryrun://acct_test/one", parts_state: [{ index: 0, status: "succeeded", external_id: "dryrun:one:0", permalink: "dryrun://acct_test/one", reply_to: null, published_at: "2026-10-01T00:00:00+00:00" }], parts_sent: [0], requires_human: false, error: null };
+    const publisherVariants = [successfulDryRun, { publication_id: "pub:one", status: "succeeded", duplicate: true, mode: "dry_run", external_publish_id: "dryrun:one:0", permalink: "dryrun://acct_test/one", parts_state: successfulDryRun.parts_state, attempts: 1 }, { publication_id: "pub:one", status: "ambiguous", duplicate: false, mode: "dry_run", parts_state: [{ index: 0, status: "ambiguous", external_id: null, permalink: null, error: "redacted" }], ambiguous_parts: [0], attempts: 1, requires_human: true, note: "human reconciliation required" }, { publication_id: "pub:one", status: "authorization_required", duplicate: false, mode: "dry_run", parts_state: [], attempts: 1, error: "redacted" }];
+    expect(acquisitionWithResult("editorial.cycle", editorialView, "result:one").records).toHaveLength(2);
+    expect(acquisitionWithResult("editorial.cycle", { status: "DISABLED", state: "OBSERVE", mutated: false }, null).records).toHaveLength(2);
+    expect(acquisitionWithResult("editorial.cycle", writerCanary, "cycle:one").records).toHaveLength(2);
+    for (const result of publisherVariants) expect(acquisitionWithResult("threads.publish.dry_run", result, "pub:one").records).toHaveLength(2);
+  });
+
+  test("corrective04 decodes bridge, direct evaluator, and outcome-runner variants without widening unknowns", () => {
+    const evaluation = producerEvaluation();
+    const bridge = { account_id: "acct_test", capability: "editorial.outcome_evaluation", request_id: "request:one", claim_identity: "claim:one", authority_ref: "authority:one", threads_generation: 1, business_identity: "experiment:one", material_revision: "a".repeat(64), state: "SUCCEEDED", native_domain_state: "SUCCESS", result_identity: "eval:one", result_revision: evaluation.observed_through, evaluation };
+    const duplicate = { ...bridge, state: "DUPLICATE", duplicate_of_request_id: "request:old", original_state: "SUCCEEDED" };
+    const unresolved = { account_id: "acct_test", capability: "editorial.outcome_evaluation", request_id: "request:one", claim_identity: "claim:one", business_identity: "experiment:one", material_revision: "a".repeat(64), state: "UNRESOLVED", native_domain_state: "BLOCKED", reason_code: "outcome_not_evaluable" };
+    const runner = { account_id: "acct_test", experiment_id: "experiment:one", state: "COMPLETED", status: "RECORDED", verdict: "SUCCESS", recorded: true, failed: false };
+    expect(acquisitionWithResult("editorial.outcome_evaluation", bridge, "eval:one", evaluation.observed_through).records).toHaveLength(2);
+    expect(acquisitionWithResult("editorial.outcome_evaluation", duplicate, "eval:one", evaluation.observed_through, "DUPLICATE").records).toHaveLength(2);
+    expect(acquisitionWithResult("editorial.outcome_evaluation", unresolved, null, null, "UNRESOLVED").records).toHaveLength(2);
+    expect(acquisitionWithResult("editorial.outcome_evaluation", { evaluation }, "eval:one", evaluation.observed_through).records).toHaveLength(2);
+    expect(acquisitionWithResult("editorial.outcome_evaluation", runner, "eval:one", evaluation.observed_through).records).toHaveLength(2);
+    expect(() => acquisitionWithResult("editorial.outcome_evaluation", { ...runner, future: true }, "eval:one", evaluation.observed_through)).toThrow("COE_RESULT_SCHEMA_INVALID");
+  });
 });
 
 function source(transform?: (page: any, request: Readonly<CoeRequest>) => unknown) {
@@ -84,6 +109,17 @@ function source(transform?: (page: any, request: Readonly<CoeRequest>) => unknow
 
 function acquisition(transform?: (page: any, request: Readonly<CoeRequest>) => unknown): CoeAcquisition {
   return acquireCoe(source(transform), scope());
+}
+
+function producerEvaluation() {
+  return { verdict: "SUCCESS", evidence_level: "strong", evidence_count: 3, sample_size: 3, observed_through: "2026-09-30T23:59:59+00:00", result_summary: "SUCCESS", decision_json: { evaluation_id: "eval:one", tested_variable: "hook", alternative_explanation: "timing", possible_confounders: [], missing_evidence: [], next_evidence_needed: "confirmation", metric_key: "replies_per_view", candidate_metric: 1, baseline_median: 0.5, baseline_snapshot_id: "snapshot:one", content_id: "content:one", content_hash: "a".repeat(64), publication_id: "pub:one" }, next_decision: "retain" };
+}
+
+function acquisitionWithResult(capability: "editorial.cycle" | "editorial.outcome_evaluation" | "threads.publish.dry_run", result: Record<string, unknown>, resultIdentity: string | null, resultRevision: string | null = null, eventType = "SUCCEEDED"): CoeAcquisition {
+  return acquisition(mutate((page) => {
+    const terminal = { ...attempt(), capability, event_type: eventType, execution_state: eventType === "SUCCEEDED" ? "SUCCEEDED" : eventType === "DUPLICATE" ? "NOT_STARTED" : "UNRESOLVED", admission_state: eventType === "DUPLICATE" ? "SEMANTIC_DUPLICATE" : "ADMITTED", duplicate_of_request_id: eventType === "DUPLICATE" ? "request:old" : null, result_identity: resultIdentity, result_revision: resultRevision, result_json: canonicalJson(result), domain_state: String(result.native_domain_state ?? result.state ?? result.status ?? "SUCCEEDED"), reason_code: eventType === "UNRESOLVED" ? "outcome_not_evaluable" : null, lifecycle_revision: 2 };
+    const claimed = { ...claimFor(terminal), capability }; page.records = [claimed, terminal]; page.coverage.scoped_count = 2; page.coverage.page_count = 2; page.coverage.record_set_digest = sha256(canonicalJson(page.records));
+  }));
 }
 
 function mutate(path: (page: any) => void) {

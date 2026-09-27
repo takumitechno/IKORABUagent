@@ -487,6 +487,7 @@ function validateTrustConfig(value: CatfoodTrustConfig): Readonly<CatfoodTrustCo
 }
 
 export function initializeProtectedCatfoodStores(controlPath: string, checkpointPath: string, trustInput: CatfoodTrustConfig, at: string): void {
+  if (trustInput.source_mode === "OPERATIONAL") throw new CatfoodTrustError("OPERATIONAL_SUPERVISOR_ENROLLMENT_UNAVAILABLE");
   const control = resolve(controlPath), checkpoint = resolve(checkpointPath);
   if (control === checkpoint) throw new CatfoodTrustError("CHECKPOINT_MUST_BE_EXTERNAL");
   if (!existsSync(control) || !existsSync(checkpoint)) throw new CatfoodTrustError("STORE_MUST_PREEXIST");
@@ -643,6 +644,7 @@ export class ProtectedCatfoodCustodian {
       configure(this.control); configure(this.checkpoints);
       assertConnection(this.control); checkpointHealth(this.checkpoints);
       this.trust = loadTrust(this.control);
+      if (this.trust.source_mode === "OPERATIONAL") throw new CatfoodTrustError("OPERATIONAL_SUPERVISOR_ENROLLMENT_UNAVAILABLE");
       if (source.mode !== this.trust.source_mode || source.source_identity !== `${this.trust.threads_sha}:${this.trust.threads_release_sha256}`) throw new CatfoodTrustError("THREADS_SOURCE_IDENTITY_MISMATCH");
       if (this.trust.source_mode === "OPERATIONAL") {
         if (clock.kind !== "SYSTEM") throw new CatfoodTrustError("TEST_CLOCK_NOT_OPERATIONAL");
@@ -1205,6 +1207,7 @@ export class IndependentCatfoodEvaluator {
     try {
       configure(this.control, true); configure(this.checkpoints, true); assertConnection(this.control); checkpointHealth(this.checkpoints);
       this.trust = loadTrust(this.control);
+      if (this.trust.source_mode === "OPERATIONAL") throw new CatfoodTrustError("OPERATIONAL_VERIFIER_ENROLLMENT_UNAVAILABLE");
       if (source.mode !== this.trust.source_mode || source.source_identity !== `${this.trust.threads_sha}:${this.trust.threads_release_sha256}`) throw new CatfoodTrustError("THREADS_SOURCE_IDENTITY_MISMATCH");
     } catch (error) { this.control.close(); this.checkpoints.close(); throw error; }
   }
@@ -1278,8 +1281,27 @@ function meaningfulClaim(work: Record<string, unknown>): boolean {
   if (work.status !== "TERMINAL" || !work.terminal_json || plain(work.governed_decision, "governed_decision").disposition !== "CREDIT") return false; const claim = work.terminal_json as ThreadsClaimRecord;
   if (claim.claim_status !== "succeeded" || claim.transport_status !== "SUCCEEDED" || claim.provider_invoked || claim.paid_cost_micros !== 0) return false;
   if (claim.capability === "editorial.cycle") return claim.domain_result.state === "DRAFT" && claim.domain_result.status === "READY" && claim.domain_result.mutated === false && typeof claim.domain_result.cycle_id === "string";
-  if (claim.capability === "editorial.outcome_evaluation") return claim.domain_result.state === "SUCCEEDED" && typeof claim.domain_result.result_identity === "string" && ["SUCCESS", "FAILURE", "INVALID_EXPERIMENT"].includes(String(claim.domain_result.native_domain_state));
+  if (claim.capability === "editorial.outcome_evaluation") {
+    const result = claim.domain_result; const evaluation = result.evaluation as Record<string, unknown> | undefined;
+    if (result.state === "SUCCEEDED") return typeof result.result_identity === "string" && ["SUCCESS", "FAILURE", "INVALID_EXPERIMENT"].includes(String(result.native_domain_state));
+    if (evaluation) return ["SUCCESS", "FAILURE", "INVALID_EXPERIMENT"].includes(String(evaluation.verdict)) && typeof (evaluation.decision_json as Record<string, unknown> | undefined)?.evaluation_id === "string";
+    return result.state === "COMPLETED" && result.status === "RECORDED" && result.recorded === true && result.failed === false && ["SUCCESS", "FAILURE", "INVALID_EXPERIMENT"].includes(String(result.verdict));
+  }
   return claim.capability === "threads.publish.dry_run" && claim.domain_result.status === "succeeded" && claim.domain_result.mode === "dry_run" && claim.domain_result.duplicate === false;
+}
+
+function semanticCreditIdentity(work: Record<string, unknown>): string | null {
+  if (!meaningfulClaim(work)) return null;
+  const decision = plain(work.governed_decision, "governed_decision"); const resultRef = decision.result_ref;
+  if (typeof resultRef !== "string" || !resultRef) return null;
+  const claim = work.terminal_json as ThreadsClaimRecord; let material: Json;
+  if (claim.capability === "editorial.cycle") {
+    const result = claim.domain_result;
+    material = { cycle_id: result.cycle_id ?? null, content_id: result.content_id ?? null, state: result.state ?? null, status: result.status ?? null, updated_at: result.updated_at ?? null, source_content_ids: result.source_content_ids ?? null, brief: result.brief ?? null, draft: result.draft ?? null };
+  } else if (claim.capability === "editorial.outcome_evaluation") {
+    material = (claim.domain_result.evaluation ?? claim.domain_result.result_revision ?? work.material_revision) as Json;
+  } else material = { publication_id: resultRef, status: claim.domain_result.status, mode: claim.domain_result.mode };
+  return sha256(canonicalJson({ capability: claim.capability, result_identity: resultRef, material }));
 }
 
 /** The sole deterministic acceptance rule-set. Acquisition and integrity checks remain role-local. */
@@ -1299,7 +1321,9 @@ export function evaluateCatfoodAcceptance(bundle: Record<string, Json>, testOnly
   if (Number(run.current_epoch) < 2 || !journal.some((event) => event.event_type === "RESTART_TAKEOVER")) reasons.add("RESTART_NOT_PROVEN");
   const inWindow = (item: Record<string, unknown>) => { const claim = item.terminal_json as ThreadsClaimRecord | null; return !!claim?.completed_at && Date.parse(claim.completed_at) >= Date.parse(String(spec.requested_window_start)) && Date.parse(claim.completed_at) < Date.parse(String(spec.requested_window_end)); };
   if (work.some((item) => item.status === "TERMINAL" && !inWindow(item))) reasons.add("WORK_COMPLETED_OUTSIDE_WINDOW");
-  const meaningful = work.filter((item) => inWindow(item) && meaningfulClaim(item));
+  const meaningfulByIdentity = new Map<string, Record<string, unknown>>();
+  for (const item of work) if (inWindow(item)) { const identity = semanticCreditIdentity(item); if (identity && !meaningfulByIdentity.has(identity)) meaningfulByIdentity.set(identity, item); }
+  const meaningful = [...meaningfulByIdentity.values()];
   if (meaningful.length < CATFOOD_FIXED_POLICY.minimum_meaningful_units) reasons.add("MEANINGFUL_WORK_COUNT_NOT_MET");
   if (new Set(meaningful.map((item) => item.capability)).size < CATFOOD_FIXED_POLICY.minimum_capability_classes) reasons.add("MEANINGFUL_CLASS_COUNT_NOT_MET");
   if (!meaningful.some((item) => Number(item.wp3_epoch) === 1) || !meaningful.some((item) => Number(item.wp3_epoch) > 1)) reasons.add("RESTART_WORK_COVERAGE_NOT_MET");
@@ -1310,5 +1334,6 @@ export function evaluateCatfoodAcceptance(bundle: Record<string, Json>, testOnly
   for (const capability of new Set(authorities.map((authority) => String(authority.capability)))) if (!journal.some((event) => { const payload = event.payload_json as Record<string, unknown>; return event.event_type === "THREADS_AUTHORITY_REVOKED" && payload.capability === capability; })) reasons.add("FINAL_AUTHORITY_OPEN");
   if (!cacheValid) reasons.add("BUNDLE_CACHE_TAMPERED");
   const digest = sha256(canonicalJson(bundle));
-  return Object.freeze({ verdict: verdictFromReasons(reasons), reason_codes: Object.freeze([...reasons].sort()), rederived_bundle_sha256: digest, evaluator_sha256: CATFOOD_EVALUATOR_SHA256, policy_sha256: CATFOOD_POLICY_SHA256, test_only: testOnly, evidence_coverage: String((source.coe as Record<string, unknown>).coverage && ((source.coe as Record<string, unknown>).coverage as Record<string, unknown>).state) as "COMPLETE" | "PARTIAL" | "UNKNOWN" });
+  void testOnly; // No enrolled operational evaluator/session exists in this repository.
+  return Object.freeze({ verdict: verdictFromReasons(reasons), reason_codes: Object.freeze([...reasons].sort()), rederived_bundle_sha256: digest, evaluator_sha256: CATFOOD_EVALUATOR_SHA256, policy_sha256: CATFOOD_POLICY_SHA256, test_only: true, evidence_coverage: String((source.coe as Record<string, unknown>).coverage && ((source.coe as Record<string, unknown>).coverage as Record<string, unknown>).state) as "COMPLETE" | "PARTIAL" | "UNKNOWN" });
 }
