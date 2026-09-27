@@ -1,7 +1,7 @@
 import { Database } from "bun:sqlite";
 import { createPublicKey, randomBytes, verify } from "node:crypto";
-import { existsSync } from "node:fs";
-import { resolve } from "node:path";
+import { existsSync, readFileSync, statSync } from "node:fs";
+import { join, resolve } from "node:path";
 import { canonicalJson, sha256, validateOperationalBoundaryV1, type Json, type OperationalBoundaryV1 } from "./catfood-harness";
 import { CATFOOD_THREADS_DEPENDENCY_ROOT, acquireCoe, assessCoe, assertFrozenDependencies, canonicalCoeJson, decodeCoeAcquisition, stableCoeEvidence, validateOutcomeEvaluationRequest, verifyGovernedWork, type CoeAcquisition, type CoeAssessment, type CoePageSource, type GovernedWorkDecision, type OutcomeEvaluationRequest } from "./catfood-coe";
 
@@ -105,7 +105,27 @@ export interface TrustedClockSample {
 
 export interface TrustedClock {
   readonly kind: "SYSTEM" | "TEST";
+  readonly operational_provenance?: OperationalProvenance;
   sample(): TrustedClockSample;
+}
+
+export interface OperationalProvenance {
+  bootstrap_sha256: string;
+  accepted_manifest_sha256: string;
+  environment_identity: string;
+  trust_domain: string;
+}
+
+export const CATFOOD_OPERATIONAL_ROOT = process.platform === "win32" ? "C:\\ProgramData\\IKORABU\\catfood" : "/etc/ikorabu/catfood";
+
+function verifyOperationalProvenance(value: OperationalProvenance | undefined): void {
+  if (!value) throw new CatfoodTrustError("OPERATIONAL_BOOTSTRAP_UNPROVISIONED");
+  const bootstrapPath = join(CATFOOD_OPERATIONAL_ROOT, "bootstrap.json"); const acceptedPath = join(CATFOOD_OPERATIONAL_ROOT, "accepted-consumer-manifest.sha256");
+  try {
+    for (const path of [bootstrapPath, acceptedPath]) { const stat = statSync(path); if (!stat.isFile() || stat.size <= 0 || stat.size > 1_000_000) throw new Error(); }
+    const bootstrap = readFileSync(bootstrapPath, "utf8"); const accepted = readFileSync(acceptedPath, "utf8").trim();
+    if (sha256(bootstrap) !== value.bootstrap_sha256 || accepted !== value.accepted_manifest_sha256 || !SHA256.test(accepted) || !value.environment_identity || !value.trust_domain) throw new Error();
+  } catch { throw new CatfoodTrustError("OPERATIONAL_BOOTSTRAP_UNPROVISIONED"); }
 }
 
 export interface TrustedGoKey {
@@ -291,6 +311,8 @@ export interface TenantProbeEvidence {
   organization_id: string; own_account_id: string; foreign_account_id: string;
   own_result: "EXPECTED_RESOURCE"; foreign_result: "AUTHORIZATION_DENIED"; foreign_status: 403;
   logical_runtime_id: string; worker_boot_id: string; observed_at: string; receipt_id: string;
+  source_session_id?: string; source_build_sha256?: string; protected_origin?: string;
+  route?: "GET /autopilot/v2/operational-boundary"; method?: "GET";
 }
 
 export interface ThreadsInventoryItem {
@@ -298,6 +320,11 @@ export interface ThreadsInventoryItem {
   capability: CatfoodCapability;
   business_identity: string;
   material_revision: string;
+  intent?: Readonly<
+    { kind: "editorial.cycle"; cycle_key: string; producer_request_id: string }
+    | { kind: "editorial.outcome_evaluation"; experiment_id: string; observed_through: string | null }
+    | { kind: "threads.publish.dry_run"; content_id: string; expected_version: number; expected_content_hash: string; actor: string }
+  >;
 }
 
 export interface ThreadsClaimRecord extends ThreadsInventoryItem {
@@ -313,6 +340,7 @@ export interface ThreadsClaimRecord extends ThreadsInventoryItem {
   paid_cost_micros: number | "UNKNOWN";
   admitted_at: string;
   completed_at: string | null;
+  invocation_receipt?: import("./catfood-coe").ProtectedInvocationBinding;
 }
 
 export interface ThreadsAuthorityTransition {
@@ -324,13 +352,14 @@ export interface ThreadsAuthorityTransition {
 export interface ThreadsEvidenceSource extends CoePageSource {
   readonly source_identity: string;
   readonly mode: SourceMode;
+  readonly operational_provenance?: OperationalProvenance;
   runtimeEvidence(spec: CatfoodRunSpec): ThreadsRuntimeEvidence;
   tenantProbe(spec: CatfoodRunSpec): TenantProbeEvidence;
   boundaries(spec: CatfoodRunSpec): readonly OperationalBoundaryV1[];
   inventory(spec: CatfoodRunSpec): readonly ThreadsInventoryItem[];
   grant(spec: CatfoodRunSpec, capability: CatfoodCapability, authorityRef: string, expectedGeneration: number | null): ThreadsAuthorityTransition;
   revoke(spec: CatfoodRunSpec, capability: CatfoodCapability, authorityRef: string, expectedGeneration: number): ThreadsAuthorityTransition;
-  claim(spec: CatfoodRunSpec, item: ThreadsInventoryItem, authorityRef: string, generation: number): ThreadsClaimRecord;
+  claim(spec: CatfoodRunSpec, item: ThreadsInventoryItem, authorityRef: string, generation: number, requestId?: string): ThreadsClaimRecord;
   outcomeEvaluation(spec: CatfoodRunSpec, request: Readonly<OutcomeEvaluationRequest>, item: ThreadsInventoryItem): ThreadsClaimRecord;
   readClaim(spec: CatfoodRunSpec, claimId: string): ThreadsClaimRecord | null;
 }
@@ -348,6 +377,13 @@ export interface PreflightReceipt {
   source_digest: string;
   state_version: number;
   epoch: number;
+}
+
+export interface TestObservationPolicy {
+  kind: "TEST_ONLY_EXPLICIT";
+  cadence_seconds: number;
+  maximum_gap_seconds: number;
+  clock_mapping: "SAME_TEST_CLOCK";
 }
 
 export interface AdmissionTicket {
@@ -552,7 +588,11 @@ export class ProtectedCatfoodCustodian {
       assertConnection(this.control); checkpointHealth(this.checkpoints);
       this.trust = loadTrust(this.control);
       if (source.mode !== this.trust.source_mode || source.source_identity !== `${this.trust.threads_sha}:${this.trust.threads_release_sha256}`) throw new CatfoodTrustError("THREADS_SOURCE_IDENTITY_MISMATCH");
-      if (this.trust.source_mode === "OPERATIONAL" && clock.kind !== "SYSTEM") throw new CatfoodTrustError("TEST_CLOCK_NOT_OPERATIONAL");
+      if (this.trust.source_mode === "OPERATIONAL") {
+        if (clock.kind !== "SYSTEM") throw new CatfoodTrustError("TEST_CLOCK_NOT_OPERATIONAL");
+        verifyOperationalProvenance(source.operational_provenance); verifyOperationalProvenance(clock.operational_provenance);
+        if (canonicalJson(source.operational_provenance) !== canonicalJson(clock.operational_provenance)) throw new CatfoodTrustError("OPERATIONAL_COMPOSITION_MISMATCH");
+      }
     } catch (error) { this.control.close(); this.checkpoints.close(); throw error; }
   }
 
@@ -691,19 +731,31 @@ export class ProtectedCatfoodCustodian {
   }
 
   private sourceSnapshot(spec: CatfoodRunSpec, now = this.sample().wall_time): { runtime: ThreadsRuntimeEvidence; boundaries: readonly OperationalBoundaryV1[]; inventory: readonly ThreadsInventoryItem[]; coe: CoeAcquisition; stableCoe: Record<string, Json>; coeAssessment: CoeAssessment; digest: string } {
+    const coe = acquireCoe(this.source, liveScope(spec, now), "LIVE_ADMISSION");
     const runtime = this.source.runtimeEvidence(spec);
     const boundaries = this.source.boundaries(spec).map((boundary) => verifyBoundary(boundary, spec, "PREPARE", now));
     const inventory = this.source.inventory(spec);
-    const coe = acquireCoe(this.source, liveScope(spec, now), "LIVE_ADMISSION");
     const coeAssessment = assessCoe(coe, now);
     const stableCoe = stableCoeEvidence(coe);
     return { runtime, boundaries, inventory, coe, stableCoe, coeAssessment, digest: sha256(canonicalCoeJson({ runtime, boundaries, inventory, coe: stableCoe })) };
   }
 
+  armObservation(session: RunnerSession, policy?: TestObservationPolicy): void {
+    this.verifyAnchored(session.run_id); const sample = this.sample();
+    this.control.transaction(() => {
+      const row = this.getRun(session.run_id); this.authenticate(session, row); this.verifyCurrentGo(row, sample); const spec = runSpec(row);
+      if (this.trust.source_mode !== "TEST_ONLY" || !policy) throw new CatfoodTrustError("POLICY_UNBOUND");
+      if (policy.kind !== "TEST_ONLY_EXPLICIT" || policy.clock_mapping !== "SAME_TEST_CLOCK" || !Number.isSafeInteger(policy.cadence_seconds) || !Number.isSafeInteger(policy.maximum_gap_seconds) || policy.cadence_seconds <= 0 || policy.maximum_gap_seconds < policy.cadence_seconds) throw new CatfoodTrustError("OBSERVATION_POLICY_INVALID");
+      const boundaries = this.source.boundaries(spec).map((boundary) => verifyBoundary(boundary, spec, "PREPARE", sample.wall_time));
+      this.appendJournal(row, "OBSERVATION_ARMED", session.session_id, this.source.source_identity, { requested_window_start: spec.requested_window_start, requested_window_end: spec.requested_window_end, policy, baseline_sha256: sha256(canonicalJson({ boot_id: sample.boot_id, monotonic_ms: sample.monotonic_ms, boundaries })) }, null, null, null, sample);
+    }).immediate();
+    const head = this.control.query<{ sequence: number; row_hash: string }, [string]>("SELECT sequence,row_hash FROM catfood_source_journal WHERE run_id=? ORDER BY sequence DESC LIMIT 1").get(session.run_id)!; this.anchor(session.run_id, head, { state: "ARMED", policy: "TEST_ONLY_EXPLICIT" });
+  }
+
   preflight(session: RunnerSession): PreflightReceipt {
     this.verifyAnchored(session.run_id);
     const sample = this.sample();
-    let output!: PreflightReceipt;
+    let output!: PreflightReceipt; let blocked: string | null = null;
     this.control.transaction(() => {
       const row = this.getRun(session.run_id); this.authenticate(session, row); this.verifyCurrentGo(row, sample);
       if (!row.lease_expires_at || Date.parse(row.lease_expires_at) <= Date.parse(sample.wall_time)) throw new CatfoodTrustError("LEASE_EXPIRED");
@@ -712,10 +764,21 @@ export class ProtectedCatfoodCustodian {
       if (snapshot.coeAssessment.state !== "READY") throw new CatfoodTrustError(snapshot.coeAssessment.reasons[0] ?? "COE_EVIDENCE_UNAVAILABLE", snapshot.coeAssessment.reasons.join(","));
       const runtime = snapshot.runtime; const probe = this.source.tenantProbe(spec); const coeRuntime = snapshot.coe.runtime_enforcement;
       if (probe.organization_id !== spec.organization_id || probe.own_account_id !== spec.account_id || probe.foreign_account_id === spec.account_id || probe.own_result !== "EXPECTED_RESOURCE" || probe.foreign_result !== "AUTHORIZATION_DENIED" || probe.foreign_status !== 403 || probe.logical_runtime_id !== coeRuntime.logical_runtime_id || probe.worker_boot_id !== coeRuntime.worker_boot_id || Date.parse(sample.wall_time) - Date.parse(probe.observed_at) > 120_000 || Date.parse(probe.observed_at) > Date.parse(sample.wall_time) + 5_000) throw new CatfoodTrustError("ACTIVE_NEGATIVE_TENANT_PROBE_REQUIRED");
-      if (runtime.writer_enabled !== false || runtime.paid_generation_enabled !== false) throw new CatfoodTrustError("PAID_PATH_NOT_DISABLED");
       if (snapshot.boundaries.length !== CATFOOD_CAPABILITIES.length) throw new CatfoodTrustError("BOUNDARY_COVERAGE_INCOMPLETE");
       for (const boundary of snapshot.boundaries) {
         if (boundary.account_id !== spec.account_id || boundary.execution_state === "UNKNOWN" || ["FAILED", "UNKNOWN"].includes(String(boundary.stop_acknowledgement))) throw new CatfoodTrustError("BOUNDARY_UNSAFE");
+      }
+      this.appendJournal(row, "TENANT_PROBE_OBSERVED", session.session_id, this.source.source_identity, probe as unknown as Json, null, null, null, sample);
+      const stopped = snapshot.boundaries.filter((boundary) => {
+        const controls = boundary.effective_safety_controls as Record<string, unknown>;
+        const reasons = Array.isArray(controls.reasons) ? controls.reasons.map(String) : [];
+        const ordinaryFence = reasons.every((reason) => ["catfood_authority_missing", "catfood_authority_revoked"].includes(reason));
+        return controls.global_stop === true || controls.account_stop === true || controls.capability_stop === true && !ordinaryFence;
+      });
+      if (stopped.length) {
+        this.appendJournal(row, "PREPARATION_OBSERVED", session.session_id, this.source.source_identity, { source_digest: snapshot.digest, coe_state: snapshot.coeAssessment.state, probe_receipt_id: probe.receipt_id, boundary_capabilities: stopped.map((boundary) => boundary.capability) }, null, null, null, sample);
+        this.appendJournal(row, "ADMISSION_BLOCKED", session.session_id, this.source.source_identity, { reason: "BOUNDARY_STOP_ACTIVE", observation_permitted: true }, null, null, null, sample);
+        blocked = "BOUNDARY_STOP_ACTIVE"; return;
       }
       const unique = new Map(snapshot.inventory.map((item) => [`${item.capability}:${item.business_identity}:${item.material_revision}`, item]));
       if (unique.size < CATFOOD_FIXED_POLICY.minimum_meaningful_units || new Set([...unique.values()].map((item) => item.capability)).size < CATFOOD_FIXED_POLICY.minimum_capability_classes) throw new CatfoodTrustError("MEANINGFUL_INVENTORY_INSUFFICIENT");
@@ -723,11 +786,11 @@ export class ProtectedCatfoodCustodian {
       const nonce = randomBytes(24).toString("base64url"); const receiptId = `pre:${sha256(`${session.run_id}:${nonce}`).slice(0, 32)}`;
       const expires = new Date(Date.parse(sample.wall_time) + 30_000).toISOString();
       this.control.query("INSERT INTO catfood_preflight_receipts VALUES (?,?,?,?,?,?,?,?,?,NULL)").run(receiptId, row.run_id, session.session_id, row.current_epoch, generationDigest, row.state_version, snapshot.digest, nonce, expires);
-      this.appendJournal(row, "TENANT_PROBE_OBSERVED", session.session_id, this.source.source_identity, probe as unknown as Json, null, null, null, sample);
       this.appendJournal(row, "PREFLIGHT_PASSED", session.session_id, this.source.source_identity, { receipt_id: receiptId, source_digest: snapshot.digest, state_version: row.state_version, coe: { contract_digest: spec.coe_sha256, release: { threads_sha: spec.threads_sha, release_sha256: spec.threads_release_sha256, schema: spec.threads_schema, schema_fingerprint: spec.threads_schema_fingerprint }, snapshot_identity: snapshot.coe.coverage.snapshot_identity, cuts: snapshot.coe.coverage.cuts, record_set_digest: snapshot.coe.coverage.record_set_digest, requested_window_start: spec.requested_window_start, requested_window_end: spec.requested_window_end, assessment_mode: "LIVE", coverage: snapshot.coe.coverage.state, current_applicability: snapshot.coeAssessment.state === "READY", activity: snapshot.coe.prohibited_activity.activity, exposure: snapshot.coe.prohibited_activity.exposure, proof_id: (snapshot.coe.coverage.prospective as Record<string, Json>).proof_id, checkpoint: snapshot.coe.operational_observation.checkpoint, runtime: snapshot.coe.runtime_enforcement } }, null, null, null, sample);
       output = Object.freeze({ receipt_id: receiptId, nonce, expires_at: expires, source_digest: snapshot.digest, state_version: Number(row.state_version), epoch: Number(row.current_epoch) });
     }).immediate();
-    const head = this.control.query<{ sequence: number; row_hash: string }, [string]>("SELECT sequence,row_hash FROM catfood_source_journal WHERE run_id=? ORDER BY sequence DESC LIMIT 1").get(session.run_id)!; this.anchor(session.run_id, head, { state: "COMPLETE", preflight: "PASSED" });
+    const head = this.control.query<{ sequence: number; row_hash: string }, [string]>("SELECT sequence,row_hash FROM catfood_source_journal WHERE run_id=? ORDER BY sequence DESC LIMIT 1").get(session.run_id)!; this.anchor(session.run_id, head, { state: "COMPLETE", preflight: blocked ? "BLOCKED" : "PASSED" });
+    if (blocked) throw new CatfoodTrustError(blocked);
     return output;
   }
 
@@ -757,7 +820,7 @@ export class ProtectedCatfoodCustodian {
   }
 
   admit(session: RunnerSession, capability: CatfoodCapability, sourceId: string): AdmissionTicket {
-    this.verifyAnchored(session.run_id); const sample = this.sample(); let ticket!: AdmissionTicket;
+    this.verifyAnchored(session.run_id); const sample = this.sample(); let ticket!: AdmissionTicket; let reserved!: { item: ThreadsInventoryItem; requestId: string; workId: string; semantic: string; authorityRef: string; generation: number };
     this.control.transaction(() => {
       const row = this.getRun(session.run_id); this.authenticate(session, row); const go = this.verifyCurrentGo(row, sample);
       if (!row.lease_expires_at || Date.parse(row.lease_expires_at) <= Date.parse(sample.wall_time) || row.lifecycle !== "RUNNING" || row.admission_state !== "OPEN") throw new CatfoodTrustError("ADMISSION_CLOSED");
@@ -771,19 +834,36 @@ export class ProtectedCatfoodCustodian {
       verifyBoundary(currentBoundary, spec, "ADMIT", sample.wall_time, { capability, generation: Number(binding.threads_generation) });
       liveScope(spec, sample.wall_time);
       const requestId = `request:${sha256(canonicalJson({ run_id: row.run_id, epoch: row.current_epoch, capability, business_identity: item.business_identity, material_revision: item.material_revision })).slice(0, 32)}`;
-      const claim = capability === "editorial.outcome_evaluation" ? this.source.outcomeEvaluation(spec, validateOutcomeEvaluationRequest({ account_id: spec.account_id, capability, request_id: requestId, experiment_id: item.business_identity, expected_material_revision: item.material_revision, authority_ref: String(binding.authority_ref), spec_hash: spec.spec_sha256, expected_threads_generation: Number(binding.threads_generation), runtime_observation_id: String(this.sourceSnapshot(spec, sample.wall_time).coe.runtime_enforcement.freshness_identity), expected_release_git_sha: spec.threads_sha }), item) : this.source.claim(spec, item, String(binding.authority_ref), Number(binding.threads_generation));
+      const semantic = sha256(canonicalJson({ capability, business_identity: item.business_identity, material_revision: item.material_revision })); const workId = `wrk:${semantic.slice(0, 32)}`;
+      if (this.control.query("SELECT 1 FROM catfood_work_admissions WHERE semantic_identity_sha256=?").get(semantic)) throw new CatfoodTrustError("DUPLICATE_SEMANTIC_WORK");
+      reserved = { item: structuredClone(item), requestId, workId, semantic, authorityRef: String(binding.authority_ref), generation: Number(binding.threads_generation) };
+      this.appendJournal(row, "WORK_DISPATCH_INTENT", session.session_id, this.source.source_identity, { work_id: workId, source_id: sourceId, capability, business_identity: item.business_identity, material_revision: item.material_revision, request_id: requestId, authority_ref: binding.authority_ref, threads_generation: binding.threads_generation }, Number(binding.threads_generation), null, requestId, sample);
+    }).immediate();
+    let head = this.control.query<{ sequence: number; row_hash: string }, [string]>("SELECT sequence,row_hash FROM catfood_source_journal WHERE run_id=? ORDER BY sequence DESC LIMIT 1").get(session.run_id)!; this.anchor(session.run_id, head, { state: "DISPATCH_INTENT_RETAINED", request_id: reserved.requestId });
+    try { this.control.transaction(() => {
+      const row = this.getRun(session.run_id); this.authenticate(session, row); const go = this.verifyCurrentGo(row, sample);
+      if (!row.lease_expires_at || Date.parse(row.lease_expires_at) <= Date.parse(sample.wall_time) || row.lifecycle !== "RUNNING" || row.admission_state !== "OPEN" || Number(row.current_epoch) > go.payload.maximum_wp3_epoch) throw new CatfoodTrustError("ADMISSION_CLOSED");
+      const spec = runSpec(row); const item = this.source.inventory(spec).find((candidate) => candidate.source_id === sourceId && candidate.capability === capability);
+      if (!item || canonicalJson(item) !== canonicalJson(reserved.item)) throw new CatfoodTrustError("SOURCE_INTENT_CHANGED");
+      const binding = this.control.query<Record<string, unknown>, [string, number, string]>("SELECT * FROM catfood_authority_bindings WHERE run_id=? AND wp3_epoch=? AND capability=?").get(row.run_id, row.current_epoch, capability);
+      if (!binding || binding.authority_ref !== reserved.authorityRef || Number(binding.threads_generation) !== reserved.generation) throw new CatfoodTrustError("AUTHORITY_BINDING_CHANGED");
+      const currentBoundary = this.source.boundaries(spec).find((candidate) => candidate.capability === capability); if (!currentBoundary) throw new CatfoodTrustError("BOUNDARY_COVERAGE_INCOMPLETE");
+      verifyBoundary(currentBoundary, spec, "ADMIT", sample.wall_time, { capability, generation: reserved.generation }); liveScope(spec, sample.wall_time);
+      const claim = capability === "editorial.outcome_evaluation" ? this.source.outcomeEvaluation(spec, validateOutcomeEvaluationRequest({ account_id: spec.account_id, capability, request_id: reserved.requestId, experiment_id: item.business_identity, expected_material_revision: item.material_revision, authority_ref: reserved.authorityRef, spec_hash: spec.spec_sha256, expected_threads_generation: reserved.generation, runtime_observation_id: String(this.sourceSnapshot(spec, sample.wall_time).coe.runtime_enforcement.freshness_identity), expected_release_git_sha: spec.threads_sha }), item) : this.source.claim(spec, item, reserved.authorityRef, reserved.generation, reserved.requestId);
       if (claim.account_id !== spec.account_id || claim.capability !== capability || claim.authority_ref !== binding.authority_ref || claim.generation !== binding.threads_generation || claim.claim_status !== "in_progress") throw new CatfoodTrustError("AUTHORITATIVE_CLAIM_INVALID");
       if (Date.parse(claim.admitted_at) < Date.parse(spec.requested_window_start) || Date.parse(claim.admitted_at) >= Date.parse(spec.requested_window_end)) throw new CatfoodTrustError("WORK_OUTSIDE_WINDOW");
-      const semantic = sha256(canonicalJson({ capability, business_identity: claim.business_identity, material_revision: claim.material_revision }));
-      const workId = `wrk:${semantic.slice(0, 32)}`;
       try {
         this.control.query("INSERT INTO catfood_work_admissions(work_id,run_id,wp3_epoch,capability,claim_id,request_id,business_identity,material_revision,semantic_identity_sha256,authority_ref,threads_generation,claim_json,status,admitted_at) VALUES (?,?,?,?,?,?,?,?,?,?,?,?, 'ADMITTED',?)")
-          .run(workId, row.run_id, row.current_epoch, capability, claim.claim_id, claim.request_id, claim.business_identity, claim.material_revision, semantic, claim.authority_ref, claim.generation, canonicalJson(claim), sample.wall_time);
+          .run(reserved.workId, row.run_id, row.current_epoch, capability, claim.claim_id, claim.request_id, claim.business_identity, claim.material_revision, reserved.semantic, claim.authority_ref, claim.generation, canonicalJson(claim), sample.wall_time);
       } catch { throw new CatfoodTrustError("DUPLICATE_SEMANTIC_WORK"); }
-      this.appendJournal(row, "WORK_ADMITTED", session.session_id, this.source.source_identity, { work_id: workId, source_id: sourceId, business_identity: claim.business_identity, material_revision: claim.material_revision, go_sha256: row.go_sha256 }, claim.generation, claim.claim_id, claim.request_id, sample);
-      ticket = Object.freeze({ work_id: workId, claim_id: claim.claim_id, request_id: claim.request_id, capability, wp3_epoch: Number(row.current_epoch), threads_generation: claim.generation });
-    }).immediate();
-    const head = this.control.query<{ sequence: number; row_hash: string }, [string]>("SELECT sequence,row_hash FROM catfood_source_journal WHERE run_id=? ORDER BY sequence DESC LIMIT 1").get(session.run_id)!; this.anchor(session.run_id, head);
+      this.appendJournal(row, "WORK_ADMITTED", session.session_id, this.source.source_identity, { work_id: reserved.workId, source_id: sourceId, business_identity: claim.business_identity, material_revision: claim.material_revision, go_sha256: row.go_sha256, dispatch_intent_request_id: reserved.requestId }, claim.generation, claim.claim_id, claim.request_id, sample);
+      ticket = Object.freeze({ work_id: reserved.workId, claim_id: claim.claim_id, request_id: claim.request_id, capability, wp3_epoch: Number(row.current_epoch), threads_generation: claim.generation });
+    }).immediate(); } catch (error) {
+      const code = error instanceof CatfoodTrustError ? error.code : "MUTATION_OUTCOME_AMBIGUOUS";
+      this.control.transaction(() => { const row = this.getRun(session.run_id); this.appendJournal(row, code.includes("AMBIGUOUS") ? "WORK_DISPATCH_AMBIGUOUS" : "WORK_DISPATCH_REJECTED", session.session_id, this.source.source_identity, { work_id: reserved.workId, request_id: reserved.requestId, reason_code: code }, reserved.generation, null, reserved.requestId, sample); }).immediate();
+      head = this.control.query<{ sequence: number; row_hash: string }, [string]>("SELECT sequence,row_hash FROM catfood_source_journal WHERE run_id=? ORDER BY sequence DESC LIMIT 1").get(session.run_id)!; this.anchor(session.run_id, head, { state: code.includes("AMBIGUOUS") ? "AMBIGUOUS" : "REJECTED", request_id: reserved.requestId }); throw error;
+    }
+    head = this.control.query<{ sequence: number; row_hash: string }, [string]>("SELECT sequence,row_hash FROM catfood_source_journal WHERE run_id=? ORDER BY sequence DESC LIMIT 1").get(session.run_id)!; this.anchor(session.run_id, head);
     return ticket;
   }
 
@@ -1001,8 +1081,8 @@ export class ProtectedCatfoodCustodian {
     const claim = (typeof work.terminal_json === "string" ? JSON.parse(work.terminal_json) : work.terminal_json) as ThreadsClaimRecord;
     if (claim.claim_status !== "succeeded" || claim.transport_status !== "SUCCEEDED" || claim.provider_invoked || claim.paid_cost_micros === "UNKNOWN" || Number(claim.paid_cost_micros) !== 0) return false;
     const result = claim.domain_result;
-    if (claim.capability === "editorial.cycle") return result.state === "DRAFT" && result.status === "READY";
-    if (claim.capability === "editorial.outcome_evaluation") return result.state === "COMPLETED" && result.status === "RECORDED" && result.recorded === true && ["SUCCESS", "FAILURE", "INVALID_EXPERIMENT"].includes(String(result.verdict));
+    if (claim.capability === "editorial.cycle") return result.state === "DRAFT" && result.status === "READY" && result.mutated === true && typeof result.cycle_id === "string";
+    if (claim.capability === "editorial.outcome_evaluation") return result.state === "SUCCEEDED" && typeof result.result_identity === "string" && ["SUCCESS", "FAILURE", "INVALID_EXPERIMENT"].includes(String(result.native_domain_state));
     if (claim.capability === "threads.publish.dry_run") return result.status === "succeeded" && result.mode === "dry_run" && result.duplicate === false;
     return false;
   }
@@ -1103,7 +1183,7 @@ export class IndependentCatfoodEvaluator {
 function meaningfulClaim(work: Record<string, unknown>): boolean {
   if (work.status !== "TERMINAL" || !work.terminal_json || plain(work.governed_decision, "governed_decision").disposition !== "CREDIT") return false; const claim = work.terminal_json as ThreadsClaimRecord;
   if (claim.claim_status !== "succeeded" || claim.transport_status !== "SUCCEEDED" || claim.provider_invoked || claim.paid_cost_micros !== 0) return false;
-  if (claim.capability === "editorial.cycle") return claim.domain_result.state === "DRAFT" && claim.domain_result.status === "READY";
-  if (claim.capability === "editorial.outcome_evaluation") return claim.domain_result.state === "COMPLETED" && claim.domain_result.status === "RECORDED" && claim.domain_result.recorded === true && ["SUCCESS", "FAILURE", "INVALID_EXPERIMENT"].includes(String(claim.domain_result.verdict));
+  if (claim.capability === "editorial.cycle") return claim.domain_result.state === "DRAFT" && claim.domain_result.status === "READY" && claim.domain_result.mutated === true && typeof claim.domain_result.cycle_id === "string";
+  if (claim.capability === "editorial.outcome_evaluation") return claim.domain_result.state === "SUCCEEDED" && typeof claim.domain_result.result_identity === "string" && ["SUCCESS", "FAILURE", "INVALID_EXPERIMENT"].includes(String(claim.domain_result.native_domain_state));
   return claim.capability === "threads.publish.dry_run" && claim.domain_result.status === "succeeded" && claim.domain_result.mode === "dry_run" && claim.domain_result.duplicate === false;
 }
