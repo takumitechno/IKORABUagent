@@ -4,11 +4,11 @@ import { existsSync } from "node:fs";
 import { resolve } from "node:path";
 import { canonicalJson, sha256 } from "./catfood-harness";
 import {
-  CATFOOD_EVALUATOR_SHA256, CATFOOD_POLICY_SHA256, CatfoodTrustError, IndependentCatfoodEvaluator,
+  CATFOOD_EVALUATION_PROVENANCE_NODES, CATFOOD_EVALUATOR_SHA256, CATFOOD_POLICY_SHA256, CatfoodTrustError, IndependentCatfoodEvaluator,
   type EvaluationResult, type ReadonlyThreadsEvidenceSource,
 } from "./catfood-trust";
 import { CATFOOD_THREADS_DEPENDENCY_ROOT } from "./catfood-coe";
-import { assertCommonEnrollmentLineage, assertEnrolledRole, composeEnrolledTrustProvenance, enrolledTrustEvidence, enrollmentEvidence, inspectEnrolledRole, type CatfoodEnrollmentContext } from "./catfood-enrollment";
+import { assertCommonEnrollmentLineage, assertEnrolledRole, composeRunTrustProvenance, deriveCatfoodTrustDomain, enrolledTrustEvidence, enrollmentEvidence, inspectEnrolledRole, type CatfoodEnrollmentContext } from "./catfood-enrollment";
 
 export const CATFOOD_ATTESTATION_SCHEMA = "catfood-independent-attestation.v1";
 export const CATFOOD_ATTESTATION_DOMAIN = "IKORABU/WP3/CATFOOD/ATTESTATION/V1";
@@ -51,6 +51,7 @@ export class IndependentCatfoodAttestationWriter {
   private readonly meta: Record<string, unknown>;
   private readonly enrollment: Record<string, unknown> | null;
   private readonly writerEnrollment?: CatfoodEnrollmentContext;
+  private readonly roleEnrollments?: Readonly<CatfoodAttestationEnrollments>;
 
   constructor(controlPath: string, checkpointPath: string, attestationPath: string, source: ReadonlyThreadsEvidenceSource, privateKeyPem: string, enrollment?: Readonly<CatfoodAttestationEnrollments>) {
     if ([resolve(controlPath), resolve(checkpointPath)].includes(resolve(attestationPath))) throw new CatfoodTrustError("ATTESTATION_STORE_MUST_BE_SEPARATE");
@@ -75,10 +76,10 @@ export class IndependentCatfoodAttestationWriter {
           writer: assertEnrolledRole(enrollment.writer, "writer", domain),
         };
         const common = assertCommonEnrollmentLineage([enrollment.source, enrollment.custodian, enrollment.evaluator, enrollment.writer]);
-        const provenance = composeEnrolledTrustProvenance([enrollment.source, enrollment.custodian, enrollment.evaluator], ["supervisor", "role_session", "role_build", "clock", "go", "environment", "acquisition", "sealed_run"].map((name) => ({ name, trust_domain: domain })));
-        this.enrollment = { authority_anchor: common.authority_anchor, accepted_snapshot_id: common.accepted_snapshot_id, accepted_snapshot_sha256: common.accepted_snapshot_sha256, enrollment_namespace: common.enrollment_namespace, build_policy_sha256: common.build_policy_sha256, roles: [enrollment.source, enrollment.custodian, enrollment.evaluator, enrollment.writer].map(enrollmentEvidence), provenance: enrolledTrustEvidence(provenance) };
+        this.enrollment = { authority_anchor: common.authority_anchor, accepted_snapshot_id: common.accepted_snapshot_id, accepted_snapshot_sha256: common.accepted_snapshot_sha256, enrollment_namespace: common.enrollment_namespace, build_policy_sha256: common.build_policy_sha256, roles: [enrollment.source, enrollment.custodian, enrollment.evaluator, enrollment.writer].map(enrollmentEvidence) };
+        this.roleEnrollments = enrollment;
         this.writerEnrollment = enrollment.writer;
-        this.evaluator = new IndependentCatfoodEvaluator(controlPath, checkpointPath, source, enrollment.evaluator, provenance);
+        this.evaluator = new IndependentCatfoodEvaluator(controlPath, checkpointPath, source, enrollment.evaluator);
       } else { this.enrollment = null; this.evaluator = new IndependentCatfoodEvaluator(controlPath, checkpointPath, source); }
     } catch (error) { this.db.close(); throw error; }
   }
@@ -86,14 +87,15 @@ export class IndependentCatfoodAttestationWriter {
   close(): void { this.evaluator.close(); this.db.close(); }
 
   attest(runId: string, attestedAt: string): string {
-    const evaluation = this.evaluator.evaluate(runId); const bundle = this.evaluator.rederive(runId);
+    const bundle = this.evaluator.rederive(runId); const provenance = this.roleEnrollments ? composeRunTrustProvenance([this.roleEnrollments.source, this.roleEnrollments.custodian, this.roleEnrollments.evaluator, this.roleEnrollments.writer], bundle) : undefined; const evaluation = this.evaluator.evaluate(runId, provenance);
     if (evaluation.rederived_bundle_sha256 !== sha256(canonicalJson(bundle))) throw new CatfoodTrustError("EVALUATOR_OUTPUT_MISMATCH");
     const existing = this.db.query<{ attestation_id: string }, [string, string, string]>("SELECT attestation_id FROM independent_attestations WHERE run_id=? AND bundle_sha256=? AND evaluator_sha256=?").get(runId, evaluation.rederived_bundle_sha256, CATFOOD_EVALUATOR_SHA256);
     if (existing) return existing.attestation_id;
     const spec = bundle.spec as Record<string, unknown>; const go = bundle.go as Record<string, unknown>; const checkpoint = bundle.checkpoint as Record<string, unknown>;
     const finalSource = bundle.final_source as Record<string, unknown>;
     const scope = { run_id: runId, environment_type: spec.environment_type, environment_instance_id: spec.environment_instance_id, organization_id: spec.organization_id, tenant_id: spec.tenant_id, account_id: spec.account_id };
-    const payload = { domain: CATFOOD_ATTESTATION_DOMAIN, schema: CATFOOD_ATTESTATION_SCHEMA, trust_domain: evaluation.test_only ? "TEST_ONLY" : "OPERATIONAL", run_id: runId, scope_sha256: sha256(canonicalJson(scope)), go_sha256: go.artifact_sha256, policy_sha256: CATFOOD_POLICY_SHA256, dependency_root: CATFOOD_THREADS_DEPENDENCY_ROOT, ikorabu_release_sha: spec.ikorabu_release_sha, threads_sha: spec.threads_sha, boundary_sha256: spec.operational_boundary_sha256, threads_release_sha256: spec.threads_release_sha256, threads_schema: spec.threads_schema, evaluator_sha256: CATFOOD_EVALUATOR_SHA256, checkpoint_id: checkpoint.checkpoint_id, source_digest: finalSource.digest, evidence_coverage: evaluation.evidence_coverage, bundle_sha256: evaluation.rederived_bundle_sha256, verdict: evaluation.verdict, reason_codes: evaluation.reason_codes, test_only: evaluation.test_only, writer_identity: this.meta.writer_identity, signing_key_id: this.meta.signing_key_id, attested_at: attestedAt, ...(this.enrollment ? { enrollment: this.enrollment } : {}) };
+    const enrollment = this.enrollment ? { ...this.enrollment, ...(provenance ? { provenance: enrolledTrustEvidence(provenance) } : {}) } : undefined;
+    const payload = { domain: CATFOOD_ATTESTATION_DOMAIN, schema: CATFOOD_ATTESTATION_SCHEMA, trust_domain: evaluation.test_only ? "TEST_ONLY" : "OPERATIONAL", run_id: runId, scope_sha256: sha256(canonicalJson(scope)), go_sha256: go.artifact_sha256, policy_sha256: CATFOOD_POLICY_SHA256, dependency_root: CATFOOD_THREADS_DEPENDENCY_ROOT, ikorabu_release_sha: spec.ikorabu_release_sha, threads_sha: spec.threads_sha, boundary_sha256: spec.operational_boundary_sha256, threads_release_sha256: spec.threads_release_sha256, threads_schema: spec.threads_schema, evaluator_sha256: CATFOOD_EVALUATOR_SHA256, checkpoint_id: checkpoint.checkpoint_id, source_digest: finalSource.digest, evidence_coverage: evaluation.evidence_coverage, bundle_sha256: evaluation.rederived_bundle_sha256, verdict: evaluation.verdict, reason_codes: evaluation.reason_codes, test_only: evaluation.test_only, writer_identity: this.meta.writer_identity, signing_key_id: this.meta.signing_key_id, attested_at: attestedAt, ...(enrollment ? { enrollment } : {}) };
     const text = canonicalJson(payload); if (this.writerEnrollment) inspectEnrolledRole(this.writerEnrollment, "writer", "writer.sign.release", runId); const signature = sign(null, Buffer.from(`${CATFOOD_ATTESTATION_DOMAIN}\n${text}`), this.privateKey).toString("base64url"); const id = `att:${sha256(`${text}.${signature}`).slice(0, 32)}`;
     this.db.query("INSERT INTO independent_attestations VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)").run(id, runId, payload.scope_sha256, payload.go_sha256, payload.policy_sha256, payload.ikorabu_release_sha, payload.threads_sha, payload.boundary_sha256, payload.threads_release_sha256, payload.threads_schema, payload.evaluator_sha256, payload.checkpoint_id, payload.evidence_coverage, payload.bundle_sha256, payload.verdict, canonicalJson(payload.reason_codes), payload.test_only ? 1 : 0, payload.writer_identity, payload.signing_key_id, payload.attested_at, text, signature);
     return id;
@@ -108,7 +110,8 @@ export function verifyIndependentAttestation(payloadJson: string, signatureBase6
   if (expected.verifier_enrollment) {
     const verifier = assertEnrolledRole(expected.verifier_enrollment, "verifier", "TEST_ONLY"), enrollment = payload.enrollment as Record<string, unknown> | undefined;
     inspectEnrolledRole(expected.verifier_enrollment, "verifier", "verifier.accept.release", expected.run_id);
-    if (!enrollment || verifier.authority_anchor !== enrollment.authority_anchor || verifier.accepted_snapshot_id !== enrollment.accepted_snapshot_id || verifier.accepted_snapshot_sha256 !== enrollment.accepted_snapshot_sha256 || verifier.enrollment_namespace !== enrollment.enrollment_namespace || verifier.build_policy_sha256 !== enrollment.build_policy_sha256) throw new CatfoodTrustError("ATTESTATION_ENROLLMENT_MISMATCH");
+    const provenance = enrollment?.provenance as import("./catfood-enrollment").VerifiedTrustProvenance | undefined;
+    if (!enrollment || verifier.authority_anchor !== enrollment.authority_anchor || verifier.accepted_snapshot_id !== enrollment.accepted_snapshot_id || verifier.accepted_snapshot_sha256 !== enrollment.accepted_snapshot_sha256 || verifier.enrollment_namespace !== enrollment.enrollment_namespace || verifier.build_policy_sha256 !== enrollment.build_policy_sha256 || !provenance || deriveCatfoodTrustDomain(provenance, CATFOOD_EVALUATION_PROVENANCE_NODES) !== "TEST_ONLY") throw new CatfoodTrustError("ATTESTATION_ENROLLMENT_MISMATCH");
   }
   if (!verify(null, Buffer.from(`${CATFOOD_ATTESTATION_DOMAIN}\n${payloadJson}`), createPublicKey(publicKeyPem), Buffer.from(signatureBase64url, "base64url"))) throw new CatfoodTrustError("ATTESTATION_SIGNATURE_INVALID");
   return payload.verdict as EvaluationResult["verdict"];

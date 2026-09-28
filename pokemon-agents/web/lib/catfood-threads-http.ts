@@ -1,8 +1,8 @@
-import { sha256, type Json } from "./catfood-harness";
+import { canonicalJson, sha256, type Json } from "./catfood-harness";
 import { acquireCoe, foldProducerAttempts, parseJsonNoDuplicateKeys, validateOutcomeEvaluationRequest, type CoeAcquisition, type CoePageSource, type CoeRawPage, type CoeRequest, type OutcomeEvaluationRequest } from "./catfood-coe";
 import { validateOperationalBoundaryV1, type OperationalBoundaryV1 } from "./catfood-harness";
 import { CATFOOD_CAPABILITIES, CatfoodTrustError, type CatfoodCapability, type CatfoodRunSpec, type OperationalProvenance, type TenantProbeEvidence, type ThreadsAuthorityTransition, type ThreadsClaimRecord, type ThreadsEvidenceSource, type ThreadsInventoryItem, type ThreadsRuntimeEvidence } from "./catfood-trust";
-import { assertEnrolledRole, inspectEnrolledRole, type CatfoodEnrollmentContext } from "./catfood-enrollment";
+import { assertAuthorizedAction, assertEnrolledRole, inspectEnrolledRole, type CatfoodActionAuthorization, type CatfoodEnrollmentContext } from "./catfood-enrollment";
 
 export interface ThreadsHttpResponse { status: number; content_type: string; content_encoding?: string; location: string | null; body?: string; body_base64url?: string; byte_length?: number; body_sha256?: string }
 export type ThreadsHttpTransport = (request: Readonly<{ method: "GET" | "POST"; url: string; headers: Readonly<Record<string, string>>; body: string | null; timeout_ms: number; maximum_bytes: number }>) => ThreadsHttpResponse;
@@ -138,6 +138,7 @@ export class OperationalThreadsEvidenceSource implements ThreadsEvidenceSource {
   private lastPage: Record<string, unknown> | null = null;
   private lastAcquisition: CoeAcquisition | null = null;
   private readonly preparedUses = new Map<string, number>();
+  private preparedAcquisition: { request: Readonly<{ account_id: string; assessment_mode: "LIVE" | "HISTORICAL"; window_start: string; window_end: string }>; nextCursor: string | null } | null = null;
   private constructor(readonly mode: "OPERATIONAL" | "TEST_ONLY", private readonly context: Readonly<ThreadsSourceContext>, private readonly adapter: OperationalThreadsHttpAdapter, private readonly now: () => Date, private readonly enrollment?: CatfoodEnrollmentContext) {
     if (enrollment) assertEnrolledRole(enrollment, "source", mode); else if (mode === "OPERATIONAL") throw new CatfoodTrustError("OPERATIONAL_SUPERVISOR_ENROLLMENT_UNAVAILABLE");
     this.source_identity = context.source_identity;
@@ -163,9 +164,21 @@ export class OperationalThreadsEvidenceSource implements ThreadsEvidenceSource {
     inspectEnrolledRole(this.enrollment, "source", action, target); const key = `${action}\n${target}`; this.preparedUses.set(key, (this.preparedUses.get(key) ?? 0) + 1);
   }
 
+  prepareAuthorizedAcquisition(authorization: CatfoodActionAuthorization, request: Readonly<{ account_id: string; assessment_mode: "LIVE" | "HISTORICAL"; window_start: string; window_end: string }>): void {
+    const target = `acquire:${sha256(canonicalJson(request))}`;
+    assertAuthorizedAction(authorization, "custodian", "HISTORICAL_EVIDENCE", "source.acquire.historical", target);
+    this.preparedAcquisition = { request: Object.freeze({ ...request }), nextCursor: null };
+  }
+
   operationalEvidence(request: Readonly<CoeRequest>): CoeRawPage {
-    this.live("source.acquire", `${request.account_id}:${request.assessment_mode}`);
-    const page = this.adapter.operationalEvidence(request); this.lastPage = page.parsed as Record<string, unknown>; return page;
+    const prepared = this.preparedAcquisition;
+    if (prepared) {
+      const expected = prepared.request;
+      if (request.account_id !== expected.account_id || request.assessment_mode !== expected.assessment_mode || request.window_start !== expected.window_start || request.window_end !== expected.window_end || request.cursor !== prepared.nextCursor) throw new CatfoodTrustError("ACTION_AUTHORIZATION_INVALID");
+    } else this.live("source.acquire", `${request.account_id}:${request.assessment_mode}`);
+    const page = this.adapter.operationalEvidence(request); this.lastPage = page.parsed as Record<string, unknown>;
+    if (prepared) { const next = (page.parsed as Record<string, unknown>).next_cursor; prepared.nextCursor = typeof next === "string" ? next : null; if (next === null || next === undefined) this.preparedAcquisition = null; }
+    return page;
   }
 
   runtimeEvidence(_spec: CatfoodRunSpec): ThreadsRuntimeEvidence {
@@ -181,7 +194,10 @@ export class OperationalThreadsEvidenceSource implements ThreadsEvidenceSource {
     return Object.freeze({ probe_id: this.context.protected_probe.probe_id, principal_ref: this.context.principal_ref, credential_version_ref: this.context.credential_version_ref, organization_id: spec.organization_id, own_account_id: spec.account_id, foreign_account_id: this.context.protected_probe.foreign_account_id, own_result: "EXPECTED_RESOURCE", foreign_result: "AUTHORIZATION_DENIED", foreign_status: 403, logical_runtime_id: String(runtime.logical_runtime_id), worker_boot_id: String(runtime.worker_boot_id), observed_at: observed.observed_at, receipt_id: `probe:${sha256(`${this.context.protected_probe.probe_id}:${observed.observed_at}:${this.context.principal_ref}`)}`, source_session_id: `source:${sha256(`${this.context.source_identity}:${this.context.credential_version_ref}`)}`, source_build_sha256: this.context.source_build_sha256, protected_origin: this.adapter.origin, route: "GET /autopilot/v2/operational-boundary", method: "GET" });
   }
 
-  boundaries(spec: CatfoodRunSpec): readonly OperationalBoundaryV1[] { return CATFOOD_CAPABILITIES.map((capability) => this.adapter.boundary(spec.account_id, capability)); }
+  boundaries(spec: CatfoodRunSpec, authorization?: CatfoodActionAuthorization): readonly OperationalBoundaryV1[] {
+    if (authorization) assertAuthorizedAction(authorization, "custodian", "SAFETY_RECONCILIATION", "source.boundaries", `${spec.run_id}:boundaries`); else this.live("source.boundaries", spec.run_id);
+    return CATFOOD_CAPABILITIES.map((capability) => this.adapter.boundary(spec.account_id, capability));
+  }
 
   inventory(_spec: CatfoodRunSpec): readonly ThreadsInventoryItem[] {
     if (!this.lastPage) throw new CatfoodTrustError("COE_ACQUISITION_REQUIRED");
@@ -198,16 +214,17 @@ export class OperationalThreadsEvidenceSource implements ThreadsEvidenceSource {
     return this.authority(spec, capability, authorityRef, expectedGeneration, "renew", permitExpiresAt);
   }
 
-  revoke(spec: CatfoodRunSpec, capability: CatfoodCapability, authorityRef: string, expectedGeneration: number): ThreadsAuthorityTransition {
-    return this.authority(spec, capability, authorityRef, expectedGeneration, "revoke");
+  revoke(spec: CatfoodRunSpec, capability: CatfoodCapability, authorityRef: string, expectedGeneration: number, authorization?: CatfoodActionAuthorization): ThreadsAuthorityTransition {
+    if (authorization) assertAuthorizedAction(authorization, "custodian", "SAFETY_RECONCILIATION", "source.authority.revoke", `${spec.run_id}:${capability}`);
+    return this.authority(spec, capability, authorityRef, expectedGeneration, "revoke", null, !!authorization);
   }
 
-  private authority(spec: CatfoodRunSpec, capability: CatfoodCapability, authorityRef: string, expectedGeneration: number | null, action: "grant" | "renew" | "revoke", permitExpiresAt: string | null = null): ThreadsAuthorityTransition {
-    if (action !== "revoke") this.live(`source.authority.${action}.dispatch`, spec.run_id);
+  private authority(spec: CatfoodRunSpec, capability: CatfoodCapability, authorityRef: string, expectedGeneration: number | null, action: "grant" | "renew" | "revoke", permitExpiresAt: string | null = null, safetyAuthorized = false): ThreadsAuthorityTransition {
+    if (!safetyAuthorized) this.live(`source.authority.${action}.dispatch`, spec.run_id);
     const value = this.adapter.changeAuthority({ action, account_id: spec.account_id, capability, authority_ref: authorityRef, spec_hash: spec.spec_sha256, expected_generation: expectedGeneration, permit_expires_at: action === "revoke" ? null : permitExpiresAt }) as Record<string, unknown>;
     const expected = ["account_id", "authority_ref", "authority_state", "capability", "fencing_generation", "permit_expires_at", "spec_hash", "stop_acknowledgement"];
     if (Object.keys(value).sort().join() !== expected.sort().join() || value.account_id !== spec.account_id || value.capability !== capability || value.authority_ref !== authorityRef || value.spec_hash !== spec.spec_sha256 || !Number.isSafeInteger(value.fencing_generation)) throw new CatfoodTrustError("THREADS_AUTHORITY_RESPONSE_INVALID");
-    if (action !== "revoke") this.live(`source.authority.${action}.release`, spec.run_id);
+    if (!safetyAuthorized) this.live(`source.authority.${action}.release`, spec.run_id);
     return Object.freeze({ boundary: this.adapter.boundary(spec.account_id, capability), authority_ref: authorityRef, generation: Number(value.fencing_generation) });
   }
 
@@ -226,8 +243,9 @@ export class OperationalThreadsEvidenceSource implements ThreadsEvidenceSource {
     this.adapter.outcomeEvaluation(request); const result = this.afterDispatch(spec, item, request.authority_ref, request.expected_threads_generation, request.request_id); this.live("source.outcome.release", spec.run_id); return result;
   }
 
-  readClaim(spec: CatfoodRunSpec, claimId: string): ThreadsClaimRecord | null {
-    const evidence = this.acquire(spec); const attempt = foldProducerAttempts(evidence).find((candidate) => candidate.first.claim_identity === claimId);
+  readClaim(spec: CatfoodRunSpec, claimId: string, authorization?: CatfoodActionAuthorization): ThreadsClaimRecord | null {
+    if (authorization) assertAuthorizedAction(authorization, "custodian", "SAFETY_RECONCILIATION", "source.read_claim", `${spec.run_id}:${claimId}`); else this.live("source.read_claim", `${spec.run_id}:${claimId}`);
+    const evidence = this.acquire(spec, !!authorization); const attempt = foldProducerAttempts(evidence).find((candidate) => candidate.first.claim_identity === claimId);
     return attempt ? this.project(spec, evidence, attempt.first, attempt.terminal) : null;
   }
 
@@ -238,10 +256,12 @@ export class OperationalThreadsEvidenceSource implements ThreadsEvidenceSource {
     return Object.freeze({ ...projected, claim_status: "in_progress", transport_status: "SUCCEEDED", domain_result: {}, completed_at: null });
   }
 
-  private acquire(spec: CatfoodRunSpec): CoeAcquisition {
+  private acquire(spec: CatfoodRunSpec, safetyAuthorized = false): CoeAcquisition {
     const at = this.now(); const end = Date.parse(spec.requested_window_end); const closed = at.getTime() >= end;
     const rounded = Math.floor(at.getTime() / 1000) * 1000; const scope = closed ? spec : { ...spec, requested_window_start: new Date(rounded - 120_000).toISOString().replace(".000Z", "Z"), requested_window_end: new Date(rounded).toISOString().replace(".000Z", "Z") };
-    this.lastAcquisition = acquireCoe(this, scope, closed ? "CLOSED_RUN" : "LIVE_ADMISSION"); return this.lastAcquisition;
+    if (safetyAuthorized) this.preparedAcquisition = { request: Object.freeze({ account_id: spec.account_id, assessment_mode: closed ? "HISTORICAL" : "LIVE", window_start: scope.requested_window_start, window_end: scope.requested_window_end }), nextCursor: null };
+    try { this.lastAcquisition = acquireCoe(this, scope, closed ? "CLOSED_RUN" : "LIVE_ADMISSION"); return this.lastAcquisition; }
+    finally { if (safetyAuthorized) this.preparedAcquisition = null; }
   }
 
   private live(action: string, target: string): void {
