@@ -356,6 +356,7 @@ export interface ThreadsEvidenceSource extends CoePageSource {
   readonly source_identity: string;
   readonly mode: SourceMode;
   readonly operational_provenance?: OperationalProvenance;
+  prepareEnrollmentUse?(action: string, target: string): void;
   runtimeEvidence(spec: CatfoodRunSpec): ThreadsRuntimeEvidence;
   tenantProbe(spec: CatfoodRunSpec): TenantProbeEvidence;
   boundaries(spec: CatfoodRunSpec): readonly OperationalBoundaryV1[];
@@ -887,6 +888,7 @@ export class ProtectedCatfoodCustodian {
     this.liveEnrollment("custodian.preflight", session.run_id);
     this.verifyAnchored(session.run_id);
     const sample = this.sample();
+    const preparing = this.getRun(session.run_id); this.authenticate(session, preparing); const preparingSpec = runSpec(preparing); this.source.prepareEnrollmentUse?.("source.acquire", `${preparingSpec.account_id}:LIVE`);
     let output!: PreflightReceipt; let blocked: string | null = null;
     this.control.transaction(() => {
       const row = this.getRun(session.run_id); this.authenticate(session, row); this.requirePositiveRun(row); this.verifyCurrentGo(row, sample);
@@ -930,20 +932,24 @@ export class ProtectedCatfoodCustodian {
   activate(session: RunnerSession, receipt: PreflightReceipt): void {
     this.liveEnrollment("custodian.activate", session.run_id);
     this.verifyAnchored(session.run_id); const sample = this.sample();
+    const initial = this.getRun(session.run_id); this.authenticate(session, initial); this.requirePositiveRun(initial); const go = this.verifyCurrentGo(initial, sample);
+    const initialReceipt = this.control.query<Record<string, unknown>, [string]>("SELECT * FROM catfood_preflight_receipts WHERE receipt_id=?").get(receipt.receipt_id);
+    if (!initialReceipt || initialReceipt.run_id !== initial.run_id || initialReceipt.session_id !== session.session_id || initialReceipt.consumed_at !== null || initialReceipt.nonce !== receipt.nonce || Number(initialReceipt.wp3_epoch) !== Number(initial.current_epoch) || Number(initialReceipt.state_version) !== Number(initial.state_version) || Date.parse(String(initialReceipt.expires_at)) <= Date.parse(sample.wall_time)) throw new CatfoodTrustError("PREFLIGHT_RECEIPT_INVALID");
+    const spec = runSpec(initial); this.source.prepareEnrollmentUse?.("source.acquire", `${spec.account_id}:LIVE`); const snapshot = this.sourceSnapshot(spec);
+    if (snapshot.coeAssessment.state !== "READY" || snapshot.digest !== initialReceipt.source_digest) throw new CatfoodTrustError("PREFLIGHT_STALE"); requireZeroPaidRuntime(snapshot.runtime);
+    const permitExpiresAt = new Date(Math.min(Date.parse(sample.wall_time) + 120_000, Date.parse(spec.requested_window_end), Date.parse(go.payload.valid_until))).toISOString();
+    if (Date.parse(permitExpiresAt) <= Date.parse(sample.wall_time)) throw new CatfoodTrustError("AUTHORITY_PERMIT_WINDOW_CLOSED");
+    const transitions = CATFOOD_CAPABILITIES.map((capability) => {
+      const current = snapshot.boundaries.find((boundary) => boundary.capability === capability), expected = current?.fencing_generation ?? null; const ref = `${initial.run_id}:wp3:${initial.current_epoch}:${capability}`;
+      return { capability, transition: this.source.grant(spec, capability, ref, expected, permitExpiresAt) };
+    });
+    this.liveEnrollment("custodian.activate.apply", session.run_id);
     this.control.transaction(() => {
-      const row = this.getRun(session.run_id); this.authenticate(session, row); this.requirePositiveRun(row); const go = this.verifyCurrentGo(row, sample);
+      const row = this.getRun(session.run_id); this.authenticate(session, row); this.requirePositiveRun(row); this.verifyCurrentGo(row, sample);
       const stored = this.control.query<Record<string, unknown>, [string]>("SELECT * FROM catfood_preflight_receipts WHERE receipt_id=?").get(receipt.receipt_id);
       if (!stored || stored.run_id !== row.run_id || stored.session_id !== session.session_id || stored.consumed_at !== null || stored.nonce !== receipt.nonce || Number(stored.wp3_epoch) !== Number(row.current_epoch) || Number(stored.state_version) !== Number(row.state_version) || Date.parse(String(stored.expires_at)) <= Date.parse(sample.wall_time)) throw new CatfoodTrustError("PREFLIGHT_RECEIPT_INVALID");
-      const spec = runSpec(row); const snapshot = this.sourceSnapshot(spec);
-      if (snapshot.coeAssessment.state !== "READY" || snapshot.digest !== stored.source_digest) throw new CatfoodTrustError("PREFLIGHT_STALE");
-      requireZeroPaidRuntime(snapshot.runtime);
-      const permitExpiresAt = new Date(Math.min(Date.parse(sample.wall_time) + 120_000, Date.parse(spec.requested_window_end), Date.parse(go.payload.valid_until))).toISOString();
-      if (Date.parse(permitExpiresAt) <= Date.parse(sample.wall_time)) throw new CatfoodTrustError("AUTHORITY_PERMIT_WINDOW_CLOSED");
-      for (const capability of CATFOOD_CAPABILITIES) {
-        const current = snapshot.boundaries.find((boundary) => boundary.capability === capability);
-        const expected = current?.fencing_generation ?? null;
-        const ref = `${row.run_id}:wp3:${row.current_epoch}:${capability}`;
-        const transition = this.source.grant(spec, capability, ref, expected, permitExpiresAt);
+      if (row.state_version !== initial.state_version || row.current_epoch !== initial.current_epoch || canonicalJson(runSpec(row)) !== canonicalJson(spec)) throw new CatfoodTrustError("PREFLIGHT_STALE");
+      for (const { capability, transition } of transitions) {
         const boundary = verifyBoundary(transition.boundary, spec, "ADMIT", sample.wall_time, { capability, generation: transition.generation });
         if (!boundary.permit_expires_at || Date.parse(boundary.permit_expires_at) > Date.parse(permitExpiresAt) || Date.parse(boundary.permit_expires_at) - Date.parse(sample.wall_time) > 120_000) throw new CatfoodTrustError("AUTHORITY_PERMIT_BOUND_INVALID");
         this.control.query("INSERT INTO catfood_authority_bindings VALUES (?,?,?,?,?,?,?,?,?)").run(row.run_id, row.current_epoch, capability, transition.authority_ref, transition.generation, boundary.canonical_sha256, boundary.permit_expires_at, "ACTIVE", sample.wall_time);

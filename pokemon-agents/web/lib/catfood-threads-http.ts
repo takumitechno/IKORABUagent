@@ -137,6 +137,7 @@ export class OperationalThreadsEvidenceSource implements ThreadsEvidenceSource {
   readonly evidence_trust: "OPERATIONAL" | "TEST_ONLY";
   private lastPage: Record<string, unknown> | null = null;
   private lastAcquisition: CoeAcquisition | null = null;
+  private readonly preparedUses = new Map<string, number>();
   private constructor(readonly mode: "OPERATIONAL" | "TEST_ONLY", private readonly context: Readonly<ThreadsSourceContext>, private readonly adapter: OperationalThreadsHttpAdapter, private readonly now: () => Date, private readonly enrollment?: CatfoodEnrollmentContext) {
     if (enrollment) assertEnrolledRole(enrollment, "source", mode); else if (mode === "OPERATIONAL") throw new CatfoodTrustError("OPERATIONAL_SUPERVISOR_ENROLLMENT_UNAVAILABLE");
     this.source_identity = context.source_identity;
@@ -155,6 +156,11 @@ export class OperationalThreadsEvidenceSource implements ThreadsEvidenceSource {
   static operational(context: Readonly<ThreadsSourceContext>, enrollment?: CatfoodEnrollmentContext): OperationalThreadsEvidenceSource {
     if (!enrollment) throw new CatfoodTrustError("OPERATIONAL_SUPERVISOR_ENROLLMENT_UNAVAILABLE");
     return new OperationalThreadsEvidenceSource("OPERATIONAL", Object.freeze(structuredClone(context)), new OperationalThreadsHttpAdapter(context), () => new Date(), enrollment);
+  }
+
+  prepareEnrollmentUse(action: string, target: string): void {
+    if (!this.enrollment) { if (this.mode === "OPERATIONAL") throw new CatfoodTrustError("ENROLLMENT_STATUS_INVALID"); return; }
+    inspectEnrolledRole(this.enrollment, "source", action, target); const key = `${action}\n${target}`; this.preparedUses.set(key, (this.preparedUses.get(key) ?? 0) + 1);
   }
 
   operationalEvidence(request: Readonly<CoeRequest>): CoeRawPage {
@@ -238,7 +244,11 @@ export class OperationalThreadsEvidenceSource implements ThreadsEvidenceSource {
     this.lastAcquisition = acquireCoe(this, scope, closed ? "CLOSED_RUN" : "LIVE_ADMISSION"); return this.lastAcquisition;
   }
 
-  private live(action: string, target: string): void { if (this.enrollment) inspectEnrolledRole(this.enrollment, "source", action, target); else if (this.mode === "OPERATIONAL") throw new CatfoodTrustError("ENROLLMENT_STATUS_INVALID"); }
+  private live(action: string, target: string): void {
+    const key = `${action}\n${target}`, prepared = this.preparedUses.get(key) ?? 0;
+    if (prepared > 0) { if (prepared === 1) this.preparedUses.delete(key); else this.preparedUses.set(key, prepared - 1); return; }
+    if (this.enrollment) inspectEnrolledRole(this.enrollment, "source", action, target); else if (this.mode === "OPERATIONAL") throw new CatfoodTrustError("ENROLLMENT_STATUS_INVALID");
+  }
 
   private project(spec: CatfoodRunSpec, evidence: CoeAcquisition, first: Record<string, Json>, terminal: Record<string, Json>): ThreadsClaimRecord {
     const state = String(terminal.event_type); const result = attemptResult(terminal); const complete = ["SUCCEEDED", "FAILED", "UNRESOLVED", "DUPLICATE", "REPLAYED", "REJECTED_PRECLAIM"].includes(state);
