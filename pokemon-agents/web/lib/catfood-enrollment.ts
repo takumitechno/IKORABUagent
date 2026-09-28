@@ -19,7 +19,7 @@ export interface TestEnrollmentBinding {
   trust_domain: "TEST_ONLY" | "OPERATIONAL"; issuer: string; issuer_key_id: string; audience: string; origin: string;
   credential: string; public_key_pem: string; environment_identity: string; deployment_id: string;
   enrollment_namespace: string; build_policy_sha256: string; accepted_snapshot_id: string; accepted_snapshot_sha256: string;
-  launch_ticket: string;
+  launch_ticket: string; writer_signing_key_id: string; writer_signing_key_version: string; writer_signing_public_key_pem: string;
 }
 export type CatfoodActionPurpose = "POSITIVE_EXECUTION" | "SAFETY_RECONCILIATION" | "HISTORICAL_EVIDENCE" | "INDEPENDENT_EVALUATION" | "ATTESTATION";
 export interface CatfoodActionAuthorization { readonly kind: "CATFOOD_ACTION_AUTHORIZATION" }
@@ -35,6 +35,7 @@ export interface EnrolledTrustProvenance { readonly kind: "ENROLLED_TRUST_PROVEN
 const PROTOCOL = "ikorabu.catfood-enrollment.v3";
 const PURPOSE = "IKORABU/WP3/CATFOOD/ROLE-ENROLLMENT/V3";
 const STATUS_PURPOSE = "IKORABU/WP3/CATFOOD/SESSION-STATUS/V3";
+export const CATFOOD_ACTION_RECEIPT_PURPOSE = "IKORABU/WP3/CATFOOD/ACTION-RECEIPT/V1";
 const MAX_BYTES = 256_000;
 const SHA256 = /^[0-9a-f]{64}$/;
 const TOKEN = /^[A-Za-z0-9][A-Za-z0-9._:@\/-]{0,299}$/;
@@ -66,6 +67,7 @@ function roles(): CatfoodEnrollmentRole[] { return ["source", "custodian", "eval
 function exact(row: Record<string, unknown>, fields: readonly string[]): void { const got = Object.keys(row).sort(), want = [...fields].sort(); if (got.length !== want.length || got.some((key, index) => key !== want[index])) throw new CatfoodTrustError("ENROLLMENT_SCHEMA_INVALID"); }
 function normalizedFile(path: string): string { return readFileSync(path, "utf8").replace(/\r\n/g, "\n"); }
 function authorityAnchor(publicKeyPem: string): string { try { return hash(createPublicKey(publicKeyPem).export({ type: "spki", format: "der" }) as Buffer); } catch { throw new CatfoodTrustError("ENROLLMENT_BINDING_INVALID"); } }
+export function catfoodPublicKeyFingerprint(publicKeyPem: string): string { try { const key = createPublicKey(publicKeyPem); if (key.asymmetricKeyType !== "ed25519") throw new Error(); return hash(key.export({ type: "spki", format: "der" }) as Buffer); } catch { throw new CatfoodTrustError("ATTESTATION_KEY_INVALID"); } }
 
 function resolvedIdentity(path: string): Readonly<Record<string, unknown>> {
   const absolute = resolve(path); if (!existsSync(absolute)) return Object.freeze({ path: absolute, present: false, sha256: null });
@@ -190,8 +192,9 @@ function post(binding: TestEnrollmentBinding, path: string, purpose: string, req
 }
 
 function validateBinding(binding: TestEnrollmentBinding): void {
-  exact(binding as unknown as Record<string, unknown>, ["accepted_snapshot_id", "accepted_snapshot_sha256", "audience", "build_policy_sha256", "credential", "deployment_id", "enrollment_namespace", "environment_identity", "issuer", "issuer_key_id", "launch_ticket", "origin", "public_key_pem", "trust_domain"]);
-  if (![binding.issuer, binding.issuer_key_id, binding.audience, binding.origin, binding.credential, binding.environment_identity, binding.deployment_id, binding.enrollment_namespace, binding.accepted_snapshot_id, binding.launch_ticket].every((value) => typeof value === "string" && value.length > 0) || binding.credential.length < 32 || !SHA256.test(binding.build_policy_sha256) || !SHA256.test(binding.accepted_snapshot_sha256)) throw new CatfoodTrustError("ENROLLMENT_BINDING_INVALID");
+  exact(binding as unknown as Record<string, unknown>, ["accepted_snapshot_id", "accepted_snapshot_sha256", "audience", "build_policy_sha256", "credential", "deployment_id", "enrollment_namespace", "environment_identity", "issuer", "issuer_key_id", "launch_ticket", "origin", "public_key_pem", "trust_domain", "writer_signing_key_id", "writer_signing_key_version", "writer_signing_public_key_pem"]);
+  if (![binding.issuer, binding.issuer_key_id, binding.audience, binding.origin, binding.credential, binding.environment_identity, binding.deployment_id, binding.enrollment_namespace, binding.accepted_snapshot_id, binding.launch_ticket, binding.writer_signing_key_id, binding.writer_signing_key_version].every((value) => typeof value === "string" && value.length > 0) || binding.credential.length < 32 || !SHA256.test(binding.build_policy_sha256) || !SHA256.test(binding.accepted_snapshot_sha256)) throw new CatfoodTrustError("ENROLLMENT_BINDING_INVALID");
+  catfoodPublicKeyFingerprint(binding.writer_signing_public_key_pem);
 }
 
 function enroll(bindingInput: TestEnrollmentBinding, role: CatfoodEnrollmentRole, scope: string, transport: ThreadsHttpTransport, now: Date): CatfoodEnrollmentContext {
@@ -223,10 +226,42 @@ export function inspectEnrolledRole(value: unknown, role: CatfoodEnrollmentRole,
   const challenge = randomBytes(32).toString("base64url"), requestId = `status:${randomBytes(16).toString("hex")}`; const subject = collectCurrentRuntimeSubject(hidden.binding);
   if (!["POSITIVE_EXECUTION", "SAFETY_RECONCILIATION", "HISTORICAL_EVIDENCE", "INDEPENDENT_EVALUATION", "ATTESTATION"].includes(purposeClass)) throw new CatfoodTrustError("ENROLLMENT_STATUS_INVALID");
   const request = { protocol: PROTOCOL, purpose: STATUS_PURPOSE, purpose_class: purposeClass, audience: hidden.binding.audience, challenge, request_id: requestId, session_id: record.session_id, role, scope: record.scope, action, target, subject, accepted_snapshot_sha256: record.accepted_snapshot_sha256 };
-  const payload = post(hidden.binding, "/v3/catfood/enrollment/status", STATUS_PURPOSE, request, hidden.transport).payload;
+  const authenticated = post(hidden.binding, "/v3/catfood/enrollment/status", STATUS_PURPOSE, request, hidden.transport), payload = authenticated.payload;
   exact(payload, ["accepted_snapshot_sha256", "action", "audience", "authority_anchor", "challenge", "expires_at", "issuer", "purpose_class", "request_id", "revoked", "role", "scope", "session_id", "status_sequence", "subject", "target"]);
   const receiptId = hash(canonicalJson(payload)); const valid = payload.issuer === hidden.binding.issuer && payload.authority_anchor === record.authority_anchor && payload.audience === hidden.binding.audience && payload.challenge === challenge && payload.request_id === requestId && payload.session_id === record.session_id && payload.role === role && payload.scope === record.scope && payload.purpose_class === purposeClass && payload.action === action && payload.target === target && payload.accepted_snapshot_sha256 === record.accepted_snapshot_sha256 && canonicalJson(payload.subject) === canonicalJson(subject) && payload.revoked === false && Number.isSafeInteger(payload.status_sequence) && Date.parse(String(payload.expires_at)) > Date.now() && !hidden.used.has(receiptId);
-  if (!valid) throw new CatfoodTrustError("ENROLLMENT_STATUS_INVALID"); hidden.used.add(receiptId); return Object.freeze({ ...payload, receipt_sha256: receiptId });
+  if (!valid) throw new CatfoodTrustError("ENROLLMENT_STATUS_INVALID"); hidden.used.add(receiptId); return Object.freeze({ ...payload, receipt_sha256: receiptId, authenticated_status: Object.freeze({ purpose: STATUS_PURPOSE, envelope_json: authenticated.envelope_json }) });
+}
+
+const ACTION_RECEIPT_FIELDS = Object.freeze(["accepted_snapshot_sha256", "action", "action_id", "action_payload", "audience", "authority_anchor", "challenge", "issuer", "observed_at", "purpose_class", "request_id", "revoked", "role", "scope", "session_id", "status_sequence", "subject", "target", "valid_until"]);
+const ACTION_RECEIPT_WRAPPER_FIELDS = Object.freeze(["envelope_json", "purpose", "receipt_sha256", "schema"]);
+
+/** Uses the existing role-authenticated status channel to obtain a transferable, purpose-separated action receipt. */
+export function issueEnrolledActionReceipt(value: CatfoodEnrollmentContext, role: CatfoodEnrollmentRole, action: string, actionPayload: Readonly<Record<string, unknown>>, purposeClass: CatfoodActionPurpose, proof?: Readonly<Record<string, unknown>>, allowExactReplay = false): Readonly<Record<string, unknown>> {
+  if (!TOKEN.test(action)) throw new CatfoodTrustError("ENROLLMENT_ACTION_INVALID"); const record = assertEnrolledRole(value, role); const hidden = contexts.get(value as object)!;
+  const payloadText = canonicalJson(actionPayload as never); if (Buffer.byteLength(payloadText) > MAX_BYTES / 2) throw new CatfoodTrustError("ENROLLMENT_ACTION_INVALID");
+  const target = hash(payloadText), challenge = randomBytes(32).toString("base64url"), requestId = `action:${randomBytes(16).toString("hex")}`, subject = collectCurrentRuntimeSubject(hidden.binding);
+  const request = { protocol: PROTOCOL, purpose: CATFOOD_ACTION_RECEIPT_PURPOSE, purpose_class: purposeClass, audience: hidden.binding.audience, challenge, request_id: requestId, session_id: record.session_id, role, scope: record.scope, action, target, action_payload: actionPayload, ...(proof ? { proof } : {}), subject, accepted_snapshot_sha256: record.accepted_snapshot_sha256 };
+  const authenticated = post(hidden.binding, "/v3/catfood/enrollment/status", CATFOOD_ACTION_RECEIPT_PURPOSE, request, hidden.transport), payload = authenticated.payload; exact(payload, ACTION_RECEIPT_FIELDS);
+  const observed = Date.parse(String(payload.observed_at)), validUntil = Date.parse(String(payload.valid_until)), enrollmentExpiry = Date.parse(String(record.expires_at)); const receiptId = hash(authenticated.envelope_json);
+  const requestBound = payload.challenge === challenge && payload.request_id === requestId; const replayBound = allowExactReplay && payload.action === action && payload.target === target && canonicalJson(payload.action_payload as never) === payloadText;
+  const valid = payload.issuer === hidden.binding.issuer && payload.authority_anchor === record.authority_anchor && payload.audience === hidden.binding.audience && payload.session_id === record.session_id && payload.role === role && payload.scope === record.scope && payload.purpose_class === purposeClass && payload.action === action && payload.target === target && canonicalJson(payload.action_payload as never) === payloadText && canonicalJson(payload.subject as never) === canonicalJson(subject) && payload.accepted_snapshot_sha256 === record.accepted_snapshot_sha256 && payload.revoked === false && Number.isSafeInteger(payload.status_sequence) && typeof payload.action_id === "string" && TOKEN.test(payload.action_id) && Number.isFinite(observed) && Number.isFinite(validUntil) && observed <= validUntil && validUntil <= enrollmentExpiry && (requestBound || replayBound);
+  if (!valid) throw new CatfoodTrustError("ENROLLMENT_ACTION_INVALID"); if (!hidden.used.has(receiptId)) hidden.used.add(receiptId);
+  return Object.freeze({ schema: "catfood-action-receipt.v1", purpose: CATFOOD_ACTION_RECEIPT_PURPOSE, envelope_json: authenticated.envelope_json, receipt_sha256: receiptId });
+}
+
+export function verifyEnrolledActionReceipt(value: unknown, policyEnrollment: CatfoodEnrollmentContext, expected: { role: CatfoodEnrollmentRole; action: string; purpose_class: CatfoodActionPurpose; scope: string; action_payload: Readonly<Record<string, unknown>>; role_evidence: Readonly<Record<string, unknown>> }): Readonly<Record<string, unknown>> {
+  if (!value || typeof value !== "object" || Array.isArray(value)) throw new CatfoodTrustError("ATTESTATION_ACTION_RECEIPT_INVALID"); const receipt = value as Record<string, unknown>; exact(receipt, ACTION_RECEIPT_WRAPPER_FIELDS);
+  if (receipt.schema !== "catfood-action-receipt.v1" || receipt.purpose !== CATFOOD_ACTION_RECEIPT_PURPOSE || typeof receipt.envelope_json !== "string" || receipt.receipt_sha256 !== hash(receipt.envelope_json)) throw new CatfoodTrustError("ATTESTATION_ACTION_RECEIPT_INVALID");
+  const policy = assertEnrolledRole(policyEnrollment, policyEnrollment.role), hidden = contexts.get(policyEnrollment as object)!; const payload = decodeSignedEnvelope(receipt.envelope_json, hidden.binding, CATFOOD_ACTION_RECEIPT_PURPOSE).payload; exact(payload, ACTION_RECEIPT_FIELDS);
+  const role = expected.role_evidence, target = hash(canonicalJson(expected.action_payload as never)), observed = Date.parse(String(payload.observed_at)), validUntil = Date.parse(String(payload.valid_until)), roleIssued = Date.parse(String(role.issued_at)), roleExpires = Date.parse(String(role.expires_at));
+  const valid = payload.issuer === hidden.binding.issuer && payload.authority_anchor === policy.authority_anchor && payload.audience === hidden.binding.audience && payload.accepted_snapshot_sha256 === policy.accepted_snapshot_sha256 && payload.role === expected.role && payload.scope === expected.scope && payload.purpose_class === expected.purpose_class && payload.action === expected.action && payload.target === target && canonicalJson(payload.action_payload as never) === canonicalJson(expected.action_payload as never) && payload.session_id === role.session_id && canonicalJson(payload.subject as never) === canonicalJson(role.subject as never) && payload.revoked === false && Number.isSafeInteger(payload.status_sequence) && typeof payload.action_id === "string" && TOKEN.test(payload.action_id) && Number.isFinite(observed) && Number.isFinite(validUntil) && roleIssued <= observed && observed <= validUntil && validUntil <= roleExpires;
+  if (!valid) throw new CatfoodTrustError("ATTESTATION_ACTION_RECEIPT_INVALID"); return Object.freeze({ ...payload, receipt_sha256: receipt.receipt_sha256 });
+}
+
+export function resolveProtectedWriterCredential(policyEnrollment: CatfoodEnrollmentContext, evidence?: Readonly<Record<string, unknown>>): Readonly<Record<string, unknown>> {
+  assertEnrolledRole(policyEnrollment, policyEnrollment.role); const binding = contexts.get(policyEnrollment as object)?.binding; if (!binding) throw new CatfoodTrustError("ATTESTATION_WRITER_CREDENTIAL_INVALID");
+  const credential = Object.freeze({ key_id: binding.writer_signing_key_id, key_version: binding.writer_signing_key_version, public_key_sha256: catfoodPublicKeyFingerprint(binding.writer_signing_public_key_pem), public_key_pem: binding.writer_signing_public_key_pem });
+  if (evidence && (evidence.key_id !== credential.key_id || evidence.key_version !== credential.key_version || evidence.public_key_sha256 !== credential.public_key_sha256)) throw new CatfoodTrustError("ATTESTATION_WRITER_CREDENTIAL_INVALID"); return credential;
 }
 
 export function authorizeEnrolledAction(value: CatfoodEnrollmentContext, role: CatfoodEnrollmentRole, purpose: CatfoodActionPurpose, action: string, target: string): CatfoodActionAuthorization {

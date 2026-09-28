@@ -21,6 +21,13 @@
     "binds": ["issuer/anchor", "subject", "role/scope/session", "purpose class", "exact action", "exact target", "accepted snapshot", "sequence", "expiry", "revocation", "fresh challenge/audience"],
     "fallback": "none"
   },
+  "action_receipt": {
+    "path": "/v3/catfood/enrollment/status",
+    "purpose": "IKORABU/WP3/CATFOOD/ACTION-RECEIPT/V1",
+    "binds": ["authority action ID", "original signed envelope", "authenticated role subject/session/scope", "purpose class", "exact canonical action payload and digest", "authority observed_at and finite valid_until"],
+    "attestation_actions": ["evaluator.result.commit", "writer.credential.authorize", "writer.issuance.prepare", "writer.issuance.finalize"],
+    "artifact_supplied_roots": false
+  },
   "external_provisioning": ["protected binding and launch ticket", "authenticated HTTPS issuer and Ed25519 anchor", "accepted immutable descriptors", "trusted launcher observation and process identity", "loader/OS immutability enforcement", "role session confinement"],
   "test_only": "isolated parent observation may exercise the protocol but permanently taints all descendants TEST_ONLY"
 }

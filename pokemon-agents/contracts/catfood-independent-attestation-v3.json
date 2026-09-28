@@ -1,0 +1,32 @@
+{
+  "contract": "ikorabu.catfood-independent-attestation.v3",
+  "domain": "IKORABU/WP3/CATFOOD/ATTESTATION/V3",
+  "artifact": "P + Ed25519 writer signature + authenticated E + authenticated writer credential authorization + prepared issuance + finalized I",
+  "legacy_v2": "diagnostic only; unsupported by the corrected accepting gate",
+  "decision_core_C": [
+    "run and exact environment/organization/tenant/account scope",
+    "spec and requested window",
+    "GO, dependency, release, boundary, checkpoint and sealed source identities",
+    "verdict, canonical unique sorted reason codes, coverage and permanent test_only state",
+    "all EvaluationResult fields and exact evaluator subject/session/launch/build/snapshot"
+  ],
+  "evaluation_receipt_E": {
+    "purpose": "IKORABU/WP3/CATFOOD/EVALUATION-RESULT/V1",
+    "authentication": "authority-signed action receipt through the enrolled evaluator role channel",
+    "binds": ["assessment_id", "H(C)", "exact C", "evaluator instance", "role evidence digest", "run", "bundle", "source", "policy"]
+  },
+  "writer_credential": {
+    "purpose": "IKORABU/WP3/CATFOOD/WRITER-CREDENTIAL/V1",
+    "resolution": "verifier-protected enrollment binding only",
+    "binds": ["key id", "SPKI DER SHA-256 fingerprint", "key version", "writer subject/session/launch/build/snapshot", "role evidence digest"]
+  },
+  "payload_P": ["C", "E digest", "writer credential authorization digest", "issuance preparation digest", "issuance_id", "authority attested_at", "exact role evidence and evaluator/writer associations"],
+  "issuance_I": {
+    "prepare_purpose": "IKORABU/WP3/CATFOOD/ATTESTATION-ISSUANCE-PREPARE/V1",
+    "finalize_purpose": "IKORABU/WP3/CATFOOD/ATTESTATION-ISSUANCE-FINALIZE/V1",
+    "binds": ["issuance_id", "assessment_id", "H(P)", "H(actual signature bytes)", "E", "writer credential authorization", "role evidence", "authority preparation/finalization times"]
+  },
+  "required_roles": ["source", "custodian", "evaluator", "writer"],
+  "receiving_role": "verifier",
+  "test_only": "any TEST_ONLY ancestry permanently produces a TEST_ONLY artifact"
+}
