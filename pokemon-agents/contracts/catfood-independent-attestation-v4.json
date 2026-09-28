@@ -1,0 +1,12 @@
+{
+  "contract": "ikorabu.catfood-independent-attestation.v4",
+  "domain": "IKORABU/WP3/CATFOOD/ATTESTATION/V4",
+  "artifact": "unchanged decision core C + V2 evaluator action receipt E + writer credential authorization + prepared/finalized issuance + Ed25519 outer writer signature",
+  "required_roles": ["source", "custodian", "evaluator", "writer"],
+  "receiving_role": "verifier",
+  "separation": ["evaluator and writer have different subjects and launches", "writer receives an authenticated assessment package and no evaluator session/key/callback", "verifier has its own session"],
+  "decision_core": "catfood-decision-core.v1 retains V1 result purpose and prior C meanings",
+  "actor_proof": "V4 public role evidence and V2 action receipts only",
+  "legacy_v3": "preserved as diagnostic historical evidence; no backfill or downgrade acceptance",
+  "test_only": "any TEST_ONLY ancestry yields only TEST_ONLY V4 provenance and artifacts"
+}

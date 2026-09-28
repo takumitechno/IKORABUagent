@@ -1,0 +1,20 @@
+{
+  "contract": "ikorabu.catfood-enrollment.v4",
+  "purpose": "IKORABU/WP3/CATFOOD/ROLE-ENROLLMENT/V4",
+  "roles": ["source", "custodian", "evaluator", "writer", "verifier"],
+  "paths": ["POST /v4/catfood/enrollment/challenge", "POST /v4/catfood/enrollment"],
+  "launcher_key_assignment": {
+    "purpose": "IKORABU/WP3/CATFOOD/LAUNCH-KEY-ASSIGNMENT/V1",
+    "one_shot": true,
+    "binds": ["issuer/audience/domain", "actual subject/start/boot", "launch ID", "exactly one role", "single-run scope", "accepted snapshot and role descriptor", "Ed25519 SPKI/fingerprint", "finite validity"]
+  },
+  "registration": {
+    "proof_domain": "IKORABU/WP3/CATFOOD/ROLE-REGISTRATION/V1",
+    "authority_derives": ["role", "subject", "scope", "launch", "snapshot", "registered public key"],
+    "private_key_export": false,
+    "replay": "exact completed replay returns the original unpredictable session; changed or consumed requests reject"
+  },
+  "policy": ["finite session lifetime", "finite registration and action challenges", "bounded outstanding requests", "receipt retention"],
+  "legacy_v3": "diagnostic historical evidence only; cannot mint V2 receipts or satisfy V4 possession proof",
+  "test_only": "fixture assignment and sessions permanently retain TEST_ONLY trust provenance"
+}

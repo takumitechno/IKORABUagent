@@ -1438,14 +1438,14 @@ export class IndependentCatfoodEvaluator {
   private readonly checkpoints: Database;
   private readonly trust: Readonly<CatfoodTrustConfig>;
 
-  constructor(controlPath: string, checkpointPath: string, private readonly source: ReadonlyThreadsEvidenceSource, private readonly enrollment?: CatfoodEnrollmentContext, private readonly provenance?: EnrolledTrustProvenance) {
+  constructor(controlPath: string, checkpointPath: string, private readonly source?: ReadonlyThreadsEvidenceSource, private readonly enrollment?: CatfoodEnrollmentContext, private readonly provenance?: EnrolledTrustProvenance) {
     this.control = new Database(resolve(controlPath), { strict: true, create: false, readonly: true });
     this.checkpoints = new Database(resolve(checkpointPath), { strict: true, create: false, readonly: true });
     try {
       configure(this.control, true); configure(this.checkpoints, true); assertConnection(this.control); checkpointHealth(this.checkpoints);
       this.trust = loadTrust(this.control);
       if (this.trust.source_mode === "OPERATIONAL") { try { assertEnrolledRole(enrollment, "evaluator", "OPERATIONAL"); } catch { throw new CatfoodTrustError("OPERATIONAL_VERIFIER_ENROLLMENT_UNAVAILABLE"); } } else if (enrollment) assertEnrolledRole(enrollment, "evaluator", "TEST_ONLY");
-      if (source.mode !== this.trust.source_mode || source.source_identity !== `${this.trust.threads_sha}:${this.trust.threads_release_sha256}`) throw new CatfoodTrustError("THREADS_SOURCE_IDENTITY_MISMATCH");
+      if (source && (source.mode !== this.trust.source_mode || source.source_identity !== `${this.trust.threads_sha}:${this.trust.threads_release_sha256}`)) throw new CatfoodTrustError("THREADS_SOURCE_IDENTITY_MISMATCH");
     } catch (error) { this.control.close(); this.checkpoints.close(); throw error; }
   }
 

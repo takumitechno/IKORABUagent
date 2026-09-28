@@ -13,7 +13,8 @@ import {
   normalizeWorkDispatchEvidence, type HumanGoPayload, type RunnerSession,
 } from "../web/lib/catfood-trust";
 import { FixtureThreadsSource, TestClock, producerEditorialResult, testEnrollmentFixture } from "./catfood-trust-fixture";
-import { IndependentCatfoodAttestationWriter, initializeIndependentAttestationStore, verifyIndependentAttestation } from "../web/lib/catfood-independent-attestation";
+// V3 is retained only as diagnostic historical coverage. V4 acceptance is exercised in catfood-role-channel.test.ts.
+import { IndependentCatfoodAttestationWriter, initializeIndependentAttestationStore, verifyIndependentAttestation } from "../web/lib/catfood-independent-attestation-v3";
 import { CATFOOD_THREADS_PINS } from "../web/lib/catfood-coe";
 import { openOperationalCatfoodCustodian, verifyOperationalIndependentAttestation } from "../web/lib/catfood-operational-bootstrap";
 import { OperationalThreadsEvidenceSource } from "../web/lib/catfood-threads-http";

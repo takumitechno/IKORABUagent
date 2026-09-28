@@ -1,0 +1,8 @@
+{
+  "contract": "catfood-action-receipt.v2",
+  "purpose": "IKORABU/WP3/CATFOOD/ACTION-RECEIPT/V2",
+  "authentication": "authority Ed25519 envelope plus original role-signed canonical request",
+  "binds": ["authority issuer/audience/anchor/domain", "registered V4 enrollment", "actor session/key/role/subject/launch/scope/snapshot", "purpose/action/action ID", "request and nonce IDs", "exact body bytes/digest", "observed time and challenge validity", "policy and status version"],
+  "historical_verification": "signature and original actor association remain verifiable after natural session expiry",
+  "legacy_v1": "never accepted as V2 actor proof"
+}

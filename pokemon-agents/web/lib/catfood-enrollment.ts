@@ -41,19 +41,19 @@ const SHA256 = /^[0-9a-f]{64}$/;
 const TOKEN = /^[A-Za-z0-9][A-Za-z0-9._:@\/-]{0,299}$/;
 const PACKAGE_ROOT = resolve(import.meta.dir, "../..");
 const ROLE_FILES: Readonly<Record<CatfoodEnrollmentRole, readonly string[]>> = Object.freeze({
-  source: Object.freeze(["web/lib/catfood-coe.ts", "web/lib/catfood-enrollment.ts", "web/lib/catfood-harness.ts", "web/lib/catfood-threads-http.ts"]),
-  custodian: Object.freeze(["web/lib/catfood-coe.ts", "web/lib/catfood-enrollment.ts", "web/lib/catfood-harness.ts", "web/lib/catfood-threads-http.ts", "web/lib/catfood-trust.ts"]),
-  evaluator: Object.freeze(["web/lib/catfood-coe.ts", "web/lib/catfood-enrollment.ts", "web/lib/catfood-harness.ts", "web/lib/catfood-trust.ts"]),
-  writer: Object.freeze(["web/lib/catfood-coe.ts", "web/lib/catfood-enrollment.ts", "web/lib/catfood-harness.ts", "web/lib/catfood-independent-attestation.ts", "web/lib/catfood-trust.ts"]),
-  verifier: Object.freeze(["scripts/check-catfood-consumer-integrity.ts", "web/lib/catfood-coe.ts", "web/lib/catfood-enrollment.ts", "web/lib/catfood-harness.ts", "web/lib/catfood-independent-attestation.ts", "web/lib/catfood-operational-bootstrap.ts", "web/lib/catfood-trust.ts"]),
+  source: Object.freeze(["scripts/catfood-custodian-role.ts", "scripts/check-catfood-consumer-integrity.ts", "web/lib/catfood-coe.ts", "web/lib/catfood-enrollment.ts", "web/lib/catfood-harness.ts", "web/lib/catfood-operational-bootstrap.ts", "web/lib/catfood-role-channel.ts", "web/lib/catfood-threads-http.ts", "web/lib/catfood-trust.ts"]),
+  custodian: Object.freeze(["scripts/catfood-custodian-role.ts", "scripts/check-catfood-consumer-integrity.ts", "web/lib/catfood-coe.ts", "web/lib/catfood-enrollment.ts", "web/lib/catfood-harness.ts", "web/lib/catfood-operational-bootstrap.ts", "web/lib/catfood-role-channel.ts", "web/lib/catfood-threads-http.ts", "web/lib/catfood-trust.ts"]),
+  evaluator: Object.freeze(["scripts/catfood-evaluate-role.ts", "web/lib/catfood-attestation-contract.ts", "web/lib/catfood-coe.ts", "web/lib/catfood-enrollment.ts", "web/lib/catfood-harness.ts", "web/lib/catfood-independent-attestation.ts", "web/lib/catfood-role-channel.ts", "web/lib/catfood-threads-http.ts", "web/lib/catfood-trust.ts"]),
+  writer: Object.freeze(["scripts/catfood-issue-role.ts", "web/lib/catfood-attestation-contract.ts", "web/lib/catfood-coe.ts", "web/lib/catfood-enrollment.ts", "web/lib/catfood-harness.ts", "web/lib/catfood-independent-attestation.ts", "web/lib/catfood-role-channel.ts", "web/lib/catfood-threads-http.ts", "web/lib/catfood-trust.ts"]),
+  verifier: Object.freeze(["scripts/catfood-verify-role.ts", "scripts/check-catfood-consumer-integrity.ts", "web/lib/catfood-attestation-contract.ts", "web/lib/catfood-coe.ts", "web/lib/catfood-enrollment.ts", "web/lib/catfood-harness.ts", "web/lib/catfood-independent-attestation.ts", "web/lib/catfood-operational-bootstrap.ts", "web/lib/catfood-role-channel.ts", "web/lib/catfood-threads-http.ts", "web/lib/catfood-trust.ts"]),
 });
-const ROLE_ENTRYPOINT: Readonly<Record<CatfoodEnrollmentRole, string>> = Object.freeze({ source: "web/lib/catfood-threads-http.ts", custodian: "web/lib/catfood-trust.ts", evaluator: "web/lib/catfood-trust.ts", writer: "web/lib/catfood-independent-attestation.ts", verifier: "web/lib/catfood-operational-bootstrap.ts" });
+const ROLE_ENTRYPOINT: Readonly<Record<CatfoodEnrollmentRole, string>> = Object.freeze({ source: "scripts/catfood-custodian-role.ts", custodian: "scripts/catfood-custodian-role.ts", evaluator: "scripts/catfood-evaluate-role.ts", writer: "scripts/catfood-issue-role.ts", verifier: "scripts/catfood-verify-role.ts" });
 const ROLE_EXPORTS: Readonly<Record<CatfoodEnrollmentRole, readonly string[]>> = Object.freeze({
   source: Object.freeze(["OperationalThreadsEvidenceSource"]),
   custodian: Object.freeze(["ProtectedCatfoodCustodian", "openOperationalCatfoodCustodian"]),
-  evaluator: Object.freeze(["IndependentCatfoodEvaluator", "evaluateCatfoodAcceptance"]),
-  writer: Object.freeze(["IndependentCatfoodAttestationWriter"]),
-  verifier: Object.freeze(["verifyOperationalIndependentAttestation"]),
+  evaluator: Object.freeze(["IndependentCatfoodEvaluator", "evaluateAssignedCatfoodJob"]),
+  writer: Object.freeze(["IndependentCatfoodAttestationWriter", "issueAuthenticatedCatfoodAssessment"]),
+  verifier: Object.freeze(["verifyAssignedCatfoodArtifact"]),
 });
 type HiddenContext = { record: Readonly<Record<string, unknown>>; binding: Readonly<TestEnrollmentBinding>; transport: ThreadsHttpTransport; subject: Readonly<RuntimeSubject>; used: Set<string> };
 const contexts = new WeakMap<object, HiddenContext>();
@@ -109,6 +109,27 @@ export function roleArtifactDescriptor(role: CatfoodEnrollmentRole): Readonly<Re
 }
 
 export function acceptedSnapshotDigest(): string { return hash(canonicalJson(roles().map(roleArtifactDescriptor))); }
+
+/** Immutable build descriptor used by the V4 launcher before any role process starts. */
+export function roleChannelArtifactDescriptor(role: CatfoodEnrollmentRole): Readonly<Record<string, unknown>> {
+  const artifacts = ROLE_FILES[role].map((path) => Object.freeze({ path, sha256: hash(normalizedFile(resolve(PACKAGE_ROOT, path))) }));
+  const role_exports = ROLE_EXPORTS[role];
+  return Object.freeze({
+    schema: "catfood-role-descriptor.v1", role, entrypoint: ROLE_ENTRYPOINT[role], role_exports,
+    artifacts: Object.freeze(artifacts), loader: Object.freeze({ engine: "bun", module_format: "typescript-esm" }),
+    artifact_root: hash(canonicalJson({ role, entrypoint: ROLE_ENTRYPOINT[role], role_exports, artifacts, loader: { engine: "bun", module_format: "typescript-esm" } })),
+  });
+}
+
+export function roleChannelAcceptedSnapshotDigest(): string { return hash(canonicalJson(roles().map(roleChannelArtifactDescriptor))); }
+
+/** TEST_ONLY child evidence; the trusted parent must still bind this to the child it actually spawned. */
+export function observeTestOnlyRoleLaunch(binding: TestEnrollmentBinding, role: CatfoodEnrollmentRole, subject = collectCurrentRuntimeSubject(binding)): Readonly<Record<string, unknown>> {
+  if (binding.trust_domain !== "TEST_ONLY") throw new CatfoodTrustError("ENROLLMENT_BINDING_INVALID");
+  const descriptor = roleChannelArtifactDescriptor(role), profile = currentLaunchProfile();
+  const core = { schema: "ikorabu.catfood-role-launch-record.v1", issuer: binding.issuer, launch_ticket: binding.launch_ticket, role, accepted_snapshot_id: binding.accepted_snapshot_id, accepted_snapshot_sha256: binding.accepted_snapshot_sha256, subject_sha256: hash(canonicalJson(subject)), artifact_root: descriptor.artifact_root, profile_sha256: profile.profile_sha256, actual_main: profile.actual_main, bun_executable: profile.bun_executable, bun_version: profile.bun_version, argv_sha256: profile.argv_sha256, exec_argv_sha256: profile.exec_argv_sha256, loading_args: profile.loading_args, loading_inputs: profile.loading_inputs, loading_environment: profile.loading_environment, cwd: profile.cwd, configuration: profile.configuration, resolution_policy: profile.resolution_policy, immutability_policy: "TEST_ONLY_PARENT_OBSERVED", observed_before_role_admission: true };
+  return Object.freeze({ launch_id: `launch:${hash(canonicalJson(core)).slice(0, 32)}`, ...core });
+}
 
 /** TEST_ONLY helper for an external parent fixture. Enrollment never calls it. */
 export function observeTestOnlyLaunch(binding: TestEnrollmentBinding, role: CatfoodEnrollmentRole, subject = collectCurrentRuntimeSubject(binding)): Readonly<Record<string, unknown>> {

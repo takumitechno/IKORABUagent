@@ -3,7 +3,6 @@ import { hostname, uptime } from "node:os";
 import { join, resolve } from "node:path";
 import { parseJsonNoDuplicateKeys } from "./catfood-coe";
 import { sha256 } from "./catfood-harness";
-import { verifyIndependentAttestationArtifact } from "./catfood-independent-attestation";
 import { CATFOOD_OPERATIONAL_ROOT, CatfoodTrustError, ProtectedCatfoodCustodian, type EvaluationResult, type OperationalProvenance, type TrustedClock, type TrustedClockSample } from "./catfood-trust";
 import { OperationalThreadsEvidenceSource, type ThreadsSourceContext } from "./catfood-threads-http";
 import { verifyConsumerIntegrity, type ConsumerIntegrityManifest } from "../../scripts/check-catfood-consumer-integrity";
@@ -87,13 +86,7 @@ export function openOperationalCatfoodCustodian(): ProtectedCatfoodCustodian {
 export function verifyOperationalIndependentAttestation(artifactJson: string, expected: { run_id: string; bundle_sha256: string }): EvaluationResult["verdict"];
 export function verifyOperationalIndependentAttestation(payloadJson: string, signatureBase64url: string, expected: { run_id: string; bundle_sha256: string }): EvaluationResult["verdict"];
 export function verifyOperationalIndependentAttestation(artifactJson: string, expectedOrSignature: { run_id: string; bundle_sha256: string } | string, legacyExpected?: { run_id: string; bundle_sha256: string }): EvaluationResult["verdict"] {
-  try {
-  if (typeof expectedOrSignature === "string") throw new CatfoodTrustError("ATTESTATION_VERSION_UNSUPPORTED"); const expected = expectedOrSignature;
-  const verifierEnrollment = loadOperationalRoleEnrollment("verifier", expected.run_id); assertEnrolledRole(verifierEnrollment, "verifier", "OPERATIONAL");
-  const bootstrap = parseJsonNoDuplicateKeys(protectedRead(join(CATFOOD_OPERATIONAL_ROOT, "bootstrap.json"), 1_000_000), 1_000_000, 32) as Record<string, unknown>;
-  const manifestRaw = readFileSync(resolve(import.meta.dir, "../../contracts/catfood-consumer-integrity-v1.json"), "utf8"); const acceptedManifest = protectedRead(join(CATFOOD_OPERATIONAL_ROOT, "accepted-consumer-manifest.sha256"), 128).trim();
-  if (sha256(manifestRaw) !== acceptedManifest) throw new CatfoodTrustError("OPERATIONAL_BUILD_NOT_ACCEPTED"); verifyConsumerIntegrity(JSON.parse(manifestRaw) as ConsumerIntegrityManifest);
-  const artifact = parseJsonNoDuplicateKeys(artifactJson, 2_000_000, 64) as Record<string, unknown>, payload = parseJsonNoDuplicateKeys(String(artifact.payload_json), 2_000_000, 64) as Record<string, unknown>; if (!new Set(bootstrap.attestation_root_ids as string[]).has(String(payload.signing_key_id))) throw new CatfoodTrustError("ATTESTATION_ROOTS_INVALID");
-  return verifyIndependentAttestationArtifact(artifactJson, { ...expected, verifier_enrollment: verifierEnrollment }, "OPERATIONAL");
-  } catch { throw new CatfoodTrustError("OPERATIONAL_VERIFIER_ENROLLMENT_UNAVAILABLE"); }
+  void artifactJson; void expectedOrSignature; void legacyExpected;
+  // V4 has no local operational enrollment loader: only the external launcher/authority may create a LocalRoleSession.
+  throw new CatfoodTrustError("OPERATIONAL_VERIFIER_ENROLLMENT_UNAVAILABLE");
 }

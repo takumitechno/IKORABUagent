@@ -1,0 +1,12 @@
+{
+  "contract": "catfood-role-action.v1",
+  "intent_domain": "IKORABU/WP3/CATFOOD/ROLE-ACTION-INTENT/V1",
+  "action_domain": "IKORABU/WP3/CATFOOD/ROLE-ACTION/V1",
+  "path": "POST /v4/catfood/actions",
+  "wire_fields": ["schema", "proof_base64url", "body_json", "signature_base64url"],
+  "proof_binds": ["issuer/audience/origin", "POST and exact path", "content type and byte length", "body SHA-256", "registered session/key", "authority-derived role/subject/launch/snapshot", "purpose/action", "single-run scope", "immutable request ID", "reserved action ID", "nonce and finite validity"],
+  "algorithm": "Ed25519 over UTF-8 domain + newline + canonical proof base64url",
+  "canonicalization": "canonical JSON, duplicate-key rejection, strict unpadded base64url round trip",
+  "key_selection": "authority store lookup only; no request-supplied key, URL or algorithm",
+  "replay": "one durable effect; exact valid-session replay returns the original receipt; altered intent/body/path/purpose/scope conflicts"
+}
