@@ -32,7 +32,7 @@
     { "path": "pokemon-agents/web/lib/catfood-independent-attestation-v3.ts", "sha256": "763623f68f8bc71a022c71a477551253af3aa3cef1a0e63b239aa88c7f7742ca" },
     { "path": "pokemon-agents/web/lib/catfood-independent-attestation.ts", "sha256": "2ffdb84d0d594e55d825ea1d6ff43d3440e51dce7701f40f5148b88d31e4c204" },
     { "path": "pokemon-agents/web/lib/catfood-operational-bootstrap.ts", "sha256": "a42c3c55ea48adf771a856b13e7ff3895ba651085d844e343845fd6177e362a7" },
-    { "path": "pokemon-agents/web/lib/catfood-role-channel.ts", "sha256": "dab42f3e8175654999893003f49557e4a6b8d0a0c40777777609352c69626e97" },
+    { "path": "pokemon-agents/web/lib/catfood-role-channel.ts", "sha256": "85556d4284fe9d5593c92de37fa9a82384b3948e0626cac12a23db12ec0a3649" },
     { "path": "pokemon-agents/web/lib/catfood-threads-http.ts", "sha256": "4098be7634f79cfe1e1cff0bbeaef18a4a6ab7043ca2f14b597ec9ed971c5355" },
     { "path": "pokemon-agents/web/lib/catfood-trust.ts", "sha256": "ccf1c20092077c24043ed8a22c8401a60ee588063a7afc668767a3b969459531" }
   ]
