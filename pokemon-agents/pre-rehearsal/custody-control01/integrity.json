@@ -1,0 +1,25 @@
+{
+  "schema": "pre-custody-control-integrity.v1",
+  "test_only": true,
+  "frozen_wp3": {
+    "commit": "712b4e528986ebf891a45dac14f65c22d6530844",
+    "tree": "effacfd2803f45e7bc84ad65f0855831980552d2"
+  },
+  "frozen_threads_commit": "875e75fce20c16c6157b5aa42f759411c52e95fe",
+  "files": [
+    {
+      "path": "controller.ts",
+      "sha256": "a6e86d7f482deee7e4b61972e74098c7cfbddcbd64b72d83db53e9741f14271e"
+    },
+    {
+      "path": "controller.test.ts",
+      "sha256": "ef7bff91f6c27f34ab9b5ef16323f9c1b5a2cd353e006bb5d190fb2bf159d95b"
+    },
+    {
+      "path": "README.md",
+      "sha256": "a2bf82583ad9116e7d7dc8b40ccc2d4ff95ad7d2046439d75b23f0dde91ca8fe"
+    }
+  ],
+  "self_hash": null,
+  "self_hash_reason": "A file cannot contain its own stable cryptographic digest; Git tree identity covers this manifest."
+}
