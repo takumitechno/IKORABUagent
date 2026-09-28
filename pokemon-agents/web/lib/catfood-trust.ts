@@ -5,7 +5,7 @@ import { join, resolve } from "node:path";
 import { assertEnrolledRole, authorizeEnrolledAction, deriveEnrolledTrustDomain, inspectEnrolledRole, type CatfoodActionAuthorization, type CatfoodActionPurpose, type CatfoodEnrollmentContext, type EnrolledTrustProvenance } from "./catfood-enrollment";
 import { canonicalJson, sha256, validateOperationalBoundaryV1, type Json, type OperationalBoundaryV1 } from "./catfood-harness";
 import { CATFOOD_THREADS_DEPENDENCY_ROOT, acquireCoe, assessCoe, assertFrozenDependencies, canonicalCoeJson, classifyRunAttempts, decodeCoeAcquisition, stableCoeEvidence, validateOutcomeEvaluationRequest, verifyGovernedWork, type AttemptMembershipDecision, type CoeAcquisition, type CoeAssessment, type CoePageSource, type GovernedWorkDecision, type OutcomeEvaluationRequest } from "./catfood-coe";
-import { CATFOOD_FINAL_CLOSURE_CHARTER, CATFOOD_SEALED_INPUT_SCHEMA, exportStandaloneSqlite, inspectStandaloneSqlite, sealedInputManifestSha256, validateSealedInputManifest, type CatfoodSealedInputManifestV1 } from "./catfood-final-closure";
+import { CATFOOD_FINAL_CLOSURE_CHARTER, CATFOOD_GO_VERIFICATION_PROFILE_ID, CATFOOD_SEALED_INPUT_SCHEMA, assertGoRootPolicyUse, buildGoVerificationProfile, exportStandaloneSqlite, goPublicKeyFingerprint, goRootPolicyRef, inspectStandaloneSqlite, sealedInputManifestSha256, validateGoRootPolicy, validateSealedInputManifest, type CatfoodGoRootPolicyV1, type CatfoodSealedInputManifestV1, type GoRootPolicyRef } from "./catfood-final-closure";
 
 export const CATFOOD_TRUST_SCHEMA = "catfood-trust.v1";
 export const CATFOOD_GO_SCHEMA = "catfood-human-go.v1";
@@ -217,6 +217,8 @@ export interface VerifiedHumanGo {
   artifact_sha256: string;
   key_id: string;
   trust_class: "OPERATIONAL" | "TEST_ONLY";
+  signing_key_sha256: string;
+  go_root_policy_ref: Readonly<GoRootPolicyRef> | null;
 }
 
 export function createCatfoodRunSpec(input: Omit<CatfoodRunSpec, "schema" | "spec_sha256" | "acceptance_policy_sha256" | "night_state">): Readonly<CatfoodRunSpec> {
@@ -260,13 +262,15 @@ function strictJson(raw: string, label: string): Record<string, unknown> {
   return value;
 }
 
-export function verifyHumanGo(rawArtifact: string, spec: CatfoodRunSpec, trust: CatfoodTrustConfig, at: string): VerifiedHumanGo {
+export function verifyHumanGo(rawArtifact: string, spec: CatfoodRunSpec, trust: CatfoodTrustConfig, at: string, policyInput?: CatfoodGoRootPolicyV1, deploymentId?: string, use: "NEW_GO" | "HISTORICAL" = "NEW_GO"): VerifiedHumanGo {
   const envelope = strictJson(rawArtifact, "GO envelope");
   exact(envelope, ["algorithm", "key_id", "payload", "signature"], "GO envelope");
   if (envelope.algorithm !== "Ed25519") throw new CatfoodTrustError("ALGORITHM_SUBSTITUTION");
   const keyId = text(envelope.key_id, "key_id");
   const key = trust.go_keys.find((candidate) => candidate.key_id === keyId);
   if (!key) throw new CatfoodTrustError("UNKNOWN_GO_KEY");
+  if (trust.source_mode === "OPERATIONAL" && key.trust_class !== "OPERATIONAL") throw new CatfoodTrustError("TEST_KEY_NOT_OPERATIONAL");
+  let policyRef: Readonly<GoRootPolicyRef> | null = null; if (policyInput) { const policy = validateGoRootPolicy(policyInput), checked = assertGoRootPolicyUse({ policy, trust_domain: trust.source_mode, scope: { environment_type: spec.environment_type, environment_instance_id: spec.environment_instance_id, deployment_id: deploymentId ?? policy.scope.deployment_id, organization_id: spec.organization_id, tenant_id: spec.tenant_id, account_id: spec.account_id }, acceptance_policy_sha256: spec.acceptance_policy_sha256, at, use, actual_keys: trust.go_keys }); policyRef = checked.ref; const permitted = checked.profile.keys.find((candidate) => candidate.key_id === keyId); if (!permitted || permitted.public_key_sha256 !== goPublicKeyFingerprint(key.public_key_pem)) throw new CatfoodTrustError("GO_ROOT_KEY_NOT_PERMITTED"); } else if (trust.source_mode === "OPERATIONAL") throw new CatfoodTrustError("GO_ROOT_POLICY_UNAVAILABLE");
   const payloadBytes = b64url(envelope.payload, "payload");
   const signature = b64url(envelope.signature, "signature");
   if (!verify(null, payloadBytes, createPublicKey(key.public_key_pem), signature)) throw new CatfoodTrustError("GO_SIGNATURE_INVALID");
@@ -295,8 +299,7 @@ export function verifyHumanGo(rawArtifact: string, spec: CatfoodRunSpec, trust: 
     || spec.wp1_sha256 !== trust.wp1_sha256 || spec.coe_sha256 !== trust.coe_sha256
     || spec.rehearsal_attestation_sha256 !== trust.rehearsal_attestation_sha256 || spec.emitter_inventory_sha256 !== trust.emitter_inventory_sha256
     || spec.threads_schema !== trust.threads_schema || spec.threads_schema_fingerprint !== trust.threads_schema_fingerprint) throw new CatfoodTrustError("TRUST_CONFIG_SCOPE_MISMATCH");
-  if (trust.source_mode === "OPERATIONAL" && key.trust_class !== "OPERATIONAL") throw new CatfoodTrustError("TEST_KEY_NOT_OPERATIONAL");
-  return Object.freeze({ payload: Object.freeze(payload as unknown as HumanGoPayload), artifact_sha256: sha256(rawArtifact), key_id: keyId, trust_class: key.trust_class });
+  return Object.freeze({ payload: Object.freeze(payload as unknown as HumanGoPayload), artifact_sha256: sha256(rawArtifact), key_id: keyId, trust_class: key.trust_class, signing_key_sha256: goPublicKeyFingerprint(key.public_key_pem), go_root_policy_ref: policyRef });
 }
 
 export interface ThreadsRuntimeEvidence {
@@ -491,12 +494,13 @@ function validateTrustConfig(value: CatfoodTrustConfig): Readonly<CatfoodTrustCo
   return Object.freeze(JSON.parse(canonicalJson(value)));
 }
 
-export function initializeProtectedCatfoodStores(controlPath: string, checkpointPath: string, trustInput: CatfoodTrustConfig, at: string, enrollment?: CatfoodEnrollmentContext): void {
+export function initializeProtectedCatfoodStores(controlPath: string, checkpointPath: string, trustInput: CatfoodTrustConfig, at: string, enrollment?: CatfoodEnrollmentContext, goRootPolicyInput?: CatfoodGoRootPolicyV1): void {
   if (trustInput.source_mode === "OPERATIONAL") { try { assertEnrolledRole(enrollment, "custodian", "OPERATIONAL"); } catch { throw new CatfoodTrustError("OPERATIONAL_SUPERVISOR_ENROLLMENT_UNAVAILABLE"); } } else if (enrollment) assertEnrolledRole(enrollment, "custodian", "TEST_ONLY");
   const control = resolve(controlPath), checkpoint = resolve(checkpointPath);
   if (control === checkpoint) throw new CatfoodTrustError("CHECKPOINT_MUST_BE_EXTERNAL");
   if (!existsSync(control) || !existsSync(checkpoint)) throw new CatfoodTrustError("STORE_MUST_PREEXIST");
   const trust = validateTrustConfig(trustInput);
+  if (!goRootPolicyInput) throw new CatfoodTrustError("GO_ROOT_POLICY_UNAVAILABLE"); const goRootPolicy = validateGoRootPolicy(goRootPolicyInput); assertGoRootPolicyUse({ policy: goRootPolicy, trust_domain: trust.source_mode, scope: { environment_type: trust.environment_type, environment_instance_id: trust.environment_instance_id, deployment_id: goRootPolicy.scope.deployment_id, organization_id: trust.organization_id, tenant_id: trust.tenant_id, account_id: trust.account_id }, acceptance_policy_sha256: CATFOOD_POLICY_SHA256, at, use: "NEW_GO", actual_keys: trust.go_keys });
   const controlDb = new Database(control, { strict: true, create: false });
   const checkpointDb = new Database(checkpoint, { strict: true, create: false });
   try {
@@ -735,6 +739,8 @@ export class ProtectedCatfoodCustodian {
   private readonly controlPath: string;
   private readonly checkpointPath: string;
   readonly trust: Readonly<CatfoodTrustConfig>;
+  readonly goRootPolicy: Readonly<CatfoodGoRootPolicyV1>;
+  readonly goRootPolicyRef: Readonly<GoRootPolicyRef>;
 
   constructor(
     controlPath: string,
@@ -742,6 +748,7 @@ export class ProtectedCatfoodCustodian {
     private readonly source: ThreadsEvidenceSource,
     private readonly clock: TrustedClock,
     private readonly enrollment?: CatfoodEnrollmentContext,
+    goRootPolicyInput?: CatfoodGoRootPolicyV1,
   ) {
     if (resolve(controlPath) === resolve(checkpointPath)) throw new CatfoodTrustError("CHECKPOINT_MUST_BE_EXTERNAL");
     this.controlPath = resolve(controlPath); this.checkpointPath = resolve(checkpointPath);
@@ -752,6 +759,7 @@ export class ProtectedCatfoodCustodian {
       assertConnection(this.control); checkpointHealth(this.checkpoints);
       this.trust = loadTrust(this.control);
       if (this.trust.source_mode === "OPERATIONAL") { try { assertEnrolledRole(enrollment, "custodian", "OPERATIONAL"); } catch { throw new CatfoodTrustError("OPERATIONAL_SUPERVISOR_ENROLLMENT_UNAVAILABLE"); } } else if (enrollment) assertEnrolledRole(enrollment, "custodian", "TEST_ONLY");
+      if (!goRootPolicyInput) throw new CatfoodTrustError("GO_ROOT_POLICY_UNAVAILABLE"); this.goRootPolicy = validateGoRootPolicy(goRootPolicyInput); this.goRootPolicyRef = goRootPolicyRef(this.goRootPolicy); assertGoRootPolicyUse({ policy: this.goRootPolicy, trust_domain: this.trust.source_mode, scope: { environment_type: this.trust.environment_type, environment_instance_id: this.trust.environment_instance_id, deployment_id: this.goRootPolicy.scope.deployment_id, organization_id: this.trust.organization_id, tenant_id: this.trust.tenant_id, account_id: this.trust.account_id }, acceptance_policy_sha256: CATFOOD_POLICY_SHA256, at: this.goRootPolicy.applicability.not_before, use: "HISTORICAL", actual_keys: this.trust.go_keys });
       if (source.mode !== this.trust.source_mode || source.source_identity !== `${this.trust.threads_sha}:${this.trust.threads_release_sha256}`) throw new CatfoodTrustError("THREADS_SOURCE_IDENTITY_MISMATCH");
       if (this.trust.source_mode === "OPERATIONAL") {
         if (clock.kind !== "SYSTEM") throw new CatfoodTrustError("TEST_CLOCK_NOT_OPERATIONAL");
@@ -767,11 +775,11 @@ export class ProtectedCatfoodCustodian {
   sealEvaluationInput(runId: string, destination: { control_path: string; checkpoint_path: string; deployment_id: string }): Readonly<{ manifest: CatfoodSealedInputManifestV1; manifest_sha256: string; control_path: string; checkpoint_path: string }> {
     this.verifyAnchored(runId); const beforeRun = this.getRun(runId); if (beforeRun.lifecycle !== "CLOSED" || beforeRun.admission_state !== "CLOSED") throw new CatfoodTrustError("RUN_NOT_CLOSED");
     const beforeBundle = this.rederive(runId), beforeBundleSha = sha256(canonicalJson(beforeBundle)); const beforeEvents = this.verifyJournal(runId), closedSource = [...beforeEvents].reverse().find((event) => event.event_type === "CLOSED_SOURCE_SEALED"), runClosed = [...beforeEvents].reverse().find((event) => event.event_type === "RUN_CLOSED"), head = beforeEvents.at(-1), checkpoint = this.checkpoints.query<Record<string, unknown>, [string]>("SELECT * FROM catfood_checkpoints WHERE run_id=? ORDER BY last_sequence DESC LIMIT 1").get(runId); if (!closedSource || !runClosed || !head || !checkpoint) throw new CatfoodTrustError("SEALED_INPUT_CLOSURE_INVALID");
-    const retained = JSON.parse(String(closedSource.payload_json)) as Record<string, unknown>, spec = runSpec(beforeRun), goProfile = { profile_id: "catfood-go-verification-profile.v1", keys: this.trust.go_keys.map((key) => ({ key_id: key.key_id, public_key_sha256: sha256(createPublicKey(key.public_key_pem).export({ type: "spki", format: "der" }) as Buffer), not_before: key.not_before ?? null, not_after: key.not_after ?? null, revoked_at: key.revoked_at ?? null })).sort((a, b) => a.key_id.localeCompare(b.key_id)) }, go = verifyHumanGo(beforeRun.go_artifact, spec, this.trust, String(beforeEvents.find((event) => event.event_type === "WORK_ADMITTED")?.observed_at ?? beforeRun.created_at));
+    const retained = JSON.parse(String(closedSource.payload_json)) as Record<string, unknown>, spec = runSpec(beforeRun), goProfile = buildGoVerificationProfile(this.trust.go_keys), go = verifyHumanGo(beforeRun.go_artifact, spec, this.trust, String(beforeEvents.find((event) => event.event_type === "WORK_ADMITTED")?.observed_at ?? beforeRun.created_at), this.goRootPolicy, destination.deployment_id, "HISTORICAL");
     const controlPath = resolve(destination.control_path), checkpointPath = resolve(destination.checkpoint_path); if (controlPath === this.controlPath || checkpointPath === this.checkpointPath || controlPath === checkpointPath) throw new CatfoodTrustError("SEALED_INPUT_EXPORT_INVALID");
-    const control = exportStandaloneSqlite(this.controlPath, controlPath), checkpointStore = exportStandaloneSqlite(this.checkpointPath, checkpointPath); const exportedEvaluator = new IndependentCatfoodEvaluator(controlPath, checkpointPath); let exportedBundle: Record<string, Json>; try { exportedBundle = exportedEvaluator.rederive(runId); } finally { exportedEvaluator.close(); }
+    const control = exportStandaloneSqlite(this.controlPath, controlPath), checkpointStore = exportStandaloneSqlite(this.checkpointPath, checkpointPath); const exportedEvaluator = new IndependentCatfoodEvaluator(controlPath, checkpointPath, undefined, undefined, undefined, this.goRootPolicy); let exportedBundle: Record<string, Json>; try { exportedBundle = exportedEvaluator.rederive(runId); } finally { exportedEvaluator.close(); }
     const afterBundle = this.rederive(runId), afterEvents = this.verifyJournal(runId), afterHead = afterEvents.at(-1), afterCheckpoint = this.checkpoints.query<Record<string, unknown>, [string]>("SELECT * FROM catfood_checkpoints WHERE run_id=? ORDER BY last_sequence DESC LIMIT 1").get(runId); if (canonicalJson(beforeBundle) !== canonicalJson(afterBundle) || canonicalJson(beforeBundle) !== canonicalJson(exportedBundle) || head.row_hash !== afterHead?.row_hash || checkpoint.checkpoint_id !== afterCheckpoint?.checkpoint_id || beforeBundleSha !== sha256(canonicalJson(exportedBundle))) throw new CatfoodTrustError("SEALED_INPUT_COMMON_CUT_INVALID");
-    if (!/^[A-Za-z0-9][A-Za-z0-9._:@\/-]{0,299}$/.test(destination.deployment_id)) throw new CatfoodTrustError("SEALED_INPUT_SCOPE_INVALID"); if (this.enrollment) { const enrolled = assertEnrolledRole(this.enrollment, "custodian", this.trust.source_mode), subject = enrolled.subject as Record<string, unknown>; if (subject?.deployment_id !== destination.deployment_id) throw new CatfoodTrustError("SEALED_INPUT_SCOPE_INVALID"); }
+    if (!/^[A-Za-z0-9][A-Za-z0-9._:@\/-]{0,299}$/.test(destination.deployment_id) || destination.deployment_id !== this.goRootPolicy.scope.deployment_id) throw new CatfoodTrustError("SEALED_INPUT_SCOPE_INVALID"); if (this.enrollment) { const enrolled = assertEnrolledRole(this.enrollment, "custodian", this.trust.source_mode), subject = enrolled.subject as Record<string, unknown>; if (subject?.deployment_id !== destination.deployment_id) throw new CatfoodTrustError("SEALED_INPUT_SCOPE_INVALID"); }
     const source = (beforeBundle.final_source as Record<string, unknown>), acquisitionTestOnly = beforeEvents.some((event) => { const payload = JSON.parse(String(event.payload_json)) as Record<string, unknown>; return event.event_type === "PREFLIGHT_PASSED" && (payload.coe as Record<string, unknown> | undefined)?.test_only === true; }), testOnly = this.trust.source_mode !== "OPERATIONAL" || (source.coe as Record<string, unknown>).test_only !== false || acquisitionTestOnly, commonCut = sha256(canonicalJson({ run_id: runId, journal_high_water: head.sequence, journal_head: head.row_hash, checkpoint_id: checkpoint.checkpoint_id, checkpoint_head: checkpoint.head_hash, bundle_sha256: beforeBundleSha })); const body = { schema: CATFOOD_SEALED_INPUT_SCHEMA, charter: CATFOOD_FINAL_CLOSURE_CHARTER, scope: { environment_type: spec.environment_type, environment_instance_id: spec.environment_instance_id, deployment_id: destination.deployment_id, organization_id: spec.organization_id, tenant_id: spec.tenant_id, account_id: spec.account_id, run_id: spec.run_id, spec_sha256: spec.spec_sha256 }, window: { start: new Date(Date.parse(spec.requested_window_start)).toISOString(), end: new Date(Date.parse(spec.requested_window_end)).toISOString() }, closure: { closed_source_event_id: String(closedSource.event_id), run_closed_event_id: String(runClosed.event_id), lifecycle: "CLOSED" as const }, journal: { high_water: Number(head.sequence), head_sha256: String(head.row_hash) }, checkpoint: { checkpoint_id: String(checkpoint.checkpoint_id), checkpoint_sha256: sha256(canonicalJson(checkpoint as never)), pins_sha256: String(checkpoint.pins_sha256) }, retained_source: { archive_sha256: String(retained.coe_sha256), source_digest: String(retained.source_digest), producer_identity: this.source.source_identity }, go: { artifact_sha256: go.artifact_sha256, verification_profile_id: goProfile.profile_id, verification_profile_sha256: sha256(canonicalJson(goProfile)), root_fingerprints: goProfile.keys.map((key) => key.public_key_sha256).sort() }, fixed: { dependencies_sha256: CATFOOD_THREADS_DEPENDENCY_ROOT, policy_sha256: CATFOOD_POLICY_SHA256, kernel_sha256: CATFOOD_EVALUATOR_SHA256 }, trust: { environment_provenance_sha256: sha256(canonicalJson({ environment_type: spec.environment_type, environment_instance_id: spec.environment_instance_id, deployment_id: destination.deployment_id })), clock_provenance_sha256: sha256(canonicalJson({ kind: this.clock.kind, operational_provenance: this.clock.operational_provenance ?? null })), acquisition_provenance_sha256: sha256(canonicalJson({ source_digest: retained.source_digest, archive_sha256: retained.coe_sha256, producer_identity: this.source.source_identity, final_test_only: (source.coe as Record<string, unknown>).test_only !== false, contributing_test_only: acquisitionTestOnly })), test_only: testOnly }, expected_bundle_sha256: beforeBundleSha, pair_common_cut_sha256: commonCut, control, checkpoint_store: checkpointStore };
     const manifestId = `manifest:${sha256(canonicalJson(body as never)).slice(0, 40)}`, manifest = validateSealedInputManifest({ ...body, manifest_id: manifestId }); if (canonicalJson(inspectStandaloneSqlite(controlPath)) !== canonicalJson(control) || canonicalJson(inspectStandaloneSqlite(checkpointPath)) !== canonicalJson(checkpointStore)) throw new CatfoodTrustError("SEALED_INPUT_SNAPSHOT_CHANGED"); return Object.freeze({ manifest, manifest_sha256: sealedInputManifestSha256(manifest), control_path: controlPath, checkpoint_path: checkpointPath });
   }
@@ -859,14 +867,14 @@ export class ProtectedCatfoodCustodian {
 
   createRun(spec: CatfoodRunSpec, signedGo: string): void {
     const sample = this.sample();
-    const verified = verifyHumanGo(signedGo, spec, this.trust, sample.wall_time);
+    const verified = verifyHumanGo(signedGo, spec, this.trust, sample.wall_time, this.goRootPolicy, this.goRootPolicy.scope.deployment_id, "NEW_GO");
     this.control.transaction(() => {
       if (this.control.query("SELECT 1 FROM catfood_go_consumptions WHERE grant_id=? OR nonce=?").get(verified.payload.grant_id, verified.payload.nonce)) throw new CatfoodTrustError("GO_REUSED");
       this.control.query("INSERT INTO catfood_runs(run_id,spec_json,spec_sha256,go_artifact,go_sha256,grant_id,lifecycle,admission_state,current_epoch,evidence_state,state_version,created_at) VALUES (?,?,?,?,?,?,'CREATED','CLOSED',1,'ANCHORED',1,?)")
         .run(spec.run_id, canonicalJson(spec), spec.spec_sha256, signedGo, verified.artifact_sha256, verified.payload.grant_id, sample.wall_time);
       this.control.query("INSERT INTO catfood_go_consumptions VALUES (?,?,?,?,?)").run(verified.payload.grant_id, verified.payload.nonce, spec.run_id, verified.artifact_sha256, sample.wall_time);
       const run = this.getRun(spec.run_id);
-      const head = this.appendJournal(run, "RUN_CREATED", this.trust.custodian_identity, "signed-go", { go_sha256: verified.artifact_sha256, key_id: verified.key_id, trust_class: verified.trust_class }, null, null, null, sample);
+      const head = this.appendJournal(run, "RUN_CREATED", this.trust.custodian_identity, "signed-go", { go_sha256: verified.artifact_sha256, key_id: verified.key_id, signing_key_sha256: verified.signing_key_sha256, trust_class: verified.trust_class, go_root_policy_ref: verified.go_root_policy_ref as unknown as Json }, null, null, null, sample);
       this.control.query("UPDATE catfood_runs SET lifecycle='READY' WHERE run_id=?").run(spec.run_id);
       (run as Record<string, unknown>).pending_head = head;
     }).immediate();
@@ -973,7 +981,7 @@ export class ProtectedCatfoodCustodian {
 
   private verifyCurrentGo(row: RunRow, sample: TrustedClockSample): VerifiedHumanGo {
     if (this.control.query("SELECT 1 FROM catfood_go_revocations WHERE grant_id=?").get(row.grant_id)) throw new CatfoodTrustError("GO_REVOKED");
-    return verifyHumanGo(row.go_artifact, runSpec(row), this.trust, sample.wall_time);
+    return verifyHumanGo(row.go_artifact, runSpec(row), this.trust, sample.wall_time, this.goRootPolicy, this.goRootPolicy.scope.deployment_id, "NEW_GO");
   }
 
   private terminalCause(runId: string): string | null {
@@ -1407,8 +1415,9 @@ export class ProtectedCatfoodCustodian {
     if (works.some((work) => !admittedWorkIds.has(String(work.work_id))) || admittedWorkIds.size !== works.length) throw new CatfoodTrustError("WORK_JOURNAL_TAMPERED");
     const actionTimes = events.filter((event) => event.event_type === "WORK_ADMITTED").map((event) => String(event.observed_at));
     const verificationTimes = actionTimes.length ? actionTimes : [String(events[0]?.observed_at ?? row.created_at)];
-    const verified = verificationTimes.map((at) => verifyHumanGo(row.go_artifact, spec, this.trust, at));
+    const verified = verificationTimes.map((at) => verifyHumanGo(row.go_artifact, spec, this.trust, at, this.goRootPolicy, this.goRootPolicy.scope.deployment_id, "HISTORICAL"));
     const go = verified[0]!;
+    const created = events.find((event) => event.event_type === "RUN_CREATED"), createdPayload = created ? JSON.parse(String(created.payload_json)) as Record<string, unknown> : null; if (!createdPayload || canonicalJson(createdPayload.go_root_policy_ref as never) !== canonicalJson(this.goRootPolicyRef as never) || createdPayload.signing_key_sha256 !== go.signing_key_sha256) throw new CatfoodTrustError("GO_ROOT_POLICY_HISTORY_MISMATCH");
     const consumption = this.control.query<Record<string, unknown>, [string]>("SELECT * FROM catfood_go_consumptions WHERE run_id=?").get(runId);
     if (!consumption || consumption.grant_id !== row.grant_id || consumption.go_sha256 !== row.go_sha256 || row.go_sha256 !== go.artifact_sha256) throw new CatfoodTrustError("GO_HISTORY_TAMPERED");
     if (this.control.query("SELECT 1 FROM catfood_go_revocations WHERE grant_id=?").get(row.grant_id)) throw new CatfoodTrustError("GO_REVOKED");
@@ -1429,7 +1438,7 @@ export class ProtectedCatfoodCustodian {
     if (canonicalJson(recomputedMembership as unknown as Json) !== canonicalJson(retained.run_membership as Json)) throw new CatfoodTrustError("RUN_MEMBERSHIP_CACHE_TAMPERED");
     const checkpoint = this.checkpoints.query<Record<string, unknown>, [string]>("SELECT * FROM catfood_checkpoints WHERE run_id=? ORDER BY last_sequence DESC LIMIT 1").get(runId);
     const finalSource = { runtime: retained.runtime, boundaries: retained.boundaries, inventory: retained.inventory, coe: closedCoeSummary(coe), coeAssessment: { state: recomputedAssessment.state, reasons: recomputedAssessment.reasons }, run_membership: recomputedMembership as unknown as Json, run_membership_reasons: membershipReasons(recomputedMembership, works, events), archive_sha256: retained.coe_sha256, digest: retained.source_digest, dependency_root: retained.dependency_root };
-    return JSON.parse(canonicalJson({ schema: "catfood-rederived-bundle.v2", spec, go: { payload: go.payload as unknown as Json, artifact_sha256: go.artifact_sha256, key_id: go.key_id, trust_class: go.trust_class, action_validity_verified: verificationTimes }, run: { lifecycle: row.lifecycle, admission_state: row.admission_state, current_epoch: row.current_epoch, evidence_state: row.evidence_state, start_wall_time: row.start_wall_time as Json, start_monotonic_ms: row.start_monotonic_ms as Json, start_boot_id: row.start_boot_id as Json, closed_wall_time: row.closed_wall_time as Json, closed_monotonic_ms: row.closed_monotonic_ms as Json, closed_boot_id: row.closed_boot_id as Json }, journal: events.map((event) => ({ ...event, payload_json: JSON.parse(String(event.payload_json)) })) as unknown as Json, authorities: authorities as unknown as Json, work: works.map((work, index) => ({ ...work, claim_json: JSON.parse(String(work.claim_json)), terminal_json: authoritativeClaims[index]!.claim as unknown as Json, governed_decision: authoritativeClaims[index]!.decision as unknown as Json })) as unknown as Json, checkpoint: checkpoint as unknown as Json, final_source: finalSource as unknown as Json, source_mode: this.trust.source_mode })) as Record<string, Json>;
+    return JSON.parse(canonicalJson({ schema: "catfood-rederived-bundle.v2", spec, go: { payload: go.payload as unknown as Json, artifact_sha256: go.artifact_sha256, key_id: go.key_id, signing_key_sha256: go.signing_key_sha256, go_root_policy_ref: go.go_root_policy_ref as unknown as Json, trust_class: go.trust_class, action_validity_verified: verificationTimes }, run: { lifecycle: row.lifecycle, admission_state: row.admission_state, current_epoch: row.current_epoch, evidence_state: row.evidence_state, start_wall_time: row.start_wall_time as Json, start_monotonic_ms: row.start_monotonic_ms as Json, start_boot_id: row.start_boot_id as Json, closed_wall_time: row.closed_wall_time as Json, closed_monotonic_ms: row.closed_monotonic_ms as Json, closed_boot_id: row.closed_boot_id as Json }, journal: events.map((event) => ({ ...event, payload_json: JSON.parse(String(event.payload_json)) })) as unknown as Json, authorities: authorities as unknown as Json, work: works.map((work, index) => ({ ...work, claim_json: JSON.parse(String(work.claim_json)), terminal_json: authoritativeClaims[index]!.claim as unknown as Json, governed_decision: authoritativeClaims[index]!.decision as unknown as Json })) as unknown as Json, checkpoint: checkpoint as unknown as Json, final_source: finalSource as unknown as Json, source_mode: this.trust.source_mode })) as Record<string, Json>;
   }
 
   evaluate(runId: string): EvaluationResult {
@@ -1454,19 +1463,22 @@ export class IndependentCatfoodEvaluator {
   private readonly control: Database;
   private readonly checkpoints: Database;
   private readonly trust: Readonly<CatfoodTrustConfig>;
+  private readonly goRootPolicy?: Readonly<CatfoodGoRootPolicyV1>;
 
-  constructor(controlPath: string, checkpointPath: string, private readonly source?: ReadonlyThreadsEvidenceSource, private readonly enrollment?: CatfoodEnrollmentContext, private readonly provenance?: EnrolledTrustProvenance) {
+  constructor(controlPath: string, checkpointPath: string, private readonly source?: ReadonlyThreadsEvidenceSource, private readonly enrollment?: CatfoodEnrollmentContext, private readonly provenance?: EnrolledTrustProvenance, goRootPolicyInput?: CatfoodGoRootPolicyV1) {
     this.control = new Database(resolve(controlPath), { strict: true, create: false, readonly: true });
     this.checkpoints = new Database(resolve(checkpointPath), { strict: true, create: false, readonly: true });
     try {
       configure(this.control, true); configure(this.checkpoints, true); assertConnection(this.control); checkpointHealth(this.checkpoints);
       this.trust = loadTrust(this.control);
+      this.goRootPolicy = goRootPolicyInput ? validateGoRootPolicy(goRootPolicyInput) : undefined;
       if (this.trust.source_mode === "OPERATIONAL") { try { assertEnrolledRole(enrollment, "evaluator", "OPERATIONAL"); } catch { throw new CatfoodTrustError("OPERATIONAL_VERIFIER_ENROLLMENT_UNAVAILABLE"); } } else if (enrollment) assertEnrolledRole(enrollment, "evaluator", "TEST_ONLY");
       if (source && (source.mode !== this.trust.source_mode || source.source_identity !== `${this.trust.threads_sha}:${this.trust.threads_release_sha256}`)) throw new CatfoodTrustError("THREADS_SOURCE_IDENTITY_MISMATCH");
     } catch (error) { this.control.close(); this.checkpoints.close(); throw error; }
   }
 
   close(): void { this.control.close(); this.checkpoints.close(); }
+  goPolicyReference(): Readonly<GoRootPolicyRef> { if (!this.goRootPolicy) throw new CatfoodTrustError("GO_ROOT_POLICY_UNAVAILABLE"); return goRootPolicyRef(this.goRootPolicy); }
 
   rederive(runId: string): Record<string, Json> {
     const row = this.control.query<RunRow, [string]>("SELECT * FROM catfood_runs WHERE run_id=?").get(runId);
@@ -1492,8 +1504,9 @@ export class IndependentCatfoodEvaluator {
     if (!head || !anchor || head.sequence !== anchor.last_sequence || head.row_hash !== anchor.head_hash) throw new CatfoodTrustError(row.evidence_state === "ANCHORED" ? "CHECKPOINT_HIGH_WATER_TAMPERED" : "EVIDENCE_UNANCHORED");
     if (row.evidence_state !== "ANCHORED") throw new CatfoodTrustError("EVIDENCE_UNANCHORED");
     const spec = runSpec(row); const actionTimes = events.filter((event) => event.event_type === "WORK_ADMITTED").map((event) => String(event.observed_at));
-    const verificationTimes = actionTimes.length ? actionTimes : [String(events[0]?.observed_at ?? row.created_at)]; const go = verifyHumanGo(row.go_artifact, spec, this.trust, verificationTimes[0]!);
-    for (const at of verificationTimes.slice(1)) verifyHumanGo(row.go_artifact, spec, this.trust, at);
+    const verificationTimes = actionTimes.length ? actionTimes : [String(events[0]?.observed_at ?? row.created_at)]; const go = verifyHumanGo(row.go_artifact, spec, this.trust, verificationTimes[0]!, this.goRootPolicy, this.goRootPolicy?.scope.deployment_id, "HISTORICAL");
+    for (const at of verificationTimes.slice(1)) verifyHumanGo(row.go_artifact, spec, this.trust, at, this.goRootPolicy, this.goRootPolicy?.scope.deployment_id, "HISTORICAL");
+    if (this.goRootPolicy) { const created = events.find((event) => event.event_type === "RUN_CREATED"), createdPayload = created ? JSON.parse(String(created.payload_json)) as Record<string, unknown> : null; if (!createdPayload || canonicalJson(createdPayload.go_root_policy_ref as never) !== canonicalJson(goRootPolicyRef(this.goRootPolicy) as never) || createdPayload.signing_key_sha256 !== go.signing_key_sha256) throw new CatfoodTrustError("GO_ROOT_POLICY_HISTORY_MISMATCH"); }
     const consumption = this.control.query<Record<string, unknown>, [string]>("SELECT * FROM catfood_go_consumptions WHERE run_id=?").get(runId);
     if (!consumption || consumption.grant_id !== row.grant_id || consumption.go_sha256 !== row.go_sha256 || row.go_sha256 !== go.artifact_sha256) throw new CatfoodTrustError("GO_HISTORY_TAMPERED");
     if (this.control.query("SELECT 1 FROM catfood_go_revocations WHERE grant_id=?").get(row.grant_id)) throw new CatfoodTrustError("GO_REVOKED");
@@ -1514,7 +1527,7 @@ export class IndependentCatfoodEvaluator {
     if (canonicalJson({ state: recomputedAssessment.state, reasons: recomputedAssessment.reasons }) !== canonicalJson(retained.coeAssessment as Json)) throw new CatfoodTrustError("COE_ASSESSMENT_CACHE_TAMPERED");
     if (canonicalJson(recomputedMembership as unknown as Json) !== canonicalJson(retained.run_membership as Json)) throw new CatfoodTrustError("RUN_MEMBERSHIP_CACHE_TAMPERED");
     const finalSource = { runtime: retained.runtime, boundaries: retained.boundaries, inventory: retained.inventory, coe: closedCoeSummary(coe), coeAssessment: { state: recomputedAssessment.state, reasons: recomputedAssessment.reasons }, run_membership: recomputedMembership as unknown as Json, run_membership_reasons: membershipReasons(recomputedMembership, rawWorks, events), archive_sha256: retained.coe_sha256, digest: retained.source_digest, dependency_root: retained.dependency_root };
-    return JSON.parse(canonicalJson({ schema: "catfood-rederived-bundle.v2", spec, go: { payload: go.payload as unknown as Json, artifact_sha256: go.artifact_sha256, key_id: go.key_id, trust_class: go.trust_class, action_validity_verified: verificationTimes }, run: { lifecycle: row.lifecycle, admission_state: row.admission_state, current_epoch: row.current_epoch, evidence_state: row.evidence_state, start_wall_time: row.start_wall_time as Json, start_monotonic_ms: row.start_monotonic_ms as Json, start_boot_id: row.start_boot_id as Json, closed_wall_time: row.closed_wall_time as Json, closed_monotonic_ms: row.closed_monotonic_ms as Json, closed_boot_id: row.closed_boot_id as Json }, journal: events.map((event) => ({ ...event, payload_json: JSON.parse(String(event.payload_json)) })), authorities, work: works, checkpoint: anchor, final_source: finalSource, source_mode: this.trust.source_mode })) as Record<string, Json>;
+    return JSON.parse(canonicalJson({ schema: "catfood-rederived-bundle.v2", spec, go: { payload: go.payload as unknown as Json, artifact_sha256: go.artifact_sha256, key_id: go.key_id, signing_key_sha256: go.signing_key_sha256, go_root_policy_ref: go.go_root_policy_ref as unknown as Json, trust_class: go.trust_class, action_validity_verified: verificationTimes }, run: { lifecycle: row.lifecycle, admission_state: row.admission_state, current_epoch: row.current_epoch, evidence_state: row.evidence_state, start_wall_time: row.start_wall_time as Json, start_monotonic_ms: row.start_monotonic_ms as Json, start_boot_id: row.start_boot_id as Json, closed_wall_time: row.closed_wall_time as Json, closed_monotonic_ms: row.closed_monotonic_ms as Json, closed_boot_id: row.closed_boot_id as Json }, journal: events.map((event) => ({ ...event, payload_json: JSON.parse(String(event.payload_json)) })), authorities, work: works, checkpoint: anchor, final_source: finalSource, source_mode: this.trust.source_mode })) as Record<string, Json>;
   }
 
   evaluate(runId: string, provenance = this.provenance): EvaluationResult {

@@ -3,18 +3,19 @@ import { generateKeyPairSync } from "node:crypto";
 import { hostname, uptime } from "node:os";
 import { join, resolve } from "node:path";
 import { parseJsonNoDuplicateKeys } from "./catfood-coe";
-import { sha256 } from "./catfood-harness";
+import { canonicalJson, sha256 } from "./catfood-harness";
 import { CATFOOD_OPERATIONAL_ROOT, CatfoodTrustError, ProtectedCatfoodCustodian, type EvaluationResult, type OperationalProvenance, type TrustedClock, type TrustedClockSample } from "./catfood-trust";
 import { OperationalThreadsEvidenceSource, type ThreadsSourceContext } from "./catfood-threads-http";
 import { verifyConsumerIntegrity, type ConsumerIntegrityManifest } from "../../scripts/check-catfood-consumer-integrity";
 import { assertEnrolledRole, loadOperationalRoleEnrollment } from "./catfood-enrollment";
 import { collectCurrentRuntimeSubject, roleChannelArtifactDescriptor } from "./catfood-enrollment";
-import { registerLocalRoleSession, type LocalRoleSession, type RoleChannelBinding } from "./catfood-role-channel";
+import { registerLocalRoleSession, resolveBindingGoRootPolicy, type LocalRoleSession, type RoleChannelBinding, type RoleRunScope } from "./catfood-role-channel";
+import { goRootPolicyRef, validateGoRootPolicyRef } from "./catfood-final-closure";
 import { verifyIndependentAttestationArtifact, type IndependentAttestationExpected } from "./catfood-independent-attestation";
 import type { ThreadsHttpTransport } from "./catfood-threads-http";
 
 const SHA256 = /^[0-9a-f]{64}$/;
-const BOOTSTRAP_FIELDS = ["attestation_root_ids", "credential_version_ref", "environment_identity", "go_root_ids", "intents", "principal_binding", "principal_ref", "protected_probe", "runtime_prohibitions", "schema", "source_build_sha256", "source_identity", "tenant_user_id", "threads_origin", "trust_domain"];
+const BOOTSTRAP_FIELDS = ["attestation_root_ids", "credential_version_ref", "environment_identity", "go_root_policy_ref", "intents", "principal_binding", "principal_ref", "protected_probe", "runtime_prohibitions", "schema", "source_build_sha256", "source_identity", "tenant_user_id", "threads_origin", "trust_domain"];
 
 function protectedRead(path: string, maximumBytes: number): string {
   const absolute = resolve(path); const rootPath = resolve(CATFOOD_OPERATIONAL_ROOT); const root = `${rootPath}${process.platform === "win32" ? "\\" : "/"}`;
@@ -59,7 +60,7 @@ export function openOperationalCatfoodCustodian(): ProtectedCatfoodCustodian {
   try {
   const bootstrapPath = join(CATFOOD_OPERATIONAL_ROOT, "bootstrap.json"); const raw = protectedRead(bootstrapPath, 1_000_000);
   const bootstrap = parseJsonNoDuplicateKeys(raw, 1_000_000, 32) as Record<string, unknown>; exact(bootstrap, BOOTSTRAP_FIELDS);
-  if (bootstrap.schema !== "ikorabu.catfood-operational-bootstrap.v1" || !SHA256.test(String(bootstrap.source_build_sha256)) || !Array.isArray(bootstrap.intents) || !Array.isArray(bootstrap.go_root_ids) || !(bootstrap.go_root_ids as unknown[]).length || !Array.isArray(bootstrap.attestation_root_ids) || !(bootstrap.attestation_root_ids as unknown[]).length) throw new CatfoodTrustError("OPERATIONAL_BOOTSTRAP_SCHEMA_INVALID");
+  if (bootstrap.schema !== "ikorabu.catfood-operational-bootstrap.v1" || !SHA256.test(String(bootstrap.source_build_sha256)) || !Array.isArray(bootstrap.intents) || !Array.isArray(bootstrap.attestation_root_ids) || !(bootstrap.attestation_root_ids as unknown[]).length) throw new CatfoodTrustError("OPERATIONAL_BOOTSTRAP_SCHEMA_INVALID"); const expectedGoPolicyRef = validateGoRootPolicyRef(bootstrap.go_root_policy_ref);
   const principalBinding = bootstrap.principal_binding as Record<string, unknown>; const runtimeProhibitions = bootstrap.runtime_prohibitions as Record<string, unknown>;
   if (!principalBinding || !runtimeProhibitions) throw new CatfoodTrustError("OPERATIONAL_BOOTSTRAP_SCHEMA_INVALID");
   exact(principalBinding, ["account_id", "actor", "organization_id"]); exact(runtimeProhibitions, ["paid_generation_enabled", "writer_enabled"]);
@@ -79,10 +80,9 @@ export function openOperationalCatfoodCustodian(): ProtectedCatfoodCustodian {
   const sourceEnrollment = loadOperationalRoleEnrollment("source", enrollmentScope); const custodianEnrollment = loadOperationalRoleEnrollment("custodian", enrollmentScope);
   const sourceSnapshot = assertEnrolledRole(sourceEnrollment, "source", "OPERATIONAL"), custodianSnapshot = assertEnrolledRole(custodianEnrollment, "custodian", "OPERATIONAL");
   if (sourceSnapshot.authority_anchor !== custodianSnapshot.authority_anchor || sourceSnapshot.accepted_snapshot_sha256 !== custodianSnapshot.accepted_snapshot_sha256 || sourceSnapshot.enrollment_namespace !== custodianSnapshot.enrollment_namespace) throw new CatfoodTrustError("ENROLLMENT_MIXED_SNAPSHOT");
+  const bindingRaw = protectedRead(join(CATFOOD_OPERATIONAL_ROOT, "role-channel-binding.json"), 1_000_000), binding = parseJsonNoDuplicateKeys(bindingRaw, 1_000_000, 32) as unknown as RoleChannelBinding; if (binding.trust_domain !== "OPERATIONAL" || binding.policy.go_root_workload_selections.length !== 1) throw new CatfoodTrustError("OPERATIONAL_BOOTSTRAP_SCHEMA_INVALID"); const selection = binding.policy.go_root_workload_selections[0]!, policyDocument = binding.policy.go_root_policy_documents.find((policy) => canonicalJson(goRootPolicyRef(policy) as never) === canonicalJson(expectedGoPolicyRef as never)); if (!policyDocument) throw new CatfoodTrustError("OPERATIONAL_GO_ROOT_MISMATCH"); const policyScope = policyDocument.scope, selectedPolicy = resolveBindingGoRootPolicy(binding, { environment_type: policyScope.environment_type, environment_instance_id: policyScope.environment_instance_id, deployment_id: policyScope.deployment_id, organization_id: policyScope.organization_id, tenant_id: policyScope.tenant_id, account_id: policyScope.account_id, run_id: selection.run_id, spec_sha256: selection.spec_sha256 } as RoleRunScope, "CURRENT", expectedGoPolicyRef);
   const source = OperationalThreadsEvidenceSource.operational(context, sourceEnrollment); const clock = new OperationalSystemClock(provenance);
-  const custodian = new ProtectedCatfoodCustodian(join(CATFOOD_OPERATIONAL_ROOT, "control.db"), join(CATFOOD_OPERATIONAL_ROOT, "checkpoint.db"), source, clock, custodianEnrollment);
-  const configuredGoRoots = [...custodian.trust.go_keys.map((key) => key.key_id)].sort(); const expectedGoRoots = [...bootstrap.go_root_ids as string[]].sort();
-  if (JSON.stringify(configuredGoRoots) !== JSON.stringify(expectedGoRoots)) { custodian.close(); throw new CatfoodTrustError("OPERATIONAL_GO_ROOT_MISMATCH"); }
+  const custodian = new ProtectedCatfoodCustodian(join(CATFOOD_OPERATIONAL_ROOT, "control.db"), join(CATFOOD_OPERATIONAL_ROOT, "checkpoint.db"), source, clock, custodianEnrollment, selectedPolicy.policy);
   return custodian;
   } catch (error) { if (error instanceof CatfoodTrustError && error.code === "OPERATIONAL_GO_ROOT_MISMATCH") throw error; throw new CatfoodTrustError("OPERATIONAL_SUPERVISOR_ENROLLMENT_UNAVAILABLE"); }
 }
