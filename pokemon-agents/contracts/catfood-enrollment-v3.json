@@ -10,7 +10,7 @@
     "runtime_subject": "actual pid, process-start token, boot identity, principal, deployment/environment and authenticated channel binding"
   },
   "launcher_record": {
-    "required": ["issuer", "launch_ticket", "launch_id", "accepted snapshot", "role", "subject digest", "actual main identity", "Bun executable identity and version", "argv and execArgv digests", "loading arguments/environment", "cwd", "configuration resolution", "artifact root", "immutability policy", "pre-admission observation"],
+    "required": ["issuer", "launch_ticket", "launch_id", "accepted snapshot", "role", "subject digest", "actual main identity", "Bun executable identity and version", "argv and execArgv digests", "loading arguments and resolved content identities", "loading environment", "cwd", "configuration resolution", "artifact root", "immutability policy", "pre-admission observation"],
     "consumer_may_construct": false,
     "legacy_v2_measurement": "unsupported for controlled launch"
   },

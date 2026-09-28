@@ -1,6 +1,7 @@
 import { createHash, createPublicKey, randomBytes, verify } from "node:crypto";
 import { closeSync, existsSync, fstatSync, lstatSync, openSync, readFileSync, realpathSync, statSync } from "node:fs";
-import { resolve } from "node:path";
+import { isAbsolute, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
 import { hostname } from "node:os";
 import { parseJsonNoDuplicateKeys } from "./catfood-coe";
 import { canonicalJson } from "./catfood-harness";
@@ -72,19 +73,28 @@ function resolvedIdentity(path: string): Readonly<Record<string, unknown>> {
   return Object.freeze({ path: real, present: true, sha256: hash(readFileSync(real)) });
 }
 
+function resolvedLoadingIdentity(flag: string, specifier: string): Readonly<Record<string, unknown>> {
+  try {
+    const path = specifier.startsWith("file:") ? fileURLToPath(specifier) : isAbsolute(specifier) ? specifier : Bun.resolveSync(specifier, process.cwd());
+    return Object.freeze({ flag, specifier, ...resolvedIdentity(path) });
+  } catch { return Object.freeze({ flag, specifier, present: false, path: null, sha256: null }); }
+}
+
 export function currentLaunchProfile(): Readonly<Record<string, unknown>> {
   if (cachedLaunchProfile) return cachedLaunchProfile;
   const executable = resolvedIdentity(process.execPath); const main = resolvedIdentity(Bun.main);
-  const loadingArgs = process.execArgv.filter((value, index, all) => /^(--preload|-r|--require|--import|--loader|--plugin)(=|$)/.test(value) || index > 0 && /^(--preload|-r|--require|--import|--loader|--plugin)$/.test(all[index - 1]!));
+  const loadingFlag = /^(--preload|-r|--require|--import|--loader|--plugin|--config)(=|$)/;
+  const loadingArgs = process.execArgv.filter((value, index, all) => loadingFlag.test(value) || index > 0 && loadingFlag.test(all[index - 1]!));
+  const loadingInputs = process.execArgv.flatMap((value, index, all) => { const match = value.match(loadingFlag); if (!match) return []; const specifier = value.includes("=") ? value.slice(value.indexOf("=") + 1) : all[index + 1]; return specifier ? [resolvedLoadingIdentity(match[1]!, specifier)] : []; });
   const loadingEnvironment = ["BUN_OPTIONS", "NODE_OPTIONS"].map((name) => Object.freeze({ name, present: process.env[name] !== undefined, value_sha256: process.env[name] === undefined ? null : hash(process.env[name]!) }));
   const configuration = ["bunfig.toml", "bunfig.local.toml", "tsconfig.json", "package.json"].map((name) => resolvedIdentity(resolve(process.cwd(), name)));
   const cwd = realpathSync(process.cwd());
   cachedLaunchProfile = Object.freeze({
     actual_main: main, bun_executable: executable, bun_version: Bun.version, cwd,
     argv_sha256: hash(canonicalJson(process.argv)), exec_argv_sha256: hash(canonicalJson(process.execArgv)),
-    loading_args: Object.freeze(loadingArgs), loading_environment: Object.freeze(loadingEnvironment),
+    loading_args: Object.freeze(loadingArgs), loading_inputs: Object.freeze(loadingInputs), loading_environment: Object.freeze(loadingEnvironment),
     configuration: Object.freeze(configuration), resolution_policy: "FIXED_DIRECT_MAIN_NO_RUNTIME_AUTO_INSTALL",
-    profile_sha256: hash(canonicalJson({ main, executable, bun_version: Bun.version, cwd, argv: process.argv, exec_argv: process.execArgv, loadingArgs, loadingEnvironment, configuration })),
+    profile_sha256: hash(canonicalJson({ main, executable, bun_version: Bun.version, cwd, argv: process.argv, exec_argv: process.execArgv, loadingArgs, loadingInputs, loadingEnvironment, configuration })),
   });
   return cachedLaunchProfile;
 }
@@ -102,17 +112,17 @@ export function acceptedSnapshotDigest(): string { return hash(canonicalJson(rol
 export function observeTestOnlyLaunch(binding: TestEnrollmentBinding, role: CatfoodEnrollmentRole, subject = collectCurrentRuntimeSubject(binding)): Readonly<Record<string, unknown>> {
   if (binding.trust_domain !== "TEST_ONLY") throw new CatfoodTrustError("ENROLLMENT_BINDING_INVALID");
   const descriptor = roleArtifactDescriptor(role), profile = descriptor.launch_profile as Record<string, unknown>;
-  const core = { schema: "ikorabu.catfood-launch-record.v1", issuer: binding.issuer, launch_ticket: binding.launch_ticket, role, accepted_snapshot_id: binding.accepted_snapshot_id, accepted_snapshot_sha256: binding.accepted_snapshot_sha256, subject_sha256: hash(canonicalJson(subject)), artifact_root: descriptor.artifact_root, profile_sha256: profile.profile_sha256, actual_main: profile.actual_main, bun_executable: profile.bun_executable, bun_version: profile.bun_version, argv_sha256: profile.argv_sha256, exec_argv_sha256: profile.exec_argv_sha256, loading_args: profile.loading_args, loading_environment: profile.loading_environment, cwd: profile.cwd, configuration: profile.configuration, resolution_policy: profile.resolution_policy, immutability_policy: "TEST_ONLY_PARENT_OBSERVED", observed_before_role_admission: true };
+  const core = { schema: "ikorabu.catfood-launch-record.v1", issuer: binding.issuer, launch_ticket: binding.launch_ticket, role, accepted_snapshot_id: binding.accepted_snapshot_id, accepted_snapshot_sha256: binding.accepted_snapshot_sha256, subject_sha256: hash(canonicalJson(subject)), artifact_root: descriptor.artifact_root, profile_sha256: profile.profile_sha256, actual_main: profile.actual_main, bun_executable: profile.bun_executable, bun_version: profile.bun_version, argv_sha256: profile.argv_sha256, exec_argv_sha256: profile.exec_argv_sha256, loading_args: profile.loading_args, loading_inputs: profile.loading_inputs, loading_environment: profile.loading_environment, cwd: profile.cwd, configuration: profile.configuration, resolution_policy: profile.resolution_policy, immutability_policy: "TEST_ONLY_PARENT_OBSERVED", observed_before_role_admission: true };
   return Object.freeze({ launch_id: `launch:${hash(canonicalJson(core)).slice(0, 32)}`, ...core });
 }
 
 function validateLaunchRecord(value: unknown, binding: TestEnrollmentBinding, role: CatfoodEnrollmentRole, subject: RuntimeSubject, descriptor: Readonly<Record<string, unknown>>): void {
   const record = value as Record<string, unknown> | undefined; if (!record) throw new CatfoodTrustError("ENROLLMENT_LAUNCH_INVALID");
   const profile = descriptor.launch_profile as Record<string, unknown>;
-  const fields = ["accepted_snapshot_id", "accepted_snapshot_sha256", "actual_main", "argv_sha256", "artifact_root", "bun_executable", "bun_version", "configuration", "cwd", "exec_argv_sha256", "immutability_policy", "issuer", "launch_id", "launch_ticket", "loading_args", "loading_environment", "observed_before_role_admission", "profile_sha256", "resolution_policy", "role", "schema", "subject_sha256"];
+  const fields = ["accepted_snapshot_id", "accepted_snapshot_sha256", "actual_main", "argv_sha256", "artifact_root", "bun_executable", "bun_version", "configuration", "cwd", "exec_argv_sha256", "immutability_policy", "issuer", "launch_id", "launch_ticket", "loading_args", "loading_environment", "loading_inputs", "observed_before_role_admission", "profile_sha256", "resolution_policy", "role", "schema", "subject_sha256"];
   exact(record, fields);
-  const core = { schema: record.schema, issuer: record.issuer, launch_ticket: record.launch_ticket, role: record.role, accepted_snapshot_id: record.accepted_snapshot_id, accepted_snapshot_sha256: record.accepted_snapshot_sha256, subject_sha256: record.subject_sha256, artifact_root: record.artifact_root, profile_sha256: record.profile_sha256, actual_main: record.actual_main, bun_executable: record.bun_executable, bun_version: record.bun_version, argv_sha256: record.argv_sha256, exec_argv_sha256: record.exec_argv_sha256, loading_args: record.loading_args, loading_environment: record.loading_environment, cwd: record.cwd, configuration: record.configuration, resolution_policy: record.resolution_policy, immutability_policy: record.immutability_policy, observed_before_role_admission: record.observed_before_role_admission };
-  const expected = { schema: "ikorabu.catfood-launch-record.v1", issuer: binding.issuer, launch_ticket: binding.launch_ticket, role, accepted_snapshot_id: binding.accepted_snapshot_id, accepted_snapshot_sha256: binding.accepted_snapshot_sha256, subject_sha256: hash(canonicalJson(subject)), artifact_root: descriptor.artifact_root, profile_sha256: profile.profile_sha256, actual_main: profile.actual_main, bun_executable: profile.bun_executable, bun_version: profile.bun_version, argv_sha256: profile.argv_sha256, exec_argv_sha256: profile.exec_argv_sha256, loading_args: profile.loading_args, loading_environment: profile.loading_environment, cwd: profile.cwd, configuration: profile.configuration, resolution_policy: profile.resolution_policy, immutability_policy: binding.trust_domain === "TEST_ONLY" ? "TEST_ONLY_PARENT_OBSERVED" : "EXTERNAL_IMMUTABLE_LAUNCH", observed_before_role_admission: true };
+  const core = { schema: record.schema, issuer: record.issuer, launch_ticket: record.launch_ticket, role: record.role, accepted_snapshot_id: record.accepted_snapshot_id, accepted_snapshot_sha256: record.accepted_snapshot_sha256, subject_sha256: record.subject_sha256, artifact_root: record.artifact_root, profile_sha256: record.profile_sha256, actual_main: record.actual_main, bun_executable: record.bun_executable, bun_version: record.bun_version, argv_sha256: record.argv_sha256, exec_argv_sha256: record.exec_argv_sha256, loading_args: record.loading_args, loading_inputs: record.loading_inputs, loading_environment: record.loading_environment, cwd: record.cwd, configuration: record.configuration, resolution_policy: record.resolution_policy, immutability_policy: record.immutability_policy, observed_before_role_admission: record.observed_before_role_admission };
+  const expected = { schema: "ikorabu.catfood-launch-record.v1", issuer: binding.issuer, launch_ticket: binding.launch_ticket, role, accepted_snapshot_id: binding.accepted_snapshot_id, accepted_snapshot_sha256: binding.accepted_snapshot_sha256, subject_sha256: hash(canonicalJson(subject)), artifact_root: descriptor.artifact_root, profile_sha256: profile.profile_sha256, actual_main: profile.actual_main, bun_executable: profile.bun_executable, bun_version: profile.bun_version, argv_sha256: profile.argv_sha256, exec_argv_sha256: profile.exec_argv_sha256, loading_args: profile.loading_args, loading_inputs: profile.loading_inputs, loading_environment: profile.loading_environment, cwd: profile.cwd, configuration: profile.configuration, resolution_policy: profile.resolution_policy, immutability_policy: binding.trust_domain === "TEST_ONLY" ? "TEST_ONLY_PARENT_OBSERVED" : "EXTERNAL_IMMUTABLE_LAUNCH", observed_before_role_admission: true };
   if (canonicalJson(core) !== canonicalJson(expected) || record.launch_id !== `launch:${hash(canonicalJson(core)).slice(0, 32)}`) throw new CatfoodTrustError("ENROLLMENT_LAUNCH_INVALID");
 }
 

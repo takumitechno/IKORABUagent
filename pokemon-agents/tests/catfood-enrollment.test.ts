@@ -67,6 +67,7 @@ describe("WP3 Corrective07 controlled launch and provenance", () => {
       (p) => { p.launcher_observed_launch.launch_id = "launch:wrong"; },
       (p) => { p.launcher_observed_launch.actual_main.sha256 = "0".repeat(64); },
       (p) => { p.launcher_observed_launch.exec_argv_sha256 = "0".repeat(64); },
+      (p) => { p.launcher_observed_launch.loading_inputs = [{ flag: "--preload", specifier: "decoy.ts", present: true, path: "decoy.ts", sha256: "0".repeat(64) }]; },
     ];
     for (const mutate of mutations) { const f = fixture(mutate); expect(() => enrollTestOnlyRoleForTest(f.binding, "source", "run:test", f.transport, f.now)).toThrow(); }
     const f = fixture(); expect(() => enrollTestOnlyRoleForTest({ ...f.binding, accepted_snapshot_sha256: "d".repeat(64) }, "source", "run:test", f.transport, f.now)).toThrow();
@@ -82,6 +83,7 @@ describe("WP3 Corrective07 controlled launch and provenance", () => {
       const profiles = [plain, preload, environment].map((child) => JSON.parse(child.stdout.toString()) as Record<string, unknown>);
       expect(new Set(profiles.map((profile) => profile.profile_sha256)).size).toBe(3);
       expect((profiles[1]!.loading_args as string[]).some((value) => value === "--preload")).toBe(true);
+      expect((profiles[1]!.loading_inputs as Array<Record<string, unknown>>)[0]).toMatchObject({ present: true, sha256: expect.stringMatching(/^[0-9a-f]{64}$/) });
       expect(profiles[2]!.loading_environment).not.toEqual(currentLaunchProfile().loading_environment);
     } catch (error) { expect(String(error)).toContain("EPERM"); }
   });
