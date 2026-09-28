@@ -45,6 +45,7 @@ const ROLE_ENTRYPOINT: Readonly<Record<CatfoodEnrollmentRole, string>> = Object.
 type HiddenContext = { record: Readonly<Record<string, unknown>>; binding: Readonly<TestEnrollmentBinding>; transport: ThreadsHttpTransport; subject: Readonly<RuntimeSubject>; used: Set<string> };
 const contexts = new WeakMap<object, HiddenContext>();
 const provenances = new WeakMap<object, VerifiedTrustProvenance>();
+let cachedLocalIdentity: Readonly<{ processStart: string; boot: string; principal: string; operationalGrade: boolean }> | undefined;
 
 function hash(value: string | Buffer): string { return createHash("sha256").update(value).digest("hex"); }
 function roles(): CatfoodEnrollmentRole[] { return ["source", "custodian", "evaluator", "writer", "verifier"]; }
@@ -62,8 +63,8 @@ export function acceptedSnapshotDigest(): string { return hash(canonicalJson(rol
 
 function spawnText(cmd: string[]): string { const result = Bun.spawnSync({ cmd, stdout: "pipe", stderr: "pipe" }); if (result.exitCode !== 0) throw new Error(result.stderr.toString()); return result.stdout.toString().trim(); }
 export function collectCurrentRuntimeSubject(binding: Pick<TestEnrollmentBinding, "origin" | "audience" | "credential" | "deployment_id" | "environment_identity"> & Partial<Pick<TestEnrollmentBinding, "trust_domain">>): Readonly<RuntimeSubject> {
-  let processStart: string, boot: string, principal: string;
-  try {
+  let processStart: string, boot: string, principal: string, operationalGrade = true;
+  if (cachedLocalIdentity) ({ processStart, boot, principal, operationalGrade } = cachedLocalIdentity); else try {
     if (process.platform === "win32") {
       const script = String.raw`$p=Get-Process -Id ${process.pid};$b=Get-ItemPropertyValue -LiteralPath 'HKLM:\SYSTEM\CurrentControlSet\Control\Session Manager\Memory Management\PrefetchParameters' -Name BootId;$s=[System.Security.Principal.WindowsIdentity]::GetCurrent().User.Value;[pscustomobject]@{Start=$p.StartTime.ToUniversalTime().ToString('o');Boot=$b;Sid=$s}|ConvertTo-Json -Compress`;
       const row = JSON.parse(spawnText(["C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe", "-NoProfile", "-NonInteractive", "-Command", script])) as { Start: string; Boot: number; Sid: string };
@@ -76,8 +77,10 @@ export function collectCurrentRuntimeSubject(binding: Pick<TestEnrollmentBinding
     }
   } catch {
     if (process.platform !== "win32" || binding.trust_domain !== "TEST_ONLY") throw new CatfoodTrustError("ENROLLMENT_SUBJECT_UNAVAILABLE");
-    processStart = `test-only-time-origin:${performance.timeOrigin}`; boot = `test-only-windows-session:${hostname()}:${process.env.SESSIONNAME ?? "unknown"}:${process.ppid}`; principal = `test-only-user:${process.env.USERDOMAIN ?? "unknown"}\\${process.env.USERNAME ?? "unknown"}`;
+    processStart = `test-only-time-origin:${performance.timeOrigin}`; boot = `test-only-windows-session:${hostname()}:${process.env.SESSIONNAME ?? "unknown"}:${process.ppid}`; principal = `test-only-user:${process.env.USERDOMAIN ?? "unknown"}\\${process.env.USERNAME ?? "unknown"}`; operationalGrade = false;
   }
+  if (!operationalGrade && binding.trust_domain === "OPERATIONAL") throw new CatfoodTrustError("ENROLLMENT_SUBJECT_UNAVAILABLE");
+  cachedLocalIdentity = Object.freeze({ processStart, boot, principal, operationalGrade });
   const executable = realpathSync(process.execPath);
   return Object.freeze({ pid: process.pid, process_start_token: processStart, boot_id: boot, executable_path: executable, principal_id: principal, deployment_id: binding.deployment_id, environment_identity: binding.environment_identity, channel_binding_sha256: hash(canonicalJson({ origin: binding.origin, audience: binding.audience, credential_sha256: hash(binding.credential), principal_id: principal })) });
 }
