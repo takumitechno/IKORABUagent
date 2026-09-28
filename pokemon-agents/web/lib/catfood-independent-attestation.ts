@@ -8,6 +8,7 @@ import {
   type EvaluationResult, type ReadonlyThreadsEvidenceSource,
 } from "./catfood-trust";
 import { CATFOOD_THREADS_DEPENDENCY_ROOT } from "./catfood-coe";
+import { assertEnrolledRole, type CatfoodEnrollmentContext } from "./catfood-enrollment";
 
 export const CATFOOD_ATTESTATION_SCHEMA = "catfood-independent-attestation.v1";
 export const CATFOOD_ATTESTATION_DOMAIN = "IKORABU/WP3/CATFOOD/ATTESTATION/V1";
@@ -41,8 +42,9 @@ export class IndependentCatfoodAttestationWriter {
   private readonly evaluator: IndependentCatfoodEvaluator;
   private readonly privateKey: ReturnType<typeof createPrivateKey>;
   private readonly meta: Record<string, unknown>;
+  private readonly enrollment: Record<string, unknown> | null;
 
-  constructor(controlPath: string, checkpointPath: string, attestationPath: string, source: ReadonlyThreadsEvidenceSource, privateKeyPem: string) {
+  constructor(controlPath: string, checkpointPath: string, attestationPath: string, source: ReadonlyThreadsEvidenceSource, privateKeyPem: string, enrollment?: Readonly<{ writer: CatfoodEnrollmentContext; evaluator: CatfoodEnrollmentContext }>) {
     if ([resolve(controlPath), resolve(checkpointPath)].includes(resolve(attestationPath))) throw new CatfoodTrustError("ATTESTATION_STORE_MUST_BE_SEPARATE");
     this.db = new Database(resolve(attestationPath), { strict: true, create: false });
     try {
@@ -55,7 +57,13 @@ export class IndependentCatfoodAttestationWriter {
       this.privateKey = createPrivateKey(privateKeyPem); if (this.privateKey.asymmetricKeyType !== "ed25519") throw new Error();
       const actual = createPublicKey(this.privateKey).export({ type: "spki", format: "der" }); const pinned = createPublicKey(String(this.meta.signing_public_key_pem)).export({ type: "spki", format: "der" });
       if (!actual.equals(pinned)) throw new CatfoodTrustError("ATTESTATION_SIGNING_KEY_MISMATCH");
-      this.evaluator = new IndependentCatfoodEvaluator(controlPath, checkpointPath, source);
+      if (source.mode === "OPERATIONAL") {
+        if (!enrollment) throw new CatfoodTrustError("OPERATIONAL_VERIFIER_ENROLLMENT_UNAVAILABLE");
+        const writer = assertEnrolledRole(enrollment.writer, "writer", "OPERATIONAL"), evaluator = assertEnrolledRole(enrollment.evaluator, "evaluator", "OPERATIONAL");
+        if (writer.enrollment_revision !== evaluator.enrollment_revision || writer.accepted_build_snapshot_sha256 !== evaluator.accepted_build_snapshot_sha256) throw new CatfoodTrustError("ENROLLMENT_MIXED_SNAPSHOT");
+        this.enrollment = { enrollment_revision: writer.enrollment_revision, accepted_build_snapshot_id: writer.accepted_build_snapshot_id, accepted_build_snapshot_sha256: writer.accepted_build_snapshot_sha256, writer_launch_measurement_id: writer.launch_measurement_id, evaluator_launch_measurement_id: evaluator.launch_measurement_id };
+      } else this.enrollment = enrollment ? { writer: assertEnrolledRole(enrollment.writer, "writer", "TEST_ONLY"), evaluator: assertEnrolledRole(enrollment.evaluator, "evaluator", "TEST_ONLY") } : null;
+      this.evaluator = new IndependentCatfoodEvaluator(controlPath, checkpointPath, source, enrollment?.evaluator);
     } catch (error) { this.db.close(); throw error; }
   }
 
@@ -69,7 +77,7 @@ export class IndependentCatfoodAttestationWriter {
     const spec = bundle.spec as Record<string, unknown>; const go = bundle.go as Record<string, unknown>; const checkpoint = bundle.checkpoint as Record<string, unknown>;
     const finalSource = bundle.final_source as Record<string, unknown>;
     const scope = { run_id: runId, environment_type: spec.environment_type, environment_instance_id: spec.environment_instance_id, organization_id: spec.organization_id, tenant_id: spec.tenant_id, account_id: spec.account_id };
-    const payload = { domain: CATFOOD_ATTESTATION_DOMAIN, schema: CATFOOD_ATTESTATION_SCHEMA, trust_domain: evaluation.test_only ? "TEST_ONLY" : "OPERATIONAL", run_id: runId, scope_sha256: sha256(canonicalJson(scope)), go_sha256: go.artifact_sha256, policy_sha256: CATFOOD_POLICY_SHA256, dependency_root: CATFOOD_THREADS_DEPENDENCY_ROOT, ikorabu_release_sha: spec.ikorabu_release_sha, threads_sha: spec.threads_sha, boundary_sha256: spec.operational_boundary_sha256, threads_release_sha256: spec.threads_release_sha256, threads_schema: spec.threads_schema, evaluator_sha256: CATFOOD_EVALUATOR_SHA256, checkpoint_id: checkpoint.checkpoint_id, source_digest: finalSource.digest, evidence_coverage: evaluation.evidence_coverage, bundle_sha256: evaluation.rederived_bundle_sha256, verdict: evaluation.verdict, reason_codes: evaluation.reason_codes, test_only: evaluation.test_only, writer_identity: this.meta.writer_identity, signing_key_id: this.meta.signing_key_id, attested_at: attestedAt };
+    const payload = { domain: CATFOOD_ATTESTATION_DOMAIN, schema: CATFOOD_ATTESTATION_SCHEMA, trust_domain: evaluation.test_only ? "TEST_ONLY" : "OPERATIONAL", run_id: runId, scope_sha256: sha256(canonicalJson(scope)), go_sha256: go.artifact_sha256, policy_sha256: CATFOOD_POLICY_SHA256, dependency_root: CATFOOD_THREADS_DEPENDENCY_ROOT, ikorabu_release_sha: spec.ikorabu_release_sha, threads_sha: spec.threads_sha, boundary_sha256: spec.operational_boundary_sha256, threads_release_sha256: spec.threads_release_sha256, threads_schema: spec.threads_schema, evaluator_sha256: CATFOOD_EVALUATOR_SHA256, checkpoint_id: checkpoint.checkpoint_id, source_digest: finalSource.digest, evidence_coverage: evaluation.evidence_coverage, bundle_sha256: evaluation.rederived_bundle_sha256, verdict: evaluation.verdict, reason_codes: evaluation.reason_codes, test_only: evaluation.test_only, writer_identity: this.meta.writer_identity, signing_key_id: this.meta.signing_key_id, attested_at: attestedAt, ...(this.enrollment ? { enrollment: this.enrollment } : {}) };
     const text = canonicalJson(payload); const signature = sign(null, Buffer.from(`${CATFOOD_ATTESTATION_DOMAIN}\n${text}`), this.privateKey).toString("base64url"); const id = `att:${sha256(`${text}.${signature}`).slice(0, 32)}`;
     this.db.query("INSERT INTO independent_attestations VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)").run(id, runId, payload.scope_sha256, payload.go_sha256, payload.policy_sha256, payload.ikorabu_release_sha, payload.threads_sha, payload.boundary_sha256, payload.threads_release_sha256, payload.threads_schema, payload.evaluator_sha256, payload.checkpoint_id, payload.evidence_coverage, payload.bundle_sha256, payload.verdict, canonicalJson(payload.reason_codes), payload.test_only ? 1 : 0, payload.writer_identity, payload.signing_key_id, payload.attested_at, text, signature);
     return id;

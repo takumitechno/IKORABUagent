@@ -2,6 +2,7 @@ import { Database } from "bun:sqlite";
 import { createPublicKey, randomBytes, verify } from "node:crypto";
 import { existsSync, readFileSync, statSync } from "node:fs";
 import { join, resolve } from "node:path";
+import { assertEnrolledRole, type CatfoodEnrollmentContext } from "./catfood-enrollment";
 import { canonicalJson, sha256, validateOperationalBoundaryV1, type Json, type OperationalBoundaryV1 } from "./catfood-harness";
 import { CATFOOD_THREADS_DEPENDENCY_ROOT, acquireCoe, assessCoe, assertFrozenDependencies, canonicalCoeJson, classifyRunAttempts, decodeCoeAcquisition, stableCoeEvidence, validateOutcomeEvaluationRequest, verifyGovernedWork, type AttemptMembershipDecision, type CoeAcquisition, type CoeAssessment, type CoePageSource, type GovernedWorkDecision, type OutcomeEvaluationRequest } from "./catfood-coe";
 
@@ -486,8 +487,8 @@ function validateTrustConfig(value: CatfoodTrustConfig): Readonly<CatfoodTrustCo
   return Object.freeze(JSON.parse(canonicalJson(value)));
 }
 
-export function initializeProtectedCatfoodStores(controlPath: string, checkpointPath: string, trustInput: CatfoodTrustConfig, at: string): void {
-  if (trustInput.source_mode === "OPERATIONAL") throw new CatfoodTrustError("OPERATIONAL_SUPERVISOR_ENROLLMENT_UNAVAILABLE");
+export function initializeProtectedCatfoodStores(controlPath: string, checkpointPath: string, trustInput: CatfoodTrustConfig, at: string, enrollment?: CatfoodEnrollmentContext): void {
+  if (trustInput.source_mode === "OPERATIONAL") { try { assertEnrolledRole(enrollment, "custodian", "OPERATIONAL"); } catch { throw new CatfoodTrustError("OPERATIONAL_SUPERVISOR_ENROLLMENT_UNAVAILABLE"); } } else if (enrollment) assertEnrolledRole(enrollment, "custodian", "TEST_ONLY");
   const control = resolve(controlPath), checkpoint = resolve(checkpointPath);
   if (control === checkpoint) throw new CatfoodTrustError("CHECKPOINT_MUST_BE_EXTERNAL");
   if (!existsSync(control) || !existsSync(checkpoint)) throw new CatfoodTrustError("STORE_MUST_PREEXIST");
@@ -636,6 +637,7 @@ export class ProtectedCatfoodCustodian {
     checkpointPath: string,
     private readonly source: ThreadsEvidenceSource,
     private readonly clock: TrustedClock,
+    enrollment?: CatfoodEnrollmentContext,
   ) {
     if (resolve(controlPath) === resolve(checkpointPath)) throw new CatfoodTrustError("CHECKPOINT_MUST_BE_EXTERNAL");
     this.control = new Database(resolve(controlPath), { strict: true, create: false });
@@ -644,7 +646,7 @@ export class ProtectedCatfoodCustodian {
       configure(this.control); configure(this.checkpoints);
       assertConnection(this.control); checkpointHealth(this.checkpoints);
       this.trust = loadTrust(this.control);
-      if (this.trust.source_mode === "OPERATIONAL") throw new CatfoodTrustError("OPERATIONAL_SUPERVISOR_ENROLLMENT_UNAVAILABLE");
+      if (this.trust.source_mode === "OPERATIONAL") { try { assertEnrolledRole(enrollment, "custodian", "OPERATIONAL"); } catch { throw new CatfoodTrustError("OPERATIONAL_SUPERVISOR_ENROLLMENT_UNAVAILABLE"); } } else if (enrollment) assertEnrolledRole(enrollment, "custodian", "TEST_ONLY");
       if (source.mode !== this.trust.source_mode || source.source_identity !== `${this.trust.threads_sha}:${this.trust.threads_release_sha256}`) throw new CatfoodTrustError("THREADS_SOURCE_IDENTITY_MISMATCH");
       if (this.trust.source_mode === "OPERATIONAL") {
         if (clock.kind !== "SYSTEM") throw new CatfoodTrustError("TEST_CLOCK_NOT_OPERATIONAL");
@@ -1201,13 +1203,13 @@ export class IndependentCatfoodEvaluator {
   private readonly checkpoints: Database;
   private readonly trust: Readonly<CatfoodTrustConfig>;
 
-  constructor(controlPath: string, checkpointPath: string, private readonly source: ReadonlyThreadsEvidenceSource) {
+  constructor(controlPath: string, checkpointPath: string, private readonly source: ReadonlyThreadsEvidenceSource, enrollment?: CatfoodEnrollmentContext) {
     this.control = new Database(resolve(controlPath), { strict: true, create: false, readonly: true });
     this.checkpoints = new Database(resolve(checkpointPath), { strict: true, create: false, readonly: true });
     try {
       configure(this.control, true); configure(this.checkpoints, true); assertConnection(this.control); checkpointHealth(this.checkpoints);
       this.trust = loadTrust(this.control);
-      if (this.trust.source_mode === "OPERATIONAL") throw new CatfoodTrustError("OPERATIONAL_VERIFIER_ENROLLMENT_UNAVAILABLE");
+      if (this.trust.source_mode === "OPERATIONAL") { try { assertEnrolledRole(enrollment, "evaluator", "OPERATIONAL"); } catch { throw new CatfoodTrustError("OPERATIONAL_VERIFIER_ENROLLMENT_UNAVAILABLE"); } } else if (enrollment) assertEnrolledRole(enrollment, "evaluator", "TEST_ONLY");
       if (source.mode !== this.trust.source_mode || source.source_identity !== `${this.trust.threads_sha}:${this.trust.threads_release_sha256}`) throw new CatfoodTrustError("THREADS_SOURCE_IDENTITY_MISMATCH");
     } catch (error) { this.control.close(); this.checkpoints.close(); throw error; }
   }
@@ -1280,7 +1282,7 @@ export class IndependentCatfoodEvaluator {
 function meaningfulClaim(work: Record<string, unknown>): boolean {
   if (work.status !== "TERMINAL" || !work.terminal_json || plain(work.governed_decision, "governed_decision").disposition !== "CREDIT") return false; const claim = work.terminal_json as ThreadsClaimRecord;
   if (claim.claim_status !== "succeeded" || claim.transport_status !== "SUCCEEDED" || claim.provider_invoked || claim.paid_cost_micros !== 0) return false;
-  if (claim.capability === "editorial.cycle") return claim.domain_result.state === "DRAFT" && claim.domain_result.status === "READY" && claim.domain_result.mutated === false && typeof claim.domain_result.cycle_id === "string";
+  if (claim.capability === "editorial.cycle") return plain(work.governed_decision, "governed_decision").material_effect && plain(plain(work.governed_decision, "governed_decision").material_effect, "material_effect").eligibility === "ELIGIBLE" && claim.domain_result.state === "DRAFT" && claim.domain_result.status === "READY" && claim.domain_result.mutated === false && typeof claim.domain_result.cycle_id === "string";
   if (claim.capability === "editorial.outcome_evaluation") {
     const result = claim.domain_result; const evaluation = result.evaluation as Record<string, unknown> | undefined;
     if (result.state === "SUCCEEDED") return typeof result.result_identity === "string" && ["SUCCESS", "FAILURE", "INVALID_EXPERIMENT"].includes(String(result.native_domain_state));

@@ -2,6 +2,7 @@ import { sha256, type Json } from "./catfood-harness";
 import { acquireCoe, foldProducerAttempts, parseJsonNoDuplicateKeys, validateOutcomeEvaluationRequest, type CoeAcquisition, type CoePageSource, type CoeRawPage, type CoeRequest, type OutcomeEvaluationRequest } from "./catfood-coe";
 import { validateOperationalBoundaryV1, type OperationalBoundaryV1 } from "./catfood-harness";
 import { CATFOOD_CAPABILITIES, CatfoodTrustError, type CatfoodCapability, type CatfoodRunSpec, type OperationalProvenance, type TenantProbeEvidence, type ThreadsAuthorityTransition, type ThreadsClaimRecord, type ThreadsEvidenceSource, type ThreadsInventoryItem, type ThreadsRuntimeEvidence } from "./catfood-trust";
+import { assertEnrolledRole, type CatfoodEnrollmentContext } from "./catfood-enrollment";
 
 export interface ThreadsHttpResponse { status: number; content_type: string; content_encoding?: string; location: string | null; body?: string; body_base64url?: string; byte_length?: number; body_sha256?: string }
 export type ThreadsHttpTransport = (request: Readonly<{ method: "GET" | "POST"; url: string; headers: Readonly<Record<string, string>>; body: string | null; timeout_ms: number; maximum_bytes: number }>) => ThreadsHttpResponse;
@@ -136,8 +137,8 @@ export class OperationalThreadsEvidenceSource implements ThreadsEvidenceSource {
   readonly evidence_trust: "OPERATIONAL" | "TEST_ONLY";
   private lastPage: Record<string, unknown> | null = null;
   private lastAcquisition: CoeAcquisition | null = null;
-  private constructor(readonly mode: "OPERATIONAL" | "TEST_ONLY", private readonly context: Readonly<ThreadsSourceContext>, private readonly adapter: OperationalThreadsHttpAdapter, private readonly now: () => Date) {
-    if (mode === "OPERATIONAL") throw new CatfoodTrustError("OPERATIONAL_SUPERVISOR_ENROLLMENT_UNAVAILABLE");
+  private constructor(readonly mode: "OPERATIONAL" | "TEST_ONLY", private readonly context: Readonly<ThreadsSourceContext>, private readonly adapter: OperationalThreadsHttpAdapter, private readonly now: () => Date, enrollment?: CatfoodEnrollmentContext) {
+    if (enrollment) assertEnrolledRole(enrollment, "source", mode); else if (mode === "OPERATIONAL") throw new CatfoodTrustError("OPERATIONAL_SUPERVISOR_ENROLLMENT_UNAVAILABLE");
     this.source_identity = context.source_identity;
     this.operational_provenance = context.operational_provenance;
     this.evidence_trust = mode;
@@ -147,9 +148,13 @@ export class OperationalThreadsEvidenceSource implements ThreadsEvidenceSource {
     return new OperationalThreadsEvidenceSource("TEST_ONLY", Object.freeze(structuredClone(context)), new OperationalThreadsHttpAdapter(context, transport), now);
   }
 
-  static operational(context: Readonly<ThreadsSourceContext>): OperationalThreadsEvidenceSource {
-    void context;
-    throw new CatfoodTrustError("OPERATIONAL_SUPERVISOR_ENROLLMENT_UNAVAILABLE");
+  static enrolledTestOnly(context: Readonly<ThreadsSourceContext>, transport: ThreadsHttpTransport, now: () => Date, enrollment: CatfoodEnrollmentContext): OperationalThreadsEvidenceSource {
+    return new OperationalThreadsEvidenceSource("TEST_ONLY", Object.freeze(structuredClone(context)), new OperationalThreadsHttpAdapter(context, transport), now, enrollment);
+  }
+
+  static operational(context: Readonly<ThreadsSourceContext>, enrollment?: CatfoodEnrollmentContext): OperationalThreadsEvidenceSource {
+    if (!enrollment) throw new CatfoodTrustError("OPERATIONAL_SUPERVISOR_ENROLLMENT_UNAVAILABLE");
+    return new OperationalThreadsEvidenceSource("OPERATIONAL", Object.freeze(structuredClone(context)), new OperationalThreadsHttpAdapter(context), () => new Date(), enrollment);
   }
 
   operationalEvidence(request: Readonly<CoeRequest>): CoeRawPage {

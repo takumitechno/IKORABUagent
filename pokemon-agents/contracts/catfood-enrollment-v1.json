@@ -1,0 +1,22 @@
+{
+  "contract": "ikorabu.catfood-enrollment.v1",
+  "purpose": "IKORABU/WP3/CATFOOD/ROLE-ENROLLMENT/V1",
+  "transport": {
+    "method": "POST",
+    "path": "/v1/catfood/enrollment",
+    "authentication": "Bearer credential from protected enrollment-binding.json",
+    "redirects": "rejected",
+    "timeout_ms": 2500,
+    "maximum_response_bytes": 256000,
+    "operational_origin": "HTTPS origin from protected enrollment-binding.json",
+    "test_origin": "explicit TEST_ONLY loopback only"
+  },
+  "roles": ["source", "custodian", "evaluator", "writer", "verifier"],
+  "signature": {
+    "algorithm": "Ed25519",
+    "message": "IKORABU/WP3/CATFOOD/ROLE-ENROLLMENT/V1\\n<canonical-payload-base64url>",
+    "key_source": "issuer_key_id/public_key_pem from protected enrollment-binding.json"
+  },
+  "failure_states": ["UNPROVISIONED", "INVALID_OR_FORGED", "UNAVAILABLE"],
+  "success_state": "VALID_ENROLLED_SESSION_AND_ROLE_BUILDS"
+}
