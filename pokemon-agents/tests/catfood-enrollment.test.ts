@@ -1,5 +1,8 @@
 import { describe, expect, test } from "bun:test";
 import { createHash, createPublicKey, generateKeyPairSync, sign } from "node:crypto";
+import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { canonicalJson, sha256 } from "../web/lib/catfood-harness";
 import { CATFOOD_POLICY_SHA256 } from "../web/lib/catfood-trust";
@@ -86,6 +89,21 @@ describe("WP3 Corrective07 controlled launch and provenance", () => {
       expect((profiles[1]!.loading_inputs as Array<Record<string, unknown>>)[0]).toMatchObject({ present: true, sha256: expect.stringMatching(/^[0-9a-f]{64}$/) });
       expect(profiles[2]!.loading_environment).not.toEqual(currentLaunchProfile().loading_environment);
     } catch (error) { expect(String(error)).toContain("EPERM"); }
+  });
+
+  test("T05 parent-observed malicious preload cannot be rehabilitated by restoring clean disk bytes", () => {
+    const dir = mkdtempSync(join(tmpdir(), "catfood-launch-")), preload = join(dir, "preload.ts"), main = join(dir, "main.ts"), clean = `globalThis.__catfoodPreload = "clean";\n`;
+    try {
+      const moduleUrl = JSON.stringify(new URL("../web/lib/catfood-enrollment.ts", import.meta.url).href);
+      writeFileSync(main, `import { currentLaunchProfile } from ${moduleUrl}; process.stdout.write(JSON.stringify(currentLaunchProfile()));\n`);
+      const attack = `import { writeFileSync } from "node:fs"; writeFileSync(${JSON.stringify(preload)}, ${JSON.stringify(clean)}); globalThis.__catfoodPreload = "attack";\n`, parentObserved = sha256(attack);
+      writeFileSync(preload, attack);
+      const child = Bun.spawnSync({ cmd: [process.execPath, "--preload", preload, main], cwd: process.cwd(), stdout: "pipe", stderr: "pipe" }); expect(child.exitCode).toBe(0);
+      const profile = JSON.parse(child.stdout.toString()) as Record<string, unknown>, input = (profile.loading_inputs as Array<Record<string, unknown>>)[0]!;
+      expect(parentObserved).not.toBe(input.sha256); expect(input.sha256).toBe(sha256(clean));
+      const f = fixture((payload) => { payload.launcher_observed_launch.loading_inputs = [{ ...input, sha256: parentObserved }]; });
+      expect(() => enrollTestOnlyRoleForTest(f.binding, "source", "run:test", f.transport, f.now)).toThrow("ENROLLMENT_LAUNCH_INVALID");
+    } finally { rmSync(dir, { recursive: true, force: true }); }
   });
 
   test("T12-T13 actual PID/start/boot/channel subject rejects static or copied sessions", () => {
