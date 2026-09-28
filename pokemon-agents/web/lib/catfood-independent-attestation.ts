@@ -19,6 +19,13 @@ export interface AttestationStoreConfig {
   signing_public_key_pem: string;
 }
 
+export interface CatfoodAttestationEnrollments {
+  source: CatfoodEnrollmentContext;
+  custodian: CatfoodEnrollmentContext;
+  evaluator: CatfoodEnrollmentContext;
+  writer: CatfoodEnrollmentContext;
+}
+
 const SQL = `
 CREATE TABLE attestation_meta(singleton INTEGER PRIMARY KEY CHECK(singleton=1),schema_version TEXT NOT NULL,writer_identity TEXT NOT NULL,signing_key_id TEXT NOT NULL,signing_public_key_pem TEXT NOT NULL,evaluator_sha256 TEXT NOT NULL,policy_sha256 TEXT NOT NULL) STRICT;
 CREATE TRIGGER attestation_meta_no_update BEFORE UPDATE ON attestation_meta BEGIN SELECT RAISE(ABORT,'attestation metadata is immutable'); END;
@@ -44,7 +51,7 @@ export class IndependentCatfoodAttestationWriter {
   private readonly meta: Record<string, unknown>;
   private readonly enrollment: Record<string, unknown> | null;
 
-  constructor(controlPath: string, checkpointPath: string, attestationPath: string, source: ReadonlyThreadsEvidenceSource, privateKeyPem: string, enrollment?: Readonly<{ writer: CatfoodEnrollmentContext; evaluator: CatfoodEnrollmentContext }>) {
+  constructor(controlPath: string, checkpointPath: string, attestationPath: string, source: ReadonlyThreadsEvidenceSource, privateKeyPem: string, enrollment?: Readonly<CatfoodAttestationEnrollments>) {
     if ([resolve(controlPath), resolve(checkpointPath)].includes(resolve(attestationPath))) throw new CatfoodTrustError("ATTESTATION_STORE_MUST_BE_SEPARATE");
     this.db = new Database(resolve(attestationPath), { strict: true, create: false });
     try {
@@ -57,12 +64,19 @@ export class IndependentCatfoodAttestationWriter {
       this.privateKey = createPrivateKey(privateKeyPem); if (this.privateKey.asymmetricKeyType !== "ed25519") throw new Error();
       const actual = createPublicKey(this.privateKey).export({ type: "spki", format: "der" }); const pinned = createPublicKey(String(this.meta.signing_public_key_pem)).export({ type: "spki", format: "der" });
       if (!actual.equals(pinned)) throw new CatfoodTrustError("ATTESTATION_SIGNING_KEY_MISMATCH");
-      if (source.mode === "OPERATIONAL") {
-        if (!enrollment) throw new CatfoodTrustError("OPERATIONAL_VERIFIER_ENROLLMENT_UNAVAILABLE");
-        const writer = assertEnrolledRole(enrollment.writer, "writer", "OPERATIONAL"), evaluator = assertEnrolledRole(enrollment.evaluator, "evaluator", "OPERATIONAL");
-        if (writer.enrollment_revision !== evaluator.enrollment_revision || writer.accepted_build_snapshot_sha256 !== evaluator.accepted_build_snapshot_sha256) throw new CatfoodTrustError("ENROLLMENT_MIXED_SNAPSHOT");
-        this.enrollment = { enrollment_revision: writer.enrollment_revision, accepted_build_snapshot_id: writer.accepted_build_snapshot_id, accepted_build_snapshot_sha256: writer.accepted_build_snapshot_sha256, writer_launch_measurement_id: writer.launch_measurement_id, evaluator_launch_measurement_id: evaluator.launch_measurement_id };
-      } else this.enrollment = enrollment ? { writer: assertEnrolledRole(enrollment.writer, "writer", "TEST_ONLY"), evaluator: assertEnrolledRole(enrollment.evaluator, "evaluator", "TEST_ONLY") } : null;
+      if (source.mode === "OPERATIONAL" && !enrollment) throw new CatfoodTrustError("OPERATIONAL_VERIFIER_ENROLLMENT_UNAVAILABLE");
+      if (enrollment) {
+        const domain = source.mode === "OPERATIONAL" ? "OPERATIONAL" : "TEST_ONLY";
+        const roles = {
+          source: assertEnrolledRole(enrollment.source, "source", domain),
+          custodian: assertEnrolledRole(enrollment.custodian, "custodian", domain),
+          evaluator: assertEnrolledRole(enrollment.evaluator, "evaluator", domain),
+          writer: assertEnrolledRole(enrollment.writer, "writer", domain),
+        };
+        const common = ["enrollment_revision", "accepted_build_snapshot_id", "accepted_build_snapshot_sha256", "scope", "session_id", "principal_id", "process_id", "process_started_at", "boot_id", "deployment_id", "environment_identity", "source_identity"] as const;
+        if (common.some((field) => Object.values(roles).some((row) => row[field] !== roles.source[field]))) throw new CatfoodTrustError("ENROLLMENT_MIXED_SNAPSHOT");
+        this.enrollment = { enrollment_revision: roles.source.enrollment_revision, accepted_build_snapshot_id: roles.source.accepted_build_snapshot_id, accepted_build_snapshot_sha256: roles.source.accepted_build_snapshot_sha256, source_launch_measurement_id: roles.source.launch_measurement_id, custodian_launch_measurement_id: roles.custodian.launch_measurement_id, evaluator_launch_measurement_id: roles.evaluator.launch_measurement_id, writer_launch_measurement_id: roles.writer.launch_measurement_id };
+      } else this.enrollment = null;
       this.evaluator = new IndependentCatfoodEvaluator(controlPath, checkpointPath, source, enrollment?.evaluator);
     } catch (error) { this.db.close(); throw error; }
   }
@@ -84,11 +98,15 @@ export class IndependentCatfoodAttestationWriter {
   }
 }
 
-export function verifyIndependentAttestation(payloadJson: string, signatureBase64url: string, publicKeyPem: string, expected: { run_id: string; bundle_sha256: string; allow_test_only?: boolean; writer_identity?: string; signing_key_id?: string }): EvaluationResult["verdict"] {
+export function verifyIndependentAttestation(payloadJson: string, signatureBase64url: string, publicKeyPem: string, expected: { run_id: string; bundle_sha256: string; allow_test_only?: boolean; writer_identity?: string; signing_key_id?: string; verifier_enrollment?: CatfoodEnrollmentContext }): EvaluationResult["verdict"] {
   const payload = JSON.parse(payloadJson) as Record<string, unknown>;
   if (expected.allow_test_only !== true || payload.test_only !== true || canonicalJson(payload) !== payloadJson || payload.domain !== CATFOOD_ATTESTATION_DOMAIN || payload.schema !== CATFOOD_ATTESTATION_SCHEMA || payload.evaluator_sha256 !== CATFOOD_EVALUATOR_SHA256 || payload.policy_sha256 !== CATFOOD_POLICY_SHA256 || payload.dependency_root !== CATFOOD_THREADS_DEPENDENCY_ROOT || !["COMPLETE", "PARTIAL", "UNKNOWN"].includes(String(payload.evidence_coverage)) || payload.trust_domain !== "TEST_ONLY") throw new CatfoodTrustError("ATTESTATION_INVALID");
   if (payload.run_id !== expected.run_id || payload.bundle_sha256 !== expected.bundle_sha256) throw new CatfoodTrustError("ATTESTATION_BINDING_MISMATCH");
   if ((expected.writer_identity && payload.writer_identity !== expected.writer_identity) || (expected.signing_key_id && payload.signing_key_id !== expected.signing_key_id)) throw new CatfoodTrustError("ATTESTATION_TRUST_DOMAIN_MISMATCH");
+  if (expected.verifier_enrollment) {
+    const verifier = assertEnrolledRole(expected.verifier_enrollment, "verifier", "TEST_ONLY"), enrollment = payload.enrollment as Record<string, unknown> | undefined;
+    if (!enrollment || verifier.enrollment_revision !== enrollment.enrollment_revision || verifier.accepted_build_snapshot_id !== enrollment.accepted_build_snapshot_id || verifier.accepted_build_snapshot_sha256 !== enrollment.accepted_build_snapshot_sha256) throw new CatfoodTrustError("ATTESTATION_ENROLLMENT_MISMATCH");
+  }
   if (!verify(null, Buffer.from(`${CATFOOD_ATTESTATION_DOMAIN}\n${payloadJson}`), createPublicKey(publicKeyPem), Buffer.from(signatureBase64url, "base64url"))) throw new CatfoodTrustError("ATTESTATION_SIGNATURE_INVALID");
   return payload.verdict as EvaluationResult["verdict"];
 }

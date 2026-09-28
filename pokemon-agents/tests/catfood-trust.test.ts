@@ -12,7 +12,7 @@ import {
   IndependentCatfoodEvaluator, evaluateCatfoodAcceptance, initializeProtectedCatfoodStores, verifyHumanGo, type CatfoodRunSpec, type CatfoodTrustConfig,
   type HumanGoPayload, type RunnerSession,
 } from "../web/lib/catfood-trust";
-import { FixtureThreadsSource, TestClock, producerEditorialResult } from "./catfood-trust-fixture";
+import { FixtureThreadsSource, TestClock, producerEditorialResult, testEnrollmentContexts } from "./catfood-trust-fixture";
 import { IndependentCatfoodAttestationWriter, initializeIndependentAttestationStore, verifyIndependentAttestation } from "../web/lib/catfood-independent-attestation";
 import { CATFOOD_THREADS_PINS } from "../web/lib/catfood-coe";
 import { openOperationalCatfoodCustodian, verifyOperationalIndependentAttestation } from "../web/lib/catfood-operational-bootstrap";
@@ -126,6 +126,17 @@ describe("WP3 CATFOOD corrective adversarial plan", () => {
     expect(verifyIndependentAttestation(row.payload_json, row.signature_base64url, publicPem, { run_id: r.spec.run_id, bundle_sha256: row.bundle_sha256, allow_test_only: true, writer_identity: "attestor:test", signing_key_id: "attest:test" })).toBe("PASS");
     expect(() => verifyIndependentAttestation(row.payload_json, row.signature_base64url, publicPem, { run_id: "other-run", bundle_sha256: row.bundle_sha256, allow_test_only: true })).toThrow("ATTESTATION_BINDING_MISMATCH");
     const changed = JSON.parse(row.payload_json); changed.verdict = "FAIL"; expect(() => verifyIndependentAttestation(canonicalJson(changed), row.signature_base64url, publicPem, { run_id: r.spec.run_id, bundle_sha256: row.bundle_sha256, allow_test_only: true })).toThrow("ATTESTATION_SIGNATURE_INVALID");
+  } finally { r.close(); } });
+
+  test("corrective05 enrolled TEST_ONLY roles are carried into and independently bind the attestation", () => { const r = rig("run-enrolled-attestation"); try {
+    const { result } = positive(r); expect(result.verdict).toBe("PASS");
+    const enrollment = testEnrollmentContexts(r.spec.run_id), signing = generateKeyPairSync("ed25519"), store = join(r.dir, "enrolled-attest.db"); writeFileSync(store, "");
+    const publicPem = signing.publicKey.export({ type: "spki", format: "pem" }).toString(); initializeIndependentAttestationStore(store, { writer_identity: "attestor:test", signing_key_id: "attest:test", signing_public_key_pem: publicPem });
+    const writer = new IndependentCatfoodAttestationWriter(r.control, r.checkpoint, store, r.source, signing.privateKey.export({ type: "pkcs8", format: "pem" }).toString(), enrollment); const id = writer.attest(r.spec.run_id, r.clock.sample().wall_time); writer.close();
+    const db = new Database(store, { readonly: true }), row = db.query<{ payload_json: string; signature_base64url: string; bundle_sha256: string }, [string]>("SELECT payload_json,signature_base64url,bundle_sha256 FROM independent_attestations WHERE attestation_id=?").get(id)!; db.close();
+    const payload = JSON.parse(row.payload_json); expect(payload.enrollment).toMatchObject({ source_launch_measurement_id: "launch:source", custodian_launch_measurement_id: "launch:custodian", evaluator_launch_measurement_id: "launch:evaluator", writer_launch_measurement_id: "launch:writer" });
+    expect(verifyIndependentAttestation(row.payload_json, row.signature_base64url, publicPem, { run_id: r.spec.run_id, bundle_sha256: row.bundle_sha256, allow_test_only: true, verifier_enrollment: enrollment.verifier })).toBe("PASS");
+    const other = testEnrollmentContexts("run:other", "b".repeat(64)); expect(() => verifyIndependentAttestation(row.payload_json, row.signature_base64url, publicPem, { run_id: r.spec.run_id, bundle_sha256: row.bundle_sha256, allow_test_only: true, verifier_enrollment: other.verifier })).toThrow("ATTESTATION_ENROLLMENT_MISMATCH");
   } finally { r.close(); } });
 
   test("T10-T12 stale owner, lease, epoch, generation, scope, and forged preflight reject", () => { const r = rig(); try {

@@ -2,6 +2,7 @@ import type { Json, OperationalBoundaryV1 } from "../web/lib/catfood-harness";
 import { canonicalSha256 } from "../web/lib/catfood-harness";
 import { canonicalJson, sha256 } from "../web/lib/catfood-harness";
 import { readFileSync } from "node:fs";
+import { generateKeyPairSync, sign } from "node:crypto";
 import { resolve } from "node:path";
 import { COE_LEGACY_SOURCE_FAMILIES, COE_SOURCES, type CoeRequest, type OutcomeEvaluationRequest } from "../web/lib/catfood-coe";
 import type {
@@ -9,8 +10,23 @@ import type {
   ThreadsEvidenceSource, ThreadsInventoryItem, ThreadsRuntimeEvidence, TrustedClock,
   TrustedClockSample, TenantProbeEvidence,
 } from "../web/lib/catfood-trust";
+import { CATFOOD_POLICY_SHA256 } from "../web/lib/catfood-trust";
+import { enrollTestOnlyRoleForTest, type CatfoodEnrollmentContext, type CatfoodEnrollmentRole, type TestEnrollmentBinding } from "../web/lib/catfood-enrollment";
+import type { ThreadsHttpTransport } from "../web/lib/catfood-threads-http";
 
 const EMITTER_DISPOSITIONS = JSON.parse(readFileSync(resolve(import.meta.dir, "../contracts/catfood-operational-evidence-v1.json"), "utf8")).emitter_dispositions as Json[];
+
+export function testEnrollmentContexts(scope: string, accepted = "a".repeat(64)): Record<CatfoodEnrollmentRole, CatfoodEnrollmentContext> {
+  const keys = generateKeyPairSync("ed25519"), roles: CatfoodEnrollmentRole[] = ["source", "custodian", "evaluator", "writer", "verifier"];
+  const binding: TestEnrollmentBinding = { trust_domain: "TEST_ONLY", issuer: "fixture-authority", issuer_key_id: "fixture-key", audience: "ikorabu-catfood", origin: "http://127.0.0.1:32199", credential: "fixture-credential-0123456789abcdef", public_key_pem: keys.publicKey.export({ type: "spki", format: "pem" }).toString(), environment_identity: "test:fixture", session_id: "session:fixture", principal_id: "principal:fixture", process_id: "process:fixture", process_started_at: "2026-09-30T00:00:00Z", boot_id: "boot:fixture", deployment_id: "deployment:fixture", accepted_manifest_sha256: accepted };
+  const transport: ThreadsHttpTransport = (request) => {
+    const asked = JSON.parse(request.body!); const now = Date.parse("2026-09-30T00:00:00Z");
+    const payload = { protocol: "ikorabu.catfood-enrollment.v1", issuer: binding.issuer, enrollment_revision: 7, trust_domain: binding.trust_domain, audience: binding.audience, challenge: asked.challenge, request_id: asked.request_id, session_id: binding.session_id, principal_id: binding.principal_id, process_id: binding.process_id, process_started_at: binding.process_started_at, boot_id: binding.boot_id, deployment_id: binding.deployment_id, environment_identity: binding.environment_identity, role: asked.requested_role, scope: asked.requested_scope, issued_at: new Date(now - 1_000).toISOString(), expires_at: new Date(now + 60_000).toISOString(), revoked: false, launch_measurement_id: `launch:${asked.requested_role}`, accepted_build_snapshot_id: "snapshot:fixture", accepted_build_snapshot_sha256: accepted, role_builds: roles.map((role) => ({ role, accepted_sha256: accepted, measured_sha256: accepted })), policy_sha256: CATFOOD_POLICY_SHA256, source_identity: "source:fixture" };
+    const encoded = Buffer.from(canonicalJson(payload)).toString("base64url"), envelope = canonicalJson({ algorithm: "Ed25519", key_id: binding.issuer_key_id, payload: encoded, signature: sign(null, Buffer.from(`IKORABU/WP3/CATFOOD/ROLE-ENROLLMENT/V1\n${encoded}`), keys.privateKey).toString("base64url") });
+    return { status: 200, content_type: "application/json", location: null, body: envelope, byte_length: Buffer.byteLength(envelope), body_sha256: sha256(envelope) };
+  };
+  return Object.fromEntries(roles.map((role) => [role, enrollTestOnlyRoleForTest(binding, role, scope, transport, new Date("2026-09-30T00:00:00Z"))])) as Record<CatfoodEnrollmentRole, CatfoodEnrollmentContext>;
+}
 
 export function producerEditorialResult(cycleId: string, accountId: string, cycleKey: string, createdAt: string, updatedAt: string): Record<string, Json> {
   const config = { minimum_posts: 3, minimum_age_hours: 6, minimum_comparable_baseline: 2, minimum_relative_lift: 0.1, sample_mode: "all", recent_window: 5, negative_theme_threshold: 3, max_edit_iterations: 3, draft_candidates: 3 };

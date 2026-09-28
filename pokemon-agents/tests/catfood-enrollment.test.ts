@@ -50,5 +50,20 @@ describe("WP3 corrective05 concrete enrollment integration", () => {
       (p: Record<string, unknown>) => { p.environment_identity = "other"; }, (p: Record<string, unknown>) => { p.revoked = true; },
       (p: Record<string, unknown>) => { (p.role_builds as Record<string, unknown>[])[0]!.measured_sha256 = "b".repeat(64); },
     ]) { const { binding, transport } = fixture(mutate); expect(() => enrollTestOnlyRoleForTest(binding, "source", "run:test", transport, new Date("2026-09-30T00:00:00Z"))).toThrow(); }
+    for (const role of roles) {
+      const { binding, transport } = fixture((payload) => { const row = (payload.role_builds as Record<string, unknown>[]).find((candidate) => candidate.role === role)!; row.measured_sha256 = "b".repeat(64); });
+      expect(() => enrollTestOnlyRoleForTest(binding, "source", "run:test", transport, new Date("2026-09-30T00:00:00Z"))).toThrow("ENROLLMENT_BUILD_INVALID");
+    }
+  });
+
+  test("unavailable, malformed, redirect, encoding, and oversized responses fail closed", () => {
+    const { binding } = fixture(); const now = new Date("2026-09-30T00:00:00Z");
+    expect(() => enrollTestOnlyRoleForTest(binding, "source", "run:test", () => { throw new Error("offline"); }, now)).toThrow("ENROLLMENT_UNAVAILABLE");
+    for (const response of [
+      { status: 302, content_type: "application/json", location: "http://127.0.0.1/other", body: "{}" },
+      { status: 200, content_type: "application/json", location: null, content_encoding: "gzip", body: "{}" },
+      { status: 200, content_type: "application/json", location: null, body: "{" },
+      { status: 200, content_type: "application/json", location: null, body: "x".repeat(256_001) },
+    ]) expect(() => enrollTestOnlyRoleForTest(binding, "source", "run:test", () => response, now)).toThrow();
   });
 });
