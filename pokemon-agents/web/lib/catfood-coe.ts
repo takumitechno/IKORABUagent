@@ -146,6 +146,13 @@ export interface GovernedWorkDecision {
   claim_id: string;
   source_ref: string | null;
   result_ref: string | null;
+  material_effect?: Readonly<{
+    eligibility: "ELIGIBLE" | "ZERO";
+    reason: string;
+    effect_at: string | null;
+    witness_ref: string;
+    causality_basis: string;
+  }>;
 }
 
 export interface ProtectedInvocationBinding {
@@ -232,6 +239,12 @@ const WRITER_CANARY_RESULT_FIELDS = ["attempt", "content_hash", "content_id", "c
 const WRITER_CANARY_HISTORY_FIELDS = ["attempt", "content_id", "verdict"];
 const OUTCOME_RUNNER_FIELDS = ["account_id", "experiment_id", "failed", "recorded", "state", "status", "verdict"];
 const DRY_RUN_PART_FIELDS = ["error", "external_id", "index", "permalink", "published_at", "reply_to", "status"];
+const EDITORIAL_CONFIG_FIELDS = ["draft_candidates", "max_edit_iterations", "minimum_age_hours", "minimum_comparable_baseline", "minimum_posts", "minimum_relative_lift", "negative_theme_threshold", "recent_window", "sample_mode"];
+const SUMMARY_FIELDS = ["critiques", "facts", "final_decision", "proposals", "rejected_options", "unknowns"];
+const BRIEF_FIELDS = ["cta_policy", "experiment_history", "failure_signal", "hypothesis", "keep_constant", "keep_constants", "n_parts", "recent_posts", "required_facts", "safety_constraints", "sample_requirement", "style_profile_version", "success_signal", "template", "test_variable", "theme_diversity", "topic", "role"];
+const DRAFT_FIELDS = ["candidate_count", "iterations", "selected_draft", "selection_rationale_summary"];
+const SECRET_NESTED_KEYS = new Set(["x-api-token", "token", "secret", "webhook_secret", "aws_secret_access_key", "access_token", "api_key", "authorization", "password"]);
+const EDITORIAL_LIMITS = Object.freeze({ depth: 12, members: 2_000, object_members: 32, array_elements: 500, string_bytes: 64_000, aggregate_bytes: 512_000 });
 
 export type CoeFieldClass = "A_IMMUTABLE_EQUAL" | "B_CONSERVATIVE" | "C_PAGE_LOCAL";
 const fields = (prefix: string, names: readonly string[], classification: CoeFieldClass) => names.map((name) => [`${prefix}.${name}`, classification] as const);
@@ -294,6 +307,70 @@ function exactResult(value: Record<string, unknown>, keys: readonly string[]): b
 
 function nullableString(value: unknown): boolean { return value === null || typeof value === "string"; }
 
+function boundedNested(value: unknown): void {
+  let members = 0, bytes = 0;
+  const walk = (item: unknown, depth: number): void => {
+    if (depth > EDITORIAL_LIMITS.depth) throw new CoeError("COE_RESULT_SCHEMA_INVALID");
+    if (typeof item === "string") { bytes += Buffer.byteLength(item); if (Buffer.byteLength(item) > EDITORIAL_LIMITS.string_bytes) throw new CoeError("COE_RESULT_SCHEMA_INVALID"); return; }
+    if (item === null || typeof item === "boolean" || typeof item === "number") return;
+    if (Array.isArray(item)) { if (item.length > EDITORIAL_LIMITS.array_elements) throw new CoeError("COE_RESULT_SCHEMA_INVALID"); members += item.length; for (const child of item) walk(child, depth + 1); return; }
+    const row = object(item, "COE_RESULT_SCHEMA_INVALID"); const keys = Object.keys(row); if (keys.length > EDITORIAL_LIMITS.object_members) throw new CoeError("COE_RESULT_SCHEMA_INVALID");
+    const normalized = new Set<string>();
+    for (const key of keys) { const clean = key.normalize("NFKC").toLowerCase(); if (normalized.has(clean) || SECRET_NESTED_KEYS.has(clean)) throw new CoeError("COE_RESULT_SCHEMA_INVALID"); normalized.add(clean); bytes += Buffer.byteLength(key); walk(row[key], depth + 1); }
+    members += keys.length;
+  };
+  walk(value, 0); if (members > EDITORIAL_LIMITS.members || bytes > EDITORIAL_LIMITS.aggregate_bytes) throw new CoeError("COE_RESULT_SCHEMA_INVALID");
+}
+
+function strings(value: unknown): boolean { return Array.isArray(value) && value.every((item) => typeof item === "string"); }
+function numericRecord(value: unknown, keys: readonly string[]): boolean { const row = object(value, "COE_RESULT_SCHEMA_INVALID"); return exactResult(row, keys) && Object.values(row).every((item) => typeof item === "number" && Number.isFinite(item)); }
+
+function validateTheme(value: unknown): void {
+  const row = object(value, "COE_RESULT_SCHEMA_INVALID"); exact(row, ["counts", "experiment_override", "negative_count", "rationale", "verdict", "warnings", "window_size"]);
+  if (!numericRecord(row.counts, ["topic", "emotional_tone", "hook", "ending", "role"]) || !strings(row.warnings) || typeof row.experiment_override !== "boolean" || !Number.isSafeInteger(row.negative_count) || typeof row.rationale !== "string" || !["PASS", "WARN", "REVISE"].includes(String(row.verdict)) || !Number.isSafeInteger(row.window_size)) throw new CoeError("COE_RESULT_SCHEMA_INVALID");
+}
+
+function validateEditorialConfig(value: unknown): void {
+  const row = object(value, "COE_RESULT_SCHEMA_INVALID"); exact(row, EDITORIAL_CONFIG_FIELDS);
+  if (!EDITORIAL_CONFIG_FIELDS.every((key) => key === "sample_mode" || typeof row[key] === "number" && Number.isFinite(row[key])) || !["all", "any"].includes(String(row.sample_mode))) throw new CoeError("COE_RESULT_SCHEMA_INVALID");
+}
+
+function validateEditorialSummary(value: unknown): void {
+  const row = object(value, "COE_RESULT_SCHEMA_INVALID"); const keys = "decision_rationale_summary" in row ? [...SUMMARY_FIELDS, "decision_rationale_summary"] : SUMMARY_FIELDS; exact(row, keys);
+  if (!strings(row.facts) || !strings(row.unknowns) || !Array.isArray(row.proposals) || !Array.isArray(row.critiques) || !Array.isArray(row.rejected_options)) throw new CoeError("COE_RESULT_SCHEMA_INVALID");
+  for (const item of row.proposals) { const child = object(item, "COE_RESULT_SCHEMA_INVALID"); exact(child, ["evidence", "hypothesis", "id", "test_variable"]); if (Object.values(child).some((part) => typeof part !== "string")) throw new CoeError("COE_RESULT_SCHEMA_INVALID"); }
+  for (const item of row.critiques) { const child = object(item, "COE_RESULT_SCHEMA_INVALID"); exact(child, ["against", "agent", "critique"]); if (Object.values(child).some((part) => typeof part !== "string")) throw new CoeError("COE_RESULT_SCHEMA_INVALID"); }
+  for (const item of row.rejected_options) { const child = object(item, "COE_RESULT_SCHEMA_INVALID"); exact(child, ["id", "reason"]); if (Object.values(child).some((part) => typeof part !== "string")) throw new CoeError("COE_RESULT_SCHEMA_INVALID"); }
+  const decision = object(row.final_decision, "COE_RESULT_SCHEMA_INVALID"); if (Object.keys(decision).length && (!exactResult(decision, ["constants", "test_variable"]) || !strings(decision.constants) || typeof decision.test_variable !== "string")) throw new CoeError("COE_RESULT_SCHEMA_INVALID");
+  if ("decision_rationale_summary" in row && typeof row.decision_rationale_summary !== "string") throw new CoeError("COE_RESULT_SCHEMA_INVALID");
+}
+
+function validateSignal(value: unknown): void { const row = object(value, "COE_RESULT_SCHEMA_INVALID"); exact(row, ["direction", "metric"]); if (typeof row.direction !== "string" || typeof row.metric !== "string") throw new CoeError("COE_RESULT_SCHEMA_INVALID"); }
+
+function validateEditorialBrief(value: unknown): void {
+  if (value === null) return; const row = object(value, "COE_RESULT_SCHEMA_INVALID"); const keys = [...BRIEF_FIELDS, ...(row.variable_scope === undefined ? [] : ["variable_scope"]), ...(row.revision_series === undefined ? [] : ["revision_series"])]; exact(row, keys);
+  for (const field of ["role", "topic", "hypothesis", "test_variable", "template", "cta_policy"] as const) if (typeof row[field] !== "string") throw new CoeError("COE_RESULT_SCHEMA_INVALID");
+  if (!strings(row.keep_constant) || !strings(row.required_facts) || !strings(row.safety_constraints) || !Number.isSafeInteger(row.n_parts) || row.n_parts < 1 || !(row.style_profile_version === null || Number.isSafeInteger(row.style_profile_version) && Number(row.style_profile_version) > 0)) throw new CoeError("COE_RESULT_SCHEMA_INVALID");
+  const constants = object(row.keep_constants, "COE_RESULT_SCHEMA_INVALID"); if (Object.keys(constants).some((key) => !["role", "topic", "hook", "length", "ending"].includes(key)) || Object.values(constants).some((item) => !nullableString(item))) throw new CoeError("COE_RESULT_SCHEMA_INVALID");
+  validateSignal(row.success_signal); validateSignal(row.failure_signal); validateEditorialConfig(row.sample_requirement);
+  if (!Array.isArray(row.recent_posts) || !Array.isArray(row.experiment_history)) throw new CoeError("COE_RESULT_SCHEMA_INVALID");
+  for (const item of row.recent_posts) { const child = object(item, "COE_RESULT_SCHEMA_INVALID"); exact(child, ["content_id", "ending", "hook", "role", "topic"]); if (Object.values(child).some((part) => !nullableString(part))) throw new CoeError("COE_RESULT_SCHEMA_INVALID"); }
+  for (const item of row.experiment_history) { const child = object(item, "COE_RESULT_SCHEMA_INVALID"); exact(child, ["test_variable"]); if (!nullableString(child.test_variable)) throw new CoeError("COE_RESULT_SCHEMA_INVALID"); }
+  validateTheme(row.theme_diversity);
+  if (row.variable_scope !== undefined) { const scope = object(row.variable_scope, "COE_RESULT_SCHEMA_INVALID"); exact(scope, ["baseline_body", "baseline_content_id", "baseline_editable", "baseline_length_band", "locked_prefix", "locked_suffix", "remaining_character_budget", "variable"]); if (Object.entries(scope).some(([key, part]) => key === "remaining_character_budget" ? !Number.isSafeInteger(part) : key === "baseline_content_id" ? !nullableString(part) : typeof part !== "string")) throw new CoeError("COE_RESULT_SCHEMA_INVALID"); }
+  if (row.revision_series !== undefined && (!Number.isSafeInteger(row.revision_series) || row.revision_series < 2)) throw new CoeError("COE_RESULT_SCHEMA_INVALID");
+}
+
+function validateEditorialDraft(value: unknown): void {
+  if (value === null) return; const row = object(value, "COE_RESULT_SCHEMA_INVALID"); const keys = [...DRAFT_FIELDS, ...(row.revision_history === undefined ? [] : ["revision_history"]), ...(row.interruptions === undefined ? [] : ["interruptions"])]; exact(row, keys);
+  if (!Number.isSafeInteger(row.candidate_count) || !Array.isArray(row.iterations) || !nullableString(row.selection_rationale_summary) || (row.selected_draft !== null && typeof row.selected_draft !== "object")) throw new CoeError("COE_RESULT_SCHEMA_INVALID");
+  const iteration = (item: unknown): void => { const child = object(item, "COE_RESULT_SCHEMA_INVALID"); onlyKnown(child, ["candidates", "ended_at", "feedback_for_next", "iteration", "plan_id", "started_at", "status"]); for (const required of ["candidates", "feedback_for_next", "iteration", "plan_id", "started_at", "status"]) if (!(required in child)) throw new CoeError("COE_RESULT_SCHEMA_INVALID"); if (!Array.isArray(child.candidates) || !strings(child.feedback_for_next) || !Number.isSafeInteger(child.iteration) || typeof child.plan_id !== "string" || typeof child.started_at !== "string" || typeof child.status !== "string" || ("ended_at" in child && typeof child.ended_at !== "string")) throw new CoeError("COE_RESULT_SCHEMA_INVALID"); for (const candidate of child.candidates) { const c = object(candidate, "COE_RESULT_SCHEMA_INVALID"); exact(c, ["candidate", "chars", "copy_guard", "editorial_critic", "ending", "hook", "qa", "theme", "verdict", "voice"]); if (!Number.isSafeInteger(c.candidate) || !Number.isSafeInteger(c.chars) || typeof c.ending !== "string" || typeof c.hook !== "string" || !["PASS", "REVISE", "BLOCK"].includes(String(c.verdict))) throw new CoeError("COE_RESULT_SCHEMA_INVALID"); const copy = object(c.copy_guard, "COE_RESULT_SCHEMA_INVALID"); exact(copy, ["finding_count", "verdict"]); if (!Number.isSafeInteger(copy.finding_count) || typeof copy.verdict !== "string") throw new CoeError("COE_RESULT_SCHEMA_INVALID"); const qa = object(c.qa, "COE_RESULT_SCHEMA_INVALID"); exact(qa, ["rules", "verdict"]); if (!strings(qa.rules) || typeof qa.verdict !== "string") throw new CoeError("COE_RESULT_SCHEMA_INVALID"); validateTheme(c.theme); const critic = object(c.editorial_critic, "COE_RESULT_SCHEMA_INVALID"); exact(critic, ["locked_prefix_preserved", "only_variable_changed", "test_variable", "verdict", "violations"]); if (typeof critic.locked_prefix_preserved !== "boolean" || typeof critic.only_variable_changed !== "boolean" || typeof critic.test_variable !== "string" || typeof critic.verdict !== "string" || !Array.isArray(critic.violations)) throw new CoeError("COE_RESULT_SCHEMA_INVALID"); for (const violation of critic.violations) { const v = object(violation, "COE_RESULT_SCHEMA_INVALID"); exact(v, ["actual", "expected", "field"]); if (Object.values(v).some((part) => !nullableString(part))) throw new CoeError("COE_RESULT_SCHEMA_INVALID"); } const voice = object(c.voice, "COE_RESULT_SCHEMA_INVALID"); const ending = "scope" in voice; exact(voice, ending ? ["baseline_observations", "editable_region", "full_body_blockers", "reasons", "scope", "scores", "verdict"] : ["reasons", "scores", "verdict"]); if (!strings(voice.reasons) || typeof voice.verdict !== "string" || !numericRecord(voice.scores, ["naturalness", "ai_like_phrasing", "poem_like_phrasing", "line_break_naturalness", "episode_specificity", "empathy", "male_psychology_absolutism", "partial_resolution_open_space", "persona_fit", "repetitive_construction"])) throw new CoeError("COE_RESULT_SCHEMA_INVALID"); if (ending) { const editable = object(voice.editable_region, "COE_RESULT_SCHEMA_INVALID"); exact(editable, ["concrete_view", "natural_conversation", "partial_resolution_open_space"]); if (Object.values(editable).some((part) => typeof part !== "boolean") || voice.scope !== "ending" || !strings(voice.baseline_observations) || !strings(voice.full_body_blockers)) throw new CoeError("COE_RESULT_SCHEMA_INVALID"); } } };
+  for (const item of row.iterations) iteration(item);
+  if (row.selected_draft !== null) { const selected = object(row.selected_draft, "COE_RESULT_SCHEMA_INVALID"); exact(selected, ["body", "candidate", "content_id", "iteration", "parts", "state"]); if (typeof selected.body !== "string" || !strings(selected.parts) || !Number.isSafeInteger(selected.candidate) || !Number.isSafeInteger(selected.iteration) || typeof selected.content_id !== "string" || typeof selected.state !== "string") throw new CoeError("COE_RESULT_SCHEMA_INVALID"); }
+  if (row.revision_history !== undefined) { if (!Array.isArray(row.revision_history)) throw new CoeError("COE_RESULT_SCHEMA_INVALID"); for (const item of row.revision_history) { const history = object(item, "COE_RESULT_SCHEMA_INVALID"); exact(history, ["iterations", "outcome", "revision_series"]); if (!Array.isArray(history.iterations) || typeof history.outcome !== "string" || !Number.isSafeInteger(history.revision_series)) throw new CoeError("COE_RESULT_SCHEMA_INVALID"); for (const past of history.iterations) iteration(past); } }
+  if (row.interruptions !== undefined) { if (!Array.isArray(row.interruptions)) throw new CoeError("COE_RESULT_SCHEMA_INVALID"); for (const item of row.interruptions) { const interruption = object(item, "COE_RESULT_SCHEMA_INVALID"); exact(interruption, ["iteration", "plan_id", "status", "summary"]); if (!Number.isSafeInteger(interruption.iteration) || typeof interruption.plan_id !== "string" || interruption.status !== "INTERRUPTED" || typeof interruption.summary !== "string") throw new CoeError("COE_RESULT_SCHEMA_INVALID"); } }
+}
+
 function validateOutcomeEvaluation(value: unknown): void {
   const evaluation = object(value, "COE_RESULT_SCHEMA_INVALID"); exact(evaluation, OUTCOME_EVALUATION_FIELDS);
   if (!["SUCCESS", "FAILURE", "INCONCLUSIVE", "INSUFFICIENT_DATA", "INVALID_EXPERIMENT"].includes(String(evaluation.verdict))
@@ -342,6 +419,7 @@ function validateNativeResult(capability: unknown, value: unknown): void {
       || !Array.isArray(result.source_content_ids) || result.source_content_ids.some((item) => typeof item !== "string") || !result.config || typeof result.config !== "object" || Array.isArray(result.config)
       || !result.summary || typeof result.summary !== "object" || Array.isArray(result.summary) || (result.brief !== null && (typeof result.brief !== "object" || Array.isArray(result.brief)))
       || (result.draft !== null && (typeof result.draft !== "object" || Array.isArray(result.draft))) || result.mutated !== false) throw new CoeError("COE_RESULT_SCHEMA_INVALID");
+    boundedNested(result); validateEditorialConfig(result.config); validateEditorialSummary(result.summary); validateEditorialBrief(result.brief); validateEditorialDraft(result.draft);
     return;
   }
   if (capability === "threads.publish.dry_run") {
@@ -766,6 +844,27 @@ export function verifyGovernedWork(evidence: CoeAcquisition, work: {
     nativeIdentity = native.result_identity ?? decision.evaluation_id;
   }
   if (nativeIdentity !== undefined && nativeIdentity !== terminal.result_identity) return Object.freeze({ ...base, disposition: "FAIL", authoritative_state: "UNRESOLVED", credit_eligible: false, reason: "COE_GOVERNED_NATIVE_IDENTITY_MISMATCH" } as GovernedWorkDecision);
+  if (work.capability === "editorial.cycle") {
+    const witness = String(terminal.event_id ?? terminal.attempt_id ?? "");
+    const effectAt = typeof native.updated_at === "string" ? native.updated_at : null;
+    const zero = (reason: string, causality_basis: string): GovernedWorkDecision => Object.freeze({ ...base, disposition: "ZERO", authoritative_state: "SUCCEEDED", credit_eligible: false, reason, material_effect: Object.freeze({ eligibility: "ZERO", reason, effect_at: effectAt, witness_ref: witness, causality_basis }) });
+    if (native.cycle_key !== work.business_identity) return zero("COE_EDITORIAL_TARGET_REUSED", "RETURNED_DIFFERENT_CYCLE_KEY");
+    const createdAt = typeof native.created_at === "string" ? Date.parse(native.created_at) : NaN;
+    const updatedAt = effectAt === null ? NaN : Date.parse(effectAt);
+    const resultRevision = typeof terminal.result_revision === "string" ? terminal.result_revision : null;
+    if (!Number.isFinite(createdAt) || !Number.isFinite(updatedAt) || resultRevision !== null && resultRevision !== effectAt || updatedAt < createdAt) return Object.freeze({ ...base, disposition: "FAIL", authoritative_state: "UNRESOLVED", credit_eligible: false, reason: "COE_GOVERNED_RESULT_MISMATCH" } as GovernedWorkDecision);
+    const window = object(evidence.coverage.window); const windowStart = Date.parse(String(window.requested_window_start)); const windowEnd = Date.parse(String(window.requested_window_end));
+    if (updatedAt < windowStart || updatedAt >= windowEnd) return zero("COE_EDITORIAL_MATERIAL_EFFECT_OUTSIDE_WINDOW", "NATIVE_EFFECT_TIME_OUTSIDE_REQUESTED_WINDOW");
+    const claimAt = Date.parse(matching[0]!.first_occurred_at); const terminalAt = Date.parse(matching[0]!.terminal_occurred_at);
+    if (updatedAt < claimAt || updatedAt > terminalAt) return zero("COE_EDITORIAL_ATTRIBUTION_UNPROVABLE", "NATIVE_EFFECT_TIME_OUTSIDE_GOVERNED_ATTEMPT");
+    const alreadyOwned = attempts.some((attempt) => {
+      if (attempt.attempt_id === matching[0]!.attempt_id || attempt.terminal.event_type !== "SUCCEEDED" || attempt.terminal.result_identity !== terminal.result_identity || Date.parse(attempt.terminal_occurred_at) > terminalAt) return false;
+      try { const prior = typeof attempt.terminal.result_json === "string" ? object(parseJsonNoDuplicateKeys(attempt.terminal.result_json, 1_000_000, 32)) : object(attempt.terminal.result_json); return prior.updated_at === effectAt; } catch { return false; }
+    });
+    if (alreadyOwned) return zero("COE_EDITORIAL_ATTRIBUTION_UNPROVABLE", "MATERIAL_EFFECT_OWNED_BY_ANOTHER_GOVERNED_ATTEMPT");
+    const basis = updatedAt === createdAt ? "NATIVE_CYCLE_CREATED_DURING_GOVERNED_ATTEMPT" : "NATIVE_CYCLE_UPDATED_DURING_GOVERNED_ATTEMPT";
+    return Object.freeze({ ...base, disposition: "CREDIT", authoritative_state: "SUCCEEDED", credit_eligible: true, reason: "COE_GOVERNED_WORK_QUALIFIED", material_effect: Object.freeze({ eligibility: "ELIGIBLE", reason: "COE_EDITORIAL_MATERIAL_EFFECT_PROVEN", effect_at: effectAt, witness_ref: witness, causality_basis: basis }) });
+  }
   if (work.capability === "editorial.outcome_evaluation") {
     const target = evidence.outcome_evaluation_targets.find((candidate) => candidate.business_identity === work.business_identity && candidate.material_revision === work.material_revision);
     if (!target || target.observed_through !== terminal.result_revision) return Object.freeze({ ...base, disposition: "BLOCKED", authoritative_state: "UNRESOLVED", credit_eligible: false, reason: "COE_OUTCOME_TARGET_UNBOUND" } as GovernedWorkDecision);

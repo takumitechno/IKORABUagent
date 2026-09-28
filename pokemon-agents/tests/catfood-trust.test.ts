@@ -12,7 +12,7 @@ import {
   IndependentCatfoodEvaluator, evaluateCatfoodAcceptance, initializeProtectedCatfoodStores, verifyHumanGo, type CatfoodRunSpec, type CatfoodTrustConfig,
   type HumanGoPayload, type RunnerSession,
 } from "../web/lib/catfood-trust";
-import { FixtureThreadsSource, TestClock } from "./catfood-trust-fixture";
+import { FixtureThreadsSource, TestClock, producerEditorialResult } from "./catfood-trust-fixture";
 import { IndependentCatfoodAttestationWriter, initializeIndependentAttestationStore, verifyIndependentAttestation } from "../web/lib/catfood-independent-attestation";
 import { CATFOOD_THREADS_PINS } from "../web/lib/catfood-coe";
 import { openOperationalCatfoodCustodian, verifyOperationalIndependentAttestation } from "../web/lib/catfood-operational-bootstrap";
@@ -243,10 +243,10 @@ describe("WP3 CATFOOD corrective adversarial plan", () => {
 
   test("T24 breaking exactly the three-unit minimum never PASS", () => { const r = rig(); try { const first = start(r); work(r, first, "editorial.cycle", "cycle:one"); r.custodian.stop(first, "STOP"); r.clock.advance(121_000); const second = r.custodian.issueOwnerSession(r.spec.run_id); r.custodian.takeover(r.spec.run_id, second); const receipt = r.custodian.preflight(second); r.custodian.activate(second, receipt); work(r, second, "editorial.outcome_evaluation", "outcome:one"); r.clock.advance(86_400_000); r.custodian.stop(second, "STOP"); const result = r.custodian.closeRun(second); expect(result.verdict).not.toBe("PASS"); expect(result.reason_codes).toEqual(["MEANINGFUL_WORK_COUNT_NOT_MET"]); } finally { r.close(); } });
 
-  test("corrective04 three admitted requests with only two producer outcomes cannot satisfy semantic credit", () => { const r = rig("run-two-outcomes"); try {
-    const first = start(r); const a = r.custodian.admit(first, "editorial.cycle", "cycle:one"); r.source.complete(a.claim_id); const resultA = r.source.readClaim(r.spec, a.claim_id)!.domain_result; r.custodian.reconcile(first, a.work_id); r.custodian.stop(first, "STOP");
+  test("corrective05 two genuine outcomes plus a first-seen historical reread cannot satisfy semantic credit", () => { const r = rig("run-two-outcomes"); try {
+    const first = start(r); const a = r.custodian.admit(first, "editorial.cycle", "cycle:one"); r.source.complete(a.claim_id); r.custodian.reconcile(first, a.work_id); r.custodian.stop(first, "STOP");
     r.clock.advance(121_000); const second = r.custodian.issueOwnerSession(r.spec.run_id); r.custodian.takeover(r.spec.run_id, second); const receipt = r.custodian.preflight(second); r.custodian.activate(second, receipt);
-    const b = r.custodian.admit(second, "editorial.cycle", "cycle:two"); r.source.complete(b.claim_id, { domain_result: structuredClone(resultA) }); r.custodian.reconcile(second, b.work_id); work(r, second, "threads.publish.dry_run", "dry:one");
+    const b = r.custodian.admit(second, "editorial.cycle", "cycle:two"); r.source.complete(b.claim_id, { domain_result: producerEditorialResult(`cycle:${b.claim_id}`, r.spec.account_id, "article:two", "2026-09-29T10:00:00.000Z", "2026-09-29T11:00:00.000Z") }); r.custodian.reconcile(second, b.work_id); work(r, second, "threads.publish.dry_run", "dry:one");
     r.clock.advance(86_400_000); r.custodian.stop(second, "STOP"); const result = r.custodian.closeRun(second);
     expect(result.verdict).toBe("FAIL"); expect(result.reason_codes).toContain("MEANINGFUL_WORK_COUNT_NOT_MET");
   } finally { r.close(); } });

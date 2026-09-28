@@ -8,7 +8,7 @@ import {
   stableCoeEvidence, validateOutcomeEvaluationRequest, verifyGovernedWork,
   type CoeAcquisition, type CoeRequest, type CoeScope,
 } from "../web/lib/catfood-coe";
-import { FixtureThreadsSource, TestClock } from "./catfood-trust-fixture";
+import { FixtureThreadsSource, TestClock, producerEditorialResult } from "./catfood-trust-fixture";
 
 const clock = () => new TestClock();
 const scope = (): CoeScope => ({
@@ -99,6 +99,37 @@ describe("WP3 corrective02 producer composition", () => {
     expect(acquisitionWithResult("editorial.outcome_evaluation", runner, "eval:one", evaluation.observed_through).records).toHaveLength(2);
     expect(() => acquisitionWithResult("editorial.outcome_evaluation", { ...runner, future: true }, "eval:one", evaluation.observed_through)).toThrow("COE_RESULT_SCHEMA_INVALID");
   });
+
+  test("corrective05 historical first observation and reused target receive zero causal credit", () => {
+    const base = attempt(); const old = producerEditorialResult("result:one", "acct_test", "article:one", "2026-09-29T10:00:00+00:00", "2026-09-29T11:00:00+00:00");
+    const terminal = { ...base, result_json: canonicalJson(old), result_revision: old.updated_at };
+    const evidence = { ...acquisition(), records: [claimFor(terminal), terminal] } as CoeAcquisition;
+    const work = { account_id: "acct_test", capability: "editorial.cycle", claim_id: "claim:one", request_id: "request:one", authority_ref: "authority:one", generation: 1, business_identity: "article:one", material_revision: "a".repeat(64), domain_result: old };
+    expect(verifyGovernedWork(evidence, work, "e".repeat(64), "org:test")).toMatchObject({ disposition: "ZERO", reason: "COE_EDITORIAL_MATERIAL_EFFECT_OUTSIDE_WINDOW", material_effect: { eligibility: "ZERO" } });
+    const reused = { ...old, cycle_key: "article:old" }; const reusedTerminal = { ...terminal, result_json: canonicalJson(reused) };
+    expect(verifyGovernedWork({ ...evidence, records: [claimFor(reusedTerminal), reusedTerminal] }, { ...work, domain_result: reused }, "e".repeat(64), "org:test")).toMatchObject({ disposition: "ZERO", reason: "COE_EDITORIAL_TARGET_REUSED" });
+  });
+
+  test("corrective05 governed in-window progression earns credit and nested unknown/credential keys fail closed", () => {
+    const progressed = producerEditorialResult("result:one", "acct_test", "article:one", "2026-09-29T10:00:00+00:00", "2026-09-30T23:59:59+00:00");
+    const terminal = { ...attempt(), result_json: canonicalJson(progressed), result_revision: progressed.updated_at };
+    const evidence = { ...acquisition(), records: [claimFor(terminal), terminal] } as CoeAcquisition;
+    const work = { account_id: "acct_test", capability: "editorial.cycle", claim_id: "claim:one", request_id: "request:one", authority_ref: "authority:one", generation: 1, business_identity: "article:one", material_revision: "a".repeat(64), domain_result: progressed };
+    expect(verifyGovernedWork(evidence, work, "e".repeat(64), "org:test")).toMatchObject({ disposition: "CREDIT", material_effect: { eligibility: "ELIGIBLE", causality_basis: "NATIVE_CYCLE_UPDATED_DURING_GOVERNED_ATTEMPT" } });
+    const nativeTerminal = { ...terminal, result_revision: null }; expect(verifyGovernedWork({ ...evidence, records: [claimFor(nativeTerminal), nativeTerminal] }, work, "e".repeat(64), "org:test").disposition).toBe("CREDIT");
+    const otherTerminal = { ...terminal, attempt_id: "attempt:other", event_id: "event:other", request_id: "request:other", claim_identity: "claim:other" }; const otherClaim = { ...claimFor(otherTerminal), event_id: "event:other:claim" };
+    expect(verifyGovernedWork({ ...evidence, records: [otherClaim, otherTerminal, claimFor(terminal), terminal] }, work, "e".repeat(64), "org:test")).toMatchObject({ disposition: "ZERO", reason: "COE_EDITORIAL_ATTRIBUTION_UNPROVABLE", material_effect: { causality_basis: "MATERIAL_EFFECT_OWNED_BY_ANOTHER_GOVERNED_ATTEMPT" } });
+    for (const key of ["x-api-token", "token", "secret", "webhook_secret", "aws_secret_access_key", "access_token", "future_field"]) expect(() => acquisitionWithResult("editorial.cycle", { ...progressed, summary: { ...(progressed.summary as Record<string, unknown>), [key]: "plain" } }, "result:one", String(progressed.updated_at))).toThrow();
+  });
+
+  test("corrective05 editorial nested size, array, and aggregate budgets reject one-past inputs", () => {
+    const result = producerEditorialResult("result:one", "acct_test", "article:one", "2026-09-30T23:59:58+00:00", "2026-09-30T23:59:59+00:00");
+    const brief = result.brief as Record<string, unknown>, summary = result.summary as Record<string, unknown>;
+    expect(acquisitionWithResult("editorial.cycle", { ...result, brief: { ...brief, hypothesis: "x".repeat(64_000) } }, "result:one", String(result.updated_at)).records).toHaveLength(2);
+    expect(() => acquisitionWithResult("editorial.cycle", { ...result, brief: { ...brief, hypothesis: "x".repeat(64_001) } }, "result:one", String(result.updated_at))).toThrow("COE_RESULT_SCHEMA_INVALID");
+    expect(() => acquisitionWithResult("editorial.cycle", { ...result, source_content_ids: Array.from({ length: 501 }, (_, index) => `content:${index}`) }, "result:one", String(result.updated_at))).toThrow("COE_RESULT_SCHEMA_INVALID");
+    expect(() => acquisitionWithResult("editorial.cycle", { ...result, summary: { ...summary, facts: Array.from({ length: 9 }, () => "x".repeat(60_000)) } }, "result:one", String(result.updated_at))).toThrow("COE_RESULT_SCHEMA_INVALID");
+  });
 });
 
 function source(transform?: (page: any, request: Readonly<CoeRequest>) => unknown) {
@@ -136,14 +167,14 @@ function attempt(eventType = "SUCCEEDED", requestId = "request:one") {
     claimed_spec_hash: null, threads_generation: 1, verified_threads_generation: 1, claimed_threads_generation: null,
     business_identity: "article:one", material_revision: "a".repeat(64), admission_state: "ADMITTED",
     execution_state: eventType === "SUCCEEDED" ? "SUCCEEDED" : "FAILED", duplicate_of_request_id: eventType === "DUPLICATE" ? "request:old" : null,
-    result_identity: eventType === "SUCCEEDED" ? "result:one" : null, result_json: eventType === "SUCCEEDED" ? canonicalJson({ cycle_id: "result:one", account_id: "acct_test", cycle_key: "article:one", state: "DRAFT", status: "READY", current_agent: "Writer", waiting_reason: null, source_content_ids: [], config: {}, summary: {}, brief: {}, draft: {}, content_id: null, created_at: "2026-09-30T23:59:59+00:00", updated_at: "2026-10-01T00:00:00+00:00", mutated: false }) : null,
-    result_revision: "2026-10-01T00:00:00+00:00", domain_state: "DRAFT", occurred_at: "2026-10-01T00:00:00+00:00",
+    result_identity: eventType === "SUCCEEDED" ? "result:one" : null, result_json: eventType === "SUCCEEDED" ? canonicalJson(producerEditorialResult("result:one", "acct_test", "article:one", "2026-09-30T23:59:58+00:00", "2026-09-30T23:59:59+00:00")) : null,
+    result_revision: "2026-09-30T23:59:59+00:00", domain_state: "DRAFT", occurred_at: "2026-09-30T23:59:59+00:00",
     payload_hash: "f".repeat(64), request_fingerprint: "1".repeat(64), reason_code: null, lifecycle_revision: ["SUCCEEDED", "FAILED", "UNRESOLVED"].includes(eventType) ? 2 : 1,
   };
 }
 
 function claimFor(terminal: ReturnType<typeof attempt>) {
-  return { ...terminal, event_seq: 0, event_id: `${terminal.event_id}:claim`, event_type: "CLAIMED", admission_state: "ADMITTED", execution_state: "IN_PROGRESS", lifecycle_revision: 1, claimed_authority_ref: terminal.authority_ref, claimed_spec_hash: terminal.spec_hash, claimed_threads_generation: terminal.threads_generation, result_identity: null, result_json: null, result_revision: null, domain_state: null, occurred_at: "2026-09-30T23:59:59+00:00" };
+  return { ...terminal, event_seq: 0, event_id: `${terminal.event_id}:claim`, event_type: "CLAIMED", admission_state: "ADMITTED", execution_state: "IN_PROGRESS", lifecycle_revision: 1, claimed_authority_ref: terminal.authority_ref, claimed_spec_hash: terminal.spec_hash, claimed_threads_generation: terminal.threads_generation, result_identity: null, result_json: null, result_revision: null, domain_state: null, occurred_at: "2026-09-30T23:59:58+00:00" };
 }
 
 function authorityFor(row: ReturnType<typeof attempt>) {
