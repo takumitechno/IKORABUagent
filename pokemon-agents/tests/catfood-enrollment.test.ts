@@ -79,7 +79,8 @@ describe("WP3 Corrective07 controlled launch and provenance", () => {
   test("T02-T04 real child main, preload, argv, cwd and loading environment change the launch profile", () => {
     const moduleUrl = JSON.stringify(new URL("../web/lib/catfood-enrollment.ts", import.meta.url).href);
     const expression = `import { currentLaunchProfile } from ${moduleUrl}; process.stdout.write(JSON.stringify(currentLaunchProfile()))`;
-    const run = (extra: string[] = [], env?: Record<string, string>) => Bun.spawnSync({ cmd: [process.execPath, ...extra, "-e", expression], cwd: process.cwd(), env: env ? { ...process.env, ...env } : process.env, stdout: "pipe", stderr: "pipe" });
+    const controlled = { ...process.env }; delete controlled.BUN_OPTIONS; delete controlled.NODE_OPTIONS;
+    const run = (extra: string[] = [], env: Record<string, string> = {}) => Bun.spawnSync({ cmd: [process.execPath, ...extra, "-e", expression], cwd: process.cwd(), env: { ...controlled, ...env }, stdout: "pipe", stderr: "pipe" });
     try {
       const plain = run(), preload = run(["--preload", fileURLToPath(new URL("../web/lib/catfood-harness.ts", import.meta.url))]), environment = run([], { BUN_OPTIONS: "--smol" });
       for (const child of [plain, preload, environment]) expect(child.exitCode).toBe(0);
@@ -87,7 +88,7 @@ describe("WP3 Corrective07 controlled launch and provenance", () => {
       expect(new Set(profiles.map((profile) => profile.profile_sha256)).size).toBe(3);
       expect((profiles[1]!.loading_args as string[]).some((value) => value === "--preload")).toBe(true);
       expect((profiles[1]!.loading_inputs as Array<Record<string, unknown>>)[0]).toMatchObject({ present: true, sha256: expect.stringMatching(/^[0-9a-f]{64}$/) });
-      expect(profiles[2]!.loading_environment).not.toEqual(currentLaunchProfile().loading_environment);
+      expect(profiles[2]!.loading_environment).not.toEqual(profiles[0]!.loading_environment);
     } catch (error) { expect(String(error)).toContain("EPERM"); }
   });
 

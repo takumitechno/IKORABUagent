@@ -16,7 +16,7 @@ import type { ThreadsHttpTransport } from "../web/lib/catfood-threads-http";
 
 const EMITTER_DISPOSITIONS = JSON.parse(readFileSync(resolve(import.meta.dir, "../contracts/catfood-operational-evidence-v1.json"), "utf8")).emitter_dispositions as Json[];
 
-export function testEnrollmentContexts(scope: string, accepted = "a".repeat(64)): Record<CatfoodEnrollmentRole, CatfoodEnrollmentContext> {
+export function testEnrollmentFixture(scope: string, accepted = "a".repeat(64)): Readonly<{ contexts: Record<CatfoodEnrollmentRole, CatfoodEnrollmentContext>; binding: TestEnrollmentBinding; signEnrollmentPayload(payload: Record<string, unknown>): string }> {
   const keys = generateKeyPairSync("ed25519"), roles: CatfoodEnrollmentRole[] = ["source", "custodian", "evaluator", "writer", "verifier"];
   void accepted;
   const binding: TestEnrollmentBinding = { trust_domain: "TEST_ONLY", issuer: "fixture-authority", issuer_key_id: "fixture-key", audience: "ikorabu-catfood", origin: "http://127.0.0.1:32199", credential: "fixture-credential-0123456789abcdef", public_key_pem: keys.publicKey.export({ type: "spki", format: "pem" }).toString(), environment_identity: "test:fixture", deployment_id: "deployment:fixture", enrollment_namespace: "namespace:fixture", build_policy_sha256: CATFOOD_POLICY_SHA256, accepted_snapshot_id: "snapshot:fixture", accepted_snapshot_sha256: acceptedSnapshotDigest(), launch_ticket: `test-launch:${scope}` };
@@ -34,8 +34,12 @@ export function testEnrollmentContexts(scope: string, accepted = "a".repeat(64))
     const encoded = Buffer.from(canonicalJson(payload)).toString("base64url"), envelope = canonicalJson({ algorithm: "Ed25519", key_id: binding.issuer_key_id, payload: encoded, signature: sign(null, Buffer.from(`${purpose}\n${encoded}`), keys.privateKey).toString("base64url") });
     return { status: 200, content_type: "application/json", location: null, body: envelope, byte_length: Buffer.byteLength(envelope), body_sha256: sha256(envelope) };
   };
-  return Object.fromEntries(roles.map((role) => [role, enrollTestOnlyRoleForTest(binding, role, scope, transport, new Date(now))])) as Record<CatfoodEnrollmentRole, CatfoodEnrollmentContext>;
+  const contexts = Object.fromEntries(roles.map((role) => [role, enrollTestOnlyRoleForTest(binding, role, scope, transport, new Date(now))])) as Record<CatfoodEnrollmentRole, CatfoodEnrollmentContext>;
+  const signEnrollmentPayload = (payload: Record<string, unknown>) => { const encoded = Buffer.from(canonicalJson(payload)).toString("base64url"); return canonicalJson({ algorithm: "Ed25519", key_id: binding.issuer_key_id, payload: encoded, signature: sign(null, Buffer.from(`IKORABU/WP3/CATFOOD/ROLE-ENROLLMENT/V3\n${encoded}`), keys.privateKey).toString("base64url") }); };
+  return Object.freeze({ contexts, binding, signEnrollmentPayload });
 }
+
+export function testEnrollmentContexts(scope: string, accepted = "a".repeat(64)): Record<CatfoodEnrollmentRole, CatfoodEnrollmentContext> { return testEnrollmentFixture(scope, accepted).contexts; }
 
 export function producerEditorialResult(cycleId: string, accountId: string, cycleKey: string, createdAt: string, updatedAt: string): Record<string, Json> {
   const config = { minimum_posts: 3, minimum_age_hours: 6, minimum_comparable_baseline: 2, minimum_relative_lift: 0.1, sample_mode: "all", recent_window: 5, negative_theme_threshold: 3, max_edit_iterations: 3, draft_candidates: 3 };
