@@ -8,7 +8,7 @@ This inventory binds `WP3-FINAL-CLOSURE-CHARTER/1` to code owners and executable
 |---|---|---|
 | AC01 | `catfood-coe.ts`, run spec, M/J fixed pins | `catfood-coe-consumer.test.ts` T01-T03; final-closure B2/B3 |
 | AC02 | provenance manifest, V4 evidence, M/R/J | enrollment lineage tests; role-channel T01-T14 |
-| AC03 | GO verifier and M `go` profile | `catfood-trust.test.ts` T01-T02; sealed-input export path |
+| AC03 | independently selected GO-root policy, GO verifier and M `go` profile | `catfood-go-root-policy.test.ts` G01-G26; trust T01-T02; sealed-input export path |
 | AC04 | scope validators in trust/role channel | tenant, account, run and recovery mismatch regressions |
 | AC05 | COE acquisition and reducer | full `catfood-coe-consumer.test.ts` pagination/reduction suite |
 | AC06 | strict COE/result decoders | corrective04/05 producer union, nested-budget and credential-key tests |
@@ -27,14 +27,14 @@ This inventory binds `WP3-FINAL-CLOSURE-CHARTER/1` to code owners and executable
 | AC19 | role PoP/action transaction store | role-channel T01-T11 and stable-job B3 |
 | AC20 | process-local sessions and key separation | role-channel T12-T14; four-process fixture; equal-key denial |
 | AC21 | journal/checkpoint source custody | trust tamper/high-water/cache tests; sealed-input manifest |
-| AC22 | custodian-only R | role-channel release validation and role/action allowlist |
+| AC22 | custodian-only R v2 | role-channel release validation, independent policy reference and role/action allowlist |
 | AC23 | exact standalone snapshots | final-closure B2: DELETE export, raw hash, sidecar and replacement denial |
-| AC24 | immutable J and separate signed JS | B3 plus `verifyEvaluationJobStateEnvelope` |
+| AC24 | immutable J v2 and separate signed JS | B3 plus `verifyEvaluationJobStateEnvelope`; independently resolved GO policy before insert |
 | AC25 | evaluator assigned J and verified staging | evaluator role main and V5 multi-process fixture |
 | AC26 | stable request/assessment and one E | B3 exact replay/random-retry checks and unique job assessment |
 | AC27 | E recovery/cancel/expiry | B3 restart/lost response/cancel-delayed-commit checks |
 | AC28 | authorized reviews and contradictions | B3 second job, semantic projection and contradiction record |
-| AC29 | independently assigned job/target | protected role reads, T assignment and stale-target denial |
+| AC29 | independently assigned job/target v2 | protected role reads, independently selected GO policy, T assignment and stale-target denial |
 | AC30 | E binds exact C/J/M/R actor evidence | V3 evaluation action and V3 package verifier |
 | AC31 | shared source-rederived kernel | direct/independent parity and full trust suite |
 | AC32 | protected outer writer credential | V4 assignment plus equal-key and outer re-sign denial |
@@ -56,14 +56,14 @@ This inventory binds `WP3-FINAL-CLOSURE-CHARTER/1` to code owners and executable
 | ID | Disposition | Executable owner/evidence |
 |---|---|---|
 | A01 | rejected | trust T01 forged GO |
-| A02 | rejected | trust T01 wrong GO key/root |
+| A02 | rejected | G01 same-ID/different-SPKI and G02 offline store-key swap |
 | A03 | rejected | trust SQL/store replacement tests; B2 |
 | A04 | rejected | trust checkpoint tamper/high-water tests; B2 |
 | A05 | rejected | M pair common-cut and mixed-manifest B2 |
 | A06 | rejected | B2 WAL/journal sidecar denial |
 | A07 | rejected | B2 stable-handle staging and replacement denial |
 | A08 | rejected | retained-source digest/rederivation tests |
-| A09 | rejected | M accepted GO profile roots; caller roots are not accepted |
+| A09 | rejected | G01-G26 independent protected policy; M/store/artifact roots are evidence, never permission |
 | A10 | rejected | frozen pin and manifest validation tests |
 | A11 | rejected | R receipt/actor/body verification in `issueEvaluationJob` |
 | A12 | rejected | SOURCE cannot call custodian release |
@@ -116,6 +116,10 @@ This inventory binds `WP3-FINAL-CLOSURE-CHARTER/1` to code owners and executable
 - B1: the shared bearer, copied public evaluator evidence and writer authority reach the real TEST_ONLY authority but cannot create `evaluator.result.commit`; the wrong-key signature is canonical and otherwise well-formed.
 - B2: a valid enrolled path accepts the genuine exported pair, while altered bytes, sidecars and a manifest/job mismatch are rejected before evaluation.
 - B3: exact retry, lost response and ordinary authority restart return byte-identical E with the same assessment, actor and time; a random request is denied and one assessment row remains for that job.
+
+## B2-GO-ROOT corrective
+
+`catfood-go-root-policy.v1` is owned by the existing protected role-authority accepted-workload configuration. Its reference is mandatory in custody release v2, evaluation job v2 and expected target v2. Store keys are parsed as Ed25519 and fingerprinted over canonical SPKI DER, then the entire effective profile is compared with the independently selected policy before GO use, release, job insertion, evaluation or expected verification. G01-G26 cover same-ID substitution, offline local-hash repair, profile completeness, scope, history/rotation, non-promotion, residual-job denial, evaluator material mismatch and an authentic full chain under policy B rejected by a verifier independently fixed to A.
 
 ## Explicit limits
 

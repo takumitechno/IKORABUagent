@@ -1,0 +1,37 @@
+{
+  "contract": "ikorabu.catfood-go-root-policy.v1",
+  "schema": "catfood-go-root-policy.v1",
+  "owner": "operator-controlled accepted-workload policy of the protected role authority",
+  "identity": ["policy_id", "positive policy_version", "policy_sha256"],
+  "policy_sha256": "SHA-256 of LF-normalized canonical JSON policy body excluding the reference digest",
+  "trust_domains": ["TEST_ONLY", "OPERATIONAL"],
+  "purpose": {
+    "use": "Human GO",
+    "go_schema": "catfood-human-go.v1",
+    "algorithm": "Ed25519",
+    "public_key_fingerprint": "SHA-256 over parsed SPKI DER"
+  },
+  "scope": ["environment_type", "environment_instance_id", "deployment_id", "organization_id", "tenant_id", "account_id"],
+  "verification_profile": {
+    "schema": "catfood-go-verification-profile.v1",
+    "ordered_by": "key_id",
+    "minimum_entries": 1,
+    "maximum_entries": 8,
+    "entry": ["key_id", "public_key_sha256", "not_before", "not_after", "revoked_at"],
+    "matching": "exact complete profile equality; no union, filtering, alias fallback, or latest-wins"
+  },
+  "selection": {
+    "current": "explicit protected workload selection fixed before the candidate store",
+    "historical": "explicit protected retained reference",
+    "artifact_selected": false,
+    "store_selected": false
+  },
+  "compatibility": {
+    "custody_release": "catfood-custody-release-action.v2",
+    "evaluation_job": "catfood-evaluation-job.v2",
+    "expected_target": "catfood-expected-evaluation-target.v2",
+    "legacy_v1_evidence": "diagnostic only; no synthetic policy backfill"
+  },
+  "private_keys": "forbidden",
+  "operational_default": "unprovisioned and fail-closed"
+}

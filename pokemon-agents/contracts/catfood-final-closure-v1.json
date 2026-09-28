@@ -8,15 +8,28 @@
     "requirements": ["exact final bytes", "journal_mode DELETE", "no WAL or journal sidecar", "one verified common closure cut", "stable-handle evaluator staging"]
   },
   "custody_release": {
+    "schema": "catfood-custody-release-action.v2",
     "action": "custodian.evaluation.release",
     "purpose_class": "HISTORICAL_EVIDENCE",
-    "authority": "authenticated CUSTODIAN role action only"
+    "authority": "authenticated CUSTODIAN role action plus independently selected GO-root policy",
+    "required_binding": "go_root_policy_ref"
+  },
+  "go_root_policy": {
+    "schema": "catfood-go-root-policy.v1",
+    "reference": ["policy_id", "positive policy_version", "policy_sha256 over the closed canonical policy body"],
+    "owner": "protected role-authority accepted-workload configuration",
+    "profile": "catfood-go-verification-profile.v1",
+    "fingerprint": "SHA-256 over parsed Ed25519 SPKI DER",
+    "entry_limit": 8,
+    "complete_profile_equality": true,
+    "store_or_artifact_is_authority": false
   },
   "evaluation_job": {
-    "schema": "catfood-evaluation-job.v1",
-    "signature_purpose": "IKORABU/WP3/CATFOOD/EVALUATION-JOB/V1",
+    "schema": "catfood-evaluation-job.v2",
+    "signature_purpose": "IKORABU/WP3/CATFOOD/EVALUATION-JOB/V2",
     "immutable": true,
-    "stable_ids": ["evaluation_job_id", "stable_evaluator_request_id", "reserved_assessment_id"]
+    "stable_ids": ["evaluation_job_id", "stable_evaluator_request_id", "reserved_assessment_id"],
+    "required_binding": "go_root_policy_ref"
   },
   "job_state": {
     "schema": "catfood-evaluation-job-state.v1",
@@ -30,10 +43,11 @@
     "divergence": "append-only contradiction; no automatic winner or clearing"
   },
   "expected_target": {
-    "schema": "catfood-expected-evaluation-target.v1",
-    "signature_purpose": "IKORABU/WP3/CATFOOD/EXPECTED-EVALUATION-TARGET/V1",
+    "schema": "catfood-expected-evaluation-target.v2",
+    "signature_purpose": "IKORABU/WP3/CATFOOD/EXPECTED-EVALUATION-TARGET/V2",
     "source": "protected host/workload assignment",
-    "acceptance": "fresh verifier PoP clearance after full artifact verification"
+    "acceptance": "fresh verifier PoP clearance after full artifact verification",
+    "required_binding": "go_root_policy_ref independently selected by the verifier"
   },
   "legacy": "no-job artifacts remain diagnostic only and cannot satisfy expected V5 acceptance"
 }
