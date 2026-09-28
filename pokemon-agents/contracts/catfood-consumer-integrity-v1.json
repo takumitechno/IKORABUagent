@@ -15,7 +15,7 @@
     { "path": "pokemon-agents/contracts/catfood-operational-evidence-v1.json", "sha256": "50b6df97abc73384063a02cd69a7872b829d264177cad11d304678c04057db0e" },
     { "path": "pokemon-agents/contracts/catfood-producer-canonical-v1.json", "sha256": "09f5375e8dc4dd5231c666a75ea0c1ed1109d643644ff19b71871941ed669e7a" },
     { "path": "pokemon-agents/contracts/catfood-role-action-v1.json", "sha256": "2fc6fbbc9e5a2fa384a265cd5dbc86a05e19fac6e2d07699695e8b6cebedf031" },
-    { "path": "pokemon-agents/scripts/catfood-custodian-role.ts", "sha256": "15e64979862fc08ed9b6f65ee7638b50f58b29ee82f74daffc5553475d5d6dd0" },
+    { "path": "pokemon-agents/scripts/catfood-custodian-role.ts", "sha256": "3d1c6330770c59d6f4240df8fde5d799c8f1463ac7b906600ebaa6b66a108f5b" },
     { "path": "pokemon-agents/scripts/catfood-evaluate-role.ts", "sha256": "2bb2273afc3720e5ecb6c11e999a978b083038bf9aff8bb9c3596a0aa6c7b0bd" },
     { "path": "pokemon-agents/scripts/catfood-issue-role.ts", "sha256": "80f932ac8a9805c98e4d3a78037163d2e2804b94112d75df26fa4aeb49eeb25c" },
     { "path": "pokemon-agents/scripts/catfood-verify-role.ts", "sha256": "999cb5e948167991bba2c55b86668ea64b1f0fdd8e67302cc9a8e1d51f6bbe85" },
