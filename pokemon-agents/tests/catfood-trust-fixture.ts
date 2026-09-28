@@ -2,7 +2,7 @@ import type { Json, OperationalBoundaryV1 } from "../web/lib/catfood-harness";
 import { canonicalSha256 } from "../web/lib/catfood-harness";
 import { canonicalJson, sha256 } from "../web/lib/catfood-harness";
 import { readFileSync } from "node:fs";
-import { createHash, createPublicKey, generateKeyPairSync, sign } from "node:crypto";
+import { createHash, createPublicKey, generateKeyPairSync, sign, verify } from "node:crypto";
 import { resolve } from "node:path";
 import { COE_LEGACY_SOURCE_FAMILIES, COE_SOURCES, type CoeRequest, type OutcomeEvaluationRequest } from "../web/lib/catfood-coe";
 import type {
@@ -11,32 +11,48 @@ import type {
   TrustedClockSample, TenantProbeEvidence,
 } from "../web/lib/catfood-trust";
 import { CATFOOD_POLICY_SHA256 } from "../web/lib/catfood-trust";
-import { acceptedSnapshotDigest, collectCurrentRuntimeSubject, enrollTestOnlyRoleForTest, observeTestOnlyLaunch, roleArtifactDescriptor, type CatfoodEnrollmentContext, type CatfoodEnrollmentRole, type TestEnrollmentBinding } from "../web/lib/catfood-enrollment";
+import { CATFOOD_ACTION_RECEIPT_PURPOSE, acceptedSnapshotDigest, catfoodPublicKeyFingerprint, collectCurrentRuntimeSubject, enrollTestOnlyRoleForTest, observeTestOnlyLaunch, roleArtifactDescriptor, type CatfoodEnrollmentContext, type CatfoodEnrollmentRole, type TestEnrollmentBinding } from "../web/lib/catfood-enrollment";
 import type { ThreadsHttpTransport } from "../web/lib/catfood-threads-http";
 
 const EMITTER_DISPOSITIONS = JSON.parse(readFileSync(resolve(import.meta.dir, "../contracts/catfood-operational-evidence-v1.json"), "utf8")).emitter_dispositions as Json[];
 
-export function testEnrollmentFixture(scope: string, accepted = "a".repeat(64)): Readonly<{ contexts: Record<CatfoodEnrollmentRole, CatfoodEnrollmentContext>; binding: TestEnrollmentBinding; signEnrollmentPayload(payload: Record<string, unknown>): string }> {
-  const keys = generateKeyPairSync("ed25519"), roles: CatfoodEnrollmentRole[] = ["source", "custodian", "evaluator", "writer", "verifier"];
+export function testEnrollmentFixture(scope: string, accepted = "a".repeat(64), authorityNow = Date.now()): Readonly<{ contexts: Record<CatfoodEnrollmentRole, CatfoodEnrollmentContext>; binding: TestEnrollmentBinding; writer: Readonly<{ key_id: string; key_version: string; public_key_sha256: string; public_key_pem: string; private_key_pem: string }>; controls: Readonly<{ advanceBefore(action: string, ms: number): void; loseResponseOnce(action: string): void }>; signEnrollmentPayload(payload: Record<string, unknown>): string }> {
+  const keys = generateKeyPairSync("ed25519"), writerKeys = generateKeyPairSync("ed25519"), roles: CatfoodEnrollmentRole[] = ["source", "custodian", "evaluator", "writer", "verifier"];
   void accepted;
-  const binding: TestEnrollmentBinding = { trust_domain: "TEST_ONLY", issuer: "fixture-authority", issuer_key_id: "fixture-key", audience: "ikorabu-catfood", origin: "http://127.0.0.1:32199", credential: "fixture-credential-0123456789abcdef", public_key_pem: keys.publicKey.export({ type: "spki", format: "pem" }).toString(), environment_identity: "test:fixture", deployment_id: "deployment:fixture", enrollment_namespace: "namespace:fixture", build_policy_sha256: CATFOOD_POLICY_SHA256, accepted_snapshot_id: "snapshot:fixture", accepted_snapshot_sha256: acceptedSnapshotDigest(), launch_ticket: `test-launch:${scope}` };
+  const writerPublicPem = writerKeys.publicKey.export({ type: "spki", format: "pem" }).toString(), writerPrivatePem = writerKeys.privateKey.export({ type: "pkcs8", format: "pem" }).toString();
+  const binding: TestEnrollmentBinding = { trust_domain: "TEST_ONLY", issuer: "fixture-authority", issuer_key_id: "fixture-key", audience: "ikorabu-catfood", origin: "http://127.0.0.1:32199", credential: "fixture-credential-0123456789abcdef", public_key_pem: keys.publicKey.export({ type: "spki", format: "pem" }).toString(), environment_identity: "test:fixture", deployment_id: "deployment:fixture", enrollment_namespace: "namespace:fixture", build_policy_sha256: CATFOOD_POLICY_SHA256, accepted_snapshot_id: "snapshot:fixture", accepted_snapshot_sha256: acceptedSnapshotDigest(), launch_ticket: `test-launch:${scope}`, writer_signing_key_id: "attest:test", writer_signing_key_version: "v1", writer_signing_public_key_pem: writerPublicPem };
   const anchor = createHash("sha256").update(createPublicKey(binding.public_key_pem).export({ type: "spki", format: "der" })).digest("hex");
-  const now = Date.now(); const subjects = new Map(roles.map((role) => [role, collectCurrentRuntimeSubject(binding)])); const launches = new Map(roles.map((role) => [role, observeTestOnlyLaunch(binding, role, subjects.get(role)!)]));
+  const now = authorityNow; let actionNow = authorityNow; const subjects = new Map(roles.map((role) => [role, collectCurrentRuntimeSubject(binding)])); const launches = new Map(roles.map((role) => [role, observeTestOnlyLaunch(binding, role, subjects.get(role)!)])); const preparations = new Map<string, { payload: Record<string, unknown>; receipt_sha256: string }>(), finalized = new Map<string, string>(), advances = new Map<string, number>(), lostResponses = new Set<string>(); let statusSequence = 0;
+  const response = (envelope: string) => ({ status: 200, content_type: "application/json", location: null, body: envelope, byte_length: Buffer.byteLength(envelope), body_sha256: sha256(envelope) });
+  const signedEnvelope = (purpose: string, payload: Record<string, unknown>) => { const encoded = Buffer.from(canonicalJson(payload)).toString("base64url"); return canonicalJson({ algorithm: "Ed25519", key_id: binding.issuer_key_id, payload: encoded, signature: sign(null, Buffer.from(`${purpose}\n${encoded}`), keys.privateKey).toString("base64url") }); };
   const transport: ThreadsHttpTransport = (request) => {
-    const asked = JSON.parse(request.body!); const isStatus = new URL(request.url).pathname.endsWith("/status");
+    const asked = JSON.parse(request.body!); const isAction = asked.purpose === CATFOOD_ACTION_RECEIPT_PURPOSE, isStatus = new URL(request.url).pathname.endsWith("/status");
     const role = (isStatus ? asked.role : asked.requested_role) as CatfoodEnrollmentRole; const subject = subjects.get(role)!;
     if (canonicalJson(asked.subject) !== canonicalJson(subject)) throw new Error("authority subject mismatch");
+    if (isAction) {
+      actionNow += advances.get(asked.action) ?? 0; advances.delete(asked.action); if (actionNow > now + 60_000) throw new Error("authority action authorization expired");
+      if (asked.action.startsWith("evaluator.") && role !== "evaluator" || asked.action.startsWith("writer.") && role !== "writer") throw new Error("authority role mismatch");
+      const writerCredential = asked.action_payload?.writer_credential; if (asked.action.startsWith("writer.") && (!writerCredential || writerCredential.key_id !== binding.writer_signing_key_id || writerCredential.key_version !== binding.writer_signing_key_version || writerCredential.public_key_sha256 !== catfoodPublicKeyFingerprint(binding.writer_signing_public_key_pem))) throw new Error("authority writer credential mismatch");
+      const actionId = asked.action === "writer.issuance.finalize" ? String(asked.action_payload.issuance_id) : asked.action === "evaluator.result.commit" ? `action:${sha256(asked.request_id).slice(0, 32)}` : `action:${sha256(canonicalJson({ issuer: binding.issuer, role, action: asked.action, target: asked.target })).slice(0, 32)}`;
+      if (asked.action === "writer.issuance.finalize") {
+        const prior = finalized.get(actionId); if (prior) return response(prior);
+        const prepared = preparations.get(String(asked.action_payload.issuance_id)), proof = asked.proof; if (!prepared || asked.action_payload.preparation_receipt_sha256 !== prepared.receipt_sha256 || typeof proof?.payload_json !== "string" || typeof proof?.signature_base64url !== "string" || sha256(proof.payload_json) !== asked.action_payload.payload_sha256 || sha256(Buffer.from(proof.signature_base64url, "base64url")) !== asked.action_payload.signature_sha256 || !verify(null, Buffer.from(`IKORABU/WP3/CATFOOD/ATTESTATION/V3\n${proof.payload_json}`), createPublicKey(binding.writer_signing_public_key_pem), Buffer.from(proof.signature_base64url, "base64url"))) throw new Error("authority finalization mismatch");
+      }
+      const payload = { issuer: binding.issuer, authority_anchor: anchor, audience: binding.audience, challenge: asked.challenge, request_id: asked.request_id, session_id: asked.session_id, role: asked.role, scope: asked.scope, purpose_class: asked.purpose_class, action: asked.action, target: asked.target, action_payload: asked.action_payload, action_id: actionId, subject, accepted_snapshot_sha256: binding.accepted_snapshot_sha256, status_sequence: ++statusSequence, observed_at: new Date(actionNow).toISOString(), valid_until: new Date(now + 60_000).toISOString(), revoked: false };
+      const envelope = signedEnvelope(CATFOOD_ACTION_RECEIPT_PURPOSE, payload), receiptSha = sha256(envelope); if (asked.action === "writer.issuance.prepare") { const actionReceipt = { schema: "catfood-action-receipt.v1", purpose: CATFOOD_ACTION_RECEIPT_PURPOSE, envelope_json: envelope, receipt_sha256: receiptSha }, preparation = { schema: "catfood-attestation-issuance-preparation.v1", purpose: "IKORABU/WP3/CATFOOD/ATTESTATION-ISSUANCE-PREPARE/V1", issuance_id: actionId, attested_at: payload.observed_at, valid_until: payload.valid_until, action_receipt: actionReceipt }; preparations.set(actionId, { payload: structuredClone(asked.action_payload), receipt_sha256: sha256(canonicalJson(preparation)) }); } if (asked.action === "writer.issuance.finalize") finalized.set(actionId, envelope); if (lostResponses.delete(asked.action)) throw new Error("simulated lost authority response"); return response(envelope);
+    }
     const descriptor = isStatus ? undefined : roleArtifactDescriptor(asked.requested_role);
     const payload = isStatus
       ? { issuer: binding.issuer, authority_anchor: anchor, audience: binding.audience, challenge: asked.challenge, request_id: asked.request_id, session_id: asked.session_id, role: asked.role, scope: asked.scope, purpose_class: asked.purpose_class, action: asked.action, target: asked.target, subject, accepted_snapshot_sha256: binding.accepted_snapshot_sha256, status_sequence: 1, expires_at: new Date(now + 60_000).toISOString(), revoked: false }
       : { protocol: "ikorabu.catfood-enrollment.v3", issuer: binding.issuer, authority_anchor: anchor, trust_domain: binding.trust_domain, audience: binding.audience, challenge: asked.challenge, request_id: asked.request_id, session_id: `session:${asked.requested_role}`, role: asked.requested_role, scope: asked.requested_scope, subject: structuredClone(subject), environment_identity: binding.environment_identity, issued_at: new Date(now - 1_000).toISOString(), expires_at: new Date(now + 60_000).toISOString(), revoked: false, accepted_snapshot_id: binding.accepted_snapshot_id, accepted_snapshot_sha256: binding.accepted_snapshot_sha256, enrollment_namespace: binding.enrollment_namespace, build_policy_sha256: binding.build_policy_sha256, accepted_role_descriptor: descriptor, launcher_observed_launch: launches.get(role) };
     const purpose = isStatus ? "IKORABU/WP3/CATFOOD/SESSION-STATUS/V3" : "IKORABU/WP3/CATFOOD/ROLE-ENROLLMENT/V3";
-    const encoded = Buffer.from(canonicalJson(payload)).toString("base64url"), envelope = canonicalJson({ algorithm: "Ed25519", key_id: binding.issuer_key_id, payload: encoded, signature: sign(null, Buffer.from(`${purpose}\n${encoded}`), keys.privateKey).toString("base64url") });
-    return { status: 200, content_type: "application/json", location: null, body: envelope, byte_length: Buffer.byteLength(envelope), body_sha256: sha256(envelope) };
+    return response(signedEnvelope(purpose, payload));
   };
   const contexts = Object.fromEntries(roles.map((role) => [role, enrollTestOnlyRoleForTest(binding, role, scope, transport, new Date(now))])) as Record<CatfoodEnrollmentRole, CatfoodEnrollmentContext>;
   const signEnrollmentPayload = (payload: Record<string, unknown>) => { const encoded = Buffer.from(canonicalJson(payload)).toString("base64url"); return canonicalJson({ algorithm: "Ed25519", key_id: binding.issuer_key_id, payload: encoded, signature: sign(null, Buffer.from(`IKORABU/WP3/CATFOOD/ROLE-ENROLLMENT/V3\n${encoded}`), keys.privateKey).toString("base64url") }); };
-  return Object.freeze({ contexts, binding, signEnrollmentPayload });
+  const writer = Object.freeze({ key_id: binding.writer_signing_key_id, key_version: binding.writer_signing_key_version, public_key_sha256: catfoodPublicKeyFingerprint(writerPublicPem), public_key_pem: writerPublicPem, private_key_pem: writerPrivatePem });
+  const controls = Object.freeze({ advanceBefore(action: string, ms: number) { advances.set(action, ms); }, loseResponseOnce(action: string) { lostResponses.add(action); } });
+  return Object.freeze({ contexts, binding, writer, controls, signEnrollmentPayload });
 }
 
 export function testEnrollmentContexts(scope: string, accepted = "a".repeat(64)): Record<CatfoodEnrollmentRole, CatfoodEnrollmentContext> { return testEnrollmentFixture(scope, accepted).contexts; }
