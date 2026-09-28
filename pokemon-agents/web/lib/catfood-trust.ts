@@ -584,11 +584,45 @@ function closedCoeSummary(coe: CoeAcquisition): Record<string, Json> {
   return { phase: coe.phase, digest: coe.digest, producer_release_identity: coe.producer_release_identity as unknown as Json, scope: coe.scope as unknown as Json, coverage: { state: coe.coverage.state as Json, unresolved_count: coe.coverage.unresolved_count as Json, snapshot_identity: coe.coverage.snapshot_identity as Json, record_set_digest: coe.coverage.record_set_digest as Json, cuts: coe.coverage.cuts as Json, window: { assessment_mode: window.assessment_mode, requested_window_start: window.requested_window_start, requested_window_end: window.requested_window_end, state: window.state }, prospective: { state: prospective.state, proof_id: prospective.proof_id, proof_applicable: prospective.proof_applicable } }, prohibited_activity: { coverage: coe.prohibited_activity.coverage as Json, activity: coe.prohibited_activity.activity as Json, exposure: coe.prohibited_activity.exposure as Json, known_zero: coe.prohibited_activity.known_zero as Json, pending_cost_count: coe.prohibited_activity.pending_cost_count as Json, unknown_cost_count: coe.prohibited_activity.unknown_cost_count as Json, unattributed_attempt_count: coe.prohibited_activity.unattributed_attempt_count as Json }, record_count: coe.records.length, page_count: coe.page_count, test_only: coe.test_only };
 }
 
-function runMembership(spec: CatfoodRunSpec, coe: CoeAcquisition, authorities: readonly Record<string, unknown>[], events: readonly Record<string, unknown>[]): readonly AttemptMembershipDecision[] {
-  const intents = events.filter((event) => ["WORK_DISPATCH_INTENT", "WORK_DISPATCH_AMBIGUOUS", "WORK_ADMITTED"].includes(String(event.event_type))).map((event) => {
+const WORK_DISPATCH_SEMANTICS = Object.freeze({
+  WORK_DISPATCH_INTENT: "INTENT",
+  WORK_DISPATCH_RELEASED: "RELEASED",
+  WORK_DISPATCH_AMBIGUOUS: "UNRESOLVED",
+  WORK_DISPATCH_POSSIBLY_APPLIED: "UNRESOLVED",
+  WORK_DISPATCH_REMOTE_FACT: "REMOTE_FACT",
+  WORK_POSITIVE_APPLY_REJECTED: "REMOTE_FACT",
+  WORK_DISPATCH_REJECTED: "REJECTED",
+  WORK_ADMITTED: "ADMITTED",
+} as const);
+
+type WorkDispatchState = { request_id: string; claim_id: string | null; released: boolean; unresolved: boolean; terminal: boolean; events: readonly string[] };
+
+export function normalizeWorkDispatchEvidence(events: readonly Record<string, unknown>[]): readonly WorkDispatchState[] {
+  const states = new Map<string, { request_id: string; claim_id: string | null; released: boolean; unresolved: boolean; terminal: boolean; events: string[] }>();
+  for (const event of events) {
+    const eventType = String(event.event_type); const semantic = WORK_DISPATCH_SEMANTICS[eventType as keyof typeof WORK_DISPATCH_SEMANTICS] ?? (eventType.startsWith("WORK_DISPATCH_") ? "UNRESOLVED" : undefined);
+    if (!semantic) continue;
     const payload = typeof event.payload_json === "string" ? JSON.parse(event.payload_json) as Record<string, unknown> : event.payload_json as Record<string, unknown>;
-    return { request_id: String(payload.request_id ?? event.request_id ?? ""), claim_id: event.claim_id === null ? null : String(event.claim_id) };
-  }).filter((item) => item.request_id);
+    const requestId = String(payload.request_id ?? event.request_id ?? ""); if (!requestId) continue;
+    const state = states.get(requestId) ?? { request_id: requestId, claim_id: null, released: false, unresolved: false, terminal: false, events: [] };
+    if (event.claim_id !== null && event.claim_id !== undefined) state.claim_id = String(event.claim_id);
+    state.events.push(eventType);
+    if (semantic === "RELEASED") state.released = true;
+    if (semantic === "UNRESOLVED") state.unresolved = true;
+    if (semantic === "REMOTE_FACT" || semantic === "ADMITTED") state.terminal = true;
+    if (semantic === "REJECTED") {
+      const dispatchState = String(payload.dispatch_state ?? "LEGACY_UNKNOWN");
+      if (dispatchState === "NOT_DISPATCHED" || dispatchState === "REMOTE_REJECTED" || !state.released && dispatchState === "LEGACY_UNKNOWN") state.terminal = true;
+      else state.unresolved = true;
+    }
+    states.set(requestId, state);
+  }
+  return Object.freeze([...states.values()].map((state) => Object.freeze({ ...state, events: Object.freeze([...state.events]) })));
+}
+
+function runMembership(spec: CatfoodRunSpec, coe: CoeAcquisition, authorities: readonly Record<string, unknown>[], events: readonly Record<string, unknown>[]): readonly AttemptMembershipDecision[] {
+  const normalized = normalizeWorkDispatchEvidence(events);
+  const intents = normalized.map((item) => ({ request_id: item.request_id, claim_id: item.claim_id }));
   return classifyRunAttempts(coe, {
     account_id: spec.account_id, spec_hash: spec.spec_sha256, window_start: spec.requested_window_start, window_end: spec.requested_window_end,
     authorities: authorities.map((row) => ({ capability: String(row.capability), authority_ref: String(row.authority_ref), generation: Number(row.threads_generation) })), intents,
@@ -606,8 +640,72 @@ function membershipReasons(decisions: readonly AttemptMembershipDecision[], work
     else if (state === "SUCCEEDED" && !localRequests.has(String(decision.attempt.terminal.request_id))) reasons.add("COE_UNTRACKED_RUN_WORK");
   }
   const known = new Set(decisions.flatMap((decision) => decision.attempt.lifecycle.map((row) => String(row.request_id))));
-  for (const event of events) if (event.event_type === "WORK_DISPATCH_AMBIGUOUS" && !known.has(String(event.request_id))) reasons.add("WORK_DISPATCH_OUTCOME_UNRESOLVED");
+  for (const dispatch of normalizeWorkDispatchEvidence(events)) if (dispatch.unresolved && !dispatch.terminal && !known.has(dispatch.request_id)) reasons.add("WORK_DISPATCH_OUTCOME_UNRESOLVED");
   return Object.freeze([...reasons].sort());
+}
+
+type AuthorityMutationOperation = "grant" | "renew" | "revoke";
+type AuthorityMutationOutcome = "NOT_DISPATCHED" | "RELEASED_UNRESOLVED" | "REMOTE_AMBIGUOUS" | "REMOTE_SUCCEEDED" | "REMOTE_REJECTED";
+type AuthorityMutationObligation = Readonly<{
+  request_id: string; operation: AuthorityMutationOperation; capability: CatfoodCapability; original_epoch: number;
+  source_provenance: string; account_id: string; tenant_id: string; payload_sha256: string | null;
+  expected_generation: number | null; expected_generation_known: boolean; requested_authority_ref: string | null; returned_authority_ref: string | null;
+  returned_generation: number | null; released: boolean; outcome: AuthorityMutationOutcome; identity_conflict: boolean;
+}>;
+
+const AUTHORITY_MUTATION_EVENTS = Object.freeze([
+  "THREADS_AUTHORITY_GRANT_INTENT", "THREADS_AUTHORITY_RENEWAL_INTENT", "THREADS_AUTHORITY_REVOKE_INTENT",
+  "THREADS_AUTHORITY_DISPATCH_RELEASED", "THREADS_AUTHORITY_REMOTE_FACT", "THREADS_AUTHORITY_REVOKE_REMOTE_FACT",
+  "THREADS_AUTHORITY_POSSIBLY_APPLIED", "THREADS_AUTHORITY_RENEWAL_AMBIGUOUS",
+  "THREADS_AUTHORITY_REMOTE_REJECTED", "THREADS_AUTHORITY_NOT_DISPATCHED",
+]);
+
+function authorityMutationInventory(events: readonly Record<string, unknown>[]): readonly AuthorityMutationObligation[] {
+  type Mutable = Omit<AuthorityMutationObligation, "outcome"> & { ambiguous: boolean; succeeded: boolean; rejected: boolean; not_dispatched: boolean };
+  const rows = new Map<string, Mutable>();
+  for (const event of events) {
+    const eventType = String(event.event_type); if (!AUTHORITY_MUTATION_EVENTS.includes(eventType)) continue;
+    const payload = typeof event.payload_json === "string" ? JSON.parse(event.payload_json) as Record<string, unknown> : event.payload_json as Record<string, unknown>;
+    const requestId = String(payload.request_id ?? event.request_id ?? ""), capability = String(payload.capability ?? "") as CatfoodCapability;
+    if (!requestId || !CATFOOD_CAPABILITIES.includes(capability)) continue;
+    const operation = String(payload.operation ?? (eventType.includes("RENEWAL") ? "renew" : eventType.includes("REVOKE") ? "revoke" : "grant")) as AuthorityMutationOperation;
+    if (!["grant", "renew", "revoke"].includes(operation)) continue;
+    const isRemoteFact = ["THREADS_AUTHORITY_REMOTE_FACT", "THREADS_AUTHORITY_REVOKE_REMOTE_FACT"].includes(eventType);
+    const expectedKnown = !isRemoteFact && (Object.prototype.hasOwnProperty.call(payload, "expected_generation") || Object.prototype.hasOwnProperty.call(payload, "threads_generation") || event.threads_generation !== null && event.threads_generation !== undefined);
+    const expectedRaw = isRemoteFact ? null : payload.expected_generation ?? payload.threads_generation ?? event.threads_generation;
+    const expected = expectedRaw === null || expectedRaw === undefined ? null : Number(expectedRaw);
+    const payloadSha = typeof payload.payload_sha256 === "string" ? payload.payload_sha256 : null;
+    const requestedRef = typeof payload.authority_ref === "string" && !isRemoteFact ? payload.authority_ref : null;
+    const current = rows.get(requestId) ?? {
+      request_id: requestId, operation, capability, original_epoch: Number(event.wp3_epoch), source_provenance: String(event.source_provenance),
+      account_id: String(event.account_id), tenant_id: String(event.tenant_id), payload_sha256: payloadSha,
+      expected_generation: expected, expected_generation_known: expectedKnown, requested_authority_ref: requestedRef, returned_authority_ref: null, returned_generation: null,
+      released: false, identity_conflict: false, ambiguous: false, succeeded: false, rejected: false, not_dispatched: false,
+    };
+    if (current.operation !== operation || current.capability !== capability || current.original_epoch !== Number(event.wp3_epoch)
+      || current.source_provenance !== String(event.source_provenance) || current.account_id !== String(event.account_id) || current.tenant_id !== String(event.tenant_id)
+      || expectedKnown && current.expected_generation_known && expected !== current.expected_generation
+      || payloadSha !== null && current.payload_sha256 !== null && payloadSha !== current.payload_sha256
+      || requestedRef !== null && current.requested_authority_ref !== null && requestedRef !== current.requested_authority_ref) current.identity_conflict = true;
+    if (!current.expected_generation_known && expectedKnown) { current.expected_generation = expected; current.expected_generation_known = true; }
+    if (current.payload_sha256 === null && payloadSha !== null) current.payload_sha256 = payloadSha;
+    if (current.requested_authority_ref === null && requestedRef !== null) current.requested_authority_ref = requestedRef;
+    if (eventType === "THREADS_AUTHORITY_DISPATCH_RELEASED") current.released = true;
+    if (["THREADS_AUTHORITY_POSSIBLY_APPLIED", "THREADS_AUTHORITY_RENEWAL_AMBIGUOUS"].includes(eventType)) current.ambiguous = true;
+    if (["THREADS_AUTHORITY_REMOTE_FACT", "THREADS_AUTHORITY_REVOKE_REMOTE_FACT"].includes(eventType)) {
+      current.succeeded = true; current.returned_authority_ref = typeof payload.authority_ref === "string" ? payload.authority_ref : null;
+      current.returned_generation = Number.isSafeInteger(Number(payload.generation ?? event.threads_generation)) ? Number(payload.generation ?? event.threads_generation) : null;
+    }
+    if (eventType === "THREADS_AUTHORITY_REMOTE_REJECTED") current.rejected = true;
+    if (eventType === "THREADS_AUTHORITY_NOT_DISPATCHED") current.not_dispatched = true;
+    rows.set(requestId, current);
+  }
+  return Object.freeze([...rows.values()].map((row) => {
+    const conflict = row.identity_conflict || row.not_dispatched && row.released || row.rejected && row.succeeded;
+    const outcome: AuthorityMutationOutcome = conflict ? "RELEASED_UNRESOLVED" : row.succeeded ? "REMOTE_SUCCEEDED" : row.rejected ? "REMOTE_REJECTED" : row.not_dispatched && !row.released ? "NOT_DISPATCHED" : row.ambiguous ? "REMOTE_AMBIGUOUS" : "RELEASED_UNRESOLVED";
+    const { ambiguous: _ambiguous, succeeded: _succeeded, rejected: _rejected, not_dispatched: _notDispatched, ...value } = row;
+    return Object.freeze({ ...value, outcome });
+  }));
 }
 
 function verdictFromReasons(reasons: ReadonlySet<string>): Verdict {
@@ -807,20 +905,22 @@ export class ProtectedCatfoodCustodian {
         if (!binding || binding.state !== "ACTIVE") throw new CatfoodTrustError("AUTHORITY_BINDING_MISSING");
         const expires = new Date(Math.min(Date.parse(sample.wall_time) + 120_000, Date.parse(spec.requested_window_end), Date.parse(go.payload.valid_until))).toISOString();
         if (Date.parse(expires) <= Date.parse(sample.wall_time)) throw new CatfoodTrustError("AUTHORITY_PERMIT_WINDOW_CLOSED");
-        const request_id = `renew:${sha256(canonicalJson({ run_id: row.run_id, epoch: row.current_epoch, capability, authority_ref: binding.authority_ref, generation: binding.threads_generation, expires })).slice(0, 32)}`;
+        const requestPayload = { action: "renew", account_id: spec.account_id, capability, authority_ref: binding.authority_ref, spec_hash: spec.spec_sha256, expected_generation: binding.threads_generation, permit_expires_at: expires };
+        const request_id = `renew:${sha256(canonicalJson({ run_id: row.run_id, epoch: row.current_epoch, payload: requestPayload })).slice(0, 32)}`;
         request = { spec, ref: String(binding.authority_ref), generation: Number(binding.threads_generation), expires, request_id };
-        this.appendJournal(row, "THREADS_AUTHORITY_RENEWAL_INTENT", session.session_id, this.source.source_identity, { capability, authority_ref: request.ref, threads_generation: request.generation, permit_expires_at: expires, request_id }, request.generation, null, request_id, sample);
+        this.appendJournal(row, "THREADS_AUTHORITY_RENEWAL_INTENT", session.session_id, this.source.source_identity, { operation: "renew", capability, authority_ref: request.ref, expected_generation: request.generation, permit_expires_at: expires, request_id, payload_sha256: sha256(canonicalJson(requestPayload)), wp3_epoch: row.current_epoch }, request.generation, null, request_id, sample);
       }).immediate();
       let head = this.control.query<{ sequence: number; row_hash: string }, [string]>("SELECT sequence,row_hash FROM catfood_source_journal WHERE run_id=? ORDER BY sequence DESC LIMIT 1").get(session.run_id)!; this.anchor(session.run_id, head, { state: "RENEWAL_INTENT_RETAINED", request_id: request.request_id });
       let transition: ThreadsAuthorityTransition;
-      this.control.transaction(() => this.appendJournal(this.getRun(session.run_id), "THREADS_AUTHORITY_DISPATCH_RELEASED", session.session_id, this.source.source_identity, { request_id: request.request_id, operation: "renew", capability }, request.generation, null, request.request_id, sample)).immediate();
+      const renewalPayloadSha = sha256(canonicalJson({ action: "renew", account_id: request.spec.account_id, capability, authority_ref: request.ref, spec_hash: request.spec.spec_sha256, expected_generation: request.generation, permit_expires_at: request.expires }));
+      this.control.transaction(() => this.appendJournal(this.getRun(session.run_id), "THREADS_AUTHORITY_DISPATCH_RELEASED", session.session_id, this.source.source_identity, { request_id: request.request_id, operation: "renew", capability, authority_ref: request.ref, expected_generation: request.generation, payload_sha256: renewalPayloadSha }, request.generation, null, request.request_id, sample)).immediate();
       head = this.control.query<{ sequence: number; row_hash: string }, [string]>("SELECT sequence,row_hash FROM catfood_source_journal WHERE run_id=? ORDER BY sequence DESC LIMIT 1").get(session.run_id)!; this.anchor(session.run_id, head, { state: "RENEWAL_DISPATCH_RELEASED", request_id: request.request_id });
       try { transition = this.source.renew(request.spec, capability, request.ref, request.generation, request.expires); }
       catch (error) {
-        this.control.transaction(() => { const row = this.getRun(session.run_id); this.control.query("UPDATE catfood_runs SET admission_state='CLOSED',lifecycle='STOP_PENDING',state_version=state_version+1 WHERE run_id=?").run(row.run_id); this.appendJournal(this.getRun(row.run_id), "THREADS_AUTHORITY_RENEWAL_AMBIGUOUS", session.session_id, this.source.source_identity, { capability, request_id: request.request_id }, request.generation, null, request.request_id, sample); }).immediate();
+        this.control.transaction(() => { const row = this.getRun(session.run_id); this.control.query("UPDATE catfood_runs SET admission_state='CLOSED',lifecycle='STOP_PENDING',state_version=state_version+1 WHERE run_id=?").run(row.run_id); this.appendJournal(this.getRun(row.run_id), "THREADS_AUTHORITY_POSSIBLY_APPLIED", session.session_id, this.source.source_identity, { operation: "renew", capability, request_id: request.request_id, authority_ref: request.ref, expected_generation: request.generation, payload_sha256: renewalPayloadSha }, request.generation, null, request.request_id, sample); }).immediate();
         head = this.control.query<{ sequence: number; row_hash: string }, [string]>("SELECT sequence,row_hash FROM catfood_source_journal WHERE run_id=? ORDER BY sequence DESC LIMIT 1").get(session.run_id)!; this.anchor(session.run_id, head, { state: "RENEWAL_AMBIGUOUS", request_id: request.request_id }); throw error;
       }
-      this.control.transaction(() => this.appendJournal(this.getRun(session.run_id), "THREADS_AUTHORITY_REMOTE_FACT", session.session_id, this.source.source_identity, { request_id: request.request_id, operation: "renew", capability, authority_ref: transition.authority_ref, generation: transition.generation, boundary: transition.boundary as unknown as Json }, transition.generation, null, request.request_id, sample)).immediate();
+      this.control.transaction(() => this.appendJournal(this.getRun(session.run_id), "THREADS_AUTHORITY_REMOTE_FACT", session.session_id, this.source.source_identity, { request_id: request.request_id, operation: "renew", capability, authority_ref: transition.authority_ref, generation: transition.generation, boundary: transition.boundary as unknown as Json, payload_sha256: renewalPayloadSha }, transition.generation, null, request.request_id, sample)).immediate();
       head = this.control.query<{ sequence: number; row_hash: string }, [string]>("SELECT sequence,row_hash FROM catfood_source_journal WHERE run_id=? ORDER BY sequence DESC LIMIT 1").get(session.run_id)!; this.anchor(session.run_id, head, { state: "RENEWAL_REMOTE_FACT_RETAINED", request_id: request.request_id });
       try { this.liveEnrollment("custodian.authority.renew.apply", session.run_id);
       this.control.transaction(() => {
@@ -966,18 +1066,18 @@ export class ProtectedCatfoodCustodian {
     for (const intent of intents) {
       if (!dispatchInvalid) try { const live = this.getRun(session.run_id); this.authenticate(session, live); this.requirePositiveRun(live); if (live.current_epoch !== initial.current_epoch || live.state_version !== initial.state_version) throw new CatfoodTrustError("PREFLIGHT_STALE"); } catch { dispatchInvalid = true; }
       if (dispatchInvalid) {
-        this.control.transaction(() => this.appendJournal(this.getRun(session.run_id), "THREADS_AUTHORITY_NOT_DISPATCHED", session.session_id, this.source.source_identity, { request_id: intent.requestId, operation: "grant", capability: intent.capability, reason: "SIBLING_INVALIDATED" }, intent.expected, null, intent.requestId, sample)).immediate();
+        this.control.transaction(() => this.appendJournal(this.getRun(session.run_id), "THREADS_AUTHORITY_NOT_DISPATCHED", session.session_id, this.source.source_identity, { request_id: intent.requestId, operation: "grant", capability: intent.capability, authority_ref: intent.authorityRef, expected_generation: intent.expected, payload_sha256: intent.payloadDigest, wp3_epoch: initial.current_epoch, reason: "SIBLING_INVALIDATED" }, intent.expected, null, intent.requestId, sample)).immediate();
         head = this.control.query<{ sequence: number; row_hash: string }, [string]>("SELECT sequence,row_hash FROM catfood_source_journal WHERE run_id=? ORDER BY sequence DESC LIMIT 1").get(session.run_id)!; this.anchor(session.run_id, head, { state: "NOT_DISPATCHED", request_id: intent.requestId });
         continue;
       }
       try {
-        this.control.transaction(() => this.appendJournal(this.getRun(session.run_id), "THREADS_AUTHORITY_DISPATCH_RELEASED", session.session_id, this.source.source_identity, { request_id: intent.requestId, operation: "grant", capability: intent.capability, payload_sha256: intent.payloadDigest }, intent.expected, null, intent.requestId, sample)).immediate();
+        this.control.transaction(() => this.appendJournal(this.getRun(session.run_id), "THREADS_AUTHORITY_DISPATCH_RELEASED", session.session_id, this.source.source_identity, { request_id: intent.requestId, operation: "grant", capability: intent.capability, authority_ref: intent.authorityRef, expected_generation: intent.expected, payload_sha256: intent.payloadDigest, wp3_epoch: initial.current_epoch }, intent.expected, null, intent.requestId, sample)).immediate();
         head = this.control.query<{ sequence: number; row_hash: string }, [string]>("SELECT sequence,row_hash FROM catfood_source_journal WHERE run_id=? ORDER BY sequence DESC LIMIT 1").get(session.run_id)!; this.anchor(session.run_id, head, { state: "GRANT_DISPATCH_RELEASED", request_id: intent.requestId });
         const transition = this.source.grant(spec, intent.capability, intent.authorityRef, intent.expected, permitExpiresAt); transitions.push({ capability: intent.capability, transition, requestId: intent.requestId });
-        this.control.transaction(() => this.appendJournal(this.getRun(session.run_id), "THREADS_AUTHORITY_REMOTE_FACT", session.session_id, this.source.source_identity, { request_id: intent.requestId, operation: "grant", capability: intent.capability, authority_ref: transition.authority_ref, generation: transition.generation, boundary: transition.boundary as unknown as Json, payload_sha256: intent.payloadDigest }, transition.generation, null, intent.requestId, sample)).immediate();
+        this.control.transaction(() => this.appendJournal(this.getRun(session.run_id), "THREADS_AUTHORITY_REMOTE_FACT", session.session_id, this.source.source_identity, { request_id: intent.requestId, operation: "grant", capability: intent.capability, requested_authority_ref: intent.authorityRef, authority_ref: transition.authority_ref, expected_generation: intent.expected, generation: transition.generation, boundary: transition.boundary as unknown as Json, payload_sha256: intent.payloadDigest, wp3_epoch: initial.current_epoch }, transition.generation, null, intent.requestId, sample)).immediate();
       } catch (error) {
         dispatchInvalid = true; const code = error instanceof CatfoodTrustError ? error.code : "MUTATION_OUTCOME_AMBIGUOUS"; const definitive = /^THREADS_HTTP_4\d\d_/.test(code) && !code.includes("AMBIGUOUS");
-        this.control.transaction(() => this.appendJournal(this.getRun(session.run_id), definitive ? "THREADS_AUTHORITY_REMOTE_REJECTED" : "THREADS_AUTHORITY_POSSIBLY_APPLIED", session.session_id, this.source.source_identity, { request_id: intent.requestId, operation: "grant", capability: intent.capability, authority_ref: intent.authorityRef, payload_sha256: intent.payloadDigest, reason_code: code }, intent.expected, null, intent.requestId, sample)).immediate();
+        this.control.transaction(() => this.appendJournal(this.getRun(session.run_id), definitive ? "THREADS_AUTHORITY_REMOTE_REJECTED" : "THREADS_AUTHORITY_POSSIBLY_APPLIED", session.session_id, this.source.source_identity, { request_id: intent.requestId, operation: "grant", capability: intent.capability, authority_ref: intent.authorityRef, expected_generation: intent.expected, payload_sha256: intent.payloadDigest, wp3_epoch: initial.current_epoch, reason_code: code }, intent.expected, null, intent.requestId, sample)).immediate();
       }
       head = this.control.query<{ sequence: number; row_hash: string }, [string]>("SELECT sequence,row_hash FROM catfood_source_journal WHERE run_id=? ORDER BY sequence DESC LIMIT 1").get(session.run_id)!; this.anchor(session.run_id, head, { state: dispatchInvalid ? "GRANT_DISPATCH_UNRESOLVED" : "GRANT_REMOTE_FACT_RETAINED", request_id: intent.requestId });
     }
@@ -1033,11 +1133,13 @@ export class ProtectedCatfoodCustodian {
       this.appendJournal(row, "WORK_DISPATCH_INTENT", session.session_id, this.source.source_identity, { work_id: workId, source_id: sourceId, capability, business_identity: item.business_identity, material_revision: item.material_revision, request_id: requestId, authority_ref: binding.authority_ref, threads_generation: binding.threads_generation }, Number(binding.threads_generation), null, requestId, sample);
     }).immediate();
     let head = this.control.query<{ sequence: number; row_hash: string }, [string]>("SELECT sequence,row_hash FROM catfood_source_journal WHERE run_id=? ORDER BY sequence DESC LIMIT 1").get(session.run_id)!; this.anchor(session.run_id, head, { state: "DISPATCH_INTENT_RETAINED", request_id: reserved.requestId });
-    let remoteClaim: ThreadsClaimRecord | undefined;
+    let remoteClaim: ThreadsClaimRecord | undefined; let dispatchReleased = false;
     try {
       const dispatchRow = this.getRun(session.run_id); this.authenticate(session, dispatchRow); this.requirePositiveRun(dispatchRow); const dispatchSpec = runSpec(dispatchRow);
       const dispatchItem = this.source.inventory(dispatchSpec).find((candidate) => candidate.source_id === sourceId && candidate.capability === capability);
       if (!dispatchItem || canonicalJson(dispatchItem) !== canonicalJson(reserved.item)) throw new CatfoodTrustError("SOURCE_INTENT_CHANGED");
+      this.control.transaction(() => this.appendJournal(this.getRun(session.run_id), "WORK_DISPATCH_RELEASED", session.session_id, this.source.source_identity, { work_id: reserved.workId, request_id: reserved.requestId, capability, authority_ref: reserved.authorityRef, threads_generation: reserved.generation }, reserved.generation, null, reserved.requestId, sample)).immediate();
+      head = this.control.query<{ sequence: number; row_hash: string }, [string]>("SELECT sequence,row_hash FROM catfood_source_journal WHERE run_id=? ORDER BY sequence DESC LIMIT 1").get(session.run_id)!; this.anchor(session.run_id, head, { state: "WORK_DISPATCH_RELEASED", request_id: reserved.requestId }); dispatchReleased = true;
       const dispatchClaim = capability === "editorial.outcome_evaluation" ? this.source.outcomeEvaluation(dispatchSpec, validateOutcomeEvaluationRequest({ account_id: dispatchSpec.account_id, capability, request_id: reserved.requestId, experiment_id: dispatchItem.business_identity, expected_material_revision: dispatchItem.material_revision, authority_ref: reserved.authorityRef, spec_hash: dispatchSpec.spec_sha256, expected_threads_generation: reserved.generation, runtime_observation_id: String(this.sourceSnapshot(dispatchSpec, sample.wall_time).coe.runtime_enforcement.freshness_identity), expected_release_git_sha: dispatchSpec.threads_sha }), dispatchItem) : this.source.claim(dispatchSpec, dispatchItem, reserved.authorityRef, reserved.generation, reserved.requestId);
       remoteClaim = dispatchClaim;
       this.control.transaction(() => this.appendJournal(this.getRun(session.run_id), "WORK_DISPATCH_REMOTE_FACT", session.session_id, this.source.source_identity, { work_id: reserved.workId, request_id: reserved.requestId, claim: dispatchClaim as unknown as Json, no_positive_credit: true }, dispatchClaim.generation, dispatchClaim.claim_id, dispatchClaim.request_id, sample)).immediate();
@@ -1064,9 +1166,11 @@ export class ProtectedCatfoodCustodian {
       ticket = Object.freeze({ work_id: reserved.workId, claim_id: claim.claim_id, request_id: claim.request_id, capability, wp3_epoch: Number(row.current_epoch), threads_generation: claim.generation });
       }).immediate();
     } catch (error) {
-      const code = error instanceof CatfoodTrustError ? error.code : "MUTATION_OUTCOME_AMBIGUOUS"; const event = remoteClaim ? "WORK_POSITIVE_APPLY_REJECTED" : code.includes("AMBIGUOUS") ? "WORK_DISPATCH_POSSIBLY_APPLIED" : "WORK_DISPATCH_REJECTED";
-      this.control.transaction(() => { const row = this.getRun(session.run_id); this.appendJournal(row, event, session.session_id, this.source.source_identity, { work_id: reserved.workId, request_id: reserved.requestId, reason_code: code, no_positive_credit: true }, remoteClaim?.generation ?? reserved.generation, remoteClaim?.claim_id ?? null, reserved.requestId, sample); }).immediate();
-      head = this.control.query<{ sequence: number; row_hash: string }, [string]>("SELECT sequence,row_hash FROM catfood_source_journal WHERE run_id=? ORDER BY sequence DESC LIMIT 1").get(session.run_id)!; this.anchor(session.run_id, head, { state: remoteClaim ? "REMOTE_FACT_WITHOUT_LOCAL_PERMISSION" : code.includes("AMBIGUOUS") ? "AMBIGUOUS" : "REJECTED", request_id: reserved.requestId }); throw error;
+      const code = error instanceof CatfoodTrustError ? error.code : "MUTATION_OUTCOME_AMBIGUOUS"; const definitiveRemoteRejection = /^THREADS_HTTP_4\d\d_/.test(code) && !code.includes("AMBIGUOUS");
+      const event = remoteClaim ? "WORK_POSITIVE_APPLY_REJECTED" : dispatchReleased && !definitiveRemoteRejection ? "WORK_DISPATCH_POSSIBLY_APPLIED" : "WORK_DISPATCH_REJECTED";
+      const dispatchState = remoteClaim ? "REMOTE_SUCCEEDED" : !dispatchReleased ? "NOT_DISPATCHED" : definitiveRemoteRejection ? "REMOTE_REJECTED" : "REMOTE_AMBIGUOUS";
+      this.control.transaction(() => { const row = this.getRun(session.run_id); this.appendJournal(row, event, session.session_id, this.source.source_identity, { work_id: reserved.workId, request_id: reserved.requestId, reason_code: code, dispatch_state: dispatchState, no_positive_credit: true }, remoteClaim?.generation ?? reserved.generation, remoteClaim?.claim_id ?? null, reserved.requestId, sample); }).immediate();
+      head = this.control.query<{ sequence: number; row_hash: string }, [string]>("SELECT sequence,row_hash FROM catfood_source_journal WHERE run_id=? ORDER BY sequence DESC LIMIT 1").get(session.run_id)!; this.anchor(session.run_id, head, { state: dispatchState, request_id: reserved.requestId }); throw error;
     }
     head = this.control.query<{ sequence: number; row_hash: string }, [string]>("SELECT sequence,row_hash FROM catfood_source_journal WHERE run_id=? ORDER BY sequence DESC LIMIT 1").get(session.run_id)!; this.anchor(session.run_id, head);
     return ticket;
@@ -1103,7 +1207,7 @@ export class ProtectedCatfoodCustodian {
   }
 
   stop(session: RunnerSession, reason: "STOP" | "PAUSE" | "ABORT" | "EXPIRY"): void {
-    const sample = this.sample(); let bindings: Record<string, unknown>[] = []; let spec!: CatfoodRunSpec; let terminal = false;
+    const sample = this.sample(); let bindings: Record<string, unknown>[] = []; let obligations: readonly AuthorityMutationObligation[] = []; let spec!: CatfoodRunSpec; let terminal = false; let stopVersion = 0;
     // Commit the local fence before any external call. Competing admissions use
     // the same immediate write lock and must re-read this closed head.
     this.control.transaction(() => {
@@ -1114,68 +1218,92 @@ export class ProtectedCatfoodCustodian {
         .run(terminal ? "ABORTED" : "STOP_PENDING", row.run_id);
       this.appendJournal(this.getRun(row.run_id), `${reason}_REQUESTED`, session.session_id, "custodian", { reason }, null, null, null, sample);
       spec = runSpec(row);
-      const history = this.control.query<Record<string, unknown>, [string]>("SELECT * FROM catfood_authority_bindings WHERE run_id=? ORDER BY wp3_epoch,capability").all(row.run_id);
-      const candidates = new Map<string, Record<string, unknown>>(history.map((binding) => [String(binding.capability), { ...binding, potentially_applied: false }]));
-      const requests = new Map<string, Record<string, unknown>>();
-      const mutationEvents = this.control.query<Record<string, unknown>, [string]>("SELECT event_type,payload_json,threads_generation,request_id,sequence FROM catfood_source_journal WHERE run_id=? AND event_type IN ('THREADS_AUTHORITY_GRANT_INTENT','THREADS_AUTHORITY_RENEWAL_INTENT','THREADS_AUTHORITY_DISPATCH_RELEASED','THREADS_AUTHORITY_REMOTE_FACT','THREADS_AUTHORITY_POSSIBLY_APPLIED','THREADS_AUTHORITY_REMOTE_REJECTED','THREADS_AUTHORITY_NOT_DISPATCHED') ORDER BY sequence").all(row.run_id);
-      for (const event of mutationEvents) {
-        const payload = JSON.parse(String(event.payload_json)) as Record<string, unknown>, requestId = String(payload.request_id ?? event.request_id ?? ""), capability = String(payload.capability ?? ""); if (!requestId || !CATFOOD_CAPABILITIES.includes(capability as CatfoodCapability)) continue;
-        if (event.event_type === "THREADS_AUTHORITY_REMOTE_REJECTED" || event.event_type === "THREADS_AUTHORITY_NOT_DISPATCHED") { requests.delete(requestId); continue; }
-        const current = requests.get(requestId) ?? { run_id: row.run_id, wp3_epoch: row.current_epoch, capability, authority_ref: payload.authority_ref, threads_generation: payload.expected_generation ?? event.threads_generation ?? 0, state: "REMOTE_ONLY", released: false, potentially_applied: false };
-        if (payload.authority_ref) current.authority_ref = payload.authority_ref; if (event.threads_generation !== null) current.threads_generation = event.threads_generation;
-        if (event.event_type === "THREADS_AUTHORITY_DISPATCH_RELEASED") current.released = true;
-        if (event.event_type === "THREADS_AUTHORITY_REMOTE_FACT" || event.event_type === "THREADS_AUTHORITY_POSSIBLY_APPLIED") current.potentially_applied = true;
-        requests.set(requestId, current);
-      }
-      for (const request of requests.values()) if (request.released || request.potentially_applied) { const capability = String(request.capability), current = candidates.get(capability); if (current) current.potentially_applied = Boolean(current.potentially_applied || request.potentially_applied); else candidates.set(capability, request); }
-      bindings = [...candidates.values()];
+      bindings = this.control.query<Record<string, unknown>, [string]>("SELECT * FROM catfood_authority_bindings WHERE run_id=? ORDER BY wp3_epoch,capability").all(row.run_id);
+      obligations = authorityMutationInventory(this.control.query<Record<string, unknown>, [string]>("SELECT * FROM catfood_source_journal WHERE run_id=? ORDER BY sequence").all(row.run_id));
+      stopVersion = Number(this.getRun(row.run_id).state_version);
     }).immediate();
     let anchorFailure: unknown;
     const requestedHead = this.control.query<{ sequence: number; row_hash: string }, [string]>("SELECT sequence,row_hash FROM catfood_source_journal WHERE run_id=? ORDER BY sequence DESC LIMIT 1").get(session.run_id)!;
     try { this.anchor(session.run_id, requestedHead, { state: "COMPLETE", local_admission: "CLOSED" }); } catch (error) { anchorFailure = error; }
-    const observations: Array<{ binding: Record<string, unknown>; transition?: ThreadsAuthorityTransition; boundary?: OperationalBoundaryV1; error?: string; fenced?: boolean; requestId?: string }> = [];
-    for (const binding of bindings) {
+    const proofs = new Map<string, OperationalBoundaryV1>(); const closedBindings = new Set<string>(); let safetyError: string | undefined;
+    const boundaryAuthorization = this.authorizeSource("source.boundaries", `${spec.run_id}:boundaries`, "SAFETY_RECONCILIATION");
+    let boundaries = new Map<CatfoodCapability, OperationalBoundaryV1>();
+    const refreshBoundaries = () => {
+      const observed = this.source.boundaries(spec, boundaryAuthorization).map((value) => verifyBoundary(value, spec, "STOP", sample.wall_time));
+      boundaries = new Map(observed.filter((value) => value.capability !== null).map((value) => [value.capability!, value]));
+    };
+    try { refreshBoundaries(); } catch (error) { safetyError = error instanceof CatfoodTrustError ? error.code : "BOUNDARY_UNAVAILABLE"; }
+    const inhibited = (boundary: OperationalBoundaryV1 | undefined) => {
+      const flight = boundary?.governed_in_flight as Record<string, unknown> | undefined;
+      return !!boundary && boundary.execution_state === "INHIBITED" && boundary.stop_acknowledgement === "INHIBITED" && Number(flight?.count) === 0;
+    };
+    const dispatchRevoke = (capability: CatfoodCapability, authorityRef: string, expectedGeneration: number): { requestId: string; boundary?: OperationalBoundaryV1; invalid_response?: boolean } => {
+      const payload = { action: "revoke", account_id: spec.account_id, capability, authority_ref: authorityRef, spec_hash: spec.spec_sha256, expected_generation: expectedGeneration, permit_expires_at: null };
+      const payloadSha = sha256(canonicalJson(payload)), requestId = `revoke:${sha256(canonicalJson({ run_id: spec.run_id, payload })).slice(0, 32)}`;
+      this.control.transaction(() => this.appendJournal(this.getRun(session.run_id), "THREADS_AUTHORITY_REVOKE_INTENT", session.session_id, this.source.source_identity, { request_id: requestId, operation: "revoke", capability, authority_ref: authorityRef, expected_generation: expectedGeneration, payload_sha256: payloadSha, wp3_epoch: this.getRun(session.run_id).current_epoch, no_positive_use: true }, expectedGeneration, null, requestId, sample)).immediate();
+      let journalHead = this.control.query<{ sequence: number; row_hash: string }, [string]>("SELECT sequence,row_hash FROM catfood_source_journal WHERE run_id=? ORDER BY sequence DESC LIMIT 1").get(session.run_id)!; this.anchor(session.run_id, journalHead, { state: "REVOKE_INTENT_RETAINED", request_id: requestId });
+      this.control.transaction(() => this.appendJournal(this.getRun(session.run_id), "THREADS_AUTHORITY_DISPATCH_RELEASED", session.session_id, this.source.source_identity, { request_id: requestId, operation: "revoke", capability, authority_ref: authorityRef, expected_generation: expectedGeneration, payload_sha256: payloadSha, no_positive_use: true }, expectedGeneration, null, requestId, sample)).immediate();
+      journalHead = this.control.query<{ sequence: number; row_hash: string }, [string]>("SELECT sequence,row_hash FROM catfood_source_journal WHERE run_id=? ORDER BY sequence DESC LIMIT 1").get(session.run_id)!; this.anchor(session.run_id, journalHead, { state: "REVOKE_DISPATCH_RELEASED", request_id: requestId });
+      let invalidResponse = false;
       try {
-        const boundaryAuthorization = this.authorizeSource("source.boundaries", `${spec.run_id}:boundaries`, "SAFETY_RECONCILIATION");
-        const existing = this.source.boundaries(spec, boundaryAuthorization).map(validateOperationalBoundaryV1).find((boundary) => boundary.capability === binding.capability);
-        const flight = existing?.governed_in_flight as Record<string, unknown> | undefined;
-        const expected = Number(binding.threads_generation || 0), alreadyFenced = !!existing && existing.execution_state === "INHIBITED" && existing.stop_acknowledgement === "INHIBITED" && Number(flight?.count) === 0 && (!binding.potentially_applied || existing.fencing_generation !== null && Number(existing.fencing_generation) > expected);
-        if (alreadyFenced) {
-          observations.push({ binding, transition: { boundary: existing!, authority_ref: String(binding.authority_ref), generation: Number(existing!.fencing_generation) }, boundary: existing!, fenced: true });
-          continue;
+        const authorization = this.authorizeSource("source.authority.revoke", `${spec.run_id}:${capability}`, "SAFETY_RECONCILIATION");
+        const transition = this.source.revoke(spec, capability, authorityRef, expectedGeneration, authorization);
+        const boundary = verifyBoundary(transition.boundary, spec, "STOP", sample.wall_time);
+        if (!inhibited(boundary)) { invalidResponse = true; throw new CatfoodTrustError("REVOKE_ACKNOWLEDGEMENT_INVALID"); }
+        this.control.transaction(() => this.appendJournal(this.getRun(session.run_id), "THREADS_AUTHORITY_REVOKE_REMOTE_FACT", session.session_id, this.source.source_identity, { request_id: requestId, operation: "revoke", capability, authority_ref: transition.authority_ref, generation: transition.generation, boundary: boundary as unknown as Json, payload_sha256: payloadSha, no_positive_use: true }, transition.generation, null, requestId, sample)).immediate();
+      } catch (error) {
+        const code = error instanceof CatfoodTrustError ? error.code : error instanceof Error ? error.message : "UNKNOWN";
+        this.control.transaction(() => this.appendJournal(this.getRun(session.run_id), "THREADS_AUTHORITY_POSSIBLY_APPLIED", session.session_id, this.source.source_identity, { request_id: requestId, operation: "revoke", capability, authority_ref: authorityRef, expected_generation: expectedGeneration, payload_sha256: payloadSha, reason_code: code, no_positive_use: true }, expectedGeneration, null, requestId, sample)).immediate();
+      }
+      journalHead = this.control.query<{ sequence: number; row_hash: string }, [string]>("SELECT sequence,row_hash FROM catfood_source_journal WHERE run_id=? ORDER BY sequence DESC LIMIT 1").get(session.run_id)!; this.anchor(session.run_id, journalHead, { state: "REVOKE_RESULT_RETAINED", request_id: requestId });
+      try { refreshBoundaries(); } catch { return { requestId, invalid_response: invalidResponse }; }
+      return { requestId, boundary: boundaries.get(capability), invalid_response: invalidResponse };
+    };
+    if (!safetyError) {
+      for (const obligation of obligations) {
+        if (!obligation.released || ["NOT_DISPATCHED", "REMOTE_REJECTED"].includes(obligation.outcome)) continue;
+        let boundary = boundaries.get(obligation.capability);
+        if (boundary?.execution_state === "PERMITTED") {
+          const authorityRef = obligation.returned_authority_ref ?? obligation.requested_authority_ref;
+          if (boundary.fencing_generation === null || !authorityRef) { safetyError = "REMOTE_EFFECT_UNRESOLVED"; continue; }
+          const recovery = dispatchRevoke(obligation.capability, authorityRef, boundary.fencing_generation); boundary = recovery.boundary; if (recovery.invalid_response) safetyError = "REVOKE_ACKNOWLEDGEMENT_INVALID"; if (boundary && !recovery.invalid_response) proofs.set(recovery.requestId, boundary);
         }
-        if (!existing || existing.fencing_generation === null || !binding.authority_ref) throw new CatfoodTrustError("REMOTE_EFFECT_UNRESOLVED");
-        const payload = { action: "revoke", account_id: spec.account_id, capability: binding.capability, authority_ref: binding.authority_ref, spec_hash: spec.spec_sha256, expected_generation: existing.fencing_generation, permit_expires_at: null };
-        const requestId = `revoke:${sha256(canonicalJson({ run_id: spec.run_id, payload })).slice(0, 32)}`;
-        this.control.transaction(() => this.appendJournal(this.getRun(session.run_id), "THREADS_AUTHORITY_REVOKE_INTENT", session.session_id, this.source.source_identity, { request_id: requestId, operation: "revoke", capability: binding.capability, authority_ref: binding.authority_ref, expected_generation: existing.fencing_generation, payload_sha256: sha256(canonicalJson(payload)), no_positive_use: true }, Number(existing.fencing_generation), null, requestId, sample)).immediate();
-        let intentHead = this.control.query<{ sequence: number; row_hash: string }, [string]>("SELECT sequence,row_hash FROM catfood_source_journal WHERE run_id=? ORDER BY sequence DESC LIMIT 1").get(session.run_id)!; this.anchor(session.run_id, intentHead, { state: "REVOKE_INTENT_RETAINED", request_id: requestId });
-        this.control.transaction(() => this.appendJournal(this.getRun(session.run_id), "THREADS_AUTHORITY_DISPATCH_RELEASED", session.session_id, this.source.source_identity, { request_id: requestId, operation: "revoke", capability: binding.capability, no_positive_use: true }, Number(existing.fencing_generation), null, requestId, sample)).immediate();
-        intentHead = this.control.query<{ sequence: number; row_hash: string }, [string]>("SELECT sequence,row_hash FROM catfood_source_journal WHERE run_id=? ORDER BY sequence DESC LIMIT 1").get(session.run_id)!; this.anchor(session.run_id, intentHead, { state: "REVOKE_DISPATCH_RELEASED", request_id: requestId });
-        const revokeAuthorization = this.authorizeSource("source.authority.revoke", `${spec.run_id}:${binding.capability}`, "SAFETY_RECONCILIATION");
-        const transition = this.source.revoke(spec, binding.capability as CatfoodCapability, String(binding.authority_ref), Number(existing.fencing_generation), revokeAuthorization);
-        this.control.transaction(() => this.appendJournal(this.getRun(session.run_id), "THREADS_AUTHORITY_REVOKE_REMOTE_FACT", session.session_id, this.source.source_identity, { request_id: requestId, operation: "revoke", capability: binding.capability, authority_ref: transition.authority_ref, generation: transition.generation, boundary: transition.boundary as unknown as Json, no_positive_use: true }, transition.generation, null, requestId, sample)).immediate();
-        intentHead = this.control.query<{ sequence: number; row_hash: string }, [string]>("SELECT sequence,row_hash FROM catfood_source_journal WHERE run_id=? ORDER BY sequence DESC LIMIT 1").get(session.run_id)!; this.anchor(session.run_id, intentHead, { state: "REVOKE_REMOTE_FACT_RETAINED", request_id: requestId });
-        observations.push({ binding, transition, boundary: validateOperationalBoundaryV1(transition.boundary), fenced: true, requestId });
-      } catch (error) { observations.push({ binding, error: error instanceof CatfoodTrustError ? error.code : error instanceof Error ? error.name : "UNKNOWN", fenced: false }); }
+        if (!inhibited(boundary)) { safetyError = "REMOTE_EFFECT_UNRESOLVED"; continue; }
+        if (obligation.outcome !== "REMOTE_SUCCEEDED" && (!obligation.expected_generation_known || boundary!.fencing_generation === obligation.expected_generation)) { safetyError = "REMOTE_EFFECT_UNRESOLVED"; continue; }
+        proofs.set(obligation.request_id, boundary!);
+      }
+      for (const binding of bindings) {
+        const capability = String(binding.capability) as CatfoodCapability; let boundary = boundaries.get(capability);
+        if (boundary?.execution_state === "PERMITTED" && boundary.fencing_generation === Number(binding.threads_generation)) {
+          const recovery = dispatchRevoke(capability, String(binding.authority_ref), boundary.fencing_generation); boundary = recovery.boundary; if (recovery.invalid_response) safetyError = "REVOKE_ACKNOWLEDGEMENT_INVALID"; if (boundary && !recovery.invalid_response) proofs.set(recovery.requestId, boundary);
+        }
+        if (inhibited(boundary) && boundary!.fencing_generation !== Number(binding.threads_generation)) closedBindings.add(`${binding.wp3_epoch}:${capability}:${binding.authority_ref}:${binding.threads_generation}`);
+        else safetyError = "REMOTE_EFFECT_UNRESOLVED";
+      }
     }
-    let safe = !anchorFailure;
+    const candidateHead = this.control.query<{ sequence: number; row_hash: string }, [string]>("SELECT sequence,row_hash FROM catfood_source_journal WHERE run_id=? ORDER BY sequence DESC LIMIT 1").get(session.run_id)!;
+    let safe = !anchorFailure && !safetyError;
     this.control.transaction(() => {
       const row = this.getRun(session.run_id); this.authenticate(session, row);
-      for (const observation of observations) {
-        if (!observation.transition || !observation.boundary) {
-          safe = false;
-          this.appendJournal(row, "THREADS_REVOKE_UNCONFIRMED", session.session_id, this.source.source_identity, { capability: String(observation.binding.capability), error_class: observation.error ?? "UNKNOWN" }, Number(observation.binding.threads_generation), null, null, sample);
-          continue;
+      const currentHead = this.control.query<{ sequence: number; row_hash: string }, [string]>("SELECT sequence,row_hash FROM catfood_source_journal WHERE run_id=? ORDER BY sequence DESC LIMIT 1").get(row.run_id)!;
+      if (Number(row.state_version) !== stopVersion || currentHead.sequence !== candidateHead.sequence || currentHead.row_hash !== candidateHead.row_hash || row.admission_state !== "CLOSED") safe = false;
+      const finalObligations = authorityMutationInventory(this.control.query<Record<string, unknown>, [string]>("SELECT * FROM catfood_source_journal WHERE run_id=? ORDER BY sequence").all(row.run_id));
+      for (const obligation of finalObligations) {
+        if (obligation.identity_conflict || obligation.released && !["REMOTE_REJECTED"].includes(obligation.outcome)) {
+          const proof = proofs.get(obligation.request_id);
+          if (!proof || !inhibited(proof) || obligation.outcome !== "REMOTE_SUCCEEDED" && (!obligation.expected_generation_known || proof.fencing_generation === obligation.expected_generation)) safe = false;
         }
-        const flight = observation.boundary.governed_in_flight as Record<string, unknown>;
-        if (!observation.fenced || observation.boundary.account_id !== spec.account_id || observation.boundary.execution_state !== "INHIBITED" || observation.boundary.stop_acknowledgement !== "INHIBITED" || Number(flight.count) !== 0) safe = false;
-        this.appendJournal(row, "THREADS_AUTHORITY_REVOKED", session.session_id, this.source.source_identity, { capability: String(observation.binding.capability), boundary: observation.boundary as unknown as Json, request_id: observation.requestId ?? null, no_positive_use: true }, observation.transition.generation, null, observation.requestId ?? null, sample);
+      }
+      if (closedBindings.size !== bindings.length) safe = false;
+      for (const binding of bindings) {
+        const boundary = boundaries.get(String(binding.capability) as CatfoodCapability);
+        if (boundary && inhibited(boundary)) this.appendJournal(row, "THREADS_AUTHORITY_REVOKED", session.session_id, this.source.source_identity, { capability: String(binding.capability), boundary: boundary as unknown as Json, request_id: null, no_positive_use: true }, boundary.fencing_generation, null, null, sample);
       }
       const unresolved = this.control.query<{ n: number }, [string]>("SELECT COUNT(*) n FROM catfood_work_admissions WHERE run_id=? AND status<>'TERMINAL'").get(row.run_id)?.n ?? 0;
       if (unresolved) safe = false;
       const lifecycle = terminal ? (safe ? "ABORTED" : "ABORT_UNCONFIRMED") : safe ? (reason === "PAUSE" ? "PAUSED" : "SAFE_QUIESCENCE") : "STOP_UNCONFIRMED";
       this.control.query("UPDATE catfood_runs SET lifecycle=?,state_version=state_version+1 WHERE run_id=?").run(lifecycle, row.run_id);
-      this.appendJournal(this.getRun(row.run_id), safe ? "SAFE_QUIESCENCE" : terminal ? "ABORT_UNCONFIRMED" : "STOP_UNCONFIRMED", session.session_id, this.source.source_identity, { unresolved, terminal_cause_preserved: terminal }, null, null, null, sample);
+      this.appendJournal(this.getRun(row.run_id), safe ? "SAFE_QUIESCENCE" : terminal ? "ABORT_UNCONFIRMED" : "STOP_UNCONFIRMED", session.session_id, this.source.source_identity, { unresolved, terminal_cause_preserved: terminal, obligation_count: finalObligations.length, proof_request_ids: [...proofs.keys()].sort(), error_class: safetyError ?? null }, null, null, null, sample);
     }).immediate();
     const head = this.control.query<{ sequence: number; row_hash: string }, [string]>("SELECT sequence,row_hash FROM catfood_source_journal WHERE run_id=? ORDER BY sequence DESC LIMIT 1").get(session.run_id)!;
     try { this.anchor(session.run_id, head); } catch (error) { anchorFailure ??= error; }
