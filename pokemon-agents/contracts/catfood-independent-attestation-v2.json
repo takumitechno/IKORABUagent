@@ -1,0 +1,13 @@
+{
+  "contract": "ikorabu.catfood-independent-attestation.v2",
+  "domain": "IKORABU/WP3/CATFOOD/ATTESTATION/V2",
+  "required_roles": ["source", "custodian", "evaluator", "writer"],
+  "receiving_role": "verifier",
+  "role_evidence": {
+    "authentication": "original canonical ROLE-ENROLLMENT/V3 authority envelope",
+    "policy_source": "receiving verifier protected enrollment binding",
+    "checks": ["exact role catalogue", "issuer/key/purpose", "accepted snapshot and build policy", "subject/session/scope", "accepted/local descriptor equality", "launcher record and measurement binding"]
+  },
+  "assessment_binding": ["run_id", "bundle_sha256", "source_digest", "policy_sha256", "evaluator session and launch", "writer session and launch", "role evidence digest"],
+  "legacy_v1": "diagnostic only; unsupported for corrected acceptance"
+}

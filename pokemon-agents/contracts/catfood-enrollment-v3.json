@@ -6,6 +6,7 @@
   "objects": {
     "accepted_role_descriptor": "external accepted descriptor for the exact role export, direct process main, Bun executable/version, loading profile, configuration resolution and measured closure",
     "launcher_observed_launch": "independently signed launcher record selected by a protected launch ticket and finalized from the realized process before role admission",
+    "authenticated_enrollment": "the original canonical Ed25519 enrollment envelope and fixed V3 purpose, forwarded unchanged for accepting-verifier authentication",
     "local_role_descriptor": "consumer-local resolution and content measurement used only as a consistency check",
     "runtime_subject": "actual pid, process-start token, boot identity, principal, deployment/environment and authenticated channel binding"
   },
