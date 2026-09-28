@@ -1,0 +1,16 @@
+{
+  "contract": "ikorabu.catfood-independent-attestation.v5",
+  "domain": "IKORABU/WP3/CATFOOD/ATTESTATION/V5",
+  "artifact": "authenticated M/R/J-bound C/E package + V3 writer authorization/preparation/finalization + Ed25519 outer writer signature",
+  "assessment_package": "catfood-authenticated-assessment-package.v3",
+  "evaluation_action": "catfood-evaluation-action.v3",
+  "writer_actions": ["catfood-writer-credential-action.v3", "catfood-issuance-prepare-action.v3", "catfood-issuance-finalize-action.v3"],
+  "required_roles": ["source", "custodian", "evaluator", "writer"],
+  "receiving_role": "verifier",
+  "job_binding": ["evaluation_job_id", "evaluation_job_sha256", "release_sha256", "manifest_sha256", "reserved assessment_id", "exact C", "original E"],
+  "expected_acceptance": ["protected target T", "exact job and assessment", "current target revision", "no contradiction", "fresh verifier action receipt"],
+  "key_separation": "writer outer-attestation key is distinct from authority and every role-action key in the cohort",
+  "historical": "expired original role sessions may remain historically authentic; new action and current clearance require a current authorized session",
+  "legacy_v4": "preserved for diagnostic compatibility; unsupported by the expected V5 acceptance gate",
+  "test_only": "any TEST_ONLY ancestry permanently produces TEST_ONLY provenance and artifacts"
+}

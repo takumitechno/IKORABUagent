@@ -18,10 +18,33 @@ export const CATFOOD_EVALUATION_RECEIPT_SCHEMA_V2 = "catfood-evaluation-receipt.
 export const CATFOOD_WRITER_AUTHORIZATION_SCHEMA_V2 = "catfood-writer-credential-authorization.v2";
 export const CATFOOD_PREPARATION_SCHEMA_V2 = "catfood-attestation-issuance-preparation.v2";
 export const CATFOOD_FINALIZATION_SCHEMA_V2 = "catfood-attestation-issuance-finalization.v2";
+export const CATFOOD_ATTESTATION_SCHEMA_V5 = "catfood-independent-attestation.v5";
+export const CATFOOD_ATTESTATION_ARTIFACT_SCHEMA_V5 = "catfood-independent-attestation-artifact.v5";
+export const CATFOOD_ATTESTATION_DOMAIN_V5 = "IKORABU/WP3/CATFOOD/ATTESTATION/V5";
+export const CATFOOD_EVALUATION_PACKAGE_SCHEMA_V3 = "catfood-authenticated-assessment-package.v3";
+export const CATFOOD_EVALUATION_RECEIPT_PURPOSE_V3 = "IKORABU/WP3/CATFOOD/EVALUATION-RESULT/V3";
+export const CATFOOD_WRITER_CREDENTIAL_PURPOSE_V3 = "IKORABU/WP3/CATFOOD/WRITER-CREDENTIAL/V3";
+export const CATFOOD_ISSUANCE_PREPARE_PURPOSE_V3 = "IKORABU/WP3/CATFOOD/ATTESTATION-ISSUANCE-PREPARE/V3";
+export const CATFOOD_ISSUANCE_FINALIZE_PURPOSE_V3 = "IKORABU/WP3/CATFOOD/ATTESTATION-ISSUANCE-FINALIZE/V3";
+export const CATFOOD_WRITER_AUTHORIZATION_SCHEMA_V3 = "catfood-writer-credential-authorization.v3";
+export const CATFOOD_PREPARATION_SCHEMA_V3 = "catfood-attestation-issuance-preparation.v3";
+export const CATFOOD_FINALIZATION_SCHEMA_V3 = "catfood-attestation-issuance-finalization.v3";
 const MAX_BYTES = 2_000_000;
 
 export interface AuthenticatedAssessmentPackage {
   schema: typeof CATFOOD_EVALUATION_PACKAGE_SCHEMA_V2;
+  decision_core: Readonly<Record<string, unknown>>;
+  evaluation_receipt: Readonly<Record<string, unknown>>;
+  role_evidence: readonly Readonly<Record<string, unknown>>[];
+  provenance: Readonly<Record<string, unknown>>;
+}
+
+export interface AuthenticatedAssessmentPackageV3 {
+  schema: typeof CATFOOD_EVALUATION_PACKAGE_SCHEMA_V3;
+  evaluation_job: Readonly<Record<string, unknown>>;
+  evaluation_job_envelope: string;
+  custody_release_receipt: Readonly<Record<string, unknown>>;
+  sealed_input_manifest: Readonly<Record<string, unknown>>;
   decision_core: Readonly<Record<string, unknown>>;
   evaluation_receipt: Readonly<Record<string, unknown>>;
   role_evidence: readonly Readonly<Record<string, unknown>>[];
@@ -54,5 +77,14 @@ export function validateDecisionCoreV4(value: unknown, expected: { run_id: strin
 
 export function buildEvaluationAction(core: Readonly<Record<string, unknown>>, roleEvidenceSha256: string, runScope: Readonly<Record<string, unknown>>, assessmentId: string): Readonly<Record<string, unknown>> { return Object.freeze({ schema: CATFOOD_EVALUATION_ACTION_SCHEMA_V2, action_id: assessmentId, assessment_id: assessmentId, run_id: core.run_id, run_scope: runScope, decision_core: core, decision_core_sha256: attestationDigest(core), role_evidence_sha256: roleEvidenceSha256, evaluator: core.evaluator, bundle_sha256: core.bundle_sha256, source_digest: core.source_digest, policy_sha256: core.policy_sha256 }); }
 export function buildWriterCredentialAction(runId: string, writer: Readonly<Record<string, unknown>>, credential: Readonly<Record<string, unknown>>, roleEvidenceSha256: string, actionId: string): Readonly<Record<string, unknown>> { return Object.freeze({ schema: "catfood-writer-credential-action.v2", action_id: actionId, run_id: runId, writer, writer_credential: credential, role_evidence_sha256: roleEvidenceSha256 }); }
+export function buildWriterCredentialActionV3(input: { job_id: string; job_sha256: string; run_id: string; assessment_id: string; writer: Readonly<Record<string, unknown>>; credential: Readonly<Record<string, unknown>>; role_evidence_sha256: string; action_id: string }): Readonly<Record<string, unknown>> { return Object.freeze({ schema: "catfood-writer-credential-action.v3", action_id: input.action_id, run_id: input.run_id, evaluation_job_id: input.job_id, evaluation_job_sha256: input.job_sha256, assessment_id: input.assessment_id, writer: input.writer, writer_credential: input.credential, role_evidence_sha256: input.role_evidence_sha256 }); }
 export function buildPreparationAction(runId: string, assessmentId: string, evaluationReceiptSha256: string, coreSha256: string, writer: Readonly<Record<string, unknown>>, credential: Readonly<Record<string, unknown>>, credentialAuthorizationSha256: string, roleEvidenceSha256: string, issuanceId: string): Readonly<Record<string, unknown>> { return Object.freeze({ schema: "catfood-issuance-prepare-action.v2", action_id: issuanceId, issuance_id: issuanceId, run_id: runId, assessment_id: assessmentId, evaluation_receipt_sha256: evaluationReceiptSha256, decision_core_sha256: coreSha256, writer, writer_credential: credential, credential_authorization_sha256: credentialAuthorizationSha256, role_evidence_sha256: roleEvidenceSha256, payload_domain: CATFOOD_ATTESTATION_DOMAIN_V4 }); }
 export function buildFinalizationAction(runId: string, assessmentId: string, payload: Record<string, unknown>, payloadText: string, signatureBase64url: string): Readonly<Record<string, unknown>> { return Object.freeze({ schema: "catfood-issuance-finalize-action.v2", action_id: payload.issuance_id, issuance_id: payload.issuance_id, run_id: runId, assessment_id: assessmentId, payload_sha256: sha256(payloadText), signature_sha256: sha256(Buffer.from(signatureBase64url, "base64url")), evaluation_receipt_sha256: payload.evaluation_receipt_sha256, credential_authorization_sha256: payload.credential_authorization_sha256, preparation_receipt_sha256: payload.issuance_preparation_sha256, role_evidence_sha256: payload.role_evidence_sha256, writer_credential: payload.writer_credential, payload_json: payloadText, signature_base64url: signatureBase64url }); }
+
+export function buildPreparationActionV3(input: { job_id: string; job_sha256: string; run_id: string; assessment_id: string; evaluation_receipt_sha256: string; decision_core_sha256: string; writer: Readonly<Record<string, unknown>>; credential: Readonly<Record<string, unknown>>; credential_authorization_sha256: string; role_evidence_sha256: string; issuance_id: string }): Readonly<Record<string, unknown>> {
+  return Object.freeze({ schema: "catfood-issuance-prepare-action.v3", action_id: input.issuance_id, issuance_id: input.issuance_id, run_id: input.run_id, evaluation_job_id: input.job_id, evaluation_job_sha256: input.job_sha256, assessment_id: input.assessment_id, evaluation_receipt_sha256: input.evaluation_receipt_sha256, decision_core_sha256: input.decision_core_sha256, writer: input.writer, writer_credential: input.credential, credential_authorization_sha256: input.credential_authorization_sha256, role_evidence_sha256: input.role_evidence_sha256, payload_domain: CATFOOD_ATTESTATION_DOMAIN_V5 });
+}
+
+export function buildFinalizationActionV3(input: { job_id: string; job_sha256: string; run_id: string; assessment_id: string; payload: Record<string, unknown>; payload_text: string; signature_base64url: string }): Readonly<Record<string, unknown>> {
+  return Object.freeze({ schema: "catfood-issuance-finalize-action.v3", action_id: input.payload.issuance_id, issuance_id: input.payload.issuance_id, run_id: input.run_id, evaluation_job_id: input.job_id, evaluation_job_sha256: input.job_sha256, assessment_id: input.assessment_id, payload_sha256: sha256(input.payload_text), signature_sha256: sha256(Buffer.from(input.signature_base64url, "base64url")), evaluation_receipt_sha256: input.payload.evaluation_receipt_sha256, credential_authorization_sha256: input.payload.credential_authorization_sha256, preparation_receipt_sha256: input.payload.issuance_preparation_sha256, role_evidence_sha256: input.payload.role_evidence_sha256, writer_credential: input.payload.writer_credential, payload_json: input.payload_text, signature_base64url: input.signature_base64url });
+}

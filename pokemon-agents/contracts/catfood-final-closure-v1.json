@@ -1,0 +1,39 @@
+{
+  "contract": "ikorabu.wp3-final-closure.v1",
+  "charter": "WP3-FINAL-CLOSURE-CHARTER/1",
+  "chain": ["closed source stores", "M", "R", "J", "C", "E", "P", "writer signature", "I", "T/V"],
+  "sealed_input": {
+    "schema": "catfood-sealed-input.v1",
+    "snapshot_profile": "sqlite3-standalone.v1",
+    "requirements": ["exact final bytes", "journal_mode DELETE", "no WAL or journal sidecar", "one verified common closure cut", "stable-handle evaluator staging"]
+  },
+  "custody_release": {
+    "action": "custodian.evaluation.release",
+    "purpose_class": "HISTORICAL_EVIDENCE",
+    "authority": "authenticated CUSTODIAN role action only"
+  },
+  "evaluation_job": {
+    "schema": "catfood-evaluation-job.v1",
+    "signature_purpose": "IKORABU/WP3/CATFOOD/EVALUATION-JOB/V1",
+    "immutable": true,
+    "stable_ids": ["evaluation_job_id", "stable_evaluator_request_id", "reserved_assessment_id"]
+  },
+  "job_state": {
+    "schema": "catfood-evaluation-job-state.v1",
+    "signature_purpose": "IKORABU/WP3/CATFOOD/EVALUATION-JOB-STATE/V1",
+    "states": ["PENDING", "COMMITTED", "CANCELLED"],
+    "separate_from_job_descriptor": true
+  },
+  "comparison": {
+    "projection": "catfood-comparison-projection.v1",
+    "excluded_only": ["evaluator.subject", "evaluator.session_id", "evaluator.launch_id", "evaluator.action_key_fingerprint"],
+    "divergence": "append-only contradiction; no automatic winner or clearing"
+  },
+  "expected_target": {
+    "schema": "catfood-expected-evaluation-target.v1",
+    "signature_purpose": "IKORABU/WP3/CATFOOD/EXPECTED-EVALUATION-TARGET/V1",
+    "source": "protected host/workload assignment",
+    "acceptance": "fresh verifier PoP clearance after full artifact verification"
+  },
+  "legacy": "no-job artifacts remain diagnostic only and cannot satisfy expected V5 acceptance"
+}

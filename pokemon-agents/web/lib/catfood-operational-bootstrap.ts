@@ -1,4 +1,5 @@
 import { closeSync, fstatSync, lstatSync, openSync, readFileSync, realpathSync, statSync } from "node:fs";
+import { generateKeyPairSync } from "node:crypto";
 import { hostname, uptime } from "node:os";
 import { join, resolve } from "node:path";
 import { parseJsonNoDuplicateKeys } from "./catfood-coe";
@@ -7,6 +8,10 @@ import { CATFOOD_OPERATIONAL_ROOT, CatfoodTrustError, ProtectedCatfoodCustodian,
 import { OperationalThreadsEvidenceSource, type ThreadsSourceContext } from "./catfood-threads-http";
 import { verifyConsumerIntegrity, type ConsumerIntegrityManifest } from "../../scripts/check-catfood-consumer-integrity";
 import { assertEnrolledRole, loadOperationalRoleEnrollment } from "./catfood-enrollment";
+import { collectCurrentRuntimeSubject, roleChannelArtifactDescriptor } from "./catfood-enrollment";
+import { registerLocalRoleSession, type LocalRoleSession, type RoleChannelBinding } from "./catfood-role-channel";
+import { verifyIndependentAttestationArtifact, type IndependentAttestationExpected } from "./catfood-independent-attestation";
+import type { ThreadsHttpTransport } from "./catfood-threads-http";
 
 const SHA256 = /^[0-9a-f]{64}$/;
 const BOOTSTRAP_FIELDS = ["attestation_root_ids", "credential_version_ref", "environment_identity", "go_root_ids", "intents", "principal_binding", "principal_ref", "protected_probe", "runtime_prohibitions", "schema", "source_build_sha256", "source_identity", "tenant_user_id", "threads_origin", "trust_domain"];
@@ -82,11 +87,23 @@ export function openOperationalCatfoodCustodian(): ProtectedCatfoodCustodian {
   } catch (error) { if (error instanceof CatfoodTrustError && error.code === "OPERATIONAL_GO_ROOT_MISMATCH") throw error; throw new CatfoodTrustError("OPERATIONAL_SUPERVISOR_ENROLLMENT_UNAVAILABLE"); }
 }
 
+let operationalVerifier: Readonly<{ session: LocalRoleSession; binding: RoleChannelBinding }> | undefined;
+
+/**
+ * Provisionable operational registration boundary. The authority binding is loaded only from the protected root;
+ * the external launcher receives the freshly generated public key and must return its signed assignment.
+ */
+export function openOperationalIndependentAttestationVerifier(input: { assignment_provider(request: Readonly<Record<string, unknown>>): string; transport: ThreadsHttpTransport }): void {
+  if (operationalVerifier) throw new CatfoodTrustError("OPERATIONAL_VERIFIER_ALREADY_OPEN");
+  try {
+    const bindingRaw = protectedRead(join(CATFOOD_OPERATIONAL_ROOT, "role-channel-binding.json"), 1_000_000), binding = parseJsonNoDuplicateKeys(bindingRaw, 1_000_000, 32) as unknown as RoleChannelBinding; if (binding.trust_domain !== "OPERATIONAL") throw new CatfoodTrustError("OPERATIONAL_BOOTSTRAP_SCHEMA_INVALID");
+    const subjectConfig = parseJsonNoDuplicateKeys(protectedRead(join(CATFOOD_OPERATIONAL_ROOT, "role-subject.json"), 16_384), 16_384, 8) as Record<string, unknown>; exact(subjectConfig, ["deployment_id", "environment_identity"]); const key = generateKeyPairSync("ed25519"), publicKeyPem = key.publicKey.export({ type: "spki", format: "pem" }).toString(), subject = collectCurrentRuntimeSubject({ origin: binding.origin, audience: binding.audience, credential: binding.credential, deployment_id: String(subjectConfig.deployment_id), environment_identity: String(subjectConfig.environment_identity), trust_domain: "OPERATIONAL" }), assignment = input.assignment_provider(Object.freeze({ role: "verifier", subject, descriptor: roleChannelArtifactDescriptor("verifier"), public_key_pem: publicKeyPem })), session = registerLocalRoleSession({ binding, transport: input.transport, assignment_envelope: assignment, private_key: key.privateKey }); operationalVerifier = Object.freeze({ session, binding });
+  } catch (error) { operationalVerifier = undefined; if (error instanceof CatfoodTrustError && error.code === "OPERATIONAL_VERIFIER_ALREADY_OPEN") throw error; throw new CatfoodTrustError("OPERATIONAL_VERIFIER_ENROLLMENT_UNAVAILABLE", error instanceof Error ? error.message : undefined); }
+}
+
 /** Fixed operational verifier: roots and accepted identities come only from the protected operational root. */
 export function verifyOperationalIndependentAttestation(artifactJson: string, expected: { run_id: string; bundle_sha256: string }): EvaluationResult["verdict"];
 export function verifyOperationalIndependentAttestation(payloadJson: string, signatureBase64url: string, expected: { run_id: string; bundle_sha256: string }): EvaluationResult["verdict"];
 export function verifyOperationalIndependentAttestation(artifactJson: string, expectedOrSignature: { run_id: string; bundle_sha256: string } | string, legacyExpected?: { run_id: string; bundle_sha256: string }): EvaluationResult["verdict"] {
-  void artifactJson; void expectedOrSignature; void legacyExpected;
-  // V4 has no local operational enrollment loader: only the external launcher/authority may create a LocalRoleSession.
-  throw new CatfoodTrustError("OPERATIONAL_VERIFIER_ENROLLMENT_UNAVAILABLE");
+  if (!operationalVerifier || typeof expectedOrSignature === "string") throw new CatfoodTrustError("OPERATIONAL_VERIFIER_ENROLLMENT_UNAVAILABLE"); try { const expectedTarget = protectedRead(join(CATFOOD_OPERATIONAL_ROOT, "expected-evaluation-target.json"), 1_000_000), expected: IndependentAttestationExpected = { ...expectedOrSignature, verifier_session: operationalVerifier.session, role_channel_binding: operationalVerifier.binding, expected_target_envelope: expectedTarget }; return verifyIndependentAttestationArtifact(artifactJson, expected, "OPERATIONAL"); } catch (error) { if (error instanceof CatfoodTrustError && error.code !== "OPERATIONAL_BOOTSTRAP_UNPROVISIONED") throw error; throw new CatfoodTrustError("OPERATIONAL_VERIFIER_ENROLLMENT_UNAVAILABLE"); }
 }
