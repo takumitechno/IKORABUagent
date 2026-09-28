@@ -2,7 +2,7 @@ import { Database } from "bun:sqlite";
 import { createPublicKey, randomBytes, verify } from "node:crypto";
 import { existsSync, readFileSync, statSync } from "node:fs";
 import { join, resolve } from "node:path";
-import { assertEnrolledRole, type CatfoodEnrollmentContext } from "./catfood-enrollment";
+import { assertEnrolledRole, deriveEnrolledTrustDomain, inspectEnrolledRole, type CatfoodEnrollmentContext, type EnrolledTrustProvenance } from "./catfood-enrollment";
 import { canonicalJson, sha256, validateOperationalBoundaryV1, type Json, type OperationalBoundaryV1 } from "./catfood-harness";
 import { CATFOOD_THREADS_DEPENDENCY_ROOT, acquireCoe, assessCoe, assertFrozenDependencies, canonicalCoeJson, classifyRunAttempts, decodeCoeAcquisition, stableCoeEvidence, validateOutcomeEvaluationRequest, verifyGovernedWork, type AttemptMembershipDecision, type CoeAcquisition, type CoeAssessment, type CoePageSource, type GovernedWorkDecision, type OutcomeEvaluationRequest } from "./catfood-coe";
 
@@ -35,6 +35,7 @@ export const CATFOOD_EVALUATOR_SHA256 = sha256(canonicalJson({
   policy_sha256: CATFOOD_POLICY_SHA256,
   source: "protected-journal+external-checkpoint+threads-source+signed-go",
 }));
+const EVALUATION_TRUST_ANCESTRY = Object.freeze(["supervisor", "role_session", "role_build", "source", "clock", "go", "environment", "acquisition", "custodian", "sealed_run", "evaluator"]);
 
 const SHA40 = /^[0-9a-f]{40}$/;
 const SHA256 = /^[0-9a-f]{64}$/;
@@ -637,7 +638,7 @@ export class ProtectedCatfoodCustodian {
     checkpointPath: string,
     private readonly source: ThreadsEvidenceSource,
     private readonly clock: TrustedClock,
-    enrollment?: CatfoodEnrollmentContext,
+    private readonly enrollment?: CatfoodEnrollmentContext,
   ) {
     if (resolve(controlPath) === resolve(checkpointPath)) throw new CatfoodTrustError("CHECKPOINT_MUST_BE_EXTERNAL");
     this.control = new Database(resolve(controlPath), { strict: true, create: false });
@@ -657,6 +658,8 @@ export class ProtectedCatfoodCustodian {
   }
 
   close(): void { this.control.close(); this.checkpoints.close(); }
+
+  private liveEnrollment(action: string, target: string): void { if (this.enrollment) inspectEnrolledRole(this.enrollment, "custodian", action, target); else if (this.trust.source_mode === "OPERATIONAL") throw new CatfoodTrustError("ENROLLMENT_STATUS_INVALID"); }
 
   private sample(): TrustedClockSample {
     const got = this.clock.sample();
@@ -790,6 +793,7 @@ export class ProtectedCatfoodCustodian {
 
   renewAuthorities(session: RunnerSession): void {
     for (const capability of CATFOOD_CAPABILITIES) {
+      this.liveEnrollment("custodian.authority.renew.dispatch", session.run_id);
       this.verifyAnchored(session.run_id); const sample = this.sample(); let request!: { spec: CatfoodRunSpec; ref: string; generation: number; expires: string; request_id: string };
       this.control.transaction(() => {
         const row = this.getRun(session.run_id); this.authenticate(session, row); this.requirePositiveRun(row); const go = this.verifyCurrentGo(row, sample); const spec = runSpec(row);
@@ -811,6 +815,7 @@ export class ProtectedCatfoodCustodian {
         this.control.transaction(() => { const row = this.getRun(session.run_id); this.control.query("UPDATE catfood_runs SET admission_state='CLOSED',lifecycle='STOP_PENDING',state_version=state_version+1 WHERE run_id=?").run(row.run_id); this.appendJournal(this.getRun(row.run_id), "THREADS_AUTHORITY_RENEWAL_AMBIGUOUS", session.session_id, this.source.source_identity, { capability, request_id: request.request_id }, request.generation, null, request.request_id, sample); }).immediate();
         head = this.control.query<{ sequence: number; row_hash: string }, [string]>("SELECT sequence,row_hash FROM catfood_source_journal WHERE run_id=? ORDER BY sequence DESC LIMIT 1").get(session.run_id)!; this.anchor(session.run_id, head, { state: "RENEWAL_AMBIGUOUS", request_id: request.request_id }); throw error;
       }
+      this.liveEnrollment("custodian.authority.renew.apply", session.run_id);
       this.control.transaction(() => {
         const row = this.getRun(session.run_id); this.authenticate(session, row); this.requirePositiveRun(row); this.verifyCurrentGo(row, sample);
         if (row.lifecycle !== "RUNNING" || row.admission_state !== "OPEN" || transition.authority_ref !== request.ref || transition.generation !== request.generation) throw new CatfoodTrustError("AUTHORITY_RENEWAL_RACE");
@@ -879,6 +884,7 @@ export class ProtectedCatfoodCustodian {
   }
 
   preflight(session: RunnerSession): PreflightReceipt {
+    this.liveEnrollment("custodian.preflight", session.run_id);
     this.verifyAnchored(session.run_id);
     const sample = this.sample();
     let output!: PreflightReceipt; let blocked: string | null = null;
@@ -922,6 +928,7 @@ export class ProtectedCatfoodCustodian {
   }
 
   activate(session: RunnerSession, receipt: PreflightReceipt): void {
+    this.liveEnrollment("custodian.activate", session.run_id);
     this.verifyAnchored(session.run_id); const sample = this.sample();
     this.control.transaction(() => {
       const row = this.getRun(session.run_id); this.authenticate(session, row); this.requirePositiveRun(row); const go = this.verifyCurrentGo(row, sample);
@@ -951,6 +958,7 @@ export class ProtectedCatfoodCustodian {
   }
 
   admit(session: RunnerSession, capability: CatfoodCapability, sourceId: string): AdmissionTicket {
+    this.liveEnrollment("custodian.admit.dispatch", session.run_id);
     this.verifyAnchored(session.run_id); const sample = this.sample(); let ticket!: AdmissionTicket; let reserved!: { item: ThreadsInventoryItem; requestId: string; workId: string; semantic: string; authorityRef: string; generation: number };
     this.control.transaction(() => {
       const row = this.getRun(session.run_id); this.authenticate(session, row); this.requirePositiveRun(row); const go = this.verifyCurrentGo(row, sample);
@@ -971,7 +979,13 @@ export class ProtectedCatfoodCustodian {
       this.appendJournal(row, "WORK_DISPATCH_INTENT", session.session_id, this.source.source_identity, { work_id: workId, source_id: sourceId, capability, business_identity: item.business_identity, material_revision: item.material_revision, request_id: requestId, authority_ref: binding.authority_ref, threads_generation: binding.threads_generation }, Number(binding.threads_generation), null, requestId, sample);
     }).immediate();
     let head = this.control.query<{ sequence: number; row_hash: string }, [string]>("SELECT sequence,row_hash FROM catfood_source_journal WHERE run_id=? ORDER BY sequence DESC LIMIT 1").get(session.run_id)!; this.anchor(session.run_id, head, { state: "DISPATCH_INTENT_RETAINED", request_id: reserved.requestId });
-    try { this.control.transaction(() => {
+    try {
+      const dispatchRow = this.getRun(session.run_id); this.authenticate(session, dispatchRow); this.requirePositiveRun(dispatchRow); const dispatchSpec = runSpec(dispatchRow);
+      const dispatchItem = this.source.inventory(dispatchSpec).find((candidate) => candidate.source_id === sourceId && candidate.capability === capability);
+      if (!dispatchItem || canonicalJson(dispatchItem) !== canonicalJson(reserved.item)) throw new CatfoodTrustError("SOURCE_INTENT_CHANGED");
+      const dispatchClaim = capability === "editorial.outcome_evaluation" ? this.source.outcomeEvaluation(dispatchSpec, validateOutcomeEvaluationRequest({ account_id: dispatchSpec.account_id, capability, request_id: reserved.requestId, experiment_id: dispatchItem.business_identity, expected_material_revision: dispatchItem.material_revision, authority_ref: reserved.authorityRef, spec_hash: dispatchSpec.spec_sha256, expected_threads_generation: reserved.generation, runtime_observation_id: String(this.sourceSnapshot(dispatchSpec, sample.wall_time).coe.runtime_enforcement.freshness_identity), expected_release_git_sha: dispatchSpec.threads_sha }), dispatchItem) : this.source.claim(dispatchSpec, dispatchItem, reserved.authorityRef, reserved.generation, reserved.requestId);
+      this.liveEnrollment("custodian.admit.apply", session.run_id);
+      this.control.transaction(() => {
       const row = this.getRun(session.run_id); this.authenticate(session, row); this.requirePositiveRun(row); const go = this.verifyCurrentGo(row, sample);
       if (!row.lease_expires_at || Date.parse(row.lease_expires_at) <= Date.parse(sample.wall_time) || row.lifecycle !== "RUNNING" || row.admission_state !== "OPEN" || Number(row.current_epoch) > go.payload.maximum_wp3_epoch) throw new CatfoodTrustError("ADMISSION_CLOSED");
       const spec = runSpec(row); requireZeroPaidRuntime(this.source.runtimeEvidence(spec)); const item = this.source.inventory(spec).find((candidate) => candidate.source_id === sourceId && candidate.capability === capability);
@@ -980,7 +994,7 @@ export class ProtectedCatfoodCustodian {
       if (!binding || binding.authority_ref !== reserved.authorityRef || Number(binding.threads_generation) !== reserved.generation) throw new CatfoodTrustError("AUTHORITY_BINDING_CHANGED");
       const currentBoundary = this.source.boundaries(spec).find((candidate) => candidate.capability === capability); if (!currentBoundary) throw new CatfoodTrustError("BOUNDARY_COVERAGE_INCOMPLETE");
       verifyBoundary(currentBoundary, spec, "ADMIT", sample.wall_time, { capability, generation: reserved.generation }); liveScope(spec, sample.wall_time);
-      const claim = capability === "editorial.outcome_evaluation" ? this.source.outcomeEvaluation(spec, validateOutcomeEvaluationRequest({ account_id: spec.account_id, capability, request_id: reserved.requestId, experiment_id: item.business_identity, expected_material_revision: item.material_revision, authority_ref: reserved.authorityRef, spec_hash: spec.spec_sha256, expected_threads_generation: reserved.generation, runtime_observation_id: String(this.sourceSnapshot(spec, sample.wall_time).coe.runtime_enforcement.freshness_identity), expected_release_git_sha: spec.threads_sha }), item) : this.source.claim(spec, item, reserved.authorityRef, reserved.generation, reserved.requestId);
+      const claim = dispatchClaim;
       if (claim.account_id !== spec.account_id || claim.capability !== capability || claim.authority_ref !== binding.authority_ref || claim.generation !== binding.threads_generation || claim.claim_status !== "in_progress") throw new CatfoodTrustError("AUTHORITATIVE_CLAIM_INVALID");
       if (Date.parse(claim.admitted_at) < Date.parse(spec.requested_window_start) || Date.parse(claim.admitted_at) >= Date.parse(spec.requested_window_end)) throw new CatfoodTrustError("WORK_OUTSIDE_WINDOW");
       try {
@@ -989,7 +1003,8 @@ export class ProtectedCatfoodCustodian {
       } catch { throw new CatfoodTrustError("DUPLICATE_SEMANTIC_WORK"); }
       this.appendJournal(row, "WORK_ADMITTED", session.session_id, this.source.source_identity, { work_id: reserved.workId, source_id: sourceId, business_identity: claim.business_identity, material_revision: claim.material_revision, go_sha256: row.go_sha256, dispatch_intent_request_id: reserved.requestId }, claim.generation, claim.claim_id, claim.request_id, sample);
       ticket = Object.freeze({ work_id: reserved.workId, claim_id: claim.claim_id, request_id: claim.request_id, capability, wp3_epoch: Number(row.current_epoch), threads_generation: claim.generation });
-    }).immediate(); } catch (error) {
+      }).immediate();
+    } catch (error) {
       const code = error instanceof CatfoodTrustError ? error.code : "MUTATION_OUTCOME_AMBIGUOUS";
       this.control.transaction(() => { const row = this.getRun(session.run_id); this.appendJournal(row, code.includes("AMBIGUOUS") ? "WORK_DISPATCH_AMBIGUOUS" : "WORK_DISPATCH_REJECTED", session.session_id, this.source.source_identity, { work_id: reserved.workId, request_id: reserved.requestId, reason_code: code }, reserved.generation, null, reserved.requestId, sample); }).immediate();
       head = this.control.query<{ sequence: number; row_hash: string }, [string]>("SELECT sequence,row_hash FROM catfood_source_journal WHERE run_id=? ORDER BY sequence DESC LIMIT 1").get(session.run_id)!; this.anchor(session.run_id, head, { state: code.includes("AMBIGUOUS") ? "AMBIGUOUS" : "REJECTED", request_id: reserved.requestId }); throw error;
@@ -1184,12 +1199,12 @@ export class ProtectedCatfoodCustodian {
     let bundle: Record<string, Json>;
     try { bundle = this.rederive(runId); } catch (error) {
       const code = error instanceof CatfoodTrustError ? error.code : "REDERIVATION_FAILED";
-      return Object.freeze({ verdict: code.includes("TAMPER") || code.includes("CORRUPT") || code.includes("CHAIN") ? "FAIL" : "BLOCKED", reason_codes: Object.freeze([code]), rederived_bundle_sha256: "", evaluator_sha256: CATFOOD_EVALUATOR_SHA256, policy_sha256: CATFOOD_POLICY_SHA256, test_only: this.trust.source_mode === "TEST_ONLY", evidence_coverage: "UNKNOWN" });
+      return Object.freeze({ verdict: code.includes("TAMPER") || code.includes("CORRUPT") || code.includes("CHAIN") ? "FAIL" : "BLOCKED", reason_codes: Object.freeze([code]), rederived_bundle_sha256: "", evaluator_sha256: CATFOOD_EVALUATOR_SHA256, policy_sha256: CATFOOD_POLICY_SHA256, test_only: true, evidence_coverage: "UNKNOWN" });
     }
     {
       const cache = this.control.query<{ bundle_json: string; bundle_sha256: string }, [string]>("SELECT bundle_json,bundle_sha256 FROM catfood_bundle_cache WHERE run_id=?").get(runId);
       const digest = sha256(canonicalJson(bundle)); const cacheValid = !cache || cache.bundle_sha256 === digest && canonicalJson(JSON.parse(cache.bundle_json)) === canonicalJson(bundle);
-      return evaluateCatfoodAcceptance(bundle, this.trust.source_mode === "TEST_ONLY", cacheValid);
+      return evaluateCatfoodAcceptance(bundle, undefined, cacheValid);
     }
   }
 }
@@ -1203,7 +1218,7 @@ export class IndependentCatfoodEvaluator {
   private readonly checkpoints: Database;
   private readonly trust: Readonly<CatfoodTrustConfig>;
 
-  constructor(controlPath: string, checkpointPath: string, private readonly source: ReadonlyThreadsEvidenceSource, enrollment?: CatfoodEnrollmentContext) {
+  constructor(controlPath: string, checkpointPath: string, private readonly source: ReadonlyThreadsEvidenceSource, private readonly enrollment?: CatfoodEnrollmentContext, private readonly provenance?: EnrolledTrustProvenance) {
     this.control = new Database(resolve(controlPath), { strict: true, create: false, readonly: true });
     this.checkpoints = new Database(resolve(checkpointPath), { strict: true, create: false, readonly: true });
     try {
@@ -1266,15 +1281,18 @@ export class IndependentCatfoodEvaluator {
   }
 
   evaluate(runId: string): EvaluationResult {
+    if (this.enrollment) inspectEnrolledRole(this.enrollment, "evaluator", "evaluator.execute", runId);
     let bundle: Record<string, Json>;
     try { bundle = this.rederive(runId); } catch (error) {
       const code = error instanceof CatfoodTrustError ? error.code : "REDERIVATION_FAILED";
-      return Object.freeze({ verdict: /TAMPER|CORRUPT|CHAIN/.test(code) ? "FAIL" : "BLOCKED", reason_codes: Object.freeze([code]), rederived_bundle_sha256: "", evaluator_sha256: CATFOOD_EVALUATOR_SHA256, policy_sha256: CATFOOD_POLICY_SHA256, test_only: this.trust.source_mode === "TEST_ONLY", evidence_coverage: "UNKNOWN" });
+      return Object.freeze({ verdict: /TAMPER|CORRUPT|CHAIN/.test(code) ? "FAIL" : "BLOCKED", reason_codes: Object.freeze([code]), rederived_bundle_sha256: "", evaluator_sha256: CATFOOD_EVALUATOR_SHA256, policy_sha256: CATFOOD_POLICY_SHA256, test_only: deriveEnrolledTrustDomain(this.provenance, EVALUATION_TRUST_ANCESTRY) !== "OPERATIONAL", evidence_coverage: "UNKNOWN" });
     }
     {
       const cache = this.control.query<{ bundle_json: string; bundle_sha256: string }, [string]>("SELECT bundle_json,bundle_sha256 FROM catfood_bundle_cache WHERE run_id=?").get(runId);
       const digest = sha256(canonicalJson(bundle)); const cacheValid = !cache || cache.bundle_sha256 === digest && canonicalJson(JSON.parse(cache.bundle_json)) === canonicalJson(bundle);
-      return evaluateCatfoodAcceptance(bundle, this.trust.source_mode === "TEST_ONLY", cacheValid);
+      const result = evaluateCatfoodAcceptance(bundle, this.provenance, cacheValid);
+      if (this.enrollment) inspectEnrolledRole(this.enrollment, "evaluator", "evaluator.release", runId);
+      return result;
     }
   }
 }
@@ -1307,7 +1325,7 @@ function semanticCreditIdentity(work: Record<string, unknown>): string | null {
 }
 
 /** The sole deterministic acceptance rule-set. Acquisition and integrity checks remain role-local. */
-export function evaluateCatfoodAcceptance(bundle: Record<string, Json>, testOnly: boolean, cacheValid = true): EvaluationResult {
+export function evaluateCatfoodAcceptance(bundle: Record<string, Json>, provenance?: EnrolledTrustProvenance, cacheValid = true): EvaluationResult {
   const reasons = new Set<string>();
   const run = plain(bundle.run, "run"); const spec = plain(bundle.spec, "spec");
   const work = bundle.work as unknown as Record<string, unknown>[]; const authorities = bundle.authorities as unknown as Record<string, unknown>[];
@@ -1336,6 +1354,7 @@ export function evaluateCatfoodAcceptance(bundle: Record<string, Json>, testOnly
   for (const capability of new Set(authorities.map((authority) => String(authority.capability)))) if (!journal.some((event) => { const payload = event.payload_json as Record<string, unknown>; return event.event_type === "THREADS_AUTHORITY_REVOKED" && payload.capability === capability; })) reasons.add("FINAL_AUTHORITY_OPEN");
   if (!cacheValid) reasons.add("BUNDLE_CACHE_TAMPERED");
   const digest = sha256(canonicalJson(bundle));
-  void testOnly; // No enrolled operational evaluator/session exists in this repository.
-  return Object.freeze({ verdict: verdictFromReasons(reasons), reason_codes: Object.freeze([...reasons].sort()), rederived_bundle_sha256: digest, evaluator_sha256: CATFOOD_EVALUATOR_SHA256, policy_sha256: CATFOOD_POLICY_SHA256, test_only: true, evidence_coverage: String((source.coe as Record<string, unknown>).coverage && ((source.coe as Record<string, unknown>).coverage as Record<string, unknown>).state) as "COMPLETE" | "PARTIAL" | "UNKNOWN" });
+  const trustDomain = deriveEnrolledTrustDomain(provenance, EVALUATION_TRUST_ANCESTRY);
+  if (trustDomain === "UNVERIFIED" && String(bundle.source_mode) === "OPERATIONAL") reasons.add("OPERATIONAL_PROVENANCE_UNVERIFIED");
+  return Object.freeze({ verdict: verdictFromReasons(reasons), reason_codes: Object.freeze([...reasons].sort()), rederived_bundle_sha256: digest, evaluator_sha256: CATFOOD_EVALUATOR_SHA256, policy_sha256: CATFOOD_POLICY_SHA256, test_only: trustDomain !== "OPERATIONAL", evidence_coverage: String((source.coe as Record<string, unknown>).coverage && ((source.coe as Record<string, unknown>).coverage as Record<string, unknown>).state) as "COMPLETE" | "PARTIAL" | "UNKNOWN" });
 }

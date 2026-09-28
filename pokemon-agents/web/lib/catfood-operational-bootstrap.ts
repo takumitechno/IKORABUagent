@@ -8,7 +8,7 @@ import { CATFOOD_ATTESTATION_DOMAIN, CATFOOD_ATTESTATION_SCHEMA } from "./catfoo
 import { CATFOOD_EVALUATOR_SHA256, CATFOOD_OPERATIONAL_ROOT, CATFOOD_POLICY_SHA256, CatfoodTrustError, ProtectedCatfoodCustodian, type EvaluationResult, type OperationalProvenance, type TrustedClock, type TrustedClockSample } from "./catfood-trust";
 import { OperationalThreadsEvidenceSource, type ThreadsSourceContext } from "./catfood-threads-http";
 import { verifyConsumerIntegrity, type ConsumerIntegrityManifest } from "../../scripts/check-catfood-consumer-integrity";
-import { assertEnrolledRole, loadOperationalRoleEnrollment } from "./catfood-enrollment";
+import { assertEnrolledRole, inspectEnrolledRole, loadOperationalRoleEnrollment } from "./catfood-enrollment";
 
 const SHA256 = /^[0-9a-f]{64}$/;
 const BOOTSTRAP_FIELDS = ["attestation_root_ids", "credential_version_ref", "environment_identity", "go_root_ids", "intents", "principal_binding", "principal_ref", "protected_probe", "runtime_prohibitions", "schema", "source_build_sha256", "source_identity", "tenant_user_id", "threads_origin", "trust_domain"];
@@ -75,7 +75,7 @@ export function openOperationalCatfoodCustodian(): ProtectedCatfoodCustodian {
   const enrollmentScope = `${bootstrap.environment_identity}:${principalBinding.organization_id}:${principalBinding.account_id}`;
   const sourceEnrollment = loadOperationalRoleEnrollment("source", enrollmentScope); const custodianEnrollment = loadOperationalRoleEnrollment("custodian", enrollmentScope);
   const sourceSnapshot = assertEnrolledRole(sourceEnrollment, "source", "OPERATIONAL"), custodianSnapshot = assertEnrolledRole(custodianEnrollment, "custodian", "OPERATIONAL");
-  if (sourceSnapshot.enrollment_revision !== custodianSnapshot.enrollment_revision || sourceSnapshot.accepted_build_snapshot_sha256 !== custodianSnapshot.accepted_build_snapshot_sha256 || sourceSnapshot.accepted_build_snapshot_sha256 !== acceptedManifest) throw new CatfoodTrustError("ENROLLMENT_MIXED_SNAPSHOT");
+  if (sourceSnapshot.authority_anchor !== custodianSnapshot.authority_anchor || sourceSnapshot.accepted_snapshot_sha256 !== custodianSnapshot.accepted_snapshot_sha256 || sourceSnapshot.enrollment_namespace !== custodianSnapshot.enrollment_namespace) throw new CatfoodTrustError("ENROLLMENT_MIXED_SNAPSHOT");
   const source = OperationalThreadsEvidenceSource.operational(context, sourceEnrollment); const clock = new OperationalSystemClock(provenance);
   const custodian = new ProtectedCatfoodCustodian(join(CATFOOD_OPERATIONAL_ROOT, "control.db"), join(CATFOOD_OPERATIONAL_ROOT, "checkpoint.db"), source, clock, custodianEnrollment);
   const configuredGoRoots = [...custodian.trust.go_keys.map((key) => key.key_id)].sort(); const expectedGoRoots = [...bootstrap.go_root_ids as string[]].sort();
@@ -88,15 +88,16 @@ export function openOperationalCatfoodCustodian(): ProtectedCatfoodCustodian {
 export function verifyOperationalIndependentAttestation(payloadJson: string, signatureBase64url: string, expected: { run_id: string; bundle_sha256: string }): EvaluationResult["verdict"] {
   try {
   const verifierEnrollment = loadOperationalRoleEnrollment("verifier", expected.run_id); const verifierSnapshot = assertEnrolledRole(verifierEnrollment, "verifier", "OPERATIONAL");
+  inspectEnrolledRole(verifierEnrollment, "verifier", "verifier.operational.release", expected.run_id);
   const bootstrap = parseJsonNoDuplicateKeys(protectedRead(join(CATFOOD_OPERATIONAL_ROOT, "bootstrap.json"), 1_000_000), 1_000_000, 32) as Record<string, unknown>;
   const manifestRaw = readFileSync(resolve(import.meta.dir, "../../contracts/catfood-consumer-integrity-v1.json"), "utf8"); const acceptedManifest = protectedRead(join(CATFOOD_OPERATIONAL_ROOT, "accepted-consumer-manifest.sha256"), 128).trim();
-  if (verifierSnapshot.accepted_build_snapshot_sha256 !== acceptedManifest || sha256(manifestRaw) !== acceptedManifest) throw new CatfoodTrustError("OPERATIONAL_BUILD_NOT_ACCEPTED"); verifyConsumerIntegrity(JSON.parse(manifestRaw) as ConsumerIntegrityManifest);
+  if (sha256(manifestRaw) !== acceptedManifest) throw new CatfoodTrustError("OPERATIONAL_BUILD_NOT_ACCEPTED"); verifyConsumerIntegrity(JSON.parse(manifestRaw) as ConsumerIntegrityManifest);
   const roots = parseJsonNoDuplicateKeys(protectedRead(join(CATFOOD_OPERATIONAL_ROOT, "attestation-roots.json"), 1_000_000), 1_000_000, 32) as Record<string, unknown>;
   exact(roots, ["keys", "schema"]); if (roots.schema !== "ikorabu.catfood-attestation-roots.v1" || !Array.isArray(roots.keys)) throw new CatfoodTrustError("ATTESTATION_ROOTS_INVALID");
   const payload = parseJsonNoDuplicateKeys(payloadJson, 1_000_000, 32) as Record<string, unknown>;
   if (canonicalJson(payload) !== payloadJson || payload.domain !== CATFOOD_ATTESTATION_DOMAIN || payload.schema !== CATFOOD_ATTESTATION_SCHEMA || payload.test_only !== false || payload.trust_domain !== "OPERATIONAL" || payload.evaluator_sha256 !== CATFOOD_EVALUATOR_SHA256 || payload.policy_sha256 !== CATFOOD_POLICY_SHA256 || payload.run_id !== expected.run_id || payload.bundle_sha256 !== expected.bundle_sha256) throw new CatfoodTrustError("ATTESTATION_INVALID");
   const enrollment = payload.enrollment as Record<string, unknown> | undefined;
-  if (!enrollment || enrollment.enrollment_revision !== verifierSnapshot.enrollment_revision || enrollment.accepted_build_snapshot_id !== verifierSnapshot.accepted_build_snapshot_id || enrollment.accepted_build_snapshot_sha256 !== verifierSnapshot.accepted_build_snapshot_sha256 || ["source_launch_measurement_id", "custodian_launch_measurement_id", "evaluator_launch_measurement_id", "writer_launch_measurement_id"].some((field) => typeof enrollment[field] !== "string" || !enrollment[field])) throw new CatfoodTrustError("ATTESTATION_ENROLLMENT_MISMATCH");
+  if (!enrollment || enrollment.authority_anchor !== verifierSnapshot.authority_anchor || enrollment.accepted_snapshot_id !== verifierSnapshot.accepted_snapshot_id || enrollment.accepted_snapshot_sha256 !== verifierSnapshot.accepted_snapshot_sha256 || enrollment.enrollment_namespace !== verifierSnapshot.enrollment_namespace || !Array.isArray(enrollment.roles) || enrollment.roles.length !== 4) throw new CatfoodTrustError("ATTESTATION_ENROLLMENT_MISMATCH");
   const acceptedIds = new Set(bootstrap.attestation_root_ids as string[]); const keys = (roots.keys as Record<string, unknown>[]).filter((key) => acceptedIds.has(String(key.key_id)) && key.key_id === payload.signing_key_id && key.writer_identity === payload.writer_identity);
   if (keys.length !== 1 || !verify(null, Buffer.from(`${CATFOOD_ATTESTATION_DOMAIN}\n${payloadJson}`), createPublicKey(String(keys[0]!.public_key_pem)), Buffer.from(signatureBase64url, "base64url"))) throw new CatfoodTrustError("ATTESTATION_SIGNATURE_INVALID");
   return payload.verdict as EvaluationResult["verdict"];

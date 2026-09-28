@@ -20,7 +20,8 @@ export function verifyConsumerIntegrity(manifest: ConsumerIntegrityManifest): vo
   for (const entry of manifest.files) {
     const absolute = resolve(root, entry.path);
     if (!entry.path.startsWith("pokemon-agents/") || !absolute.startsWith(`${root}${sep}`) || !SHA256.test(entry.sha256)) throw new Error("CATFOOD_INTEGRITY_ENTRY_INVALID");
-    if (digest(readFileSync(absolute)) !== entry.sha256) throw new Error(`CATFOOD_INTEGRITY_DRIFT:${entry.path}`);
+    const actual = digest(readFileSync(absolute));
+    if (actual !== entry.sha256) throw new Error(`CATFOOD_INTEGRITY_DRIFT:${entry.path}:${actual}`);
   }
 }
 

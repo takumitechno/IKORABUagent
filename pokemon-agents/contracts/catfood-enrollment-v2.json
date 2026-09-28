@@ -1,0 +1,21 @@
+{
+  "contract": "ikorabu.catfood-enrollment.v2",
+  "purpose": "IKORABU/WP3/CATFOOD/ROLE-ENROLLMENT/V2",
+  "status_purpose": "IKORABU/WP3/CATFOOD/SESSION-STATUS/V2",
+  "roles": ["source", "custodian", "evaluator", "writer", "verifier"],
+  "bootstrap_only": ["authority endpoint and Ed25519 anchor", "protected credential reference", "deployment/environment", "enrollment namespace", "accepted immutable snapshot", "build policy"],
+  "runtime_subject": ["actual pid", "OS process-start token", "OS boot/namespace identity", "runtime executable", "OS principal", "deployment/environment", "authenticated channel binding"],
+  "build_agreement": ["externally accepted role descriptor", "authenticated launch measurement", "local actual-executed artifact measurement", "verified role session/subject"],
+  "measurement": {
+    "source": "LF-normalized TypeScript source membership plus Bun version/executable/module format",
+    "acceptance": "accepted descriptor membership is fixed by protected enrollment snapshot; candidate measurement cannot change it",
+    "assumption": "controlled loader and immutable-code deployment; no arbitrary JIT/runtime-tamper claim"
+  },
+  "status": {
+    "path": "/v2/catfood/enrollment/status",
+    "fresh_challenge_per_use": true,
+    "binds": ["issuer/anchor", "subject", "role/scope/session", "action/request", "target run or seal", "accepted snapshot", "sequence", "expiry", "revocation", "nonce/audience"],
+    "fallback": "none"
+  },
+  "legacy_v1": "diagnostic/non-attestable"
+}

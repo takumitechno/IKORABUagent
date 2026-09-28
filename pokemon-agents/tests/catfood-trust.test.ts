@@ -134,7 +134,7 @@ describe("WP3 CATFOOD corrective adversarial plan", () => {
     const publicPem = signing.publicKey.export({ type: "spki", format: "pem" }).toString(); initializeIndependentAttestationStore(store, { writer_identity: "attestor:test", signing_key_id: "attest:test", signing_public_key_pem: publicPem });
     const writer = new IndependentCatfoodAttestationWriter(r.control, r.checkpoint, store, r.source, signing.privateKey.export({ type: "pkcs8", format: "pem" }).toString(), enrollment); const id = writer.attest(r.spec.run_id, r.clock.sample().wall_time); writer.close();
     const db = new Database(store, { readonly: true }), row = db.query<{ payload_json: string; signature_base64url: string; bundle_sha256: string }, [string]>("SELECT payload_json,signature_base64url,bundle_sha256 FROM independent_attestations WHERE attestation_id=?").get(id)!; db.close();
-    const payload = JSON.parse(row.payload_json); expect(payload.enrollment).toMatchObject({ source_launch_measurement_id: "launch:source", custodian_launch_measurement_id: "launch:custodian", evaluator_launch_measurement_id: "launch:evaluator", writer_launch_measurement_id: "launch:writer" });
+    const payload = JSON.parse(row.payload_json); expect(payload.enrollment).toMatchObject({ accepted_snapshot_id: "snapshot:fixture", enrollment_namespace: "namespace:fixture" }); expect(payload.enrollment.roles.map((role: Record<string, unknown>) => role.role)).toEqual(["source", "custodian", "evaluator", "writer"]); expect(payload.enrollment.roles.every((role: Record<string, unknown>) => (role.launch_measurement as Record<string, unknown>).artifact_root === (role.local_role_descriptor as Record<string, unknown>).artifact_root)).toBe(true);
     expect(verifyIndependentAttestation(row.payload_json, row.signature_base64url, publicPem, { run_id: r.spec.run_id, bundle_sha256: row.bundle_sha256, allow_test_only: true, verifier_enrollment: enrollment.verifier })).toBe("PASS");
     const other = testEnrollmentContexts("run:other", "b".repeat(64)); expect(() => verifyIndependentAttestation(row.payload_json, row.signature_base64url, publicPem, { run_id: r.spec.run_id, bundle_sha256: row.bundle_sha256, allow_test_only: true, verifier_enrollment: other.verifier })).toThrow("ATTESTATION_ENROLLMENT_MISMATCH");
   } finally { r.close(); } });
@@ -267,7 +267,7 @@ describe("WP3 CATFOOD corrective adversarial plan", () => {
   } finally { r.close(); } });
 
   test("corrective04 TEST_ONLY ancestry cannot be relabelled by the pure-kernel argument", () => { const r = rig("run-taint"); try {
-    positive(r); const bundle = r.custodian.rederive(r.spec.run_id); expect(evaluateCatfoodAcceptance(bundle, false)).toMatchObject({ test_only: true });
+    positive(r); const bundle = r.custodian.rederive(r.spec.run_id); expect(evaluateCatfoodAcceptance(bundle)).toMatchObject({ test_only: true });
   } finally { r.close(); } });
 
   test("accepted COE contract with PARTIAL operational evidence fails precisely", () => { const r = rig("run-partial-coe"); try { r.source.coeTransform = (page) => { (page.coverage as Record<string, unknown>).state = "PARTIAL"; return page; }; r.custodian.createRun(r.spec, r.artifact); const session = r.custodian.issueOwnerSession(r.spec.run_id); expect(() => r.custodian.preflight(session)).toThrow("COE_COVERAGE_PARTIAL"); } finally { r.close(); } });
