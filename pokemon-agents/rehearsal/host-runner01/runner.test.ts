@@ -2,6 +2,8 @@ import { afterAll, describe, expect, test } from "bun:test";
 import { existsSync, mkdtempSync, readFileSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+import { canonicalJson } from "../../web/lib/catfood-harness";
+import { cutForAttestedState } from "./host-worker";
 import { RehearsalHostSupervisor } from "./supervisor";
 import type { WorkerCommand, WorkerResponse } from "./protocol";
 
@@ -124,4 +126,41 @@ describe("TEST_ONLY rehearsal host runner U01-U12", () => {
     await supervisor.start(); const response = await ok(supervisor, { kind: "INITIALIZE_CASE" });
     expect((response.result as any).network_required).toBeFalse();
   }));
+});
+
+describe("Claude B1 cut attestation corrective", () => {
+  test("cut labels require pending durable material and exact persisted witness equality", () => {
+    const record = { schema: "test-only-continuity-witness.v1", operation_id: "lineage:b1", key_sha256: "a".repeat(64), sequence: 4, previous_digest: "b".repeat(64), transition: "ADVANCE_LINEAGE", payload_sha256: "c".repeat(64), record_digest: "d".repeat(64) }, witness = { record }, persisted = canonicalJson(record as never);
+    expect(cutForAttestedState("WITNESS_UNAVAILABLE", { status: "PENDING", witness_record_json: persisted }, "H1", null)).toBe("R2A_CUT_REACHED");
+    expect(cutForAttestedState("WITNESS_UNAVAILABLE", { status: "ACKNOWLEDGED", witness_record_json: persisted }, "H1", null)).toBeUndefined();
+    expect(cutForAttestedState("WITNESS_UNAVAILABLE", { status: "PENDING", witness_record_json: persisted }, "PRE_WRITE", null)).toBeUndefined();
+    expect(cutForAttestedState("WITNESS_UNAVAILABLE", { status: "PENDING", witness_record_json: persisted }, "H1", witness)).toBeUndefined();
+    expect(cutForAttestedState("WITNESS_RESPONSE_LOST", { status: "PENDING", witness_record_json: persisted }, "H1", witness)).toBe("R2B_CUT_REACHED");
+    expect(cutForAttestedState("WITNESS_RESPONSE_LOST", { status: "ACKNOWLEDGED", witness_record_json: persisted }, "H1", witness)).toBeUndefined();
+    expect(cutForAttestedState("WITNESS_RESPONSE_LOST", { status: "PENDING", witness_record_json: persisted }, "PRE_WRITE", witness)).toBeUndefined();
+    expect(cutForAttestedState("WITNESS_RESPONSE_LOST", { status: "PENDING", witness_record_json: persisted }, "H1", { record: { ...record, sequence: 5 } })).toBeUndefined();
+  });
+
+  test("cut, reconcile, and report COMMAND_RESULT JSONL contains reconstructable summaries only", async () => {
+    await rig(async (supervisor) => {
+      await activeCase(supervisor); await ok(supervisor, { kind: "MUTATE_TEST_MATERIAL", material: "H1" }); await ok(supervisor, { kind: "CONFIGURE_WITNESS_FAULT", mode: "BEFORE_COMMIT" });
+      const request = command({ kind: "ADVANCE_LINEAGE", operation_id: "lineage:b1:r2a" }); await supervisor.send(request);
+      const event = supervisor.evidence().find((item) => item.event === "COMMAND_RESULT" && item.command_id === request.id);
+      expect(event).toMatchObject({ fault_cut: "R2A_CUT_REACHED", operation_status: "PENDING", material: "H1", witness_record_present: false, witness_sequence: null });
+    });
+    await rig(async (supervisor) => {
+      await activeCase(supervisor); await ok(supervisor, { kind: "MUTATE_TEST_MATERIAL", material: "H1" }); await ok(supervisor, { kind: "CONFIGURE_WITNESS_FAULT", mode: "AFTER_COMMIT" });
+      const request = command({ kind: "ADVANCE_LINEAGE", operation_id: "lineage:b1:r2b" }); await supervisor.send(request);
+      const reconcile = command({ kind: "RECONCILE_READ", operation_id: "lineage:b1:r2b" }); await supervisor.send(reconcile);
+      const report = command({ kind: "REPORT_STATE" }); await supervisor.send(report);
+      const events = supervisor.evidence(), cut = events.find((item) => item.event === "COMMAND_RESULT" && item.command_id === request.id), reconciled = events.find((item) => item.event === "COMMAND_RESULT" && item.command_id === reconcile.id), reported = events.find((item) => item.event === "COMMAND_RESULT" && item.command_id === report.id);
+      expect(cut).toMatchObject({ fault_cut: "R2B_CUT_REACHED", operation_status: "PENDING", material: "H1", witness_record_present: true });
+      expect(Number(cut?.witness_sequence)).toBeGreaterThan(0);
+      expect(reconciled).toMatchObject({ operation_status: "PENDING", material: "H1", witness_record_present: true });
+      expect(Number(reconciled?.witness_sequence)).toBeGreaterThan(0);
+      expect(reported).toMatchObject({ operation_status: null, material: "H1", witness_record_present: true });
+      expect(Number(reported?.witness_sequence)).toBeGreaterThan(0);
+      expect(JSON.stringify({ cut, reconciled, reported })).not.toMatch(/witness_record_json|record_digest|payload_sha256/);
+    });
+  });
 });

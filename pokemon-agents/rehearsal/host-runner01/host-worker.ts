@@ -1,6 +1,7 @@
 import { createHash, generateKeyPairSync, randomBytes } from "node:crypto";
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join, resolve } from "node:path";
+import { Database } from "bun:sqlite";
 import { canonicalJson } from "../../web/lib/catfood-harness";
 import { CATFOOD_POLICY_SHA256 } from "../../web/lib/catfood-trust";
 import { roleChannelAcceptedSnapshotDigest } from "../../web/lib/catfood-enrollment";
@@ -19,6 +20,24 @@ const json = (value: unknown) => canonicalJson(value as never);
 const startedAt = new Date(Date.now() - Math.floor(process.uptime() * 1000)).toISOString();
 
 type StoredCase = Readonly<{ key: CanonicalRunKey; binding: RoleChannelBinding; run_binding: RunBinding }>;
+type PersistedOperationAttestation = Readonly<{ status: string; witness_record_json: string }>;
+type WitnessAttestation = Readonly<{ record: unknown }>;
+
+export function cutForAttestedState(code: string, operation: PersistedOperationAttestation, material: "PRE_WRITE" | "H1" | "H2", witnessRecord: WitnessAttestation | null): WorkerResponse["cut"] {
+  if (operation.status !== "PENDING" || material === "PRE_WRITE") return undefined;
+  if (code === "WITNESS_UNAVAILABLE" && !witnessRecord) return "R2A_CUT_REACHED";
+  if (code === "WITNESS_RESPONSE_LOST" && witnessRecord && json(witnessRecord.record) === operation.witness_record_json) return "R2B_CUT_REACHED";
+  return undefined;
+}
+
+function persistedOperationAttestation(controllerPath: string, operationId: string): PersistedOperationAttestation {
+  const db = new Database(resolve(controllerPath), { strict: true, create: false });
+  try {
+    const operation = db.query<PersistedOperationAttestation, [string]>("SELECT status,witness_record_json FROM controller_operations WHERE operation_id=?").get(operationId);
+    if (!operation) throw new Error("OPERATION_NOT_FOUND");
+    return Object.freeze(operation);
+  } finally { db.close(); }
+}
 
 function loadConfig(): WorkerConfig {
   if (process.argv.length !== 3) throw new Error("WORKER_CONFIG_REQUIRED");
@@ -111,7 +130,10 @@ async function main(): Promise<void> {
       case "RECONCILE_JOB": return host.reconcileEvaluationJob(stored.key, command.operation_id);
       case "RECONCILE_TARGET": return host.reconcileExpectedTarget(stored.key, command.operation_id);
       case "STATUS_READ": return host.safety(stored.key, { kind: "STATUS_READ" });
-      case "RECONCILE_READ": return host.safety(stored.key, { kind: "RECONCILE_READ", operation_id: command.operation_id });
+      case "RECONCILE_READ": {
+        const operation = host.safety(stored.key, { kind: "RECONCILE_READ", operation_id: command.operation_id }) as { kind: string; status: string; result: unknown }, witnessRecord = witness.readOperation(command.operation_id);
+        return { ...operation, operation_status: operation.status, material: adapter.read().material, witness_record_present: witnessRecord !== null, witness_sequence: witnessRecord?.record.sequence ?? null };
+      }
       case "REQUEST_REPLACEMENT": {
         const state = host.safety(stored.key, { kind: "STATUS_READ" }) as { lease_expires_ms?: number };
         const next = host.observeLeaseAndReplace({ key: stored.key, observed_now_ms: Number(state.lease_expires_ms) + command.observed_after_lease_ms, operation_id: command.operation_id, lease_expires_ms: Date.now() + command.lease_lifetime_ms, host_incarnation: `host:${config.generation}:replacement` });
@@ -120,7 +142,7 @@ async function main(): Promise<void> {
       }
       case "REPORT_STATE": {
         const state = host.safety(stored.key, { kind: "STATUS_READ" }), current = witness.current(canonicalKeySha256(stored.key));
-        return { ...publicState(config, stored, adapter), host_state: state, material: adapter.read(), witness_sequence: current?.record.sequence ?? 0, witness_digest: current?.record.record_digest ?? null };
+        return { ...publicState(config, stored, adapter), host_state: state, material: adapter.read(), witness_record_present: current !== null, witness_sequence: current?.record.sequence ?? 0, witness_digest: current?.record.record_digest ?? null };
       }
       case "GRACEFUL_STOP": host.close(); writeFileSync(p.graceful, new Date().toISOString(), { flag: "w" }); graceful = true; return { stop: "GRACEFUL_STOP" };
     }
@@ -144,10 +166,9 @@ async function main(): Promise<void> {
         const code = error instanceof CustodyControlError ? error.code : error instanceof Error ? error.message : "WORKER_COMMAND_FAILED";
         let cut: WorkerResponse["cut"], result: unknown;
         if (command?.kind === "ADVANCE_LINEAGE" && (code === "WITNESS_UNAVAILABLE" || code === "WITNESS_RESPONSE_LOST")) {
-          const operation = host.safety(stored.key, { kind: "RECONCILE_READ", operation_id: command.operation_id }), witnessRecord = witness.readOperation(command.operation_id);
-          if (code === "WITNESS_UNAVAILABLE" && !witnessRecord) cut = "R2A_CUT_REACHED";
-          if (code === "WITNESS_RESPONSE_LOST" && witnessRecord) cut = "R2B_CUT_REACHED";
-          result = { operation, witness_sequence: witnessRecord?.record.sequence ?? null, material: adapter.read().material };
+          const operation = host.safety(stored.key, { kind: "RECONCILE_READ", operation_id: command.operation_id }), persistedOperation = persistedOperationAttestation(p.controller, command.operation_id), witnessRecord = witness.readOperation(command.operation_id), material = adapter.read().material;
+          cut = cutForAttestedState(code, persistedOperation, material, witnessRecord);
+          result = { operation, operation_status: persistedOperation.status, material, witness_record_present: witnessRecord !== null, witness_sequence: witnessRecord?.record.sequence ?? null };
         }
         const response: WorkerResponse = { id: command?.id ?? responseId, ok: false, error_code: code, cut, result };
         process.stdout.write(`${JSON.stringify(response)}\n`);
@@ -157,4 +178,4 @@ async function main(): Promise<void> {
   }
 }
 
-await main();
+if (import.meta.main) await main();
