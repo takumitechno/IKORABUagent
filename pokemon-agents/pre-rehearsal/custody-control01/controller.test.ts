@@ -45,17 +45,20 @@ function fixture(activate = true, fenceValid = true, autoAdvance = true, autoRes
   const roleBinding: RoleChannelBinding = { trust_domain: "TEST_ONLY", issuer: "fixture-role-authority", issuer_key_id: "authority:v4", audience: "ikorabu-catfood", origin: "http://127.0.0.1:32199", credential: "fixture-coarse-service-access-credential", authority_public_key_pem: authorityPublic, enrollment_namespace: "fixture:pre-custody", build_policy_sha256: CATFOOD_POLICY_SHA256, accepted_snapshot_id: "snapshot:pre-custody", accepted_snapshot_sha256: roleChannelAcceptedSnapshotDigest(), policy: { policy_id: "fixture-policy-v1", session_lifetime_ms: 60_000, registration_challenge_lifetime_ms: 5_000, action_challenge_lifetime_ms: 5_000, maximum_outstanding_requests: 64, receipt_retention_ms: 86_400_000, go_root_policy_documents: [go.policy], go_root_workload_selections: [go.selection] } };
   initializeRoleAuthorityStore(authorityPath, roleBinding); initializeCustodyController(controllerPath, "controller:test", roleBinding); initializeTestOnlyContinuityWitness(witnessPath);
   const witness = new TestOnlySqliteContinuityWitness(witnessPath), controller = new CustodyController(controllerPath, witness, roleBinding), rootLineage = lineage("root"), finalLineage = lineage("a"), binding = runBinding(go.ref, rootLineage);
-  let observedLineage = rootLineage, observedPredecessor = sha(cj(rootLineage)), observedSequence = 0;
-  const lineageAdapter = {
-    inspectRoot(): any { return Object.freeze({ schema: "pre-custody-lineage-root-observation.v1", adapter_id: "fixture:lineage", pre_write: observedSequence === 0, lineage: observedLineage, observed_at: new Date(CLOCK).toISOString() }); },
-    inspect(): any { return Object.freeze({ schema: "pre-custody-lineage-observation.v1", adapter_id: "fixture:lineage", sequence: observedSequence, predecessor_sha256: observedPredecessor, lineage: observedLineage, observed_at: new Date(CLOCK).toISOString() }); },
-  };
-  const fenceAdapter = { inspect({ admitted }: any): FenceObservation { return { old_session_id: admitted.session_id, old_process_cannot_execute: fenceValid, old_credentials_revoked: fenceValid, producer_effects_resolved: fenceValid, complete_history_verified: fenceValid, journal_head_sha256: observedLineage.journal_head_sha256, checkpoint_head_sha256: observedLineage.checkpoint_head_sha256, control_snapshot_sha256: observedLineage.control_snapshot_sha256, checkpoint_snapshot_sha256: observedLineage.checkpoint_snapshot_sha256, pair_common_cut_sha256: observedLineage.pair_common_cut_sha256 }; } };
+  let observedLineage = rootLineage, observedPredecessor = sha(cj(rootLineage)), observedSequence = 0, observedAtMs = CLOCK, adapterGeneration = 0;
+  const makeLineageAdapter = () => { const adapter: any = {
+    generation: ++adapterGeneration,
+    inspect_calls: 0,
+    inspectRoot(): any { adapter.inspect_calls++; return Object.freeze({ schema: "pre-custody-lineage-root-observation.v1", adapter_id: "fixture:lineage", pre_write: observedSequence === 0, lineage: observedLineage, observed_at: new Date(observedAtMs).toISOString() }); },
+    inspect(): any { adapter.inspect_calls++; return Object.freeze({ schema: "pre-custody-lineage-observation.v1", adapter_id: "fixture:lineage", sequence: observedSequence, predecessor_sha256: observedPredecessor, lineage: observedLineage, observed_at: new Date(observedAtMs).toISOString() }); },
+  }; return adapter; };
+  const makeFenceAdapter = () => ({ inspect({ admitted }: any): FenceObservation { return { old_session_id: admitted.session_id, old_process_cannot_execute: fenceValid, old_credentials_revoked: fenceValid, producer_effects_resolved: fenceValid, complete_history_verified: fenceValid, journal_head_sha256: observedLineage.journal_head_sha256, checkpoint_head_sha256: observedLineage.checkpoint_head_sha256, control_snapshot_sha256: observedLineage.control_snapshot_sha256, checkpoint_snapshot_sha256: observedLineage.checkpoint_snapshot_sha256, pair_common_cut_sha256: observedLineage.pair_common_cut_sha256 }; } });
+  const lineageAdapter = makeLineageAdapter(), fenceAdapter = makeFenceAdapter();
   const host = new TestOnlyPreCustodyHost({ authority_path: authorityPath, authority_binding: roleBinding, authority_private_key: authorityKey.privateKey, controller, fence_adapter: fenceAdapter, lineage_adapter: lineageAdapter, now: () => CLOCK });
   const enrollmentBinding = (role: CatfoodEnrollmentRole, writer?: { key_id: string; key_version: string; public_key_sha256: string; public_key_pem: string }): TestEnrollmentBinding => ({ trust_domain: "TEST_ONLY", issuer: roleBinding.issuer, issuer_key_id: roleBinding.issuer_key_id, audience: roleBinding.audience, origin: roleBinding.origin, credential: roleBinding.credential, public_key_pem: roleBinding.authority_public_key_pem, environment_identity: scope.environment_instance_id, deployment_id: scope.deployment_id, enrollment_namespace: roleBinding.enrollment_namespace, build_policy_sha256: roleBinding.build_policy_sha256, accepted_snapshot_id: roleBinding.accepted_snapshot_id, accepted_snapshot_sha256: roleBinding.accepted_snapshot_sha256, launch_ticket: `launch:${role}`, writer_signing_key_id: writer?.key_id ?? "none", writer_signing_key_version: writer?.key_version ?? "none", writer_signing_public_key_pem: writer?.public_key_pem ?? roleBinding.authority_public_key_pem });
   const rawAuthority = () => new CatfoodRoleAuthority(authorityPath, roleBinding, authorityKey.privateKey, () => CLOCK), rawSessionAuthorities: CatfoodRoleAuthority[] = [];
   const enrollRaw = (role: CatfoodEnrollmentRole, distinct = false) => { const authority = rawAuthority(); rawSessionAuthorities.push(authority); const outer = generateKeyPairSync("ed25519"), outerPem = outer.publicKey.export({ type: "spki", format: "pem" }).toString(), writer = role === "writer" ? { key_id: "writer:raw", key_version: "v1", public_key_sha256: roleChannelPublicKeyFingerprint(outerPem), public_key_pem: outerPem } : undefined, eb = enrollmentBinding(role, writer), base = collectCurrentRuntimeSubject(eb), subject = distinct ? { ...base, pid: base.pid + Math.floor(Math.random() * 100000) + 1, process_start: `${base.process_start}:raw:${Math.random()}` } : base, launch = observeTestOnlyRoleLaunch(eb, role, subject); return createTestOnlyRoleSession(authority, { role, scope, subject, launch, writer_credential: writer, now: () => CLOCK }); };
-  const out: any = { dir, authorityPath, controllerPath, witnessPath, authorityKey, roleBinding, go, witness, controller, host, manifest: undefined, binding, rootLineage, finalLineage, fenceAdapter, lineageAdapter, makeManifest(variant: string, current: LineageState) { const manifest = sealed(go.policy.verification_profile, variant, current); out.manifest = manifest; return manifest; }, observeLineage(next: LineageState, predecessor: LineageState = observedLineage, sequence = observedSequence + 1) { observedPredecessor = sha(cj(predecessor)); observedLineage = next; observedSequence = sequence; }, rawAuthority, enrollRaw, close() { for (const authority of rawSessionAuthorities) try { authority.close(); } catch {} try { out.host.close(); } catch {} try { out.witness.close(); } catch {} try { rmSync(dir, { recursive: true, force: true, maxRetries: 5, retryDelay: 20 }); } catch (error) { if (!(error instanceof Error && "code" in error && error.code === "EBUSY")) throw error; deferredCleanup.add(dir); } } };
+  const out: any = { dir, authorityPath, controllerPath, witnessPath, authorityKey, roleBinding, go, witness, controller, host, manifest: undefined, binding, rootLineage, finalLineage, fenceAdapter, lineageAdapter, makeManifest(variant: string, current: LineageState) { const manifest = sealed(go.policy.verification_profile, variant, current); out.manifest = manifest; return manifest; }, observeLineage(next: LineageState, predecessor: LineageState = observedLineage, sequence = observedSequence + 1) { observedPredecessor = sha(cj(predecessor)); observedLineage = next; observedSequence = sequence; }, rebuildAdapters(nowMs: number) { observedAtMs = nowMs; out.lineageAdapter = makeLineageAdapter(); out.fenceAdapter = makeFenceAdapter(); }, rawAuthority, enrollRaw, close() { for (const authority of rawSessionAuthorities) try { authority.close(); } catch {} try { out.host.close(); } catch {} try { out.witness.close(); } catch {} try { rmSync(dir, { recursive: true, force: true, maxRetries: 5, retryDelay: 20 }); } catch (error) { if (!(error instanceof Error && "code" in error && error.code === "EBUSY")) throw error; deferredCleanup.add(dir); } } };
   if (autoReserve) host.reserveRun(binding, "reserve:one");
   else if (activate) throw new Error("fixture cannot activate before reservation");
   if (activate) {
@@ -81,7 +84,9 @@ function nonOwner(f: Fixture) { return f.enrollRaw("custodian"); }
 function incidentWithNonOwner(f: Fixture, manifest = f.manifest, operation = "incident:nonowner") { const other = nonOwner(f), receipt = release(f, other, manifest, `${operation}:release`); expect(() => f.host.closeCustody({ key, manifest, release_receipt: receipt, operation_id: operation })).toThrow("NON_ADMITTED_CUSTODIAN"); }
 function counts(f: Fixture) { const db = new Database(f.authorityPath, { readonly: true }); try { return { jobs: db.query<{ n: number }, []>("SELECT COUNT(*) n FROM evaluation_jobs").get()!.n, targets: db.query<{ n: number }, []>("SELECT COUNT(*) n FROM expected_evaluation_targets").get()!.n }; } finally { db.close(); } }
 function rawCanonicalJob(f: Fixture): AuthorityEvaluationJob { const raw = f.rawAuthority(); try { return raw.issueEvaluationJob({ custody_release_receipt: f.release, manifest: f.manifest, evaluator: verifyRoleEvidenceV4(f.evaluator.evidence, f.roleBinding, "evaluator", scope), writer: verifyRoleEvidenceV4(f.writer.evidence, f.roleBinding, "writer", scope), role_evidence_sha256: f.roleEvidenceSha, workflow_instruction_id: "instruction:canonical", workflow_instruction_sha256: sha("instruction:canonical"), commit_lifetime_ms: 30000 }); } finally { raw.close(); } }
-function restartHost(f: Fixture): void { f.host.close(); f.witness.close(); const witness = new TestOnlySqliteContinuityWitness(f.witnessPath), controller = new CustodyController(f.controllerPath, witness, f.roleBinding), host = new TestOnlyPreCustodyHost({ authority_path: f.authorityPath, authority_binding: f.roleBinding, authority_private_key: f.authorityKey.privateKey, controller, fence_adapter: f.fenceAdapter, lineage_adapter: f.lineageAdapter, now: () => CLOCK }); f.witness = witness; f.controller = controller; f.host = host; }
+function restartHost(f: Fixture, observedAtMs = CLOCK + 1_000): void { f.host.close(); f.witness.close(); f.rebuildAdapters(observedAtMs); const witness = new TestOnlySqliteContinuityWitness(f.witnessPath), controller = new CustodyController(f.controllerPath, witness, f.roleBinding), host = new TestOnlyPreCustodyHost({ authority_path: f.authorityPath, authority_binding: f.roleBinding, authority_private_key: f.authorityKey.privateKey, controller, fence_adapter: f.fenceAdapter, lineage_adapter: f.lineageAdapter, now: () => CLOCK }); f.witness = witness; f.controller = controller; f.host = host; }
+function forceLineageAcknowledged(f: Fixture, operationId: string): void { const witness = new Database(f.witnessPath, { readonly: true }), ack = witness.query<{ record_json: string; acknowledged_at: string }, [string]>("SELECT record_json,acknowledged_at FROM witness_records WHERE operation_id=?").get(operationId)!; witness.close(); const record = JSON.parse(ack.record_json), controller = new Database(f.controllerPath); controller.transaction(() => { controller.query("UPDATE governed_runs SET revision=?,witness_digest=?,updated_at=? WHERE key_sha256=?").run(record.sequence, record.record_digest, ack.acknowledged_at, record.key_sha256); controller.query("UPDATE controller_operations SET status='ACKNOWLEDGED' WHERE operation_id=? AND status='PENDING'").run(operationId); })(); controller.close(); }
+function lineageCounts(f: Fixture): { advances: number; witnesses: number } { const controller = new Database(f.controllerPath, { readonly: true }), witness = new Database(f.witnessPath, { readonly: true }); try { return { advances: controller.query<{ n: number }, []>("SELECT COUNT(*) n FROM lineage_advances").get()!.n, witnesses: witness.query<{ n: number }, []>("SELECT COUNT(*) n FROM witness_records WHERE transition='ADVANCE_LINEAGE'").get()!.n }; } finally { controller.close(); witness.close(); } }
 
 describe("N01-N18 corrected", () => {
   test("N01 canonical admission pins authenticated custodian lineage", () => { const f = fixture(); try { expect(f.controller.state(key)).toMatchObject({ state: "ACTIVE", admitted: { session_id: decode(f.custodian.session).session_id }, binding: { control_store_id: "control:test" } }); } finally { f.close(); } });
@@ -355,7 +360,7 @@ describe("S01-S10 corrective04 lineage revisit and recovery", () => {
       const h1 = lineage("s05:h1"); f.observeLineage(h1);
       expect(f.host.advanceLineage({ key, operation_id: "s05:h1", custodian_session: f.custodian.session })).toMatchObject({ replay: false, sequence: 1 });
       restartHost(f);
-      expect(f.host.advanceLineage({ key, operation_id: "s05:h1", custodian_session: f.custodian.session })).toMatchObject({ replay: true, sequence: 1 });
+      expect(f.host.advanceLineage({ key, operation_id: "s05:h1" })).toMatchObject({ replay: true, sequence: 1 });
       expect(f.controller.state(key)).toMatchObject({ state: "ACTIVE", incident_count: 0, lineage_sequence: 1 });
     } finally { f.close(); }
   });
@@ -366,7 +371,7 @@ describe("S01-S10 corrective04 lineage revisit and recovery", () => {
       const h1 = lineage("s06:before:h1"); unavailable.observeLineage(h1); unavailable.witness.setFailureForTest("BEFORE_COMMIT");
       expect(() => unavailable.host.advanceLineage({ key, operation_id: "s06:before", custodian_session: unavailable.custodian.session })).toThrow("WITNESS_UNAVAILABLE");
       restartHost(unavailable);
-      expect(unavailable.host.advanceLineage({ key, operation_id: "s06:before", custodian_session: unavailable.custodian.session })).toMatchObject({ replay: false, sequence: 1 });
+      expect(unavailable.host.advanceLineage({ key, operation_id: "s06:before" })).toMatchObject({ replay: false, sequence: 1 });
       expect(unavailable.controller.state(key)).toMatchObject({ state: "ACTIVE", incident_count: 0, lineage_sequence: 1, current_lineage: h1 });
     } finally { unavailable.close(); }
     const f = fixture(true, true, false);
@@ -387,7 +392,7 @@ describe("S01-S10 corrective04 lineage revisit and recovery", () => {
       const h1 = lineage("s07:h1"); f.observeLineage(h1); f.witness.setFailureForTest("AFTER_COMMIT");
       expect(() => f.host.advanceLineage({ key, operation_id: "s07:h1", custodian_session: f.custodian.session })).toThrow("WITNESS_RESPONSE_LOST");
       restartHost(f);
-      expect(f.host.advanceLineage({ key, operation_id: "s07:h1", custodian_session: f.custodian.session })).toMatchObject({ replay: false, sequence: 1 });
+      expect(f.host.advanceLineage({ key, operation_id: "s07:h1" })).toMatchObject({ replay: false, sequence: 1 });
       expect(f.controller.state(key)).toMatchObject({ state: "ACTIVE", incident_count: 0, lineage_sequence: 1, current_lineage: h1 });
     } finally { f.close(); }
   });
@@ -431,6 +436,136 @@ describe("S01-S10 corrective04 lineage revisit and recovery", () => {
       const text = readFileSync(join(import.meta.dir, "README.md"), "utf8");
       expect(text).toContain("does not prove semantic descent");
       expect(text).toContain("trusted adapter");
+    } finally { f.close(); }
+  });
+});
+
+describe("T01-T10 corrective05 host-owned exact lineage recovery", () => {
+  test("T01 Host recovers PENDING advance before witness commit after full restart", () => {
+    const f = fixture(true, true, false);
+    try {
+      const h1 = lineage("t01:h1"), oldLineageAdapter = f.lineageAdapter, oldFenceAdapter = f.fenceAdapter; f.observeLineage(h1); f.witness.setFailureForTest("BEFORE_COMMIT");
+      expect(() => f.host.advanceLineage({ key, operation_id: "t01:advance", custodian_session: f.custodian.session })).toThrow("WITNESS_UNAVAILABLE");
+      restartHost(f, CLOCK + 2_000);
+      expect(f.lineageAdapter).not.toBe(oldLineageAdapter); expect(f.fenceAdapter).not.toBe(oldFenceAdapter);
+      expect(f.host.advanceLineage({ key, operation_id: "t01:advance" })).toMatchObject({ sequence: 1, replay: false });
+      expect(f.lineageAdapter.inspect_calls).toBe(0);
+      expect(f.controller.state(key)).toMatchObject({ state: "ACTIVE", current_lineage: h1, lineage_sequence: 1, incident_count: 0 });
+    } finally { f.close(); }
+  });
+
+  test("T02 Host adopts the exact committed witness record without a second append", () => {
+    const f = fixture(true, true, false);
+    try {
+      const h1 = lineage("t02:h1"); f.observeLineage(h1); f.witness.setFailureForTest("AFTER_COMMIT");
+      expect(() => f.host.advanceLineage({ key, operation_id: "t02:advance", custodian_session: f.custodian.session })).toThrow("WITNESS_RESPONSE_LOST");
+      expect(lineageCounts(f)).toEqual({ advances: 0, witnesses: 1 });
+      restartHost(f, CLOCK + 3_000);
+      expect(f.host.advanceLineage({ key, operation_id: "t02:advance" })).toMatchObject({ sequence: 1, replay: false });
+      expect(f.lineageAdapter.inspect_calls).toBe(0);
+      expect(lineageCounts(f)).toEqual({ advances: 1, witnesses: 1 });
+    } finally { f.close(); }
+  });
+
+  test("T03 Host finishes ACKNOWLEDGED advance exactly once after restart", () => {
+    const f = fixture(true, true, false);
+    try {
+      const h1 = lineage("t03:h1"); f.observeLineage(h1); f.witness.setFailureForTest("AFTER_COMMIT");
+      expect(() => f.host.advanceLineage({ key, operation_id: "t03:advance", custodian_session: f.custodian.session })).toThrow("WITNESS_RESPONSE_LOST");
+      forceLineageAcknowledged(f, "t03:advance"); restartHost(f, CLOCK + 4_000);
+      expect(f.host.advanceLineage({ key, operation_id: "t03:advance" })).toMatchObject({ sequence: 1, replay: false });
+      expect(f.host.advanceLineage({ key, operation_id: "t03:advance" })).toMatchObject({ sequence: 1, replay: true });
+      expect(lineageCounts(f)).toEqual({ advances: 1, witnesses: 1 });
+    } finally { f.close(); }
+  });
+
+  test("T04 APPLIED response-loss replay returns the recorded result without observation", () => {
+    const f = fixture(true, true, false);
+    try {
+      const h1 = lineage("t04:h1"), later = lineage("t04:later"); f.observeLineage(h1);
+      expect(f.host.advanceLineage({ key, operation_id: "t04:advance", custodian_session: f.custodian.session })).toMatchObject({ sequence: 1, replay: false });
+      f.observeLineage(later, h1, 2); restartHost(f, CLOCK + 5_000);
+      expect(f.host.advanceLineage({ key, operation_id: "t04:advance" })).toEqual({ sequence: 1, lineage_sha256: sha(cj(h1)), replay: true });
+      expect(f.lineageAdapter.inspect_calls).toBe(0);
+      expect(lineageCounts(f)).toEqual({ advances: 1, witnesses: 1 });
+    } finally { f.close(); }
+  });
+
+  test("T05 moved current store cannot replace interrupted historical input", () => {
+    const f = fixture(true, true, false);
+    try {
+      const h1 = lineage("t05:h1"), later = lineage("t05:later"); f.observeLineage(h1); f.witness.setFailureForTest("AFTER_COMMIT");
+      expect(() => f.host.advanceLineage({ key, operation_id: "t05:advance", custodian_session: f.custodian.session })).toThrow("WITNESS_RESPONSE_LOST");
+      f.observeLineage(later, h1, 2); restartHost(f, CLOCK + 6_000);
+      expect(f.host.advanceLineage({ key, operation_id: "t05:advance" })).toMatchObject({ sequence: 1, lineage_sha256: sha(cj(h1)), replay: false });
+      expect(f.lineageAdapter.inspect_calls).toBe(0);
+      expect(f.controller.state(key)).toMatchObject({ current_lineage: h1, lineage_sequence: 1 });
+    } finally { f.close(); }
+  });
+
+  test("T06 different operation cannot inherit an interrupted advance", () => {
+    const f = fixture(true, true, false);
+    try {
+      const h1 = lineage("t06:h1"); f.observeLineage(h1); f.witness.setFailureForTest("AFTER_COMMIT");
+      expect(() => f.host.advanceLineage({ key, operation_id: "t06:a", custodian_session: f.custodian.session })).toThrow("WITNESS_RESPONSE_LOST");
+      expect(() => f.host.advanceLineage({ key, operation_id: "t06:b", custodian_session: f.custodian.session })).toThrow("CONTINUITY_OPERATION_PENDING");
+      restartHost(f, CLOCK + 7_000);
+      expect(f.host.advanceLineage({ key, operation_id: "t06:a" })).toMatchObject({ sequence: 1, replay: false });
+      expect(f.controller.operationStatus(key, "t06:a")).toMatchObject({ kind: "ADVANCE_LINEAGE", status: "APPLIED" });
+      expect(() => f.controller.operationStatus(key, "t06:b")).toThrow("OPERATION_NOT_FOUND");
+    } finally { f.close(); }
+  });
+
+  test("T07 live post-restart clock is irrelevant to exact recovery", () => {
+    const f = fixture(true, true, false);
+    try {
+      const h1 = lineage("t07:h1"); f.observeLineage(h1); f.witness.setFailureForTest("BEFORE_COMMIT");
+      expect(() => f.host.advanceLineage({ key, operation_id: "t07:advance", custodian_session: f.custodian.session })).toThrow("WITNESS_UNAVAILABLE");
+      restartHost(f, CLOCK + 25_000);
+      expect(f.host.advanceLineage({ key, operation_id: "t07:advance" })).toMatchObject({ sequence: 1, replay: false });
+      const db = new Database(f.controllerPath, { readonly: true }), stored = JSON.parse(db.query<{ observation_json: string }, []>("SELECT observation_json FROM lineage_advances").get()!.observation_json); db.close();
+      expect(stored.observed_at).toBe(new Date(CLOCK).toISOString());
+      expect(stored.observed_at).not.toBe(new Date(CLOCK + 25_000).toISOString());
+      expect(f.lineageAdapter.inspect_calls).toBe(0);
+    } finally { f.close(); }
+  });
+
+  test("T08 open lineage operation blocks replacement before FENCING or successor creation", () => {
+    const f = fixture(true, true, false);
+    try {
+      const h1 = lineage("t08:h1"); f.observeLineage(h1); f.witness.setFailureForTest("BEFORE_COMMIT");
+      expect(() => f.host.advanceLineage({ key, operation_id: "t08:advance", custodian_session: f.custodian.session })).toThrow("WITNESS_UNAVAILABLE");
+      const authority = new Database(f.authorityPath, { readonly: true }), before = authority.query<{ assignments: number; sessions: number; revoked: number }, []>("SELECT (SELECT COUNT(*) FROM launch_key_assignments) assignments,(SELECT COUNT(*) FROM role_sessions) sessions,(SELECT COUNT(*) FROM role_sessions WHERE revoked=1) revoked").get()!; authority.close();
+      expect(() => f.host.observeLeaseAndReplace({ key, observed_now_ms: CLOCK + 40_000, operation_id: "t08:replace", lease_expires_ms: CLOCK + 90_000, host_incarnation: "host:two" })).toThrow("CONTINUITY_OPERATION_PENDING");
+      const afterDb = new Database(f.authorityPath, { readonly: true }), after = afterDb.query<{ assignments: number; sessions: number; revoked: number }, []>("SELECT (SELECT COUNT(*) FROM launch_key_assignments) assignments,(SELECT COUNT(*) FROM role_sessions) sessions,(SELECT COUNT(*) FROM role_sessions WHERE revoked=1) revoked").get()!; afterDb.close();
+      expect(after).toEqual(before);
+      expect(f.controller.state(key)).toMatchObject({ state: "ACTIVE", admitted: { session_id: decode(f.custodian.session).session_id } });
+    } finally { f.close(); }
+  });
+
+  test("T09 recovered lineage preserves exact root, predecessor, sequence and cardinality", () => {
+    const f = fixture(true, true, false);
+    try {
+      const h1 = lineage("t09:h1"), rootSha = sha(cj(f.rootLineage)); f.observeLineage(h1); f.witness.setFailureForTest("AFTER_COMMIT");
+      expect(() => f.host.advanceLineage({ key, operation_id: "t09:advance", custodian_session: f.custodian.session })).toThrow("WITNESS_RESPONSE_LOST");
+      restartHost(f, CLOCK + 8_000); f.host.advanceLineage({ key, operation_id: "t09:advance" });
+      const state = f.controller.state(key), db = new Database(f.controllerPath, { readonly: true }), row = db.query<{ lineage_sequence: number; predecessor_sha256: string; lineage_sha256: string }, []>("SELECT lineage_sequence,predecessor_sha256,lineage_sha256 FROM lineage_advances").get()!; db.close();
+      expect(state).toMatchObject({ lineage_root: f.rootLineage, current_lineage: h1, lineage_sequence: 1, current_lineage_sha256: sha(cj(h1)), incident_count: 0 });
+      expect(row).toEqual({ lineage_sequence: 1, predecessor_sha256: rootSha, lineage_sha256: sha(cj(h1)) });
+      expect(lineageCounts(f)).toEqual({ advances: 1, witnesses: 1 });
+    } finally { f.close(); }
+  });
+
+  test("T10 recovered advance does not weaken durable historical-revisit rejection", () => {
+    const f = fixture(true, true, false);
+    try {
+      const h1 = lineage("t10:h1"), h2 = lineage("t10:h2"); f.observeLineage(h1); f.witness.setFailureForTest("AFTER_COMMIT");
+      expect(() => f.host.advanceLineage({ key, operation_id: "t10:h1", custodian_session: f.custodian.session })).toThrow("WITNESS_RESPONSE_LOST");
+      restartHost(f, CLOCK + 9_000); f.host.advanceLineage({ key, operation_id: "t10:h1" });
+      f.observeLineage(h2, h1, 2); f.host.advanceLineage({ key, operation_id: "t10:h2", custodian_session: f.custodian.session });
+      f.observeLineage(h1, h2, 3);
+      expect(() => f.host.advanceLineage({ key, operation_id: "t10:revisit", custodian_session: f.custodian.session })).toThrow("LINEAGE_ROLLBACK");
+      expect(f.controller.state(key)).toMatchObject({ state: "INCIDENT", current_lineage: h2, lineage_sequence: 2, incident_count: 1 });
     } finally { f.close(); }
   });
 });

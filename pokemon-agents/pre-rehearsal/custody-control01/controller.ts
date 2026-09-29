@@ -251,7 +251,7 @@ type RunRow = {
   admitted_json: string | null; lease_expires_ms: number | null; canonical_manifest_sha256: string | null;
   canonical_manifest_json: string | null; canonical_release_json: string | null; authority_incarnation: string; authority_high_water: number;
 };
-export type OperationRow = { operation_id: string; key_sha256: string; kind: string; input_json: string; expected_json: string; sequence: number; previous_digest: string; witness_record_json: string; status: string; result_json: string | null };
+export type OperationRow = { operation_id: string; key_sha256: string; kind: string; input_sha256: string; input_json: string; expected_json: string; sequence: number; previous_digest: string; witness_record_json: string; status: string; result_json: string | null };
 export type PendingEffectIdentity = Readonly<{ operation_id: string; key_sha256: string; kind: "JOB" | "TARGET"; authority_incarnation: string; authority_revision: number; effect_id: string; effect_sha256: string; envelope_sha256: string }>;
 export interface AuthoritySnapshot { readonly continuity: AuthorityContinuity; readonly jobs: readonly AuthorityEvaluationJob[]; readonly targets: readonly string[] }
 
@@ -347,12 +347,34 @@ export class CustodyController {
       this.recordIncident(row, "NON_ADMITTED_LINEAGE_ADVANCE", { admitted_session_id: admitted.session_id, presented_session_id: authenticated.session_id, observation }, operationId);
       throw new CustodyControlError("NON_ADMITTED_CUSTODIAN");
     }
-    const observationJson = json(observation), lineageJson = json(observation.lineage), lineageSha = hash(lineageJson), input = { observation, custodian_session_id: admitted.session_id }, expected = { lineage_sequence: observation.sequence, predecessor_sha256: observation.predecessor_sha256, lineage_sha256: lineageSha };
+    return this.advanceLineageForAdmitted(keySha, row, admitted.session_id, observation, operationId);
+  }
+
+  recoverLineageAdvance(key: CanonicalRunKey, operationId: string): Readonly<{ sequence: number; lineage_sha256: string; replay: boolean }> | null {
+    const keySha = canonicalKeySha256(key), op = this.operation(operationId);
+    if (!op) return null;
+    this.assertOperationDomain(op, "ADVANCE_LINEAGE", keySha);
+    const row = this.requireRun(keySha), admitted = row.admitted_json ? JSON.parse(row.admitted_json) as AdmittedCustodian : null, input = JSON.parse(op.input_json) as { observation?: LineageObservation; custodian_session_id?: string }, custodianSessionId = input.custodian_session_id;
+    if (!input.observation || !custodianSessionId || !TOKEN.test(custodianSessionId) || op.status !== "APPLIED" && (!admitted || custodianSessionId !== admitted.session_id)) throw new CustodyControlError("OPERATION_DOMAIN_CONFLICT");
+    validateLineageObservation(input.observation);
+    const lineageSha = hash(json(input.observation.lineage)), expected = { lineage_sequence: input.observation.sequence, predecessor_sha256: input.observation.predecessor_sha256, lineage_sha256: lineageSha }, exactInput = { observation: input.observation, custodian_session_id: custodianSessionId }, record = JSON.parse(op.witness_record_json) as WitnessRecord;
+    this.assertOperation(op, "ADVANCE_LINEAGE", keySha, expected);
+    validateWitnessRecord(record);
+    if (op.input_json !== json(exactInput) || op.input_sha256 !== hash(op.input_json) || record.operation_id !== op.operation_id || record.key_sha256 !== keySha || record.sequence !== op.sequence || record.previous_digest !== op.previous_digest || record.transition !== "ADVANCE_LINEAGE" || record.payload_sha256 !== hash(json({ input: exactInput, expected }))) throw new CustodyControlError("OPERATION_DOMAIN_CONFLICT");
+    return this.advanceLineageForAdmitted(keySha, row, custodianSessionId, input.observation, operationId);
+  }
+
+  private advanceLineageForAdmitted(keySha: string, row: RunRow, custodianSessionId: string, observation: LineageObservation, operationId: string): Readonly<{ sequence: number; lineage_sha256: string; replay: boolean }> {
+    const observationJson = json(observation), lineageJson = json(observation.lineage), lineageSha = hash(lineageJson), input = { observation, custodian_session_id: custodianSessionId }, expected = { lineage_sequence: observation.sequence, predecessor_sha256: observation.predecessor_sha256, lineage_sha256: lineageSha };
     const existing = this.operation(operationId);
     if (existing) {
       this.assertOperation(existing, "ADVANCE_LINEAGE", keySha, expected);
       if (existing.input_json !== json(input)) throw new CustodyControlError("OPERATION_DOMAIN_CONFLICT");
-      if (existing.status === "APPLIED") return Object.freeze({ sequence: observation.sequence, lineage_sha256: lineageSha, replay: true });
+      if (existing.status === "APPLIED") {
+        const ack = this.witness.readOperation(operationId), result = existing.result_json ? JSON.parse(existing.result_json) as { sequence?: number; lineage_sha256?: string } : null, advance = this.db.query<{ key_sha256: string; lineage_sequence: number; predecessor_sha256: string; lineage_sha256: string; custodian_session_id: string; observation_json: string }, [string]>("SELECT key_sha256,lineage_sequence,predecessor_sha256,lineage_sha256,custodian_session_id,observation_json FROM lineage_advances WHERE operation_id=?").get(operationId);
+        if (!ack || json(ack.record) !== existing.witness_record_json || !result || result.sequence !== observation.sequence || result.lineage_sha256 !== lineageSha || !advance || advance.key_sha256 !== keySha || advance.lineage_sequence !== observation.sequence || advance.predecessor_sha256 !== observation.predecessor_sha256 || advance.lineage_sha256 !== lineageSha || advance.custodian_session_id !== custodianSessionId || advance.observation_json !== observationJson) throw new CustodyControlError("OPERATION_DOMAIN_CONFLICT");
+        return Object.freeze({ sequence: result.sequence, lineage_sha256: result.lineage_sha256, replay: true });
+      }
     }
     this.assertNoOpenOperationExcept(keySha, operationId);
     const revisitsRoot = lineageSha === hash(row.lineage_root_json), revisitsAccepted = !!this.db.query("SELECT 1 FROM lineage_advances WHERE key_sha256=? AND lineage_sha256=?").get(keySha, lineageSha);
@@ -366,7 +388,11 @@ export class CustodyController {
     }
     if (!existing) this.assertWitnessCurrent(row);
     const op = existing ?? this.prepareOperation(operationId, keySha, "ADVANCE_LINEAGE", input, expected);
-    if (existing?.status === "ACKNOWLEDGED") this.assertWitnessCurrent(row);
+    if (existing?.status === "ACKNOWLEDGED") {
+      const ack = this.witness.readOperation(operationId);
+      if (!ack || json(ack.record) !== existing.witness_record_json) throw new CustodyControlError("CONTINUITY_HIGH_WATER_MISMATCH");
+      this.assertWitnessCurrent(row);
+    }
     else this.finishTransition(op, false);
     const afterWitness = this.requireRun(keySha);
     if (afterWitness.state !== "ACTIVE" || afterWitness.lineage_sequence + 1 !== observation.sequence || afterWitness.current_lineage_sha256 !== observation.predecessor_sha256 || afterWitness.admitted_json !== row.admitted_json) {
@@ -374,7 +400,7 @@ export class CustodyController {
       throw new CustodyControlError("LINEAGE_CONTINUITY_CONFLICT");
     }
     this.db.transaction(() => {
-      this.db.query("INSERT INTO lineage_advances VALUES(?,?,?,?,?,?,?,?)").run(operationId, keySha, observation.sequence, observation.predecessor_sha256, lineageSha, admitted.session_id, observationJson, new Date().toISOString());
+      this.db.query("INSERT INTO lineage_advances VALUES(?,?,?,?,?,?,?,?)").run(operationId, keySha, observation.sequence, observation.predecessor_sha256, lineageSha, custodianSessionId, observationJson, new Date().toISOString());
       const updated = this.db.query("UPDATE governed_runs SET current_lineage_json=?,current_lineage_sha256=?,lineage_sequence=?,updated_at=? WHERE key_sha256=? AND state='ACTIVE' AND current_lineage_sha256=? AND lineage_sequence=?").run(lineageJson, lineageSha, observation.sequence, new Date().toISOString(), keySha, observation.predecessor_sha256, observation.sequence - 1);
       if (updated.changes !== 1) throw new CustodyControlError("LINEAGE_CONTINUITY_CONFLICT");
       this.db.query("UPDATE controller_operations SET status='APPLIED',result_json=? WHERE operation_id=? AND status='ACKNOWLEDGED'").run(json({ sequence: observation.sequence, lineage_sha256: lineageSha }), operationId);
@@ -384,6 +410,7 @@ export class CustodyController {
 
   observeLeaseExpiry(key: CanonicalRunKey, observedNowMs: number): boolean {
     const row = this.requireRun(canonicalKeySha256(key));
+    this.assertNoOpenOperation(row.key_sha256);
     if (row.state !== "ACTIVE" || row.lease_expires_ms === null || observedNowMs <= row.lease_expires_ms) return false;
     this.db.query("UPDATE governed_runs SET state='FENCING',updated_at=? WHERE key_sha256=? AND state='ACTIVE'").run(new Date().toISOString(), row.key_sha256);
     return true;
@@ -728,8 +755,11 @@ export class TestOnlyPreCustodyHost {
   close(): void { this.#authority.close(); this.#controller.close(); }
   reserveRun(binding: RunBinding, operationId: string) { return this.#controller.reserveRun(binding, this.#readContinuity(), operationId, this.#lineageAdapter.inspectRoot({ key: binding.key, binding })); }
 
-  advanceLineage(input: { key: CanonicalRunKey; operation_id: string; custodian_session: LocalRoleSession }) {
+  advanceLineage(input: { key: CanonicalRunKey; operation_id: string; custodian_session?: LocalRoleSession }) {
     this.#audit(input.key);
+    const recovered = this.#controller.recoverLineageAdvance(input.key, input.operation_id);
+    if (recovered) return recovered;
+    if (!input.custodian_session) throw new CustodyControlError("CUSTODIAN_SESSION_REQUIRED");
     const admitted = this.#controller.admitted(input.key), state = this.#controller.lineageFor(input.key), evidence = localRoleEvidence(input.custodian_session), observation = this.#lineageAdapter.inspect({ key: input.key, admitted, current: state.current, sequence: state.sequence });
     return this.#controller.advanceLineage(input.key, observation, evidence, input.operation_id);
   }
