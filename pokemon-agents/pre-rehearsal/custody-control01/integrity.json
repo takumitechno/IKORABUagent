@@ -1,6 +1,7 @@
 {
-  "schema": "pre-custody-control-integrity.v1",
+  "schema": "pre-custody-control-integrity.v2",
   "test_only": true,
+  "byte_model": "canonical LF source bytes are hashed as a Git SHA-1 blob and SHA-256; checkout raw bytes are classified separately",
   "frozen_wp3": {
     "commit": "712b4e528986ebf891a45dac14f65c22d6530844",
     "tree": "effacfd2803f45e7bc84ad65f0855831980552d2"
@@ -9,17 +10,25 @@
   "files": [
     {
       "path": "controller.ts",
-      "sha256": "a6e86d7f482deee7e4b61972e74098c7cfbddcbd64b72d83db53e9741f14271e"
+      "canonical_lf_sha256": "766de972a0c57b53c66c87d4fe498ce9c84bfdb3cc677ce88a15686f8c2c45ae",
+      "git_blob_sha1": "b49f96f80177268246551c6ba79c6d9e251dbeef"
     },
     {
       "path": "controller.test.ts",
-      "sha256": "ef7bff91f6c27f34ab9b5ef16323f9c1b5a2cd353e006bb5d190fb2bf159d95b"
+      "canonical_lf_sha256": "7487d77ce26b289025e7a825bc0812778c54ca64428ea071f19b5e84008b557d",
+      "git_blob_sha1": "2f57c6d6e0ce67ec0a9e3bf6796c4bd045abe16d"
+    },
+    {
+      "path": "admission-race-worker.ts",
+      "canonical_lf_sha256": "afa11486556ca5e10a50ebd44b4df034d99b940e24c5d0a25fd792b9b4c7576b",
+      "git_blob_sha1": "5cab9cbabab1bed60dba24d37e94e3ec1b619087"
     },
     {
       "path": "README.md",
-      "sha256": "a2bf82583ad9116e7d7dc8b40ccc2d4ff95ad7d2046439d75b23f0dde91ca8fe"
+      "canonical_lf_sha256": "9fff2e1772c90336930bfb1ce4a7ad317fdb4cea206f197db3ddf98b199e5caa",
+      "git_blob_sha1": "94e9ff5cc66a13a29c44a2c5132214a5423e58c2"
     }
   ],
   "self_hash": null,
-  "self_hash_reason": "A file cannot contain its own stable cryptographic digest; Git tree identity covers this manifest."
+  "self_hash_reason": "Git tree identity covers this manifest; a file cannot contain its own stable digest."
 }

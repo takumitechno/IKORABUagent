@@ -1,53 +1,52 @@
-# PRE-CUSTODY-CONTROL01
+# PRE-CUSTODY-CONTROL01-CORRECTIVE01
 
-Status: `TEST_ONLY` deployment adjunct. This directory is not part of the accepted WP3 runtime or integrity manifest and does not change WP3 acceptance.
+Status: external `TEST_ONLY` pre-rehearsal adjunct. It does not change or extend WP3 acceptance.
 
-## Frozen inputs
+Frozen inputs:
 
-- IKORABU WP3: commit `712b4e528986ebf891a45dac14f65c22d6530844`, tree `effacfd2803f45e7bc84ad65f0855831980552d2`.
-- Threads producer: commit `875e75fce20c16c6157b5aa42f759411c52e95fe`, read only.
-- The adjunct imports frozen validators, role receipts, evaluation jobs and expected-target verification as a read-only dependency. It does not preload, replace, subclass or patch accepted code.
+- IKORABU WP3 commit `712b4e528986ebf891a45dac14f65c22d6530844`, tree `effacfd2803f45e7bc84ad65f0855831980552d2`.
+- Threads commit `875e75fce20c16c6157b5aa42f759411c52e95fe`, read only.
 
-## Canonical ownership
+## Guarded reference composition
 
-The canonical key is `(environment_type, deployment_id, organization_id, tenant_id, account_id, run_id)`. Spec, W/window, GO artifact and policy, authority incarnation, store pair, producer generation and environment instance are immutable bound values. Changing a bound value cannot create a second namespace for the same run.
+`TestOnlyPreCustodyHost` privately owns the accepted `CatfoodRoleAuthority` capability and its pinned `RoleChannelBinding`. Its ordinary public interface exposes guarded run reservation, custodian admission/replacement, supporting-role launch, canonical close, job issue, exact reconciliation, target assignment, publication eligibility and a fixed safety command set. It does not expose the authority, private key, controller database or unrestricted callback execution.
 
-The initial profile is deliberately small: one controller store, one accepted authority store, one independently persisted witness store, one active control host and one custody writer for a governed run. There is no active-active placement, consensus, automatic failover or reconciliation that chooses a winning verdict.
+The canonical run binding pins K, environment instance, spec, W/window, GO artifact/policy reference, custody store-pair identity, journal/checkpoint heads, raw control/checkpoint snapshot identities, pair common cut, producer generation and the authority incarnation/high-water. Admission additionally pins the authenticated WP3 custodian session, launch assignment, action-key fingerprint, subject, process, host incarnation and accepted build identity.
 
-| Frozen host interface | Adjunct guard | Durable evidence |
-|---|---|---|
-| `CatfoodRoleAuthority.issueLaunchKeyAssignment` / store and credential admission | `reserveRun` then `admitCustodian` before the host grants any handle | canonical binding, owner subject, host incarnation, lease suspicion and witness acknowledgment |
-| `custodian.evaluation.release` + `CatfoodRoleAuthority.issueEvaluationJob` | `closeManifest` pins the accepted manifest; `issueEvaluationJob` verifies the authentic V2 release and exact pinned bytes | raw canonical manifest, variant incidents, operation identity, authorized job identity |
-| `CatfoodRoleAuthority.assignExpectedEvaluationTarget` | `assignExpectedTarget` accepts only a controller-authorized job and validates the signed frozen target | current target digest and prior target revocation |
-| publication / current verification boundary | `publishCurrentTarget` requires a current target, canonical close, no incident, no pending effect and matching witness high-water | current target row and controller/witness revisions |
-| stop, reconcile and revoke | `runSafetyAction` remains available in fencing, recovery and incident states | existing accepted authority evidence; the adjunct does not mint verdict evidence |
+A close is canonical only when its authentic V2 release receipt belongs to the admitted custodian session and its signed manifest and GO reference match the pinned lineage. An authentic non-admitted custodian is not a candidate-selection input: it creates durable incident evidence and cannot issue a controller-authorized job or publish.
 
-`PreCustodyControlHost` intentionally exposes only these guarded routes. The accepted authority and private store/credential handles must remain private to the real host composition. N15 proves this property for the TEST_ONLY object composition; OS-level non-bypassability is still a commissioning requirement.
+Job and target effects are reserved before invocation with operation kind, K and exact expected authority incarnation/revision and effect identity. Only the host invokes the pinned authority. Lost-response recovery reads the exact original effect by those values; callers cannot submit substitute jobs, targets or trust roots. A different operation ID cannot abandon an unresolved effect.
 
-## State and fork rules
+Authority snapshots are checked for incarnation changes, revision rollback, disappearance, unguarded effects and reuse of an observed revision for different authenticated content. An incident is terminal for positive controller actions, revokes current controller eligibility, and cannot be overwritten by delayed job/target completion. Historical accepted evidence is not mutated.
 
-`RESERVING → RESERVED → ACTIVE → CLOSED` is the positive path. Lease loss enters `FENCING`; it never grants replacement. Replacement requires proof that the old process cannot execute, its credentials are revoked, all producer effects are resolved and the complete same history is present. Unknown remote effects enter `RECOVERY_REQUIRED` and require exact-operation reconciliation.
+## Launch, fencing and safety limits
 
-The first close is not “first PASS wins”: only the already reserved writer may pin its registered history. Exact manifest replay is idempotent. Any distinct valid manifest for the same key is preserved in `custody_incidents`, moves the run to terminal `INCIDENT`, and blocks jobs, targets and publication. The controller never reads a verdict to resolve this state. Recovery means authorizing a different future run, not resetting this run.
+The host performs the launch/key-assignment guard before returning any role session. A second ordinary custodian cannot obtain a session through the host after admission. Replacement begins only after real lease-expiry comparison and a trusted host-owned `TrustedFenceAdapter` observation. Invalid fence evidence is rejected before a successor assignment is created. This interface does not claim real producer fencing; OS/process/credential revocation and delayed producer-effect resolution remain deployment work.
 
-Ordinary restart reopens the same controller and witness histories. A copied/restored store, mismatched head, lower controller revision, advanced witness or unresolved suffix blocks positive work. A witness append is conditional on `(key, sequence, previous_digest)`; exact retransmission returns the original acknowledgment. A response lost after witness commit is reconciled by the same operation ID.
+Safety is a closed command union: `STATUS_READ`, `RECONCILE_READ`, and `REVOKE`. It cannot run caller functions, create jobs or targets, assign positive roles, renew authority, select custody history/verdict, publish or clear an incident.
 
-## H and clock hooks
+## Tests and evidence
 
-`CustodyControlInstrumentation` emits monotonic elapsed time plus wall and monotonic observation samples for witness appends and guarded authority effects, including blocked/unresolved outcomes. These are measurement hooks only. This package defines no production capacity, renewal margin, drift bound or clock acceptance threshold and therefore does not satisfy Incremental Verification H or the production clock methodology.
+- N01-N18 exercise the corrected normative suite. N02 uses two overlapping OS processes against the same SQLite controller/witness stores. N09 changes actual authenticated manifest W/store/head material. N10 changes the actual accepted authority continuity row.
+- C01-C25 cover every corrective hostile case, including authentic non-owner receipts, exact reconciliation, raw-authority detection, authority revision reuse, incident completion races, operation-domain separation and CRLF classification.
+- P1-P7 reproduce the independent audit attacks at the external guard boundary.
+- Adjunct integrity identifies canonical LF/Git-blob bytes separately from checkout working-tree bytes. A CRLF checkout may have a different raw working-tree SHA-256 without changing the canonical committed blob identity.
 
-## Commissioning checklist (not performed)
+The witness is a **TEST_ONLY witness protocol mechanism**. In this reference fixture the witness and controller remain in the **same rollback domain**. Actual independent durability, principal separation and rollback-domain protection are not verified and must not be inferred from these tests.
 
-- Run the controller, authority and witness under separate protected principals and durability/backup domains.
-- Make the controller the only route to custody role assignment, writable control/checkpoint mounts, producer credentials, job issue, target assignment and publication.
-- Deny alternate writable store mappings and raw authority endpoints to role processes.
-- Prove process identity, accepted artifact/config identity, private-key handle isolation and child-process inheritance rules.
-- Implement and exercise real Threads generation/permit revocation, delayed-request resolution and restricted producer egress; the adjunct does not invent a producer fencing token.
-- Prove controller, authority and custody rollback/restore behavior against an independently retained witness high-water.
-- Exercise crash, host reboot, backup restore, witness outage, clock step/rollback and permit-expiry margins under the later approved rehearsal plan.
-- Establish H thresholds and production wall/monotonic/boot mapping methodology separately.
-- Obtain independent adjunct audit before any deployment or rehearsal decision.
+## Required deployment assumptions
 
-## Explicit limits
+- The deployed launcher must keep the authority private key, raw authority endpoint and writable authority/controller/custody stores away from ordinary roles.
+- Controller, authority, witness and custody stores need independently enforced principals, ACLs, backup/restore rules and durable high-water storage.
+- Real launch identity, key-handle isolation, child-process inheritance, store mounts, producer generation/fencing, delayed effects, clock bounds and restart/restore behavior require separate commissioning evidence.
+- H acceptance, production clock methodology, real provider behavior and Threads producer fencing semantics are outside this package.
 
-No production deployment, provisioning, real root/key/credential, Human GO, tenant probe, rehearsal, CATFOOD, provider call or live network action is implemented or authorized here. The TEST_ONLY mechanism is evidence that the protocol/composition can fail closed; real N1 deployment closure remains unverified.
+`REAL_DEPLOYMENT_CLOSURE_NOT_VERIFIED`
+
+`PRE_REHEARSAL_COMPLETE = NO`
+
+`REHEARSAL_READY = NO`
+
+`Rehearsal authorization = NOT_GRANTED`
+
+No production, deployment, provisioning, real keys/roots, Human GO, probes, rehearsal, CATFOOD or provider/live action is performed or authorized.
