@@ -203,7 +203,7 @@ describe("Q01-Q10 corrective03 monotonic lineage lifecycle", () => {
       f.observeLineage(h1); f.host.advanceLineage({ key, operation_id: "q04:h1", custodian_session: f.custodian.session });
       f.observeLineage(h2); f.host.advanceLineage({ key, operation_id: "q04:h2", custodian_session: f.custodian.session });
       f.observeLineage(h1, f.rootLineage, 1);
-      expect(() => f.host.advanceLineage({ key, operation_id: "q04:rollback", custodian_session: f.custodian.session })).toThrow("LINEAGE_CONTINUITY_CONFLICT");
+      expect(() => f.host.advanceLineage({ key, operation_id: "q04:rollback", custodian_session: f.custodian.session })).toThrow("LINEAGE_ROLLBACK");
       expect(f.controller.state(key)).toMatchObject({ state: "INCIDENT", incident_count: 1, current_lineage: h2 });
     } finally { f.close(); }
   });
@@ -288,4 +288,149 @@ describe("P1-P7 independent audit attack reproduction", () => {
   test("P5 mismatched replacement/store/head/W cannot close", () => { const f = fixture(); try { const changed = sealed(f.go.policy.verification_profile, "b"); expect(() => f.host.closeCustody({ key, manifest: changed, release_receipt: release(f, f.custodian.session, changed), operation_id: "p5" })).toThrow("CUSTODY_LINEAGE_MISMATCH"); } finally { f.close(); } });
   test("P6 incident cannot be overwritten back to CLOSED", () => { const f = fixture(); try { closeCanonical(f); expect(() => issue(f, "p6:job", { lost: true })).toThrow(); incidentWithNonOwner(f); expect(() => f.host.reconcileEvaluationJob(key, "p6:job")).toThrow("INCIDENT_TERMINAL"); expect(f.controller.state(key).state).toBe("INCIDENT"); } finally { f.close(); } });
   test("P7 arbitrary safety positive effect is rejected", () => { const f = fixture(); try { expect(() => f.host.safety(key, { kind: "RECONCILE", callback: () => issue(f) } as any)).toThrow("SAFETY_COMMAND_INVALID"); expect(counts(f)).toEqual({ jobs: 0, targets: 0 }); } finally { f.close(); } });
+});
+
+describe("S01-S10 corrective04 lineage revisit and recovery", () => {
+  test("S01 root revisit is rejected before witness advance", () => {
+    const f = fixture(true, true, false);
+    try {
+      const h1 = lineage("s01:h1"), h2 = lineage("s01:h2");
+      f.observeLineage(h1); f.host.advanceLineage({ key, operation_id: "s01:h1", custodian_session: f.custodian.session });
+      f.observeLineage(h2); f.host.advanceLineage({ key, operation_id: "s01:h2", custodian_session: f.custodian.session });
+      const before = f.witness.current(canonicalKeySha256(key))!.record.sequence;
+      f.observeLineage(f.rootLineage);
+      expect(() => f.host.advanceLineage({ key, operation_id: "s01:root", custodian_session: f.custodian.session })).toThrow("LINEAGE_ROLLBACK");
+      expect(f.witness.current(canonicalKeySha256(key))!.record).toMatchObject({ sequence: before + 1, transition: "INCIDENT" });
+      expect(f.controller.state(key)).toMatchObject({ state: "INCIDENT", incident_count: 1, current_lineage: h2 });
+    } finally { f.close(); }
+  });
+
+  test("S02 historical Hk revisit creates durable rollback incident", () => {
+    const f = fixture(true, true, false);
+    try {
+      const h1 = lineage("s02:h1"), h2 = lineage("s02:h2");
+      f.observeLineage(h1); f.host.advanceLineage({ key, operation_id: "s02:h1", custodian_session: f.custodian.session });
+      f.observeLineage(h2); f.host.advanceLineage({ key, operation_id: "s02:h2", custodian_session: f.custodian.session });
+      f.observeLineage(h1);
+      expect(() => f.host.advanceLineage({ key, operation_id: "s02:revisit", custodian_session: f.custodian.session })).toThrow("LINEAGE_ROLLBACK");
+      const db = new Database(f.controllerPath, { readonly: true });
+      expect(db.query<{ kind: string }, []>("SELECT kind FROM custody_incidents").get()!.kind).toBe("LINEAGE_ROLLBACK"); db.close();
+    } finally { f.close(); }
+  });
+
+  test("S03 fresh-store restore cannot start a divergent pass history", () => {
+    const f = fixture(true, true, false);
+    try {
+      const h1 = lineage("s03:fail:h1"), h2 = lineage("s03:fail:h2"), divergent = lineage("s03:pass:h1");
+      f.observeLineage(h1); f.host.advanceLineage({ key, operation_id: "s03:h1", custodian_session: f.custodian.session });
+      f.observeLineage(h2); f.host.advanceLineage({ key, operation_id: "s03:h2", custodian_session: f.custodian.session });
+      f.observeLineage(f.rootLineage);
+      expect(() => f.host.advanceLineage({ key, operation_id: "s03:restore", custodian_session: f.custodian.session })).toThrow("LINEAGE_ROLLBACK");
+      f.observeLineage(divergent, f.rootLineage, 1);
+      expect(() => f.host.advanceLineage({ key, operation_id: "s03:divergent", custodian_session: f.custodian.session })).toThrow();
+      f.makeManifest("s03:divergent", divergent); expect(() => f.host.closeCustody({ key, manifest: f.manifest, release_receipt: release(f), operation_id: "s03:close" })).toThrow();
+      expect(() => issue(f, "s03:job")).toThrow();
+      expect(() => f.host.assignExpectedTarget({ key, operation_id: "s03:target", verifier_evidence: f.verifier.evidence, evaluation_job_id: "job:none" })).toThrow();
+      expect(counts(f)).toEqual({ jobs: 0, targets: 0 });
+      expect(() => f.host.publicationEligibility(key, "none")).toThrow();
+      expect(f.controller.state(key)).toMatchObject({ state: "INCIDENT", current_lineage: h2 });
+    } finally { f.close(); }
+  });
+
+  test("S04 same digest under a new operation is a contradiction", () => {
+    const f = fixture(true, true, false);
+    try {
+      const h1 = lineage("s04:h1"), h2 = lineage("s04:h2");
+      f.observeLineage(h1); f.host.advanceLineage({ key, operation_id: "s04:h1", custodian_session: f.custodian.session });
+      f.observeLineage(h2); f.host.advanceLineage({ key, operation_id: "s04:h2", custodian_session: f.custodian.session });
+      f.observeLineage(h2);
+      expect(() => f.host.advanceLineage({ key, operation_id: "s04:h2:again", custodian_session: f.custodian.session })).toThrow("LINEAGE_ROLLBACK");
+      expect(f.controller.state(key).state).toBe("INCIDENT");
+    } finally { f.close(); }
+  });
+
+  test("S05 exact applied operation replay stays idempotent across restart", () => {
+    const f = fixture(true, true, false);
+    try {
+      const h1 = lineage("s05:h1"); f.observeLineage(h1);
+      expect(f.host.advanceLineage({ key, operation_id: "s05:h1", custodian_session: f.custodian.session })).toMatchObject({ replay: false, sequence: 1 });
+      restartHost(f);
+      expect(f.host.advanceLineage({ key, operation_id: "s05:h1", custodian_session: f.custodian.session })).toMatchObject({ replay: true, sequence: 1 });
+      expect(f.controller.state(key)).toMatchObject({ state: "ACTIVE", incident_count: 0, lineage_sequence: 1 });
+    } finally { f.close(); }
+  });
+
+  test("S06 witness interruption and response loss recover the exact same operation", () => {
+    const unavailable = fixture(true, true, false);
+    try {
+      const h1 = lineage("s06:before:h1"); unavailable.observeLineage(h1); unavailable.witness.setFailureForTest("BEFORE_COMMIT");
+      expect(() => unavailable.host.advanceLineage({ key, operation_id: "s06:before", custodian_session: unavailable.custodian.session })).toThrow("WITNESS_UNAVAILABLE");
+      restartHost(unavailable);
+      expect(unavailable.host.advanceLineage({ key, operation_id: "s06:before", custodian_session: unavailable.custodian.session })).toMatchObject({ replay: false, sequence: 1 });
+      expect(unavailable.controller.state(key)).toMatchObject({ state: "ACTIVE", incident_count: 0, lineage_sequence: 1, current_lineage: h1 });
+    } finally { unavailable.close(); }
+    const f = fixture(true, true, false);
+    try {
+      const h1 = lineage("s06:h1"); f.observeLineage(h1); f.witness.setFailureForTest("AFTER_COMMIT");
+      expect(() => f.host.advanceLineage({ key, operation_id: "s06:h1", custodian_session: f.custodian.session })).toThrow("WITNESS_RESPONSE_LOST");
+      f.witness.setFailureForTest("NONE");
+      expect(f.host.advanceLineage({ key, operation_id: "s06:h1", custodian_session: f.custodian.session })).toMatchObject({ replay: false, sequence: 1 });
+      const db = new Database(f.witnessPath, { readonly: true });
+      expect(db.query<{ n: number }, []>("SELECT COUNT(*) n FROM witness_records WHERE transition='ADVANCE_LINEAGE'").get()!.n).toBe(1); db.close();
+      expect(f.controller.state(key)).toMatchObject({ state: "ACTIVE", incident_count: 0, lineage_sequence: 1, current_lineage: h1 });
+    } finally { f.close(); }
+  });
+
+  test("S07 restart after witness commit completes the persisted transition", () => {
+    const f = fixture(true, true, false);
+    try {
+      const h1 = lineage("s07:h1"); f.observeLineage(h1); f.witness.setFailureForTest("AFTER_COMMIT");
+      expect(() => f.host.advanceLineage({ key, operation_id: "s07:h1", custodian_session: f.custodian.session })).toThrow("WITNESS_RESPONSE_LOST");
+      restartHost(f);
+      expect(f.host.advanceLineage({ key, operation_id: "s07:h1", custodian_session: f.custodian.session })).toMatchObject({ replay: false, sequence: 1 });
+      expect(f.controller.state(key)).toMatchObject({ state: "ACTIVE", incident_count: 0, lineage_sequence: 1, current_lineage: h1 });
+    } finally { f.close(); }
+  });
+
+  test("S08 a different operation cannot steal a witnessed unresolved advance", () => {
+    const f = fixture(true, true, false);
+    try {
+      const h1 = lineage("s08:h1"); f.observeLineage(h1); f.witness.setFailureForTest("AFTER_COMMIT");
+      expect(() => f.host.advanceLineage({ key, operation_id: "s08:a", custodian_session: f.custodian.session })).toThrow("WITNESS_RESPONSE_LOST");
+      f.witness.setFailureForTest("NONE");
+      expect(() => f.host.advanceLineage({ key, operation_id: "s08:b", custodian_session: f.custodian.session })).toThrow("CONTINUITY_OPERATION_PENDING");
+      expect(f.host.advanceLineage({ key, operation_id: "s08:a", custodian_session: f.custodian.session })).toMatchObject({ sequence: 1, replay: false });
+    } finally { f.close(); }
+  });
+
+  test("S09 rollback incident remains terminal across restart and later positive attempts", () => {
+    const f = fixture(true, true, false);
+    try {
+      const h1 = lineage("s09:h1"), h2 = lineage("s09:h2"), later = lineage("s09:later");
+      f.observeLineage(h1); f.host.advanceLineage({ key, operation_id: "s09:h1", custodian_session: f.custodian.session });
+      f.observeLineage(h2); f.host.advanceLineage({ key, operation_id: "s09:h2", custodian_session: f.custodian.session });
+      f.observeLineage(f.rootLineage); expect(() => f.host.advanceLineage({ key, operation_id: "s09:rollback", custodian_session: f.custodian.session })).toThrow("LINEAGE_ROLLBACK");
+      restartHost(f);
+      expect(() => f.host.advanceLineage({ key, operation_id: "s09:rollback", custodian_session: f.custodian.session })).toThrow();
+      f.observeLineage(later, h2, 3); expect(() => f.host.advanceLineage({ key, operation_id: "s09:later", custodian_session: f.custodian.session })).toThrow();
+      f.makeManifest("s09", later); expect(() => f.host.closeCustody({ key, manifest: f.manifest, release_receipt: release(f), operation_id: "s09:close" })).toThrow();
+      expect(() => issue(f, "s09:job")).toThrow();
+      expect(() => f.host.assignExpectedTarget({ key, operation_id: "s09:target", verifier_evidence: f.verifier.evidence, evaluation_job_id: "job:none" })).toThrow();
+      expect(() => f.host.publicationEligibility(key, "none")).toThrow();
+      expect(counts(f)).toEqual({ jobs: 0, targets: 0 });
+      expect(f.controller.state(key)).toMatchObject({ state: "INCIDENT", current_lineage: h2 });
+      expect(Number(f.controller.state(key).incident_count)).toBeGreaterThanOrEqual(1);
+    } finally { f.close(); }
+  });
+
+  test("S10 all-new opaque successor relies on trusted adapter evidence", () => {
+    const f = fixture(true, true, false);
+    try {
+      const opaque = lineage("s10:opaque-new"); f.observeLineage(opaque);
+      expect(f.host.advanceLineage({ key, operation_id: "s10:opaque", custodian_session: f.custodian.session })).toMatchObject({ sequence: 1, replay: false });
+      const text = readFileSync(join(import.meta.dir, "README.md"), "utf8");
+      expect(text).toContain("does not prove semantic descent");
+      expect(text).toContain("trusted adapter");
+    } finally { f.close(); }
+  });
 });

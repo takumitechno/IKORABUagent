@@ -355,13 +355,19 @@ export class CustodyController {
       if (existing.status === "APPLIED") return Object.freeze({ sequence: observation.sequence, lineage_sha256: lineageSha, replay: true });
     }
     this.assertNoOpenOperationExcept(keySha, operationId);
-    this.assertWitnessCurrent(row);
+    const revisitsRoot = lineageSha === hash(row.lineage_root_json), revisitsAccepted = !!this.db.query("SELECT 1 FROM lineage_advances WHERE key_sha256=? AND lineage_sha256=?").get(keySha, lineageSha);
+    if (revisitsRoot || revisitsAccepted) {
+      this.recordIncident(row, "LINEAGE_ROLLBACK", { current_sequence: row.lineage_sequence, current_lineage_sha256: row.current_lineage_sha256, revisited_lineage_sha256: lineageSha, revisits_root: revisitsRoot, observation }, operationId);
+      throw new CustodyControlError("LINEAGE_ROLLBACK");
+    }
     if (row.state !== "ACTIVE" || observation.sequence !== row.lineage_sequence + 1 || observation.predecessor_sha256 !== row.current_lineage_sha256 || lineageSha === row.current_lineage_sha256 || observation.lineage.store_pair_lineage_sha256 !== (JSON.parse(row.lineage_root_json) as LineageState).store_pair_lineage_sha256) {
       this.recordIncident(row, "LINEAGE_CONTINUITY_CONFLICT", { current_sequence: row.lineage_sequence, current_lineage_sha256: row.current_lineage_sha256, observation }, operationId);
       throw new CustodyControlError("LINEAGE_CONTINUITY_CONFLICT");
     }
+    if (!existing) this.assertWitnessCurrent(row);
     const op = existing ?? this.prepareOperation(operationId, keySha, "ADVANCE_LINEAGE", input, expected);
-    this.finishTransition(op, false);
+    if (existing?.status === "ACKNOWLEDGED") this.assertWitnessCurrent(row);
+    else this.finishTransition(op, false);
     const afterWitness = this.requireRun(keySha);
     if (afterWitness.state !== "ACTIVE" || afterWitness.lineage_sequence + 1 !== observation.sequence || afterWitness.current_lineage_sha256 !== observation.predecessor_sha256 || afterWitness.admitted_json !== row.admitted_json) {
       this.recordIncident(afterWitness, "LINEAGE_CONCURRENT_CONFLICT", { observation }, `incident:${operationId}:lineage-concurrent`);
