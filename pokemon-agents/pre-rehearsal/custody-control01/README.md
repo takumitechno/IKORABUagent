@@ -1,4 +1,4 @@
-# PRE-CUSTODY-CONTROL01-CORRECTIVE01
+# PRE-CUSTODY-CONTROL01-CORRECTIVE02
 
 Status: external `TEST_ONLY` pre-rehearsal adjunct. It does not change or extend WP3 acceptance.
 
@@ -15,9 +15,9 @@ The canonical run binding pins K, environment instance, spec, W/window, GO artif
 
 A close is canonical only when its authentic V2 release receipt belongs to the admitted custodian session and its signed manifest and GO reference match the pinned lineage. An authentic non-admitted custodian is not a candidate-selection input: it creates durable incident evidence and cannot issue a controller-authorized job or publish.
 
-Job and target effects are reserved before invocation with operation kind, K and exact expected authority incarnation/revision and effect identity. Only the host invokes the pinned authority. Lost-response recovery reads the exact original effect by those values; callers cannot submit substitute jobs, targets or trust roots. A different operation ID cannot abandon an unresolved effect.
+Job and target operations reserve operation kind, K and expected authority incarnation/revision before invocation. After the pinned authority creates the signed effect, and before the host returns it to its caller, the controller durably pins the exact job/assignment ID, authenticated content digest and signed-envelope digest. Lost-response recovery ignores process-local bookkeeping and reads only an authority effect that matches that persisted exact identity. Callers cannot submit substitute jobs, targets or trust roots, and a different operation ID cannot abandon an unresolved effect.
 
-Authority snapshots are checked for incarnation changes, revision rollback, disappearance, unguarded effects and reuse of an observed revision for different authenticated content. An incident is terminal for positive controller actions, revokes current controller eligibility, and cannot be overwritten by delayed job/target completion. Historical accepted evidence is not mutated.
+Authority snapshots are checked for incarnation changes, revision rollback, disappearance of an applied or pending exact effect, unguarded effects and reuse of a pending or applied revision for different authenticated content. Missing exact identity, disappearance and same-revision replacement create durable incident evidence. An incident is terminal for positive controller actions, revokes current controller eligibility, and cannot be overwritten by delayed job/target completion. Historical accepted evidence is not mutated.
 
 ## Launch, fencing and safety limits
 
@@ -29,8 +29,11 @@ Safety is a closed command union: `STATUS_READ`, `RECONCILE_READ`, and `REVOKE`.
 
 - N01-N18 exercise the corrected normative suite. N02 uses two overlapping OS processes against the same SQLite controller/witness stores. N09 changes actual authenticated manifest W/store/head material. N10 changes the actual accepted authority continuity row.
 - C01-C25 cover every corrective hostile case, including authentic non-owner receipts, exact reconciliation, raw-authority detection, authority revision reuse, incident completion races, operation-domain separation and CRLF classification.
+- R01-R07 cover the corrective02 defect symmetrically: pending job and target rollback/reissue, exact recovery after host restart without volatile maps, disappearance without replacement, delayed completion/retry after durable incident, restart in the pin-to-`UNRESOLVED` crash window, and same-revision alternate coexistence.
 - P1-P7 reproduce the independent audit attacks at the external guard boundary.
 - Adjunct integrity identifies canonical LF/Git-blob bytes separately from checkout working-tree bytes. A CRLF checkout may have a different raw working-tree SHA-256 without changing the canonical committed blob identity.
+
+The earlier C17 and P4 oracles did not cover this case. C17 first applied the original job, so its authenticated digest was already present in `authority_revision_effects`; P4 rolled continuity below an already applied controller high-water. Neither left an `UNRESOLVED` lost-response operation, removed its still-pending original effect, and reissued different authentic content at the same revision and logical inputs. R01/R02 exercise that missing transition directly.
 
 The witness is a **TEST_ONLY witness protocol mechanism**. In this reference fixture the witness and controller remain in the **same rollback domain**. Actual independent durability, principal separation and rollback-domain protection are not verified and must not be inferred from these tests.
 

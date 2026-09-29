@@ -195,6 +195,7 @@ const CONTROLLER_SQL = `
 CREATE TABLE controller_meta(singleton INTEGER PRIMARY KEY CHECK(singleton=1),schema TEXT NOT NULL,controller_id TEXT NOT NULL UNIQUE,test_only INTEGER NOT NULL CHECK(test_only=1),authority_binding_sha256 TEXT NOT NULL,authority_anchor_sha256 TEXT NOT NULL) STRICT;
 CREATE TABLE governed_runs(key_sha256 TEXT PRIMARY KEY,key_json TEXT NOT NULL CHECK(json_valid(key_json)),binding_json TEXT NOT NULL CHECK(json_valid(binding_json)),state TEXT NOT NULL CHECK(state IN('RESERVING','RESERVED','ADMITTING','ACTIVE','FENCING','RECOVERY_REQUIRED','CLOSED','INCIDENT','ENDED')),revision INTEGER NOT NULL CHECK(revision>=0),witness_digest TEXT NOT NULL,admitted_json TEXT CHECK(admitted_json IS NULL OR json_valid(admitted_json)),lease_expires_ms INTEGER,canonical_manifest_sha256 TEXT,canonical_manifest_json TEXT CHECK(canonical_manifest_json IS NULL OR json_valid(canonical_manifest_json)),canonical_release_json TEXT CHECK(canonical_release_json IS NULL OR json_valid(canonical_release_json)),authority_incarnation TEXT NOT NULL,authority_high_water INTEGER NOT NULL CHECK(authority_high_water>=1),created_at TEXT NOT NULL,updated_at TEXT NOT NULL) STRICT;
 CREATE TABLE controller_operations(operation_id TEXT PRIMARY KEY,key_sha256 TEXT NOT NULL REFERENCES governed_runs(key_sha256),kind TEXT NOT NULL,input_sha256 TEXT NOT NULL,input_json TEXT NOT NULL CHECK(json_valid(input_json)),expected_json TEXT NOT NULL CHECK(json_valid(expected_json)),sequence INTEGER NOT NULL,previous_digest TEXT NOT NULL,witness_record_json TEXT NOT NULL CHECK(json_valid(witness_record_json)),status TEXT NOT NULL CHECK(status IN('PENDING','ACKNOWLEDGED','UNRESOLVED','APPLIED')),result_json TEXT CHECK(result_json IS NULL OR json_valid(result_json)),created_at TEXT NOT NULL,UNIQUE(key_sha256,sequence)) STRICT;
+CREATE TABLE pending_effect_identities(operation_id TEXT PRIMARY KEY REFERENCES controller_operations(operation_id),key_sha256 TEXT NOT NULL REFERENCES governed_runs(key_sha256),kind TEXT NOT NULL CHECK(kind IN('JOB','TARGET')),authority_incarnation TEXT NOT NULL,authority_revision INTEGER NOT NULL CHECK(authority_revision>0),effect_id TEXT NOT NULL,effect_sha256 TEXT NOT NULL,envelope_sha256 TEXT NOT NULL,pinned_at TEXT NOT NULL,UNIQUE(authority_incarnation,authority_revision)) STRICT;
 CREATE TABLE custody_incidents(incident_id TEXT PRIMARY KEY,key_sha256 TEXT NOT NULL REFERENCES governed_runs(key_sha256),kind TEXT NOT NULL,evidence_sha256 TEXT NOT NULL,raw_json TEXT NOT NULL CHECK(json_valid(raw_json)),created_at TEXT NOT NULL,UNIQUE(key_sha256,kind,evidence_sha256)) STRICT;
 CREATE TABLE authorized_jobs(evaluation_job_id TEXT PRIMARY KEY,key_sha256 TEXT NOT NULL REFERENCES governed_runs(key_sha256),operation_id TEXT NOT NULL UNIQUE REFERENCES controller_operations(operation_id),authority_incarnation TEXT NOT NULL,authority_revision INTEGER NOT NULL,manifest_sha256 TEXT NOT NULL,descriptor_sha256 TEXT NOT NULL,descriptor_envelope TEXT NOT NULL,result_json TEXT NOT NULL CHECK(json_valid(result_json)),current_eligible INTEGER NOT NULL CHECK(current_eligible IN(0,1)),UNIQUE(authority_incarnation,authority_revision)) STRICT;
 CREATE TABLE authorized_targets(target_sha256 TEXT PRIMARY KEY,key_sha256 TEXT NOT NULL REFERENCES governed_runs(key_sha256),operation_id TEXT NOT NULL UNIQUE REFERENCES controller_operations(operation_id),authority_incarnation TEXT NOT NULL,authority_revision INTEGER NOT NULL,evaluation_job_id TEXT NOT NULL,target_envelope TEXT NOT NULL,state TEXT NOT NULL CHECK(state IN('CURRENT','REVOKED')),UNIQUE(authority_incarnation,authority_revision)) STRICT;
@@ -219,6 +220,7 @@ type RunRow = {
   canonical_manifest_json: string | null; canonical_release_json: string | null; authority_incarnation: string; authority_high_water: number;
 };
 export type OperationRow = { operation_id: string; key_sha256: string; kind: string; input_json: string; expected_json: string; sequence: number; previous_digest: string; witness_record_json: string; status: string; result_json: string | null };
+export type PendingEffectIdentity = Readonly<{ operation_id: string; key_sha256: string; kind: "JOB" | "TARGET"; authority_incarnation: string; authority_revision: number; effect_id: string; effect_sha256: string; envelope_sha256: string }>;
 export interface AuthoritySnapshot { readonly continuity: AuthorityContinuity; readonly jobs: readonly AuthorityEvaluationJob[]; readonly targets: readonly string[] }
 
 export class CustodyController {
@@ -360,9 +362,14 @@ export class CustodyController {
     this.finishTransition(op, false);
   }
 
+  pinJobEffectIdentity(key: CanonicalRunKey, operationId: string, jobInput: AuthorityEvaluationJob): void {
+    const validated = this.validatedJobEffect(key, operationId, jobInput);
+    this.pinPendingEffect(validated.row, validated.op, validated.identity);
+  }
+
   completeJobEffect(key: CanonicalRunKey, operationId: string, jobInput: AuthorityEvaluationJob): AuthorityEvaluationJob {
-    const keySha = canonicalKeySha256(key), op = this.requireOperationFor(operationId, "ISSUE_JOB", keySha), expected = JSON.parse(op.expected_json) as Record<string, unknown>, row = this.requireRun(keySha), verified = verifyEvaluationJobEnvelope(jobInput.descriptor_envelope, this.authorityBinding);
-    if (verified.descriptor_sha256 !== jobInput.descriptor_sha256 || json(verified.descriptor) !== json(jobInput.descriptor) || verified.descriptor.authority_incarnation !== expected.authority_incarnation || verified.descriptor.authority_revision !== expected.authority_revision || verified.descriptor.workflow_instruction_id !== expected.workflow_instruction_id || verified.descriptor.release_sha256 !== expected.release_receipt_sha256 || verified.descriptor.manifest_sha256 !== row.canonical_manifest_sha256 || canonicalKeySha256(scopeKey(verified.descriptor.scope)) !== keySha) throw new CustodyControlError("EVALUATION_JOB_MISMATCH");
+    const { keySha, op, expected, row, verified, identity } = this.validatedJobEffect(key, operationId, jobInput);
+    this.requirePendingEffect(row, op, identity);
     let eligible = false;
     this.db.transaction(() => {
       const current = this.requireRun(keySha), prior = this.db.query<{ effect_sha256: string; effect_kind: string }, [string, number]>("SELECT effect_sha256,effect_kind FROM authority_revision_effects WHERE authority_incarnation=? AND authority_revision=?").get(String(expected.authority_incarnation), Number(expected.authority_revision));
@@ -386,9 +393,14 @@ export class CustodyController {
     this.finishTransition(op, false);
   }
 
+  pinTargetEffectIdentity(key: CanonicalRunKey, operationId: string, envelope: string): void {
+    const validated = this.validatedTargetEffect(key, operationId, envelope);
+    this.pinPendingEffect(validated.row, validated.op, validated.identity);
+  }
+
   completeTargetEffect(key: CanonicalRunKey, operationId: string, envelope: string): string {
-    const keySha = canonicalKeySha256(key), op = this.requireOperationFor(operationId, "ASSIGN_TARGET", keySha), expected = JSON.parse(op.expected_json) as Record<string, unknown>, target = verifyExpectedEvaluationTargetEnvelope(envelope, this.authorityBinding), targetSha = hash(envelope);
-    if (target.authority_incarnation !== expected.authority_incarnation || target.target_revision !== expected.authority_revision || target.evaluation_job_id !== expected.evaluation_job_id || target.verifier_session_id !== expected.verifier_session_id || canonicalKeySha256(scopeKey(target.scope as RoleRunScope)) !== keySha) throw new CustodyControlError("TARGET_MISMATCH");
+    const { keySha, op, expected, row, target, targetSha, identity } = this.validatedTargetEffect(key, operationId, envelope);
+    this.requirePendingEffect(row, op, identity);
     let eligible = false;
     this.db.transaction(() => {
       const current = this.requireRun(keySha), prior = this.db.query<{ effect_sha256: string; effect_kind: string }, [string, number]>("SELECT effect_sha256,effect_kind FROM authority_revision_effects WHERE authority_incarnation=? AND authority_revision=?").get(String(expected.authority_incarnation), Number(expected.authority_revision));
@@ -417,9 +429,26 @@ export class CustodyController {
     if (op.status === "ACKNOWLEDGED") this.markEffectUnresolved(key, operationId, kind);
   }
   resumeExactReconciliation(key: CanonicalRunKey, operationId: string, kind: "ISSUE_JOB" | "ASSIGN_TARGET"): OperationRow {
-    const op = this.requireOperationFor(operationId, kind, canonicalKeySha256(key));
+    const keySha = canonicalKeySha256(key), op = this.requireOperationFor(operationId, kind, keySha);
+    if (op.status === "ACKNOWLEDGED") {
+      if (!this.pendingEffect(operationId)) this.rejectPendingEffect(key, operationId, kind, "PENDING_EFFECT_IDENTITY_MISSING", { operation_id: operationId, operation_kind: kind, phase: "ACKNOWLEDGED_RESTART" });
+      this.db.query("UPDATE controller_operations SET status='UNRESOLVED' WHERE operation_id=? AND status='ACKNOWLEDGED'").run(operationId);
+      return this.requireOperationFor(operationId, kind, keySha);
+    }
     if (op.status !== "UNRESOLVED") throw new CustodyControlError("OPERATION_NOT_RECONCILABLE");
     return op;
+  }
+  pendingEffectIdentity(key: CanonicalRunKey, operationId: string, operationKind: "ISSUE_JOB" | "ASSIGN_TARGET"): PendingEffectIdentity {
+    const keySha = canonicalKeySha256(key), op = this.requireOperationFor(operationId, operationKind, keySha), identity = this.pendingEffect(operationId);
+    if (op.status !== "UNRESOLVED") throw new CustodyControlError("OPERATION_NOT_RECONCILABLE");
+    if (!identity) this.rejectPendingEffect(key, operationId, operationKind, "PENDING_EFFECT_IDENTITY_MISSING", { operation_id: operationId, operation_kind: operationKind });
+    return Object.freeze(identity!);
+  }
+  rejectPendingEffect(key: CanonicalRunKey, operationId: string, operationKind: "ISSUE_JOB" | "ASSIGN_TARGET", reason: "PENDING_EFFECT_IDENTITY_MISSING" | "AUTHORITY_EFFECT_DISAPPEARED" | "AUTHORITY_REVISION_REUSED", evidence: unknown): never {
+    const keySha = canonicalKeySha256(key), op = this.requireOperationFor(operationId, operationKind, keySha), row = this.requireRun(keySha);
+    if (!['ACKNOWLEDGED', 'UNRESOLVED'].includes(op.status)) throw new CustodyControlError("OPERATION_NOT_RECONCILABLE");
+    this.recordIncident(row, reason, { operation_id: operationId, operation_kind: operationKind, evidence }, `incident:${operationId}:${reason}`);
+    throw new CustodyControlError(reason);
   }
 
   appliedEffect<T>(key: CanonicalRunKey, operationId: string, kind: "ISSUE_JOB" | "ASSIGN_TARGET"): T | null {
@@ -446,18 +475,21 @@ export class CustodyController {
   verifyAuthoritySnapshot(key: CanonicalRunKey, snapshot: AuthoritySnapshot): void {
     const keySha = canonicalKeySha256(key), row = this.requireRun(keySha); validateAuthorityContinuity(snapshot.continuity);
     let failure: string | null = snapshot.continuity.incarnation !== row.authority_incarnation ? "AUTHORITY_INCARNATION_MISMATCH" : snapshot.continuity.revision < row.authority_high_water ? "AUTHORITY_ROLLBACK" : null;
+    const pending = this.db.query<PendingEffectIdentity, [string]>("SELECT p.operation_id,p.key_sha256,p.kind,p.authority_incarnation,p.authority_revision,p.effect_id,p.effect_sha256,p.envelope_sha256 FROM pending_effect_identities p JOIN controller_operations o ON o.operation_id=p.operation_id WHERE p.key_sha256=? AND o.status IN('ACKNOWLEDGED','UNRESOLVED')").all(keySha);
     const knownJobs = this.db.query<{ evaluation_job_id: string; descriptor_sha256: string }, [string]>("SELECT evaluation_job_id,descriptor_sha256 FROM authorized_jobs WHERE key_sha256=?").all(keySha), actualJobs = new Map(snapshot.jobs.map((job) => [job.descriptor.evaluation_job_id, job.descriptor_sha256]));
     for (const known of knownJobs) if (actualJobs.get(known.evaluation_job_id) !== known.descriptor_sha256) failure ??= "AUTHORITY_EFFECT_DISAPPEARED";
+    for (const identity of pending.filter((item) => item.kind === "JOB")) if (!snapshot.jobs.some((job) => this.matchesPendingJob(identity, job))) failure ??= snapshot.jobs.some((job) => job.descriptor.authority_incarnation === identity.authority_incarnation && job.descriptor.authority_revision === identity.authority_revision) ? "AUTHORITY_REVISION_REUSED" : "AUTHORITY_EFFECT_DISAPPEARED";
     for (const job of snapshot.jobs) if (!knownJobs.some((known) => known.evaluation_job_id === job.descriptor.evaluation_job_id) && !this.pendingJobMatches(keySha, job)) {
-      const prior = this.db.query<{ effect_sha256: string }, [string, number]>("SELECT effect_sha256 FROM authority_revision_effects WHERE authority_incarnation=? AND authority_revision=?").get(job.descriptor.authority_incarnation, job.descriptor.authority_revision);
-      if (prior && prior.effect_sha256 !== job.descriptor_sha256) failure = "AUTHORITY_REVISION_REUSED";
+      const reserved = pending.find((identity) => identity.kind === "JOB" && identity.authority_incarnation === job.descriptor.authority_incarnation && identity.authority_revision === job.descriptor.authority_revision), prior = this.db.query<{ effect_sha256: string }, [string, number]>("SELECT effect_sha256 FROM authority_revision_effects WHERE authority_incarnation=? AND authority_revision=?").get(job.descriptor.authority_incarnation, job.descriptor.authority_revision);
+      if ((reserved && !this.matchesPendingJob(reserved, job)) || (prior && prior.effect_sha256 !== job.descriptor_sha256)) failure = "AUTHORITY_REVISION_REUSED";
       else failure ??= "UNGUARDED_AUTHORITY_EFFECT";
     }
     const knownTargets = this.db.query<{ target_sha256: string }, [string]>("SELECT target_sha256 FROM authorized_targets WHERE key_sha256=?").all(keySha), actualTargets = new Map(snapshot.targets.map((envelope) => [hash(envelope), envelope]));
     for (const known of knownTargets) if (!actualTargets.has(known.target_sha256)) failure ??= "AUTHORITY_EFFECT_DISAPPEARED";
+    for (const identity of pending.filter((item) => item.kind === "TARGET")) if (!snapshot.targets.some((envelope) => this.matchesPendingTarget(identity, envelope))) failure ??= snapshot.targets.some((envelope) => { const target = verifyExpectedEvaluationTargetEnvelope(envelope, this.authorityBinding); return target.authority_incarnation === identity.authority_incarnation && target.target_revision === identity.authority_revision; }) ? "AUTHORITY_REVISION_REUSED" : "AUTHORITY_EFFECT_DISAPPEARED";
     for (const [digest, envelope] of actualTargets) if (!knownTargets.some((known) => known.target_sha256 === digest) && !this.pendingTargetMatches(keySha, envelope)) {
-      const target = verifyExpectedEvaluationTargetEnvelope(envelope, this.authorityBinding), prior = this.db.query<{ effect_sha256: string }, [string, number]>("SELECT effect_sha256 FROM authority_revision_effects WHERE authority_incarnation=? AND authority_revision=?").get(target.authority_incarnation, target.target_revision);
-      if (prior && prior.effect_sha256 !== digest) failure = "AUTHORITY_REVISION_REUSED";
+      const target = verifyExpectedEvaluationTargetEnvelope(envelope, this.authorityBinding), reserved = pending.find((identity) => identity.kind === "TARGET" && identity.authority_incarnation === target.authority_incarnation && identity.authority_revision === target.target_revision), prior = this.db.query<{ effect_sha256: string }, [string, number]>("SELECT effect_sha256 FROM authority_revision_effects WHERE authority_incarnation=? AND authority_revision=?").get(target.authority_incarnation, target.target_revision);
+      if ((reserved && !this.matchesPendingTarget(reserved, envelope)) || (prior && prior.effect_sha256 !== digest)) failure = "AUTHORITY_REVISION_REUSED";
       else failure ??= "UNGUARDED_AUTHORITY_EFFECT";
     }
     if (failure) {
@@ -529,19 +561,62 @@ export class CustodyController {
     }
   }
 
+  private validatedJobEffect(key: CanonicalRunKey, operationId: string, jobInput: AuthorityEvaluationJob) {
+    const keySha = canonicalKeySha256(key), op = this.requireOperationFor(operationId, "ISSUE_JOB", keySha), expected = JSON.parse(op.expected_json) as Record<string, unknown>, row = this.requireRun(keySha), verified = verifyEvaluationJobEnvelope(jobInput.descriptor_envelope, this.authorityBinding);
+    if (verified.descriptor_sha256 !== jobInput.descriptor_sha256 || json(verified.descriptor) !== json(jobInput.descriptor) || verified.descriptor.authority_incarnation !== expected.authority_incarnation || verified.descriptor.authority_revision !== expected.authority_revision || verified.descriptor.workflow_instruction_id !== expected.workflow_instruction_id || verified.descriptor.release_sha256 !== expected.release_receipt_sha256 || verified.descriptor.manifest_sha256 !== row.canonical_manifest_sha256 || canonicalKeySha256(scopeKey(verified.descriptor.scope)) !== keySha) {
+      this.recordIncident(row, "PENDING_EFFECT_MISMATCH", { operation_id: operationId, effect_kind: "JOB", job: jobInput }, `incident:${operationId}:job-mismatch`);
+      throw new CustodyControlError("EVALUATION_JOB_MISMATCH");
+    }
+    const identity: PendingEffectIdentity = Object.freeze({ operation_id: operationId, key_sha256: keySha, kind: "JOB", authority_incarnation: verified.descriptor.authority_incarnation, authority_revision: verified.descriptor.authority_revision, effect_id: verified.descriptor.evaluation_job_id, effect_sha256: verified.descriptor_sha256, envelope_sha256: hash(verified.descriptor_envelope) });
+    return { keySha, op, expected, row, verified, identity };
+  }
+  private validatedTargetEffect(key: CanonicalRunKey, operationId: string, envelope: string) {
+    const keySha = canonicalKeySha256(key), op = this.requireOperationFor(operationId, "ASSIGN_TARGET", keySha), expected = JSON.parse(op.expected_json) as Record<string, unknown>, row = this.requireRun(keySha), target = verifyExpectedEvaluationTargetEnvelope(envelope, this.authorityBinding), targetSha = hash(envelope);
+    if (target.authority_incarnation !== expected.authority_incarnation || target.target_revision !== expected.authority_revision || target.evaluation_job_id !== expected.evaluation_job_id || target.verifier_session_id !== expected.verifier_session_id || canonicalKeySha256(scopeKey(target.scope as RoleRunScope)) !== keySha) {
+      this.recordIncident(row, "PENDING_EFFECT_MISMATCH", { operation_id: operationId, effect_kind: "TARGET", envelope_sha256: targetSha }, `incident:${operationId}:target-mismatch`);
+      throw new CustodyControlError("TARGET_MISMATCH");
+    }
+    const identity: PendingEffectIdentity = Object.freeze({ operation_id: operationId, key_sha256: keySha, kind: "TARGET", authority_incarnation: String(target.authority_incarnation), authority_revision: Number(target.target_revision), effect_id: String(target.assignment_id), effect_sha256: targetSha, envelope_sha256: targetSha });
+    return { keySha, op, expected, row, target, targetSha, identity };
+  }
+  private pinPendingEffect(row: RunRow, op: OperationRow, identity: PendingEffectIdentity): void {
+    if (op.status !== "ACKNOWLEDGED") throw new CustodyControlError("OPERATION_NOT_RECONCILABLE");
+    const current = this.pendingEffect(op.operation_id);
+    if (current) {
+      if (!samePendingEffect(current, identity)) {
+        this.recordIncident(row, "PENDING_EFFECT_IDENTITY_CONFLICT", { reserved: current, observed: identity }, `incident:${op.operation_id}:identity-conflict`);
+        throw new CustodyControlError("PENDING_EFFECT_IDENTITY_CONFLICT");
+      }
+      return;
+    }
+    this.db.query("INSERT INTO pending_effect_identities VALUES(?,?,?,?,?,?,?,?,?)").run(identity.operation_id, identity.key_sha256, identity.kind, identity.authority_incarnation, identity.authority_revision, identity.effect_id, identity.effect_sha256, identity.envelope_sha256, new Date().toISOString());
+  }
+  private requirePendingEffect(row: RunRow, op: OperationRow, observed: PendingEffectIdentity): PendingEffectIdentity {
+    const reserved = this.pendingEffect(op.operation_id);
+    if (!reserved) {
+      this.recordIncident(row, "PENDING_EFFECT_IDENTITY_MISSING", { operation_id: op.operation_id, observed }, `incident:${op.operation_id}:identity-missing`);
+      throw new CustodyControlError("PENDING_EFFECT_IDENTITY_MISSING");
+    }
+    if (!samePendingEffect(reserved, observed)) {
+      this.recordIncident(row, "AUTHORITY_REVISION_REUSED", { reserved, observed }, `incident:${op.operation_id}:revision-reused`);
+      throw new CustodyControlError("AUTHORITY_REVISION_REUSED");
+    }
+    return reserved;
+  }
+  private pendingEffect(operationId: string): PendingEffectIdentity | null { return this.db.query<PendingEffectIdentity, [string]>("SELECT operation_id,key_sha256,kind,authority_incarnation,authority_revision,effect_id,effect_sha256,envelope_sha256 FROM pending_effect_identities WHERE operation_id=?").get(operationId) ?? null; }
+  private matchesPendingJob(identity: PendingEffectIdentity, job: AuthorityEvaluationJob): boolean { return identity.kind === "JOB" && identity.effect_id === job.descriptor.evaluation_job_id && identity.effect_sha256 === job.descriptor_sha256 && identity.envelope_sha256 === hash(job.descriptor_envelope) && identity.authority_incarnation === job.descriptor.authority_incarnation && identity.authority_revision === job.descriptor.authority_revision; }
+  private matchesPendingTarget(identity: PendingEffectIdentity, envelope: string): boolean { const target = verifyExpectedEvaluationTargetEnvelope(envelope, this.authorityBinding); return identity.kind === "TARGET" && identity.effect_id === target.assignment_id && identity.effect_sha256 === hash(envelope) && identity.envelope_sha256 === hash(envelope) && identity.authority_incarnation === target.authority_incarnation && identity.authority_revision === target.target_revision; }
   private pendingJobMatches(keySha: string, job: AuthorityEvaluationJob): boolean {
-    const op = this.db.query<OperationRow, [string]>("SELECT * FROM controller_operations WHERE key_sha256=? AND kind='ISSUE_JOB' AND status IN('ACKNOWLEDGED','UNRESOLVED')").get(keySha);
-    if (!op) return false;
-    const expected = JSON.parse(op.expected_json) as Record<string, unknown>;
-    return job.descriptor.authority_revision === expected.authority_revision && job.descriptor.authority_incarnation === expected.authority_incarnation && job.descriptor.workflow_instruction_id === expected.workflow_instruction_id;
+    const identity = this.db.query<PendingEffectIdentity, [string]>("SELECT p.operation_id,p.key_sha256,p.kind,p.authority_incarnation,p.authority_revision,p.effect_id,p.effect_sha256,p.envelope_sha256 FROM pending_effect_identities p JOIN controller_operations o ON o.operation_id=p.operation_id WHERE p.key_sha256=? AND p.kind='JOB' AND o.status IN('ACKNOWLEDGED','UNRESOLVED')").get(keySha);
+    return !!identity && this.matchesPendingJob(identity, job);
   }
   private pendingTargetMatches(keySha: string, envelope: string): boolean {
-    const op = this.db.query<OperationRow, [string]>("SELECT * FROM controller_operations WHERE key_sha256=? AND kind='ASSIGN_TARGET' AND status IN('ACKNOWLEDGED','UNRESOLVED')").get(keySha);
-    if (!op) return false;
-    const expected = JSON.parse(op.expected_json) as Record<string, unknown>, target = verifyExpectedEvaluationTargetEnvelope(envelope, this.authorityBinding);
-    return target.authority_incarnation === expected.authority_incarnation && target.target_revision === expected.authority_revision && target.evaluation_job_id === expected.evaluation_job_id && target.verifier_session_id === expected.verifier_session_id;
+    const identity = this.db.query<PendingEffectIdentity, [string]>("SELECT p.operation_id,p.key_sha256,p.kind,p.authority_incarnation,p.authority_revision,p.effect_id,p.effect_sha256,p.envelope_sha256 FROM pending_effect_identities p JOIN controller_operations o ON o.operation_id=p.operation_id WHERE p.key_sha256=? AND p.kind='TARGET' AND o.status IN('ACKNOWLEDGED','UNRESOLVED')").get(keySha);
+    return !!identity && this.matchesPendingTarget(identity, envelope);
   }
 }
+
+function samePendingEffect(left: PendingEffectIdentity, right: PendingEffectIdentity): boolean { return left.operation_id === right.operation_id && left.key_sha256 === right.key_sha256 && left.kind === right.kind && left.authority_incarnation === right.authority_incarnation && left.authority_revision === right.authority_revision && left.effect_id === right.effect_id && left.effect_sha256 === right.effect_sha256 && left.envelope_sha256 === right.envelope_sha256; }
 
 export type LaunchedRole = Readonly<{ session: LocalRoleSession; evidence: Readonly<Record<string, unknown>> }>;
 export type SafetyCommand = Readonly<{ kind: "STATUS_READ" }> | Readonly<{ kind: "RECONCILE_READ"; operation_id: string }> | Readonly<{ kind: "REVOKE"; session_id: string }>;
@@ -553,8 +628,6 @@ export class TestOnlyPreCustodyHost {
   #authorityPath: string;
   #fenceAdapter: TrustedFenceAdapter;
   #now: () => number;
-  #lostJobs = new Map<string, AuthorityEvaluationJob>();
-  #lostTargets = new Map<string, string>();
 
   constructor(input: { authority_path: string; authority_binding: RoleChannelBinding; authority_private_key: string | KeyObject; controller: CustodyController; fence_adapter: TrustedFenceAdapter; now?: () => number }) {
     if (input.authority_binding.trust_domain !== "TEST_ONLY") throw new CustodyControlError("TEST_ONLY_HOST_REQUIRED");
@@ -598,7 +671,8 @@ export class TestOnlyPreCustodyHost {
     this.#controller.beginJobEffect(input.key, input.operation_id, expected);
     try {
       const job = this.#authority.issueEvaluationJob({ custody_release_receipt: canonical.release, manifest: canonical.manifest, evaluator, writer, role_evidence_sha256: input.role_evidence_sha256, workflow_instruction_id: input.workflow_instruction_id, workflow_instruction_sha256: input.workflow_instruction_sha256, commit_lifetime_ms: input.commit_lifetime_ms });
-      if (input.lose_response_for_test) { this.#lostJobs.set(input.operation_id, job); this.#controller.markEffectUnresolved(input.key, input.operation_id, "ISSUE_JOB"); throw new CustodyControlError("TEST_ONLY_RESPONSE_LOST"); }
+      this.#controller.pinJobEffectIdentity(input.key, input.operation_id, job);
+      if (input.lose_response_for_test) { this.#controller.markEffectUnresolved(input.key, input.operation_id, "ISSUE_JOB"); throw new CustodyControlError("TEST_ONLY_RESPONSE_LOST"); }
       return this.#controller.completeJobEffect(input.key, input.operation_id, job);
     } catch (error) {
       if (!(error instanceof CustodyControlError && error.code === "TEST_ONLY_RESPONSE_LOST")) this.#controller.markEffectUnresolvedIfAcknowledged(input.key, input.operation_id, "ISSUE_JOB");
@@ -608,9 +682,9 @@ export class TestOnlyPreCustodyHost {
 
   reconcileEvaluationJob(key: CanonicalRunKey, operationId: string): AuthorityEvaluationJob {
     this.#audit(key);
-    const op = this.#controller.resumeExactReconciliation(key, operationId, "ISSUE_JOB"), expected = JSON.parse(op.expected_json) as Record<string, unknown>, job = this.#lostJobs.get(operationId) ?? this.#readJobByRevision(key, String(expected.authority_incarnation), Number(expected.authority_revision), String(expected.workflow_instruction_id)), result = this.#controller.completeJobEffect(key, operationId, job);
-    this.#lostJobs.delete(operationId);
-    return result;
+    this.#controller.resumeExactReconciliation(key, operationId, "ISSUE_JOB");
+    const identity = this.#controller.pendingEffectIdentity(key, operationId, "ISSUE_JOB"), job = this.#readJobByIdentity(key, operationId, identity);
+    return this.#controller.completeJobEffect(key, operationId, job);
   }
 
   assignExpectedTarget(input: { key: CanonicalRunKey; operation_id: string; verifier_evidence: Readonly<Record<string, unknown>>; evaluation_job_id: string; lose_response_for_test?: boolean }): string {
@@ -621,7 +695,8 @@ export class TestOnlyPreCustodyHost {
     this.#controller.beginTargetEffect(input.key, input.operation_id, expected);
     try {
       const envelope = this.#authority.assignExpectedEvaluationTarget({ verifier, evaluation_job_id: input.evaluation_job_id, purpose: "VERIFY_EXPECTED" });
-      if (input.lose_response_for_test) { this.#lostTargets.set(input.operation_id, envelope); this.#controller.markEffectUnresolved(input.key, input.operation_id, "ASSIGN_TARGET"); throw new CustodyControlError("TEST_ONLY_RESPONSE_LOST"); }
+      this.#controller.pinTargetEffectIdentity(input.key, input.operation_id, envelope);
+      if (input.lose_response_for_test) { this.#controller.markEffectUnresolved(input.key, input.operation_id, "ASSIGN_TARGET"); throw new CustodyControlError("TEST_ONLY_RESPONSE_LOST"); }
       return this.#controller.completeTargetEffect(input.key, input.operation_id, envelope);
     } catch (error) {
       if (!(error instanceof CustodyControlError && error.code === "TEST_ONLY_RESPONSE_LOST")) this.#controller.markEffectUnresolvedIfAcknowledged(input.key, input.operation_id, "ASSIGN_TARGET");
@@ -631,9 +706,9 @@ export class TestOnlyPreCustodyHost {
 
   reconcileExpectedTarget(key: CanonicalRunKey, operationId: string): string {
     this.#audit(key);
-    const op = this.#controller.resumeExactReconciliation(key, operationId, "ASSIGN_TARGET"), expected = JSON.parse(op.expected_json) as Record<string, unknown>, envelope = this.#lostTargets.get(operationId) ?? this.#readTargetByRevision(key, String(expected.authority_incarnation), Number(expected.authority_revision), String(expected.evaluation_job_id), String(expected.verifier_session_id)), result = this.#controller.completeTargetEffect(key, operationId, envelope);
-    this.#lostTargets.delete(operationId);
-    return result;
+    this.#controller.resumeExactReconciliation(key, operationId, "ASSIGN_TARGET");
+    const identity = this.#controller.pendingEffectIdentity(key, operationId, "ASSIGN_TARGET"), envelope = this.#readTargetByIdentity(key, operationId, identity);
+    return this.#controller.completeTargetEffect(key, operationId, envelope);
   }
 
   publicationEligibility(key: CanonicalRunKey, targetEnvelope: string) { this.#audit(key); return this.#controller.publicationEligibility(key, targetEnvelope); }
@@ -671,14 +746,14 @@ export class TestOnlyPreCustodyHost {
     try { const row = db.query<AuthorityContinuity, []>("SELECT incarnation,revision FROM role_authority_continuity WHERE singleton=1").get(); if (!row) throw new CustodyControlError("AUTHORITY_CONTINUITY_MISSING"); return Object.freeze(row); }
     finally { db.close(); }
   }
-  #readJobByRevision(key: CanonicalRunKey, incarnation: string, revision: number, instruction: string): AuthorityEvaluationJob {
-    const matches = this.#snapshot(key).jobs.filter((job) => job.descriptor.authority_incarnation === incarnation && job.descriptor.authority_revision === revision && job.descriptor.workflow_instruction_id === instruction);
-    if (matches.length !== 1) throw new CustodyControlError("EXACT_AUTHORITY_EFFECT_NOT_FOUND");
+  #readJobByIdentity(key: CanonicalRunKey, operationId: string, identity: PendingEffectIdentity): AuthorityEvaluationJob {
+    const snapshot = this.#snapshot(key), matches = snapshot.jobs.filter((job) => identity.kind === "JOB" && job.descriptor.authority_incarnation === identity.authority_incarnation && job.descriptor.authority_revision === identity.authority_revision && job.descriptor.evaluation_job_id === identity.effect_id && job.descriptor_sha256 === identity.effect_sha256 && hash(job.descriptor_envelope) === identity.envelope_sha256);
+    if (matches.length !== 1) this.#controller.rejectPendingEffect(key, operationId, "ISSUE_JOB", snapshot.jobs.some((job) => job.descriptor.authority_incarnation === identity.authority_incarnation && job.descriptor.authority_revision === identity.authority_revision) ? "AUTHORITY_REVISION_REUSED" : "AUTHORITY_EFFECT_DISAPPEARED", { reserved: identity, observed_job_count: snapshot.jobs.length });
     return matches[0]!;
   }
-  #readTargetByRevision(key: CanonicalRunKey, incarnation: string, revision: number, jobId: string, verifierSessionId: string): string {
-    const matches = this.#snapshot(key).targets.filter((envelope) => { const target = verifyExpectedEvaluationTargetEnvelope(envelope, this.#authorityBinding); return target.authority_incarnation === incarnation && target.target_revision === revision && target.evaluation_job_id === jobId && target.verifier_session_id === verifierSessionId; });
-    if (matches.length !== 1) throw new CustodyControlError("EXACT_AUTHORITY_EFFECT_NOT_FOUND");
+  #readTargetByIdentity(key: CanonicalRunKey, operationId: string, identity: PendingEffectIdentity): string {
+    const snapshot = this.#snapshot(key), matches = snapshot.targets.filter((envelope) => { const target = verifyExpectedEvaluationTargetEnvelope(envelope, this.#authorityBinding); return identity.kind === "TARGET" && target.authority_incarnation === identity.authority_incarnation && target.target_revision === identity.authority_revision && target.assignment_id === identity.effect_id && hash(envelope) === identity.effect_sha256 && hash(envelope) === identity.envelope_sha256; });
+    if (matches.length !== 1) this.#controller.rejectPendingEffect(key, operationId, "ASSIGN_TARGET", snapshot.targets.some((envelope) => { const target = verifyExpectedEvaluationTargetEnvelope(envelope, this.#authorityBinding); return target.authority_incarnation === identity.authority_incarnation && target.target_revision === identity.authority_revision; }) ? "AUTHORITY_REVISION_REUSED" : "AUTHORITY_EFFECT_DISAPPEARED", { reserved: identity, observed_target_count: snapshot.targets.length });
     return matches[0]!;
   }
   #scope(key: CanonicalRunKey): RoleRunScope { const binding = this.#controller.bindingFor(key); return { ...key, environment_instance_id: binding.environment_instance_id, spec_sha256: binding.spec_sha256 }; }
