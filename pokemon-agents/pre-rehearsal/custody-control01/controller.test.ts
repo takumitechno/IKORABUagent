@@ -10,49 +10,59 @@ import { collectCurrentRuntimeSubject, observeTestOnlyRoleLaunch, roleChannelAcc
 import { CATFOOD_FINAL_CLOSURE_CHARTER, CATFOOD_SEALED_INPUT_SCHEMA, CATFOOD_SQLITE_EXPORT_PROFILE, type CatfoodGoRootPolicyV1, type CatfoodSealedInputManifestV1 } from "../../web/lib/catfood-final-closure";
 import { CatfoodRoleAuthority, buildCustodyReleaseAction, buildEvaluationActionV3, createTestOnlyRoleSession, initializeRoleAuthorityStore, localRoleEvidence, performRoleAction, roleChannelPublicKeyFingerprint, verifyEvaluationJobEnvelope, verifyExpectedEvaluationTargetEnvelope, verifyRoleEvidenceV4, type AuthorityEvaluationJob, type LocalRoleSession, type RoleActionReceiptV2, type RoleChannelBinding, type RoleRunScope } from "../../web/lib/catfood-role-channel";
 import { testGoRootPolicy } from "../../tests/catfood-go-root-policy-fixture";
-import { CustodyController, CustodyControlError, TestOnlyPreCustodyHost, TestOnlySqliteContinuityWitness, canonicalKeySha256, initializeCustodyController, initializeTestOnlyContinuityWitness, type CanonicalRunKey, type FenceObservation, type RunBinding } from "./controller";
+import { CustodyController, CustodyControlError, TestOnlyPreCustodyHost, TestOnlySqliteContinuityWitness, canonicalKeySha256, initializeCustodyController, initializeTestOnlyContinuityWitness, type CanonicalRunKey, type FenceObservation, type LineageState, type RunBinding } from "./controller";
 
 const sha = (value: string | Uint8Array) => createHash("sha256").update(value).digest("hex");
 const cj = (value: unknown) => canonicalJson(value as never);
 const CLOCK = Date.parse("2026-09-29T12:00:00.000Z");
 const key: CanonicalRunKey = { environment_type: "test", deployment_id: "deployment:test", organization_id: "org:test", tenant_id: "tenant:test", account_id: "acct:test", run_id: "run:test" };
 const scope: RoleRunScope = { ...key, environment_instance_id: "instance:test", spec_sha256: "1".repeat(64) };
+const RUN_WINDOW = { start: "2026-09-29T00:00:00.000Z", end: "2026-09-30T00:00:00.000Z" } as const;
 const deferredCleanup = new Set<string>();
 afterAll(() => { Bun.gc(true); for (const path of deferredCleanup) rmSync(path, { recursive: true, force: true, maxRetries: 5, retryDelay: 20 }); });
 
-function sealed(profile: CatfoodGoRootPolicyV1["verification_profile"], variant = "a"): CatfoodSealedInputManifestV1 {
-  const control = { format: CATFOOD_SQLITE_EXPORT_PROFILE, byte_length: 4096, raw_sha256: variant.repeat(64), logical_schema_sha256: "2".repeat(64) } as const;
-  const checkpoint = { ...control, raw_sha256: variant === "a" ? "b".repeat(64) : "c".repeat(64) } as const;
-  const body = { schema: CATFOOD_SEALED_INPUT_SCHEMA, charter: CATFOOD_FINAL_CLOSURE_CHARTER, scope, window: { start: "2026-09-29T00:00:00.000Z", end: "2026-09-30T00:00:00.000Z" }, closure: { closed_source_event_id: `event:closed:${variant}`, run_closed_event_id: `event:run:${variant}`, lifecycle: "CLOSED" as const }, journal: { high_water: 42, head_sha256: variant.repeat(64) }, checkpoint: { checkpoint_id: `checkpoint:${variant}`, checkpoint_sha256: variant === "a" ? "4".repeat(64) : "5".repeat(64), pins_sha256: "6".repeat(64) }, retained_source: { archive_sha256: "7".repeat(64), source_digest: "8".repeat(64), producer_identity: "threads:875e75fce20c16c6157b5aa42f759411c52e95fe" }, go: { artifact_sha256: "9".repeat(64), verification_profile_id: profile.profile_id, verification_profile_sha256: sha(cj(profile)), root_fingerprints: profile.keys.map((item) => item.public_key_sha256) }, fixed: { dependencies_sha256: "a".repeat(64), policy_sha256: CATFOOD_POLICY_SHA256, kernel_sha256: "b".repeat(64) }, trust: { environment_provenance_sha256: "c".repeat(64), clock_provenance_sha256: "d".repeat(64), acquisition_provenance_sha256: "e".repeat(64), test_only: true }, expected_bundle_sha256: "f".repeat(64), pair_common_cut_sha256: variant === "a" ? "0".repeat(64) : "1".repeat(64), control, checkpoint_store: checkpoint };
+function lineage(name: string): LineageState { return Object.freeze({ store_pair_lineage_sha256: sha("store-pair:one"), journal_head_sha256: sha(`journal:${name}`), checkpoint_head_sha256: sha(`checkpoint:${name}`), control_snapshot_sha256: sha(`control:${name}`), checkpoint_snapshot_sha256: sha(`checkpoint-store:${name}`), pair_common_cut_sha256: sha(`common-cut:${name}`) }); }
+
+function sealed(profile: CatfoodGoRootPolicyV1["verification_profile"], variant = "a", current = lineage(variant)): CatfoodSealedInputManifestV1 {
+  const control = { format: CATFOOD_SQLITE_EXPORT_PROFILE, byte_length: 4096, raw_sha256: current.control_snapshot_sha256, logical_schema_sha256: "2".repeat(64) } as const;
+  const checkpoint = { ...control, raw_sha256: current.checkpoint_snapshot_sha256 } as const;
+  const body = { schema: CATFOOD_SEALED_INPUT_SCHEMA, charter: CATFOOD_FINAL_CLOSURE_CHARTER, scope, window: RUN_WINDOW, closure: { closed_source_event_id: `event:closed:${variant}`, run_closed_event_id: `event:run:${variant}`, lifecycle: "CLOSED" as const }, journal: { high_water: 42, head_sha256: current.journal_head_sha256 }, checkpoint: { checkpoint_id: `checkpoint:${variant}`, checkpoint_sha256: current.checkpoint_head_sha256, pins_sha256: "6".repeat(64) }, retained_source: { archive_sha256: "7".repeat(64), source_digest: "8".repeat(64), producer_identity: "threads:875e75fce20c16c6157b5aa42f759411c52e95fe" }, go: { artifact_sha256: "9".repeat(64), verification_profile_id: profile.profile_id, verification_profile_sha256: sha(cj(profile)), root_fingerprints: profile.keys.map((item) => item.public_key_sha256) }, fixed: { dependencies_sha256: "a".repeat(64), policy_sha256: CATFOOD_POLICY_SHA256, kernel_sha256: "b".repeat(64) }, trust: { environment_provenance_sha256: "c".repeat(64), clock_provenance_sha256: "d".repeat(64), acquisition_provenance_sha256: "e".repeat(64), test_only: true }, expected_bundle_sha256: "f".repeat(64), pair_common_cut_sha256: current.pair_common_cut_sha256, control, checkpoint_store: checkpoint };
   return { ...body, manifest_id: `manifest:${sha(cj(body)).slice(0, 40)}` } as CatfoodSealedInputManifestV1;
 }
 
-function runBinding(manifest: CatfoodSealedInputManifestV1, goRef: unknown): RunBinding {
-  return { key, environment_instance_id: scope.environment_instance_id, spec_sha256: scope.spec_sha256, window_sha256: sha(cj(manifest.window)), go_artifact_sha256: manifest.go.artifact_sha256, go_policy_ref_sha256: sha(cj(goRef)), control_store_id: "control:test", checkpoint_store_id: "checkpoint:test", store_pair_lineage_sha256: "3".repeat(64), producer_generation: 1, journal_head_sha256: manifest.journal.head_sha256, checkpoint_head_sha256: manifest.checkpoint.checkpoint_sha256, control_snapshot_sha256: manifest.control.raw_sha256, checkpoint_snapshot_sha256: manifest.checkpoint_store.raw_sha256, pair_common_cut_sha256: manifest.pair_common_cut_sha256, test_only: true };
+function runBinding(goRef: unknown, root = lineage("root")): RunBinding {
+  return { key, environment_instance_id: scope.environment_instance_id, spec_sha256: scope.spec_sha256, window_sha256: sha(cj(RUN_WINDOW)), go_artifact_sha256: "9".repeat(64), go_policy_ref_sha256: sha(cj(goRef)), control_store_id: "control:test", checkpoint_store_id: "checkpoint:test", ...root, producer_generation: 1, test_only: true };
 }
 
 const decode = (session: LocalRoleSession) => JSON.parse(Buffer.from(JSON.parse(String(localRoleEvidence(session).enrollment_envelope_json)).payload, "base64url").toString()) as Record<string, unknown>;
 
 type Fixture = ReturnType<typeof fixture>;
-function fixture(activate = true, fenceValid = true) {
+function fixture(activate = true, fenceValid = true, autoAdvance = true, autoReserve = true) {
   const dir = mkdtempSync(join(tmpdir(), "pre-custody-corrective-")), authorityPath = join(dir, "authority.db"), controllerPath = join(dir, "controller.db"), witnessPath = join(dir, "witness.db");
   for (const path of [authorityPath, controllerPath, witnessPath]) writeFileSync(path, "");
   const authorityKey = generateKeyPairSync("ed25519"), goKey = generateKeyPairSync("ed25519"), authorityPublic = authorityKey.publicKey.export({ type: "spki", format: "pem" }).toString(), goPublic = goKey.publicKey.export({ type: "spki", format: "pem" }).toString();
   const go = testGoRootPolicy({ authority_identity: "fixture-role-authority", authority_public_key_pem: authorityPublic, enrollment_namespace: "fixture:pre-custody", scope, public_keys: [{ key_id: "go:test", public_key_pem: goPublic }], not_before: "2026-09-29T00:00:00.000Z", not_after: "2026-10-03T00:00:00.000Z", acceptance_policy_sha256: CATFOOD_POLICY_SHA256 });
   const roleBinding: RoleChannelBinding = { trust_domain: "TEST_ONLY", issuer: "fixture-role-authority", issuer_key_id: "authority:v4", audience: "ikorabu-catfood", origin: "http://127.0.0.1:32199", credential: "fixture-coarse-service-access-credential", authority_public_key_pem: authorityPublic, enrollment_namespace: "fixture:pre-custody", build_policy_sha256: CATFOOD_POLICY_SHA256, accepted_snapshot_id: "snapshot:pre-custody", accepted_snapshot_sha256: roleChannelAcceptedSnapshotDigest(), policy: { policy_id: "fixture-policy-v1", session_lifetime_ms: 60_000, registration_challenge_lifetime_ms: 5_000, action_challenge_lifetime_ms: 5_000, maximum_outstanding_requests: 64, receipt_retention_ms: 86_400_000, go_root_policy_documents: [go.policy], go_root_workload_selections: [go.selection] } };
   initializeRoleAuthorityStore(authorityPath, roleBinding); initializeCustodyController(controllerPath, "controller:test", roleBinding); initializeTestOnlyContinuityWitness(witnessPath);
-  const witness = new TestOnlySqliteContinuityWitness(witnessPath), controller = new CustodyController(controllerPath, witness, roleBinding), manifest = sealed(go.policy.verification_profile), binding = runBinding(manifest, go.ref);
-  const fenceAdapter = { inspect({ admitted, binding: current }: any): FenceObservation { return { old_session_id: admitted.session_id, old_process_cannot_execute: fenceValid, old_credentials_revoked: fenceValid, producer_effects_resolved: fenceValid, complete_history_verified: fenceValid, journal_head_sha256: current.journal_head_sha256, checkpoint_head_sha256: current.checkpoint_head_sha256, control_snapshot_sha256: current.control_snapshot_sha256, checkpoint_snapshot_sha256: current.checkpoint_snapshot_sha256, pair_common_cut_sha256: current.pair_common_cut_sha256 }; } };
-  const host = new TestOnlyPreCustodyHost({ authority_path: authorityPath, authority_binding: roleBinding, authority_private_key: authorityKey.privateKey, controller, fence_adapter: fenceAdapter, now: () => CLOCK });
+  const witness = new TestOnlySqliteContinuityWitness(witnessPath), controller = new CustodyController(controllerPath, witness, roleBinding), rootLineage = lineage("root"), finalLineage = lineage("a"), binding = runBinding(go.ref, rootLineage);
+  let observedLineage = rootLineage, observedPredecessor = sha(cj(rootLineage)), observedSequence = 0;
+  const lineageAdapter = {
+    inspectRoot(): any { return Object.freeze({ schema: "pre-custody-lineage-root-observation.v1", adapter_id: "fixture:lineage", pre_write: observedSequence === 0, lineage: observedLineage, observed_at: new Date(CLOCK).toISOString() }); },
+    inspect(): any { return Object.freeze({ schema: "pre-custody-lineage-observation.v1", adapter_id: "fixture:lineage", sequence: observedSequence, predecessor_sha256: observedPredecessor, lineage: observedLineage, observed_at: new Date(CLOCK).toISOString() }); },
+  };
+  const fenceAdapter = { inspect({ admitted }: any): FenceObservation { return { old_session_id: admitted.session_id, old_process_cannot_execute: fenceValid, old_credentials_revoked: fenceValid, producer_effects_resolved: fenceValid, complete_history_verified: fenceValid, journal_head_sha256: observedLineage.journal_head_sha256, checkpoint_head_sha256: observedLineage.checkpoint_head_sha256, control_snapshot_sha256: observedLineage.control_snapshot_sha256, checkpoint_snapshot_sha256: observedLineage.checkpoint_snapshot_sha256, pair_common_cut_sha256: observedLineage.pair_common_cut_sha256 }; } };
+  const host = new TestOnlyPreCustodyHost({ authority_path: authorityPath, authority_binding: roleBinding, authority_private_key: authorityKey.privateKey, controller, fence_adapter: fenceAdapter, lineage_adapter: lineageAdapter, now: () => CLOCK });
   const enrollmentBinding = (role: CatfoodEnrollmentRole, writer?: { key_id: string; key_version: string; public_key_sha256: string; public_key_pem: string }): TestEnrollmentBinding => ({ trust_domain: "TEST_ONLY", issuer: roleBinding.issuer, issuer_key_id: roleBinding.issuer_key_id, audience: roleBinding.audience, origin: roleBinding.origin, credential: roleBinding.credential, public_key_pem: roleBinding.authority_public_key_pem, environment_identity: scope.environment_instance_id, deployment_id: scope.deployment_id, enrollment_namespace: roleBinding.enrollment_namespace, build_policy_sha256: roleBinding.build_policy_sha256, accepted_snapshot_id: roleBinding.accepted_snapshot_id, accepted_snapshot_sha256: roleBinding.accepted_snapshot_sha256, launch_ticket: `launch:${role}`, writer_signing_key_id: writer?.key_id ?? "none", writer_signing_key_version: writer?.key_version ?? "none", writer_signing_public_key_pem: writer?.public_key_pem ?? roleBinding.authority_public_key_pem });
   const rawAuthority = () => new CatfoodRoleAuthority(authorityPath, roleBinding, authorityKey.privateKey, () => CLOCK), rawSessionAuthorities: CatfoodRoleAuthority[] = [];
   const enrollRaw = (role: CatfoodEnrollmentRole, distinct = false) => { const authority = rawAuthority(); rawSessionAuthorities.push(authority); const outer = generateKeyPairSync("ed25519"), outerPem = outer.publicKey.export({ type: "spki", format: "pem" }).toString(), writer = role === "writer" ? { key_id: "writer:raw", key_version: "v1", public_key_sha256: roleChannelPublicKeyFingerprint(outerPem), public_key_pem: outerPem } : undefined, eb = enrollmentBinding(role, writer), base = collectCurrentRuntimeSubject(eb), subject = distinct ? { ...base, pid: base.pid + Math.floor(Math.random() * 100000) + 1, process_start: `${base.process_start}:raw:${Math.random()}` } : base, launch = observeTestOnlyRoleLaunch(eb, role, subject); return createTestOnlyRoleSession(authority, { role, scope, subject, launch, writer_credential: writer, now: () => CLOCK }); };
-  const out: any = { dir, authorityPath, controllerPath, witnessPath, authorityKey, roleBinding, go, witness, controller, host, manifest, binding, fenceAdapter, rawAuthority, enrollRaw, close() { for (const authority of rawSessionAuthorities) try { authority.close(); } catch {} try { out.host.close(); } catch {} try { out.witness.close(); } catch {} try { rmSync(dir, { recursive: true, force: true, maxRetries: 5, retryDelay: 20 }); } catch (error) { if (!(error instanceof Error && "code" in error && error.code === "EBUSY")) throw error; deferredCleanup.add(dir); } } };
-  host.reserveRun(binding, "reserve:one");
+  const out: any = { dir, authorityPath, controllerPath, witnessPath, authorityKey, roleBinding, go, witness, controller, host, manifest: undefined, binding, rootLineage, finalLineage, fenceAdapter, lineageAdapter, makeManifest(variant: string, current: LineageState) { const manifest = sealed(go.policy.verification_profile, variant, current); out.manifest = manifest; return manifest; }, observeLineage(next: LineageState, predecessor: LineageState = observedLineage, sequence = observedSequence + 1) { observedPredecessor = sha(cj(predecessor)); observedLineage = next; observedSequence = sequence; }, rawAuthority, enrollRaw, close() { for (const authority of rawSessionAuthorities) try { authority.close(); } catch {} try { out.host.close(); } catch {} try { out.witness.close(); } catch {} try { rmSync(dir, { recursive: true, force: true, maxRetries: 5, retryDelay: 20 }); } catch (error) { if (!(error instanceof Error && "code" in error && error.code === "EBUSY")) throw error; deferredCleanup.add(dir); } } };
+  if (autoReserve) host.reserveRun(binding, "reserve:one");
+  else if (activate) throw new Error("fixture cannot activate before reservation");
   if (activate) {
     out.custodian = host.admitCustodian({ key, operation_id: "admit:one", lease_expires_ms: CLOCK + 30_000, host_incarnation: "host:one" });
     out.evaluator = host.launchRole(key, "evaluator"); out.writer = host.launchRole(key, "writer"); out.verifier = host.launchRole(key, "verifier");
     out.roleEvidenceSha = sha(cj([out.custodian.evidence, out.evaluator.evidence, out.writer.evidence]));
+    if (autoAdvance) { out.observeLineage(finalLineage); host.advanceLineage({ key, operation_id: "lineage:final", custodian_session: out.custodian.session }); out.makeManifest("a", finalLineage); }
   }
   return out as Fixture & any;
 }
@@ -71,7 +81,7 @@ function nonOwner(f: Fixture) { return f.enrollRaw("custodian"); }
 function incidentWithNonOwner(f: Fixture, manifest = f.manifest, operation = "incident:nonowner") { const other = nonOwner(f), receipt = release(f, other, manifest, `${operation}:release`); expect(() => f.host.closeCustody({ key, manifest, release_receipt: receipt, operation_id: operation })).toThrow("NON_ADMITTED_CUSTODIAN"); }
 function counts(f: Fixture) { const db = new Database(f.authorityPath, { readonly: true }); try { return { jobs: db.query<{ n: number }, []>("SELECT COUNT(*) n FROM evaluation_jobs").get()!.n, targets: db.query<{ n: number }, []>("SELECT COUNT(*) n FROM expected_evaluation_targets").get()!.n }; } finally { db.close(); } }
 function rawCanonicalJob(f: Fixture): AuthorityEvaluationJob { const raw = f.rawAuthority(); try { return raw.issueEvaluationJob({ custody_release_receipt: f.release, manifest: f.manifest, evaluator: verifyRoleEvidenceV4(f.evaluator.evidence, f.roleBinding, "evaluator", scope), writer: verifyRoleEvidenceV4(f.writer.evidence, f.roleBinding, "writer", scope), role_evidence_sha256: f.roleEvidenceSha, workflow_instruction_id: "instruction:canonical", workflow_instruction_sha256: sha("instruction:canonical"), commit_lifetime_ms: 30000 }); } finally { raw.close(); } }
-function restartHost(f: Fixture): void { f.host.close(); f.witness.close(); const witness = new TestOnlySqliteContinuityWitness(f.witnessPath), controller = new CustodyController(f.controllerPath, witness, f.roleBinding), host = new TestOnlyPreCustodyHost({ authority_path: f.authorityPath, authority_binding: f.roleBinding, authority_private_key: f.authorityKey.privateKey, controller, fence_adapter: f.fenceAdapter, now: () => CLOCK }); f.witness = witness; f.controller = controller; f.host = host; }
+function restartHost(f: Fixture): void { f.host.close(); f.witness.close(); const witness = new TestOnlySqliteContinuityWitness(f.witnessPath), controller = new CustodyController(f.controllerPath, witness, f.roleBinding), host = new TestOnlyPreCustodyHost({ authority_path: f.authorityPath, authority_binding: f.roleBinding, authority_private_key: f.authorityKey.privateKey, controller, fence_adapter: f.fenceAdapter, lineage_adapter: f.lineageAdapter, now: () => CLOCK }); f.witness = witness; f.controller = controller; f.host = host; }
 
 describe("N01-N18 corrected", () => {
   test("N01 canonical admission pins authenticated custodian lineage", () => { const f = fixture(); try { expect(f.controller.state(key)).toMatchObject({ state: "ACTIVE", admitted: { session_id: decode(f.custodian.session).session_id }, binding: { control_store_id: "control:test" } }); } finally { f.close(); } });
@@ -130,6 +140,144 @@ describe("R01-R07 corrective02 pending exact identity", () => {
   test("R05 delayed exact completion and retry cannot erase rollback incident", () => { const f = fixture(); try { closeCanonical(f); expect(() => issue(f, "r05:job", { lost: true })).toThrow("TEST_ONLY_RESPONSE_LOST"); const db = new Database(f.authorityPath), firstRow = db.query<{ descriptor_envelope: string }, []>("SELECT descriptor_envelope FROM evaluation_jobs").get()!, original = verifyEvaluationJobEnvelope(firstRow.descriptor_envelope, f.roleBinding), revision = original.descriptor.authority_revision; db.query("DELETE FROM evaluation_jobs").run(); db.query("UPDATE role_authority_continuity SET revision=? WHERE singleton=1").run(revision - 1); db.close(); rawCanonicalJob(f); expect(() => f.host.reconcileEvaluationJob(key, "r05:job")).toThrow("AUTHORITY_REVISION_REUSED"); expect(() => f.controller.completeJobEffect(key, "r05:job", original)).toThrow("INCIDENT_TERMINAL"); expect(f.controller.state(key).state).toBe("INCIDENT"); expect(() => f.host.reconcileEvaluationJob(key, "r05:job")).toThrow(); expect(f.controller.state(key).state).toBe("INCIDENT"); } finally { f.close(); } });
   test("R06 pinned ACKNOWLEDGED job and target reconcile after crash-window restart", () => { const jobFixture = fixture(); try { closeCanonical(jobFixture); const db = new Database(jobFixture.authorityPath, { readonly: true }), continuity = db.query<{ incarnation: string; revision: number }, []>("SELECT incarnation,revision FROM role_authority_continuity WHERE singleton=1").get()!; db.close(); jobFixture.controller.beginJobEffect(key, "r06:job", { authority_incarnation: continuity.incarnation, authority_revision: continuity.revision + 1, workflow_instruction_id: "instruction:canonical", release_receipt_sha256: jobFixture.release.receipt_sha256 }); const job = rawCanonicalJob(jobFixture); jobFixture.controller.pinJobEffectIdentity(key, "r06:job", job); restartHost(jobFixture); expect(jobFixture.host.reconcileEvaluationJob(key, "r06:job").descriptor.evaluation_job_id).toBe(job.descriptor.evaluation_job_id); } finally { jobFixture.close(); } const targetFixture = fixture(); try { closeCanonical(targetFixture); const job = issue(targetFixture); commit(targetFixture, job); const db = new Database(targetFixture.authorityPath, { readonly: true }), continuity = db.query<{ incarnation: string; revision: number }, []>("SELECT incarnation,revision FROM role_authority_continuity WHERE singleton=1").get()!; db.close(); targetFixture.controller.beginTargetEffect(key, "r06:target", { authority_incarnation: continuity.incarnation, authority_revision: continuity.revision + 1, evaluation_job_id: job.descriptor.evaluation_job_id, verifier_session_id: String(decode(targetFixture.verifier.session).session_id) }); const raw = targetFixture.rawAuthority(); let envelope: string; try { envelope = raw.assignExpectedEvaluationTarget({ verifier: verifyRoleEvidenceV4(targetFixture.verifier.evidence, targetFixture.roleBinding, "verifier", scope), evaluation_job_id: job.descriptor.evaluation_job_id, purpose: "VERIFY_EXPECTED" }); } finally { raw.close(); } targetFixture.controller.pinTargetEffectIdentity(key, "r06:target", envelope); restartHost(targetFixture); expect(targetFixture.host.reconcileExpectedTarget(key, "r06:target")).toBe(envelope); } finally { targetFixture.close(); } });
   test("R07 same-revision alternate effect cannot coexist with exact pending job or target", () => { const jobFixture = fixture(); try { closeCanonical(jobFixture); expect(() => issue(jobFixture, "r07:job", { lost: true })).toThrow("TEST_ONLY_RESPONSE_LOST"); const db = new Database(jobFixture.authorityPath), revision = db.query<{ revision: number }, []>("SELECT revision FROM role_authority_continuity WHERE singleton=1").get()!.revision; db.query("UPDATE role_authority_continuity SET revision=? WHERE singleton=1").run(revision - 1); db.close(); const alternateReceipt = release(jobFixture, jobFixture.custodian.session, jobFixture.manifest, "release:r07:alternate", "instruction:r07:alternate"), raw = jobFixture.rawAuthority(); try { raw.issueEvaluationJob({ custody_release_receipt: alternateReceipt, manifest: jobFixture.manifest, evaluator: verifyRoleEvidenceV4(jobFixture.evaluator.evidence, jobFixture.roleBinding, "evaluator", scope), writer: verifyRoleEvidenceV4(jobFixture.writer.evidence, jobFixture.roleBinding, "writer", scope), role_evidence_sha256: jobFixture.roleEvidenceSha, workflow_instruction_id: "instruction:r07:alternate", workflow_instruction_sha256: sha("instruction:r07:alternate"), commit_lifetime_ms: 30000 }); } finally { raw.close(); } expect(() => jobFixture.host.reconcileEvaluationJob(key, "r07:job")).toThrow("AUTHORITY_REVISION_REUSED"); expect(jobFixture.controller.state(key).state).toBe("INCIDENT"); } finally { jobFixture.close(); } const targetFixture = fixture(); try { closeCanonical(targetFixture); const job = issue(targetFixture); commit(targetFixture, job); expect(() => target(targetFixture, job, "r07:target", true)).toThrow("TEST_ONLY_RESPONSE_LOST"); const db = new Database(targetFixture.authorityPath), revision = db.query<{ revision: number }, []>("SELECT revision FROM role_authority_continuity WHERE singleton=1").get()!.revision; db.query("UPDATE role_authority_continuity SET revision=? WHERE singleton=1").run(revision - 1); db.close(); const raw = targetFixture.rawAuthority(); try { raw.assignExpectedEvaluationTarget({ verifier: verifyRoleEvidenceV4(targetFixture.verifier.evidence, targetFixture.roleBinding, "verifier", scope), evaluation_job_id: job.descriptor.evaluation_job_id, purpose: "VERIFY_EXPECTED" }); } finally { raw.close(); } expect(() => targetFixture.host.reconcileExpectedTarget(key, "r07:target")).toThrow("AUTHORITY_REVISION_REUSED"); expect(targetFixture.controller.state(key).state).toBe("INCIDENT"); } finally { targetFixture.close(); } });
+});
+
+describe("Q01-Q10 corrective03 monotonic lineage lifecycle", () => {
+  test("Q01 realistic pre-write reservation can advance and close", () => {
+    const f = fixture(true, true, false);
+    try {
+      expect(f.controller.lineageFor(key)).toMatchObject({ root: f.rootLineage, current: f.rootLineage, sequence: 0 });
+      f.observeLineage(f.finalLineage);
+      expect(f.host.advanceLineage({ key, operation_id: "q01:advance", custodian_session: f.custodian.session })).toMatchObject({ sequence: 1, replay: false });
+      f.makeManifest("q01", f.finalLineage);
+      expect(closeCanonical(f).receipt_sha256).toBeTruthy();
+      expect(f.controller.state(key)).toMatchObject({ state: "CLOSED", lineage_sequence: 1, current_lineage: f.finalLineage });
+    } finally { f.close(); }
+  });
+
+  test("Q02 incompatible completed-history reservation claims create durable incident and revoke publication", () => {
+    const delayed = fixture(false, true, false, false);
+    try {
+      const completedA = lineage("q02:delayed:a"), completedB = lineage("q02:delayed:b");
+      expect(sealed(delayed.go.policy.verification_profile, "q02:delayed:a", completedA).manifest_id).not.toBe(sealed(delayed.go.policy.verification_profile, "q02:delayed:b", completedB).manifest_id);
+      delayed.observeLineage(completedB, delayed.rootLineage, 1);
+      expect(() => delayed.host.reserveRun(runBinding(delayed.go.ref, completedB), "q02:delayed-reserve")).toThrow("RESERVATION_ROOT_NOT_PRE_WRITE");
+      expect(() => delayed.controller.state(key)).toThrow("RUN_NOT_RESERVED");
+    } finally { delayed.close(); }
+    const f = fixture();
+    try {
+      closeCanonical(f);
+      const job = issue(f); commit(f, job); const current = target(f, job);
+      const a = lineage("q02:a"), b = lineage("q02:b");
+      const historyA = sealed(f.go.policy.verification_profile, "q02:a", a), historyB = sealed(f.go.policy.verification_profile, "q02:b", b);
+      expect(historyA.manifest_id).not.toBe(historyB.manifest_id);
+      expect(() => f.host.reserveRun(runBinding(f.go.ref, a), "q02:reserve:a")).toThrow("RUN_BINDING_CONFLICT");
+      expect(() => f.host.reserveRun(runBinding(f.go.ref, b), "q02:reserve:b")).toThrow("RUN_BINDING_CONFLICT");
+      expect(f.controller.state(key)).toMatchObject({ state: "INCIDENT" });
+      expect(Number(f.controller.state(key).incident_count)).toBeGreaterThanOrEqual(2);
+      expect(() => f.host.publicationEligibility(key, current)).toThrow();
+    } finally { f.close(); }
+  });
+
+  test("Q03 root to H1 to H2 to H3 is one witnessed monotonic chain", () => {
+    const f = fixture(true, true, false);
+    try {
+      const h1 = lineage("q03:h1"), h2 = lineage("q03:h2"), h3 = lineage("q03:h3");
+      f.observeLineage(h1); expect(f.host.advanceLineage({ key, operation_id: "q03:advance:1", custodian_session: f.custodian.session })).toMatchObject({ sequence: 1, replay: false });
+      expect(f.host.advanceLineage({ key, operation_id: "q03:advance:1", custodian_session: f.custodian.session })).toMatchObject({ sequence: 1, replay: true });
+      for (const [index, next] of [h2, h3].entries()) { f.observeLineage(next); expect(f.host.advanceLineage({ key, operation_id: `q03:advance:${index + 2}`, custodian_session: f.custodian.session }).sequence).toBe(index + 2); }
+      const manifest = sealed(f.go.policy.verification_profile, "q03", h3), receipt = release(f, f.custodian.session, manifest, "q03:release");
+      expect(f.host.closeCustody({ key, manifest, release_receipt: receipt, operation_id: "q03:close" }).replay).toBeFalse();
+      const db = new Database(f.controllerPath, { readonly: true });
+      const rows = db.query<{ lineage_sequence: number; predecessor_sha256: string; lineage_sha256: string }, []>("SELECT lineage_sequence,predecessor_sha256,lineage_sha256 FROM lineage_advances ORDER BY lineage_sequence").all(); db.close();
+      expect(rows.map((row) => row.lineage_sequence)).toEqual([1, 2, 3]);
+      expect(rows[0]!.predecessor_sha256).toBe(sha(cj(f.rootLineage))); expect(rows[1]!.predecessor_sha256).toBe(rows[0]!.lineage_sha256); expect(rows[2]!.predecessor_sha256).toBe(rows[1]!.lineage_sha256);
+      expect(f.controller.state(key)).toMatchObject({ state: "CLOSED", lineage_sequence: 3, current_lineage: h3 });
+    } finally { f.close(); }
+  });
+
+  test("Q04 rollback advance fails closed into INCIDENT", () => {
+    const f = fixture(true, true, false);
+    try {
+      const h1 = lineage("q04:h1"), h2 = lineage("q04:h2");
+      f.observeLineage(h1); f.host.advanceLineage({ key, operation_id: "q04:h1", custodian_session: f.custodian.session });
+      f.observeLineage(h2); f.host.advanceLineage({ key, operation_id: "q04:h2", custodian_session: f.custodian.session });
+      f.observeLineage(h1, f.rootLineage, 1);
+      expect(() => f.host.advanceLineage({ key, operation_id: "q04:rollback", custodian_session: f.custodian.session })).toThrow("LINEAGE_CONTINUITY_CONFLICT");
+      expect(f.controller.state(key)).toMatchObject({ state: "INCIDENT", incident_count: 1, current_lineage: h2 });
+    } finally { f.close(); }
+  });
+
+  test("Q05 sibling fork after accepted continuation becomes INCIDENT", () => {
+    const f = fixture(true, true, false);
+    try {
+      const h1 = lineage("q05:h1"), h2a = lineage("q05:h2:a"), h2b = lineage("q05:h2:b");
+      f.observeLineage(h1); f.host.advanceLineage({ key, operation_id: "q05:h1", custodian_session: f.custodian.session });
+      f.observeLineage(h2a); f.host.advanceLineage({ key, operation_id: "q05:h2:a", custodian_session: f.custodian.session });
+      f.observeLineage(h2b, h1, 2);
+      expect(() => f.host.advanceLineage({ key, operation_id: "q05:h2:b", custodian_session: f.custodian.session })).toThrow("LINEAGE_CONTINUITY_CONFLICT");
+      expect(f.controller.state(key)).toMatchObject({ state: "INCIDENT", current_lineage: h2a, incident_count: 1 });
+    } finally { f.close(); }
+  });
+
+  test("Q06 authentic non-admitted custodian cannot advance lineage", () => {
+    const f = fixture(true, true, false);
+    try {
+      const other = nonOwner(f); f.observeLineage(lineage("q06:foreign"));
+      expect(() => f.host.advanceLineage({ key, operation_id: "q06:foreign", custodian_session: other })).toThrow("NON_ADMITTED_CUSTODIAN");
+      expect(f.controller.state(key)).toMatchObject({ state: "INCIDENT", incident_count: 1, lineage_sequence: 0 });
+    } finally { f.close(); }
+  });
+
+  test("Q07 accepted latest lineage survives host restart", () => {
+    const f = fixture(true, true, false);
+    try {
+      const h1 = lineage("q07:h1"), h2 = lineage("q07:h2");
+      f.observeLineage(h1); f.host.advanceLineage({ key, operation_id: "q07:h1", custodian_session: f.custodian.session });
+      restartHost(f);
+      expect(f.controller.lineageFor(key)).toMatchObject({ current: h1, sequence: 1 });
+      f.observeLineage(h2); f.host.advanceLineage({ key, operation_id: "q07:h2", custodian_session: f.custodian.session });
+      expect(f.controller.lineageFor(key)).toMatchObject({ current: h2, sequence: 2, root: f.rootLineage });
+    } finally { f.close(); }
+  });
+
+  test("Q08 close against stale H1 after H2 is rejected", () => {
+    const f = fixture(true, true, false);
+    try {
+      const h1 = lineage("q08:h1"), h2 = lineage("q08:h2");
+      f.observeLineage(h1); f.host.advanceLineage({ key, operation_id: "q08:h1", custodian_session: f.custodian.session });
+      f.observeLineage(h2); f.host.advanceLineage({ key, operation_id: "q08:h2", custodian_session: f.custodian.session });
+      const stale = sealed(f.go.policy.verification_profile, "q08:stale", h1), receipt = release(f, f.custodian.session, stale, "q08:release");
+      expect(() => f.host.closeCustody({ key, manifest: stale, release_receipt: receipt, operation_id: "q08:close" })).toThrow("CUSTODY_LINEAGE_MISMATCH");
+      expect(f.controller.state(key)).toMatchObject({ state: "INCIDENT", current_lineage: h2 });
+    } finally { f.close(); }
+  });
+
+  test("Q09 fence observation is checked against latest witnessed lineage", () => {
+    const f = fixture(true, true, false);
+    try {
+      const h1 = lineage("q09:h1"); f.observeLineage(h1); f.host.advanceLineage({ key, operation_id: "q09:h1", custodian_session: f.custodian.session });
+      f.observeLineage(f.rootLineage, f.rootLineage, 0);
+      expect(() => f.host.observeLeaseAndReplace({ key, observed_now_ms: CLOCK + 40_000, operation_id: "q09:replace", lease_expires_ms: CLOCK + 90_000, host_incarnation: "host:two" })).toThrow("REPLACEMENT_NOT_PROVEN");
+      expect(f.controller.state(key)).toMatchObject({ state: "INCIDENT", current_lineage: h1, incident_count: 1 });
+    } finally { f.close(); }
+  });
+
+  test("Q10 lineage contradiction remains terminal across restart, delayed completion and retry", () => {
+    const f = fixture();
+    try {
+      closeCanonical(f); expect(() => issue(f, "q10:job", { lost: true })).toThrow("TEST_ONLY_RESPONSE_LOST");
+      const conflicting = { ...f.binding, journal_head_sha256: sha("q10:conflict") };
+      expect(() => f.host.reserveRun(conflicting, "q10:conflicting-reserve")).toThrow("RUN_BINDING_CONFLICT");
+      expect(f.controller.state(key).state).toBe("INCIDENT");
+      restartHost(f);
+      expect(() => f.host.reconcileEvaluationJob(key, "q10:job")).toThrow("INCIDENT_TERMINAL");
+      expect(f.host.closeCustody({ key, manifest: f.manifest, release_receipt: f.release, operation_id: "q10:historical-replay" }).replay).toBeTrue();
+      expect(() => issue(f, "q10:new-job")).toThrow();
+      expect(() => f.host.publicationEligibility(key, "not-a-target")).toThrow();
+      expect(f.controller.state(key)).toMatchObject({ state: "INCIDENT", incident_count: 1 });
+    } finally { f.close(); }
+  });
 });
 
 describe("P1-P7 independent audit attack reproduction", () => {

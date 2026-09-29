@@ -1,5 +1,5 @@
 {
-  "schema": "pre-custody-control-integrity.v2",
+  "schema": "pre-custody-control-integrity.v3",
   "test_only": true,
   "byte_model": "canonical LF source bytes are hashed as a Git SHA-1 blob and SHA-256; checkout raw bytes are classified separately",
   "frozen_wp3": {
@@ -10,13 +10,13 @@
   "files": [
     {
       "path": "controller.ts",
-      "canonical_lf_sha256": "a8b5c7e3a3d7776d1f231dbafee25360afbd115dfe5991c3b2290d1d60c4c1f5",
-      "git_blob_sha1": "0e14d4213ce2594de32cdc1c94b19e44809327bc"
+      "canonical_lf_sha256": "96b46705c8acf3b7b12d0371dbf6d5954ed09e10b383527e0ffc2ecfead94487",
+      "git_blob_sha1": "7f1b784704d64d0e969b2f087555f89907a93e35"
     },
     {
       "path": "controller.test.ts",
-      "canonical_lf_sha256": "5a0192fa6836c18e6a4adc20e9a6f66636edb0b740900ce3aaf5fe6b0cd3aabe",
-      "git_blob_sha1": "5b32fc7e3ce96d35cde72c75c92b2e2632f30e3b"
+      "canonical_lf_sha256": "72f15fd9cd594550647e2f2a55763639a8fa8e217d9ace0444c0765883edfb84",
+      "git_blob_sha1": "14fa2f4d45904e269866cab434a2d22819d6a81b"
     },
     {
       "path": "admission-race-worker.ts",
@@ -25,8 +25,8 @@
     },
     {
       "path": "README.md",
-      "canonical_lf_sha256": "474212f7518ec0b2ac281426766231bdc2e9200f4ee486f6216889fb8c850858",
-      "git_blob_sha1": "c3b620db2c31533562b64eaaf96d3edf3625b3fd"
+      "canonical_lf_sha256": "b7c63f3d2c08b798e9cde0c2696359011ab0dd42a930e5b97531a21a648ae2d9",
+      "git_blob_sha1": "2e67ae2baa0ae566901c71bd10bf83a157fb2fa4"
     }
   ],
   "self_hash": null,

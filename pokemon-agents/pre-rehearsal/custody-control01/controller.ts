@@ -37,7 +37,7 @@ import {
 const ZERO = "0".repeat(64);
 const SHA256 = /^[0-9a-f]{64}$/;
 const TOKEN = /^[A-Za-z0-9][A-Za-z0-9:._/-]{0,255}$/;
-const CONTROLLER_SCHEMA = "pre-custody-control.v2";
+const CONTROLLER_SCHEMA = "pre-custody-control.v3";
 const WITNESS_SCHEMA = "pre-custody-continuity-witness.v2";
 const hash = (value: string | Uint8Array) => createHash("sha256").update(value).digest("hex");
 const json = (value: unknown) => canonicalJson(value as never);
@@ -74,6 +74,37 @@ export interface RunBinding {
   readonly test_only: true;
 }
 
+export interface LineageState {
+  readonly store_pair_lineage_sha256: string;
+  readonly journal_head_sha256: string;
+  readonly checkpoint_head_sha256: string;
+  readonly control_snapshot_sha256: string;
+  readonly checkpoint_snapshot_sha256: string;
+  readonly pair_common_cut_sha256: string;
+}
+
+export interface LineageObservation {
+  readonly schema: "pre-custody-lineage-observation.v1";
+  readonly adapter_id: string;
+  readonly sequence: number;
+  readonly predecessor_sha256: string;
+  readonly lineage: LineageState;
+  readonly observed_at: string;
+}
+
+export interface LineageRootObservation {
+  readonly schema: "pre-custody-lineage-root-observation.v1";
+  readonly adapter_id: string;
+  readonly pre_write: boolean;
+  readonly lineage: LineageState;
+  readonly observed_at: string;
+}
+
+export interface TrustedLineageAdapter {
+  inspectRoot(input: Readonly<{ key: CanonicalRunKey; binding: RunBinding }>): LineageRootObservation;
+  inspect(input: Readonly<{ key: CanonicalRunKey; admitted: AdmittedCustodian; current: LineageState; sequence: number }>): LineageObservation;
+}
+
 export interface AuthorityContinuity { readonly incarnation: string; readonly revision: number }
 
 export interface AdmittedCustodian {
@@ -101,7 +132,7 @@ export interface FenceObservation {
 }
 
 export interface TrustedFenceAdapter {
-  inspect(input: Readonly<{ key: CanonicalRunKey; admitted: AdmittedCustodian; binding: RunBinding }>): FenceObservation;
+  inspect(input: Readonly<{ key: CanonicalRunKey; admitted: AdmittedCustodian; binding: RunBinding; lineage: LineageState }>): FenceObservation;
 }
 
 export interface WitnessRecord {
@@ -193,8 +224,9 @@ function validateWitnessRecord(record: WitnessRecord): void {
 
 const CONTROLLER_SQL = `
 CREATE TABLE controller_meta(singleton INTEGER PRIMARY KEY CHECK(singleton=1),schema TEXT NOT NULL,controller_id TEXT NOT NULL UNIQUE,test_only INTEGER NOT NULL CHECK(test_only=1),authority_binding_sha256 TEXT NOT NULL,authority_anchor_sha256 TEXT NOT NULL) STRICT;
-CREATE TABLE governed_runs(key_sha256 TEXT PRIMARY KEY,key_json TEXT NOT NULL CHECK(json_valid(key_json)),binding_json TEXT NOT NULL CHECK(json_valid(binding_json)),state TEXT NOT NULL CHECK(state IN('RESERVING','RESERVED','ADMITTING','ACTIVE','FENCING','RECOVERY_REQUIRED','CLOSED','INCIDENT','ENDED')),revision INTEGER NOT NULL CHECK(revision>=0),witness_digest TEXT NOT NULL,admitted_json TEXT CHECK(admitted_json IS NULL OR json_valid(admitted_json)),lease_expires_ms INTEGER,canonical_manifest_sha256 TEXT,canonical_manifest_json TEXT CHECK(canonical_manifest_json IS NULL OR json_valid(canonical_manifest_json)),canonical_release_json TEXT CHECK(canonical_release_json IS NULL OR json_valid(canonical_release_json)),authority_incarnation TEXT NOT NULL,authority_high_water INTEGER NOT NULL CHECK(authority_high_water>=1),created_at TEXT NOT NULL,updated_at TEXT NOT NULL) STRICT;
+CREATE TABLE governed_runs(key_sha256 TEXT PRIMARY KEY,key_json TEXT NOT NULL CHECK(json_valid(key_json)),binding_json TEXT NOT NULL CHECK(json_valid(binding_json)),lineage_root_json TEXT NOT NULL CHECK(json_valid(lineage_root_json)),lineage_root_observation_json TEXT NOT NULL CHECK(json_valid(lineage_root_observation_json)),current_lineage_json TEXT NOT NULL CHECK(json_valid(current_lineage_json)),current_lineage_sha256 TEXT NOT NULL,lineage_sequence INTEGER NOT NULL CHECK(lineage_sequence>=0),state TEXT NOT NULL CHECK(state IN('RESERVING','RESERVED','ADMITTING','ACTIVE','FENCING','RECOVERY_REQUIRED','CLOSED','INCIDENT','ENDED')),revision INTEGER NOT NULL CHECK(revision>=0),witness_digest TEXT NOT NULL,admitted_json TEXT CHECK(admitted_json IS NULL OR json_valid(admitted_json)),lease_expires_ms INTEGER,canonical_manifest_sha256 TEXT,canonical_manifest_json TEXT CHECK(canonical_manifest_json IS NULL OR json_valid(canonical_manifest_json)),canonical_release_json TEXT CHECK(canonical_release_json IS NULL OR json_valid(canonical_release_json)),authority_incarnation TEXT NOT NULL,authority_high_water INTEGER NOT NULL CHECK(authority_high_water>=1),created_at TEXT NOT NULL,updated_at TEXT NOT NULL) STRICT;
 CREATE TABLE controller_operations(operation_id TEXT PRIMARY KEY,key_sha256 TEXT NOT NULL REFERENCES governed_runs(key_sha256),kind TEXT NOT NULL,input_sha256 TEXT NOT NULL,input_json TEXT NOT NULL CHECK(json_valid(input_json)),expected_json TEXT NOT NULL CHECK(json_valid(expected_json)),sequence INTEGER NOT NULL,previous_digest TEXT NOT NULL,witness_record_json TEXT NOT NULL CHECK(json_valid(witness_record_json)),status TEXT NOT NULL CHECK(status IN('PENDING','ACKNOWLEDGED','UNRESOLVED','APPLIED')),result_json TEXT CHECK(result_json IS NULL OR json_valid(result_json)),created_at TEXT NOT NULL,UNIQUE(key_sha256,sequence)) STRICT;
+CREATE TABLE lineage_advances(operation_id TEXT PRIMARY KEY REFERENCES controller_operations(operation_id),key_sha256 TEXT NOT NULL REFERENCES governed_runs(key_sha256),lineage_sequence INTEGER NOT NULL CHECK(lineage_sequence>0),predecessor_sha256 TEXT NOT NULL,lineage_sha256 TEXT NOT NULL,custodian_session_id TEXT NOT NULL,observation_json TEXT NOT NULL CHECK(json_valid(observation_json)),accepted_at TEXT NOT NULL,UNIQUE(key_sha256,lineage_sequence),UNIQUE(key_sha256,lineage_sha256)) STRICT;
 CREATE TABLE pending_effect_identities(operation_id TEXT PRIMARY KEY REFERENCES controller_operations(operation_id),key_sha256 TEXT NOT NULL REFERENCES governed_runs(key_sha256),kind TEXT NOT NULL CHECK(kind IN('JOB','TARGET')),authority_incarnation TEXT NOT NULL,authority_revision INTEGER NOT NULL CHECK(authority_revision>0),effect_id TEXT NOT NULL,effect_sha256 TEXT NOT NULL,envelope_sha256 TEXT NOT NULL,pinned_at TEXT NOT NULL,UNIQUE(authority_incarnation,authority_revision)) STRICT;
 CREATE TABLE custody_incidents(incident_id TEXT PRIMARY KEY,key_sha256 TEXT NOT NULL REFERENCES governed_runs(key_sha256),kind TEXT NOT NULL,evidence_sha256 TEXT NOT NULL,raw_json TEXT NOT NULL CHECK(json_valid(raw_json)),created_at TEXT NOT NULL,UNIQUE(key_sha256,kind,evidence_sha256)) STRICT;
 CREATE TABLE authorized_jobs(evaluation_job_id TEXT PRIMARY KEY,key_sha256 TEXT NOT NULL REFERENCES governed_runs(key_sha256),operation_id TEXT NOT NULL UNIQUE REFERENCES controller_operations(operation_id),authority_incarnation TEXT NOT NULL,authority_revision INTEGER NOT NULL,manifest_sha256 TEXT NOT NULL,descriptor_sha256 TEXT NOT NULL,descriptor_envelope TEXT NOT NULL,result_json TEXT NOT NULL CHECK(json_valid(result_json)),current_eligible INTEGER NOT NULL CHECK(current_eligible IN(0,1)),UNIQUE(authority_incarnation,authority_revision)) STRICT;
@@ -215,7 +247,7 @@ export function initializeCustodyController(path: string, controllerId: string, 
 }
 
 type RunRow = {
-  key_sha256: string; key_json: string; binding_json: string; state: string; revision: number; witness_digest: string;
+  key_sha256: string; key_json: string; binding_json: string; lineage_root_json: string; lineage_root_observation_json: string; current_lineage_json: string; current_lineage_sha256: string; lineage_sequence: number; state: string; revision: number; witness_digest: string;
   admitted_json: string | null; lease_expires_ms: number | null; canonical_manifest_sha256: string | null;
   canonical_manifest_json: string | null; canonical_release_json: string | null; authority_incarnation: string; authority_high_water: number;
 };
@@ -233,16 +265,21 @@ export class CustodyController {
   }
   close(): void { this.db.close(); }
 
-  reserveRun(runBinding: RunBinding, authority: AuthorityContinuity, operationId: string): Readonly<Record<string, unknown>> {
+  reserveRun(runBinding: RunBinding, authority: AuthorityContinuity, operationId: string, rootObservation: LineageRootObservation): Readonly<Record<string, unknown>> {
     validateRunBinding(runBinding); validateAuthorityContinuity(authority);
-    const keySha = canonicalKeySha256(runBinding.key), current = this.run(keySha), bindingJson = json(runBinding), now = new Date().toISOString();
+    const keySha = canonicalKeySha256(runBinding.key), current = this.run(keySha), bindingJson = json(runBinding), root = lineageFromBinding(runBinding), rootJson = json(root), now = new Date().toISOString();
     if (current) {
-      if (current.binding_json !== bindingJson || current.authority_incarnation !== authority.incarnation) throw new CustodyControlError("RUN_BINDING_CONFLICT");
+      if (current.binding_json !== bindingJson || current.authority_incarnation !== authority.incarnation) {
+        this.recordIncident(current, "RUN_BINDING_CONFLICT", { existing_binding_sha256: hash(current.binding_json), presented_binding_sha256: hash(bindingJson), existing_lineage_root_sha256: hash(current.lineage_root_json), presented_lineage_root_sha256: hash(rootJson) }, operationId);
+        throw new CustodyControlError("RUN_BINDING_CONFLICT");
+      }
       return this.finishTransition(this.requireOperationFor(operationId, "RESERVE", keySha), true);
     }
+    validateLineageRootObservation(rootObservation);
+    if (!rootObservation.pre_write || json(rootObservation.lineage) !== rootJson) throw new CustodyControlError("RESERVATION_ROOT_NOT_PRE_WRITE");
     this.db.transaction(() => {
-      this.db.query("INSERT INTO governed_runs VALUES(?,?,?,?,0,?,NULL,NULL,NULL,NULL,NULL,?,?,?,?)").run(keySha, json(runBinding.key), bindingJson, "RESERVING", ZERO, authority.incarnation, authority.revision, now, now);
-      this.prepareOperation(operationId, keySha, "RESERVE", { binding_sha256: hash(bindingJson), authority }, {});
+      this.db.query("INSERT INTO governed_runs(key_sha256,key_json,binding_json,lineage_root_json,lineage_root_observation_json,current_lineage_json,current_lineage_sha256,lineage_sequence,state,revision,witness_digest,admitted_json,lease_expires_ms,canonical_manifest_sha256,canonical_manifest_json,canonical_release_json,authority_incarnation,authority_high_water,created_at,updated_at) VALUES(?,?,?,?,?,?,?,0,'RESERVING',0,?,NULL,NULL,NULL,NULL,NULL,?,?,?,?)").run(keySha, json(runBinding.key), bindingJson, rootJson, json(rootObservation), rootJson, hash(rootJson), ZERO, authority.incarnation, authority.revision, now, now);
+      this.prepareOperation(operationId, keySha, "RESERVE", { binding_sha256: hash(bindingJson), root_observation_sha256: hash(json(rootObservation)), authority }, {});
     }).immediate();
     return this.finishTransition(this.requireOperationFor(operationId, "RESERVE", keySha), true);
   }
@@ -291,10 +328,52 @@ export class CustodyController {
     return Object.freeze(JSON.parse(row.admitted_json));
   }
   bindingFor(key: CanonicalRunKey): RunBinding { return Object.freeze(JSON.parse(this.requireRun(canonicalKeySha256(key)).binding_json)); }
+  lineageFor(key: CanonicalRunKey): Readonly<{ root: LineageState; current: LineageState; sequence: number; current_sha256: string }> {
+    const row = this.requireRun(canonicalKeySha256(key));
+    return Object.freeze({ root: JSON.parse(row.lineage_root_json), current: JSON.parse(row.current_lineage_json), sequence: row.lineage_sequence, current_sha256: row.current_lineage_sha256 });
+  }
   canonicalEvidence(key: CanonicalRunKey): Readonly<{ manifest: CatfoodSealedInputManifestV1; release: RoleActionReceiptV2 }> {
     const row = this.requireRun(canonicalKeySha256(key));
     if (!row.canonical_manifest_json || !row.canonical_release_json) throw new CustodyControlError("CANONICAL_CLOSE_REQUIRED");
     return Object.freeze({ manifest: JSON.parse(row.canonical_manifest_json), release: JSON.parse(row.canonical_release_json) });
+  }
+
+  advanceLineage(key: CanonicalRunKey, observation: LineageObservation, custodianEvidence: Readonly<Record<string, unknown>>, operationId: string): Readonly<{ sequence: number; lineage_sha256: string; replay: boolean }> {
+    validateLineageObservation(observation);
+    const keySha = canonicalKeySha256(key), row = this.requireRun(keySha), admitted = row.admitted_json ? JSON.parse(row.admitted_json) as AdmittedCustodian : null;
+    if (!admitted) throw new CustodyControlError("ADMITTED_CUSTODIAN_REQUIRED");
+    const authenticated = admittedFromEvidence(custodianEvidence, this.authorityBinding, scopeFor(key, JSON.parse(row.binding_json)), admitted.host_incarnation);
+    if (json(authenticated) !== row.admitted_json) {
+      this.recordIncident(row, "NON_ADMITTED_LINEAGE_ADVANCE", { admitted_session_id: admitted.session_id, presented_session_id: authenticated.session_id, observation }, operationId);
+      throw new CustodyControlError("NON_ADMITTED_CUSTODIAN");
+    }
+    const observationJson = json(observation), lineageJson = json(observation.lineage), lineageSha = hash(lineageJson), input = { observation, custodian_session_id: admitted.session_id }, expected = { lineage_sequence: observation.sequence, predecessor_sha256: observation.predecessor_sha256, lineage_sha256: lineageSha };
+    const existing = this.operation(operationId);
+    if (existing) {
+      this.assertOperation(existing, "ADVANCE_LINEAGE", keySha, expected);
+      if (existing.input_json !== json(input)) throw new CustodyControlError("OPERATION_DOMAIN_CONFLICT");
+      if (existing.status === "APPLIED") return Object.freeze({ sequence: observation.sequence, lineage_sha256: lineageSha, replay: true });
+    }
+    this.assertNoOpenOperationExcept(keySha, operationId);
+    this.assertWitnessCurrent(row);
+    if (row.state !== "ACTIVE" || observation.sequence !== row.lineage_sequence + 1 || observation.predecessor_sha256 !== row.current_lineage_sha256 || lineageSha === row.current_lineage_sha256 || observation.lineage.store_pair_lineage_sha256 !== (JSON.parse(row.lineage_root_json) as LineageState).store_pair_lineage_sha256) {
+      this.recordIncident(row, "LINEAGE_CONTINUITY_CONFLICT", { current_sequence: row.lineage_sequence, current_lineage_sha256: row.current_lineage_sha256, observation }, operationId);
+      throw new CustodyControlError("LINEAGE_CONTINUITY_CONFLICT");
+    }
+    const op = existing ?? this.prepareOperation(operationId, keySha, "ADVANCE_LINEAGE", input, expected);
+    this.finishTransition(op, false);
+    const afterWitness = this.requireRun(keySha);
+    if (afterWitness.state !== "ACTIVE" || afterWitness.lineage_sequence + 1 !== observation.sequence || afterWitness.current_lineage_sha256 !== observation.predecessor_sha256 || afterWitness.admitted_json !== row.admitted_json) {
+      this.recordIncident(afterWitness, "LINEAGE_CONCURRENT_CONFLICT", { observation }, `incident:${operationId}:lineage-concurrent`);
+      throw new CustodyControlError("LINEAGE_CONTINUITY_CONFLICT");
+    }
+    this.db.transaction(() => {
+      this.db.query("INSERT INTO lineage_advances VALUES(?,?,?,?,?,?,?,?)").run(operationId, keySha, observation.sequence, observation.predecessor_sha256, lineageSha, admitted.session_id, observationJson, new Date().toISOString());
+      const updated = this.db.query("UPDATE governed_runs SET current_lineage_json=?,current_lineage_sha256=?,lineage_sequence=?,updated_at=? WHERE key_sha256=? AND state='ACTIVE' AND current_lineage_sha256=? AND lineage_sequence=?").run(lineageJson, lineageSha, observation.sequence, new Date().toISOString(), keySha, observation.predecessor_sha256, observation.sequence - 1);
+      if (updated.changes !== 1) throw new CustodyControlError("LINEAGE_CONTINUITY_CONFLICT");
+      this.db.query("UPDATE controller_operations SET status='APPLIED',result_json=? WHERE operation_id=? AND status='ACKNOWLEDGED'").run(json({ sequence: observation.sequence, lineage_sha256: lineageSha }), operationId);
+    }).immediate();
+    return Object.freeze({ sequence: observation.sequence, lineage_sha256: lineageSha, replay: false });
   }
 
   observeLeaseExpiry(key: CanonicalRunKey, observedNowMs: number): boolean {
@@ -306,9 +385,13 @@ export class CustodyController {
 
   assertReplacementAllowed(key: CanonicalRunKey, observation: FenceObservation, leaseExpiresMs: number): void {
     validateFenceObservation(observation);
-    const keySha = canonicalKeySha256(key), row = this.requireRun(keySha), runBinding = JSON.parse(row.binding_json) as RunBinding, old = row.admitted_json ? JSON.parse(row.admitted_json) as AdmittedCustodian : null;
+    const keySha = canonicalKeySha256(key), row = this.requireRun(keySha), currentLineage = JSON.parse(row.current_lineage_json) as LineageState, old = row.admitted_json ? JSON.parse(row.admitted_json) as AdmittedCustodian : null;
     this.assertNoOpenOperation(keySha);
-    if (row.state !== "FENCING" || !old || observation.old_session_id !== old.session_id || !observation.old_process_cannot_execute || !observation.old_credentials_revoked || !observation.producer_effects_resolved || !observation.complete_history_verified || !sameLineage(runBinding, observation) || !Number.isSafeInteger(leaseExpiresMs) || leaseExpiresMs <= Date.now()) {
+    if (!sameLineage(currentLineage, observation)) {
+      this.recordIncident(row, "LINEAGE_FENCE_CONFLICT", { current_lineage_sha256: row.current_lineage_sha256, observation }, `incident:fence:${hash(json(observation)).slice(0, 32)}`);
+      throw new CustodyControlError("REPLACEMENT_NOT_PROVEN");
+    }
+    if (row.state !== "FENCING" || !old || observation.old_session_id !== old.session_id || !observation.old_process_cannot_execute || !observation.old_credentials_revoked || !observation.producer_effects_resolved || !observation.complete_history_verified || !Number.isSafeInteger(leaseExpiresMs) || leaseExpiresMs <= Date.now()) {
       this.db.query("UPDATE governed_runs SET state='RECOVERY_REQUIRED',updated_at=? WHERE key_sha256=? AND state!='INCIDENT'").run(new Date().toISOString(), keySha);
       throw new CustodyControlError("REPLACEMENT_NOT_PROVEN");
     }
@@ -329,10 +412,10 @@ export class CustodyController {
   }
 
   closeManifest(key: CanonicalRunKey, manifestInput: CatfoodSealedInputManifestV1, receipt: RoleActionReceiptV2, operationId: string): Readonly<{ manifest_sha256: string; replay: boolean }> {
-    const manifest = validateSealedInputManifest(manifestInput), manifestSha = sealedInputManifestSha256(manifest), keySha = canonicalKeySha256(key), row = this.requireRun(keySha), runBinding = JSON.parse(row.binding_json) as RunBinding;
+    const manifest = validateSealedInputManifest(manifestInput), manifestSha = sealedInputManifestSha256(manifest), keySha = canonicalKeySha256(key), row = this.requireRun(keySha), runBinding = JSON.parse(row.binding_json) as RunBinding, currentLineage = JSON.parse(row.current_lineage_json) as LineageState;
     const release = verifyRoleActionReceiptV2(receipt, this.authorityBinding, { role: "custodian", action: "custodian.evaluation.release", purpose_class: "HISTORICAL_EVIDENCE", scope: manifest.scope as RoleRunScope }), body = JSON.parse(release.body_json) as Record<string, unknown>, admitted = row.admitted_json ? JSON.parse(row.admitted_json) as AdmittedCustodian : null;
     const authenticBody = body.manifest_sha256 === manifestSha && json(body.manifest) === json(manifest), owner = admitted && release.session_id === admitted.session_id, goRootBound = hash(json(body.go_root_policy_ref)) === runBinding.go_policy_ref_sha256;
-    if (!authenticBody || !owner || !goRootBound || !manifestMatchesRun(manifest, runBinding, keySha)) {
+    if (!authenticBody || !owner || !goRootBound || !manifestMatchesRun(manifest, runBinding, currentLineage, keySha)) {
       this.recordIncident(row, !owner ? "NON_ADMITTED_CUSTODIAN" : !authenticBody ? "RELEASE_MANIFEST_MISMATCH" : "CUSTODY_LINEAGE_MISMATCH", { manifest, receipt, admitted_session_id: admitted?.session_id ?? null }, operationId);
       throw new CustodyControlError(!owner ? "NON_ADMITTED_CUSTODIAN" : "CUSTODY_LINEAGE_MISMATCH");
     }
@@ -500,7 +583,7 @@ export class CustodyController {
 
   state(key: CanonicalRunKey): Readonly<Record<string, unknown>> {
     const row = this.requireRun(canonicalKeySha256(key));
-    return Object.freeze({ key_sha256: row.key_sha256, key: JSON.parse(row.key_json), binding: JSON.parse(row.binding_json), state: row.state, revision: row.revision, witness_digest: row.witness_digest, admitted: row.admitted_json ? JSON.parse(row.admitted_json) : null, lease_expires_ms: row.lease_expires_ms, canonical_manifest_sha256: row.canonical_manifest_sha256, authority_incarnation: row.authority_incarnation, authority_high_water: row.authority_high_water, incident_count: this.db.query<{ n: number }, [string]>("SELECT COUNT(*) n FROM custody_incidents WHERE key_sha256=?").get(row.key_sha256)!.n });
+    return Object.freeze({ key_sha256: row.key_sha256, key: JSON.parse(row.key_json), binding: JSON.parse(row.binding_json), lineage_root: JSON.parse(row.lineage_root_json), current_lineage: JSON.parse(row.current_lineage_json), current_lineage_sha256: row.current_lineage_sha256, lineage_sequence: row.lineage_sequence, state: row.state, revision: row.revision, witness_digest: row.witness_digest, admitted: row.admitted_json ? JSON.parse(row.admitted_json) : null, lease_expires_ms: row.lease_expires_ms, canonical_manifest_sha256: row.canonical_manifest_sha256, authority_incarnation: row.authority_incarnation, authority_high_water: row.authority_high_water, incident_count: this.db.query<{ n: number }, [string]>("SELECT COUNT(*) n FROM custody_incidents WHERE key_sha256=?").get(row.key_sha256)!.n });
   }
 
   private run(keySha: string): RunRow | null { return this.db.query<RunRow, [string]>("SELECT * FROM governed_runs WHERE key_sha256=?").get(keySha) ?? null; }
@@ -511,6 +594,7 @@ export class CustodyController {
   private assertOperation(op: OperationRow, kind: string, keySha: string, expected: unknown): void { if (op.kind !== kind || op.key_sha256 !== keySha || op.expected_json !== json(expected)) throw new CustodyControlError("OPERATION_DOMAIN_CONFLICT"); }
   private assertOperationDomain(op: OperationRow, kind: string, keySha: string): void { if (op.kind !== kind || op.key_sha256 !== keySha) throw new CustodyControlError("OPERATION_DOMAIN_CONFLICT"); }
   private assertNoOpenOperation(keySha: string): void { if (this.db.query("SELECT 1 FROM controller_operations WHERE key_sha256=? AND status IN('PENDING','ACKNOWLEDGED','UNRESOLVED')").get(keySha)) throw new CustodyControlError("CONTINUITY_OPERATION_PENDING"); }
+  private assertNoOpenOperationExcept(keySha: string, operationId: string): void { if (this.db.query("SELECT 1 FROM controller_operations WHERE key_sha256=? AND operation_id!=? AND status IN('PENDING','ACKNOWLEDGED','UNRESOLVED')").get(keySha, operationId)) throw new CustodyControlError("CONTINUITY_OPERATION_PENDING"); }
   private assertWitnessCurrent(row: RunRow): void { const current = this.witness.current(row.key_sha256); if (!current || current.record.sequence !== row.revision || current.record.record_digest !== row.witness_digest) throw new CustodyControlError("CONTINUITY_HIGH_WATER_MISMATCH"); }
   private requireClosedCurrent(keySha: string): RunRow { const row = this.requireRun(keySha); this.assertNoOpenOperation(keySha); this.assertWitnessCurrent(row); if (row.state !== "CLOSED" || !row.canonical_manifest_sha256 || !row.canonical_release_json) throw new CustodyControlError("CANONICAL_CLOSE_REQUIRED"); return row; }
   private assertAuthorityExpectation(row: RunRow, incarnation: string, revision: number): void { if (incarnation !== row.authority_incarnation) throw new CustodyControlError("AUTHORITY_INCARNATION_MISMATCH"); if (!Number.isSafeInteger(revision) || revision <= row.authority_high_water) throw new CustodyControlError("AUTHORITY_ROLLBACK"); }
@@ -627,15 +711,22 @@ export class TestOnlyPreCustodyHost {
   #authorityBinding: RoleChannelBinding;
   #authorityPath: string;
   #fenceAdapter: TrustedFenceAdapter;
+  #lineageAdapter: TrustedLineageAdapter;
   #now: () => number;
 
-  constructor(input: { authority_path: string; authority_binding: RoleChannelBinding; authority_private_key: string | KeyObject; controller: CustodyController; fence_adapter: TrustedFenceAdapter; now?: () => number }) {
+  constructor(input: { authority_path: string; authority_binding: RoleChannelBinding; authority_private_key: string | KeyObject; controller: CustodyController; fence_adapter: TrustedFenceAdapter; lineage_adapter: TrustedLineageAdapter; now?: () => number }) {
     if (input.authority_binding.trust_domain !== "TEST_ONLY") throw new CustodyControlError("TEST_ONLY_HOST_REQUIRED");
-    this.#authorityBinding = Object.freeze(structuredClone(input.authority_binding)); this.#authorityPath = resolve(input.authority_path); this.#controller = input.controller; this.#fenceAdapter = input.fence_adapter; this.#now = input.now ?? Date.now;
+    this.#authorityBinding = Object.freeze(structuredClone(input.authority_binding)); this.#authorityPath = resolve(input.authority_path); this.#controller = input.controller; this.#fenceAdapter = input.fence_adapter; this.#lineageAdapter = input.lineage_adapter; this.#now = input.now ?? Date.now;
     this.#authority = new CatfoodRoleAuthority(this.#authorityPath, this.#authorityBinding, input.authority_private_key, input.now);
   }
   close(): void { this.#authority.close(); this.#controller.close(); }
-  reserveRun(binding: RunBinding, operationId: string) { return this.#controller.reserveRun(binding, this.#readContinuity(), operationId); }
+  reserveRun(binding: RunBinding, operationId: string) { return this.#controller.reserveRun(binding, this.#readContinuity(), operationId, this.#lineageAdapter.inspectRoot({ key: binding.key, binding })); }
+
+  advanceLineage(input: { key: CanonicalRunKey; operation_id: string; custodian_session: LocalRoleSession }) {
+    this.#audit(input.key);
+    const admitted = this.#controller.admitted(input.key), state = this.#controller.lineageFor(input.key), evidence = localRoleEvidence(input.custodian_session), observation = this.#lineageAdapter.inspect({ key: input.key, admitted, current: state.current, sequence: state.sequence });
+    return this.#controller.advanceLineage(input.key, observation, evidence, input.operation_id);
+  }
 
   admitCustodian(input: { key: CanonicalRunKey; operation_id: string; lease_expires_ms: number; host_incarnation: string; subject?: RuntimeSubject }): LaunchedRole {
     this.#audit(input.key);
@@ -722,7 +813,7 @@ export class TestOnlyPreCustodyHost {
   observeLeaseAndReplace(input: { key: CanonicalRunKey; observed_now_ms: number; operation_id: string; lease_expires_ms: number; host_incarnation: string; subject?: RuntimeSubject }): LaunchedRole {
     if (!this.#controller.observeLeaseExpiry(input.key, input.observed_now_ms)) throw new CustodyControlError("LEASE_NOT_EXPIRED");
     const old = this.#controller.admitted(input.key); this.#authority.revokeSession(old.session_id);
-    const observation = this.#fenceAdapter.inspect({ key: input.key, admitted: old, binding: this.#controller.bindingFor(input.key) });
+    const observation = this.#fenceAdapter.inspect({ key: input.key, admitted: old, binding: this.#controller.bindingFor(input.key), lineage: this.#controller.lineageFor(input.key).current });
     this.#controller.assertReplacementAllowed(input.key, observation, input.lease_expires_ms);
     const pair = generateKeyPairSync("ed25519"), eb = this.#enrollmentBinding(input.key, "custodian"), subject = input.subject ?? collectCurrentRuntimeSubject(eb), launch = observeTestOnlyRoleLaunch(eb, "custodian", subject), assignment = this.#authority.issueLaunchKeyAssignment({ role: "custodian", scope: this.#scope(input.key), subject, launch, descriptor: roleChannelArtifactDescriptor("custodian"), public_key_pem: pair.publicKey.export({ type: "spki", format: "pem" }).toString() }), session = registerLocalRoleSessionForTest({ binding: this.#authorityBinding, transport: this.#authority.transport, assignment_envelope: assignment, private_key: pair.privateKey, now: this.#now }), admitted = admittedFromEvidence(localRoleEvidence(session), this.#authorityBinding, this.#scope(input.key), input.host_incarnation);
     try { this.#controller.replaceCustodian(input.key, observation, admitted, input.lease_expires_ms, input.operation_id); }
@@ -772,8 +863,13 @@ function validateRunBinding(value: RunBinding): void { validateKey(value.key); i
 function validateAdmissionCandidate(value: Readonly<Record<string, string>>): void { for (const item of [value.launch_id, value.process_id, value.host_incarnation]) if (!TOKEN.test(item)) throw new CustodyControlError("CUSTODIAN_SUBJECT_INVALID"); for (const item of [value.subject_sha256, value.action_key_fingerprint, value.build_sha256]) requireSha(item); }
 function validateAdmitted(value: AdmittedCustodian): void { for (const item of [value.session_id, value.assignment_id, value.launch_id, value.process_id, value.host_incarnation]) if (!TOKEN.test(item)) throw new CustodyControlError("ADMISSION_EVIDENCE_MISMATCH"); for (const item of [value.action_key_fingerprint, value.subject_sha256, value.build_sha256]) requireSha(item); }
 function validateFenceObservation(value: FenceObservation): void { if (!TOKEN.test(value.old_session_id)) throw new CustodyControlError("REPLACEMENT_NOT_PROVEN"); for (const item of [value.journal_head_sha256, value.checkpoint_head_sha256, value.control_snapshot_sha256, value.checkpoint_snapshot_sha256, value.pair_common_cut_sha256]) requireSha(item); }
-function sameLineage(binding: RunBinding, observed: FenceObservation): boolean { return binding.journal_head_sha256 === observed.journal_head_sha256 && binding.checkpoint_head_sha256 === observed.checkpoint_head_sha256 && binding.control_snapshot_sha256 === observed.control_snapshot_sha256 && binding.checkpoint_snapshot_sha256 === observed.checkpoint_snapshot_sha256 && binding.pair_common_cut_sha256 === observed.pair_common_cut_sha256; }
-function manifestMatchesRun(manifest: CatfoodSealedInputManifestV1, binding: RunBinding, keySha: string): boolean { return canonicalKeySha256(scopeKey(manifest.scope)) === keySha && manifest.scope.environment_instance_id === binding.environment_instance_id && manifest.scope.spec_sha256 === binding.spec_sha256 && hash(json(manifest.window)) === binding.window_sha256 && manifest.go.artifact_sha256 === binding.go_artifact_sha256 && manifest.journal.head_sha256 === binding.journal_head_sha256 && manifest.checkpoint.checkpoint_sha256 === binding.checkpoint_head_sha256 && manifest.control.raw_sha256 === binding.control_snapshot_sha256 && manifest.checkpoint_store.raw_sha256 === binding.checkpoint_snapshot_sha256 && manifest.pair_common_cut_sha256 === binding.pair_common_cut_sha256 && manifest.trust.test_only === true; }
+function validateLineageState(value: LineageState): void { for (const item of [value.store_pair_lineage_sha256, value.journal_head_sha256, value.checkpoint_head_sha256, value.control_snapshot_sha256, value.checkpoint_snapshot_sha256, value.pair_common_cut_sha256]) requireSha(item); }
+function validateLineageRootObservation(value: LineageRootObservation): void { if (value.schema !== "pre-custody-lineage-root-observation.v1" || !TOKEN.test(value.adapter_id) || typeof value.pre_write !== "boolean" || !Number.isFinite(Date.parse(value.observed_at))) throw new CustodyControlError("LINEAGE_ROOT_OBSERVATION_INVALID"); validateLineageState(value.lineage); }
+function validateLineageObservation(value: LineageObservation): void { if (value.schema !== "pre-custody-lineage-observation.v1" || !TOKEN.test(value.adapter_id) || !Number.isSafeInteger(value.sequence) || value.sequence < 1 || !SHA256.test(value.predecessor_sha256) || !Number.isFinite(Date.parse(value.observed_at))) throw new CustodyControlError("LINEAGE_OBSERVATION_INVALID"); validateLineageState(value.lineage); }
+function lineageFromBinding(binding: RunBinding): LineageState { return Object.freeze({ store_pair_lineage_sha256: binding.store_pair_lineage_sha256, journal_head_sha256: binding.journal_head_sha256, checkpoint_head_sha256: binding.checkpoint_head_sha256, control_snapshot_sha256: binding.control_snapshot_sha256, checkpoint_snapshot_sha256: binding.checkpoint_snapshot_sha256, pair_common_cut_sha256: binding.pair_common_cut_sha256 }); }
+function sameLineage(lineage: LineageState, observed: FenceObservation): boolean { return lineage.journal_head_sha256 === observed.journal_head_sha256 && lineage.checkpoint_head_sha256 === observed.checkpoint_head_sha256 && lineage.control_snapshot_sha256 === observed.control_snapshot_sha256 && lineage.checkpoint_snapshot_sha256 === observed.checkpoint_snapshot_sha256 && lineage.pair_common_cut_sha256 === observed.pair_common_cut_sha256; }
+function manifestMatchesRun(manifest: CatfoodSealedInputManifestV1, binding: RunBinding, lineage: LineageState, keySha: string): boolean { return canonicalKeySha256(scopeKey(manifest.scope)) === keySha && manifest.scope.environment_instance_id === binding.environment_instance_id && manifest.scope.spec_sha256 === binding.spec_sha256 && hash(json(manifest.window)) === binding.window_sha256 && manifest.go.artifact_sha256 === binding.go_artifact_sha256 && manifest.journal.head_sha256 === lineage.journal_head_sha256 && manifest.checkpoint.checkpoint_sha256 === lineage.checkpoint_head_sha256 && manifest.control.raw_sha256 === lineage.control_snapshot_sha256 && manifest.checkpoint_store.raw_sha256 === lineage.checkpoint_snapshot_sha256 && manifest.pair_common_cut_sha256 === lineage.pair_common_cut_sha256 && manifest.trust.test_only === true; }
+function scopeFor(key: CanonicalRunKey, binding: RunBinding): RoleRunScope { return { ...key, environment_instance_id: binding.environment_instance_id, spec_sha256: binding.spec_sha256 }; }
 function publicKeyFingerprint(pem: string): string { return hash(createPublicKey(pem).export({ type: "spki", format: "der" }) as Buffer); }
 function decodeSignedEnvelope(envelope: string): Record<string, any> { const outer = JSON.parse(envelope) as { payload: string }; return JSON.parse(Buffer.from(outer.payload, "base64url").toString()); }
 function decodeEvidence(session: LocalRoleSession): Record<string, any> { return decodeSignedEnvelope(String(localRoleEvidence(session).enrollment_envelope_json)); }
