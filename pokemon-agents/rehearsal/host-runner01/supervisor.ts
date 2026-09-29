@@ -92,13 +92,16 @@ export class RehearsalHostSupervisor {
 
   async send(command: WorkerCommand): Promise<WorkerResponse> {
     const active = this.requireActive(), identity = active.ready!;
-    this.recorder.record("COMMAND_SENT", { generation: identity.generation, pid: identity.pid, process_identity: identity.process_identity, command_id: command.id, command_kind: command.kind, operation_id: "operation_id" in command ? command.operation_id : null, declared_fault_mode: command.kind === "CONFIGURE_WITNESS_FAULT" ? command.mode : null });
+    const observerBeforeMs = command.kind === "REQUEST_REPLACEMENT" ? Date.now() : null, sentEvidence = command.kind === "REQUEST_REPLACEMENT" ? { observer_before_ms: observerBeforeMs } : command.kind === "ADMIT_FIXED_EXPIRY" ? { submitted_lease_expires_ms: command.lease_expires_ms } : {};
+    this.recorder.record("COMMAND_SENT", { generation: identity.generation, pid: identity.pid, process_identity: identity.process_identity, command_id: command.id, command_kind: command.kind, operation_id: "operation_id" in command ? command.operation_id : null, declared_fault_mode: command.kind === "CONFIGURE_WITNESS_FAULT" ? command.mode : null, ...sentEvidence });
     active.child.stdin.write(`${JSON.stringify(command)}\n`); active.child.stdin.flush();
     const response = await this.readMessage(active) as WorkerResponse;
     if (response.id !== command.id) throw new Error("WORKER_RESPONSE_ID_MISMATCH");
     const result = response.result as any, stateEvidence = command.kind === "INITIALIZE_CASE" || command.kind === "REPORT_STATE" ? { store_paths: result?.store_paths ?? null, store_ids: result?.store_ids ?? null } : {};
     const attestationEvidence = response.cut || command.kind === "RECONCILE_READ" || command.kind === "REPORT_STATE" ? { operation_status: result?.operation_status ?? result?.operation?.status ?? result?.status ?? null, material: typeof result?.material === "string" ? result.material : result?.material?.material ?? null, witness_record_present: typeof result?.witness_record_present === "boolean" ? result.witness_record_present : null } : {};
-    this.recorder.record("COMMAND_RESULT", { generation: identity.generation, pid: identity.pid, process_identity: identity.process_identity, command_id: command.id, command_kind: command.kind, operation_id: "operation_id" in command ? command.operation_id : null, ok: response.ok, error_code: response.error_code ?? null, fault_cut: response.cut ?? null, witness_sequence: result?.witness_sequence ?? null, recovery_result: command.kind === "ADVANCE_LINEAGE" && response.ok ? response.result : null, ...stateEvidence, ...attestationEvidence });
+    const timingEvidence = command.kind === "REQUEST_REPLACEMENT" ? { observer_before_ms: observerBeforeMs, observed_now_ms: result?.observed_now_ms ?? null, observer_after_ms: Date.now() } : {};
+    const expiryEvidence = command.kind === "ADMIT_FIXED_EXPIRY" ? { submitted_lease_expires_ms: result?.submitted_lease_expires_ms ?? command.lease_expires_ms } : {};
+    this.recorder.record("COMMAND_RESULT", { generation: identity.generation, pid: identity.pid, process_identity: identity.process_identity, command_id: command.id, command_kind: command.kind, operation_id: "operation_id" in command ? command.operation_id : null, ok: response.ok, error_code: response.error_code ?? null, fault_cut: response.cut ?? null, witness_sequence: result?.witness_sequence ?? null, recovery_result: command.kind === "ADVANCE_LINEAGE" && response.ok ? response.result : null, ...stateEvidence, ...attestationEvidence, ...timingEvidence, ...expiryEvidence });
     return response;
   }
 

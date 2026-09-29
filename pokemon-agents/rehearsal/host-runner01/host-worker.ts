@@ -5,7 +5,8 @@ import { Database } from "bun:sqlite";
 import { canonicalJson } from "../../web/lib/catfood-harness";
 import { CATFOOD_POLICY_SHA256 } from "../../web/lib/catfood-trust";
 import { roleChannelAcceptedSnapshotDigest } from "../../web/lib/catfood-enrollment";
-import { initializeRoleAuthorityStore, type LocalRoleSession, type RoleChannelBinding, type RoleRunScope } from "../../web/lib/catfood-role-channel";
+import { CATFOOD_FINAL_CLOSURE_CHARTER, CATFOOD_SEALED_INPUT_SCHEMA, CATFOOD_SQLITE_EXPORT_PROFILE, goRootPolicyRef, type CatfoodGoRootPolicyV1, type CatfoodSealedInputManifestV1 } from "../../web/lib/catfood-final-closure";
+import { buildCustodyReleaseAction, buildEvaluationActionV3, initializeRoleAuthorityStore, localRoleEvidence, performRoleAction, type LocalRoleSession, type RoleChannelBinding, type RoleRunScope } from "../../web/lib/catfood-role-channel";
 import { testGoRootPolicy } from "../../tests/catfood-go-root-policy-fixture";
 import {
   CustodyController, CustodyControlError, TestOnlyPreCustodyHost, TestOnlySqliteContinuityWitness,
@@ -19,7 +20,7 @@ const sha = (value: string) => createHash("sha256").update(value).digest("hex");
 const json = (value: unknown) => canonicalJson(value as never);
 const startedAt = new Date(Date.now() - Math.floor(process.uptime() * 1000)).toISOString();
 
-type StoredCase = Readonly<{ key: CanonicalRunKey; binding: RoleChannelBinding; run_binding: RunBinding }>;
+type StoredCase = Readonly<{ key: CanonicalRunKey; binding: RoleChannelBinding; run_binding: RunBinding; window: Readonly<{ start: string; end: string }> }>;
 type PersistedOperationAttestation = Readonly<{ status: string; witness_record_json: string }>;
 type WitnessAttestation = Readonly<{ record: unknown }>;
 
@@ -37,6 +38,27 @@ function persistedOperationAttestation(controllerPath: string, operationId: stri
     if (!operation) throw new Error("OPERATION_NOT_FOUND");
     return Object.freeze(operation);
   } finally { db.close(); }
+}
+
+function decodeSession(session: LocalRoleSession): Record<string, any> {
+  const envelope = JSON.parse(String(localRoleEvidence(session).enrollment_envelope_json)) as { payload: string };
+  return JSON.parse(Buffer.from(envelope.payload, "base64url").toString());
+}
+
+function positiveManifest(stored: StoredCase, material: ReturnType<PersistentLineageAdapter["read"]>): CatfoodSealedInputManifestV1 {
+  const policy = stored.binding.policy.go_root_policy_documents[0] as CatfoodGoRootPolicyV1, profile = policy.verification_profile, current = material.current;
+  const snapshot = (raw_sha256: string) => ({ format: CATFOOD_SQLITE_EXPORT_PROFILE, byte_length: 4096, raw_sha256, logical_schema_sha256: sha("rehearsal:sqlite-schema") } as const);
+  const body = {
+    schema: CATFOOD_SEALED_INPUT_SCHEMA, charter: CATFOOD_FINAL_CLOSURE_CHARTER,
+    scope: { ...stored.key, environment_instance_id: stored.run_binding.environment_instance_id, spec_sha256: stored.run_binding.spec_sha256 }, window: stored.window,
+    closure: { closed_source_event_id: "event:rehearsal:closed-source", run_closed_event_id: "event:rehearsal:run-closed", lifecycle: "CLOSED" as const },
+    journal: { high_water: material.sequence, head_sha256: current.journal_head_sha256 }, checkpoint: { checkpoint_id: "checkpoint:rehearsal:final", checkpoint_sha256: current.checkpoint_head_sha256, pins_sha256: sha("rehearsal:pins") },
+    retained_source: { archive_sha256: sha("rehearsal:archive"), source_digest: sha("rehearsal:source"), producer_identity: "rehearsal:producer" },
+    go: { artifact_sha256: stored.run_binding.go_artifact_sha256, verification_profile_id: profile.profile_id, verification_profile_sha256: sha(json(profile)), root_fingerprints: profile.keys.map((key) => key.public_key_sha256).sort() },
+    fixed: { dependencies_sha256: sha("rehearsal:dependencies"), policy_sha256: CATFOOD_POLICY_SHA256, kernel_sha256: sha("rehearsal:kernel") }, trust: { environment_provenance_sha256: sha("rehearsal:environment"), clock_provenance_sha256: sha("rehearsal:clock"), acquisition_provenance_sha256: sha("rehearsal:acquisition"), test_only: true },
+    expected_bundle_sha256: sha("rehearsal:expected-bundle"), pair_common_cut_sha256: current.pair_common_cut_sha256, control: snapshot(current.control_snapshot_sha256), checkpoint_store: snapshot(current.checkpoint_snapshot_sha256),
+  };
+  return Object.freeze({ ...body, manifest_id: `manifest:${sha(json(body)).slice(0, 40)}` });
 }
 
 function loadConfig(): WorkerConfig {
@@ -66,7 +88,7 @@ function initializeCase(config: WorkerConfig): StoredCase {
   const scope: RoleRunScope = Object.freeze({ ...key, environment_instance_id: `instance:${suffix}`, spec_sha256: sha(`spec:${suffix}`) });
   const authorityPair = generateKeyPairSync("ed25519"), goPair = generateKeyPairSync("ed25519");
   const authorityPublic = authorityPair.publicKey.export({ type: "spki", format: "pem" }).toString(), goPublic = goPair.publicKey.export({ type: "spki", format: "pem" }).toString();
-  const now = Date.now(), go = testGoRootPolicy({
+  const now = Date.now(), window = Object.freeze({ start: new Date(now).toISOString(), end: new Date(now + config.policy_validity_ms).toISOString() }), go = testGoRootPolicy({
     authority_identity: `fixture-role-authority:${suffix}`, authority_public_key_pem: authorityPublic,
     enrollment_namespace: `fixture:rehearsal:${suffix}`, scope,
     public_keys: [{ key_id: `go:${suffix}`, public_key_pem: goPublic }],
@@ -84,21 +106,21 @@ function initializeCase(config: WorkerConfig): StoredCase {
   const controlStore = `control:${suffix}`, checkpointStore = `checkpoint:${suffix}`;
   initializePersistentLineage(p.lineage, { adapter_id: `adapter:${suffix}`, key, control_store_id: controlStore, checkpoint_store_id: checkpointStore, store_pair: suffix });
   const root = new PersistentLineageAdapter(p.lineage).read().pre_write_root;
-  const runBinding: RunBinding = Object.freeze({ key, environment_instance_id: scope.environment_instance_id, spec_sha256: scope.spec_sha256, window_sha256: sha(json({ start_offset_ms: 0, duration_ms: config.policy_validity_ms })), go_artifact_sha256: sha(`go-artifact:${suffix}`), go_policy_ref_sha256: sha(json(go.ref)), control_store_id: controlStore, checkpoint_store_id: checkpointStore, ...root, producer_generation: 1, test_only: true });
+  const runBinding: RunBinding = Object.freeze({ key, environment_instance_id: scope.environment_instance_id, spec_sha256: scope.spec_sha256, window_sha256: sha(json(window)), go_artifact_sha256: sha(`go-artifact:${suffix}`), go_policy_ref_sha256: sha(json(go.ref)), control_store_id: controlStore, checkpoint_store_id: checkpointStore, ...root, producer_generation: 1, test_only: true });
 
   writeFileSync(p.authorityKey, authorityPair.privateKey.export({ type: "pkcs8", format: "pem" }).toString(), { encoding: "utf8", mode: 0o600, flag: "wx" });
   for (const dbPath of [p.authority, p.controller, p.witness]) writeFileSync(dbPath, "", { flag: "wx", mode: 0o600 });
   initializeRoleAuthorityStore(p.authority, binding);
   initializeCustodyController(p.controller, `controller:${suffix}`, binding);
   initializeTestOnlyContinuityWitness(p.witness);
-  const stored: StoredCase = Object.freeze({ key, binding, run_binding: runBinding });
+  const stored: StoredCase = Object.freeze({ key, binding, run_binding: runBinding, window });
   writeFileSync(p.binding, JSON.stringify(stored), { encoding: "utf8", mode: 0o600, flag: "wx" });
   return stored;
 }
 
 function publicState(config: WorkerConfig, stored: StoredCase, adapter: PersistentLineageAdapter): PublicCaseState {
   const p = paths(config.case_dir), material = adapter.read();
-  return Object.freeze({ key: stored.key, store_paths: { controller: p.controller, witness: p.witness, authority: p.authority, lineage: p.lineage }, store_ids: { control: material.control_store_id, checkpoint: material.checkpoint_store_id, adapter: material.adapter_id }, network_required: false });
+  return Object.freeze({ key: stored.key, store_paths: { controller: p.controller, witness: p.witness, authority: p.authority, lineage: p.lineage }, store_ids: { control: material.control_store_id, checkpoint: material.checkpoint_store_id, adapter: material.adapter_id }, window: stored.window, window_sha256: stored.run_binding.window_sha256, network_required: false });
 }
 
 async function main(): Promise<void> {
@@ -106,7 +128,7 @@ async function main(): Promise<void> {
   const witness = new TestOnlySqliteContinuityWitness(p.witness), controller = new CustodyController(p.controller, witness, stored.binding);
   const fenceAdapter = { inspect({ admitted }: { admitted: { session_id: string } }): FenceObservation { const state = adapter.read(); return { old_session_id: admitted.session_id, old_process_cannot_execute: false, old_credentials_revoked: false, producer_effects_resolved: false, complete_history_verified: false, journal_head_sha256: state.current.journal_head_sha256, checkpoint_head_sha256: state.current.checkpoint_head_sha256, control_snapshot_sha256: state.current.control_snapshot_sha256, checkpoint_snapshot_sha256: state.current.checkpoint_snapshot_sha256, pair_common_cut_sha256: state.current.pair_common_cut_sha256 }; } };
   const host = new TestOnlyPreCustodyHost({ authority_path: p.authority, authority_binding: stored.binding, authority_private_key: readFileSync(p.authorityKey, "utf8"), controller, fence_adapter: fenceAdapter, lineage_adapter: adapter });
-  let custodianSession: LocalRoleSession | undefined, graceful = false;
+  let custodianSession: LocalRoleSession | undefined, graceful = false, replacementTiming: { observed_now_ms: number } | undefined, fixedAdmissionExpiry: number | undefined;
 
   const ready: WorkerReady = Object.freeze({ kind: "WORKER_READY", campaign_id: config.campaign_id, case_id: config.case_id, generation: config.generation, pid: process.pid, process_started_at: startedAt, process_identity: `${process.pid}:${startedAt}:${randomBytes(8).toString("hex")}` });
   process.stdout.write(`${JSON.stringify(ready)}\n`);
@@ -119,6 +141,12 @@ async function main(): Promise<void> {
         const launched = host.admitCustodian({ key: stored.key, operation_id: command.operation_id, lease_expires_ms: Date.now() + command.lease_lifetime_ms, host_incarnation: `host:${config.generation}` });
         custodianSession = launched.session;
         return host.safety(stored.key, { kind: "STATUS_READ" });
+      }
+      case "ADMIT_FIXED_EXPIRY": {
+        fixedAdmissionExpiry = command.lease_expires_ms;
+        const launched = host.admitCustodian({ key: stored.key, operation_id: command.operation_id, lease_expires_ms: command.lease_expires_ms, host_incarnation: `host:${config.generation}:fixed-expiry` });
+        custodianSession = launched.session;
+        return { ...(host.safety(stored.key, { kind: "STATUS_READ" }) as Record<string, unknown>), submitted_lease_expires_ms: command.lease_expires_ms };
       }
       case "MUTATE_TEST_MATERIAL": return adapter.mutate(command.material);
       case "CONFIGURE_WITNESS_FAULT": witness.setFailureForTest(command.mode); return { mode: command.mode };
@@ -135,10 +163,21 @@ async function main(): Promise<void> {
         return { ...operation, operation_status: operation.status, material: adapter.read().material, witness_record_present: witnessRecord !== null, witness_sequence: witnessRecord?.record.sequence ?? null };
       }
       case "REQUEST_REPLACEMENT": {
-        const state = host.safety(stored.key, { kind: "STATUS_READ" }) as { lease_expires_ms?: number };
-        const next = host.observeLeaseAndReplace({ key: stored.key, observed_now_ms: Number(state.lease_expires_ms) + command.observed_after_lease_ms, operation_id: command.operation_id, lease_expires_ms: Date.now() + command.lease_lifetime_ms, host_incarnation: `host:${config.generation}:replacement` });
+        const observed_now_ms = Date.now(); replacementTiming = { observed_now_ms };
+        const next = host.observeLeaseAndReplace({ key: stored.key, observed_now_ms, operation_id: command.operation_id, lease_expires_ms: Date.now() + command.lease_lifetime_ms, host_incarnation: `host:${config.generation}:replacement` });
         custodianSession = next.session;
-        return host.safety(stored.key, { kind: "STATUS_READ" });
+        return { ...(host.safety(stored.key, { kind: "STATUS_READ" }) as Record<string, unknown>), observed_now_ms };
+      }
+      case "ESTABLISH_POSITIVE_BASELINE": {
+        if (!custodianSession) throw new CustodyControlError("CUSTODIAN_SESSION_REQUIRED");
+        const operation = `baseline:${sha(command.operation_id).slice(0, 24)}`, material = adapter.read().material === "PRE_WRITE" ? adapter.mutate("H1") : adapter.read();
+        host.advanceLineage({ key: stored.key, operation_id: `${operation}:lineage`, custodian_session: custodianSession });
+        const evaluator = host.launchRole(stored.key, "evaluator"), writer = host.launchRole(stored.key, "writer"), verifier = host.launchRole(stored.key, "verifier"), manifest = positiveManifest(stored, material), workflow = `${operation}:workflow`, roleEvidenceSha = sha(json([localRoleEvidence(custodianSession), evaluator.evidence, writer.evidence]));
+        const release = performRoleAction(custodianSession, { action: "custodian.evaluation.release", purpose_class: "HISTORICAL_EVIDENCE", request_id: `${operation}:release`, logical_target: stored.key.run_id, body: (actionId) => buildCustodyReleaseAction({ action_id: actionId, manifest, go_root_policy_ref: goRootPolicyRef(stored.binding.policy.go_root_policy_documents[0] as CatfoodGoRootPolicyV1), evaluator_session_id: String(decodeSession(evaluator.session).session_id), writer_session_id: String(decodeSession(writer.session).session_id), role_evidence_sha256: roleEvidenceSha, workflow_instruction_id: workflow }) });
+        const closed = host.closeCustody({ key: stored.key, operation_id: `${operation}:close`, manifest, release_receipt: release }), job = host.issueEvaluationJob({ key: stored.key, operation_id: `${operation}:job`, evaluator_evidence: evaluator.evidence, writer_evidence: writer.evidence, role_evidence_sha256: roleEvidenceSha, workflow_instruction_id: workflow, workflow_instruction_sha256: sha(workflow), commit_lifetime_ms: command.commit_lifetime_ms });
+        const evaluatorEnrollment = decodeSession(evaluator.session), evaluatorIdentity = { session_id: String(evaluatorEnrollment.session_id), build_sha256: String((evaluatorEnrollment.accepted_role_descriptor as Record<string, unknown>).artifact_root) }, decision = { evaluator: evaluatorIdentity, verdict: "PASS" as const, reason_codes: [] as string[] };
+        const committed = performRoleAction(evaluator.session, { action: "evaluator.result.commit", purpose_class: "INDEPENDENT_EVALUATION", request_id: job.descriptor.stable_evaluator_request_id, logical_target: job.descriptor.evaluation_job_id, body: () => buildEvaluationActionV3({ job, decision_core: decision, evaluator: evaluatorIdentity, source_digest: manifest.retained_source.source_digest }) }), target_envelope = host.assignExpectedTarget({ key: stored.key, operation_id: `${operation}:target`, verifier_evidence: verifier.evidence, evaluation_job_id: job.descriptor.evaluation_job_id }), eligibility = host.publicationEligibility(stored.key, target_envelope);
+        return { window: stored.window, run_binding_window_sha256: stored.run_binding.window_sha256, manifest_window_sha256: sha(json(manifest.window)), release_receipt_sha256: release.receipt_sha256, close: closed, evaluation_job_id: job.descriptor.evaluation_job_id, evaluator_commit_receipt_sha256: committed.receipt_sha256, target_envelope, eligibility };
       }
       case "REPORT_STATE": {
         const state = host.safety(stored.key, { kind: "STATUS_READ" }), current = witness.current(canonicalKeySha256(stored.key));
@@ -170,6 +209,8 @@ async function main(): Promise<void> {
           cut = cutForAttestedState(code, persistedOperation, material, witnessRecord);
           result = { operation, operation_status: persistedOperation.status, material, witness_record_present: witnessRecord !== null, witness_sequence: witnessRecord?.record.sequence ?? null };
         }
+        if (command?.kind === "REQUEST_REPLACEMENT" && replacementTiming) result = replacementTiming;
+        if (command?.kind === "ADMIT_FIXED_EXPIRY" && fixedAdmissionExpiry !== undefined) result = { submitted_lease_expires_ms: fixedAdmissionExpiry };
         const response: WorkerResponse = { id: command?.id ?? responseId, ok: false, error_code: code, cut, result };
         process.stdout.write(`${JSON.stringify(response)}\n`);
       }

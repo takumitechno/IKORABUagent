@@ -6,6 +6,7 @@ export type WorkerCommand =
   | Readonly<{ id: string; kind: "INITIALIZE_CASE" }>
   | Readonly<{ id: string; kind: "RESERVE"; operation_id: string }>
   | Readonly<{ id: string; kind: "ADMIT"; operation_id: string; lease_lifetime_ms: number }>
+  | Readonly<{ id: string; kind: "ADMIT_FIXED_EXPIRY"; operation_id: string; lease_expires_ms: number }>
   | Readonly<{ id: string; kind: "MUTATE_TEST_MATERIAL"; material: "H1" | "H2" }>
   | Readonly<{ id: string; kind: "CONFIGURE_WITNESS_FAULT"; mode: WitnessFault }>
   | Readonly<{ id: string; kind: "ADVANCE_LINEAGE"; operation_id: string }>
@@ -17,7 +18,8 @@ export type WorkerCommand =
   | Readonly<{ id: string; kind: "RECONCILE_TARGET"; operation_id: string }>
   | Readonly<{ id: string; kind: "STATUS_READ" }>
   | Readonly<{ id: string; kind: "RECONCILE_READ"; operation_id: string }>
-  | Readonly<{ id: string; kind: "REQUEST_REPLACEMENT"; operation_id: string; observed_after_lease_ms: number; lease_lifetime_ms: number }>
+  | Readonly<{ id: string; kind: "REQUEST_REPLACEMENT"; operation_id: string; lease_lifetime_ms: number }>
+  | Readonly<{ id: string; kind: "ESTABLISH_POSITIVE_BASELINE"; operation_id: string; commit_lifetime_ms: number }>
   | Readonly<{ id: string; kind: "REPORT_STATE" }>
   | Readonly<{ id: string; kind: "GRACEFUL_STOP" }>;
 
@@ -52,20 +54,23 @@ export interface PublicCaseState {
   readonly key: CanonicalRunKey;
   readonly store_paths: Readonly<{ controller: string; witness: string; authority: string; lineage: string }>;
   readonly store_ids: Readonly<{ control: string; checkpoint: string; adapter: string }>;
+  readonly window: Readonly<{ start: string; end: string }>;
+  readonly window_sha256: string;
   readonly network_required: false;
 }
 
 const TOKEN = /^[A-Za-z0-9][A-Za-z0-9:._/-]{0,255}$/;
 const kinds = new Set([
-  "INITIALIZE_CASE", "RESERVE", "ADMIT", "MUTATE_TEST_MATERIAL", "CONFIGURE_WITNESS_FAULT",
+  "INITIALIZE_CASE", "RESERVE", "ADMIT", "ADMIT_FIXED_EXPIRY", "MUTATE_TEST_MATERIAL", "CONFIGURE_WITNESS_FAULT",
   "ADVANCE_LINEAGE", "CLOSE", "ISSUE_JOB", "ASSIGN_TARGET", "CHECK_ELIGIBILITY",
   "RECONCILE_JOB", "RECONCILE_TARGET", "STATUS_READ", "RECONCILE_READ", "REQUEST_REPLACEMENT",
-  "REPORT_STATE", "GRACEFUL_STOP",
+  "ESTABLISH_POSITIVE_BASELINE", "REPORT_STATE", "GRACEFUL_STOP",
 ]);
 
 const fields: Record<string, readonly string[]> = {
   INITIALIZE_CASE: ["id", "kind"], RESERVE: ["id", "kind", "operation_id"],
   ADMIT: ["id", "kind", "operation_id", "lease_lifetime_ms"],
+  ADMIT_FIXED_EXPIRY: ["id", "kind", "operation_id", "lease_expires_ms"],
   MUTATE_TEST_MATERIAL: ["id", "kind", "material"],
   CONFIGURE_WITNESS_FAULT: ["id", "kind", "mode"],
   ADVANCE_LINEAGE: ["id", "kind", "operation_id"],
@@ -75,7 +80,8 @@ const fields: Record<string, readonly string[]> = {
   CHECK_ELIGIBILITY: ["id", "kind", "target_envelope"],
   RECONCILE_JOB: ["id", "kind", "operation_id"], RECONCILE_TARGET: ["id", "kind", "operation_id"],
   STATUS_READ: ["id", "kind"], RECONCILE_READ: ["id", "kind", "operation_id"],
-  REQUEST_REPLACEMENT: ["id", "kind", "operation_id", "observed_after_lease_ms", "lease_lifetime_ms"],
+  REQUEST_REPLACEMENT: ["id", "kind", "operation_id", "lease_lifetime_ms"],
+  ESTABLISH_POSITIVE_BASELINE: ["id", "kind", "operation_id", "commit_lifetime_ms"],
   REPORT_STATE: ["id", "kind"], GRACEFUL_STOP: ["id", "kind"],
 };
 
@@ -86,7 +92,7 @@ export function parseWorkerCommand(value: unknown): WorkerCommand {
   const allowed = fields[kind]!, optional = new Set(["lose_response_for_test"]);
   if (Object.keys(row).some((key) => !allowed.includes(key)) || allowed.some((key) => !optional.has(key) && !(key in row))) throw new Error("PROTOCOL_COMMAND_INVALID");
   for (const name of ["operation_id", "workflow_instruction_id", "evaluation_job_id"] as const) if (name in row && (typeof row[name] !== "string" || !TOKEN.test(row[name] as string))) throw new Error("PROTOCOL_COMMAND_INVALID");
-  for (const name of ["lease_lifetime_ms", "policy_validity_ms", "observed_after_lease_ms", "commit_lifetime_ms"] as const) if (name in row && (!Number.isSafeInteger(row[name]) || Number(row[name]) <= 0)) throw new Error("PROTOCOL_COMMAND_INVALID");
+  for (const name of ["lease_lifetime_ms", "lease_expires_ms", "policy_validity_ms", "commit_lifetime_ms"] as const) if (name in row && (!Number.isSafeInteger(row[name]) || Number(row[name]) <= 0)) throw new Error("PROTOCOL_COMMAND_INVALID");
   if (kind === "MUTATE_TEST_MATERIAL" && row.material !== "H1" && row.material !== "H2") throw new Error("PROTOCOL_COMMAND_INVALID");
   if (kind === "CONFIGURE_WITNESS_FAULT" && !["NONE", "BEFORE_COMMIT", "AFTER_COMMIT"].includes(String(row.mode))) throw new Error("PROTOCOL_COMMAND_INVALID");
   if ("lose_response_for_test" in row && typeof row.lose_response_for_test !== "boolean") throw new Error("PROTOCOL_COMMAND_INVALID");

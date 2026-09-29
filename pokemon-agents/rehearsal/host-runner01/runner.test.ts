@@ -1,4 +1,5 @@
 import { afterAll, describe, expect, test } from "bun:test";
+import { createHash } from "node:crypto";
 import { existsSync, mkdtempSync, readFileSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -36,6 +37,12 @@ async function activeCase(supervisor: RehearsalHostSupervisor): Promise<void> {
   await ok(supervisor, { kind: "ADMIT", operation_id: "admit:one", lease_lifetime_ms: 120_000 });
 }
 
+async function reservedCase(supervisor: RehearsalHostSupervisor): Promise<void> {
+  await supervisor.start();
+  await ok(supervisor, { kind: "INITIALIZE_CASE" });
+  await ok(supervisor, { kind: "RESERVE", operation_id: "reserve:one" });
+}
+
 describe("TEST_ONLY rehearsal host runner U01-U12", () => {
   test("U01 Host runs in a different OS process", async () => rig(async (supervisor) => {
     const worker = await supervisor.start();
@@ -60,7 +67,7 @@ describe("TEST_ONLY rehearsal host runner U01-U12", () => {
     await ok(supervisor, { kind: "CONFIGURE_WITNESS_FAULT", mode: "BEFORE_COMMIT" });
     const response = await supervisor.send(command({ kind: "ADVANCE_LINEAGE", operation_id: "lineage:r2a" }));
     expect(response).toMatchObject({ ok: false, error_code: "WITNESS_UNAVAILABLE", cut: "R2A_CUT_REACHED", result: { operation: { kind: "ADVANCE_LINEAGE", status: "PENDING" }, witness_sequence: null, material: "H1" } });
-    const replacement = await supervisor.send(command({ kind: "REQUEST_REPLACEMENT", operation_id: "replace:blocked", observed_after_lease_ms: 1, lease_lifetime_ms: 120_000 }));
+    const replacement = await supervisor.send(command({ kind: "REQUEST_REPLACEMENT", operation_id: "replace:blocked", lease_lifetime_ms: 120_000 }));
     expect(replacement).toMatchObject({ ok: false, error_code: "CONTINUITY_OPERATION_PENDING" });
     const state = await ok(supervisor, { kind: "STATUS_READ" }); expect(state.result).toMatchObject({ state: "ACTIVE" });
   }));
@@ -163,4 +170,39 @@ describe("Claude B1 cut attestation corrective", () => {
       expect(JSON.stringify({ cut, reconciled, reported })).not.toMatch(/witness_record_json|record_digest|payload_sha256/);
     });
   });
+});
+
+describe("rehearsal plan conformance corrective02", () => {
+  test("positive lifecycle uses one canonical window and authentic role-owned prerequisites", async () => rig(async (supervisor) => {
+    await supervisor.start(); const initialized = await ok(supervisor, { kind: "INITIALIZE_CASE" }); await ok(supervisor, { kind: "RESERVE", operation_id: "reserve:positive" }); await ok(supervisor, { kind: "ADMIT", operation_id: "admit:positive", lease_lifetime_ms: 120_000 });
+    const baseline = await ok(supervisor, { kind: "ESTABLISH_POSITIVE_BASELINE", operation_id: "positive:one", commit_lifetime_ms: 30_000 }), initial = initialized.result as any, result = baseline.result as any;
+    expect(initial.window_sha256).toBe(createHash("sha256").update(canonicalJson(initial.window)).digest("hex"));
+    expect(result).toMatchObject({ window: initial.window, run_binding_window_sha256: initial.window_sha256, manifest_window_sha256: initial.window_sha256, close: { replay: false }, eligibility: { current: true } });
+    for (const field of ["release_receipt_sha256", "evaluation_job_id", "evaluator_commit_receipt_sha256", "target_envelope"]) expect(result[field]).toBeTruthy();
+    expect(JSON.stringify(result)).not.toMatch(/private_key|authority-key\.pem/);
+  }));
+
+  test("R4 replacement uses a real call-time sample bracketed in evidence", async () => rig(async (supervisor) => {
+    await activeCase(supervisor); const before = await ok(supervisor, { kind: "STATUS_READ" });
+    const request = command({ kind: "REQUEST_REPLACEMENT", operation_id: "replace:real-time", lease_lifetime_ms: 120_000 }), response = await supervisor.send(request), sample = Number((response.result as any).observed_now_ms);
+    expect(response).toMatchObject({ ok: false, error_code: "LEASE_NOT_EXPIRED" });
+    const evidence = supervisor.evidence().find((event) => event.event === "COMMAND_RESULT" && event.command_id === request.id)!;
+    expect(sample).toBeLessThan(Number((before.result as any).lease_expires_ms)); expect(evidence.observed_now_ms).toBe(sample); expect(Number(evidence.observer_before_ms)).toBeLessThanOrEqual(sample); expect(sample).toBeLessThanOrEqual(Number(evidence.observer_after_ms));
+  }));
+
+  test("R6 reuses one fixed absolute expiry across separate RESERVED targets", async () => {
+    const fixedExpiry = Date.now() + 5_000;
+    await rig(async (supervisor) => {
+      await reservedCase(supervisor); const request = command({ kind: "ADMIT_FIXED_EXPIRY", operation_id: "admit:fixed:before", lease_expires_ms: fixedExpiry }), response = await supervisor.send(request);
+      expect(response).toMatchObject({ ok: true, result: { state: "ACTIVE", lease_expires_ms: fixedExpiry, submitted_lease_expires_ms: fixedExpiry } });
+      expect(supervisor.evidence().find((event) => event.event === "COMMAND_RESULT" && event.command_id === request.id)).toMatchObject({ submitted_lease_expires_ms: fixedExpiry, ok: true });
+    });
+    await Bun.sleep(Math.max(0, fixedExpiry - Date.now() + 100));
+    await rig(async (supervisor) => {
+      await reservedCase(supervisor); const request = command({ kind: "ADMIT_FIXED_EXPIRY", operation_id: "admit:fixed:after", lease_expires_ms: fixedExpiry }), response = await supervisor.send(request);
+      expect(response).toMatchObject({ ok: false, error_code: "LEASE_INVALID", result: { submitted_lease_expires_ms: fixedExpiry } });
+      expect(supervisor.evidence().find((event) => event.event === "COMMAND_RESULT" && event.command_id === request.id)).toMatchObject({ submitted_lease_expires_ms: fixedExpiry, ok: false, error_code: "LEASE_INVALID" });
+      expect((await ok(supervisor, { kind: "STATUS_READ" })).result).toMatchObject({ state: "RESERVED" });
+    });
+  }, 15_000);
 });
