@@ -10,6 +10,8 @@ export type WorkerCommand =
   | Readonly<{ id: string; kind: "MUTATE_TEST_MATERIAL"; material: "H1" | "H2" }>
   | Readonly<{ id: string; kind: "CONFIGURE_WITNESS_FAULT"; mode: WitnessFault }>
   | Readonly<{ id: string; kind: "ADVANCE_LINEAGE"; operation_id: string }>
+  | Readonly<{ id: string; kind: "ATTEMPT_NON_ADMITTED_ADVANCE"; operation_id: string }>
+  | Readonly<{ id: string; kind: "ATTEMPT_FRESH_STORE_ROOT_RESTORE"; operation_id: string }>
   | Readonly<{ id: string; kind: "CLOSE"; operation_id: string; manifest: Readonly<Record<string, unknown>>; release_receipt: Readonly<Record<string, unknown>> }>
   | Readonly<{ id: string; kind: "ISSUE_JOB"; operation_id: string; evaluator_evidence: Readonly<Record<string, unknown>>; writer_evidence: Readonly<Record<string, unknown>>; role_evidence_sha256: string; workflow_instruction_id: string; workflow_instruction_sha256: string; commit_lifetime_ms: number; lose_response_for_test?: boolean }>
   | Readonly<{ id: string; kind: "ASSIGN_TARGET"; operation_id: string; verifier_evidence: Readonly<Record<string, unknown>>; evaluation_job_id: string; lose_response_for_test?: boolean }>
@@ -62,7 +64,8 @@ export interface PublicCaseState {
 const TOKEN = /^[A-Za-z0-9][A-Za-z0-9:._/-]{0,255}$/;
 const kinds = new Set([
   "INITIALIZE_CASE", "RESERVE", "ADMIT", "ADMIT_FIXED_EXPIRY", "MUTATE_TEST_MATERIAL", "CONFIGURE_WITNESS_FAULT",
-  "ADVANCE_LINEAGE", "CLOSE", "ISSUE_JOB", "ASSIGN_TARGET", "CHECK_ELIGIBILITY",
+  "ADVANCE_LINEAGE", "ATTEMPT_NON_ADMITTED_ADVANCE", "ATTEMPT_FRESH_STORE_ROOT_RESTORE",
+  "CLOSE", "ISSUE_JOB", "ASSIGN_TARGET", "CHECK_ELIGIBILITY",
   "RECONCILE_JOB", "RECONCILE_TARGET", "STATUS_READ", "RECONCILE_READ", "REQUEST_REPLACEMENT",
   "ESTABLISH_POSITIVE_BASELINE", "REPORT_STATE", "GRACEFUL_STOP",
 ]);
@@ -74,6 +77,8 @@ const fields: Record<string, readonly string[]> = {
   MUTATE_TEST_MATERIAL: ["id", "kind", "material"],
   CONFIGURE_WITNESS_FAULT: ["id", "kind", "mode"],
   ADVANCE_LINEAGE: ["id", "kind", "operation_id"],
+  ATTEMPT_NON_ADMITTED_ADVANCE: ["id", "kind", "operation_id"],
+  ATTEMPT_FRESH_STORE_ROOT_RESTORE: ["id", "kind", "operation_id"],
   CLOSE: ["id", "kind", "operation_id", "manifest", "release_receipt"],
   ISSUE_JOB: ["id", "kind", "operation_id", "evaluator_evidence", "writer_evidence", "role_evidence_sha256", "workflow_instruction_id", "workflow_instruction_sha256", "commit_lifetime_ms", "lose_response_for_test"],
   ASSIGN_TARGET: ["id", "kind", "operation_id", "verifier_evidence", "evaluation_job_id", "lose_response_for_test"],

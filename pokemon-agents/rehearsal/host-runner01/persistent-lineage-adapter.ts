@@ -67,6 +67,17 @@ export class PersistentLineageAdapter implements TrustedLineageAdapter {
     return Object.freeze(next);
   }
 
+  restoreRecordedRootForTest(): MaterialState {
+    const current = this.read();
+    if (current.material !== "H2" || current.sequence !== 2) throw new Error("FRESH_STORE_ROOT_RESTORE_PREREQUISITE_INVALID");
+    const next: MaterialState = {
+      ...current, current: current.pre_write_root, sequence: current.sequence + 1,
+      predecessor_sha256: digest(current.current), material: "PRE_WRITE", observed_at: new Date().toISOString(),
+    };
+    durableWrite(this.path, next);
+    return Object.freeze(next);
+  }
+
   inspectRoot(input: Readonly<{ key: CanonicalRunKey; binding: RunBinding }>): LineageRootObservation {
     const state = this.read();
     if (canonicalKeySha256(input.key) !== state.key_sha256 || input.binding.control_store_id !== state.control_store_id || input.binding.checkpoint_store_id !== state.checkpoint_store_id) throw new Error("LINEAGE_MATERIAL_BINDING_MISMATCH");

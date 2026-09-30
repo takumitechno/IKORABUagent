@@ -4,9 +4,9 @@ import { join, resolve } from "node:path";
 import { Database } from "bun:sqlite";
 import { canonicalJson } from "../../web/lib/catfood-harness";
 import { CATFOOD_POLICY_SHA256 } from "../../web/lib/catfood-trust";
-import { roleChannelAcceptedSnapshotDigest } from "../../web/lib/catfood-enrollment";
+import { collectCurrentRuntimeSubject, observeTestOnlyRoleLaunch, roleChannelAcceptedSnapshotDigest, type TestEnrollmentBinding } from "../../web/lib/catfood-enrollment";
 import { CATFOOD_FINAL_CLOSURE_CHARTER, CATFOOD_SEALED_INPUT_SCHEMA, CATFOOD_SQLITE_EXPORT_PROFILE, goRootPolicyRef, type CatfoodGoRootPolicyV1, type CatfoodSealedInputManifestV1 } from "../../web/lib/catfood-final-closure";
-import { buildCustodyReleaseAction, buildEvaluationActionV3, initializeRoleAuthorityStore, localRoleEvidence, performRoleAction, type LocalRoleSession, type RoleChannelBinding, type RoleRunScope } from "../../web/lib/catfood-role-channel";
+import { CatfoodRoleAuthority, buildCustodyReleaseAction, buildEvaluationActionV3, createTestOnlyRoleSession, initializeRoleAuthorityStore, localRoleEvidence, performRoleAction, verifyRoleEvidenceV4, type LocalRoleSession, type RoleChannelBinding, type RoleRunScope } from "../../web/lib/catfood-role-channel";
 import { testGoRootPolicy } from "../../tests/catfood-go-root-policy-fixture";
 import {
   CustodyController, CustodyControlError, TestOnlyPreCustodyHost, TestOnlySqliteContinuityWitness,
@@ -23,6 +23,8 @@ const startedAt = new Date(Date.now() - Math.floor(process.uptime() * 1000)).toI
 type StoredCase = Readonly<{ key: CanonicalRunKey; binding: RoleChannelBinding; run_binding: RunBinding; window: Readonly<{ start: string; end: string }> }>;
 type PersistedOperationAttestation = Readonly<{ status: string; witness_record_json: string }>;
 type WitnessAttestation = Readonly<{ record: unknown }>;
+type AttackSnapshot = Readonly<{ lineage_sequence: number; current_lineage_sha256: string; admitted_session_id: string; witness_sequence: number; witness_transition: string | null; authority_revision: number }>;
+type AttackContext = Readonly<{ kind: "R3A" | "R3C"; before: AttackSnapshot; challenger_authentic?: boolean; challenger_admitted?: boolean; canonical_h1_h2_established?: boolean; root_source_recorded_pre_write?: boolean }>;
 
 export function cutForAttestedState(code: string, operation: PersistedOperationAttestation, material: "PRE_WRITE" | "H1" | "H2", witnessRecord: WitnessAttestation | null): WorkerResponse["cut"] {
   if (operation.status !== "PENDING" || material === "PRE_WRITE") return undefined;
@@ -43,6 +45,54 @@ function persistedOperationAttestation(controllerPath: string, operationId: stri
 function decodeSession(session: LocalRoleSession): Record<string, any> {
   const envelope = JSON.parse(String(localRoleEvidence(session).enrollment_envelope_json)) as { payload: string };
   return JSON.parse(Buffer.from(envelope.payload, "base64url").toString());
+}
+
+function scopeFor(stored: StoredCase): RoleRunScope {
+  return Object.freeze({ ...stored.key, environment_instance_id: stored.run_binding.environment_instance_id, spec_sha256: stored.run_binding.spec_sha256 });
+}
+
+function custodianEnrollmentBinding(stored: StoredCase): TestEnrollmentBinding {
+  const binding = stored.binding;
+  return Object.freeze({ trust_domain: "TEST_ONLY", issuer: binding.issuer, issuer_key_id: binding.issuer_key_id, audience: binding.audience, origin: binding.origin, credential: binding.credential, public_key_pem: binding.authority_public_key_pem, environment_identity: stored.run_binding.environment_instance_id, deployment_id: stored.key.deployment_id, enrollment_namespace: binding.enrollment_namespace, build_policy_sha256: binding.build_policy_sha256, accepted_snapshot_id: binding.accepted_snapshot_id, accepted_snapshot_sha256: binding.accepted_snapshot_sha256, launch_ticket: "launch:custodian", writer_signing_key_id: "none", writer_signing_key_version: "none", writer_signing_public_key_pem: binding.authority_public_key_pem });
+}
+
+function launchNonAdmittedCustodian(stored: StoredCase, authorityPath: string, authorityKeyPath: string): LocalRoleSession {
+  const authority = new CatfoodRoleAuthority(authorityPath, stored.binding, readFileSync(authorityKeyPath, "utf8"));
+  try {
+    const enrollment = custodianEnrollmentBinding(stored), subject = collectCurrentRuntimeSubject(enrollment), launch = observeTestOnlyRoleLaunch(enrollment, "custodian", subject);
+    return createTestOnlyRoleSession(authority, { role: "custodian", scope: scopeFor(stored), subject, launch });
+  } finally { authority.close(); }
+}
+
+function attackSnapshot(host: TestOnlyPreCustodyHost, stored: StoredCase, witness: TestOnlySqliteContinuityWitness, authorityPath: string): AttackSnapshot {
+  const state = host.safety(stored.key, { kind: "STATUS_READ" }) as Record<string, any>, current = witness.current(canonicalKeySha256(stored.key));
+  const db = new Database(resolve(authorityPath), { readonly: true, strict: true });
+  try {
+    const continuity = db.query<{ revision: number }, []>("SELECT revision FROM role_authority_continuity WHERE singleton=1").get();
+    if (!continuity || !state.admitted?.session_id) throw new Error("R3_ATTACK_STATE_INVALID");
+    return Object.freeze({ lineage_sequence: Number(state.lineage_sequence), current_lineage_sha256: String(state.current_lineage_sha256), admitted_session_id: String(state.admitted.session_id), witness_sequence: current?.record.sequence ?? 0, witness_transition: current?.record.transition ?? null, authority_revision: continuity.revision });
+  } finally { db.close(); }
+}
+
+function canonicalH1H2Established(controllerPath: string, keySha256: string): boolean {
+  const db = new Database(resolve(controllerPath), { readonly: true, strict: true });
+  try {
+    const row = db.query<{ n: number; first_sequence: number; last_sequence: number }, [string]>("SELECT COUNT(*) n,MIN(lineage_sequence) first_sequence,MAX(lineage_sequence) last_sequence FROM lineage_advances WHERE key_sha256=?").get(keySha256);
+    return row?.n === 2 && row.first_sequence === 1 && row.last_sequence === 2;
+  } finally { db.close(); }
+}
+
+function attackEvidence(command: Extract<WorkerCommand, { kind: "ATTEMPT_NON_ADMITTED_ADVANCE" | "ATTEMPT_FRESH_STORE_ROOT_RESTORE" }>, context: AttackContext, host: TestOnlyPreCustodyHost, stored: StoredCase, witness: TestOnlySqliteContinuityWitness, controllerPath: string, authorityPath: string): Readonly<Record<string, unknown>> {
+  const after = attackSnapshot(host, stored, witness, authorityPath), state = host.safety(stored.key, { kind: "STATUS_READ" }) as Record<string, any>;
+  const controllerDb = new Database(resolve(controllerPath), { readonly: true, strict: true }), authorityDb = new Database(resolve(authorityPath), { readonly: true, strict: true });
+  try {
+    const incident = controllerDb.query<{ kind: string }, [string]>("SELECT kind FROM custody_incidents WHERE key_sha256=? ORDER BY rowid DESC LIMIT 1").get(canonicalKeySha256(stored.key));
+    const controllerCounts = controllerDb.query<{ jobs: number; targets: number }, [string, string]>("SELECT (SELECT COUNT(*) FROM authorized_jobs WHERE key_sha256=?) jobs,(SELECT COUNT(*) FROM authorized_targets WHERE key_sha256=?) targets").get(canonicalKeySha256(stored.key), canonicalKeySha256(stored.key))!;
+    const authorityCounts = authorityDb.query<{ jobs: number; targets: number }, []>("SELECT (SELECT COUNT(*) FROM evaluation_jobs) jobs,(SELECT COUNT(*) FROM expected_evaluation_targets) targets").get()!;
+    const common = { controller_state: state.state, incident_kind: incident?.kind ?? null, lineage_sequence_before: context.before.lineage_sequence, lineage_sequence_after: after.lineage_sequence, canonical_lineage_unchanged: after.current_lineage_sha256 === context.before.current_lineage_sha256, admitted_custodian_unchanged: after.admitted_session_id === context.before.admitted_session_id, witness_sequence_before: context.before.witness_sequence, witness_sequence_after: after.witness_sequence, witness_incident_appended: after.witness_sequence === context.before.witness_sequence + 1 && after.witness_transition === "INCIDENT", authority_revision_before: context.before.authority_revision, authority_revision_after: after.authority_revision, authority_revision_unchanged: after.authority_revision === context.before.authority_revision, authorized_job_count: controllerCounts.jobs, authorized_target_count: controllerCounts.targets, authority_job_count: authorityCounts.jobs, authority_target_count: authorityCounts.targets, positive_follow_on: controllerCounts.jobs > 0 || controllerCounts.targets > 0 || authorityCounts.jobs > 0 || authorityCounts.targets > 0 };
+    if (command.kind === "ATTEMPT_NON_ADMITTED_ADVANCE") return Object.freeze({ attack_seam: "R3A_AUTHENTIC_NON_ADMITTED_CUSTODIAN", second_custodian_authentic: context.challenger_authentic === true, second_custodian_admitted: context.challenger_admitted === true, second_custodian_lineage_current: !common.canonical_lineage_unchanged, ...common });
+    return Object.freeze({ attack_seam: "R3C_FRESH_STORE_ROOT_RESTORE", root_source_recorded_pre_write: context.root_source_recorded_pre_write === true, canonical_h1_h2_established: context.canonical_h1_h2_established === true, canonical_current_material: after.lineage_sequence === 2 && common.canonical_lineage_unchanged ? "H2" : "UNKNOWN", restored_root_authoritative: !common.canonical_lineage_unchanged, ...common });
+  } finally { controllerDb.close(); authorityDb.close(); }
 }
 
 function positiveManifest(stored: StoredCase, material: ReturnType<PersistentLineageAdapter["read"]>): CatfoodSealedInputManifestV1 {
@@ -128,7 +178,7 @@ async function main(): Promise<void> {
   const witness = new TestOnlySqliteContinuityWitness(p.witness), controller = new CustodyController(p.controller, witness, stored.binding);
   const fenceAdapter = { inspect({ admitted }: { admitted: { session_id: string } }): FenceObservation { const state = adapter.read(); return { old_session_id: admitted.session_id, old_process_cannot_execute: false, old_credentials_revoked: false, producer_effects_resolved: false, complete_history_verified: false, journal_head_sha256: state.current.journal_head_sha256, checkpoint_head_sha256: state.current.checkpoint_head_sha256, control_snapshot_sha256: state.current.control_snapshot_sha256, checkpoint_snapshot_sha256: state.current.checkpoint_snapshot_sha256, pair_common_cut_sha256: state.current.pair_common_cut_sha256 }; } };
   const host = new TestOnlyPreCustodyHost({ authority_path: p.authority, authority_binding: stored.binding, authority_private_key: readFileSync(p.authorityKey, "utf8"), controller, fence_adapter: fenceAdapter, lineage_adapter: adapter });
-  let custodianSession: LocalRoleSession | undefined, graceful = false, replacementTiming: { observed_now_ms: number } | undefined, fixedAdmissionExpiry: number | undefined;
+  let custodianSession: LocalRoleSession | undefined, graceful = false, replacementTiming: { observed_now_ms: number } | undefined, fixedAdmissionExpiry: number | undefined, attackContext: AttackContext | undefined;
 
   const ready: WorkerReady = Object.freeze({ kind: "WORKER_READY", campaign_id: config.campaign_id, case_id: config.case_id, generation: config.generation, pid: process.pid, process_started_at: startedAt, process_identity: `${process.pid}:${startedAt}:${randomBytes(8).toString("hex")}` });
   process.stdout.write(`${JSON.stringify(ready)}\n`);
@@ -151,6 +201,28 @@ async function main(): Promise<void> {
       case "MUTATE_TEST_MATERIAL": return adapter.mutate(command.material);
       case "CONFIGURE_WITNESS_FAULT": witness.setFailureForTest(command.mode); return { mode: command.mode };
       case "ADVANCE_LINEAGE": return host.advanceLineage({ key: stored.key, operation_id: command.operation_id, custodian_session: custodianSession });
+      case "ATTEMPT_NON_ADMITTED_ADVANCE": {
+        attackContext = undefined;
+        if (!custodianSession) throw new CustodyControlError("CUSTODIAN_SESSION_REQUIRED");
+        const state = host.safety(stored.key, { kind: "STATUS_READ" }) as Record<string, any>, material = adapter.read();
+        if (state.state !== "ACTIVE" || state.lineage_sequence !== 0 || material.material !== "PRE_WRITE" || material.sequence !== 0) throw new Error("R3A_PREREQUISITE_INVALID");
+        adapter.mutate("H1");
+        const challenger = launchNonAdmittedCustodian(stored, p.authority, p.authorityKey), authenticated = verifyRoleEvidenceV4(localRoleEvidence(challenger), stored.binding, "custodian", scopeFor(stored));
+        const before = attackSnapshot(host, stored, witness, p.authority);
+        attackContext = Object.freeze({ kind: "R3A", before, challenger_authentic: true, challenger_admitted: String(authenticated.session_id) === before.admitted_session_id });
+        return host.advanceLineage({ key: stored.key, operation_id: command.operation_id, custodian_session: challenger });
+      }
+      case "ATTEMPT_FRESH_STORE_ROOT_RESTORE": {
+        attackContext = undefined;
+        if (!custodianSession) throw new CustodyControlError("CUSTODIAN_SESSION_REQUIRED");
+        const state = host.safety(stored.key, { kind: "STATUS_READ" }) as Record<string, any>, material = adapter.read(), keySha256 = canonicalKeySha256(stored.key);
+        const progression = canonicalH1H2Established(p.controller, keySha256), rootRecorded = json(material.pre_write_root) === json(state.lineage_root);
+        if (state.state !== "ACTIVE" || state.lineage_sequence !== 2 || material.material !== "H2" || material.sequence !== 2 || sha(json(material.current)) !== state.current_lineage_sha256 || !progression || !rootRecorded) throw new Error("R3C_PREREQUISITE_INVALID");
+        const before = attackSnapshot(host, stored, witness, p.authority);
+        adapter.restoreRecordedRootForTest();
+        attackContext = Object.freeze({ kind: "R3C", before, canonical_h1_h2_established: progression, root_source_recorded_pre_write: rootRecorded });
+        return host.advanceLineage({ key: stored.key, operation_id: command.operation_id, custodian_session: custodianSession });
+      }
       case "CLOSE": return host.closeCustody({ key: stored.key, operation_id: command.operation_id, manifest: command.manifest as never, release_receipt: command.release_receipt as never });
       case "ISSUE_JOB": return host.issueEvaluationJob({ key: stored.key, ...command });
       case "ASSIGN_TARGET": return host.assignExpectedTarget({ key: stored.key, ...command });
@@ -211,6 +283,7 @@ async function main(): Promise<void> {
         }
         if (command?.kind === "REQUEST_REPLACEMENT" && replacementTiming) result = replacementTiming;
         if (command?.kind === "ADMIT_FIXED_EXPIRY" && fixedAdmissionExpiry !== undefined) result = { submitted_lease_expires_ms: fixedAdmissionExpiry };
+        if ((command?.kind === "ATTEMPT_NON_ADMITTED_ADVANCE" || command?.kind === "ATTEMPT_FRESH_STORE_ROOT_RESTORE") && attackContext) result = attackEvidence(command, attackContext, host, stored, witness, p.controller, p.authority);
         const response: WorkerResponse = { id: command?.id ?? responseId, ok: false, error_code: code, cut, result };
         process.stdout.write(`${JSON.stringify(response)}\n`);
       }

@@ -206,3 +206,45 @@ describe("rehearsal plan conformance corrective02", () => {
     });
   }, 15_000);
 });
+
+describe("R3 closed attack seams", () => {
+  test("R3a uses an authentic non-admitted custodian and leaves no positive lineage or follow-on", async () => rig(async (supervisor) => {
+    await activeCase(supervisor);
+    const request = command({ kind: "ATTEMPT_NON_ADMITTED_ADVANCE", operation_id: "r3a:non-admitted" }), response = await supervisor.send(request), result = response.result as any;
+    expect(response).toMatchObject({ ok: false, error_code: "NON_ADMITTED_CUSTODIAN", result: { attack_seam: "R3A_AUTHENTIC_NON_ADMITTED_CUSTODIAN", second_custodian_authentic: true, second_custodian_admitted: false, second_custodian_lineage_current: false, controller_state: "INCIDENT", incident_kind: "NON_ADMITTED_LINEAGE_ADVANCE", lineage_sequence_before: 0, lineage_sequence_after: 0, canonical_lineage_unchanged: true, admitted_custodian_unchanged: true, witness_incident_appended: true, authorized_job_count: 0, authorized_target_count: 0, authority_job_count: 0, authority_target_count: 0, positive_follow_on: false } });
+    expect(result.witness_sequence_after).toBe(result.witness_sequence_before + 1);
+    const logged = supervisor.evidence().find((event) => event.event === "COMMAND_RESULT" && event.command_id === request.id);
+    expect(logged).toMatchObject({ error_code: "NON_ADMITTED_CUSTODIAN", incident_kind: "NON_ADMITTED_LINEAGE_ADVANCE", second_custodian_authentic: true, second_custodian_admitted: false, canonical_lineage_unchanged: true, positive_follow_on: false });
+    expect(JSON.stringify({ response, logged })).not.toMatch(/private_key|authority-key\.pem|enrollment_envelope|assignment_envelope|session_id|credential/);
+    const followOn = await supervisor.send(command({ kind: "ESTABLISH_POSITIVE_BASELINE", operation_id: "r3a:forbidden-follow-on", commit_lifetime_ms: 30_000 }));
+    expect(followOn.ok).toBeFalse();
+    expect((await ok(supervisor, { kind: "REPORT_STATE" })).result).toMatchObject({ host_state: { state: "INCIDENT", lineage_sequence: 0 }, material: { material: "H1" } });
+  }));
+
+  test("R3c restores only the recorded root observation after canonical H1 to H2", async () => rig(async (supervisor) => {
+    await activeCase(supervisor);
+    await ok(supervisor, { kind: "MUTATE_TEST_MATERIAL", material: "H1" }); await ok(supervisor, { kind: "ADVANCE_LINEAGE", operation_id: "r3c:h1" });
+    await ok(supervisor, { kind: "MUTATE_TEST_MATERIAL", material: "H2" }); await ok(supervisor, { kind: "ADVANCE_LINEAGE", operation_id: "r3c:h2" });
+    const before = (await ok(supervisor, { kind: "REPORT_STATE" })).result as any;
+    const request = command({ kind: "ATTEMPT_FRESH_STORE_ROOT_RESTORE", operation_id: "r3c:root-restore" }), response = await supervisor.send(request), result = response.result as any;
+    expect(response).toMatchObject({ ok: false, error_code: "LINEAGE_ROLLBACK", result: { attack_seam: "R3C_FRESH_STORE_ROOT_RESTORE", root_source_recorded_pre_write: true, canonical_h1_h2_established: true, canonical_current_material: "H2", restored_root_authoritative: false, controller_state: "INCIDENT", incident_kind: "LINEAGE_ROLLBACK", lineage_sequence_before: 2, lineage_sequence_after: 2, canonical_lineage_unchanged: true, admitted_custodian_unchanged: true, witness_incident_appended: true, authority_revision_unchanged: true, authorized_job_count: 0, authorized_target_count: 0, authority_job_count: 0, authority_target_count: 0, positive_follow_on: false } });
+    expect(result.witness_sequence_after).toBe(result.witness_sequence_before + 1);
+    const after = (await ok(supervisor, { kind: "REPORT_STATE" })).result as any;
+    expect(after.host_state).toMatchObject({ state: "INCIDENT", lineage_sequence: 2, current_lineage: before.host_state.current_lineage, current_lineage_sha256: before.host_state.current_lineage_sha256, admitted: before.host_state.admitted });
+    expect(after.material).toMatchObject({ material: "PRE_WRITE", sequence: 3, current: before.material.pre_write_root });
+    const logged = supervisor.evidence().find((event) => event.event === "COMMAND_RESULT" && event.command_id === request.id);
+    expect(logged).toMatchObject({ error_code: "LINEAGE_ROLLBACK", incident_kind: "LINEAGE_ROLLBACK", root_source_recorded_pre_write: true, canonical_h1_h2_established: true, canonical_lineage_unchanged: true, authority_revision_unchanged: true, positive_follow_on: false });
+    const followOn = await supervisor.send(command({ kind: "ESTABLISH_POSITIVE_BASELINE", operation_id: "r3c:forbidden-follow-on", commit_lifetime_ms: 30_000 }));
+    expect(followOn.ok).toBeFalse();
+    await supervisor.forceKill(); await supervisor.start();
+    expect((await ok(supervisor, { kind: "REPORT_STATE" })).result).toMatchObject({ host_state: { state: "INCIDENT", lineage_sequence: 2, current_lineage: before.host_state.current_lineage } });
+  }));
+
+  test("R3 commands remain closed to caller-supplied identity and lineage material", async () => rig(async (supervisor) => {
+    await supervisor.start();
+    const r3a = await supervisor.send({ id: "r3a:raw", kind: "ATTEMPT_NON_ADMITTED_ADVANCE", operation_id: "r3a:raw", custodian_evidence: {} } as never);
+    const r3c = await supervisor.send({ id: "r3c:raw", kind: "ATTEMPT_FRESH_STORE_ROOT_RESTORE", operation_id: "r3c:raw", lineage: {} } as never);
+    expect(r3a).toEqual({ id: "r3a:raw", ok: false, error_code: "PROTOCOL_COMMAND_INVALID" });
+    expect(r3c).toEqual({ id: "r3c:raw", ok: false, error_code: "PROTOCOL_COMMAND_INVALID" });
+  }));
+});
