@@ -225,7 +225,38 @@ function renderCustomerReviews(
     return `<article class="review-card"><div class="review-meta"><span>${escapeHtml(topicLabel(item.topic))}</span><span>${escapeHtml(roleLabel(item.contentRole))}</span><span>第${item.version}案</span>${statusBadge({ status: "warn", icon: "!", label: item.status })}</div><p class="review-body">${escapeHtml(item.body)}</p><details class="review-detail"><summary>作成日時・投稿予定・変更点</summary><div class="review-detail-grid"><div><small>作成日時</small><b>${escapeHtml(formatDate(item.createdAt, "作成日時を確認中"))}</b><small>投稿予定</small><b>${escapeHtml(formatDate(item.scheduledAt, "予定を調整中"))}</b></div><div><small>AIが変更したポイント</small><ul>${item.aiChanges.map((change) => `<li>${escapeHtml(change)}</li>`).join("") || "<li>品質確認済み</li>"}</ul></div></div></details>${actions}</article>`;
   }).join("");
   const needsAction = reviews.length > 0 || manualFailed || !connected;
-  return `<section id="action-required" class="home-section action-required ${needsAction ? "is-expanded" : "is-compact"}" aria-labelledby="action-required-title">${sectionHeader({ id: "action-required-title", eyebrow: "次にやること", title: reviews.length ? "投稿案を確認してください" : needsAction ? "運用状況を確認中です" : "次にやること" })}${noticeText ? `<p class="review-notice" role="status" aria-live="polite">${statusBadge({ status: "ok", icon: "✓", label: noticeText })}</p>` : ""}${manualFailed ? `<p class="review-notice" role="status" aria-live="polite">${statusBadge({ status: "serious", icon: "!", label: "公開済み投稿の実績を取得できませんでした。" })}<a href="#manual-analysis">対象の投稿を確認・再試行</a></p>` : ""}${!connected ? `<p class="connection-note" role="status" aria-live="polite">${statusBadge({ status: "warn", icon: "!", label: "現在、運用データを確認できません" })}<span>復旧後に自動で最新状況へ切り替わります。</span></p>` : ""}${reviews.length ? `<p class="home-muted">確認待ち ${reviews.length}件 · 内容を読んで、承認・修正依頼・見送りを選べます。</p><div class="review-list" role="region" aria-label="確認待ちの投稿一覧" tabindex="0">${cards}</div>` : !needsAction ? `<p class="success-strip">${statusBadge({ status: "ok", icon: "✓", label: "いま確認が必要な投稿はありません" })}</p>` : ""}</section>`;
+  const actionTitle = reviews.length ? "投稿案を確認してください" : needsAction ? "運用状況を確認中です" : "次にやること";
+  const illustrationIcon = reviews.length ? "publish" : connected ? "activity" : "clock";
+  return `<section id="action-required" class="home-section action-required ${needsAction ? "is-expanded" : "is-compact"}" aria-labelledby="action-required-title">
+    <div class="action-layout">
+      <div class="action-copy">
+        ${sectionHeader({ id: "action-required-title", eyebrow: "次にやること", title: actionTitle })}
+        ${noticeText ? `<p class="review-notice" role="status" aria-live="polite">${statusBadge({ status: "ok", icon: "✓", label: noticeText })}</p>` : ""}
+        ${manualFailed ? `<p class="review-notice" role="status" aria-live="polite">${statusBadge({ status: "serious", icon: "!", label: "公開済み投稿の実績を取得できませんでした。" })}<a href="#manual-analysis">対象の投稿を確認・再試行</a></p>` : ""}
+        ${!connected ? `<p class="connection-note" role="status" aria-live="polite">${statusBadge({ status: "warn", icon: "!", label: "現在、運用データを確認できません" })}<span>復旧後に自動で最新状況へ切り替わります。</span></p>` : ""}
+        ${reviews.length ? `<p class="home-muted">確認待ち ${reviews.length}件 · 内容を読んで、承認・修正依頼・見送りを選べます。</p>` : !needsAction ? `<p class="success-strip">${statusBadge({ status: "ok", icon: "✓", label: "いま確認が必要な投稿はありません" })}</p>` : ""}
+      </div>
+      <div class="operation-visual ${connected ? "is-connected" : "is-waiting"}" aria-hidden="true">
+        <span class="operation-orbit orbit-one"><i></i></span><span class="operation-orbit orbit-two"><i></i></span>
+        <span class="operation-core">${dashboardIcon(illustrationIcon)}<b>${reviews.length ? `${reviews.length}件` : connected ? "運用中" : "確認中"}</b></span>
+      </div>
+    </div>
+    ${reviews.length ? `<div class="review-list" role="region" aria-label="確認待ちの投稿一覧" tabindex="0">${cards}</div>` : ""}
+  </section>`;
+}
+
+function renderCustomerFlow(activeStage: number): string {
+  const steps = [
+    { label: "データ連携", detail: "安全に取得", icon: "activity" },
+    { label: "投稿案", detail: "内容を確認", icon: "publish" },
+    { label: "投稿予定", detail: "日時を調整", icon: "calendar" },
+    { label: "公開", detail: "Threadsへ投稿", icon: "next" },
+    { label: "分析・改善", detail: "結果を次へ", icon: "metrics" },
+  ] as const;
+  return `<div class="home-flow" aria-labelledby="home-flow-title">
+    <div class="home-flow-heading"><span>運用の流れ</span><b id="home-flow-title">いまどこまで進んでいるか</b></div>
+    <ol>${steps.map((step, index) => `<li class="${index < activeStage ? "done" : index === activeStage ? "active" : "upcoming"}"><span class="flow-icon">${dashboardIcon(step.icon)}<i>${index < activeStage ? "✓" : index + 1}</i></span><b>${step.label}</b><small>${step.detail}</small></li>`).join("")}</ol>
+  </div>`;
 }
 
 export function renderOverview(
@@ -265,6 +296,7 @@ export function renderOverview(
   const latestMetricAt = contents.map((content) => content.metricsFetchedAt ?? content.metricsObservedAt).filter((value): value is string => Boolean(value)).sort().at(-1) ?? null;
   const nextPostLabel = nextContent ? `${formatDate(nextContent.scheduledAt, "予定を調整中")} · ${topicLabel(nextContent.topic)}` : connected ? "投稿予定を調整中" : "接続復旧後に表示";
   const metricNext = latestMetricAt ? "次回の実績更新を待っています" : connected ? "最初の実績取得待ち" : "復旧後に計測を開始します";
+  const flowStage = !connected ? 0 : pendingApproval > 0 ? 1 : nextContent ? 2 : published.length ? 3 : measured.length ? 4 : 1;
 
   return `
 ${renderCustomerHomeStyles()}
@@ -280,6 +312,7 @@ ${renderCustomerHomeStyles()}
       ${kpiTile({ label: "今日の公開済み", value: connected ? todayPublished : "—", detail: "公開を確認できた投稿" })}
       <div class="today-sync">${kpiTile({ label: "最終同期", value: updatedAt, detail: connected ? "最新の運用データを表示" : "実データは表示していません" })}</div>
     </div>
+    ${renderCustomerFlow(flowStage)}
     ${connected && contents.length === 0 ? `<details class="getting-started"><summary>まず、ここから始めましょう</summary><div class="getting-started-grid">${card({ title: "Threadsで5〜10件投稿", body: "いつもの言葉で、まずは手動投稿をためます。" })}${card({ title: "投稿の取り込みを依頼", body: "運用担当者が投稿を分析対象として安全に取り込みます。" })}${card({ title: "届いたAI案を確認", body: "確認待ちに表示された案を、承認・修正依頼・見送りから選びます。" })}</div><p>紹介リンクは後から登録できます。未登録の間は、販売を促す投稿案を作りません。</p></details>` : ""}
   </section>
   ${connected ? scheduleSection(contents) : `<section id="schedule" class="home-section" aria-labelledby="schedule-title">${sectionHeader({ id: "schedule-title", eyebrow: "投稿予定", title: "投稿予定" })}${emptyState({ title: "接続待ち", description: "接続が復旧するまで、投稿予定を推測で補いません。" })}</section>`}

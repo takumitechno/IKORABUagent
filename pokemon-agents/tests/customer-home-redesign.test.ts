@@ -133,6 +133,8 @@ describe("PRODUCT-UI-REDESIGN01 customer home", () => {
     const today = section(html, "today", "schedule");
     expect((today.match(/class="t-kpi"/g) ?? []).length).toBe(4);
     for (const text of ["今日の投稿予定", "今日の公開済み", "次の動作", "最終同期"]) expect(today.includes(text)).toBe(true);
+    for (const text of ["運用の流れ", "データ連携", "投稿案", "投稿予定", "公開", "分析・改善"]) expect(today.includes(text)).toBe(true);
+    expect(today.includes('class="home-flow"')).toBe(true);
     expect((today.match(/class="t-kpi__value">1</g) ?? []).length).toBe(2);
     const schedule = section(html, "schedule", "performance");
     for (const text of ["今日", "明日", "今週"]) expect(schedule.includes(text)).toBe(true);
