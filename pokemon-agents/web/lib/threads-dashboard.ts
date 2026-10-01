@@ -21,12 +21,15 @@ const DEFAULT_ACCOUNT_ID = "acct_8ssana";
 const CACHE_TTL_MS = 15_000;
 
 export interface ThreadsPublication {
+  publicationId?: string | null;
   mode: string;
   status: string;
   externalId: string | null;
   permalink: string | null;
   createdAt: string | null;
   publishedAt: string | null;
+  readbackStatus?: string | null;
+  duplicate?: boolean | null;
 }
 
 export type ThreadsMetricKey =
@@ -36,6 +39,8 @@ export type ThreadsMetricKey =
 
 export interface ThreadsContent {
   contentId: string;
+  version?: number | null;
+  attempt?: number | null;
   topic: string | null;
   contentRole: string | null;
   body: string;
@@ -50,6 +55,7 @@ export interface ThreadsContent {
   metrics: Partial<Record<ThreadsMetricKey, number>>;
   metricsObservedAt: string | null;
   metricsFetchedAt: string | null;
+  metricsEligibleAt?: string | null;
   viewsPerHour: number | null;
   engagementPerHour: number | null;
   origin: "ai_auto" | "ai_manual" | "human_manual" | "unknown";
@@ -94,6 +100,7 @@ export interface NightBatchItem {
   status: "pending" | "succeeded" | "failed_confirmed" | "ambiguous" | "blocked" | "unknown";
   blockReason: string | null;
   attemptedAt: string | null;
+  attemptCount?: number | null;
   batchStatus: string;
   expiresAt: string | null;
 }
@@ -135,6 +142,46 @@ export interface ThreadsEditorial {
   customerSummary: Record<string, unknown> | null;
 }
 
+export interface ThreadsCredentialStatus {
+  state: string | null;
+  ready: boolean | null;
+  expiresAt: string | null;
+}
+
+export interface ThreadsRunnerStatus {
+  name: string;
+  state: string;
+  healthy: boolean | null;
+  lastRunAt: string | null;
+  runStatus: string | null;
+}
+
+export interface ThreadsOperatorStatus {
+  armed: boolean | null;
+  providerUsername: string | null;
+  providerUserId: string | null;
+  publishCredential: ThreadsCredentialStatus;
+  insightsCredential: ThreadsCredentialStatus;
+  structuralStatus: string | null;
+  readyForDryRun: boolean | null;
+  readinessBlocking: string[];
+  gitSha: string | null;
+  deploymentPath: string | null;
+  schemaVersion: number | null;
+  schemaReadiness: string | null;
+  executionState: string | null;
+  enabledCapabilities: string[];
+  runners: ThreadsRunnerStatus[];
+  writerPolicyStatus: string | null;
+}
+
+export interface ThreadsActivity {
+  type: string;
+  at: string | null;
+  entityId: string | null;
+  detail: string | null;
+}
+
 export interface ThreadsDashboardData {
   connected: boolean;
   bridgeStatus: ThreadsBridgeStatus;
@@ -150,6 +197,8 @@ export interface ThreadsDashboardData {
   operations: ThreadsOperations;
   safety: ThreadsSafetyStatus;
   editorial: ThreadsEditorial;
+  operator: ThreadsOperatorStatus;
+  activities: ThreadsActivity[];
   message: "実アカウント連携済み" | "接続待ち" | "データ取得待ち" | "アカウントが見つかりません";
 }
 
@@ -193,6 +242,15 @@ const EMPTY_EDITORIAL: ThreadsEditorial = {
   state: null, status: null, currentAgent: null, waitingReason: null,
   facts: [], unknowns: [], proposals: [], critiques: [], rejectedOptions: [],
   finalDecision: null, brief: null, experiments: [], customerSummary: null,
+};
+
+const EMPTY_CREDENTIAL: ThreadsCredentialStatus = { state: null, ready: null, expiresAt: null };
+const EMPTY_OPERATOR: ThreadsOperatorStatus = {
+  armed: null, providerUsername: null, providerUserId: null,
+  publishCredential: { ...EMPTY_CREDENTIAL }, insightsCredential: { ...EMPTY_CREDENTIAL },
+  structuralStatus: null, readyForDryRun: null, readinessBlocking: [],
+  gitSha: null, deploymentPath: null, schemaVersion: null, schemaReadiness: null,
+  executionState: null, enabledCapabilities: [], runners: [], writerPolicyStatus: null,
 };
 
 function recordArray(value: unknown): Array<Record<string, unknown>> {
@@ -300,6 +358,74 @@ function nonNegativeInt(value: unknown): number | null {
   return typeof value === "number" && Number.isInteger(value) && value >= 0 ? value : null;
 }
 
+function credentialStatus(value: unknown): ThreadsCredentialStatus {
+  const source = record(value);
+  return {
+    state: text(source?.state),
+    ready: typeof source?.ready === "boolean" ? source.ready : null,
+    expiresAt: text(source?.expires_at),
+  };
+}
+
+function operatorStatus(liveValue: unknown, boundaryValue: unknown): ThreadsOperatorStatus {
+  const live = record(liveValue), account = record(live?.account);
+  const credentials = record(live?.credential_readiness);
+  const publish = record(credentials?.publish), insights = record(credentials?.insights);
+  const structural = record(live?.structural_readiness);
+  const boundary = record(boundaryValue), release = record(boundary?.producer_release_identity);
+  const evidence = record(boundary?.source_evidence);
+  const runners = recordArray(evidence?.runner_heartbeats).map((runner) => ({
+    name: text(runner.runner_name) ?? "unknown",
+    state: text(runner.state) ?? "unknown",
+    healthy: typeof runner.healthy === "boolean" ? runner.healthy : null,
+    lastRunAt: text(runner.last_run_at),
+    runStatus: text(runner.run_status),
+  }));
+  return {
+    armed: typeof account?.armed === "boolean" ? account.armed : null,
+    providerUsername: text(publish?.threads_username) ?? text(insights?.threads_username),
+    providerUserId: text(publish?.threads_user_id) ?? text(insights?.threads_user_id),
+    publishCredential: credentialStatus(publish),
+    insightsCredential: credentialStatus(insights),
+    structuralStatus: text(structural?.status),
+    readyForDryRun: typeof structural?.ready_for_dry_run === "boolean" ? structural.ready_for_dry_run : null,
+    readinessBlocking: stringArray(structural?.blocking),
+    gitSha: text(release?.git_sha),
+    // The current Bridge does not expose a deployment path. Keep UNKNOWN rather
+    // than leaking or guessing a host path.
+    deploymentPath: null,
+    schemaVersion: nonNegativeInt(boundary?.schema_version),
+    schemaReadiness: text(boundary?.schema_readiness),
+    executionState: text(boundary?.execution_state),
+    enabledCapabilities: stringArray(boundary?.enabled_capabilities),
+    runners,
+    writerPolicyStatus: text(boundary?.writer_policy_status),
+  };
+}
+
+function activitiesFrom(value: unknown): ThreadsActivity[] {
+  return recordArray(value).map((event) => ({
+    type: text(event.event_type) ?? text(event.action) ?? text(event.type) ?? "unknown",
+    at: text(event.occurred_at) ?? text(event.created_at) ?? text(event.at),
+    entityId: text(event.entity_id) ?? text(event.content_id) ?? text(event.publication_id),
+    // Audit summaries can contain operator-authored text. The overview needs
+    // only the controlled status/result label, never payload or prompt text.
+    detail: text(event.status) ?? text(event.result),
+  }));
+}
+
+async function optionalJson(
+  fetcher: FetchLike, url: string, headers: Record<string, string>, signal: AbortSignal,
+): Promise<unknown> {
+  try {
+    const response = await fetcher(url, { method: "GET", headers, signal });
+    if (!response.ok) return null;
+    return await response.json();
+  } catch {
+    return null;
+  }
+}
+
 function normalizeOrigin(value: unknown): ThreadsContent["origin"] {
   const got = text(value);
   return got && ["ai_auto", "ai_manual", "human_manual"].includes(got)
@@ -324,6 +450,7 @@ function operationsFrom(value: unknown): ThreadsOperations {
           status: ["pending", "succeeded", "failed_confirmed", "ambiguous", "blocked"].includes(rawStatus)
             ? rawStatus as NightBatchItem["status"] : "unknown",
           blockReason: text(row.block_reason), attemptedAt: text(row.attempted_at),
+          attemptCount: nonNegativeInt(row.attempt_count) ?? nonNegativeInt(row.attempts),
           batchStatus: text(row.batch_status) ?? "unknown", expiresAt: text(row.expires_at),
         };
       }).filter((row): row is NightBatchItem => row !== null)
@@ -372,12 +499,16 @@ function publicationFor(
   const publishedPart = parts.find((part) => text(part.external_id) === id)
     ?? parts.find((part) => text(part.external_id) && !text(part.external_id)!.startsWith("dryrun:"));
   return {
+    publicationId: text(recent?.publication_id),
     mode: text(live.mode) ?? "unknown",
     status: text(live.status) ?? "unknown",
     externalId: id,
     permalink: text(live.permalink) ?? text(publishedPart?.permalink),
     createdAt: text(live.created_at) ?? text(recent?.created_at),
     publishedAt: text(live.published_at) ?? text(recent?.published_at) ?? text(publishedPart?.published_at),
+    readbackStatus: text(live.readback_status) ?? text(recent?.readback_status),
+    duplicate: typeof live.duplicate === "boolean" ? live.duplicate
+      : typeof recent?.duplicate === "boolean" ? recent.duplicate : null,
   };
 }
 
@@ -402,7 +533,8 @@ export async function loadThreadsDashboard(options: {
     connected: false, bridgeStatus, accountId, handle: null, displayName: null, accountStatus: null,
     fetchedAt, contents: [], manualPosts: [], metricsRecordCount: 0, hasLearningSnapshot: false,
     operations: { ...EMPTY_OPERATIONS }, safety: { ...EMPTY_SAFETY },
-    editorial: { ...EMPTY_EDITORIAL }, message: customerMessage(bridgeStatus),
+    editorial: { ...EMPTY_EDITORIAL }, operator: { ...EMPTY_OPERATOR }, activities: [],
+    message: customerMessage(bridgeStatus),
   });
   try {
     if (!/^acct_[a-zA-Z0-9_-]+$/.test(accountId)) return fallback("ACCOUNT_NOT_FOUND");
@@ -456,6 +588,17 @@ export async function loadThreadsDashboard(options: {
         ),
       ]);
       const editorial = editorialFrom(internalEditorial, customerEditorial);
+      const [liveReadiness, operationalBoundary] = await Promise.all([
+        optionalJson(fetcher, `${origin}/operator/readiness/accounts/${encodedAccount}`, headers, controller.signal),
+        optionalJson(
+          fetcher,
+          `${origin}/autopilot/v2/operational-boundary?account_id=${encodedAccount}&capability=editorial.cycle`,
+          headers,
+          controller.signal,
+        ),
+      ]);
+      const operator = operatorStatus(liveReadiness, operationalBoundary);
+      const activities = activitiesFrom(summary.recent_audit_events);
       const manualPosts: ManualPostStatus[] = Array.isArray(summary.manual_posts)
         ? summary.manual_posts.map(record).filter((row): row is Record<string, unknown> => row !== null)
           .map((row): ManualPostStatus | null => {
@@ -524,6 +667,8 @@ export async function loadThreadsDashboard(options: {
           const rates = hourlyRates(metrics, publication?.publishedAt ?? null, observation.observedAt);
         contents.push({
             contentId,
+            version: nonNegativeInt(detail.version),
+            attempt: nonNegativeInt(detail.attempt),
             topic: text(detail.topic),
             contentRole: text(detail.content_role),
             body: text(detail.body_text) ?? parts.join("\n\n"),
@@ -538,6 +683,7 @@ export async function loadThreadsDashboard(options: {
             metrics,
             metricsObservedAt: observation.observedAt,
             metricsFetchedAt: observation.fetchedAt,
+            metricsEligibleAt: text(detail.metrics_eligible_at),
             viewsPerHour: rates.viewsPerHour,
             engagementPerHour: rates.engagementPerHour,
             origin: normalizeOrigin(detail.origin),
@@ -568,6 +714,8 @@ export async function loadThreadsDashboard(options: {
         operations,
         safety,
         editorial,
+        operator,
+        activities,
         message: customerMessage(bridgeStatus),
       };
     } finally {

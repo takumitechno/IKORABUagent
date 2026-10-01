@@ -142,7 +142,7 @@ export interface LayoutOpts {
 export function renderLayout(opts: LayoutOpts): string {
   const pathOnly = opts.currentPath.split("?")[0];
   const isCustomerDashboard = pathOnly === "/" || pathOnly === "/improvement";
-  const isInternalOperations = pathOnly === "/internal";
+  const isInternalOperations = pathOnly === "/internal" || pathOnly === "/operator";
   const nav = isCustomerDashboard
     ? buildCustomerNav(opts.currentPath)
     : buildHqNav(opts.currentPath);

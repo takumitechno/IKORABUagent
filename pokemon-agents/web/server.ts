@@ -20,6 +20,7 @@ import { renderLayout, escapeHtml } from "./components/layout";
 import { renderOverview } from "./routes/overview";
 import { renderImprovementReport } from "./routes/improvement-report";
 import { renderInternalOperations } from "./routes/internal-operations";
+import { OPERATOR_ACCOUNT_IDS, renderOperatorDashboard } from "./routes/operator-dashboard";
 import { renderAgents } from "./routes/agents";
 import { renderHeartbeat } from "./routes/heartbeat";
 import { renderApprovalActions } from "./routes/approvalActions";
@@ -143,7 +144,7 @@ async function internalAccount(
 }
 
 function tenantIdentityRequired(path: string): boolean {
-  return path === "/" || path === "/improvement" || path === "/internal"
+  return path === "/" || path === "/improvement" || path === "/internal" || path === "/internal/hq" || path === "/operator"
     || path === "/api/internal/manual-policy"
     || path === "/api/internal/threads-activity-projection"
     || path.startsWith("/api/customer/");
@@ -315,7 +316,7 @@ const server = Bun.serve({
       }
       if (!customerRoute && (TENANT_AUTH.enabled || TENANT_AUTH.canaryEnabled)
         && tenantIdentityRequired(path) && !tenantIdentity && !isPublicDashboardPath(path)) {
-        if (path === "/internal" && tenantFailure) {
+        if ((path === "/internal" || path === "/internal/hq" || path === "/operator") && tenantFailure) {
           return new Response(`Tenant identity unavailable (${tenantFailure})`, { status: 401 });
         }
         return new Response("Unauthorized", { status: 401 });
@@ -762,7 +763,18 @@ const server = Bun.serve({
         }), 200, responseHeaders);
 
       // ===== 4-menu structure =====
-      if (path === "/internal") {
+      if (path === "/internal") return redirect("/operator");
+      if (path === "/operator") {
+        const trustedTenant = tenantEnforced ? requireTenantSelection(tenantIdentity) : null;
+        const allowed = (await getThreadsAccounts(trustedTenant?.userId)).filter((account) =>
+          accountAllowed(account.accountId, INTERNAL_AUTH));
+        const allowedIds = new Set(allowed.map((account) => account.accountId));
+        const dashboards = await Promise.all(OPERATOR_ACCOUNT_IDS
+          .filter((accountId) => allowedIds.has(accountId))
+          .map((accountId) => getThreadsDashboard(accountId, trustedTenant?.userId)));
+        return lay("Two-account operations", renderOperatorDashboard(dashboards));
+      }
+      if (path === "/internal/hq") {
         const trustedTenant = tenantEnforced ? requireTenantSelection(tenantIdentity) : null;
         const selection = await internalAccount(
           url.searchParams.get("account_id"), trustedTenant?.userId, tenantEnforced,
