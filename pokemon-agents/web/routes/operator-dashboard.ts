@@ -9,23 +9,32 @@ export const OPERATOR_ACCOUNT_IDS = ["acct_8ssana", "acct_taku_ai_tech"] as cons
 type Tone = "ok" | "warn" | "bad" | "neutral";
 type NextAction = { label: string; detail: string | null; tone: Tone };
 
-const UNKNOWN = "UNKNOWN";
+const UNKNOWN = "未確認";
 const EVENT_LABELS: Record<string, string> = {
-  candidate_generated: "Generated candidate",
-  content_generated: "Generated candidate",
-  human_approved: "Human approved",
-  content_approved: "Human approved",
-  batch_created: "Batch created",
-  night_batch_created: "Batch created",
-  account_armed_for_live: "Account armed",
-  account_disarmed: "Account disarmed",
-  publish_succeeded: "Published to Threads",
-  publication_succeeded: "Published to Threads",
-  readback_confirmed: "Readback confirmed",
-  insights_collected: "Insights collected",
-  metrics_imported: "Insights collected",
-  safety_stop_engaged: "Safety stop engaged",
-  safety_stop_released: "Safety stop released",
+  candidate_generated: "投稿案を作成",
+  content_generated: "投稿案を作成",
+  human_approved: "担当者が承認",
+  content_approved: "担当者が承認",
+  batch_created: "投稿予定を作成",
+  night_batch_created: "投稿予定を作成",
+  account_armed_for_live: "投稿可能に変更",
+  account_disarmed: "停止中に変更",
+  publish_succeeded: "Threadsへ投稿",
+  publication_succeeded: "Threadsへ投稿",
+  readback_confirmed: "投稿確認済み",
+  insights_collected: "分析結果を取得",
+  metrics_imported: "分析結果を取得",
+  safety_stop_engaged: "安全停止を開始",
+  safety_stop_released: "安全停止を解除",
+};
+
+const STATE_LABELS: Record<string, string> = {
+  ready: "準備完了", succeeded: "完了", metrics_collected: "分析結果取得済み", clear: "問題なし",
+  healthy: "正常", active: "稼働中", pass: "確認済み", unknown: UNKNOWN, missing: "未取得",
+  backend_unavailable: "接続不可", failed: "失敗", ambiguous: "要確認", corrupt: "データ不整合",
+  stopped: "停止中", pending: "待機中", waiting: "待機中", metrics_pending: "データ集計待ち",
+  human_approval_pending: "確認・承認待ち", disarmed: "停止中", inactive: "停止中",
+  publish_ready: "投稿準備完了", disabled: "停止中", confirmed: "確認済み",
 };
 
 function value(input: string | number | null | undefined): string {
@@ -34,10 +43,19 @@ function value(input: string | number | null | undefined): string {
 
 function fmt(iso: string | null | undefined): string {
   if (!iso || Number.isNaN(Date.parse(iso))) return UNKNOWN;
-  return new Intl.DateTimeFormat("en-GB", {
-    timeZone: "Asia/Tokyo", month: "short", day: "2-digit",
+  return new Intl.DateTimeFormat("ja-JP", {
+    timeZone: "Asia/Tokyo", month: "numeric", day: "numeric",
     hour: "2-digit", minute: "2-digit", hour12: false,
-  }).format(new Date(iso)) + " JST";
+  }).format(new Date(iso));
+}
+
+function stateLabel(state: string | null | undefined): string {
+  if (!state) return UNKNOWN;
+  return STATE_LABELS[state.toLowerCase()] ?? state;
+}
+
+function boolLabel(flag: boolean | null | undefined): string {
+  return flag === true ? "有効" : flag === false ? "なし" : UNKNOWN;
 }
 
 function badge(label: string, tone: Tone = "neutral", icon?: string): string {
@@ -63,25 +81,25 @@ function latestBatch(data: ThreadsDashboardData): NightBatchItem | null {
 
 export function deriveOperatorNextAction(data: ThreadsDashboardData): NextAction {
   const content = latestContent(data), batch = latestBatch(data);
-  if (!data.connected || !data.safety.available) return { label: "Reconciliation required", detail: "Status is incomplete", tone: "bad" };
+  if (!data.connected || !data.safety.available) return { label: "状態確認が必要", detail: "一部の状態を取得できません", tone: "bad" };
   if (data.safety.unresolvedAmbiguous || data.safety.globalStop || data.safety.accountStop || data.safety.capabilityStop
     || content?.publication?.status === "ambiguous") {
-    return { label: "Reconciliation required", detail: "Resolve the reported safety or publication state", tone: "bad" };
+    return { label: "確認・復旧してください", detail: "安全状態または投稿状態を確認してください", tone: "bad" };
   }
   if (content?.state === "human_approval_pending" || (content && !content.approved && content.state !== "metrics_pending")) {
-    return { label: "Human approval required", detail: content.contentId, tone: "warn" };
+    return { label: "確認・承認してください", detail: content.contentId, tone: "warn" };
   }
   if (content?.state === "metrics_pending") {
-    return { label: "Await insights maturity", detail: content.metricsEligibleAt ? fmt(content.metricsEligibleAt) : null, tone: "warn" };
+    return { label: "分析結果を待機中", detail: content.metricsEligibleAt ? fmt(content.metricsEligibleAt) : null, tone: "warn" };
   }
-  if (batch?.status === "pending") return { label: "Batch scheduled", detail: fmt(batch.scheduledAt), tone: "ok" };
-  if (!content) return { label: "Review generated content", detail: "No recent content returned", tone: "warn" };
-  if (content.state === "publish_ready") return { label: "Ready to create finite batch", detail: content.contentId, tone: "ok" };
+  if (batch?.status === "pending") return { label: "投稿予定を作成済み", detail: fmt(batch.scheduledAt), tone: "ok" };
+  if (!content) return { label: "投稿案を確認してください", detail: "最近の投稿案はありません", tone: "warn" };
+  if (content.state === "publish_ready") return { label: "投稿準備完了", detail: content.contentId, tone: "ok" };
   if (data.operator.armed === false && data.operator.publishCredential.ready === true
     && data.operator.readyForDryRun === true) {
-    return { label: "Ready to arm", detail: "Future operator action", tone: "ok" };
+    return { label: "投稿可能に切り替え可能", detail: "将来の管理操作", tone: "ok" };
   }
-  return { label: "No action required", detail: null, tone: "ok" };
+  return { label: "対応はありません", detail: null, tone: "ok" };
 }
 
 function keyValue(label: string, content: string, mono = false): string {
@@ -91,57 +109,59 @@ function keyValue(label: string, content: string, mono = false): string {
 function metricSummary(content: ThreadsContent | null): string {
   if (!content || Object.keys(content.metrics).length === 0) return UNKNOWN;
   const keys = ["views", "likes", "replies", "reposts"] as const;
+  const labels = { views: "表示", likes: "いいね", replies: "返信", reposts: "再投稿" };
   return keys.filter((key) => typeof content.metrics[key] === "number")
-    .map((key) => `${key} ${content.metrics[key]}`).join(" · ") || UNKNOWN;
+    .map((key) => `${labels[key]} ${content.metrics[key]}`).join(" · ") || UNKNOWN;
 }
 
 function safetyStatus(data: ThreadsDashboardData): { label: string; tone: Tone } {
   if (!data.safety.available) return { label: UNKNOWN, tone: "bad" };
-  if (data.safety.globalStop || data.safety.accountStop || data.safety.capabilityStop) return { label: "STOPPED", tone: "bad" };
-  if (data.safety.unresolvedAmbiguous) return { label: "RECONCILE", tone: "bad" };
-  return { label: "SAFETY CLEAR", tone: "ok" };
+  if (data.safety.globalStop || data.safety.accountStop || data.safety.capabilityStop) return { label: "安全停止中", tone: "bad" };
+  if (data.safety.unresolvedAmbiguous) return { label: "要確認", tone: "bad" };
+  return { label: "問題なし", tone: "ok" };
 }
 
 function automationStatus(data: ThreadsDashboardData): { label: string; tone: Tone } {
   const runners = data.operator.runners;
   if (!runners.length) return { label: UNKNOWN, tone: "bad" };
-  if (runners.some((runner) => runner.healthy === true)) return { label: "RUNNING", tone: "ok" };
-  if (runners.every((runner) => ["disabled", "stopped", "inactive"].includes(runner.state))) return { label: "OFF", tone: "neutral" };
-  return { label: "ATTENTION", tone: "warn" };
+  if (runners.some((runner) => runner.healthy === true)) return { label: "稼働中", tone: "ok" };
+  if (runners.every((runner) => ["disabled", "stopped", "inactive"].includes(runner.state))) return { label: "停止中", tone: "neutral" };
+  return { label: "要確認", tone: "warn" };
 }
 
 function renderNextAction(data: ThreadsDashboardData): string {
   const next = deriveOperatorNextAction(data);
-  return `<section class="op-next op-next-${next.tone}" aria-label="Next operator action"><span>NEXT ACTION</span><strong>${escapeHtml(next.label)}</strong>${next.detail ? `<small>${escapeHtml(next.detail)}</small>` : ""}</section>`;
+  return `<section class="op-next op-next-${next.tone}" aria-label="次にやること"><span>次にやること</span><strong>${escapeHtml(next.label)}</strong>${next.detail ? `<small>${escapeHtml(next.detail)}</small>` : ""}</section>`;
 }
 
 function renderSafetyStatus(data: ThreadsDashboardData): string {
   const safety = safetyStatus(data);
-  return `<section class="op-section"><h3>Safety</h3><div class="op-badges">${badge(safety.label, safety.tone)}${badge(data.operator.armed === null ? "ARMED UNKNOWN" : data.operator.armed ? "ARMED" : "DISARMED", data.operator.armed === null ? "bad" : data.operator.armed ? "warn" : "ok")}</div><dl class="op-list">${keyValue("Account", value(data.accountStatus))}${keyValue("Global stop", data.safety.available ? String(data.safety.globalStop) : UNKNOWN)}${keyValue("Account stop", data.safety.available ? String(data.safety.accountStop) : UNKNOWN)}${keyValue("Capability stop", data.safety.available ? String(data.safety.capabilityStop) : UNKNOWN)}${keyValue("Publication ambiguity", data.safety.available ? String(data.safety.unresolvedAmbiguous) : UNKNOWN)}</dl></section>`;
+  return `<section class="op-section"><h3>安全状態</h3><div class="op-badges">${badge(safety.label, safety.tone)}${badge(data.operator.armed === null ? "投稿可否を未確認" : data.operator.armed ? "投稿可能" : "停止中", data.operator.armed === null ? "bad" : data.operator.armed ? "warn" : "ok")}</div><dl class="op-list">${keyValue("アカウント", stateLabel(data.accountStatus))}${keyValue("全体停止", data.safety.available ? boolLabel(data.safety.globalStop) : UNKNOWN)}${keyValue("アカウント停止", data.safety.available ? boolLabel(data.safety.accountStop) : UNKNOWN)}${keyValue("機能停止", data.safety.available ? boolLabel(data.safety.capabilityStop) : UNKNOWN)}${keyValue("投稿状態の不一致", data.safety.available ? boolLabel(data.safety.unresolvedAmbiguous) : UNKNOWN)}</dl></section>`;
 }
 
 function renderPipeline(data: ThreadsDashboardData): string {
   const content = latestContent(data), batch = latestBatch(data);
-  return `<section class="op-section"><h3>Current pipeline</h3><div class="op-primary-grid"><div><span>Stage</span>${badge(value(content?.state), stateTone(content?.state))}</div><div><span>Approval</span>${badge(content ? (content.approved ? "APPROVED" : "REQUIRED") : UNKNOWN, content?.approved ? "ok" : content ? "warn" : "bad")}</div><div><span>Latest result</span>${badge(value(content?.publication?.status), stateTone(content?.publication?.status))}</div><div><span>Insights</span>${badge(value(content?.state === "metrics_collected" ? "METRICS_COLLECTED" : content?.state === "metrics_pending" ? "METRICS_PENDING" : null), content?.state === "metrics_collected" ? "ok" : content?.state === "metrics_pending" ? "warn" : "bad")}</div></div><dl class="op-list">${keyValue("Content / version", content ? `${content.contentId} / v${value(content.version)}` : UNKNOWN, true)}${keyValue("Content attempt", value(content?.attempt))}${keyValue("NIGHT batch", batch ? `${batch.batchId} · ${batch.status}` : UNKNOWN, true)}${keyValue("Batch item", batch ? `${batch.itemId} · ${fmt(batch.scheduledAt)}` : UNKNOWN, true)}${keyValue("Batch attempts", value(batch?.attemptCount))}</dl></section>`;
+  return `<section class="op-section"><h3>現在の進行状況</h3><div class="op-primary-grid"><div><span>状態</span>${badge(stateLabel(content?.state), stateTone(content?.state))}</div><div><span>承認</span>${badge(content ? (content.approved ? "承認済み" : "確認・承認待ち") : UNKNOWN, content?.approved ? "ok" : content ? "warn" : "bad")}</div><div><span>最新結果</span>${badge(stateLabel(content?.publication?.status), stateTone(content?.publication?.status))}</div><div><span>分析結果</span>${badge(stateLabel(content?.state === "metrics_collected" ? "metrics_collected" : content?.state === "metrics_pending" ? "metrics_pending" : null), content?.state === "metrics_collected" ? "ok" : content?.state === "metrics_pending" ? "warn" : "bad")}</div></div><dl class="op-list">${keyValue("コンテンツID / 版", content ? `${content.contentId} / v${value(content.version)}` : UNKNOWN, true)}${keyValue("作成回数", value(content?.attempt))}${keyValue("夜間バッチ", batch ? `${batch.batchId} · ${stateLabel(batch.status)}` : UNKNOWN, true)}${keyValue("予定項目", batch ? `${batch.itemId} · ${fmt(batch.scheduledAt)}` : UNKNOWN, true)}${keyValue("バッチ試行回数", value(batch?.attemptCount))}</dl></section>`;
 }
 
 function renderPublication(data: ThreadsDashboardData): string {
   const content = latestContent(data), publication = content?.publication ?? null;
-  return `<section class="op-section"><h3>Publication & insights</h3><dl class="op-list">${keyValue("Internal publication", value(publication?.publicationId), true)}${keyValue("Provider post", value(publication?.externalId), true)}${keyValue("Confirmation / readback", value(publication?.readbackStatus))}${keyValue("Duplicate", publication?.duplicate === undefined || publication?.duplicate === null ? UNKNOWN : String(publication.duplicate))}${keyValue("Earliest collection", fmt(content?.metricsEligibleAt))}${keyValue("Last collected", fmt(content?.metricsFetchedAt))}${keyValue("Metrics", metricSummary(content))}</dl></section>`;
+  return `<section class="op-section"><h3>投稿・分析結果</h3><dl class="op-list">${keyValue("内部投稿ID", value(publication?.publicationId), true)}${keyValue("Threads投稿ID", value(publication?.externalId), true)}${keyValue("投稿確認", stateLabel(publication?.readbackStatus))}${keyValue("重複", publication?.duplicate === undefined || publication?.duplicate === null ? UNKNOWN : boolLabel(publication.duplicate))}${keyValue("集計開始予定", fmt(content?.metricsEligibleAt))}${keyValue("最終集計", fmt(content?.metricsFetchedAt))}${keyValue("KPI", metricSummary(content))}</dl></section>`;
 }
 
 function renderTechnical(data: ThreadsDashboardData): string {
   const automation = automationStatus(data);
-  const runnerText = data.operator.runners.map((runner) => `${runner.name}: ${runner.state}${runner.runStatus ? `/${runner.runStatus}` : ""}`).join(" · ") || UNKNOWN;
+  const runnerNames: Record<string, string> = { night_batch: "夜間バッチ", insights: "分析取得" };
+  const runnerText = data.operator.runners.map((runner) => `${runnerNames[runner.name] ?? runner.name}: ${stateLabel(runner.state)}${runner.runStatus ? `/${stateLabel(runner.runStatus)}` : ""}`).join(" · ") || UNKNOWN;
   const rate = data.safety.rateGuardReady
-    ? `${value(data.safety.hourlyLimit)}/h · ${value(data.safety.dailyLimit)}/day · ${value(data.safety.minIntervalSeconds)}s min`
+    ? `${value(data.safety.hourlyLimit)}/時 · ${value(data.safety.dailyLimit)}/日 · 最短${value(data.safety.minIntervalSeconds)}秒`
     : UNKNOWN;
-  return `<details class="op-technical"><summary>Technical details</summary><dl class="op-list">${keyValue("Provider identity", data.operator.providerUsername ? `Threads @${data.operator.providerUsername}${data.operator.providerUserId ? ` · ${data.operator.providerUserId}` : ""}` : UNKNOWN, true)}${keyValue("Publish credential", value(data.operator.publishCredential.state))}${keyValue("Insights credential", value(data.operator.insightsCredential.state))}${keyValue("Threads SHA", value(data.operator.gitSha), true)}${keyValue("Deployment path", value(data.operator.deploymentPath), true)}${keyValue("Schema", data.operator.schemaVersion === null ? value(data.operator.schemaReadiness) : `v${data.operator.schemaVersion} ${value(data.operator.schemaReadiness)}`)}${keyValue("Automation", automation.label)}${keyValue("Tasks", runnerText)}${keyValue("Writer policy", value(data.operator.writerPolicyStatus))}${keyValue("Publish rate", rate)}${keyValue("Rolling usage", `${value(data.operations.publicationsLastHour)}/h · ${value(data.operations.publicationsLast24h)}/24h`)}</dl></details>`;
+  return `<details class="op-technical"><summary>技術詳細</summary><dl class="op-list">${keyValue("Threadsアカウント", data.operator.providerUsername ? `Threads @${data.operator.providerUsername}${data.operator.providerUserId ? ` · ${data.operator.providerUserId}` : ""}` : UNKNOWN, true)}${keyValue("投稿用接続", stateLabel(data.operator.publishCredential.state))}${keyValue("分析用接続", stateLabel(data.operator.insightsCredential.state))}${keyValue("Threads SHA", value(data.operator.gitSha), true)}${keyValue("配置先", value(data.operator.deploymentPath), true)}${keyValue("スキーマ", data.operator.schemaVersion === null ? stateLabel(data.operator.schemaReadiness) : `v${data.operator.schemaVersion} ${stateLabel(data.operator.schemaReadiness)}`)}${keyValue("自動処理", automation.label)}${keyValue("タスク", runnerText)}${keyValue("投稿ルール", stateLabel(data.operator.writerPolicyStatus))}${keyValue("投稿上限", rate)}${keyValue("投稿実績", `${value(data.operations.publicationsLastHour)}/時 · ${value(data.operations.publicationsLast24h)}/24時`)}</dl></details>`;
 }
 
 function renderAccountCard(data: ThreadsDashboardData): string {
   const safety = safetyStatus(data), automation = automationStatus(data);
-  return `<article class="op-account" data-account-id="${escapeHtml(data.accountId)}"><div class="op-account-top"><header class="op-account-head"><div><span class="op-eyebrow">THREADS ACCOUNT</span><h2>@${escapeHtml(data.handle ?? data.accountId)}</h2><p>${escapeHtml(data.displayName ?? "Identity unavailable")} · <code>${escapeHtml(data.accountId)}</code></p></div><div class="op-badges">${badge(safety.label, safety.tone)}${badge(automation.label, automation.tone, "◉")}</div></header>${renderNextAction(data)}</div><div class="op-sections">${renderSafetyStatus(data)}${renderPipeline(data)}${renderPublication(data)}</div>${renderTechnical(data)}</article>`;
+  return `<article class="op-account" data-account-id="${escapeHtml(data.accountId)}"><div class="op-account-top"><header class="op-account-head"><div><span class="op-eyebrow">THREADS アカウント</span><h2>@${escapeHtml(data.handle ?? data.accountId)}</h2><p>${escapeHtml(data.displayName ?? "アカウント名未取得")} · <code>${escapeHtml(data.accountId)}</code></p></div><div class="op-badges">${badge(safety.label, safety.tone)}${badge(automation.label, automation.tone, "◉")}</div></header>${renderNextAction(data)}</div><div class="op-sections">${renderSafetyStatus(data)}${renderPipeline(data)}${renderPublication(data)}</div>${renderTechnical(data)}</article>`;
 }
 
 type TimelineItem = ThreadsActivity & { account: string };
@@ -160,8 +180,8 @@ function activityItems(data: ThreadsDashboardData): TimelineItem[] {
 
 function renderTimeline(accounts: ThreadsDashboardData[]): string {
   const items = accounts.flatMap(activityItems).sort((a, b) => (b.at ?? "").localeCompare(a.at ?? "")).slice(0, 10);
-  if (!items.length) return `<p class="op-empty">No recent activity returned.</p>`;
-  return `<ol class="op-timeline">${items.map((item) => `<li><span class="op-dot" aria-hidden="true"></span><time>${escapeHtml(fmt(item.at))}</time><div><strong>${escapeHtml(EVENT_LABELS[item.type] ?? item.type.replaceAll("_", " "))}</strong><p>@${escapeHtml(item.account)}${item.detail ? ` · ${escapeHtml(item.detail)}` : ""}</p>${item.entityId ? `<code title="${escapeHtml(item.entityId)}">${escapeHtml(item.entityId)}</code>` : ""}</div></li>`).join("")}</ol>`;
+  if (!items.length) return `<p class="op-empty">最近の更新はありません。</p>`;
+  return `<ol class="op-timeline">${items.map((item) => `<li><span class="op-dot" aria-hidden="true"></span><time>${escapeHtml(fmt(item.at))}</time><div><strong>${escapeHtml(EVENT_LABELS[item.type] ?? item.type.replaceAll("_", " "))}</strong><p>@${escapeHtml(item.account)}${item.detail ? ` · ${escapeHtml(stateLabel(item.detail))}` : ""}</p>${item.entityId ? `<code title="${escapeHtml(item.entityId)}">${escapeHtml(item.entityId)}</code>` : ""}</div></li>`).join("")}</ol>`;
 }
 
 function globalSchema(accounts: ThreadsDashboardData[]): string {
@@ -169,14 +189,14 @@ function globalSchema(accounts: ThreadsDashboardData[]): string {
   if (known.length !== accounts.length) return UNKNOWN;
   const first = known[0];
   if (!first || known.some((account) => account.operator.schemaVersion !== first.operator.schemaVersion
-    || account.operator.schemaReadiness !== first.operator.schemaReadiness)) return "MIXED";
-  return `v${first.operator.schemaVersion} ${first.operator.schemaReadiness}`;
+    || account.operator.schemaReadiness !== first.operator.schemaReadiness)) return "複数状態";
+  return `v${first.operator.schemaVersion} ${stateLabel(first.operator.schemaReadiness)}`;
 }
 
 function globalKill(accounts: ThreadsDashboardData[]): { label: string; tone: Tone } {
-  if (accounts.some((account) => account.safety.available && account.safety.globalStop)) return { label: "GLOBAL STOP", tone: "bad" };
+  if (accounts.some((account) => account.safety.available && account.safety.globalStop)) return { label: "全体停止中", tone: "bad" };
   if (accounts.some((account) => !account.safety.available)) return { label: UNKNOWN, tone: "bad" };
-  return { label: "CLEAR", tone: "ok" };
+  return { label: "問題なし", tone: "ok" };
 }
 
 export function renderOperatorDashboard(accounts: ThreadsDashboardData[], refreshedAt = new Date().toISOString()): string {
@@ -191,11 +211,11 @@ export function renderOperatorDashboard(accounts: ThreadsDashboardData[], refres
     activities: [], message: "アカウントが見つかりません",
   } as ThreadsDashboardData));
   const kill = globalKill(visible);
-  const automation = visible.every((account) => automationStatus(account).label === "OFF") ? "OFF"
-    : visible.some((account) => automationStatus(account).label === "RUNNING") ? "RUNNING" : UNKNOWN;
+  const automation = visible.every((account) => automationStatus(account).label === "停止中") ? "停止中"
+    : visible.some((account) => automationStatus(account).label === "稼働中") ? "稼働中" : UNKNOWN;
   const armed = visible.filter((account) => account.operator.armed === true).length;
   const ambiguous = visible.some((account) => account.safety.unresolvedAmbiguous);
-  return `<style>${operatorStyles}</style><div class="operator-dashboard"><header class="op-page-head"><div><span class="op-eyebrow">IKORABU · READ ONLY</span><h1>Operations</h1><p>See safety first, then the single next action for each account.</p></div><div class="op-refresh"><span>LAST REFRESH</span><strong>${escapeHtml(fmt(refreshedAt))}</strong><a href="/operator" aria-label="Refresh operator dashboard">Refresh</a></div></header><section class="op-system" id="safety" aria-label="System safety status"><div><span>Global safety</span>${badge(kill.label, kill.tone)}</div><div><span>Accounts</span><strong>${visible.length} visible · ${armed} armed</strong></div><div><span>Automation</span><strong>${escapeHtml(automation)}</strong></div><div><span>Schema</span><strong>${escapeHtml(globalSchema(visible))}</strong></div><div><span>Publication ambiguity</span><strong>${ambiguous ? "REQUIRES REVIEW" : visible.every((account) => account.safety.available) ? "NONE REPORTED" : UNKNOWN}</strong></div></section><main class="op-account-grid" id="accounts">${visible.map(renderAccountCard).join("")}</main><section class="op-activity" id="activity" aria-labelledby="operator-activity-title"><header><div><span class="op-eyebrow">RECENT ACTIVITY</span><h2 id="operator-activity-title">Operational timeline</h2></div><p>Sanitized events from audit, content, publication, and metrics records.</p></header>${renderTimeline(visible)}</section><footer class="op-readonly"><strong>READ ONLY</strong><span>GET requests only. No production mutation is wired.</span></footer></div>`;
+  return `<style>${operatorStyles}</style><div class="operator-dashboard"><header class="op-page-head"><div><span class="op-eyebrow">IKORABU · 閲覧専用</span><h1>運用管理</h1><p>最初に安全状態、その後に各アカウントの「次にやること」を確認できます。</p></div><div class="op-refresh"><span>最終更新</span><strong>${escapeHtml(fmt(refreshedAt))}</strong><a href="/operator" aria-label="運用管理画面を更新">更新</a></div></header><section class="op-system" id="safety" aria-label="システムの安全状態"><div><span>全体の安全状態</span>${badge(kill.label, kill.tone)}</div><div><span>アカウント</span><strong>${visible.length}件表示 · ${armed}件投稿可能</strong></div><div><span>自動処理</span><strong>${escapeHtml(automation)}</strong></div><div><span>スキーマ</span><strong>${escapeHtml(globalSchema(visible))}</strong></div><div><span>投稿状態の不一致</span><strong>${ambiguous ? "確認が必要" : visible.every((account) => account.safety.available) ? "報告なし" : UNKNOWN}</strong></div></section><main class="op-account-grid" id="accounts">${visible.map(renderAccountCard).join("")}</main><section class="op-activity" id="activity" aria-labelledby="operator-activity-title"><header><div><span class="op-eyebrow">更新履歴</span><h2 id="operator-activity-title">運用タイムライン</h2></div><p>監査・コンテンツ・投稿・KPIの記録から、安全な項目だけを表示しています。</p></header>${renderTimeline(visible)}</section><footer class="op-readonly"><strong>閲覧専用</strong><span>GETリクエストのみ。本番データを変更する操作はありません。</span></footer></div>`;
 }
 
 const operatorStyles = `

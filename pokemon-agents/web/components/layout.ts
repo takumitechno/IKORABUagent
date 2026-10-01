@@ -102,12 +102,12 @@ export function buildHqNav(currentPath: string): NavSection[] {
 
 function buildOperatorNav(): NavSection[] {
   return [{
-    label: "OPERATIONS",
+    label: "運用管理",
     items: [
-      { key: "operations", href: "/operator", label: "Operations", iconName: "home", active: true, current: "page" },
-      { key: "accounts", href: "/operator#accounts", label: "Accounts", iconName: "list" },
-      { key: "safety", href: "/operator#safety", label: "Safety", iconName: "goals" },
-      { key: "activity", href: "/operator#activity", label: "Activity", iconName: "activity" },
+      { key: "operations", href: "/operator", label: "運用状況", iconName: "home", active: true, current: "page" },
+      { key: "accounts", href: "/operator#accounts", label: "アカウント", iconName: "list" },
+      { key: "safety", href: "/operator#safety", label: "安全状態", iconName: "goals" },
+      { key: "activity", href: "/operator#activity", label: "更新履歴", iconName: "activity" },
     ],
   }];
 }
@@ -161,7 +161,7 @@ export function renderLayout(opts: LayoutOpts): string {
     : isOperator ? buildOperatorNav() : buildHqNav(opts.currentPath);
   const navMarkup = renderNavSections(nav, isCustomerDashboard ? "customer" : isOperator ? "operator" : "hq");
   const activeNavLabel = isOperator
-    ? "Operations"
+    ? "運用状況"
     : isInternalOperations
     ? "Mission Control"
     : nav.flatMap((section) => section.items).find((item) => item.active)?.label ?? "HQメニュー";
@@ -175,17 +175,17 @@ export function renderLayout(opts: LayoutOpts): string {
       </a>`;
   const browserTitle = isCustomerDashboard
     ? "IKORABU | SNS運用"
-    : isOperator ? "IKORABU | Operations"
+    : isOperator ? "IKORABU | 運用管理"
     : "Takumi Technologies HQ | Mission Control";
   const brandName = isCustomerDashboard ? "IKORABU" : isOperator ? "IKORABU" : "Takumi Technologies HQ";
-  const brandContext = isCustomerDashboard ? "SNS運用" : isOperator ? "Operations" : "Mission Control";
+  const brandContext = isCustomerDashboard ? "SNS運用" : isOperator ? "運用管理" : "Mission Control";
   const brandMarkSrc = isOperator || isCustomerDashboard ? null : "/brand/takumi-mark.png";
   const brandMark = brandMarkSrc
     ? `<img src="${brandMarkSrc}" alt="" width="34" height="34">`
     : `<span aria-hidden="true">I</span>`;
   const shellClass = isCustomerDashboard ? "customer-shell" : isOperator ? "internal-shell operator-shell" : "internal-shell";
-  const sidebarLabel = isCustomerDashboard ? "運用セクション" : isOperator ? "Operations navigation" : "HQナビゲーション";
-  const mobileLabel = isOperator ? "Operations mobile navigation" : "HQモバイルナビゲーション";
+  const sidebarLabel = isCustomerDashboard ? "運用セクション" : isOperator ? "運用管理ナビゲーション" : "HQナビゲーション";
+  const mobileLabel = isOperator ? "運用管理モバイルナビゲーション" : "HQモバイルナビゲーション";
   const currentWorkspace = opts.customerWorkspaces?.find((workspace) => workspace.current);
   const workspaceSwitcher = isCustomerDashboard && currentWorkspace
     ? `<details class="customer-workspace"${opts.customerWorkspaces!.length === 1 ? " open" : ""}>
@@ -226,7 +226,7 @@ export function renderLayout(opts: LayoutOpts): string {
       ${internalHomeButton}
       ${workspaceSwitcher}
       <nav class="sidebar-nav" aria-label="${sidebarLabel}">${navMarkup}</nav>
-      ${isCustomerDashboard ? "" : `<details class="hq-mobile-nav"><summary>${isOperator ? "Current" : "現在地"} · ${escapeHtml(activeNavLabel)}</summary><nav class="hq-mobile-nav-panel" aria-label="${mobileLabel}">${navMarkup}</nav></details>`}
+      ${isCustomerDashboard ? "" : `<details class="hq-mobile-nav"><summary>現在地 · ${escapeHtml(activeNavLabel)}</summary><nav class="hq-mobile-nav-panel" aria-label="${mobileLabel}">${navMarkup}</nav></details>`}
     </aside>
     <main class="main" id="main">
       ${opts.flash ? `<div class="flash ${opts.flash.type}">${escapeHtml(opts.flash.msg)}</div>` : ""}

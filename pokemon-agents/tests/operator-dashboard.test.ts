@@ -42,20 +42,20 @@ function account(accountId: string, handle: string, state = "metrics_pending"): 
 }
 
 describe("MVP operator dashboard", () => {
-  test("shows two separated accounts, one action each, and honest UNKNOWN states", () => {
+  test("shows two separated accounts, one action each, and honest unknown states in Japanese", () => {
     const first = account("acct_8ssana", "8sssana");
     const second = account("acct_taku_ai_tech", "taku_ai_tech", "metrics_collected");
     const html = renderOperatorDashboard([first, second], "2026-10-01T11:00:00Z");
     expect(html.match(/class="op-account"/g)).toHaveLength(2);
     expect(html).toContain('data-account-id="acct_8ssana"');
     expect(html).toContain('data-account-id="acct_taku_ai_tech"');
-    expect(html.match(/aria-label="Next operator action"/g)).toHaveLength(2);
-    expect(html).toContain("Await insights maturity");
-    expect(html).toContain("Ready to arm");
-    expect(html).toContain("v33 READY");
-    expect(html).toContain("Deployment path");
-    expect(html).toContain("UNKNOWN");
-    expect(html).toContain("Readback confirmed");
+    expect(html.match(/aria-label="次にやること"/g)).toHaveLength(2);
+    expect(html).toContain("分析結果を待機中");
+    expect(html).toContain("投稿可能に切り替え可能");
+    expect(html).toContain("v33 準備完了");
+    expect(html).toContain("配置先");
+    expect(html).toContain("未確認");
+    expect(html).toContain("投稿確認済み");
   });
 
   test("contains no live mutation or secret surface", () => {
@@ -64,7 +64,7 @@ describe("MVP operator dashboard", () => {
       account("acct_taku_ai_tech", "taku_ai_tech"),
     ]);
     expect(html).not.toMatch(/<form|method=["']post|\/arm|\/disarm|access_token|secret_ref|app_secret|authorization_code/i);
-    expect(html).toContain("READ ONLY");
+    expect(html).toContain("閲覧専用");
     expect(html).not.toContain("FUTURE OPERATOR ACTION");
     for (const hidden of ["sashihara", "kiara", "iori", "agent hierarchy", "internal meeting"]) {
       expect(html.toLowerCase()).not.toContain(hidden);
@@ -76,12 +76,12 @@ describe("MVP operator dashboard", () => {
     first.activities.push({ type: "employee_run_completed", at: "2026-10-01T10:30:00Z", entityId: "kiara", detail: "pokemon agent" });
     const body = renderOperatorDashboard([first, account("acct_taku_ai_tech", "taku_ai_tech")]);
     const html = renderLayout({ title: "Operations", body, currentPath: "/operator", csrfToken: "not-rendered" });
-    expect(html).toContain("<title>IKORABU | Operations</title>");
+    expect(html).toContain("<title>IKORABU | 運用管理</title>");
     expect(html).toContain('<meta name="application-name" content="IKORABU">');
     expect(html).toContain('<span class="brand-name">IKORABU</span>');
-    expect(html).toContain('<div class="brand-sub">Operations</div>');
-    expect(html).toContain('aria-label="Operations navigation"');
-    expect(html).toContain('aria-label="Operations mobile navigation"');
+    expect(html).toContain('<div class="brand-sub">運用管理</div>');
+    expect(html).toContain('aria-label="運用管理ナビゲーション"');
+    expect(html).toContain('aria-label="運用管理モバイルナビゲーション"');
     expect(html).toContain('href="/operator#accounts"');
     expect(html).toContain('href="/operator#safety"');
     expect(html).toContain('href="/operator#activity"');
@@ -99,12 +99,12 @@ describe("MVP operator dashboard", () => {
   test("prioritizes reported stops and ambiguity over optimistic actions", () => {
     const stopped = account("acct_8ssana", "8sssana", "publish_ready");
     stopped.safety.globalStop = true;
-    expect(deriveOperatorNextAction(stopped).label).toBe("Reconciliation required");
+    expect(deriveOperatorNextAction(stopped).label).toBe("確認・復旧してください");
     stopped.safety.globalStop = false;
     stopped.safety.unresolvedAmbiguous = true;
-    expect(deriveOperatorNextAction(stopped).label).toBe("Reconciliation required");
+    expect(deriveOperatorNextAction(stopped).label).toBe("確認・復旧してください");
     stopped.safety.available = false;
-    expect(deriveOperatorNextAction(stopped).label).toBe("Reconciliation required");
+    expect(deriveOperatorNextAction(stopped).label).toBe("状態確認が必要");
   });
 
   test("loads sanitized readiness and operational status through GET-only production paths", async () => {

@@ -168,9 +168,11 @@ describe("PRODUCT-UI-REDESIGN01 customer home", () => {
   });
   test("keeps customer copy free of operator and implementation language", () => {
     const html = render({ contents: [content], manualPosts: [manual] });
-    for (const hidden of ["learn=false", "APIから", "credential", "kill switch", "Threads SHA", "オフィスに戻る", "Takumi Technologies"]) {
-      expect(html).not.toContain(hidden);
+    for (const hidden of ["learn=false", "APIから", "credential", "kill switch", "threads sha", "armed", "pokemon", "secret-agent", "meeting-secret", "internal-thread", "オフィスに戻る", "takumi technologies"]) {
+      expect(html.toLowerCase()).not.toContain(hidden);
     }
+    for (const label of ["次にやること", "今日", "投稿予定", "投稿済み・KPI", "次の改善", "投稿済み", "投稿の詳細"]) expect(html).toContain(label);
+    for (const english of ["NEXT ACTION", "TODAY", "SCHEDULE", "PUBLISHED POSTS", "NEXT IMPROVEMENT", "POST DETAIL"]) expect(html).not.toContain(english);
   });
   test("escapes text, form attributes, textarea content and drawer JSON", () => {
     const attack = '</script><img src=x onerror="alert(1)">';
