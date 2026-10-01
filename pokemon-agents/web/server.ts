@@ -1337,19 +1337,19 @@ details pre { background: #18181b; color: #e4e4e7; padding: 12px; border-radius:
 .org-board::before { content: ""; position: absolute; z-index: -2; inset: 0; opacity: .28; background-image: linear-gradient(rgba(165,180,252,.14) 1px, transparent 1px), linear-gradient(90deg, rgba(165,180,252,.14) 1px, transparent 1px); background-size: 34px 34px; mask-image: linear-gradient(to bottom, #000, transparent 76%); }
 .org-board::after { content: ""; position: absolute; z-index: -1; width: 440px; height: 440px; right: -170px; top: -210px; border-radius: 50%; background: radial-gradient(circle, rgba(34,211,238,.36), rgba(99,102,241,.18) 45%, transparent 70%); filter: blur(3px); animation: org-aurora 8s ease-in-out infinite alternate; }
 .org-hero { display: flex; align-items: center; justify-content: space-between; gap: 24px; padding: 2px 2px 20px; border-bottom: 1px solid rgba(165,180,252,.22); }
-.org-eyebrow { display: block; margin-bottom: 5px; color: #67e8f9; font-size: 10px; font-weight: 800; letter-spacing: .18em; }
+.org-eyebrow { display: block; margin-bottom: 5px; color: #67e8f9; font-size: 12px; font-weight: 800; letter-spacing: .18em; }
 .org-hero h2 { margin: 0; color: #fff; font-size: 24px; font-weight: 750; letter-spacing: -.025em; text-transform: none; }
 .org-hero p { margin-top: 5px; color: #cbd5e1; font-size: 12px; font-weight: 500; }
 .org-stats { flex: 0 0 auto; display: grid; grid-template-columns: repeat(3, minmax(72px, 1fr)); gap: 8px; }
 .org-stats > span { min-height: 62px; display: grid; grid-template-columns: auto auto; align-content: center; justify-content: center; column-gap: 7px; padding: 9px 12px; border: 1px solid rgba(165,180,252,.22); border-radius: 14px; background: rgba(15,23,42,.38); box-shadow: inset 0 1px rgba(255,255,255,.08); }
 .org-stats strong { color: #fff; font-size: 20px; line-height: 1; }
-.org-stats strong small { color: #94a3b8; font-size: 10px; }
-.org-stats em { grid-column: 1 / -1; margin-top: 5px; color: #a5b4fc; font-size: 10px; font-style: normal; font-weight: 750; text-align: center; letter-spacing: .05em; }
+.org-stats strong small { color: #94a3b8; font-size: 12px; }
+.org-stats em { grid-column: 1 / -1; margin-top: 5px; color: #a5b4fc; font-size: 12px; font-style: normal; font-weight: 750; text-align: center; letter-spacing: .05em; }
 .org-live { border-color: rgba(94,234,212,.26) !important; }
 .org-live i { width: 8px; height: 8px; border-radius: 50%; background: #34d399; box-shadow: 0 0 0 5px rgba(52,211,153,.12); animation: org-pulse 2.2s ease-in-out infinite; }
 .org-live em { color: #a7f3d0; }
 .org-team { display: grid; justify-items: center; gap: 12px; padding-bottom: 22px; border-bottom: 1px solid rgba(165,180,252,.20); }
-.org-team > h3, .org-core > h3, .org-specialists > h3 { margin: 0; color: #c7d2fe; font-size: 11px; font-weight: 750; letter-spacing: .08em; text-transform: none; }
+.org-team > h3, .org-core > h3, .org-specialists > h3 { margin: 0; color: #c7d2fe; font-size: 12px; font-weight: 750; letter-spacing: .08em; text-transform: none; }
 .org-team h3 span, .org-specialists h3 span { margin-right: 6px; color: #67e8f9; font-family: ui-monospace, monospace; }
 .org-core { width: 100%; display: grid; justify-items: center; gap: 12px; }
 .org-connector { width: min(500px, 72%); height: 20px; position: relative; border-top: 1px solid rgba(103,232,249,.45); }
@@ -1373,7 +1373,7 @@ details pre { background: #18181b; color: #e4e4e7; padding: 12px; border-radius:
 .org-person-copy { min-width: 0; display: grid; gap: 4px; }
 .org-person-copy strong { color: inherit; font-size: 15px; line-height: 1.25; }
 .org-person-copy > span { color: #dbeafe; font-size: 12px; font-weight: 650; line-height: 1.45; overflow-wrap: anywhere; }
-.org-person-copy small { display: flex; align-items: center; gap: 5px; color: #cbd5e1; font-size: 10px; font-weight: 700; }
+.org-person-copy small { display: flex; align-items: center; gap: 5px; color: #cbd5e1; font-size: 12px; font-weight: 700; }
 .org-person-copy small.active { color: #6ee7b7; }
 .org-person-leader .org-person-copy small.active { color: #a7f3d0; }
 .org-person-copy small.disabled { color: #94a3b8; }
