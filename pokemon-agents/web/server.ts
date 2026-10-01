@@ -1382,14 +1382,16 @@ details pre { background: #18181b; color: #e4e4e7; padding: 12px; border-radius:
 @keyframes org-aurora { to { transform: translate(-60px, 38px) scale(1.12); } }
 @keyframes org-pulse { 50% { opacity: .55; box-shadow: 0 0 0 9px rgba(52,211,153,0); } }
 @keyframes org-card-in { from { opacity: 0; transform: translateY(8px); } }
+@media (max-width: 900px) {
+  .org-hero { display: grid; }
+  .org-stats { width: 100%; grid-template-columns: repeat(3, 1fr); }
+}
 @media (max-width: 640px) {
   .org-board { padding: 16px; }
   .org-hero { align-items: flex-start; }
   .org-hero h2 { font-size: 20px; }
-  .org-hero p { max-width: 220px; }
-  .org-stats { grid-template-columns: 1fr; min-width: 86px; }
+  .org-hero p { max-width: none; }
   .org-stats > span { min-height: 54px; padding: 7px 9px; }
-  .org-stats > span:not(.org-live) { display: none; }
   .org-connector { width: 70%; }
   .org-report-grid, .org-specialist-grid { grid-template-columns: 1fr; }
   .org-person-leader { width: 100%; }

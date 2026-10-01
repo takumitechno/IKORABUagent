@@ -305,9 +305,10 @@ html:has(.customer-home),.customer-shell:has(.customer-home){max-width:100%;over
 .customer-shell:has(.customer-home) .office-back-button{width:100%}
 .customer-shell:has(.customer-home) .main{padding:0 0 24px}
 .customer-home .home-overview-head{padding:16px 4px 18px;align-items:flex-start}
-.customer-home .home-overview-head h1{font-size:24px}
+.customer-home .home-overview-head h1{font-size:22px}
 .customer-home .home-overview-head .theme-toggle{width:46px;height:46px;padding:0;justify-content:center;flex:none}
 .customer-home .home-overview-head .theme-toggle span{display:none}
+.customer-home .home-overview-head .theme-toggle .ui-icon{display:block}
 .customer-home .home-section{padding:22px 4px;margin:0}
 .customer-home .action-required.is-expanded{margin:0 0 8px;padding:18px}
 .customer-home .home-today-grid,.customer-home .home-kpi-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
