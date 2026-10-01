@@ -8,9 +8,9 @@ Open it directly in a browser. The only external request is Google Fonts.
 | Section | Content |
 |---|---|
 | Hero | The square logo is written stroke by stroke, the seal is stamped, and the end of the last stroke continues as a precise circuit bus. |
-| Philosophy | 守備は哲学。攻撃は閃きと再現性。(vertical type) |
+| Philosophy | 本質を守り、可能性をひらく。閃きを、一度きりで終わらせない。(vertical type, English as a secondary echo) |
 | Business | 12 domains → 4 stages → 1 flow, scroll-linked chapters |
-| IKORABU | 7-stage operating loop (generate → approve → schedule → publish → confirm → analyze → improve) |
+| 環 — MEGURI | Proprietary operating platform: 7-stage loop (generate → approve → schedule → publish → confirm → analyze → improve → next generation) |
 | Human × AI × System | Role design; three lines converge into one |
 | Closing / Footer | White logo on sumi; horizontal logo |
 
@@ -32,5 +32,15 @@ python3 build.py         # page.html + logo-paths.json → ../index.html
 ```
 
 Edit `src/page.html`; never edit `index.html` by hand.
+
+## Public naming
+
+The operating platform is shown publicly only as **環 — MEGURI**. Internal codenames, agent names
+and internal organisation names must not appear anywhere in the page (text, metadata, labels,
+hidden text, comments). Check before publishing:
+
+```sh
+grep -i -c "<internal codename>" index.html   # must print 0
+```
 
 `prefers-reduced-motion` shows the final composition with no animation. Without JavaScript all content stays readable.

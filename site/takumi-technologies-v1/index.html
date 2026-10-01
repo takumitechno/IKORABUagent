@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <!--BODY-START-->
 <title>Takumi Technologies</title>
-<meta name="description" content="合同会社 匠Technologies（Takumi Technologies LLC）。人の感性とAIの実装力で、SNS運用・マーケティング・業務を仕組み化する。自社開発の運用基盤 IKORABU。">
+<meta name="description" content="合同会社 匠Technologies（Takumi Technologies LLC）。人の感性とAIの実装力で、SNS運用・マーケティング・業務を仕組み化する。自社開発の事業運用基盤「環 — MEGURI」。">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Saira:wght@200;300;400&family=Shippori+Mincho:wght@500;600&family=Zen+Kaku+Gothic+New:wght@400;500&display=swap">
@@ -108,8 +108,9 @@ button { font: inherit; color: inherit; }
 .label {
   display: flex; align-items: center; gap: 14px;
   font-family: var(--f-lat); font-weight: 400; font-size: 11.5px; letter-spacing: .28em; text-transform: uppercase;
-  color: var(--fg3); margin-bottom: clamp(28px, 3.6vw, 48px);
+  color: var(--fg3); margin-bottom: clamp(28px, 3.6vw, 48px); flex-wrap: wrap; row-gap: 6px;
 }
+.label > span { flex: none; }
 .label::before { content: ""; width: 28px; height: 1px; background: var(--kin); flex: none; }
 .label .jp { font-family: var(--f-got); font-size: 12px; letter-spacing: .2em; text-transform: none; }
 .label .jp::before { content: "/"; margin-right: 14px; opacity: .5; font-family: var(--f-lat); }
@@ -142,6 +143,9 @@ button { font: inherit; color: inherit; }
 .gd.kin { fill: var(--kin); }
 .gd.ring { fill: var(--bgc, var(--paper)); stroke: var(--line); stroke-width: var(--sw, 1.2); }
 .is-in .gp, .is-active .gp { stroke-dashoffset: 0; }
+.gt { opacity: 0; transition: opacity .9s ease calc(var(--i, 0) * 60ms + .2s); }
+.is-in .gt { opacity: 1; }
+.m-reduce .gt, html:not(.js) .gt { opacity: 1; transition: none; }
 .is-in .gd, .is-active .gd { opacity: 1; }
 .m-reduce .gp, html:not(.js) .gp { stroke-dashoffset: 0; transition: none; }
 .m-reduce .gd, html:not(.js) .gd { opacity: 1; transition: none; }
@@ -163,7 +167,7 @@ button { font: inherit; color: inherit; }
 .site-header.at-hero .brand { opacity: 0; transform: translateY(-6px); pointer-events: none; }
 .nav { display: flex; gap: clamp(20px, 2.6vw, 40px); }
 .nav a { position: relative; font-size: 13px; letter-spacing: .14em; text-decoration: none; padding-block: 6px; color: inherit; }
-.nav a[lang="en"] { font-family: var(--f-lat); letter-spacing: .2em; font-size: 12px; }
+.nav [lang="en"] { font-family: var(--f-lat); letter-spacing: .2em; font-size: 12px; }
 .nav a::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 1px; background: var(--kin); transform: scaleX(0); transform-origin: left; transition: transform .6s var(--ease); }
 .nav a:hover::after, .nav a.is-cur::after { transform: none; }
 .menu-btn { display: none; align-items: center; gap: 10px; background: none; border: 0; padding: 10px 0 10px 10px; cursor: pointer; font-family: var(--f-lat); font-size: 11.5px; letter-spacing: .26em; text-transform: uppercase; }
@@ -177,6 +181,7 @@ button { font: inherit; color: inherit; }
 @keyframes menuIn { from { opacity: 0; } }
 .menu nav { display: grid; gap: 6px; }
 .menu nav a { display: flex; align-items: baseline; gap: 18px; padding-block: 14px; border-bottom: 1px solid var(--rule-d); font-family: var(--f-min); font-size: 26px; letter-spacing: .1em; text-decoration: none; }
+.menu nav a i { font-style: normal; font-family: var(--f-lat); font-weight: 300; font-size: 22px; letter-spacing: .24em; }
 .menu nav a span { font-family: var(--f-lat); font-size: 11px; letter-spacing: .26em; color: var(--wash-3); text-transform: uppercase; min-width: 7.5em; }
 .menu-foot { margin-top: 40px; font-size: 12px; color: var(--wash-3); letter-spacing: .14em; }
 
@@ -193,7 +198,8 @@ button { font: inherit; color: inherit; }
 .hero-copy { grid-column: 7 / span 6; position: relative; min-width: 0; }
 .hero-eyebrow { font-family: var(--f-lat); font-weight: 300; font-size: 12px; letter-spacing: .34em; text-transform: uppercase; color: var(--ink-3); display: flex; align-items: center; gap: 12px; margin-bottom: 26px; }
 .hero-eyebrow i { font-style: normal; color: var(--kin); letter-spacing: 0; }
-.hero-title { font-family: var(--f-min); font-weight: 500; font-feature-settings: "palt"; font-size: clamp(38px, min(4.7vw, 9vh), 78px); line-height: 1.32; letter-spacing: .07em; color: var(--ink); }
+.hero-title { font-family: var(--f-min); font-weight: 500; font-feature-settings: "palt"; font-size: clamp(34px, min(4.2vw, 8.4vh), 70px); line-height: 1.34; letter-spacing: .07em; color: var(--ink); }
+.ht-tech { font-family: var(--f-lat); font-weight: 300; font-size: .9em; letter-spacing: .03em; margin-right: .06em; }
 .hero-gap { height: 72px; }
 .hero-lead { font-size: clamp(14.5px, 1.1vw, 16px); line-height: 2.05; color: var(--ink-2); max-width: 31em; }
 .hero-foot { position: absolute; left: 0; right: 0; bottom: 0; margin-inline: auto; display: flex; justify-content: space-between; align-items: flex-end; padding-bottom: 32px; }
@@ -245,51 +251,77 @@ html:not(.js) .sq-kanji, .m-reduce .sq-kanji, html:not(.js) .dk-kanji, .m-reduce
 
 /* ---------- PHILOSOPHY (sumi) ---------- */
 .phil { --bgc: var(--sumi); }
-.phil-grid { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: var(--colgap); align-items: start; }
+.phil-grid { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: var(--colgap); align-items: center; }
 .phil-v {
-  grid-column: 1 / span 4; justify-self: center;
+  --vfs: clamp(24px, 2.2vw, 34px);
+  grid-column: 1 / span 5; justify-self: center;
   writing-mode: vertical-rl; text-orientation: mixed;
-  font-family: var(--f-min); font-weight: 500; font-size: clamp(28px, 3vw, 46px); letter-spacing: .2em; line-height: 1;
+  font-family: var(--f-min); font-weight: 500; font-size: var(--vfs); letter-spacing: .12em; line-height: 1;
   color: var(--wash); display: block; margin: 0;
 }
 .v-col { display: block; white-space: nowrap; position: relative; }
 .v-col > span { display: block; }
-.v-col + .v-col { margin-block-start: clamp(20px, 2.4vw, 36px); padding-inline-start: 1.2em; }
-.m-full .phil-v .v-col > span { clip-path: inset(0 0 100% 0); transition: clip-path 1.9s var(--ease-io); }
-.m-full .phil-v .v-col + .v-col > span { transition-delay: .45s; }
+/* English sits beside each Japanese line as a quiet, sideways echo */
+.v-en { display: block; white-space: nowrap; font-family: var(--f-lat); font-weight: 300; font-size: 11.5px; letter-spacing: .16em; line-height: 1; color: var(--wash-3); margin-block-start: 16px; padding-inline-start: .3em; }
+.v-en + .v-col { margin-block-start: clamp(30px, 3.2vw, 48px); padding-inline-start: 1.2em; }
+.v-en:last-child { padding-inline-start: calc(var(--vfs) * 1.2 + .3em); }
+.m-full .phil-v .v-col > span { clip-path: inset(0 0 100% 0); transition: clip-path 2s var(--ease-io); }
+.m-full .phil-v .v-en + .v-col > span { transition-delay: .55s; }
 .m-full .phil-v.is-in .v-col > span { clip-path: inset(0 0 0 0); }
-.phil-body { grid-column: 6 / span 7; min-width: 0; padding-top: 8px; }
-.phil-lead { font-family: var(--f-min); font-weight: 500; font-feature-settings: "palt"; font-size: clamp(22px, 2.1vw, 32px); line-height: 1.75; letter-spacing: .08em; color: var(--wash); margin-bottom: 18px; }
-.phil-sub { color: var(--wash-2); margin-bottom: clamp(56px, 6vw, 88px); }
-.phil-pair { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(28px, 4vw, 64px); }
-.phil-item { position: relative; padding-top: 28px; }
-.phil-item::before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 1px; background: var(--rule-d); }
-.phil-glyph { display: block; width: 132px; height: 82px; margin-bottom: 26px; overflow: visible; }
-.pi-label { display: flex; align-items: baseline; gap: 14px; margin-bottom: 10px; }
-.pi-k { font-family: var(--f-min); font-size: 30px; line-height: 1; color: var(--wash); }
-.pi-label [lang="en"] { font-family: var(--f-lat); font-size: 11px; letter-spacing: .28em; text-transform: uppercase; color: var(--kin); }
-.phil-item h3 { font-family: var(--f-min); font-weight: 500; font-size: clamp(19px, 1.5vw, 22px); letter-spacing: .1em; color: var(--wash); margin-bottom: 14px; }
-.phil-item p:last-child { color: var(--wash-2); font-size: 14.5px; }
+.m-full .phil-v .v-en { opacity: 0; transition: opacity 1.6s ease 1.25s; }
+.m-full .phil-v .v-en:last-child { transition-delay: 1.8s; }
+.m-full .phil-v.is-in .v-en { opacity: 1; }
+.phil-fig { grid-column: 7 / span 6; margin: 0; min-width: 0; }
+.pf-stage { position: relative; width: 100%; max-width: 600px; margin-inline: auto; aspect-ratio: 600 / 520; }
+.pf-svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; --sw: 1.15; }
+.pf-dotc { fill: var(--wash); }
+.pf-dots { opacity: .22; }
+.m-full .pf-dots { opacity: 0; transition: opacity 1.8s ease .1s; }
+.m-full .is-in .pf-dots { opacity: .22; }
+/* the opening: rays rest at their own angle; with motion they start folded together and open */
+.pf-ray { transform-box: view-box; transform-origin: 200px 340px; transform: rotate(var(--a)); }
+.m-full .pf-ray { transform: rotate(-16deg); transition: transform 1.9s var(--ease) calc(1.3s + var(--i) * 90ms); }
+.m-full .is-in .pf-ray { transform: rotate(var(--a)); }
+.pf-ray .gp { transition: stroke-dashoffset 1.5s var(--ease) calc(1.15s + var(--i) * 90ms); }
+.pf-node { fill: var(--sumi); stroke: var(--wash-2); stroke-width: 1.1; }
+.pf-node.kin { stroke: var(--kin); fill: var(--kin); }
+.pf-rep { fill: var(--sumi); stroke: var(--kin); stroke-width: 1.1; }
+.m-full .pf-node, .m-full .pf-rep { opacity: 0; transition: opacity .7s ease calc(2.6s + var(--k, 0) * 170ms); }
+.m-full .is-in .pf-node, .m-full .is-in .pf-rep { opacity: 1; }
+.pf-tag { position: absolute; display: grid; gap: 9px; }
+.pf-keep { left: 18%; top: 90%; }
+.pf-open { right: 0; top: 63%; justify-items: end; text-align: right; }
+.pf-name { display: flex; align-items: baseline; gap: 12px; }
+.pf-name .jp { font-family: var(--f-min); font-weight: 500; font-size: clamp(19px, 1.6vw, 23px); letter-spacing: .14em; color: var(--wash); }
+.pf-name [lang="en"] { font-family: var(--f-lat); font-weight: 300; font-size: 10.5px; letter-spacing: .3em; text-transform: uppercase; color: var(--kin); }
+.pf-terms { display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: 12.5px; letter-spacing: .14em; color: var(--wash-2); }
+.pf-open .pf-terms { justify-content: flex-end; }
+.pf-terms li { display: inline-flex; align-items: center; gap: 7px; white-space: nowrap; }
+.pf-terms li::before { content: ""; width: 3px; height: 3px; border-radius: 50%; background: var(--kin); flex: none; }
+.m-full .pf-tag { opacity: 0; transform: translateY(8px); transition: opacity 1.2s ease, transform 1.2s var(--ease); }
+.m-full .pf-keep { transition-delay: 1.2s; }
+.m-full .pf-open { transition-delay: 3s; }
+.m-full .is-in .pf-tag { opacity: 1; transform: none; }
+.pf-cap { margin-top: clamp(76px, 8vw, 104px); font-family: var(--f-min); font-weight: 500; font-feature-settings: "palt"; font-size: clamp(17px, 1.5vw, 21px); letter-spacing: .1em; line-height: 1.8; color: var(--wash); text-align: center; }
 
 /* ---------- BUSINESS ---------- */
 .biz { --bgc: var(--shiro); }
-.biz-head { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: var(--colgap); align-items: end; margin-bottom: clamp(64px, 9vw, 140px); }
-.biz-head-main { grid-column: 1 / span 7; }
-.conv { --cg: clamp(28px, 3.4vw, 52px); grid-column: 8 / span 5; display: flex; align-items: flex-end; justify-content: flex-end; gap: var(--cg); }
-.conv > div { display: flex; flex-direction: column-reverse; gap: 10px; }
-.conv dd { position: relative; }
-.conv > div + div dd::before { content: ""; position: absolute; left: calc(var(--cg) * -1 + 8px); width: calc(var(--cg) - 16px); top: 52%; height: 1px; background: var(--kin); }
-.conv dt { font-size: 12px; letter-spacing: .18em; color: var(--ink-3); }
-.conv dd { font-family: var(--f-lat); font-weight: 200; font-size: clamp(56px, 6.4vw, 104px); line-height: .9; letter-spacing: 0; font-variant-numeric: tabular-nums; color: var(--ink); }
-.conv .is-one dd { color: var(--kin-deep); }
+.biz-head { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: var(--colgap); align-items: center; margin-bottom: clamp(64px, 9vw, 140px); }
+.biz-head-main { grid-column: 1 / span 6; }
+.biz-fig { grid-column: 7 / span 6; margin: 0; min-width: 0; }
+.bf-svg { display: block; width: 100%; height: auto; overflow: visible; --sw: 1.1; }
+.bf-guide { fill: none; stroke: var(--ink); stroke-opacity: .16; stroke-width: 1; }
+.bf-label { font-family: var(--f-got); font-size: calc(13px * var(--inv, 1)); letter-spacing: .14em; fill: var(--ink-2); }
+.bf-label.en { font-family: var(--f-lat); font-weight: 400; letter-spacing: .14em; }
+.bf-out { font-family: var(--f-min); font-weight: 500; font-size: calc(15px * var(--inv, 1)); letter-spacing: .12em; fill: var(--ink); }
+.bf-path { fill: none; stroke: none; }
+.bf-pulse { fill: var(--kin-deep); opacity: 0; }
+.bf-cap { display: flex; align-items: baseline; justify-content: flex-end; flex-wrap: wrap; gap: 6px 18px; margin-top: 22px; font-size: 13px; letter-spacing: .14em; color: var(--ink-2); }
+.bf-ratio { font-family: var(--f-lat); font-weight: 300; font-size: 22px; letter-spacing: .1em; color: var(--kin-deep); }
 .biz-story { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: var(--colgap); }
-.biz-visual { grid-column: 1 / span 5; position: relative; }
+.biz-visual { grid-column: 8 / span 5; grid-row: 1; position: relative; }
 .bv-inner { position: sticky; top: calc(var(--header-h) + 8vh); height: calc(84vh - var(--header-h)); display: flex; flex-direction: column; justify-content: center; gap: 28px; }
-.bv-num { font-family: var(--f-lat); font-weight: 200; font-size: clamp(64px, 6vw, 96px); line-height: 1; color: var(--ink); display: flex; align-items: baseline; gap: 14px; font-variant-numeric: tabular-nums; }
-.bv-num .bv-tot { font-size: 14px; letter-spacing: .2em; color: var(--ink-3); font-weight: 300; }
-.bv-cur { display: inline-block; transition: opacity .3s ease, transform .5s var(--ease); }
-.bv-cur.swap { opacity: 0; transform: translateY(10px); }
-.bv-glyph { --sw: .85; width: min(100%, 300px); aspect-ratio: 1; height: auto; overflow: visible; }
+.bv-glyph { --sw: .85; width: min(100%, 320px); aspect-ratio: 1; height: auto; overflow: visible; }
 .bv-glyph .g-step { opacity: 0; transition: opacity .35s ease; }
 .bv-glyph .g-step.is-active { opacity: 1; }
 .bv-rail { display: grid; grid-template-columns: repeat(4, 1fr); position: relative; padding-top: 18px; max-width: 420px; }
@@ -299,7 +331,7 @@ html:not(.js) .sq-kanji, .m-reduce .sq-kanji, html:not(.js) .dk-kanji, .m-reduce
 .bv-rail li::before { content: ""; position: absolute; left: 0; top: -21px; width: 5px; height: 5px; border-radius: 50%; background: var(--shiro); border: 1px solid var(--ink-3); transition: background .4s ease, border-color .4s ease; }
 .bv-rail li.is-on { color: var(--ink); }
 .bv-rail li.is-on::before, .bv-rail li.is-past::before { background: var(--kin); border-color: var(--kin); }
-.chapters { grid-column: 7 / span 6; }
+.chapters { grid-column: 1 / span 6; grid-row: 1; }
 .chapter { min-height: 78vh; display: flex; flex-direction: column; justify-content: center; padding-block: 8vh; position: relative; }
 .ch-glyph { display: none; }
 .ch-num { font-family: var(--f-lat); font-size: 12px; letter-spacing: .28em; text-transform: uppercase; color: var(--kin-deep); margin-bottom: 18px; }
@@ -309,64 +341,94 @@ html:not(.js) .sq-kanji, .m-reduce .sq-kanji, html:not(.js) .dk-kanji, .m-reduce
 .ch-tags { display: flex; flex-wrap: wrap; gap: 4px 0; padding-top: 16px; border-top: 1px solid var(--rule-l); font-size: 13px; letter-spacing: .1em; color: var(--ink-2); max-width: 30em; }
 .ch-tags li + li::before { content: "／"; margin-inline: .7em; color: var(--kin); }
 
-/* ---------- IKORABU ---------- */
-.ik { color: var(--wash); background: var(--shiro); --bgc: var(--ai); }
-.ik-bg { position: absolute; inset: 0; z-index: 0; background-color: var(--ai); background-image: radial-gradient(60% 70% at 72% 50%, rgba(44, 66, 110, .45), transparent 70%), var(--grain-l); clip-path: inset(0 var(--ci, 0px)); }
-.ik > .wrap { position: relative; z-index: 1; }
-.ik-grid { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: var(--colgap); align-items: center; }
-.ik-text { grid-column: 1 / span 5; }
-.ik-word { font-family: var(--f-lat); font-weight: 200; font-size: clamp(44px, 5.6vw, 88px); letter-spacing: .26em; line-height: 1; margin: 0 0 clamp(26px, 3vw, 40px) -.04em; color: var(--wash); }
-.ik .title { font-size: clamp(26px, 2.8vw, 40px); }
-.ik-points { margin-top: clamp(36px, 4vw, 56px); border-top: 1px solid var(--rule-d); }
-.ik-points > div { display: grid; grid-template-columns: 8.5em 1fr; gap: 20px; padding-block: 18px; border-bottom: 1px solid var(--rule-d); }
-.ik-points dt { font-family: var(--f-min); font-weight: 500; font-size: 15.5px; letter-spacing: .1em; color: var(--wash); }
-.ik-points dd { font-size: 14px; line-height: 1.9; color: var(--wash-2); }
-.ik-note { margin-top: 28px; font-size: 13.5px; color: var(--wash-2); }
-.ik-visual { grid-column: 7 / span 6; min-width: 0; }
-.ik-ring { position: relative; width: 100%; max-width: 600px; margin-inline: auto; aspect-ratio: 1 / 1; }
-.ik-svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
-.ik-tick { stroke: var(--wash); stroke-opacity: .2; stroke-width: 1; vector-effect: non-scaling-stroke; }
-.ik-tick.mj { stroke-opacity: .42; }
-.ik-base { fill: none; stroke: var(--wash); stroke-opacity: .16; stroke-width: 1; vector-effect: non-scaling-stroke; }
-.ik-inner { fill: none; stroke: var(--wash); stroke-opacity: .08; stroke-width: 1; vector-effect: non-scaling-stroke; }
-.ik-prog { fill: none; stroke: var(--kin); stroke-width: 1.8; stroke-dasharray: 1 2; stroke-dashoffset: 1.01; }
-.ik-dot { fill: var(--ai); stroke: var(--wash-3); stroke-width: 1.2; vector-effect: non-scaling-stroke; transition: fill .4s ease, stroke .4s ease; }
-.ik-dot.lit { stroke: var(--kin); }
-.ik-dot.on { fill: var(--kin); stroke: var(--kin-hi); }
-.ik-halo { fill: none; stroke: var(--kin); stroke-width: 1; vector-effect: non-scaling-stroke; opacity: 0; transform-box: fill-box; transform-origin: center; transform: scale(.5); transition: opacity .4s ease, transform .6s var(--ease); }
-.ik-halo.on { opacity: .7; transform: none; }
-.ik-comet { fill: var(--kin-hi); opacity: 0; }
-.ik-arrow { fill: none; stroke: var(--kin); stroke-width: 1.2; vector-effect: non-scaling-stroke; }
-.ik-node {
+/* ---------- 環 — MEGURI (proprietary operating platform) ---------- */
+.mg { color: var(--wash); background: var(--shiro); --bgc: var(--ai); }
+.mg-bg { position: absolute; inset: 0; z-index: 0; background-color: var(--ai); background-image: radial-gradient(60% 70% at 72% 50%, rgba(44, 66, 110, .45), transparent 70%), var(--grain-l); clip-path: inset(0 var(--ci, 0px)); }
+.mg > .wrap { position: relative; z-index: 1; }
+.mg-grid { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: var(--colgap); align-items: center; }
+.mg-text { grid-column: 1 / span 5; }
+.mg-brand { display: flex; align-items: center; gap: clamp(14px, 1.4vw, 22px); margin: 0 0 clamp(28px, 3.2vw, 44px); color: var(--wash); line-height: 1; }
+.mg-k { font-family: var(--f-min); font-weight: 500; font-size: clamp(46px, 4.6vw, 72px); }
+.mg-dash { display: inline-block; width: clamp(28px, 2.6vw, 44px); height: 1px; overflow: hidden; color: transparent; background: var(--kin); }
+.mg-en { font-family: var(--f-lat); font-weight: 200; font-size: clamp(22px, 2.3vw, 34px); letter-spacing: .42em; margin-right: -.42em; }
+.mg .title { font-size: clamp(26px, 2.8vw, 40px); }
+.mg-points { margin-top: clamp(36px, 4vw, 56px); border-top: 1px solid var(--rule-d); }
+.mg-points > div { display: grid; grid-template-columns: 8.5em 1fr; gap: 20px; padding-block: 18px; border-bottom: 1px solid var(--rule-d); }
+.mg-points dt { font-family: var(--f-min); font-weight: 500; font-size: 15.5px; letter-spacing: .1em; color: var(--wash); }
+.mg-points dd { font-size: 14px; line-height: 1.9; color: var(--wash-2); }
+.mg-note { margin-top: 28px; font-size: 13.5px; color: var(--wash-2); }
+.mg-visual { grid-column: 7 / span 6; min-width: 0; }
+.mg-ring { position: relative; width: 100%; max-width: 600px; margin-inline: auto; aspect-ratio: 1 / 1; }
+.mg-svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+.mg-tick { stroke: var(--wash); stroke-opacity: .2; stroke-width: 1; vector-effect: non-scaling-stroke; }
+.mg-tick.mj { stroke-opacity: .42; }
+.mg-base { fill: none; stroke: var(--wash); stroke-opacity: .16; stroke-width: 1; vector-effect: non-scaling-stroke; }
+.mg-enso { fill: var(--wash); opacity: .11; }
+.mg-kasure { fill: none; stroke: var(--wash); stroke-opacity: .14; stroke-width: 1; stroke-linecap: round; }
+.enso-wr { fill: none; stroke: #fff; stroke-width: 46; }
+.m-full .enso-wr { stroke-dasharray: 1 2; stroke-dashoffset: 1.01; }
+.mg-ring.run .enso-wr { animation: draw 1.7s var(--ease-brush) forwards; }
+.mg-inner { fill: none; stroke: var(--wash); stroke-opacity: .08; stroke-width: 1; vector-effect: non-scaling-stroke; }
+.mg-prog { fill: none; stroke: var(--kin); stroke-width: 1.8; stroke-dasharray: 1 2; stroke-dashoffset: 1.01; }
+.mg-dot { fill: var(--ai); stroke: var(--wash-3); stroke-width: 1.2; vector-effect: non-scaling-stroke; transition: fill .4s ease, stroke .4s ease; }
+.mg-dot.lit { stroke: var(--kin); }
+.mg-dot.on { fill: var(--kin); stroke: var(--kin-hi); }
+.mg-dot.human, .mg-dot.human.lit { fill: var(--wash); stroke: none; }
+.mg-dot.human.on { fill: var(--kin-hi); }
+.mg-halo { fill: none; stroke: var(--kin); stroke-width: 1; vector-effect: non-scaling-stroke; opacity: 0; transform-box: fill-box; transform-origin: center; transform: scale(.5); transition: opacity .4s ease, transform .6s var(--ease); }
+.mg-halo.on { opacity: .7; transform: none; }
+.mg-comet { fill: var(--kin-hi); opacity: 0; }
+.mg-arrow { fill: none; stroke: var(--kin); stroke-width: 1.2; vector-effect: non-scaling-stroke; }
+.mg-node {
   position: absolute; left: var(--x); top: var(--y); transform: translate(var(--tx), var(--ty));
   display: flex; flex-direction: column; align-items: var(--al); text-align: var(--ta);
   background: none; border: 0; padding: 8px 10px; cursor: pointer; white-space: nowrap; line-height: 1.35; color: var(--wash-2);
   transition: color .3s ease;
 }
-.ik-node .n { font-family: var(--f-lat); font-size: 10.5px; letter-spacing: .22em; color: var(--wash-3); }
-.ik-node .jp { font-family: var(--f-min); font-weight: 500; font-size: 17px; letter-spacing: .14em; color: var(--wash); transition: color .3s ease; }
-.ik-node .en { font-family: var(--f-lat); font-size: 10.5px; letter-spacing: .14em; text-transform: uppercase; color: var(--wash-3); }
-.ik-node .tag { margin-top: 5px; font-family: var(--f-lat); font-size: 9.5px; letter-spacing: .24em; text-transform: uppercase; color: var(--kin-hi); border: 1px solid rgba(173, 149, 100, .6); padding: 0 6px 0 7px; }
-.ik-node:hover .jp, .ik-node.is-on .jp { color: var(--kin-hi); }
-.ik-center { position: absolute; left: 50%; top: 50%; width: 38%; transform: translate(-50%, -50%); text-align: center; pointer-events: none; transition: opacity .25s ease; }
-.ik-center.swap { opacity: 0; }
-.ikc-num { font-family: var(--f-lat); font-size: 11px; letter-spacing: .26em; text-transform: uppercase; color: var(--wash-3); }
-.ikc-jp { font-family: var(--f-min); font-weight: 500; font-size: clamp(30px, 3.4vw, 50px); letter-spacing: .16em; line-height: 1.25; color: var(--wash); margin: 6px 0 4px; }
-.ikc-jp.ov { font-size: clamp(17px, 1.6vw, 22px); letter-spacing: .1em; line-height: 1.7; margin: 12px 0 10px; }
-.ikc-en { font-family: var(--f-lat); font-size: 11.5px; letter-spacing: .2em; text-transform: uppercase; color: var(--kin); }
-.ikc-desc { margin-top: 12px; font-size: 13px; line-height: 1.85; color: var(--wash-2); }
-.ikc-desc:empty, .ikc-en:empty { display: none; }
-.ik-steps { margin-top: 36px; border-top: 1px solid var(--rule-d); }
-.ik-steps li { display: grid; grid-template-columns: 2.6em 4.2em 1fr; gap: 6px 12px; padding-block: 14px; border-bottom: 1px solid var(--rule-d); align-items: baseline; transition: background .4s ease; }
-.ik-steps .n { font-family: var(--f-lat); font-size: 11px; letter-spacing: .2em; color: var(--wash-3); }
-.ik-steps .jp { font-family: var(--f-min); font-weight: 500; font-size: 17px; letter-spacing: .14em; color: var(--wash); }
-.ik-steps .en { font-family: var(--f-lat); font-size: 10.5px; letter-spacing: .16em; text-transform: uppercase; color: var(--kin); }
-.ik-steps .d { grid-column: 2 / -1; font-size: 13.5px; line-height: 1.85; color: var(--wash-2); }
-.ik-steps li.is-on .jp { color: var(--kin-hi); }
+.mg-node .n { font-family: var(--f-lat); font-size: 10.5px; letter-spacing: .22em; color: var(--wash-3); }
+.mg-node .jp { font-family: var(--f-min); font-weight: 500; font-size: 17px; letter-spacing: .14em; color: var(--wash); transition: color .3s ease; }
+.mg-node .en { font-family: var(--f-lat); font-size: 10.5px; letter-spacing: .14em; text-transform: uppercase; color: var(--wash-3); }
+.mg-node .tag { margin-top: 5px; font-family: var(--f-lat); font-size: 9.5px; letter-spacing: .24em; text-transform: uppercase; color: var(--kin-hi); border: 1px solid rgba(173, 149, 100, .6); padding: 0 6px 0 7px; }
+.mg-node:hover .jp, .mg-node.is-on .jp { color: var(--kin-hi); }
+.mg-center { position: absolute; left: 50%; top: 50%; width: 38%; transform: translate(-50%, -50%); text-align: center; pointer-events: none; transition: opacity .25s ease; }
+.mg-center.swap { opacity: 0; }
+.mgc-num { font-family: var(--f-lat); font-size: 11px; letter-spacing: .26em; text-transform: uppercase; color: var(--wash-3); }
+.mgc-jp { font-family: var(--f-min); font-weight: 500; font-size: clamp(30px, 3.4vw, 50px); letter-spacing: .16em; line-height: 1.25; color: var(--wash); margin: 6px 0 4px; }
+.mgc-jp.ov { font-size: clamp(60px, 6.4vw, 96px); letter-spacing: 0; line-height: 1.08; margin: 8px 0 10px; }
+.mgc-en.ov { font-weight: 200; font-size: 13px; letter-spacing: .5em; margin-right: -.5em; color: var(--wash); }
+.mgc-en { font-family: var(--f-lat); font-size: 11.5px; letter-spacing: .2em; text-transform: uppercase; color: var(--kin); }
+.mgc-desc { margin-top: 12px; font-size: 13px; line-height: 1.85; color: var(--wash-2); }
+.mgc-desc:empty, .mgc-en:empty { display: none; }
+.mg-steps { margin-top: 36px; border-top: 1px solid var(--rule-d); }
+.mg-steps li { display: grid; grid-template-columns: 2.6em 4.2em 1fr; gap: 6px 12px; padding-block: 14px; border-bottom: 1px solid var(--rule-d); align-items: baseline; transition: background .4s ease; }
+.mg-steps .n { font-family: var(--f-lat); font-size: 11px; letter-spacing: .2em; color: var(--wash-3); }
+.mg-steps .jp { font-family: var(--f-min); font-weight: 500; font-size: 17px; letter-spacing: .14em; color: var(--wash); }
+.mg-steps .en { font-family: var(--f-lat); font-size: 10.5px; letter-spacing: .16em; text-transform: uppercase; color: var(--kin); }
+.mg-steps .d { grid-column: 2 / -1; font-size: 13.5px; line-height: 1.85; color: var(--wash-2); }
+.mg-steps li.is-on .jp { color: var(--kin-hi); }
 
 /* ---------- HUMAN × AI × SYSTEM ---------- */
 .has { --bgc: var(--kinari); }
-.has-head { max-width: 760px; }
+.has-top { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: var(--colgap); align-items: center; }
+.has-head { grid-column: 1 / span 6; }
+.has-fig { grid-column: 7 / span 6; margin: 0; min-width: 0; }
+.hf-stage { position: relative; width: 100%; max-width: 560px; margin-inline: auto; aspect-ratio: 560 / 480; }
+.hf-svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; --sw: 1.1; }
+.hf-face { fill: var(--kinari); fill-opacity: .92; stroke: var(--ink); stroke-width: 1.1; }
+.hf-pat { fill: none; stroke: var(--ink-3); stroke-opacity: .55; stroke-width: 1; vector-effect: non-scaling-stroke; }
+.hf-pat.ai { stroke: var(--ai-2); stroke-opacity: .6; }
+.hf-pat.seal { stroke: var(--kin); stroke-opacity: 1; }
+.hf-brush { fill: var(--ink); }
+/* exploded → assembled (at rest the layers are assembled) */
+.m-full .hf-plane { transform: translateY(var(--dy, 0)); transition: transform 1.9s var(--ease-io) .35s; }
+.m-full .is-in .hf-plane { transform: none; }
+.hf-tag { position: absolute; left: 60%; top: var(--y); transform: translateY(-50%); display: grid; gap: 2px; line-height: 1.45; }
+.hf-tag [lang="en"] { font-family: var(--f-lat); font-size: 10.5px; letter-spacing: .3em; text-transform: uppercase; color: var(--ink-3); }
+.hf-tag .jp { font-size: 12.5px; letter-spacing: .12em; color: var(--ink-2); white-space: nowrap; }
+.hf-base { position: absolute; left: 32.1%; top: 79%; transform: translateX(-50%); font-family: var(--f-min); font-weight: 500; font-size: 15px; letter-spacing: .14em; color: var(--ink); white-space: nowrap; }
+.m-full .hf-tag, .m-full .hf-base { opacity: 0; transition: opacity 1.1s ease 2.3s; }
+.m-full .is-in .hf-tag, .m-full .is-in .hf-base { opacity: 1; }
+.hf-cap { margin-top: clamp(24px, 3vw, 36px); font-family: var(--f-min); font-weight: 500; font-feature-settings: "palt"; font-size: clamp(16px, 1.4vw, 19px); letter-spacing: .1em; line-height: 1.8; color: var(--ink); text-align: center; }
 .strata { margin-top: clamp(56px, 8vw, 112px); position: relative; }
 .strata::before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 1px; background: var(--rule-l); }
 .stratum { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: var(--colgap); align-items: center; padding-block: clamp(28px, 3.6vw, 48px); position: relative; }
@@ -381,18 +443,6 @@ html:not(.js) .sq-kanji, .m-reduce .sq-kanji, html:not(.js) .dk-kanji, .m-reduce
 .st-brush { fill: var(--ink); }
 .m-full .stratum .st-brush { clip-path: inset(0 100% 0 0); transition: clip-path 1.5s var(--ease-brush) .2s; }
 .m-full .stratum.is-in .st-brush { clip-path: inset(0 0 0 0); }
-.cv { margin-top: clamp(56px, 7vw, 96px); margin-right: calc((100% - 100vw) / 2); position: relative; }
-.cv-svg { display: block; width: 100%; overflow: visible; }
-.cv-l { fill: none; stroke-width: 1.2; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 1 2; stroke-dashoffset: 1.01; }
-.cv-h { stroke: var(--ink); stroke-width: 1.6; }
-.cv-a { stroke: var(--ai-2); }
-.cv-s { stroke: var(--ink-3); }
-.cv-g { stroke: var(--kin); stroke-width: 1.6; }
-.cv-t { font-family: var(--f-lat); font-size: 10.5px; letter-spacing: .26em; text-transform: uppercase; fill: var(--ink-3); }
-.cv-t.kin { fill: var(--kin-deep); }
-.cv-node { fill: var(--kinari); stroke: var(--kin); stroke-width: 1.2; opacity: 0; transition: opacity .6s ease; }
-.cv-node.on { opacity: 1; }
-.cv-cap { margin-top: 28px; font-family: var(--f-min); font-weight: 500; font-size: clamp(16px, 1.4vw, 19px); letter-spacing: .1em; color: var(--ink); text-align: right; padding-right: var(--gutter); }
 
 /* ---------- CLOSING ---------- */
 .closing { padding-block: clamp(120px, 15vw, 220px) clamp(96px, 11vw, 160px); --bgc: var(--sumi); overflow: hidden; }
@@ -410,6 +460,7 @@ html:not(.js) .sq-kanji, .m-reduce .sq-kanji, html:not(.js) .dk-kanji, .m-reduce
 .m-full .cl-logo .dk-seal, .m-full .cl-logo .dk-word { opacity: 0; }
 .m-full .cl-logo.is-in .dk-seal { opacity: 1; animation: stamp .7s cubic-bezier(.3, 1.4, .5, 1) 2.9s both; }
 .m-full .cl-logo.is-in .dk-word { opacity: 1; animation: rise 1.4s var(--ease) 3.1s both; }
+.m-reduce .enso-wr { stroke-dasharray: none; }
 .m-reduce .cl-logo .dk-seal, .m-reduce .cl-logo .dk-word { opacity: 1; animation: none; }
 .cl-line { height: 1px; margin-top: clamp(80px, 10vw, 140px); background: linear-gradient(90deg, transparent, var(--kin) 10%, var(--kin) 90%, transparent); }
 
@@ -425,11 +476,13 @@ html:not(.js) .sq-kanji, .m-reduce .sq-kanji, html:not(.js) .dk-kanji, .m-reduce
 /* ---------- responsive ---------- */
 @media (min-width: 1200px) { .spine { display: block; } }
 @media (max-width: 1099px) {
-  .ik-text, .ik-visual { grid-column: 1 / -1; }
-  .ik-visual { margin-top: 64px; }
-  .ik-ring { max-width: 560px; }
-  .conv { grid-column: 1 / -1; justify-content: flex-start; margin-top: 48px; }
-  .biz-head-main { grid-column: 1 / -1; }
+  .mg-text, .mg-visual { grid-column: 1 / -1; }
+  .mg-visual { margin-top: 64px; }
+  .mg-ring { max-width: 560px; }
+  .biz-head-main, .biz-fig { grid-column: 1 / -1; }
+  .biz-fig { margin-top: 56px; max-width: 640px; }
+  .has-head, .has-fig { grid-column: 1 / -1; }
+  .has-fig { margin-top: 48px; max-width: 600px; justify-self: center; width: 100%; }
   .stratum h3 { grid-column: 3 / span 3; }
   .st-desc { grid-column: 6 / span 7; }
   .st-svg { grid-column: 3 / -1; justify-self: start; margin-top: 18px; max-width: 300px; }
@@ -444,8 +497,8 @@ html:not(.js) .sq-kanji, .m-reduce .sq-kanji, html:not(.js) .dk-kanji, .m-reduce
   .hero-copy { grid-column: 1 / -1; margin-top: 78px; }
   .hero-gap { height: 22px; }
   .hero-title { font-size: clamp(34px, 6.4vw, 54px); }
-  .phil-v { grid-column: 1 / -1; justify-self: start; margin-bottom: 64px; }
-  .phil-body { grid-column: 1 / -1; }
+  .phil-v { grid-column: 1 / -1; justify-self: start; margin-bottom: 72px; }
+  .phil-fig { grid-column: 1 / -1; }
   .biz-visual { display: none; }
   .chapters { grid-column: 1 / -1; border-left: 1px solid var(--rule-l); padding-left: clamp(20px, 4vw, 40px); }
   .chapter { min-height: 0; padding-block: 48px; }
@@ -457,29 +510,37 @@ html:not(.js) .sq-kanji, .m-reduce .sq-kanji, html:not(.js) .dk-kanji, .m-reduce
 }
 @media (max-width: 719px) {
   body { font-size: 14.5px; }
-  .phil-pair { grid-template-columns: 1fr; gap: 40px; }
-  .phil-v { font-size: clamp(28px, 8vw, 36px); }
+  .pf-terms { font-size: 11.5px; gap: 3px 10px; }
+  .pf-name .jp { font-size: 17px; }
+  .pf-keep { left: 4%; }
+  .pf-open { right: auto; left: 0; top: 1%; justify-items: start; text-align: left; }
+  .pf-open .pf-terms { justify-content: flex-start; }
+  .phil-v { --vfs: clamp(24px, 7vw, 30px); }
+  .v-en { font-size: 10.5px; }
   .stratum { row-gap: 10px; }
   .st-label { grid-column: 1 / span 4; }
   .stratum h3 { grid-column: 5 / -1; }
   .st-desc { grid-column: 1 / -1; margin-top: 6px; }
   .st-svg { grid-column: 1 / -1; max-width: 240px; margin-top: 10px; }
-  .ik-points > div { grid-template-columns: 1fr; gap: 4px; }
-  .ik-node { padding: 6px; }
-  .ik-node .en, .ik-node .tag { display: none; }
-  .ik-node .jp { font-size: 15px; }
-  .ik-node.is-human .jp::after { content: "・人"; font-size: 11px; color: var(--kin-hi); letter-spacing: 0; }
-  .ik-center { width: 42%; }
-  .ikc-num { font-size: 9.5px; letter-spacing: .2em; }
-  .ikc-jp { font-size: 30px; }
-  .ikc-jp.ov { font-size: 12.5px; line-height: 1.75; letter-spacing: .04em; margin: 6px 0 0; }
-  .ikc-desc, .ikc-hint { display: none; }
-  .conv dd { font-size: 60px; }
+  .mg-points > div { grid-template-columns: 1fr; gap: 4px; }
+  .mg-node { padding: 6px; }
+  .mg-node .en, .mg-node .tag { display: none; }
+  .mg-node .jp { font-size: 15px; }
+  .mg-node.is-human .jp::after { content: "・人"; font-size: 11px; color: var(--kin-hi); letter-spacing: 0; }
+  .mg-center { width: 42%; }
+  .mgc-num { font-size: 9.5px; letter-spacing: .2em; }
+  .mgc-jp { font-size: 30px; }
+  .mgc-jp.ov { font-size: 46px; margin: 4px 0 6px; }
+  .mgc-en.ov { font-size: 10px; letter-spacing: .4em; }
+  .mgc-desc, .mgc-hint { display: none; }
+  .bf-cap { justify-content: flex-start; }
   .hero-foot .fig { display: none; }
-  .cv-cap { text-align: left; padding-right: 0; }
+  .hf-tag [lang="en"] { font-size: 9.5px; }
+  .hf-tag .jp { font-size: 11px; }
+  .hf-base { font-size: 13px; }
   .foot-in { flex-direction: column; align-items: flex-start; }
 }
-@media (min-width: 720px) { .js .ik-steps { display: none; } }
+@media (min-width: 720px) { .js .mg-steps { display: none; } }
 @media (min-width: 600px) and (max-width: 959px) { .hero { justify-content: center; } }
 </style>
 <!--HEAD-END-->
@@ -503,7 +564,7 @@ html:not(.js) .sq-kanji, .m-reduce .sq-kanji, html:not(.js) .dk-kanji, .m-reduce
     <nav class="nav" aria-label="ページ内">
       <a href="#philosophy">思想</a>
       <a href="#business">事業</a>
-      <a href="#ikorabu" lang="en">IKORABU</a>
+      <a href="#meguri">環 — <span lang="en">MEGURI</span></a>
       <a href="#design">人とAI</a>
     </nav>
     <button class="menu-btn" type="button" aria-expanded="false" aria-controls="menu"><span class="menu-lines" aria-hidden="true"></span><span class="menu-txt">Menu</span></button>
@@ -514,7 +575,7 @@ html:not(.js) .sq-kanji, .m-reduce .sq-kanji, html:not(.js) .dk-kanji, .m-reduce
   <nav aria-label="メニュー">
     <a href="#philosophy"><span>Philosophy</span>思想</a>
     <a href="#business"><span>Business</span>事業</a>
-    <a href="#ikorabu"><span>Platform</span>IKORABU</a>
+    <a href="#meguri"><span>Platform</span>環 — <i lang="en">MEGURI</i></a>
     <a href="#design"><span>Human × AI</span>人とAI</a>
   </nav>
   <p class="menu-foot">合同会社 匠Technologies</p>
@@ -551,8 +612,8 @@ html:not(.js) .sq-kanji, .m-reduce .sq-kanji, html:not(.js) .dk-kanji, .m-reduce
     <div class="hero-copy">
       <p class="hero-eyebrow" data-hi style="--d:3.45s"><span lang="en">Craft</span><i>×</i><span lang="en">AI Technology</span></p>
       <h1 class="hero-title">
-        <span class="ln"><span style="--d:3.55s">匠の技を、</span></span>
-        <span class="ln"><span style="--d:3.68s">AIで拡張する。</span></span>
+        <span class="ln"><span style="--d:3.55s">匠の技を</span></span>
+        <span class="ln"><span style="--d:3.68s"><span class="nw"><span class="ht-tech" lang="en">Technology</span>で</span><span class="nw">拡張する。</span></span></span>
       </h1>
       <div class="hero-gap" aria-hidden="true"></div>
       <p class="hero-lead" data-hi style="--d:4.0s">SNS運用、マーケティング、業務の自動化。<br>人の判断とAIの実装力を組み合わせ、<span class="nw">成果が続く運用を設計します。</span></p>
@@ -570,41 +631,43 @@ html:not(.js) .sq-kanji, .m-reduce .sq-kanji, html:not(.js) .dk-kanji, .m-reduce
     <p class="label" data-r="up"><span lang="en">Philosophy</span><span class="jp">思想</span></p>
     <div class="phil-grid">
       <h2 class="phil-v" data-r="vert">
-        <span class="v-col"><span>守備は哲学。</span></span>
-        <span class="v-col"><span>攻撃は閃きと再現性。</span></span>
+        <span class="v-col"><span>本質を守り、可能性をひらく。</span></span>
+        <span class="v-en" lang="en">Preserve the essence. Expand the possibility.</span>
+        <span class="v-col"><span>ひらめきを、一度きりで終わらせない。</span></span>
+        <span class="v-en" lang="en">Turn inspiration into something repeatable.</span>
       </h2>
-      <div class="phil-body">
-        <p class="phil-lead" data-r="up">守りが土台にあるから、<br>思い切って攻められる。</p>
-        <p class="phil-sub" data-r="up" style="--d:.12s">私たちの仕事は、この二つの均衡から始まります。</p>
-        <div class="phil-pair">
-          <article class="phil-item" data-r="up">
-            <svg class="phil-glyph" viewBox="0 0 132 82" aria-hidden="true">
-              <path class="gp thin" pathLength="1" style="--i:0" d="M36 6H96V66H36Z"/>
-              <path class="gp" pathLength="1" style="--i:2" d="M51 21H81V51H51Z"/>
-              <path class="gp thin" pathLength="1" style="--i:4" d="M66 -6V0M66 72V78M22 36H28M104 36H110"/>
-              <circle class="gd kin" cx="66" cy="36" r="2.6" style="--i:6"/>
-            </svg>
-            <p class="pi-label"><span class="pi-k">守</span><span lang="en">Defense</span></p>
-            <h3>本質を、守る。</h3>
-            <p>守るのは、お客様の信用、ブランドの本質、そして事業の安全です。一方で、守るための手段そのものには固執しません。状況が変われば守り方を更新し、守るべきものだけは見失わない。それが私たちの守備です。</p>
-          </article>
-          <article class="phil-item" data-r="up" style="--d:.15s">
-            <svg class="phil-glyph" viewBox="0 0 132 82" aria-hidden="true">
-              <path class="gp thin" pathLength="1" style="--i:0" d="M4 62H18V76H4Z"/>
-              <path class="gp kin" pathLength="1" style="--i:2" d="M18 62L62 18"/>
-              <path class="gp thin" pathLength="1" style="--i:5" d="M62 18H128"/>
-              <circle class="gd ring" cx="76" cy="18" r="4" style="--i:7"/>
-              <circle class="gd ring" cx="92" cy="18" r="4" style="--i:8"/>
-              <circle class="gd ring" cx="108" cy="18" r="4" style="--i:9"/>
-              <circle class="gd ring" cx="124" cy="18" r="4" style="--i:10"/>
-              <circle class="gd kin" cx="62" cy="18" r="2.6" style="--i:6"/>
-            </svg>
-            <p class="pi-label"><span class="pi-k">攻</span><span lang="en">Offense</span></p>
-            <h3>閃きを、再現する。</h3>
-            <p>閃きは、新しい機会の入り口です。まず試し、結果を確かめる。うまくいったものは言葉にして仕組みにし、一度きりの成功を、何度でも再現できる力へ変えていきます。</p>
-          </article>
+      <figure class="phil-fig" data-r="fig" aria-label="中心と土台を守る枠から線がひらき、可能性が伸びていく図。守る：本質・信頼・安全・土台。ひらく：閃き・可能性・前進・再現。">
+        <div class="pf-stage">
+          <svg class="pf-svg" viewBox="0 0 600 520" aria-hidden="true">
+            <defs>
+              <pattern id="pfDot" width="24" height="24" patternUnits="userSpaceOnUse"><circle class="pf-dotc" cx="12" cy="12" r="1.1"/></pattern>
+              <linearGradient id="pfFade" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset=".5" stop-color="#fff" stop-opacity="1"/></linearGradient>
+              <mask id="pfMask" maskUnits="userSpaceOnUse" x="0" y="0" width="600" height="520"><rect x="0" y="240" width="600" height="280" fill="url(#pfFade)"/></mask>
+            </defs>
+            <!-- foundation: a quiet grid and a ground line -->
+            <rect class="pf-dots" x="24" y="240" width="552" height="264" fill="url(#pfDot)" mask="url(#pfMask)"/>
+            <path class="gp thin" pathLength="1" style="--i:0" d="M60 452H340"/>
+            <path class="gp thin" pathLength="1" style="--i:1" d="M60 452v6M110 452v10M155 452v6M200 452v10M245 452v6M290 452v10M340 452v6"/>
+            <!-- 守る: the frame and the core -->
+            <path class="gp" pathLength="1" style="--i:2" d="M110 250H290V430H110Z"/>
+            <path class="gp thin" pathLength="1" style="--i:5" d="M140 280H260V400H140Z"/>
+            <path class="gp thin" pathLength="1" style="--i:7" d="M200 312V322M200 358V368M172 340H182M218 340H228"/>
+            <circle class="gd kin" cx="200" cy="340" r="3.4" style="--i:9"/>
+            <!-- ひらく: lines open from the core; the main line repeats itself -->
+            <path class="gp thin" pathLength="1" style="--i:26" d="M344.2 298.7A150 150 0 0 0 246.4 197.3"/>
+            <g class="pf-ray" style="--a:-16deg;--i:0"><path class="gp thin" pathLength="1" d="M200 340H530"/><circle class="pf-node" cx="530" cy="340" r="3.2" style="--k:0"/></g>
+            <g class="pf-ray" style="--a:-30deg;--i:1"><path class="gp thin" pathLength="1" d="M200 340H560"/><circle class="pf-node" cx="560" cy="340" r="3.2" style="--k:1"/></g>
+            <g class="pf-ray" style="--a:-58deg;--i:3"><path class="gp thin" pathLength="1" d="M200 340H500"/><circle class="pf-node" cx="500" cy="340" r="3.2" style="--k:2"/></g>
+            <g class="pf-ray" style="--a:-72deg;--i:4"><path class="gp thin" pathLength="1" d="M200 340H440"/><circle class="pf-node" cx="440" cy="340" r="3.2" style="--k:3"/></g>
+            <g class="pf-ray" style="--a:-44deg;--i:2"><path class="gp kin" pathLength="1" d="M200 340H580"/>
+              <circle class="pf-rep" cx="390" cy="340" r="4.4" style="--k:2"/><circle class="pf-rep" cx="436" cy="340" r="4.4" style="--k:3"/><circle class="pf-rep" cx="482" cy="340" r="4.4" style="--k:4"/><circle class="pf-rep" cx="528" cy="340" r="4.4" style="--k:5"/>
+              <circle class="pf-node kin" cx="580" cy="340" r="3.6" style="--k:6"/></g>
+          </svg>
+          <div class="pf-tag pf-keep"><p class="pf-name"><span class="jp">守る</span><span lang="en">Essence</span></p><ul class="pf-terms"><li>本質</li><li>信頼</li><li>安全</li><li>土台</li></ul></div>
+          <div class="pf-tag pf-open"><p class="pf-name"><span class="jp">ひらく</span><span lang="en">Possibility</span></p><ul class="pf-terms"><li>閃き</li><li>可能性</li><li>前進</li><li>再現</li></ul></div>
         </div>
-      </div>
+        <figcaption class="pf-cap">本質を守ることが、<span class="nw">可能性をひらく前提になる。</span></figcaption>
+      </figure>
     </div>
   </div>
 </section>
@@ -618,17 +681,38 @@ html:not(.js) .sq-kanji, .m-reduce .sq-kanji, html:not(.js) .dk-kanji, .m-reduce
         <h2 class="title" data-r="lines"><span class="ln"><span>点の施策を、</span></span><span class="ln"><span>一本の流れに。</span></span></h2>
         <p class="lead" data-r="up">SNS、広告、Web、計測、CRM、自動化。私たちはこれらを別々のサービスとして扱わず、お客様の事業が動く一本の流れとして設計します。届けて、迎えて、測って、仕組みにする。そのすべてを、同じ設計思想でつなぎます。</p>
       </div>
-      <dl class="conv" data-r="up" aria-label="12の専門領域を、4つの工程で、1本の流れに">
-        <div><dt>専門領域</dt><dd><span class="cnt" data-to="12">12</span></dd></div>
-        <div><dt>工程</dt><dd><span class="cnt" data-to="4">4</span></dd></div>
-        <div class="is-one"><dt>流れ</dt><dd><span class="cnt" data-to="1">1</span></dd></div>
-      </dl>
+      <figure class="biz-fig" data-r="fig" aria-label="SNS、広告、Web、計測、CRM、自動化の6つの領域が、ひとつの運用設計へ収束する図">
+        <svg class="bf-svg" viewBox="0 0 600 440" aria-hidden="true">
+          <path class="bf-guide gt" d="M120 34V406M390 200V240" style="--i:0"/>
+          <path class="bf-guide gt" d="M404 212V216M418 212V216M432 212V216M446 212V216M460 212V216M474 212V216M488 212V216M502 212V216M516 212V216M530 212V216" style="--i:14"/>
+          <path class="gp" pathLength="1" style="--i:0" d="M120 50C270 50 270 220 390 220"/>
+          <path class="gp" pathLength="1" style="--i:1" d="M120 118C270 118 270 220 390 220"/>
+          <path class="gp" pathLength="1" style="--i:2" d="M120 186C270 186 270 220 390 220"/>
+          <path class="gp" pathLength="1" style="--i:3" d="M120 254C270 254 270 220 390 220"/>
+          <path class="gp" pathLength="1" style="--i:4" d="M120 322C270 322 270 220 390 220"/>
+          <path class="gp" pathLength="1" style="--i:5" d="M120 390C270 390 270 220 390 220"/>
+          <path class="gp kin" pathLength="1" style="--i:16;--sw:1.6" d="M390 220H560"/>
+          <circle class="gp kin" pathLength="1" style="--i:12" cx="390" cy="220" r="8"/>
+          <circle class="gd kin" style="--i:12" cx="390" cy="220" r="2.8"/>
+          <circle class="gp kin" pathLength="1" style="--i:22" cx="560" cy="220" r="10"/>
+          <circle class="gd kin" style="--i:22" cx="560" cy="220" r="3.8"/>
+          <circle class="gd ring" style="--i:0" cx="120" cy="50" r="4.5"/><circle class="gd ring" style="--i:1" cx="120" cy="118" r="4.5"/><circle class="gd ring" style="--i:2" cx="120" cy="186" r="4.5"/><circle class="gd ring" style="--i:3" cx="120" cy="254" r="4.5"/><circle class="gd ring" style="--i:4" cx="120" cy="322" r="4.5"/><circle class="gd ring" style="--i:5" cx="120" cy="390" r="4.5"/>
+          <text class="bf-label en gt" style="--i:0" x="100" y="54.5" text-anchor="end">SNS</text>
+          <text class="bf-label gt" style="--i:1" x="100" y="122.5" text-anchor="end">広告</text>
+          <text class="bf-label en gt" style="--i:2" x="100" y="190.5" text-anchor="end">Web</text>
+          <text class="bf-label gt" style="--i:3" x="100" y="258.5" text-anchor="end">計測</text>
+          <text class="bf-label en gt" style="--i:4" x="100" y="326.5" text-anchor="end">CRM</text>
+          <text class="bf-label gt" style="--i:5" x="100" y="394.5" text-anchor="end">自動化</text>
+          <text class="bf-out gt" style="--i:24" x="572" y="188" text-anchor="end">ひとつの運用設計</text>
+          <g class="bf-pulses"></g>
+        </svg>
+        <figcaption class="bf-cap"><span class="bf-ratio" lang="en">6 → 1</span><span>6つの領域を、ひとつの運用設計へ。</span></figcaption>
+      </figure>
     </div>
 
     <div class="biz-story">
       <div class="biz-visual" aria-hidden="true">
         <div class="bv-inner">
-          <p class="bv-num"><span class="bv-cur">01</span><span class="bv-tot">/ 04</span></p>
           <svg class="bv-glyph" viewBox="0 0 200 200"></svg>
           <ol class="bv-rail"><li class="is-on">届ける</li><li>迎える</li><li>測る</li><li>仕組みにする</li></ol>
         </div>
@@ -671,42 +755,42 @@ html:not(.js) .sq-kanji, .m-reduce .sq-kanji, html:not(.js) .dk-kanji, .m-reduce
   </div>
 </section>
 
-<!-- ================= IKORABU ================= -->
-<section class="sec ik t-dark" id="ikorabu" data-tone="ai">
-  <div class="ik-bg" aria-hidden="true"></div>
-  <div class="wrap ik-grid">
-    <div class="ik-text">
-      <p class="label" data-r="up"><span lang="en">Proprietary Platform</span><span class="jp">自社開発の運用基盤</span></p>
-      <p class="ik-word" lang="en" data-r="up" style="--d:.08s">IKORABU</p>
+<!-- ================= 環 — MEGURI ================= -->
+<section class="sec mg t-dark" id="meguri" data-tone="ai">
+  <div class="mg-bg" aria-hidden="true"></div>
+  <div class="wrap mg-grid">
+    <div class="mg-text">
+      <p class="label" data-r="up"><span lang="en">Proprietary Operating Platform</span><span class="jp">自社開発の事業運用基盤</span></p>
+      <p class="mg-brand" data-r="up" style="--d:.08s"><span class="mg-k">環</span><span class="mg-dash">—</span><span class="mg-en" lang="en">MEGURI</span></p>
       <h2 class="title" data-r="lines"><span class="ln"><span>運用を、</span></span><span class="ln"><span>ひとつの循環に。</span></span></h2>
-      <p class="lead" data-r="up">IKORABUは、匠Technologiesが自社で開発し、日々の運用に使っている事業運用基盤です。コンテンツの生成から、人による承認、予約、公開、公開の確認、分析、改善までを、ひとつの循環としてつなぎます。</p>
-      <dl class="ik-points" data-r="up">
+      <p class="lead" data-r="up">環 — MEGURI は、匠Technologiesが自社で開発し、日々の運用に使っている事業運用基盤です。七つの工程をひとつの環としてつなぎ、改善で分かったことを次の生成へ返します。</p>
+      <dl class="mg-points" data-r="up">
         <div><dt>分断しない</dt><dd>七つの工程が、別々のツールに散らばらない。運用の全体を、一つの基盤で見渡せます。</dd></div>
         <div><dt>人が承認する</dt><dd>AIがつくったものを、そのまま公開しない。公開の判断は、必ず人が行います。</dd></div>
-        <div><dt>次に返す</dt><dd>公開して終わりにしない。確かめ、計測し、分かったことを次の企画へ返します。</dd></div>
+        <div><dt>次に返す</dt><dd>公開して終わりにしない。確かめ、計測し、分かったことを次の生成へ返します。</dd></div>
       </dl>
-      <p class="ik-note" data-r="up">自社の運用で磨き続けている仕組みを、お客様の運用設計にも活かしています。</p>
+      <p class="mg-note" data-r="up">「環」の名は、運用が一方通行で終わらず、めぐり続けることから。自社の運用で磨いたこの仕組みを、お客様の運用設計にも活かしています。</p>
     </div>
-    <div class="ik-visual">
-      <div class="ik-ring" data-r="fade" role="group" aria-label="IKORABUの運用サイクル（7工程）">
-        <svg class="ik-svg" viewBox="0 0 600 600" aria-hidden="true"></svg>
-        <div class="ik-labels"></div>
-        <div class="ik-center" aria-hidden="true">
-          <p class="ikc-num"></p>
-          <p class="ikc-jp"></p>
-          <p class="ikc-en"></p>
-          <p class="ikc-desc"></p>
+    <div class="mg-visual">
+      <div class="mg-ring" data-r="fade" role="group" aria-label="環 — MEGURI の運用サイクル（7工程）">
+        <svg class="mg-svg" viewBox="0 0 600 600" aria-hidden="true"></svg>
+        <div class="mg-labels"></div>
+        <div class="mg-center" aria-hidden="true">
+          <p class="mgc-num"></p>
+          <p class="mgc-jp"></p>
+          <p class="mgc-en"></p>
+          <p class="mgc-desc"></p>
         </div>
       </div>
-      <p class="sr-only" aria-live="polite" id="ik-live"></p>
-      <ol class="ik-steps">
+      <p class="sr-only" aria-live="polite" id="mg-live"></p>
+      <ol class="mg-steps">
         <li data-i="0"><span class="n" lang="en">01</span><span class="jp">生成</span><span class="en" lang="en">Content generation</span><span class="d">ブランドの文脈と過去の反応をもとに、AIが企画と下書きをつくる。</span></li>
         <li data-i="1"><span class="n" lang="en">02</span><span class="jp">承認</span><span class="en" lang="en">Human approval</span><span class="d">公開してよいかを、人が確かめて決める。判断の責任は人が持つ。</span></li>
         <li data-i="2"><span class="n" lang="en">03</span><span class="jp">予約</span><span class="en" lang="en">Scheduling</span><span class="d">承認されたものだけを、届きやすい時間に配置する。</span></li>
         <li data-i="3"><span class="n" lang="en">04</span><span class="jp">公開</span><span class="en" lang="en">Publication</span><span class="d">予約どおりに、確実に公開する。</span></li>
         <li data-i="4"><span class="n" lang="en">05</span><span class="jp">確認</span><span class="en" lang="en">Confirmation</span><span class="d">本当に公開されたかを、実際の状態で確かめる。</span></li>
         <li data-i="5"><span class="n" lang="en">06</span><span class="jp">分析</span><span class="en" lang="en">Analytics</span><span class="d">反応を計測し、数字と文脈の両方から読み解く。</span></li>
-        <li data-i="6"><span class="n" lang="en">07</span><span class="jp">改善</span><span class="en" lang="en">Improvement</span><span class="d">分かったことを、次の企画と仕組みへ返す。</span></li>
+        <li data-i="6"><span class="n" lang="en">07</span><span class="jp">改善</span><span class="en" lang="en">Improvement</span><span class="d">分かったことを、次の生成へ返す。環はここから、もう一周めぐる。</span></li>
       </ol>
     </div>
   </div>
@@ -715,10 +799,39 @@ html:not(.js) .sq-kanji, .m-reduce .sq-kanji, html:not(.js) .dk-kanji, .m-reduce
 <!-- ================= HUMAN × AI × SYSTEM ================= -->
 <section class="sec has t-kinari t-light" id="design" data-tone="light">
   <div class="wrap">
+    <div class="has-top">
     <div class="has-head">
       <p class="label" data-r="up"><span lang="en">Human × AI × System</span><span class="jp">設計思想</span></p>
       <h2 class="title" data-r="lines"><span class="ln"><span>人とAIの役割を、</span></span><span class="ln"><span>設計する。</span></span></h2>
       <p class="lead" data-r="up">AIにすべてを任せることも、人がすべてを抱えることもしない。感性と責任は人に、速さと幅はAIに、継続と再現は仕組みに。それぞれが得意なことを担うとき、運用は強く、しなやかになります。</p>
+    </div>
+    <figure class="has-fig" data-r="fig" aria-label="人、AI、仕組みの三つの層が重なり、ひとつの運用基盤になる図">
+      <div class="hf-stage">
+        <svg class="hf-svg" viewBox="0 0 560 480" aria-hidden="true">
+          <g class="hf-plane" style="--dy:56px">
+            <path class="hf-face" d="M180 213L310 278L180 343L50 278Z"/>
+            <path class="hf-pat" transform="matrix(130 65 -130 65 180 213)" d="M.1667 0V1M.3333 0V1M.5 0V1M.6667 0V1M.8333 0V1M0 .1667H1M0 .3333H1M0 .5H1M0 .6667H1M0 .8333H1"/>
+          </g>
+          <g class="hf-plane">
+            <path class="hf-face" d="M180 159L310 224L180 289L50 224Z"/>
+            <path class="hf-pat ai" transform="matrix(130 65 -130 65 180 159)" d="M.08 .1H.62M.08 .2H.88M.08 .3H.5M.08 .4H.92M.08 .5H.7M.08 .6H.84M.08 .7H.58M.08 .8H.9M.08 .9H.74"/>
+          </g>
+          <g class="hf-plane" style="--dy:-56px">
+            <path class="hf-face" d="M180 105L310 170L180 235L50 170Z"/>
+            <path class="hf-brush" transform="matrix(130 65 -130 65 180 105)" d="M.18 .62C.3 .55 .48 .5 .62 .46C.72 .43 .8 .38 .86 .34C.88 .33 .9 .35 .88 .37C.8 .45 .7 .5 .6 .53C.45 .58 .32 .62 .2 .67C.16 .68 .15 .64 .18 .62Z"/>
+            <path class="hf-pat seal" transform="matrix(130 65 -130 65 180 105)" d="M.72 .7H.82V.8H.72Z"/>
+          </g>
+          <path class="gp kin" pathLength="1" style="--i:36" d="M180 105L310 170L180 235L50 170Z"/>
+          <path class="gp kin" pathLength="1" style="--i:38" d="M50 170V278L180 343L310 278V170M180 235V343"/>
+          <path class="gp thin" pathLength="1" style="--i:40" d="M318 170H332M318 224H332M318 278H332"/>
+        </svg>
+        <div class="hf-tag" style="--y:35.4%"><span lang="en">Human</span><span class="jp">判断・承認・文脈理解</span></div>
+        <div class="hf-tag" style="--y:46.7%"><span lang="en">AI</span><span class="jp">速度・生成・補助</span></div>
+        <div class="hf-tag" style="--y:57.9%"><span lang="en">System</span><span class="jp">記録・再現・継続運用</span></div>
+        <p class="hf-base">ひとつの運用基盤</p>
+      </div>
+      <figcaption class="hf-cap">三つが重なったところで、<span class="nw">運用は事業を動かす力になる。</span></figcaption>
+    </figure>
     </div>
     <div class="strata">
       <article class="stratum" data-r="up">
@@ -747,10 +860,6 @@ html:not(.js) .sq-kanji, .m-reduce .sq-kanji, html:not(.js) .dk-kanji, .m-reduce
         </svg>
       </article>
     </div>
-    <figure class="cv" aria-label="人、AI、仕組みの三本の線が一点で重なり、一本の金の線となって伸びていく図">
-      <svg class="cv-svg" aria-hidden="true"></svg>
-    </figure>
-    <p class="cv-cap" data-r="up">三つが重なったところで、運用は事業を動かす力になる。</p>
   </div>
 </section>
 
@@ -1020,7 +1129,7 @@ html:not(.js) .sq-kanji, .m-reduce .sq-kanji, html:not(.js) .dk-kanji, .m-reduce
      Reveal on scroll
      ========================================================= */
   const onReveal = el => {
-    if (el.matches('.conv')) $$('.cnt', el).forEach(countUp);
+    if (el.matches('.biz-fig')) setTimeout(() => runPulses(2), 1700);
     if (el.matches('.chapter')) { const g = $('.ch-glyph g', el); if (g) g.classList.add('is-active'); }
   };
   if (!reduce && 'IntersectionObserver' in window) {
@@ -1031,16 +1140,6 @@ html:not(.js) .sq-kanji, .m-reduce .sq-kanji, html:not(.js) .dk-kanji, .m-reduce
     $$('[data-r], .phil-item, .stratum').forEach(el => io.observe(el));
   } else {
     $$('[data-r], .phil-item, .stratum').forEach(el => { el.classList.add('is-in'); });
-  }
-  function countUp(el) {
-    const to = +el.dataset.to; if (reduce) return;
-    const t0 = performance.now(), T = 1500;
-    const step = now => {
-      const p = clamp((now - t0) / T, 0, 1), e = 1 - Math.pow(1 - p, 3);
-      el.textContent = String(Math.round(to * e));
-      if (p < 1) requestAnimationFrame(step);
-    };
-    el.textContent = '0'; requestAnimationFrame(step);
   }
 
   /* =========================================================
@@ -1092,15 +1191,13 @@ html:not(.js) .sq-kanji, .m-reduce .sq-kanji, html:not(.js) .dk-kanji, .m-reduce
   bvGlyph.innerHTML = GLYPHS.map((f, i) => `<g class="g-step${i === 0 ? ' is-active' : ''}">${f()}</g>`).join('');
   $$('.chapter').forEach((ch, i) => { const sv = $('.ch-glyph svg', ch); if (sv) sv.innerHTML = `<g>${GLYPHS[i]()}</g>`; });
   if (reduce) $$('.ch-glyph g').forEach(g => g.classList.add('is-active'));
-  const bvCur = $('.bv-cur'), bvRail = $$('.bv-rail li'), bvSteps = $$('.g-step', bvGlyph);
+  const bvRail = $$('.bv-rail li'), bvSteps = $$('.g-step', bvGlyph);
   let bizActive = 0;
   function setBiz(i) {
     if (i === bizActive) return;
     bizActive = i;
     bvSteps.forEach((g, k) => g.classList.toggle('is-active', k === i));
     bvRail.forEach((li, k) => { li.classList.toggle('is-on', k === i); li.classList.toggle('is-past', k < i); });
-    bvCur.classList.add('swap');
-    setTimeout(() => { bvCur.textContent = String(i + 1).padStart(2, '0'); bvCur.classList.remove('swap'); }, 220);
   }
   if ('IntersectionObserver' in window) {
     const cio = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) setBiz(+e.target.dataset.step); }), { rootMargin: '-48% 0px -48% 0px' });
@@ -1108,15 +1205,31 @@ html:not(.js) .sq-kanji, .m-reduce .sq-kanji, html:not(.js) .dk-kanji, .m-reduce
   }
 
   /* =========================================================
-     IKORABU — seven stages, one loop
+     環 — MEGURI: seven stages, one loop (brush circle → precise ring)
      ========================================================= */
-  const ST = $$('.ik-steps li').map(li => ({
+  const ST = $$('.mg-steps li').map(li => ({
     n: $('.n', li).textContent, jp: $('.jp', li).textContent, en: $('.en', li).textContent, d: $('.d', li).textContent
   }));
   const SHORT_EN = ['Generate', 'Approve', 'Schedule', 'Publish', 'Confirm', 'Analyze', 'Improve'];
-  const ring = $('.ik-ring'), ikSvg = $('.ik-svg'), ikLabels = $('.ik-labels'), center = $('.ik-center');
+  const ring = $('.mg-ring'), mgSvg = $('.mg-svg'), mgLabels = $('.mg-labels'), center = $('.mg-center');
   const CX = 300, R = 184, LR = 37.6;
   const ang = i => -90 + i * 360 / 7;
+  // a brush circle: swells at the entry, thins and dries out before closing
+  function ensoPath(cx, cy, r, a0, sweep, wMax) {
+    const N = 180, outer = [], inner = [];
+    for (let k = 0; k <= N; k++) {
+      const t = k / N, a = (a0 + sweep * t) * Math.PI / 180;
+      const w = wMax * Math.min(1, t / .05) * (1 - .78 * Math.pow(t, 1.5)) * (.86 + .14 * Math.sin(t * 9.4 + .4));
+      const rr = r + 2.6 * Math.sin(t * 4.1 + .7);
+      outer.push([cx + (rr + w / 2) * Math.cos(a), cy + (rr + w / 2) * Math.sin(a)]);
+      inner.push([cx + (rr - w / 2) * Math.cos(a), cy + (rr - w / 2) * Math.sin(a)]);
+    }
+    return 'M' + outer.map(pt).join('L') + 'L' + inner.reverse().map(pt).join('L') + 'Z';
+  }
+  const arcD = (c, r, a0, a1) => {
+    const p = a => [c + r * Math.cos(a * Math.PI / 180), c + r * Math.sin(a * Math.PI / 180)];
+    return `M${pt(p(a0))}A${r} ${r} 0 0 1 ${pt(p(a1))}`;
+  };
   (function buildRing() {
     let minor = '', major = '';
     for (let i = 0; i < 120; i++) {
@@ -1127,51 +1240,56 @@ html:not(.js) .sq-kanji, .m-reduce .sq-kanji, html:not(.js) .dk-kanji, .m-reduce
     let dots = '';
     ST.forEach((s, i) => {
       const a = ang(i) * Math.PI / 180, x = CX + R * Math.cos(a), y = CX + R * Math.sin(a);
-      dots += `<circle class="ik-halo" data-i="${i}" cx="${r1(x)}" cy="${r1(y)}" r="13"/>`;
+      dots += `<circle class="mg-halo" data-i="${i}" cx="${r1(x)}" cy="${r1(y)}" r="13"/>`;
       dots += i === 1
-        ? `<rect class="ik-dot" data-i="${i}" x="${r1(x - 5.5)}" y="${r1(y - 5.5)}" width="11" height="11" transform="rotate(${r1(ang(i) + 90)} ${r1(x)} ${r1(y)})"/>`
-        : `<circle class="ik-dot" data-i="${i}" cx="${r1(x)}" cy="${r1(y)}" r="5.5"/>`;
+        ? `<path class="mg-dot human" data-i="${i}" d="M-5.5 -7C-.5 -9.6 6.8 -6 7.6 .6C8.3 6 4.6 9.2 .4 8.6C-3.8 8 -7 4 -7.4 -.4C-7.8 -3.8 -7.4 -5.9 -5.5 -7Z" transform="translate(${r1(x)} ${r1(y)}) rotate(-24)"/>`
+        : `<circle class="mg-dot" data-i="${i}" cx="${r1(x)}" cy="${r1(y)}" r="5.5"/>`;
     });
     // direction of travel, between 07 and 01
     const aa = (-90 - 360 / 14) * Math.PI / 180, ax = CX + R * Math.cos(aa), ay = CX + R * Math.sin(aa);
     const tx = -Math.sin(aa), ty = Math.cos(aa), nx = Math.cos(aa), ny = Math.sin(aa), L = 7;
     const arrow = `M${pt([ax - tx * L + nx * L * .8, ay - ty * L + ny * L * .8])}L${pt([ax, ay])}L${pt([ax - tx * L - nx * L * .8, ay - ty * L - ny * L * .8])}`;
-    ikSvg.innerHTML = `
-      <defs><radialGradient id="ikGlow"><stop offset="0" stop-color="#dcc796" stop-opacity=".55"/><stop offset="1" stop-color="#dcc796" stop-opacity="0"/></radialGradient></defs>
-      <path class="ik-tick" d="${minor}"/><path class="ik-tick mj" d="${major}"/>
-      <circle class="ik-inner" cx="${CX}" cy="${CX}" r="128"/>
-      <circle class="ik-base" cx="${CX}" cy="${CX}" r="${R}"/>
-      <circle class="ik-prog" cx="${CX}" cy="${CX}" r="${R}" pathLength="1" transform="rotate(-90 ${CX} ${CX})"/>
-      <path class="ik-arrow" d="${arrow}"/>
+    mgSvg.innerHTML = `
+      <defs><radialGradient id="mgGlow"><stop offset="0" stop-color="#dcc796" stop-opacity=".55"/><stop offset="1" stop-color="#dcc796" stop-opacity="0"/></radialGradient></defs>
+      <path class="mg-tick" d="${minor}"/><path class="mg-tick mj" d="${major}"/>
+      <mask id="ensoMask" maskUnits="userSpaceOnUse" x="0" y="0" width="600" height="600"><circle class="enso-wr" cx="${CX}" cy="${CX}" r="${R}" pathLength="1" transform="rotate(-96 ${CX} ${CX})"/></mask>
+      <g mask="url(#ensoMask)">
+        <path class="mg-enso" d="${ensoPath(CX, CX, R, -96, 338, 30)}"/>
+        <path class="mg-kasure" d="${arcD(CX, R + 9, 96, 176)} ${arcD(CX, R - 8, 120, 196)} ${arcD(CX, R + 4, 150, 224)} ${arcD(CX, R - 3, 188, 236)}"/>
+      </g>
+      <circle class="mg-inner" cx="${CX}" cy="${CX}" r="128"/>
+      <circle class="mg-base" cx="${CX}" cy="${CX}" r="${R}"/>
+      <circle class="mg-prog" cx="${CX}" cy="${CX}" r="${R}" pathLength="1" transform="rotate(-90 ${CX} ${CX})"/>
+      <path class="mg-arrow" d="${arrow}"/>
       ${dots}
-      <circle class="ik-comet-glow ik-comet" r="12" fill="url(#ikGlow)" cx="${CX}" cy="${CX - R}"/>
-      <circle class="ik-comet" r="3.6" cx="${CX}" cy="${CX - R}"/>`;
-    ikLabels.innerHTML = ST.map((s, i) => {
+      <circle class="mg-comet-glow mg-comet" r="12" fill="url(#mgGlow)" cx="${CX}" cy="${CX - R}"/>
+      <circle class="mg-comet" r="3.6" cx="${CX}" cy="${CX - R}"/>`;
+    mgLabels.innerHTML = ST.map((s, i) => {
       const a = ang(i) * Math.PI / 180, c = Math.cos(a), sn = Math.sin(a);
       const x = 50 + c * LR, y = 50 + sn * LR;
       const ta = c > .35 ? 'left' : c < -.35 ? 'right' : 'center';
       const al = ta === 'left' ? 'flex-start' : ta === 'right' ? 'flex-end' : 'center';
-      return `<button class="ik-node${i === 1 ? ' is-human' : ''}" type="button" data-i="${i}" aria-pressed="false" aria-label="${s.n} ${s.jp}（${s.en}）"
+      return `<button class="mg-node${i === 1 ? ' is-human' : ''}" type="button" data-i="${i}" aria-pressed="false" aria-label="${s.n} ${s.jp}（${s.en}）"
         style="--x:${r1(x)}%;--y:${r1(y)}%;--tx:${r1(-50 + c * 50)}%;--ty:${r1(-50 + sn * 50)}%;--ta:${ta};--al:${al}">
         <span class="n" lang="en">${s.n}</span><span class="jp">${s.jp}</span><span class="en" lang="en">${SHORT_EN[i]}</span>${i === 1 ? '<span class="tag" lang="en">Human</span>' : ''}</button>`;
     }).join('');
   })();
-  const prog = $('.ik-prog', ikSvg), comets = $$('.ik-comet', ikSvg);
-  const dotsEl = $$('.ik-dot', ikSvg), halos = $$('.ik-halo', ikSvg), btns = $$('.ik-node', ikLabels), stepLis = $$('.ik-steps li');
-  const cNum = $('.ikc-num'), cJp = $('.ikc-jp'), cEn = $('.ikc-en'), cDesc = $('.ikc-desc'), live = $('#ik-live');
-  let ikSel = -1, ikRunning = false;
+  const prog = $('.mg-prog', mgSvg), comets = $$('.mg-comet', mgSvg);
+  const dotsEl = $$('.mg-dot', mgSvg), halos = $$('.mg-halo', mgSvg), btns = $$('.mg-node', mgLabels), stepLis = $$('.mg-steps li');
+  const cNum = $('.mgc-num'), cJp = $('.mgc-jp'), cEn = $('.mgc-en'), cDesc = $('.mgc-desc'), live = $('#mg-live');
+  let mgSel = -1, mgRunning = false;
   function centerOverview() {
-    cNum.textContent = 'Operation Loop';
-    cJp.innerHTML = '七つの工程を、<br>ひとつの循環に。';
-    cJp.classList.add('ov');
-    cEn.textContent = '';
-    cDesc.innerHTML = '<span class="ikc-hint">工程を選ぶと、詳細を表示します。</span>';
+    cNum.textContent = 'Operating Loop';
+    cJp.textContent = '環';
+    cJp.classList.add('ov'); cEn.classList.add('ov');
+    cEn.textContent = 'MEGURI';
+    cDesc.innerHTML = '<span class="mgc-hint">工程を選ぶと、詳細を表示します。</span>';
   }
   function centerStage(i, quick) {
     const s = ST[i];
     const apply = () => {
       cNum.textContent = `${s.n} / 07`;
-      cJp.textContent = s.jp; cJp.classList.remove('ov');
+      cJp.textContent = s.jp; cJp.classList.remove('ov'); cEn.classList.remove('ov');
       cEn.textContent = quick ? SHORT_EN[i] : s.en;
       cDesc.textContent = quick ? '' : s.d;
       center.classList.remove('swap');
@@ -1179,8 +1297,8 @@ html:not(.js) .sq-kanji, .m-reduce .sq-kanji, html:not(.js) .dk-kanji, .m-reduce
     if (quick) apply(); else { center.classList.add('swap'); setTimeout(apply, 180); }
   }
   function selectStage(i) {
-    if (ikRunning) finishLoop();
-    ikSel = i;
+    if (mgRunning) finishLoop();
+    mgSel = i;
     dotsEl.forEach((el, k) => el.classList.toggle('on', k === i));
     halos.forEach((el, k) => el.classList.toggle('on', k === i));
     btns.forEach((b, k) => { b.classList.toggle('is-on', k === i); b.setAttribute('aria-pressed', String(k === i)); });
@@ -1191,25 +1309,25 @@ html:not(.js) .sq-kanji, .m-reduce .sq-kanji, html:not(.js) .dk-kanji, .m-reduce
   btns.forEach(b => {
     const i = +b.dataset.i;
     b.addEventListener('click', () => selectStage(i));
-    b.addEventListener('focus', () => { if (ikSel !== i) selectStage(i); });
-    if (finePointer) b.addEventListener('mouseenter', () => { if (ikSel !== i) selectStage(i); });
+    b.addEventListener('focus', () => { if (mgSel !== i) selectStage(i); });
+    if (finePointer) b.addEventListener('mouseenter', () => { if (mgSel !== i) selectStage(i); });
   });
   function finishLoop() {
-    ikRunning = false;
+    mgRunning = false;
     prog.style.strokeDashoffset = '0';
     dotsEl.forEach(el => el.classList.add('lit'));
     comets.forEach(c => { c.style.transition = 'opacity .8s ease'; c.style.opacity = '0'; });
-    if (ikSel < 0) centerOverview();
+    if (mgSel < 0) centerOverview();
   }
   function runLoop() {
     if (reduce) { finishLoop(); return; }
-    ikRunning = true;
+    mgRunning = true;
     const t0 = performance.now(), T = 3800;
     comets.forEach(c => { c.style.opacity = '1'; });
     let lastIdx = -1;
     const ease = p => p < .5 ? 4 * p * p * p : 1 - Math.pow(-2 * p + 2, 3) / 2;
     const step = now => {
-      if (!ikRunning) return;
+      if (!mgRunning) return;
       const p = clamp((now - t0) / T, 0, 1), e = ease(p);
       const a = (-90 + 360 * e) * Math.PI / 180;
       const x = CX + R * Math.cos(a), y = CX + R * Math.sin(a);
@@ -1227,49 +1345,59 @@ html:not(.js) .sq-kanji, .m-reduce .sq-kanji, html:not(.js) .dk-kanji, .m-reduce
   }
   centerOverview();
   if ('IntersectionObserver' in window && !reduce) {
-    const rio = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { rio.disconnect(); setTimeout(runLoop, 350); } }), { threshold: .45 });
+    const rio = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { rio.disconnect(); ring.classList.add('run'); setTimeout(runLoop, 1250); } }), { threshold: .45 });
     rio.observe(ring);
   } else finishLoop();
 
   /* =========================================================
-     Convergence: Human / AI / System → one gold line
+     Business figure: six domains flow into one design
      ========================================================= */
-  const cvBox = $('.cv'), cvSvg = $('.cv-svg');
-  let cvEls = null;
-  function buildCv() {
-    const W = Math.round(cvBox.clientWidth), mob = innerWidth < 720, H = mob ? 190 : 236;
-    const xm = W * (mob ? .64 : .62), ym = H / 2;
-    const y1 = mob ? 30 : 36, y3 = H - (mob ? 30 : 36);
-    const h = `M0 ${y1}C${r1(W * .1)} ${y1 - 18} ${r1(W * .18)} ${y1 + 34} ${r1(W * .3)} ${y1 + 16}S${r1(W * .46)} ${y1 - 8} ${r1(W * .53)} ${r1(ym - 20)}S${r1(xm - 26)} ${ym} ${r1(xm)} ${ym}`;
-    const a = `M0 ${ym}H${r1(xm)}`;
-    let tk = '';
-    for (let x = 18; x < xm - 24; x += mob ? 14 : 18) tk += `M${x} ${ym - 4}V${ym + 4}`;
-    const st = 20, q1 = W * .12, q2 = W * .26, q3 = W * .4;
-    const sx = xm - (y3 - st * 2 - ym);
-    const s = `M0 ${y3}H${r1(q1)}L${r1(q1 + st)} ${y3 - st}H${r1(q2)}L${r1(q2 + st)} ${y3}H${r1(q3)}L${r1(q3 + st)} ${y3 - st}H${r1(Math.max(q3 + st + 10, sx - st))}L${r1(Math.max(q3 + st + 10, sx - st) + (y3 - st - ym))} ${ym}H${r1(xm)}`;
-    const gl = `M${r1(xm)} ${ym}H${W + 2}`;
-    cvSvg.setAttribute('viewBox', `0 0 ${W} ${H}`);
-    cvSvg.setAttribute('height', H);
-    cvSvg.innerHTML = `
-      <text class="cv-t" x="0" y="${y1 - 14}">Human</text>
-      <text class="cv-t" x="0" y="${ym - 14}">AI</text>
-      <text class="cv-t" x="0" y="${y3 + 24}">System</text>
-      <path class="cv-l cv-h" pathLength="1" d="${h}"/>
-      <path class="cv-l cv-a" pathLength="1" d="${a}"/>
-      <path class="cv-l cv-a" pathLength="1" d="${tk}" style="stroke-opacity:.5"/>
-      <path class="cv-l cv-s" pathLength="1" d="${s}"/>
-      <path class="cv-l cv-g" pathLength="1" d="${gl}"/>
-      <circle class="cv-node" cx="${r1(xm)}" cy="${ym}" r="5.5"/>
-      <text class="cv-t kin" x="${r1(xm + 16)}" y="${ym - 14}">Operation</text>`;
-    cvEls = { lines: $$('.cv-l:not(.cv-g)', cvSvg), gold: $('.cv-g', cvSvg), node: $('.cv-node', cvSvg) };
-    if (reduce) { [...cvEls.lines, cvEls.gold].forEach(l => { l.style.strokeDashoffset = '0'; }); cvEls.node.classList.add('on'); }
+  const bizFig = $('.biz-fig'), bfSvg = $('.bf-svg', bizFig), bfPulses = $('.bf-pulses', bfSvg);
+  const BF_Y = [50, 118, 186, 254, 322, 390];
+  const NS = 'http://www.w3.org/2000/svg';
+  const bfTracks = BF_Y.map(y => {
+    const pth = d.createElementNS(NS, 'path');
+    pth.setAttribute('class', 'bf-path');
+    pth.setAttribute('d', `M120 ${y}C270 ${y} 270 220 390 220H560`);
+    const dot = d.createElementNS(NS, 'circle');
+    dot.setAttribute('class', 'bf-pulse'); dot.setAttribute('r', '2.8');
+    bfPulses.append(pth, dot);
+    return { pth, dot, len: 0 };
+  });
+  let pulsing = false;
+  function runPulses(cycles) {
+    if (reduce || pulsing) return;
+    pulsing = true;
+    bfTracks.forEach(t => { t.len = t.pth.getTotalLength(); });
+    const t0 = performance.now(), per = 2300, dur = 2000, stagger = 130, total = (cycles - 1) * per + 5 * stagger + dur;
+    const ease = p => .5 - Math.cos(Math.PI * p) / 2;
+    const step = now => {
+      const el = now - t0;
+      bfTracks.forEach((t, i) => {
+        let shown = false;
+        for (let c = 0; c < cycles; c++) {
+          const p = (el - c * per - i * stagger) / dur;
+          if (p < 0 || p > 1) continue;
+          const q = t.pth.getPointAtLength(ease(p) * t.len);
+          t.dot.setAttribute('cx', r1(q.x)); t.dot.setAttribute('cy', r1(q.y));
+          t.dot.style.opacity = String(Math.min(1, p / .08, (1 - p) / .14));
+          shown = true;
+        }
+        if (!shown) t.dot.style.opacity = '0';
+      });
+      if (el < total) requestAnimationFrame(step); else { bfTracks.forEach(t => { t.dot.style.opacity = '0'; }); pulsing = false; }
+    };
+    requestAnimationFrame(step);
   }
-  buildCv();
+  if (finePointer) bizFig.addEventListener('pointerenter', () => { if (bizFig.classList.contains('is-in')) runPulses(1); });
+  // keep the figure's labels at a readable size at every width
+  const sizeBizFig = () => { const w = bfSvg.clientWidth || 600; bizFig.style.setProperty('--inv', clamp(600 / w, 1, 1.75).toFixed(3)); };
+  sizeBizFig();
 
   /* =========================================================
-     Scroll-linked: header tone, spine, IKORABU opening, rail, convergence
+     Scroll-linked: header tone, spine, MEGURI opening, rail
      ========================================================= */
-  const ik = $('#ikorabu'), chaptersEl = $('.chapters'), bvRailEl = $('.bv-rail');
+  const mg = $('#meguri'), chaptersEl = $('.chapters'), bvRailEl = $('.bv-rail');
   const heroLogoWrap = $('.hero-logo');
   let ticking = false, docH = 0, headH = 72;
   function measure() {
@@ -1296,23 +1424,14 @@ html:not(.js) .sq-kanji, .m-reduce .sq-kanji, html:not(.js) .dk-kanji, .m-reduce
     });
     navLinks.forEach(a => a.classList.toggle('is-cur', a === cur));
     if (reduce) return;
-    // IKORABU: the indigo panel opens from the centre as it arrives
-    const ir = ik.getBoundingClientRect();
+    // MEGURI: the indigo panel opens from the centre as it arrives
+    const ir = mg.getBoundingClientRect();
     const ip = clamp((vh - ir.top) / (vh * .75), 0, 1);
-    ik.style.setProperty('--ci', r1((1 - ip) * Math.min(innerWidth * .07, 110)) + 'px');
+    mg.style.setProperty('--ci', r1((1 - ip) * Math.min(innerWidth * .07, 110)) + 'px');
     // business rail
     if (bvRailEl && chaptersEl) {
       const cr = chaptersEl.getBoundingClientRect();
       bvRailEl.style.setProperty('--rp', clamp((vh * .5 - cr.top) / cr.height, 0, 1).toFixed(3));
-    }
-    // convergence
-    if (cvEls) {
-      const r = cvBox.getBoundingClientRect();
-      const p = clamp((vh * .92 - r.top) / (vh * .62), 0, 1);
-      const pl = clamp(p / .72, 0, 1), pg = clamp((p - .62) / .38, 0, 1);
-      cvEls.lines.forEach(l => { l.style.strokeDashoffset = (1.01 - 1.01 * pl).toFixed(3); });
-      cvEls.gold.style.strokeDashoffset = (1.01 - 1.01 * pg).toFixed(3);
-      cvEls.node.classList.toggle('on', p > .6);
     }
   }
   addEventListener('scroll', () => { if (!ticking) { ticking = true; requestAnimationFrame(() => { ticking = false; onScroll(); }); } }, { passive: true });
@@ -1334,7 +1453,7 @@ html:not(.js) .sq-kanji, .m-reduce .sq-kanji, html:not(.js) .dk-kanji, .m-reduce
   let rT = 0;
   addEventListener('resize', () => {
     clearTimeout(rT);
-    rT = setTimeout(() => { measure(); onResizeHero(); buildCv(); onScroll(); }, 160);
+    rT = setTimeout(() => { measure(); onResizeHero(); sizeBizFig(); onScroll(); }, 160);
   });
   addEventListener('load', () => { measure(); onScroll(); });
   measure(); onScroll();
