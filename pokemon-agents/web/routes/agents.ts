@@ -6,7 +6,7 @@ import { renderCosts } from "./costs";
 
 /**
  * Agents — 1 URL で 4 つの view:
- *   ?view=org       (default) ─ SVG 組織図
+ *   ?view=org       (default) ─ 組織図
  *   ?view=list      ─ 部署別カード一覧
  *   ?view=schedule  ─ heartbeat / scheduler 設定
  *   ?view=cost      ─ 予算 / コスト

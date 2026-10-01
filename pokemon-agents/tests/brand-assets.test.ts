@@ -46,6 +46,7 @@ describe("BRAND01 site branding", () => {
     expect(html).toContain("<title>Takumi Technologies HQ | Mission Control</title>");
     expect(html).toContain('<span class="brand-name">Takumi Technologies HQ</span>');
     expect(html).toContain('<div class="brand-sub">Mission Control</div>');
+    expect(html).toContain('href="/internal" class="sidebar-header"');
     expect(html).toContain('href="/internal" class="nav-item internal-home-button active"');
     expect(html).toContain('data-nav="home" aria-current="page"');
     expect(html).toContain('<span class="nav-label">トップページ</span>');

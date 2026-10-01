@@ -1,16 +1,11 @@
 import type { Database } from "bun:sqlite";
 import { escapeHtml, jpRole } from "../components/layout";
 
-/**
- * Org Chart — agent_edges (supervises) を tree として SVG render
- */
-
 interface AgentBasic {
   id: number;
   slug: string;
   pokemon_jp: string;
   role: string;
-  role_label?: string | null;
   status: string;
   avatar_url?: string | null;
 }
@@ -19,141 +14,78 @@ interface OrgNode extends AgentBasic {
   reports: OrgNode[];
 }
 
-interface LayoutNode extends OrgNode {
-  x: number;
-  y: number;
-  layoutChildren: LayoutNode[];
-}
+const ROLE_LABEL_JP: Record<string, string> = {
+  "sashihara-orchestrator": "運用統括・最終判断",
+  "anna-supervisor": "改善案の提案",
+  "hana-heartbeat": "稼働・結果の監視",
+  "kiara-executor": "承認済み作業の実行",
+  "mirinya-cost-analyst": "売上・CV・コスト分析",
+  "sanatsun-knowledge-editor": "確認済みナレッジ管理",
+  "shoko-reporter": "調査・情報収集",
+  "iori-validator": "根拠・事実の検証",
+  "maika-hypothesizer": "仮説・実験設計",
+  "hitomi-selector": "戦略・施策の選定",
+  "risa-notifier": "通知・確認依頼の判断",
+};
 
-const CARD_W = 220;
-const CARD_H = 90;
-const GAP_X = 28;
-const GAP_Y = 64;
-const PADDING = 30;
-const MAX_ROW_WIDTH = 1600;
-
-function subtreeWidth(node: OrgNode): number {
-  if (node.reports.length === 0) return CARD_W;
-  const childrenW = node.reports.reduce((s, c) => s + subtreeWidth(c), 0);
-  const gaps = (node.reports.length - 1) * GAP_X;
-  return Math.max(CARD_W, childrenW + gaps);
-}
-
-function subtreeHeight(node: OrgNode): number {
-  if (node.reports.length === 0) return CARD_H;
-  return CARD_H + GAP_Y + Math.max(...node.reports.map(subtreeHeight));
-}
-
-function layoutTree(node: OrgNode, x: number, y: number): LayoutNode {
-  const totalW = subtreeWidth(node);
-  const children: LayoutNode[] = [];
-  if (node.reports.length > 0) {
-    const childrenW = node.reports.reduce((s, c) => s + subtreeWidth(c), 0);
-    const gaps = (node.reports.length - 1) * GAP_X;
-    let cx = x + (totalW - childrenW - gaps) / 2;
-    for (const child of node.reports) {
-      const cw = subtreeWidth(child);
-      children.push(layoutTree(child, cx, y + CARD_H + GAP_Y));
-      cx += cw + GAP_X;
-    }
-  }
-  return { ...node, x: x + (totalW - CARD_W) / 2, y, layoutChildren: children };
-}
-
-function flatten(node: LayoutNode, acc: LayoutNode[] = []): LayoutNode[] {
-  acc.push(node);
-  for (const c of node.layoutChildren) flatten(c, acc);
-  return acc;
-}
-
-function edges(
-  node: LayoutNode,
-  acc: { x1: number; y1: number; x2: number; y2: number }[] = [],
-): typeof acc {
-  for (const c of node.layoutChildren) {
-    acc.push({ x1: node.x + CARD_W / 2, y1: node.y + CARD_H, x2: c.x + CARD_W / 2, y2: c.y });
-    edges(c, acc);
-  }
-  return acc;
+function renderAgentCard(agent: AgentBasic, leader = false): string {
+  const active = agent.status === "active";
+  const role = ROLE_LABEL_JP[agent.slug] || jpRole(agent.role);
+  return `<a class="org-person${leader ? " org-person-leader" : ""}" href="/agents" aria-label="${escapeHtml(agent.pokemon_jp)}、${escapeHtml(role)}">
+    ${agent.avatar_url ? `<img src="${escapeHtml(agent.avatar_url)}" alt="" width="56" height="56">` : `<span class="org-avatar-fallback" aria-hidden="true">${escapeHtml(agent.pokemon_jp.slice(0, 1))}</span>`}
+    <span class="org-person-copy">
+      <strong>${escapeHtml(agent.pokemon_jp)}</strong>
+      <span>${escapeHtml(role)}</span>
+      <small class="${active ? "active" : "disabled"}"><i aria-hidden="true"></i>${active ? "稼働中" : "停止中"}</small>
+    </span>
+  </a>`;
 }
 
 export function renderOrgChart(db: Database, agentsList: AgentBasic[]): string {
-  if (agentsList.length === 0) {
-    return `<div class="section empty">エージェント未登録</div>`;
-  }
+  if (agentsList.length === 0) return `<div class="section empty">エージェント未登録</div>`;
 
-  const edgesData = db
+  const edges = db
     .query<{ supervisor_id: number; subordinate_id: number }, []>(
       `SELECT supervisor_id, subordinate_id FROM agent_edges WHERE edge_type='supervises'`,
     )
     .all();
-
-  const nodeMap = new Map<number, OrgNode>();
-  for (const a of agentsList) {
-    nodeMap.set(a.id, { ...a, reports: [] });
-  }
+  const nodes = new Map<number, OrgNode>(agentsList.map((agent) => [agent.id, { ...agent, reports: [] }]));
   const isReport = new Set<number>();
-  for (const e of edgesData) {
-    const sup = nodeMap.get(e.supervisor_id);
-    const sub = nodeMap.get(e.subordinate_id);
-    if (sup && sub) {
-      sup.reports.push(sub);
-      isReport.add(sub.id);
-    }
-  }
-  const roots = agentsList.filter((a) => !isReport.has(a.id)).map((a) => nodeMap.get(a.id)!);
-
-  const layouts: LayoutNode[] = [];
-  let cursorX = PADDING;
-  let cursorY = PADDING;
-  let rowMaxH = 0;
-  for (const root of roots) {
-    const sw = subtreeWidth(root);
-    if (cursorX > PADDING && cursorX + sw > MAX_ROW_WIDTH) {
-      cursorX = PADDING;
-      cursorY += rowMaxH + GAP_Y * 2;
-      rowMaxH = 0;
-    }
-    const tree = layoutTree(root, cursorX, cursorY);
-    layouts.push(tree);
-    cursorX += sw + GAP_X * 2;
-    const h = subtreeHeight(root);
-    if (h > rowMaxH) rowMaxH = h;
+  for (const edge of edges) {
+    const supervisor = nodes.get(edge.supervisor_id);
+    const report = nodes.get(edge.subordinate_id);
+    if (!supervisor || !report) continue;
+    supervisor.reports.push(report);
+    isReport.add(report.id);
   }
 
-  const allNodes = layouts.flatMap((l) => flatten(l));
-  const allEdges = layouts.flatMap((l) => edges(l));
+  const roots = agentsList.map((agent) => nodes.get(agent.id)!).filter((agent) => !isReport.has(agent.id));
+  const leaders = roots.filter((agent) => agent.reports.length > 0);
+  const specialists = roots.filter((agent) => agent.reports.length === 0);
+  const activeCount = agentsList.filter((agent) => agent.status === "active").length;
 
-  const maxX = Math.max(...allNodes.map((n) => n.x + CARD_W), MAX_ROW_WIDTH) + PADDING;
-  const maxY = Math.max(...allNodes.map((n) => n.y + CARD_H)) + PADDING;
-
-  return `
-<div class="org-canvas">
-  <svg class="org-svg" width="${maxX}" height="${maxY}" viewBox="0 0 ${maxX} ${maxY}">
-    ${allEdges
-      .map(
-        (e) => `<path class="org-edge" d="M ${e.x1} ${e.y1} C ${e.x1} ${(e.y1 + e.y2) / 2}, ${e.x2} ${(e.y1 + e.y2) / 2}, ${e.x2} ${e.y2}"/>`,
-      )
-      .join("")}
-    ${allNodes
-      .map(
-        (n) => `<g transform="translate(${n.x},${n.y})">
-        <a href="/agents">
-          <rect class="org-card-bg ${n.status === "active" ? "active" : "disabled"}" width="${CARD_W}" height="${CARD_H}" rx="8"/>
-          ${n.avatar_url ? `<image href="${escapeHtml(n.avatar_url)}" x="10" y="12" width="64" height="64" preserveAspectRatio="xMidYMid meet"/>` : ""}
-          <text class="org-card-name" x="${n.avatar_url ? 82 : 14}" y="28">${escapeHtml(n.pokemon_jp)}</text>
-          <text class="org-card-role" x="${n.avatar_url ? 82 : 14}" y="46" style="font-size:11px;">${escapeHtml(n.role_label || jpRole(n.role))}</text>
-          <text class="org-card-role" x="${n.avatar_url ? 82 : 14}" y="64" style="font-size:10px;">${escapeHtml(n.slug)}</text>
-          <text class="org-card-status" x="${CARD_W - 10}" y="22" text-anchor="end" fill="${n.status === "active" ? "#10b981" : "#a1a1aa"}">●</text>
-        </a>
-      </g>`,
-      )
-      .join("")}
-  </svg>
-</div>
-
-<p class="muted small" style="margin-top:12px;">
-  ${agentsList.length} agents · ${edgesData.length} edges · ${roots.length} root${roots.length === 1 ? "" : "s"}
-</p>
-`;
+  return `<div class="org-board">
+    <header class="org-hero">
+      <div>
+        <span class="org-eyebrow">AI OPERATIONS NETWORK</span>
+        <h2>${agentsList.length}人のAI運用チーム</h2>
+        <p>判断・実行・検証を、それぞれの専門担当が連携して進めます。</p>
+      </div>
+      <div class="org-live"><i aria-hidden="true"></i><strong>${activeCount}</strong><span>稼働中</span></div>
+    </header>
+    ${leaders.map((leader) => `<section class="org-team" aria-labelledby="org-team-${leader.id}">
+      <h3 id="org-team-${leader.id}"><span>01</span> 運用統括</h3>
+      ${renderAgentCard(leader, true)}
+      <div class="org-connector" aria-hidden="true"><i></i><i></i><i></i></div>
+      <div class="org-core">
+        <h3><span>02</span> 判断・実行チーム</h3>
+        <div class="org-report-grid" aria-label="判断・実行チーム">${leader.reports.map((agent) => renderAgentCard(agent)).join("")}</div>
+      </div>
+    </section>`).join("")}
+    ${specialists.length > 0 ? `<section class="org-specialists" aria-labelledby="org-specialists-title">
+      <h3 id="org-specialists-title"><span>03</span> 専門ユニット</h3>
+      <div class="org-specialist-grid">${specialists.map((agent) => renderAgentCard(agent)).join("")}</div>
+    </section>` : ""}
+  </div>
+  <p class="muted small org-summary">各カードを押すと一覧で詳細を確認できます</p>`;
 }

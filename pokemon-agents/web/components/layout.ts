@@ -9,7 +9,7 @@ import { icon } from "./icons";
 import { baseComponents, designTokens } from "./design-tokens";
 import type { CustomerWorkspaceView } from "../lib/customer-workspaces";
 
-export const DASHBOARD_STYLESHEET_VERSION = "product-ui-20261001";
+export const DASHBOARD_STYLESHEET_VERSION = "hq-ui-20261001";
 
 export function dashboardStylesheetHref(): string {
   return `/styles.css?v=${DASHBOARD_STYLESHEET_VERSION}`;
@@ -186,6 +186,7 @@ export function renderLayout(opts: LayoutOpts): string {
   const brandMark = brandMarkSrc
     ? `<img src="${brandMarkSrc}" alt="" width="34" height="34">`
     : `<span aria-hidden="true">I</span>`;
+  const brandHomeHref = isCustomerDashboard ? "/" : isOperator ? "/operator" : "/internal";
   const shellClass = isCustomerDashboard ? "customer-shell" : isOperator ? "internal-shell operator-shell" : "internal-shell";
   const sidebarLabel = isCustomerDashboard ? "運用セクション" : isOperator ? "運用管理ナビゲーション" : "HQナビゲーション";
   const mobileLabel = isOperator ? "運用管理モバイルナビゲーション" : "HQモバイルナビゲーション";
@@ -197,13 +198,13 @@ export function renderLayout(opts: LayoutOpts): string {
       </details>` : "";
 
   return `<!DOCTYPE html>
-<html lang="ja"${isOperator ? ' data-theme="light"' : ""}>
+<html lang="ja"${!isCustomerDashboard ? ' data-theme="light"' : ""}>
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>${escapeHtml(browserTitle)}</title>
   <meta name="application-name" content="${escapeHtml(brandName)}">
-  <meta name="theme-color" content="#0b0f14">
+  <meta name="theme-color" content="${isCustomerDashboard ? "#0b0f14" : "#312e81"}">
   ${isCustomerDashboard ? `<script>(()=>{try{const saved=localStorage.getItem('takumi-customer-theme');const theme=saved==='light'||saved==='dark'?saved:(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');document.documentElement.dataset.customerTheme=theme}catch(_){}})();</script>` : ""}
   ${brandMarkSrc ? `<link rel="icon" type="image/png" href="${brandMarkSrc}">
   <link rel="apple-touch-icon" href="${brandMarkSrc}">` : ""}
@@ -217,7 +218,7 @@ export function renderLayout(opts: LayoutOpts): string {
 <body class="${shellClass}">
   <div class="app">
     <aside class="sidebar">
-      <a href="${isOperator ? "/operator" : "/"}" class="sidebar-header" style="text-decoration:none;color:inherit;display:block;">
+      <a href="${brandHomeHref}" class="sidebar-header" style="text-decoration:none;color:inherit;display:block;">
         <div class="brand">
           <span class="brand-mark">
             ${brandMark}
