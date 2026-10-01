@@ -82,6 +82,8 @@ describe("MVP operator dashboard", () => {
     expect(html).toContain('<div class="brand-sub">運用管理</div>');
     expect(html).toContain('aria-label="運用管理ナビゲーション"');
     expect(html).toContain('aria-label="運用管理モバイルナビゲーション"');
+    expect(html).toContain('href="/agents?view=org" class="nav-item internal-home-button"');
+    expect(html).toContain('<span class="nav-label">本部へ戻る</span>');
     expect(html).toContain('href="/operator#accounts"');
     expect(html).toContain('href="/operator#safety"');
     expect(html).toContain('href="/operator#activity"');

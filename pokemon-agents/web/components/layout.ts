@@ -168,7 +168,10 @@ export function renderLayout(opts: LayoutOpts): string {
   const internalHomeButton = isCustomerDashboard
     ? ""
     : isOperator
-    ? ""
+    ? `<a href="/agents?view=org" class="nav-item internal-home-button" data-nav="agents">
+        <span class="nav-icon-chip">${icon("agents", "size-4")}</span>
+        <span class="nav-label">本部へ戻る</span>
+      </a>`
     : `<a href="/internal" class="nav-item internal-home-button ${isInternalOperations ? "active" : ""}" data-nav="home"${isInternalOperations ? ' aria-current="page"' : ""}>
         <span class="nav-icon-chip">${icon("home", "size-4")}</span>
         <span class="nav-label">トップページ</span>
