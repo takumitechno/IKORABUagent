@@ -190,9 +190,9 @@ describe("read-only Threads dashboard connector", () => {
     })]);
     expect(requests.every((request) => request.method === "GET")).toBe(true);
     const html = renderOverview({} as Database, data);
-    expect(html).toContain("必要なものだけ分析に追加できます");
+    expect(html).toContain("必要なものだけ実績確認に追加できます");
     expect(html).toContain("分析済み");
-    expect(html).toContain("改善学習には使わない");
+    expect(html).toContain("投稿案には自動反映しません");
     expect(html).toContain("スレッド投稿 1/3〜3/3");
     expect(html).toContain("スレッドの本文と実績を見る");
     expect(html).toContain("手動投稿");
@@ -202,7 +202,7 @@ describe("read-only Threads dashboard connector", () => {
     expect(html).toContain("シェア</b>取得不可");
     expect(html).toContain("最終取得");
     expect(html).toContain('id="theme-toggle"');
-    expect(html).toContain("投稿と実績");
+    expect(html).toContain("投稿済み・KPI");
     expect(html).toContain("投稿ごとの表示数");
     expect(html).toContain("投稿状態の内訳");
     expect(html).toContain("conic-gradient");
@@ -322,10 +322,10 @@ describe("read-only Threads dashboard connector", () => {
     const html = renderOverview({} as Database, data);
     expect(html).toContain("接続待ち");
     expect(html).toContain("実データは表示していません");
-    expect(html).toContain("投稿と実績");
-    expect(html).toContain("推定値やデモ値は表示しません");
-    expect(html).toContain("表示データを計測中");
-    expect(html).toContain("投稿データを待っています");
+    expect(html).toContain("投稿済み・KPI");
+    expect(html).toContain("公開を確認できた投稿と、取得済みの実績だけを表示します");
+    expect(html).toContain("運用状況を確認中です");
+    expect(html).toContain("復旧後に投稿済みの内容とKPIを表示します");
     expect(html).not.toContain("デモ補助");
     expect(html.match(/data-post-index=/g)).toBeNull();
     expect(html).not.toContain("secret transport detail");

@@ -165,9 +165,9 @@ describe("customer content review experience", () => {
     const html = renderOverview({} as Database, dashboard, {
       reviews, canReview: true, accountId: "acct_A",
     });
-    expect(html).toContain("確認が必要な操作");
+    expect(html).toContain("投稿案を確認してください");
     expect(html).toContain("確認待ち 1件");
-    expect(html).toContain("AI案は修正を依頼でき、手動案は本文を直接編集できます。");
+    expect(html).toContain("内容を読んで、承認・修正依頼・見送りを選べます。");
     expect(html).toContain("承認する");
     expect(html).toContain("修正を依頼");
     expect(html).toContain("今回は見送る");
@@ -269,6 +269,7 @@ describe("customer content review experience", () => {
     expect(html).toContain("分析済み");
     expect(html).toContain("分析に追加");
     expect(html).toContain("取得できませんでした。再試行してください。");
-    expect(html).toContain("改善学習には使わない");
+    expect(html).toContain("投稿案には自動反映しません");
+    expect(html).not.toContain("learn=false");
   });
 });

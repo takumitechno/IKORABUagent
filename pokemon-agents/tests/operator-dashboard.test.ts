@@ -64,8 +64,8 @@ describe("MVP operator dashboard", () => {
       account("acct_taku_ai_tech", "taku_ai_tech"),
     ]);
     expect(html).not.toMatch(/<form|method=["']post|\/arm|\/disarm|access_token|secret_ref|app_secret|authorization_code/i);
-    expect(html).toContain("READ ONLY NOW");
-    expect(html.match(/<button type="button" disabled>/g)).toHaveLength(6);
+    expect(html).toContain("READ ONLY");
+    expect(html).not.toContain("FUTURE OPERATOR ACTION");
     for (const hidden of ["sashihara", "kiara", "iori", "agent hierarchy", "internal meeting"]) {
       expect(html.toLowerCase()).not.toContain(hidden);
     }
@@ -85,6 +85,9 @@ describe("MVP operator dashboard", () => {
     expect(html).toContain('href="/operator#accounts"');
     expect(html).toContain('href="/operator#safety"');
     expect(html).toContain('href="/operator#activity"');
+    expect(html).toContain("@media(max-width:720px)");
+    expect(html).toContain(".op-account-top,.op-sections{grid-template-columns:1fr}");
+    expect(html).toContain(".sidebar>.sidebar-nav{display:none}");
     expect(html).not.toContain('name="csrf-token"');
     for (const hidden of [
       "Pokemon Agents", "Pokémon", "pokemon agent", "ポケモンエージェント",

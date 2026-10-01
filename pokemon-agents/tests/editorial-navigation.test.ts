@@ -21,10 +21,10 @@ describe("PRODUCT-UI-REDESIGN01 editorial navigation rail", () => {
   test("uses the five canonical customer chapters and resolves one location", () => {
     expect(CUSTOMER_HOME_NAV.map(({ key, href, label }) => ({ key, href, label }))).toEqual([
       { key: "today", href: "/#today", label: "今日" },
+      { key: "action-required", href: "/#action-required", label: "投稿案" },
       { key: "schedule", href: "/#schedule", label: "投稿予定" },
-      { key: "performance", href: "/#performance", label: "投稿と実績" },
-      { key: "ai-improvement", href: "/#ai-improvement", label: "AI改善" },
-      { key: "manual-analysis", href: "/#manual-analysis", label: "公開済み投稿" },
+      { key: "performance", href: "/#performance", label: "投稿済み・KPI" },
+      { key: "ai-improvement", href: "/#ai-improvement", label: "次の改善" },
     ]);
     for (const item of CUSTOMER_HOME_NAV) expect(resolveCustomerNavKey("/", `#${item.key}`)).toBe(item.key);
     expect(resolveCustomerNavKey("/", "")).toBe("today");
@@ -40,7 +40,8 @@ describe("PRODUCT-UI-REDESIGN01 editorial navigation rail", () => {
       const html = render(path, true);
       expect(html.match(/class="nav-item active"/g)).toHaveLength(1);
       expect(html.match(/aria-current="(?:location|page)"/g)).toHaveLength(1);
-      expect(html.includes("オフィスに戻る")).toBe(true);
+      expect(html.includes("オフィスに戻る")).toBe(false);
+      expect(html.includes('href="/internal"')).toBe(false);
     }
   });
 

@@ -150,6 +150,7 @@ export const baseComponents = `
 .t-button[disabled] { cursor: not-allowed; opacity: .55; transform: none; }
 .t-badge { display: inline-flex; align-items: center; gap: var(--t-space-1); min-height: 24px; padding: 2px var(--t-space-2); border-radius: var(--t-radius-pill); background: var(--t-surface-2); color: var(--t-ink-2); font-size: var(--t-type-caption-size); font-weight: 650; line-height: 1.5; }
 .t-badge__icon { line-height: 1; }
+.t-badge--neutral { background: var(--t-surface-2); color: var(--t-ink-2); }
 .t-badge--ok { background: var(--t-ok-soft); color: var(--t-ok); }
 .t-badge--warn { background: var(--t-warn-soft); color: var(--t-warn); }
 .t-badge--serious { background: var(--t-serious-soft); color: var(--t-serious); }

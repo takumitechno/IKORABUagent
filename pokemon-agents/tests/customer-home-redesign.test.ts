@@ -61,9 +61,9 @@ describe("PRODUCT-UI-REDESIGN01 customer home", () => {
     expect(active.includes('class="review-card"')).toBe(true);
     const clear = section(render(), "action-required", "today");
     expect(clear.includes("is-compact")).toBe(true);
-    expect(clear.includes("現在、確認が必要な操作はありません")).toBe(true);
+    expect(clear.includes("いま確認が必要な投稿はありません")).toBe(true);
     expect(clear.includes("t-empty")).toBe(false);
-    expect(render({ connected: false }).includes("現在、確認が必要な操作はありません")).toBe(false);
+    expect(render({ connected: false }).includes("いま確認が必要な投稿はありません")).toBe(false);
   });
   test("keeps AI and human-manual contracts and exact bindings with approval last", () => {
     for (const origin of ["ai_auto", "human_manual"] as const) {
@@ -112,7 +112,8 @@ describe("PRODUCT-UI-REDESIGN01 customer home", () => {
     expect(top.includes('href="#manual-analysis"')).toBe(true);
     expect(top.includes("is-expanded")).toBe(true);
     const bottom = section(html, "manual-analysis");
-    for (const text of ["未追加", "取得中", "分析済み", "取得できませんでした。再試行してください。", "learn=false", "1件だけでAIの書き方は変更しません。"]) expect(bottom.includes(text)).toBe(true);
+    for (const text of ["未追加", "取得中", "分析済み", "取得できませんでした。再試行してください。", "投稿案には自動反映しません"]) expect(bottom.includes(text)).toBe(true);
+    expect(bottom.includes("learn=false")).toBe(false);
     const analysisForms = forms(bottom);
     expect(analysisForms).toHaveLength(1);
     expect(analysisForms[0].includes('method="post" action="/api/customer/manual-posts/detect%2Fone/analyze"')).toBe(true);
@@ -164,6 +165,12 @@ describe("PRODUCT-UI-REDESIGN01 customer home", () => {
     }
     expect(html.includes("反応の違いは仮説として保留")).toBe(true);
     for (const text of ["secret-agent", "meeting-secret", "internal-thread", "human_approval_pending"]) expect(html.includes(text)).toBe(false);
+  });
+  test("keeps customer copy free of operator and implementation language", () => {
+    const html = render({ contents: [content], manualPosts: [manual] });
+    for (const hidden of ["learn=false", "APIから", "credential", "kill switch", "Threads SHA", "オフィスに戻る", "Takumi Technologies"]) {
+      expect(html).not.toContain(hidden);
+    }
   });
   test("escapes text, form attributes, textarea content and drawer JSON", () => {
     const attack = '</script><img src=x onerror="alert(1)">';

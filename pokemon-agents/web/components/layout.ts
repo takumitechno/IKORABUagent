@@ -9,7 +9,7 @@ import { icon } from "./icons";
 import { baseComponents, designTokens } from "./design-tokens";
 import type { CustomerWorkspaceView } from "../lib/customer-workspaces";
 
-export const DASHBOARD_STYLESHEET_VERSION = "editorial-rail-20260923";
+export const DASHBOARD_STYLESHEET_VERSION = "product-ui-20261001";
 
 export function dashboardStylesheetHref(): string {
   return `/styles.css?v=${DASHBOARD_STYLESHEET_VERSION}`;
@@ -35,10 +35,10 @@ export interface NavSection {
 
 export const CUSTOMER_HOME_NAV = [
   { key: "today", href: "/#today", label: "今日", iconName: "activity" },
+  { key: "action-required", href: "/#action-required", label: "投稿案", iconName: "knowledge" },
   { key: "schedule", href: "/#schedule", label: "投稿予定", iconName: "clock" },
-  { key: "performance", href: "/#performance", label: "投稿と実績", iconName: "list" },
-  { key: "ai-improvement", href: "/#ai-improvement", label: "AI改善", iconName: "zap" },
-  { key: "manual-analysis", href: "/#manual-analysis", label: "公開済み投稿", iconName: "knowledge" },
+  { key: "performance", href: "/#performance", label: "投稿済み・KPI", iconName: "list" },
+  { key: "ai-improvement", href: "/#ai-improvement", label: "次の改善", iconName: "zap" },
 ] as const;
 
 export function resolveCustomerNavKey(pathname: string, hash: string): string | null {
@@ -166,12 +166,7 @@ export function renderLayout(opts: LayoutOpts): string {
     ? "Mission Control"
     : nav.flatMap((section) => section.items).find((item) => item.active)?.label ?? "HQメニュー";
   const internalHomeButton = isCustomerDashboard
-    ? opts.internalAccessAllowed
-      ? `<a href="/internal" class="nav-item office-back-button" data-nav="home">
-        <span class="nav-icon-chip office-icon" aria-hidden="true">🏢</span>
-        <span class="nav-label">オフィスに戻る</span>
-      </a>`
-      : ""
+    ? ""
     : isOperator
     ? ""
     : `<a href="/internal" class="nav-item internal-home-button ${isInternalOperations ? "active" : ""}" data-nav="home"${isInternalOperations ? ' aria-current="page"' : ""}>
@@ -179,14 +174,12 @@ export function renderLayout(opts: LayoutOpts): string {
         <span class="nav-label">トップページ</span>
       </a>`;
   const browserTitle = isCustomerDashboard
-    ? "Takumi Technologies | AI SNS運用"
+    ? "IKORABU | SNS運用"
     : isOperator ? "IKORABU | Operations"
     : "Takumi Technologies HQ | Mission Control";
-  const brandName = isCustomerDashboard ? "Takumi Technologies" : isOperator ? "IKORABU" : "Takumi Technologies HQ";
-  const brandContext = isCustomerDashboard ? "AI SNS運用" : isOperator ? "Operations" : "Mission Control";
-  const brandMarkSrc = isOperator ? null : isCustomerDashboard
-    ? "/brand/takumi-mark-compact.png?v=brand03"
-    : "/brand/takumi-mark.png";
+  const brandName = isCustomerDashboard ? "IKORABU" : isOperator ? "IKORABU" : "Takumi Technologies HQ";
+  const brandContext = isCustomerDashboard ? "SNS運用" : isOperator ? "Operations" : "Mission Control";
+  const brandMarkSrc = isOperator || isCustomerDashboard ? null : "/brand/takumi-mark.png";
   const brandMark = brandMarkSrc
     ? `<img src="${brandMarkSrc}" alt="" width="34" height="34">`
     : `<span aria-hidden="true">I</span>`;
@@ -201,7 +194,7 @@ export function renderLayout(opts: LayoutOpts): string {
       </details>` : "";
 
   return `<!DOCTYPE html>
-<html lang="ja">
+<html lang="ja"${isOperator ? ' data-theme="light"' : ""}>
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">

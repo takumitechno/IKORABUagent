@@ -6,14 +6,12 @@ import { renderLayout } from "../web/components/layout";
 const root = resolve(import.meta.dir, "..", "..");
 
 describe("BRAND01 site branding", () => {
-  test("customer shell uses the company brand without internal HQ wording", () => {
+  test("customer shell uses the product brand without internal HQ wording", () => {
     const html = renderLayout({ title: "Dashboard", body: "<main>customer</main>", currentPath: "/" });
-    expect(html).toContain("<title>Takumi Technologies | AI SNS運用</title>");
-    expect(html).toContain('<img src="/brand/takumi-mark-compact.png?v=brand03"');
-    expect(html).toContain('<span class="brand-name">Takumi Technologies</span>');
-    expect(html).toContain('<div class="brand-sub">AI SNS運用</div>');
-    expect(html).toContain('rel="icon" type="image/png" href="/brand/takumi-mark-compact.png?v=brand03"');
-    expect(html).toContain('rel="apple-touch-icon" href="/brand/takumi-mark-compact.png?v=brand03"');
+    expect(html).toContain("<title>IKORABU | SNS運用</title>");
+    expect(html).toContain('<span class="brand-name">IKORABU</span>');
+    expect(html).toContain('<div class="brand-sub">SNS運用</div>');
+    expect(html).not.toContain("Takumi Technologies");
     expect(html).toContain("prefers-color-scheme: dark");
     expect(html).toContain("takumi-customer-theme");
     expect(html).not.toContain('<svg width="16" height="16" viewBox="0 0 24 24"');
@@ -23,16 +21,15 @@ describe("BRAND01 site branding", () => {
     expect(html).not.toContain('href="/internal"');
   });
 
-  test("customer shell shows the office return only with server-verified internal access", () => {
+  test("customer shell never exposes the internal office return", () => {
     const internalHtml = renderLayout({
       title: "Dashboard",
       body: "<main>customer</main>",
       currentPath: "/",
       internalAccessAllowed: true,
     });
-    expect(internalHtml).toContain('href="/internal" class="nav-item office-back-button"');
-    expect(internalHtml).toContain('<span class="nav-label">オフィスに戻る</span>');
-    expect(internalHtml).toContain('data-nav="home"');
+    expect(internalHtml).not.toContain("オフィスに戻る");
+    expect(internalHtml).not.toContain('href="/internal"');
 
     const customerHtml = renderLayout({
       title: "Dashboard",

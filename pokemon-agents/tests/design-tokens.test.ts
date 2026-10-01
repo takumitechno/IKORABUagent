@@ -66,8 +66,9 @@ describe("PRODUCT-UI-REDESIGN01 design system", () => {
   test("renders customer and internal shell brands without the retired name", () => {
     const customer = renderLayout({ title: "Customer", body: "", currentPath: "/" });
     const internal = renderLayout({ title: "Internal", body: "", currentPath: "/internal" });
-    expect(customer).toContain("Takumi Technologies");
-    expect(customer).toContain("AI SNS運用");
+    expect(customer).toContain("IKORABU");
+    expect(customer).toContain("SNS運用");
+    expect(customer).not.toContain("Takumi Technologies");
     expect(internal).toContain("Takumi Technologies HQ");
     expect(internal).toContain("Mission Control");
     expect(customer.toLowerCase()).not.toContain("capsell");

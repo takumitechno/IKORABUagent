@@ -1,6 +1,6 @@
 import { escapeHtml } from "./layout";
 
-export type StatusTone = "ok" | "warn" | "serious" | "critical";
+export type StatusTone = "neutral" | "ok" | "warn" | "serious" | "critical";
 export type ButtonVariant = "primary" | "secondary" | "tertiary" | "destructive";
 
 export interface ButtonOptions {
