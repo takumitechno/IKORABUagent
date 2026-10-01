@@ -772,7 +772,7 @@ const server = Bun.serve({
         const dashboards = await Promise.all(OPERATOR_ACCOUNT_IDS
           .filter((accountId) => allowedIds.has(accountId))
           .map((accountId) => getThreadsDashboard(accountId, trustedTenant?.userId)));
-        return lay("Two-account operations", renderOperatorDashboard(dashboards));
+        return lay("Operations", renderOperatorDashboard(dashboards));
       }
       if (path === "/internal/hq") {
         const trustedTenant = tenantEnforced ? requireTenantSelection(tenantIdentity) : null;
@@ -918,11 +918,14 @@ const server = Bun.serve({
     } catch (e) {
       const err = e as Error;
       console.error(`[server] ${req.method} ${path}:`, err);
+      const operatorError = path === "/operator";
       return html(
         renderLayout({
-          title: "Error",
-          body: `<div class="error"><h2>Server Error</h2><pre>${escapeHtml(err.message)}\n\n${escapeHtml(err.stack || "")}</pre></div>`,
-          currentPath: req.url,
+          title: operatorError ? "Operations unavailable" : "Error",
+          body: operatorError
+            ? `<div class="error"><h2>Operations unavailable</h2><p>Status could not be loaded. No state was changed.</p></div>`
+            : `<div class="error"><h2>Server Error</h2><pre>${escapeHtml(err.message)}\n\n${escapeHtml(err.stack || "")}</pre></div>`,
+          currentPath: path,
         }),
         500,
       );

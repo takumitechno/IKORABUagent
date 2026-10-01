@@ -1,4 +1,5 @@
 import { describe, expect, test } from "bun:test";
+import { renderLayout } from "../web/components/layout";
 import { loadThreadsDashboard, type ThreadsDashboardData } from "../web/lib/threads-dashboard";
 import { deriveOperatorNextAction, renderOperatorDashboard } from "../web/routes/operator-dashboard";
 import {
@@ -68,6 +69,28 @@ describe("MVP operator dashboard", () => {
     for (const hidden of ["sashihara", "kiara", "iori", "agent hierarchy", "internal meeting"]) {
       expect(html.toLowerCase()).not.toContain(hidden);
     }
+  });
+
+  test("uses the neutral IKORABU operator shell without legacy branding", () => {
+    const first = account("acct_8ssana", "8sssana");
+    first.activities.push({ type: "employee_run_completed", at: "2026-10-01T10:30:00Z", entityId: "kiara", detail: "pokemon agent" });
+    const body = renderOperatorDashboard([first, account("acct_taku_ai_tech", "taku_ai_tech")]);
+    const html = renderLayout({ title: "Operations", body, currentPath: "/operator", csrfToken: "not-rendered" });
+    expect(html).toContain("<title>IKORABU | Operations</title>");
+    expect(html).toContain('<meta name="application-name" content="IKORABU">');
+    expect(html).toContain('<span class="brand-name">IKORABU</span>');
+    expect(html).toContain('<div class="brand-sub">Operations</div>');
+    expect(html).toContain('aria-label="Operations navigation"');
+    expect(html).toContain('aria-label="Operations mobile navigation"');
+    expect(html).toContain('href="/operator#accounts"');
+    expect(html).toContain('href="/operator#safety"');
+    expect(html).toContain('href="/operator#activity"');
+    expect(html).not.toContain('name="csrf-token"');
+    for (const hidden of [
+      "Pokemon Agents", "Pokémon", "pokemon agent", "ポケモンエージェント",
+      "Takumi Technologies HQ", "Mission Control", "HQナビゲーション",
+      "HQモバイルナビゲーション", "編集部", "エージェント", "kiara", "=LOVE Agent OS",
+    ]) expect(html).not.toContain(hidden);
   });
 
   test("prioritizes reported stops and ambiguity over optimistic actions", () => {

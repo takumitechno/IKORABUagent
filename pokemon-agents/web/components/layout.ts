@@ -100,7 +100,19 @@ export function buildHqNav(currentPath: string): NavSection[] {
   ];
 }
 
-function renderNavSections(nav: NavSection[], kind: "customer" | "hq"): string {
+function buildOperatorNav(): NavSection[] {
+  return [{
+    label: "OPERATIONS",
+    items: [
+      { key: "operations", href: "/operator", label: "Operations", iconName: "home", active: true, current: "page" },
+      { key: "accounts", href: "/operator#accounts", label: "Accounts", iconName: "list" },
+      { key: "safety", href: "/operator#safety", label: "Safety", iconName: "goals" },
+      { key: "activity", href: "/operator#activity", label: "Activity", iconName: "activity" },
+    ],
+  }];
+}
+
+function renderNavSections(nav: NavSection[], kind: "customer" | "hq" | "operator"): string {
   return nav.map((section) => `
     ${section.label ? `<div class="nav-section-label">${escapeHtml(section.label)}</div>` : ""}
     <div class="nav-section">
@@ -142,12 +154,15 @@ export interface LayoutOpts {
 export function renderLayout(opts: LayoutOpts): string {
   const pathOnly = opts.currentPath.split("?")[0];
   const isCustomerDashboard = pathOnly === "/" || pathOnly === "/improvement";
-  const isInternalOperations = pathOnly === "/internal" || pathOnly === "/operator";
+  const isOperator = pathOnly === "/operator";
+  const isInternalOperations = pathOnly === "/internal" || pathOnly === "/internal/hq";
   const nav = isCustomerDashboard
     ? buildCustomerNav(opts.currentPath)
-    : buildHqNav(opts.currentPath);
-  const navMarkup = renderNavSections(nav, isCustomerDashboard ? "customer" : "hq");
-  const activeHqLabel = isInternalOperations
+    : isOperator ? buildOperatorNav() : buildHqNav(opts.currentPath);
+  const navMarkup = renderNavSections(nav, isCustomerDashboard ? "customer" : isOperator ? "operator" : "hq");
+  const activeNavLabel = isOperator
+    ? "Operations"
+    : isInternalOperations
     ? "Mission Control"
     : nav.flatMap((section) => section.items).find((item) => item.active)?.label ?? "HQメニュー";
   const internalHomeButton = isCustomerDashboard
@@ -157,18 +172,27 @@ export function renderLayout(opts: LayoutOpts): string {
         <span class="nav-label">オフィスに戻る</span>
       </a>`
       : ""
+    : isOperator
+    ? ""
     : `<a href="/internal" class="nav-item internal-home-button ${isInternalOperations ? "active" : ""}" data-nav="home"${isInternalOperations ? ' aria-current="page"' : ""}>
         <span class="nav-icon-chip">${icon("home", "size-4")}</span>
         <span class="nav-label">トップページ</span>
       </a>`;
   const browserTitle = isCustomerDashboard
     ? "Takumi Technologies | AI SNS運用"
+    : isOperator ? "IKORABU | Operations"
     : "Takumi Technologies HQ | Mission Control";
-  const brandName = isCustomerDashboard ? "Takumi Technologies" : "Takumi Technologies HQ";
-  const brandContext = isCustomerDashboard ? "AI SNS運用" : "Mission Control";
-  const brandMarkSrc = isCustomerDashboard
+  const brandName = isCustomerDashboard ? "Takumi Technologies" : isOperator ? "IKORABU" : "Takumi Technologies HQ";
+  const brandContext = isCustomerDashboard ? "AI SNS運用" : isOperator ? "Operations" : "Mission Control";
+  const brandMarkSrc = isOperator ? null : isCustomerDashboard
     ? "/brand/takumi-mark-compact.png?v=brand03"
     : "/brand/takumi-mark.png";
+  const brandMark = brandMarkSrc
+    ? `<img src="${brandMarkSrc}" alt="" width="34" height="34">`
+    : `<span aria-hidden="true">I</span>`;
+  const shellClass = isCustomerDashboard ? "customer-shell" : isOperator ? "internal-shell operator-shell" : "internal-shell";
+  const sidebarLabel = isCustomerDashboard ? "運用セクション" : isOperator ? "Operations navigation" : "HQナビゲーション";
+  const mobileLabel = isOperator ? "Operations mobile navigation" : "HQモバイルナビゲーション";
   const currentWorkspace = opts.customerWorkspaces?.find((workspace) => workspace.current);
   const workspaceSwitcher = isCustomerDashboard && currentWorkspace
     ? `<details class="customer-workspace"${opts.customerWorkspaces!.length === 1 ? " open" : ""}>
@@ -185,8 +209,8 @@ export function renderLayout(opts: LayoutOpts): string {
   <meta name="application-name" content="${escapeHtml(brandName)}">
   <meta name="theme-color" content="#0b0f14">
   ${isCustomerDashboard ? `<script>(()=>{try{const saved=localStorage.getItem('takumi-customer-theme');const theme=saved==='light'||saved==='dark'?saved:(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');document.documentElement.dataset.customerTheme=theme}catch(_){}})();</script>` : ""}
-  <link rel="icon" type="image/png" href="${brandMarkSrc}">
-  <link rel="apple-touch-icon" href="${brandMarkSrc}">
+  ${brandMarkSrc ? `<link rel="icon" type="image/png" href="${brandMarkSrc}">
+  <link rel="apple-touch-icon" href="${brandMarkSrc}">` : ""}
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=LINE+Seed+JP:wght@400;700&display=swap">
@@ -194,13 +218,13 @@ export function renderLayout(opts: LayoutOpts): string {
   <style>${designTokens}${baseComponents}</style>
   <link rel="stylesheet" href="${dashboardStylesheetHref()}">
 </head>
-<body class="${isCustomerDashboard ? "customer-shell" : "internal-shell"}">
+<body class="${shellClass}">
   <div class="app">
     <aside class="sidebar">
-      <a href="/" class="sidebar-header" style="text-decoration:none;color:inherit;display:block;">
+      <a href="${isOperator ? "/operator" : "/"}" class="sidebar-header" style="text-decoration:none;color:inherit;display:block;">
         <div class="brand">
           <span class="brand-mark">
-            <img src="${brandMarkSrc}" alt="" width="34" height="34">
+            ${brandMark}
           </span>
           <span class="brand-name">${brandName}</span>
         </div>
@@ -208,16 +232,16 @@ export function renderLayout(opts: LayoutOpts): string {
       </a>
       ${internalHomeButton}
       ${workspaceSwitcher}
-      <nav class="sidebar-nav" aria-label="${isCustomerDashboard ? "運用セクション" : "HQナビゲーション"}">${navMarkup}</nav>
-      ${isCustomerDashboard ? "" : `<details class="hq-mobile-nav"><summary>現在地 · ${escapeHtml(activeHqLabel)}</summary><nav class="hq-mobile-nav-panel" aria-label="HQモバイルナビゲーション">${navMarkup}</nav></details>`}
+      <nav class="sidebar-nav" aria-label="${sidebarLabel}">${navMarkup}</nav>
+      ${isCustomerDashboard ? "" : `<details class="hq-mobile-nav"><summary>${isOperator ? "Current" : "現在地"} · ${escapeHtml(activeNavLabel)}</summary><nav class="hq-mobile-nav-panel" aria-label="${mobileLabel}">${navMarkup}</nav></details>`}
     </aside>
     <main class="main" id="main">
       ${opts.flash ? `<div class="flash ${opts.flash.type}">${escapeHtml(opts.flash.msg)}</div>` : ""}
       <div id="live-content">${opts.body}</div>
     </main>
   </div>
-  ${opts.csrfToken ? `<meta name="csrf-token" content="${escapeHtml(opts.csrfToken)}">` : ""}
-  ${opts.csrfToken ? `<script>${internalSecurityScript(opts.csrfToken)}</script>` : ""}
+  ${opts.csrfToken && !isOperator ? `<meta name="csrf-token" content="${escapeHtml(opts.csrfToken)}">` : ""}
+  ${opts.csrfToken && !isOperator ? `<script>${internalSecurityScript(opts.csrfToken)}</script>` : ""}
   ${isCustomerDashboard ? `<script>${customerEditorialNavScript()}</script>` : `<script>${liveScript(opts.currentPath)}</script>`}
 </body>
 </html>`;
