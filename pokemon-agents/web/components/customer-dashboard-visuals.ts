@@ -286,6 +286,7 @@ export const customerHomeStyles = `
 @keyframes home-reveal{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}
 @media(max-width:1100px){.customer-home .home-today-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.customer-home .home-kpi-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.customer-home .home-chart-grid{grid-template-columns:1fr}}
 @media(max-width:700px){
+html:has(.customer-home),.customer-shell:has(.customer-home){max-width:100%;overflow-x:clip}
 .customer-shell:has(.customer-home) .app{display:block;padding:10px}
 .customer-shell:has(.customer-home) .sidebar{position:static;width:100%;height:auto;padding:10px 12px;margin-bottom:8px;border-radius:var(--t-radius-2);display:flex;flex-direction:column;align-items:stretch}
 .customer-shell:has(.customer-home) .sidebar-header .brand{font-size:15px}
