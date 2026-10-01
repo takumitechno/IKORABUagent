@@ -301,10 +301,12 @@ export function renderOverview(
   return `
 ${renderCustomerHomeStyles()}
 <div id="overview" class="customer-dashboard customer-home">
-  <h1 class="home-sr-only">${escapeHtml(accountName)}のSNS運用</h1>
+  <header class="home-overview-head">
+    <div><span>IKORABU SNS運用</span><h1>${escapeHtml(accountName)}のSNS運用</h1><p>${handle ? `<b>${escapeHtml(handle)}</b> · ` : ""}${statusBadge({ status: connected && data?.accountStatus === "active" ? "ok" : "warn", icon: connected && data?.accountStatus === "active" ? "✓" : "!", label: connected ? accountStatusLabel(data?.accountStatus ?? null) : "接続待ち" })}</p></div>
+    <button class="theme-toggle t-button t-button--secondary" id="theme-toggle" type="button" aria-label="表示テーマを切り替える">${dashboardIcon("sun")}<span id="theme-label">ダーク</span></button>
+  </header>
   ${renderCustomerReviews(reviewOptions?.reviews ?? [], reviewOptions?.accountId ?? "", reviewOptions?.canReview === true, reviewOptions?.notice ?? null, reviewOptions?.manualAnalysisNotice === "failed", connected)}
   <section id="today" class="home-section" aria-labelledby="today-title">
-    <div class="today-context"><div><p class="home-account-name">${escapeHtml(accountName)}のSNS運用</p><p>${handle ? `<span>${escapeHtml(handle)}</span> · ` : ""}${statusBadge({ status: connected && data?.accountStatus === "active" ? "ok" : "warn", icon: connected && data?.accountStatus === "active" ? "✓" : "!", label: connected ? accountStatusLabel(data?.accountStatus ?? null) : "接続待ち" })}</p></div><button class="theme-toggle t-button t-button--secondary" id="theme-toggle" type="button" aria-label="表示テーマを切り替える">${dashboardIcon("sun")}<span id="theme-label">ダーク</span></button></div>
     ${sectionHeader({ id: "today-title", eyebrow: "今日", title: "今日の運用" })}
     <div class="home-today-grid">
       <div class="today-next">${kpiTile({ label: "次の動作", value: operationNow, detail: nextPostLabel })}</div>

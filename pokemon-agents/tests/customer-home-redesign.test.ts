@@ -53,6 +53,8 @@ describe("PRODUCT-UI-REDESIGN01 customer home", () => {
         expect(html.includes('<h2 id="' + id + '-title"')).toBe(true);
       }
       expect(html.indexOf("<h1")).toBeLessThan(html.indexOf('<section id="action-required"'));
+      expect(html.includes('class="home-overview-head"')).toBe(true);
+      expect((html.match(/id="theme-toggle"/g) ?? []).length).toBe(1);
     }
   });
   test("expands real reviews, keeps the clear state compact and does not fake success while disconnected", () => {

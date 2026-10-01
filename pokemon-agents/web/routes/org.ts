@@ -71,7 +71,11 @@ export function renderOrgChart(db: Database, agentsList: AgentBasic[]): string {
         <h2>${agentsList.length}人のAI運用チーム</h2>
         <p>判断・実行・検証を、それぞれの専門担当が連携して進めます。</p>
       </div>
-      <div class="org-live"><i aria-hidden="true"></i><strong>${activeCount}</strong><span>稼働中</span></div>
+      <div class="org-stats" aria-label="チーム状況">
+        <span class="org-live"><i aria-hidden="true"></i><strong>${activeCount}<small>/${agentsList.length}</small></strong><em>稼働中</em></span>
+        <span><strong>${edges.length}</strong><em>連携</em></span>
+        <span><strong>${specialists.length}</strong><em>専門担当</em></span>
+      </div>
     </header>
     ${leaders.map((leader) => `<section class="org-team" aria-labelledby="org-team-${leader.id}">
       <h3 id="org-team-${leader.id}"><span>01</span> 運用統括</h3>

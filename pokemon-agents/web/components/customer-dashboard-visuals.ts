@@ -101,6 +101,11 @@ export const customerHomeStyles = `
 .customer-shell:has(.customer-home) .brand,.customer-home strong,.customer-home b,.home-drawer strong,.home-drawer b{color:var(--t-ink)}
 .customer-home *,.home-drawer *{box-sizing:border-box;min-width:0}
 .customer-home p{margin:8px 0}
+.customer-home .home-overview-head{display:flex;align-items:center;justify-content:space-between;gap:24px;padding:12px 4px 24px}
+.customer-home .home-overview-head>div>span{color:var(--t-brand);font-size:12px;font-weight:800;letter-spacing:.13em}
+.customer-home .home-overview-head h1{margin:4px 0 6px;color:var(--t-ink);font-size:30px;line-height:1.25;letter-spacing:-.03em}
+.customer-home .home-overview-head p{display:flex;align-items:center;gap:7px;margin:0;color:var(--t-ink-muted);font-size:12px}
+.customer-home .home-overview-head p>b{color:var(--t-ink-2);font-weight:650}
 .customer-home .today-context .home-account-name{font-size:22px;line-height:1.4;font-weight:650;margin:0;color:var(--t-ink)}
 .customer-home h3,.home-drawer h3{font-size:15px;line-height:1.5;margin:0 0 8px;color:var(--t-ink)}
 .customer-home .home-section{position:relative;margin:0;padding:28px 0;border:0;border-top:1px solid var(--t-line-soft);border-radius:0;background:transparent;scroll-margin-top:16px}
@@ -299,6 +304,10 @@ html:has(.customer-home),.customer-shell:has(.customer-home){max-width:100%;over
 .customer-shell:has(.customer-home) .sidebar-nav .nav-item.active{border-bottom-color:var(--t-brand)}
 .customer-shell:has(.customer-home) .office-back-button{width:100%}
 .customer-shell:has(.customer-home) .main{padding:0 0 24px}
+.customer-home .home-overview-head{padding:16px 4px 18px;align-items:flex-start}
+.customer-home .home-overview-head h1{font-size:24px}
+.customer-home .home-overview-head .theme-toggle{width:46px;height:46px;padding:0;justify-content:center;flex:none}
+.customer-home .home-overview-head .theme-toggle span{display:none}
 .customer-home .home-section{padding:22px 4px;margin:0}
 .customer-home .action-required.is-expanded{margin:0 0 8px;padding:18px}
 .customer-home .home-today-grid,.customer-home .home-kpi-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}

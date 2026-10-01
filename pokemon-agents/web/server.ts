@@ -1340,10 +1340,14 @@ details pre { background: #18181b; color: #e4e4e7; padding: 12px; border-radius:
 .org-eyebrow { display: block; margin-bottom: 5px; color: #67e8f9; font-size: 10px; font-weight: 800; letter-spacing: .18em; }
 .org-hero h2 { margin: 0; color: #fff; font-size: 24px; font-weight: 750; letter-spacing: -.025em; text-transform: none; }
 .org-hero p { margin-top: 5px; color: #cbd5e1; font-size: 12px; font-weight: 500; }
-.org-live { flex: 0 0 auto; min-width: 116px; display: grid; grid-template-columns: auto auto; align-items: center; justify-content: center; column-gap: 7px; padding: 11px 15px; border: 1px solid rgba(94,234,212,.26); border-radius: 14px; background: rgba(15,23,42,.38); box-shadow: inset 0 1px rgba(255,255,255,.08); }
+.org-stats { flex: 0 0 auto; display: grid; grid-template-columns: repeat(3, minmax(72px, 1fr)); gap: 8px; }
+.org-stats > span { min-height: 62px; display: grid; grid-template-columns: auto auto; align-content: center; justify-content: center; column-gap: 7px; padding: 9px 12px; border: 1px solid rgba(165,180,252,.22); border-radius: 14px; background: rgba(15,23,42,.38); box-shadow: inset 0 1px rgba(255,255,255,.08); }
+.org-stats strong { color: #fff; font-size: 20px; line-height: 1; }
+.org-stats strong small { color: #94a3b8; font-size: 10px; }
+.org-stats em { grid-column: 1 / -1; margin-top: 5px; color: #a5b4fc; font-size: 10px; font-style: normal; font-weight: 750; text-align: center; letter-spacing: .05em; }
+.org-live { border-color: rgba(94,234,212,.26) !important; }
 .org-live i { width: 8px; height: 8px; border-radius: 50%; background: #34d399; box-shadow: 0 0 0 5px rgba(52,211,153,.12); animation: org-pulse 2.2s ease-in-out infinite; }
-.org-live strong { color: #fff; font-size: 20px; line-height: 1; }
-.org-live span { grid-column: 1 / -1; margin-top: 4px; color: #a7f3d0; font-size: 10px; font-weight: 750; text-align: center; letter-spacing: .08em; }
+.org-live em { color: #a7f3d0; }
 .org-team { display: grid; justify-items: center; gap: 12px; padding-bottom: 22px; border-bottom: 1px solid rgba(165,180,252,.20); }
 .org-team > h3, .org-core > h3, .org-specialists > h3 { margin: 0; color: #c7d2fe; font-size: 11px; font-weight: 750; letter-spacing: .08em; text-transform: none; }
 .org-team h3 span, .org-specialists h3 span { margin-right: 6px; color: #67e8f9; font-family: ui-monospace, monospace; }
@@ -1383,7 +1387,9 @@ details pre { background: #18181b; color: #e4e4e7; padding: 12px; border-radius:
   .org-hero { align-items: flex-start; }
   .org-hero h2 { font-size: 20px; }
   .org-hero p { max-width: 220px; }
-  .org-live { min-width: 90px; padding: 9px 10px; }
+  .org-stats { grid-template-columns: 1fr; min-width: 86px; }
+  .org-stats > span { min-height: 54px; padding: 7px 9px; }
+  .org-stats > span:not(.org-live) { display: none; }
   .org-connector { width: 70%; }
   .org-report-grid, .org-specialist-grid { grid-template-columns: 1fr; }
   .org-person-leader { width: 100%; }

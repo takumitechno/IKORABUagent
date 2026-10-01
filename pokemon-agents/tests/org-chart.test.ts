@@ -16,6 +16,8 @@ describe("organization chart", () => {
     expect(html).toContain("根拠・事実の検証");
     expect(html).toContain("2人のAI運用チーム");
     expect(html).toContain("判断・実行チーム");
+    expect(html).toContain('class="org-stats"');
+    expect(html).toContain("専門担当");
     expect(html).not.toContain("<svg");
   });
 });
