@@ -327,17 +327,19 @@ function internalSecurityScript(token: string): string {
  */
 function liveScript(currentPath: string): string {
   // 注: "/" (overview) は overview.ts 自身が SSE で部分更新するので live swap は OFF
-  const isLive = currentPath === "/heartbeat" || currentPath === "/agents";
-  const fragmentUrl = currentPath === "/agents"
+  const [pathname, query = ""] = currentPath.split("?");
+  const isAgentsOrg = pathname === "/agents" && new URLSearchParams(query).get("view") === "org";
+  const isLive = pathname === "/heartbeat" || isAgentsOrg;
+  const fragmentUrl = isAgentsOrg
     ? "/api/fragments/agents-org"
-    : currentPath === "/"
+    : pathname === "/"
       ? "/api/fragments/dashboard"
       : "/api/fragments/heartbeat";
   return `
 (() => {
   const dot = document.getElementById('live-dot');
   const txt = document.getElementById('live-text');
-  const isLive = ${JSON.stringify(isLive)} && (location.pathname !== '/agents' || new URLSearchParams(location.search).get('view') === 'org');
+  const isLive = ${JSON.stringify(isLive)};
   const fragmentUrl = ${JSON.stringify(fragmentUrl)};
   let es = null;
   let reconnectTimer = null;
