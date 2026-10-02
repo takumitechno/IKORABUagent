@@ -36,6 +36,9 @@ describe("organization chart", () => {
     expect(html).toContain("投稿の承認待ちだよ。");
     expect(html).toContain("根拠の確認が終わったよ。");
     expect(html).toContain("次の改善案、見つけたよ。");
+    expect(html).toMatch(/href="\/operator"[^>]+aria-label="指原/);
+    expect(html).toMatch(/href="\/hypotheses"[^>]+aria-label="衣織/);
+    expect(html).toMatch(/href="\/improvements"[^>]+aria-label="杏奈/);
     expect(html).not.toContain("ブランドカラー");
     expect(html).not.toContain(">紫<");
     expect(html).not.toContain("<svg");

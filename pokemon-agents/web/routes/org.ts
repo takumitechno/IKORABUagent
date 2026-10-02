@@ -30,6 +30,11 @@ interface IssueSpeechRow {
   status: string;
 }
 
+interface SpeechBubble {
+  message: string;
+  href: string;
+}
+
 const ROLE_LABEL_JP: Record<string, string> = {
   "sashihara-orchestrator": "運用統括・最終判断",
   "anna-supervisor": "改善案の提案",
@@ -57,18 +62,18 @@ const MEMBER_ACCENT: Record<string, string> = {
   "mirinya-cost-analyst": "#c4b5fd",
 };
 
-const AGENT_SPEECH: Record<string, [message: string, delaySeconds: number]> = {
-  "sashihara-orchestrator": ["今日も、いい運用にしよう。", 0],
-  "iori-validator": ["根拠までしっかり確認するよ。", 3],
-  "maika-hypothesizer": ["次の仮説、試してみよう。", 6],
-  "hitomi-selector": ["いちばん効く施策を選ぶね。", 9],
-  "anna-supervisor": ["次の改善案、見つけたよ。", 12],
-  "hana-heartbeat": ["稼働状況、ちゃんと見てるよ。", 15],
-  "kiara-executor": ["承認済みの作業を進めます。", 18],
-  "mirinya-cost-analyst": ["数字から伸びしろを探すね。", 21],
-  "risa-notifier": ["確認が必要ならすぐ知らせるね。", 24],
-  "sanatsun-knowledge-editor": ["確認済みの知識を整理中。", 27],
-  "shoko-reporter": ["新しい情報を調べてくるね。", 30],
+const AGENT_SPEECH: Record<string, [message: string, delaySeconds: number, href: string]> = {
+  "sashihara-orchestrator": ["今日も、いい運用にしよう。", 0, "/logs"],
+  "iori-validator": ["根拠までしっかり確認するよ。", 3, "/hypotheses"],
+  "maika-hypothesizer": ["次の仮説、試してみよう。", 6, "/hypotheses"],
+  "hitomi-selector": ["いちばん効く施策を選ぶね。", 9, "/hypotheses"],
+  "anna-supervisor": ["次の改善案、見つけたよ。", 12, "/improvements"],
+  "hana-heartbeat": ["稼働状況、ちゃんと見てるよ。", 15, "/logs"],
+  "kiara-executor": ["承認済みの作業を進めます。", 18, "/improvements"],
+  "mirinya-cost-analyst": ["数字から伸びしろを探すね。", 21, "/costs"],
+  "risa-notifier": ["確認が必要ならすぐ知らせるね。", 24, "/logs"],
+  "sanatsun-knowledge-editor": ["確認済みの知識を整理中。", 27, "/knowledge"],
+  "shoko-reporter": ["新しい情報を調べてくるね。", 30, "/knowledge"],
 };
 
 const ACTION_SPEECH: Record<string, string> = {
@@ -130,6 +135,26 @@ const SYSTEM_ACTION_AGENT: Record<string, string> = {
   workflow_checked: "hana-heartbeat",
 };
 
+const ACTION_DESTINATION: Record<string, string> = {
+  source_collected: "/knowledge", provenance_recorded: "/knowledge", research_gap_reported: "/knowledge",
+  evidence_validated: "/hypotheses", evidence_rejected: "/hypotheses", evidence_insufficient: "/hypotheses",
+  contradiction_detected: "/hypotheses", freshness_checked: "/hypotheses", hypothesis_proposed: "/hypotheses",
+  alternative_hypothesis_proposed: "/hypotheses", experiment_variable_selected: "/hypotheses",
+  offer_adopted: "/hypotheses", offer_held: "/hypotheses", offer_rejected: "/hypotheses", strategy_selected: "/hypotheses",
+  revenue_analyzed: "/costs", conversion_analyzed: "/costs", cost_analyzed: "/costs", margin_analyzed: "/costs",
+  unit_economics_analyzed: "/costs", commercial_waste_flagged: "/costs",
+  knowledge_versioned: "/knowledge", knowledge_expired: "/knowledge", knowledge_superseded: "/knowledge", knowledge_marked_stale: "/knowledge",
+  improvement_proposed: "/improvements", bounded_change_defined: "/improvements", human_gate_requested: "/improvements?tab=pending_review",
+  approved_change_executed: "/improvements", approved_change_tested: "/improvements", approved_change_reverted: "/improvements",
+  editorial_cycle_waiting: "/operator", editorial_experiment_decided: "/operator", editorial_draft_ready: "/operator",
+  editorial_cycle_approved: "/operator", writer_canary_pending: "/operator", human_approval: "/operator",
+  publication_state: "/operator", insights_collected: "/operator", safety_state: "/operator",
+};
+
+const AGENT_DESTINATION: Record<string, string> = Object.fromEntries(
+  Object.entries(AGENT_SPEECH).map(([slug, speech]) => [slug, speech[2]]),
+);
+
 function tableExists(db: Database, name: string): boolean {
   return (db.query<{ n: number }, [string]>(
     "SELECT COUNT(*) n FROM sqlite_master WHERE type='table' AND name=?",
@@ -148,6 +173,15 @@ function activitySpeech(row: ActivitySpeechRow): string {
   return ACTION_SPEECH[row.action] ?? "最新の運用状況を確認したよ。";
 }
 
+function activityDestination(row: ActivitySpeechRow, target: string): string {
+  if (row.next_action_owner === "human:approval") {
+    return row.action.startsWith("improvement") || row.action === "human_gate_requested"
+      ? "/improvements?tab=pending_review"
+      : "/operator";
+  }
+  return ACTION_DESTINATION[row.action] ?? AGENT_DESTINATION[target] ?? "/logs";
+}
+
 function issueSpeech(issue: IssueSpeechRow): string {
   if (issue.status === "blocked") return "確認が必要で、いったん止まっているよ。";
   if (issue.type === "content_task" && issue.status === "in_review") return "投稿の承認待ちだよ。";
@@ -163,14 +197,27 @@ function issueSpeech(issue: IssueSpeechRow): string {
   } as Record<string, string>)[issue.type] ?? "いま担当タスクを進めているよ。";
 }
 
-function loadLiveSpeech(db: Database, agentSlugs: Set<string>): Map<string, string> {
-  const speech = new Map<string, string>();
+function issueDestination(issue: IssueSpeechRow): string {
+  if (issue.type === "hypothesis_run") {
+    return issue.status === "in_review" ? "/hypotheses?tab=pending_review" : "/hypotheses?tab=running";
+  }
+  if (["control_apply", "pilot_review", "bug"].includes(issue.type)) {
+    return issue.status === "in_review" ? "/improvements?tab=pending_review" : "/improvements";
+  }
+  if (["content_task", "data_sync"].includes(issue.type)) return "/operator";
+  return "/logs";
+}
+
+function loadLiveSpeech(db: Database, agentSlugs: Set<string>): Map<string, SpeechBubble> {
+  const speech = new Map<string, SpeechBubble>();
   if (tableExists(db, "issues") && tableExists(db, "agents")) {
     const issues = db.query<IssueSpeechRow, []>(`SELECT a.slug, i.type, i.status
       FROM issues i JOIN agents a ON a.id=i.assignee_agent_id
       WHERE i.status IN ('todo','in_progress','in_review','blocked')
       ORDER BY i.updated_at DESC, i.id DESC`).all();
-    for (const issue of issues) if (!speech.has(issue.slug)) speech.set(issue.slug, issueSpeech(issue));
+    for (const issue of issues) if (!speech.has(issue.slug)) speech.set(issue.slug, {
+      message: issueSpeech(issue), href: issueDestination(issue),
+    });
   }
   if (!tableExists(db, "agent_activity_ledger")) return speech;
   const activities = db.query<ActivitySpeechRow, []>(`SELECT sequence,timestamp,agent_id,action,
@@ -187,21 +234,21 @@ function loadLiveSpeech(db: Database, agentSlugs: Set<string>): Map<string, stri
       || ["pending", "blocked", "failed"].includes(activity.result_status);
     const maxAge = needsAttention ? 7 * 86_400_000 : 86_400_000;
     if (!Number.isFinite(age) || age < -300_000 || age > maxAge) continue;
-    speech.set(target, activitySpeech(activity));
+    speech.set(target, { message: activitySpeech(activity), href: activityDestination(activity, target) });
   }
   return speech;
 }
 
-function renderAgentCard(agent: AgentBasic, liveSpeech: Map<string, string>, leader = false): string {
+function renderAgentCard(agent: AgentBasic, liveSpeech: Map<string, SpeechBubble>, leader = false): string {
   const active = agent.status === "active";
   const role = ROLE_LABEL_JP[agent.slug] || jpRole(agent.role);
   const accent = MEMBER_ACCENT[agent.slug] ?? "#ec4899";
-  const [fallbackSpeech, delaySeconds] = AGENT_SPEECH[agent.slug] ?? ["今日も稼働中です。", 0];
-  const speech = liveSpeech.get(agent.slug) ?? fallbackSpeech;
+  const [fallbackSpeech, delaySeconds, fallbackHref] = AGENT_SPEECH[agent.slug] ?? ["今日も稼働中です。", 0, "/logs"];
+  const speech = liveSpeech.get(agent.slug) ?? { message: fallbackSpeech, href: fallbackHref };
   const speechClass = liveSpeech.has(agent.slug) ? " org-speech-live" : "";
   const avatarUrl = agent.slug === "sashihara-orchestrator" ? "/internal-assets/equal-love-mark.png" : agent.avatar_url;
-  return `<a class="org-person${leader ? " org-person-leader" : ""}" href="/agents" style="--member-color:${accent};--talk-delay:${delaySeconds}s" aria-label="${escapeHtml(agent.pokemon_jp)}、${escapeHtml(role)}">
-    <span class="org-speech${speechClass}" aria-hidden="true">${escapeHtml(speech)}</span>
+  return `<a class="org-person${leader ? " org-person-leader" : ""}" href="${escapeHtml(speech.href)}" style="--member-color:${accent};--talk-delay:${delaySeconds}s" aria-label="${escapeHtml(agent.pokemon_jp)}、${escapeHtml(role)}。${escapeHtml(speech.message)} 関連画面を開く" title="${escapeHtml(speech.message)} 関連画面を開く">
+    <span class="org-speech${speechClass}" aria-hidden="true"><span>${escapeHtml(speech.message)}</span><b>↗</b></span>
     ${avatarUrl ? `<img src="${escapeHtml(avatarUrl)}" alt="" width="72" height="72">` : `<span class="org-avatar-fallback" aria-hidden="true">${escapeHtml(agent.pokemon_jp.slice(0, 1))}</span>`}
     <span class="org-person-copy">
       <strong>${escapeHtml(agent.pokemon_jp)}</strong>
@@ -270,5 +317,5 @@ export function renderOrgChart(db: Database, agentsList: AgentBasic[]): string {
       <div class="org-specialist-grid">${specialists.map((agent) => renderAgentCard(agent, liveSpeech)).join("")}</div>
     </section>` : ""}
   </div>
-  <p class="muted small org-summary">各カードを押すと一覧で詳細を確認できます</p>`;
+  <p class="muted small org-summary">吹き出し・カードを押すと、関連する運用画面を開きます</p>`;
 }
