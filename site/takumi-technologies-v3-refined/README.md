@@ -11,7 +11,7 @@ a clearer product, and philosophy reduced to one moment near the end.
 
 | # | Section | What the visitor learns |
 |---|---|---|
-| 01 | Hero | 事業の運用を、もっとシンプルに。 What the company does, in one sentence. The official logo appears whole (no partial brush strokes) |
+| 01 | Hero | Technologyを、事業の力に。 運用代行、メディア自動運用、業務改善・BPO、広告運用。 The official 匠 is written stroke by stroke with a dry-brush edge, flying ink and a hard seal stamp; the finished logo is the original artwork |
 | 02 | Services `#services` | Four services, each with a small animated line illustration and a short list: 運用代行 / メディア自動運用 / 業務改善・BPO / 広告・マーケティング |
 | 03 | 環 — MEGURI `#meguri` | 自律型AI運用・改善プラットフォーム. 指示を待つAIではなく、運用を継続するAI。 Platform marks for Threads / X / Instagram / owned media connected to 環 |
 | 04 | Features `#features` | 環でできること: ten capabilities, one line each; icons draw in on arrival |
@@ -19,7 +19,7 @@ a clearer product, and philosophy reduced to one moment near the end.
 | 06 | Product demo `#demo` | A conceptual operating board (表示例) that moves from draft through safety check to improvement ideas without manual steps; pause and step controls |
 | 07 | Cost model `#cost` | モデルケース（試算例）: outsourcing at the median of published prices (初期15万円＋月25万円) against 環 (初期導入20万円＋月8万円). Bars show the first-year total to one scale; figures count up on arrival; method note and disclaimer below |
 | 08 | Philosophy | 繰り返しは、AIに。ひらめきは、人に。 A compact section: AI keeps operating and improving, so people can keep their own ひらめき. The four fixed lines sit below as a signature |
-| 09 | Closing | The company logo |
+| 09 | Closing | The company logo, written again with the same brush animation |
 
 ## Rules kept in the copy
 
@@ -28,7 +28,7 @@ a clearer product, and philosophy reduced to one moment near the end.
 - Media: Threads, X, Instagram and owned media are all presented as supported (自動運用), as instructed by the company.
 - Operation is presented as running without human involvement; the seven-role loop has no human step (role 04 is 安全確認, an AI check).
 - The cost section is a model case, not a customer result, and says so next to the numbers.
-  The outsourcing side is the median of published prices (see below); the 環 side is the company's own pricing plan.
+  The outsourcing side is the median of published prices (see below); the 環 side is one implementation example of the company's plan, and the page says so.
 - Numbers in the product demo are labelled 表示例 and are not production data.
 - The four philosophy lines are fixed and are not edited.
 

@@ -218,19 +218,32 @@ button { font: inherit; color: inherit; }
 .ha-node.solid { fill: var(--kin); }
 .hero-art .dr { stroke-dasharray: 1 2; stroke-dashoffset: 1.01; }
 
-/* logo intro: the whole official mark settles like ink on paper (no partial strokes) */
+/* logo intro: 匠 is written stroke by stroke with a dry brush, ink flies, the seal lands hard */
+.m-full .logo-sq .wr, .m-full .logo-cl .wr { stroke-dasharray: 1 2; stroke-dashoffset: 1.01; }
+html:not(.js) .sq-kanji, .m-reduce .sq-kanji { mask: none; }
+.ink-wash, .ink-drop, .seal-ring { opacity: 0; transform-box: fill-box; transform-origin: center; pointer-events: none; }
+@keyframes splat { 0% { opacity: 0; transform: translate(var(--x), var(--y)) scale(.25); } 7% { opacity: 1; } 24% { opacity: 1; transform: none; } 72% { opacity: .9; } 100% { opacity: 0; transform: none; } }
+@keyframes wash { 0% { opacity: 0; transform: scale(.3); } 22% { opacity: .11; } 100% { opacity: 0; transform: scale(1.18); } }
+@keyframes ring { 0% { opacity: .95; transform: scale(.55); } 100% { opacity: 0; transform: scale(2.3); } }
+@keyframes stampHard { 0% { opacity: 0; transform: scale(2.6) rotate(-9deg); filter: blur(4px); } 55% { opacity: 1; transform: scale(.92) rotate(0); filter: blur(0); } 78% { transform: scale(1.04); } 100% { opacity: 1; transform: none; } }
+@keyframes thump { 0% { transform: none; } 30% { transform: scale(1.022); } 100% { transform: none; } }
 .sq-seal, .sq-word { transform-box: fill-box; transform-origin: center; }
 
 /* intro choreography */
 .m-full.intro-wait .hero [data-hi], .m-full.intro-wait .hero .ln > span { opacity: 0; animation: failsafe .01s 6s forwards; }
-.m-full.intro-wait .logo-sq, .m-full.intro-wait .logo-sq .sq-seal, .m-full.intro-wait .logo-sq .sq-word { opacity: 0; }
+.m-full.intro-wait .logo-sq .sq-seal, .m-full.intro-wait .logo-sq .sq-word { opacity: 0; }
 .m-full.intro-wait .site-header { opacity: 0; }
 @keyframes failsafe { to { opacity: 1; } }
 .intro-run .hero [data-hi] { animation: rise 1.25s var(--ease) var(--d, 0s) both; }
 .intro-run .hero .ln > span { animation: lineUp 1.35s var(--ease) var(--d, 0s) both; }
-.intro-run .logo-sq { animation: ink 1.5s var(--ease) .05s both; }
-.intro-run .logo-sq .sq-seal { animation: stamp .7s cubic-bezier(.3, 1.4, .5, 1) .85s both; }
-.intro-run .logo-sq .sq-word { animation: rise 1.3s var(--ease) 1s both; }
+.intro-run .logo-sq .wr { animation: draw var(--t, 1s) var(--e, var(--ease-brush)) var(--d, 0s) forwards; }
+.intro-run .logo-sq { animation: thump .55s ease-out 2.86s both; }
+.intro-run .logo-sq .ink-wash { animation: wash 3.2s ease-out .15s both; }
+.intro-run .logo-sq .ink-drop { animation: splat 2.3s cubic-bezier(.15, .9, .3, 1) var(--d) both; }
+.intro-run .logo-sq .seal-ring { animation: ring .95s cubic-bezier(.2, .7, .3, 1) 2.90s forwards; }
+.intro-run .logo-sq .seal-ring.r2 { animation-delay: 3.04s; }
+.intro-run .logo-sq .sq-seal { animation: stampHard .8s cubic-bezier(.2, 1.2, .4, 1) 2.82s both; }
+.intro-run .logo-sq .sq-word { animation: rise 1.3s var(--ease) 2.98s both; }
 .intro-run .hero-art .dr { animation: draw var(--t, 1s) var(--e, var(--ease-io)) var(--d, 0s) forwards; }
 .intro-run .hero-art .ha-node { animation: node .7s var(--ease) var(--d, 0s) both; }
 .intro-run .hero-art .ha-fade { animation: fadeIn 1.6s ease var(--d, 0s) both; }
@@ -245,6 +258,8 @@ button { font: inherit; color: inherit; }
 /* static: reduced motion, skipped intro, rebuilt after resize */
 .is-static .dr { animation: none !important; stroke-dashoffset: 0; }
 .is-static .ha-node, .is-static .ha-fade { animation: none !important; }
+.intro-skip .logo-sq .wr { animation: none !important; stroke-dashoffset: 0; }
+.intro-skip .logo-sq .ink-drop, .intro-skip .logo-sq .ink-wash, .intro-skip .logo-sq .seal-ring { animation: none !important; opacity: 0; }
 .intro-skip .hero [data-hi], .intro-skip .hero .ln > span, .intro-skip .logo-sq, .intro-skip .logo-sq .sq-seal, .intro-skip .logo-sq .sq-word, .intro-skip .site-header, .intro-skip .hp-arc { animation: none !important; opacity: 1; }
 
 /* ---------- 環 — MEGURI (proprietary operating platform) ---------- */
@@ -315,11 +330,17 @@ button { font: inherit; color: inherit; }
 .cl-logo { grid-column: 8 / span 5; justify-self: end; width: min(100%, 400px); }
 .logo-cl { display: block; width: 100%; height: auto; overflow: visible; }
 .cl-seal, .cl-word { transform-box: fill-box; transform-origin: center; }
-.m-full .logo-cl, .m-full .cl-seal, .m-full .cl-word { opacity: 0; }
-.m-full .closing.run .logo-cl { opacity: 1; animation: ink 1.6s var(--ease) .7s both; }
-.m-full .closing.run .cl-seal { opacity: 1; animation: stamp .7s cubic-bezier(.3, 1.4, .5, 1) 1.5s both; }
-.m-full .closing.run .cl-word { opacity: 1; animation: rise 1.3s var(--ease) 1.65s both; }
+.m-full .cl-seal, .m-full .cl-word { opacity: 0; }
+.closing.run .logo-cl .wr { animation: draw var(--t, 1s) var(--e, var(--ease-brush)) var(--d, 0s) forwards; }
+.m-full .closing.run .logo-cl { animation: thump .55s ease-out 3.86s both; }
+.m-full .closing.run .ink-wash { animation: wash 3.2s ease-out 1.15s both; }
+.m-full .closing.run .ink-drop { animation: splat 2.3s cubic-bezier(.15, .9, .3, 1) var(--d) both; }
+.m-full .closing.run .seal-ring { animation: ring .95s cubic-bezier(.2, .7, .3, 1) 3.90s forwards; }
+.m-full .closing.run .seal-ring.r2 { animation-delay: 4.04s; }
+.m-full .closing.run .cl-seal { opacity: 1; animation: stampHard .8s cubic-bezier(.2, 1.2, .4, 1) 3.82s both; }
+.m-full .closing.run .cl-word { opacity: 1; animation: rise 1.3s var(--ease) 3.98s both; }
 .m-full .closing.done .logo-cl, .m-full .closing.done .cl-seal, .m-full .closing.done .cl-word { opacity: 1; animation: none; }
+.m-full .closing.done .ink-drop, .m-full .closing.done .ink-wash, .m-full .closing.done .seal-ring { animation: none; opacity: 0; }
 .m-reduce .enso-wr { stroke-dasharray: none; }
 
 
@@ -794,7 +815,7 @@ button { font: inherit; color: inherit; }
 }
 @media (max-width: 719px) {
   body { font-size: 14.5px; }
-  .hero-lead br { display: none; }
+  .hero-lead br.br-wide { display: none; }
   .hero-eyebrow i { display: none; }
   .hero-eyebrow [lang="en"] { flex-basis: 100%; }
   .hero-cta { flex-direction: column; align-items: flex-start; }
@@ -926,19 +947,44 @@ button { font: inherit; color: inherit; }
   <div class="wrap hero-grid">
     <div class="hero-logo">
       <svg class="logo-sq" viewBox="205 264 845 670" role="img" aria-label="匠 Technologies（合同会社 匠Technologies）">
-        <g class="sq-kanji"><path id="sqKanji" d="__SQ_KANJI__" fill="#111111" fill-rule="evenodd"/></g>
+        <defs>
+          <filter id="wrBrush" x="-10%" y="-10%" width="120%" height="120%" color-interpolation-filters="sRGB">
+            <feTurbulence type="fractalNoise" baseFrequency=".035" numOctaves="2" seed="7" result="n"/>
+            <feDisplacementMap in="SourceGraphic" in2="n" scale="16" xChannelSelector="R" yChannelSelector="G" result="d"/>
+            <feGaussianBlur in="d" stdDeviation="2.5"/>
+          </filter>
+          <filter id="washF" x="-40%" y="-40%" width="180%" height="180%">
+            <feTurbulence type="fractalNoise" baseFrequency=".011" numOctaves="3" seed="3" result="n"/>
+            <feDisplacementMap in="SourceGraphic" in2="n" scale="110" xChannelSelector="R" yChannelSelector="B"/>
+            <feGaussianBlur stdDeviation="16"/>
+          </filter>
+          <mask id="wrMask" maskUnits="userSpaceOnUse" x="150" y="200" width="960" height="800">
+            <g fill="none" stroke="#fff" stroke-linecap="round" stroke-linejoin="round" filter="url(#wrBrush)">
+              <path class="wr" pathLength="1" stroke-width="94" d="M428 342C470 366 520 374 580 352S720 291 800 300" style="--d:0.25s;--t:0.42s"/>
+              <path class="wr" pathLength="1" stroke-width="74" d="M706 378C682 400 632 432 568 468" style="--d:0.76s;--t:0.20s"/>
+              <path class="wr" pathLength="1" stroke-width="72" d="M562 468C572 510 558 560 538 600S506 650 494 670" style="--d:1.00s;--t:0.28s"/>
+              <path class="wr" pathLength="1" stroke-width="74" d="M598 526C650 512 700 495 745 476S792 470 806 480" style="--d:1.36s;--t:0.26s"/>
+              <path class="wr" pathLength="1" stroke-width="72" d="M712 500C713 560 713 610 700 642S660 682 626 694" style="--d:1.66s;--t:0.28s"/>
+              <path class="wr" pathLength="1" stroke-width="102" d="M424 418C434 480 430 560 424 640C420 700 420 734 452 744C560 736 680 718 760 718C812 718 848 738 864 756" style="--d:2.00s;--t:0.72s;--e:cubic-bezier(.5,.05,.3,1)"/>
+            </g>
+          </mask>
+        </defs>
+        <ellipse class="ink-wash" cx="630" cy="520" rx="290" ry="240" fill="#111111" filter="url(#washF)"/>
+        <g class="sq-kanji" mask="url(#wrMask)"><path id="sqKanji" d="__SQ_KANJI__" fill="#111111" fill-rule="evenodd"/></g>
+        <circle class="seal-ring" cx="939" cy="743" r="50" fill="none" stroke="__SQ_RED__" stroke-width="3"/><circle class="seal-ring r2" cx="939" cy="743" r="50" fill="none" stroke="__SQ_RED__" stroke-width="1.5"/>
         <g class="sq-seal"><path id="sqSeal" d="__SQ_SEAL__" fill="__SQ_RED__" fill-rule="evenodd"/></g>
         <g class="sq-word"><path id="sqWord" d="__SQ_WORD__" fill="#111111" fill-rule="evenodd"/></g>
+        <g class="ink-splash" fill="#111111"><g class="ink-drop" style="--d:0.65s;--x:-61.8px;--y:-3.2px"><ellipse cx="877.2" cy="304.1" rx="10.3" ry="5.3" transform="rotate(3 877.2 304.1)"/></g><g class="ink-drop" style="--d:0.67s;--x:-29.4px;--y:-6.4px"><ellipse cx="836.7" cy="308" rx="15.8" ry="7.3" transform="rotate(12.3 836.7 308)"/></g><g class="ink-drop" style="--d:0.67s;--x:-37.3px;--y:14.8px"><ellipse cx="846.6" cy="281.5" rx="11.9" ry="5" transform="rotate(-21.6 846.6 281.5)"/></g><g class="ink-drop" style="--d:0.66s;--x:-88.4px;--y:41.6px"><ellipse cx="910.5" cy="248" rx="11.8" ry="5.4" transform="rotate(-25.2 910.5 248)"/></g><g class="ink-drop" style="--d:0.63s;--x:-15px;--y:4.7px"><ellipse cx="818.7" cy="294.2" rx="10.9" ry="7.4" transform="rotate(-17.3 818.7 294.2)"/></g><g class="ink-drop" style="--d:0.68s;--x:-16.6px;--y:3.4px"><ellipse cx="820.8" cy="295.8" rx="13.6" ry="7.1" transform="rotate(-11.5 820.8 295.8)"/></g><g class="ink-drop" style="--d:0.94s;--x:48.8px;--y:-25.2px"><ellipse cx="507.1" cy="499.5" rx="8.9" ry="4" transform="rotate(152.7 507.1 499.5)"/></g><g class="ink-drop" style="--d:0.96s;--x:55.8px;--y:-53.7px"><ellipse cx="498.2" cy="535.1" rx="13.2" ry="5.5" transform="rotate(136.1 498.2 535.1)"/></g><g class="ink-drop" style="--d:0.96s;--x:21.7px;--y:-19.1px"><ellipse cx="540.9" cy="491.9" rx="9" ry="6.1" transform="rotate(138.7 540.9 491.9)"/></g><g class="ink-drop" style="--d:1.29s;--x:29px;--y:-68.1px"><ellipse cx="457.8" cy="755.1" rx="9.5" ry="3.7" transform="rotate(113 457.8 755.1)"/></g><g class="ink-drop" style="--d:1.30s;--x:-2.3px;--y:-29.1px"><ellipse cx="496.8" cy="706.3" rx="18.7" ry="9.5" transform="rotate(85.5 496.8 706.3)"/></g><g class="ink-drop" style="--d:1.24s;--x:7.6px;--y:-18px"><ellipse cx="484.5" cy="692.5" rx="18.6" ry="8" transform="rotate(112.8 484.5 692.5)"/></g><g class="ink-drop" style="--d:1.23s;--x:1px;--y:-37.8px"><ellipse cx="492.8" cy="717.3" rx="22.6" ry="9.8" transform="rotate(91.5 492.8 717.3)"/></g><g class="ink-drop" style="--d:1.57s;--x:-20.5px;--y:-6.4px"><ellipse cx="831.7" cy="488" rx="11.4" ry="4.8" transform="rotate(17.4 831.7 488)"/></g><g class="ink-drop" style="--d:1.57s;--x:-35.7px;--y:-28.8px"><ellipse cx="850.7" cy="516" rx="12.6" ry="5.5" transform="rotate(38.9 850.7 516)"/></g><g class="ink-drop" style="--d:1.58s;--x:-16.1px;--y:-15.9px"><ellipse cx="826.1" cy="499.9" rx="11.3" ry="6.8" transform="rotate(44.7 826.1 499.9)"/></g><g class="ink-drop" style="--d:1.58s;--x:-27.5px;--y:-65.4px"><ellipse cx="840.4" cy="561.8" rx="8.6" ry="3.5" transform="rotate(67.2 840.4 561.8)"/></g><g class="ink-drop" style="--d:1.96s;--x:62.1px;--y:-28.7px"><ellipse cx="548.4" cy="729.9" rx="6.8" ry="4.5" transform="rotate(155.2 548.4 729.9)"/></g><g class="ink-drop" style="--d:1.90s;--x:24.5px;--y:-18.6px"><ellipse cx="595.4" cy="717.2" rx="15.7" ry="8.7" transform="rotate(142.8 595.4 717.2)"/></g><g class="ink-drop" style="--d:1.93s;--x:13.7px;--y:-14.7px"><ellipse cx="608.8" cy="712.3" rx="13" ry="7.7" transform="rotate(133.1 608.8 712.3)"/></g><g class="ink-drop" style="--d:2.71s;--x:-48.1px;--y:-40.1px"><ellipse cx="924.1" cy="806.1" rx="10.7" ry="5.4" transform="rotate(39.8 924.1 806.1)"/></g><g class="ink-drop" style="--d:2.73s;--x:-9.4px;--y:-32.5px"><ellipse cx="875.8" cy="796.6" rx="13.3" ry="5.3" transform="rotate(73.9 875.8 796.6)"/></g><g class="ink-drop" style="--d:2.68s;--x:-29.5px;--y:-18px"><ellipse cx="900.9" cy="778.5" rx="21.7" ry="8.6" transform="rotate(31.4 900.9 778.5)"/></g><g class="ink-drop" style="--d:2.67s;--x:-19.5px;--y:-106.5px"><ellipse cx="888.4" cy="889.1" rx="8.3" ry="4.4" transform="rotate(79.6 888.4 889.1)"/></g><g class="ink-drop" style="--d:2.68s;--x:-111.8px;--y:-34px"><ellipse cx="1003.7" cy="798.5" rx="7.4" ry="3.3" transform="rotate(16.9 1003.7 798.5)"/></g><g class="ink-drop" style="--d:2.72s;--x:-25.5px;--y:-73.6px"><ellipse cx="895.8" cy="848" rx="5.6" ry="3.5" transform="rotate(70.9 895.8 848)"/></g><g class="ink-drop" style="--d:2.71s;--x:-36.6px;--y:-12.6px"><ellipse cx="909.7" cy="771.8" rx="18.4" ry="7.6" transform="rotate(19 909.7 771.8)"/></g><g class="ink-drop" style="--d:2.68s;--x:-93.4px;--y:-61.9px"><ellipse cx="980.7" cy="833.4" rx="4.5" ry="3.2" transform="rotate(33.5 980.7 833.4)"/></g><g class="ink-drop" style="--d:2.71s;--x:-14.8px;--y:-14.7px"><ellipse cx="882.4" cy="774.4" rx="10.1" ry="5.5" transform="rotate(44.9 882.4 774.4)"/></g><g class="ink-drop" style="--d:2.69s;--x:-21.7px;--y:-20.7px"><ellipse cx="882.8" cy="773.9" rx="16" ry="1.6" transform="rotate(43.6 882.8 773.9)"/></g><g class="ink-drop" style="--d:2.69s;--x:-20.6px;--y:-21.9px"><ellipse cx="892.8" cy="786.6" rx="13" ry="1.6" transform="rotate(46.8 892.8 786.6)"/></g><g class="ink-drop" style="--d:2.69s;--x:-17.6px;--y:-24.3px"><ellipse cx="898.1" cy="802.9" rx="10" ry="1.6" transform="rotate(54 898.1 802.9)"/></g></g>
       </svg>
     </div>
     <div class="hero-copy">
       <p class="hero-eyebrow" data-hi style="--d:.2s">合同会社 匠Technologies<i aria-hidden="true">／</i><span lang="en">Takumi Technologies LLC</span></p>
       <h1 class="hero-title">
-        <span class="ln"><span style="--d:.32s">事業の運用を、</span></span>
-        <span class="ln"><span style="--d:.44s">もっとシンプルに。</span></span>
+        <span class="ln"><span style="--d:.32s"><span class="ht-tech" lang="en">Technology</span>を、</span></span>
+        <span class="ln"><span style="--d:.44s">事業の力に。</span></span>
       </h1>
       <div class="hero-gap" aria-hidden="true"></div>
-      <p class="hero-lead" data-hi style="--d:.7s">合同会社 匠Technologiesは、<br><strong>SNS・メディア運用、業務改善・BPO、広告運用、業務自動化</strong>を<br>支援する会社です。</p>
+      <p class="hero-lead" data-hi style="--d:.7s"><strong>運用代行、メディア自動運用、業務改善・BPO、広告運用。</strong><br>匠Technologiesは、最新のテクノロジーと仕組みで、<br class="br-wide">事業運営の基盤を構築します。</p>
       <p class="hero-gloss" data-hi style="--d:.8s">BPO：業務の外部委託・代行</p>
       <div class="hero-cta" data-hi style="--d:.95s">
         <a class="btn-primary" href="#services">事業内容を見る<span aria-hidden="true">→</span></a>
@@ -1256,7 +1302,7 @@ button { font: inherit; color: inherit; }
           </dl>
         </div>
         <div class="cost-col after" data-r="up">
-          <h3>環を活用した運用モデル<span class="cc-sub">初期導入＋月額</span></h3>
+          <h3>環を活用した運用モデル<span class="cc-sub">導入例の一例・初期導入＋月額</span></h3>
           <div class="cbar" role="img" aria-label="環を活用した運用モデル：初年度の総額116万円（初期導入費20万円＋月額8万円×12か月）"><i style="--v:20" data-seg="a0"></i><i style="--v:60" data-seg="a1"></i><i style="--v:36" data-seg="a2"></i></div>
           <dl class="cost-rows">
             <div data-seg="a0"><dt>初期導入費</dt><dd><b lang="en" data-count="20">20</b>万円</dd></div>
@@ -1278,6 +1324,7 @@ button { font: inherit; color: inherit; }
     </div>
     <div class="cost-notes" data-r="up">
       <p>※従来の外注費は、国内のSNS運用代行について公開されている料金情報（比較記事・各社の料金表、2026年10月時点）から、企画・投稿制作・投稿管理・月次レポートを含む標準的なプランの価格帯を集め、その中央値をもとに概算した金額です。</p>
+      <p>※「環を活用した運用モデル」の金額は、導入例の一例です。</p>
       <p>※上記は想定業務をもとにしたモデルケースです。実際の費用・削減額は、業務量・運用内容・契約条件によって異なります。</p>
     </div>
   </div>
@@ -1327,9 +1374,24 @@ button { font: inherit; color: inherit; }
     </div>
     <div class="cl-logo">
       <svg class="logo-cl" viewBox="205 264 845 670" role="img" aria-label="匠 Technologies（合同会社 匠Technologies）">
+        <defs>
+          <mask id="wrMask3" maskUnits="userSpaceOnUse" x="150" y="200" width="960" height="800">
+            <g fill="none" stroke="#fff" stroke-linecap="round" stroke-linejoin="round" filter="url(#wrBrush)">
+              <path class="wr" pathLength="1" stroke-width="94" d="M428 342C470 366 520 374 580 352S720 291 800 300" style="--d:1.25s;--t:0.42s"/>
+              <path class="wr" pathLength="1" stroke-width="74" d="M706 378C682 400 632 432 568 468" style="--d:1.76s;--t:0.20s"/>
+              <path class="wr" pathLength="1" stroke-width="72" d="M562 468C572 510 558 560 538 600S506 650 494 670" style="--d:2.00s;--t:0.28s"/>
+              <path class="wr" pathLength="1" stroke-width="74" d="M598 526C650 512 700 495 745 476S792 470 806 480" style="--d:2.36s;--t:0.26s"/>
+              <path class="wr" pathLength="1" stroke-width="72" d="M712 500C713 560 713 610 700 642S660 682 626 694" style="--d:2.66s;--t:0.28s"/>
+              <path class="wr" pathLength="1" stroke-width="102" d="M424 418C434 480 430 560 424 640C420 700 420 734 452 744C560 736 680 718 760 718C812 718 848 738 864 756" style="--d:3.00s;--t:0.72s;--e:cubic-bezier(.5,.05,.3,1)"/>
+            </g>
+          </mask>
+        </defs>
+        <ellipse class="ink-wash" cx="630" cy="520" rx="290" ry="240" fill="#111111" filter="url(#washF)"/>
         <g class="cl-kanji"><use href="#sqKanji"/></g>
+        <circle class="seal-ring" cx="939" cy="743" r="50" fill="none" stroke="__SQ_RED__" stroke-width="3"/><circle class="seal-ring r2" cx="939" cy="743" r="50" fill="none" stroke="__SQ_RED__" stroke-width="1.5"/>
         <g class="cl-seal"><use href="#sqSeal"/></g>
         <g class="cl-word"><use href="#sqWord"/></g>
+        <g class="ink-splash" fill="#111111"><g class="ink-drop" style="--d:1.66s;--x:-77.2px;--y:-55.1px"><ellipse cx="896.5" cy="368.8" rx="7.8" ry="5.2" transform="rotate(35.5 896.5 368.8)"/></g><g class="ink-drop" style="--d:1.65s;--x:-59.3px;--y:-1.1px"><ellipse cx="874.2" cy="301.3" rx="4.9" ry="3" transform="rotate(1 874.2 301.3)"/></g><g class="ink-drop" style="--d:1.67s;--x:-51.6px;--y:11.8px"><ellipse cx="864.6" cy="285.2" rx="4" ry="2.7" transform="rotate(-12.9 864.6 285.2)"/></g><g class="ink-drop" style="--d:1.61s;--x:-57.9px;--y:-0.9px"><ellipse cx="872.3" cy="301.1" rx="8.7" ry="4.7" transform="rotate(0.9 872.3 301.1)"/></g><g class="ink-drop" style="--d:1.69s;--x:-58px;--y:-28px"><ellipse cx="872.5" cy="334.9" rx="9.7" ry="4.5" transform="rotate(25.7 872.5 334.9)"/></g><g class="ink-drop" style="--d:1.66s;--x:-78.7px;--y:4.3px"><ellipse cx="898.4" cy="294.6" rx="7.7" ry="3.7" transform="rotate(-3.2 898.4 294.6)"/></g><g class="ink-drop" style="--d:1.95s;--x:14.9px;--y:-13.1px"><ellipse cx="549.4" cy="484.4" rx="16.1" ry="7.1" transform="rotate(138.6 549.4 484.4)"/></g><g class="ink-drop" style="--d:1.93s;--x:46.5px;--y:-29.3px"><ellipse cx="509.8" cy="504.7" rx="5" ry="3.1" transform="rotate(147.8 509.8 504.7)"/></g><g class="ink-drop" style="--d:1.90s;--x:26.6px;--y:-3.2px"><ellipse cx="534.8" cy="472" rx="7.8" ry="5.1" transform="rotate(173.1 534.8 472)"/></g><g class="ink-drop" style="--d:2.25s;--x:13.7px;--y:-53px"><ellipse cx="476.9" cy="736.2" rx="8.9" ry="5" transform="rotate(104.5 476.9 736.2)"/></g><g class="ink-drop" style="--d:2.24s;--x:9.5px;--y:-34.6px"><ellipse cx="482.1" cy="713.2" rx="18.1" ry="8.8" transform="rotate(105.3 482.1 713.2)"/></g><g class="ink-drop" style="--d:2.24s;--x:3.5px;--y:-69.5px"><ellipse cx="489.6" cy="756.9" rx="11.1" ry="4.7" transform="rotate(92.9 489.6 756.9)"/></g><g class="ink-drop" style="--d:2.23s;--x:43.1px;--y:-66.3px"><ellipse cx="440.1" cy="752.9" rx="10.9" ry="4.3" transform="rotate(123 440.1 752.9)"/></g><g class="ink-drop" style="--d:2.62s;--x:-7px;--y:-16.9px"><ellipse cx="814.8" cy="501.2" rx="9.7" ry="6.8" transform="rotate(67.5 814.8 501.2)"/></g><g class="ink-drop" style="--d:2.60s;--x:-55.9px;--y:-61.3px"><ellipse cx="875.8" cy="556.7" rx="12.5" ry="4.9" transform="rotate(47.7 875.8 556.7)"/></g><g class="ink-drop" style="--d:2.59s;--x:-24.7px;--y:-62.4px"><ellipse cx="836.9" cy="558" rx="9.3" ry="3.6" transform="rotate(68.4 836.9 558)"/></g><g class="ink-drop" style="--d:2.63s;--x:-19.2px;--y:-4.7px"><ellipse cx="830" cy="485.9" rx="11.6" ry="7.1" transform="rotate(13.7 830 485.9)"/></g><g class="ink-drop" style="--d:2.89s;--x:27.3px;--y:6.5px"><ellipse cx="591.9" cy="685.8" rx="10.3" ry="5.1" transform="rotate(193.4 591.9 685.8)"/></g><g class="ink-drop" style="--d:2.95s;--x:63.7px;--y:-16.5px"><ellipse cx="546.4" cy="714.6" rx="6.4" ry="3.3" transform="rotate(165.5 546.4 714.6)"/></g><g class="ink-drop" style="--d:2.95s;--x:33.6px;--y:-13.1px"><ellipse cx="584" cy="710.4" rx="22.4" ry="9.4" transform="rotate(158.7 584 710.4)"/></g><g class="ink-drop" style="--d:3.71s;--x:-27.8px;--y:-51.3px"><ellipse cx="898.7" cy="820.1" rx="11" ry="4.6" transform="rotate(61.6 898.7 820.1)"/></g><g class="ink-drop" style="--d:3.70s;--x:-39.4px;--y:-23.4px"><ellipse cx="913.3" cy="785.2" rx="15.7" ry="6.8" transform="rotate(30.7 913.3 785.2)"/></g><g class="ink-drop" style="--d:3.69s;--x:-62.9px;--y:-80.7px"><ellipse cx="942.6" cy="856.9" rx="6.3" ry="2.9" transform="rotate(52.1 942.6 856.9)"/></g><g class="ink-drop" style="--d:3.67s;--x:-62.5px;--y:-82.2px"><ellipse cx="942.2" cy="858.7" rx="8.4" ry="3.3" transform="rotate(52.7 942.2 858.7)"/></g><g class="ink-drop" style="--d:3.70s;--x:-43.4px;--y:-57.5px"><ellipse cx="918.3" cy="827.8" rx="6.8" ry="3.3" transform="rotate(52.9 918.3 827.8)"/></g><g class="ink-drop" style="--d:3.72s;--x:-64px;--y:-64.4px"><ellipse cx="944" cy="836.5" rx="4.8" ry="2.6" transform="rotate(45.2 944 836.5)"/></g><g class="ink-drop" style="--d:3.67s;--x:-97.4px;--y:-43.4px"><ellipse cx="985.8" cy="810.3" rx="7.1" ry="3.2" transform="rotate(24 985.8 810.3)"/></g><g class="ink-drop" style="--d:3.70s;--x:-41.9px;--y:-42.1px"><ellipse cx="916.3" cy="808.6" rx="6.4" ry="2.8" transform="rotate(45.2 916.3 808.6)"/></g><g class="ink-drop" style="--d:3.68s;--x:-34.1px;--y:-63.2px"><ellipse cx="906.6" cy="834.9" rx="8.6" ry="4.2" transform="rotate(61.6 906.6 834.9)"/></g><g class="ink-drop" style="--d:3.69s;--x:-17.6px;--y:-24.3px"><ellipse cx="879.2" cy="777.1" rx="16" ry="1.6" transform="rotate(54.1 879.2 777.1)"/></g><g class="ink-drop" style="--d:3.69s;--x:-22px;--y:-20.4px"><ellipse cx="894.7" cy="784.6" rx="13" ry="1.6" transform="rotate(43 894.7 784.6)"/></g><g class="ink-drop" style="--d:3.69s;--x:-17.7px;--y:-24.2px"><ellipse cx="898.2" cy="802.8" rx="10" ry="1.6" transform="rotate(53.8 898.2 802.8)"/></g></g>
       </svg>
     </div>
   </div>
@@ -1441,7 +1503,7 @@ button { font: inherit; color: inherit; }
       const off = two ? ex > W : false;
       last[0] = ex;
       if (!two && Math.abs(last[0] - prev[0]) < 1) last[0] = prev[0] - 1;
-      const delay = 1.25 + i * .07;
+      const delay = 2.70 + i * .07;
       const len = p.reduce((s, q, k) => k ? s + Math.hypot(q[0] - p[k - 1][0], q[1] - p[k - 1][1]) : 0, 0);
       const t = clamp(.9 + len / 1600, 1.0, 1.9);
       lanes += `<path class="ha-lane dr" pathLength="1" d="${polyD(p)}" style="--d:${delay.toFixed(2)}s;--t:${t.toFixed(2)}s"/>`;
@@ -1480,8 +1542,8 @@ button { font: inherit; color: inherit; }
           <stop offset="1" stop-color="#9a8456"/>
         </radialGradient>`}
       </defs>
-      <path class="ha-grid ha-fade" d="${g}" style="--d:1.1s"/>
-      <path class="ha-reg ha-fade" d="${reg}" style="--d:1.9s"/>
+      <path class="ha-grid ha-fade" d="${g}" style="--d:2.4s"/>
+      <path class="ha-reg ha-fade" d="${reg}" style="--d:3.4s"/>
       <g>${lanes}</g>
       <g>${nodes}</g>`;
     if (!animated) art.classList.add('is-static');
@@ -1515,15 +1577,18 @@ button { font: inherit; color: inherit; }
   function finishIntro() {
     if (introDone) return;
     introDone = true;
+    $('.sq-kanji').removeAttribute('mask');
     root.classList.add('intro-skip');
     art.classList.add('is-static');
   }
   function startIntro() {
     buildHero(!reduce);
-    if (reduce) return;
+    if (reduce) { $('.sq-kanji').removeAttribute('mask'); return; }
     root.classList.remove('intro-wait');
     root.classList.add('intro-run');
-    setTimeout(() => { introDone = true; }, 3400);
+    // once the brush has left the paper, show the original logo artwork without the writing mask
+    setTimeout(() => { $('.sq-kanji').removeAttribute('mask'); }, 2840);
+    setTimeout(() => { introDone = true; }, 4580);
     const skip = () => { if (scrollY > 40) finishIntro(); };
     addEventListener('scroll', skip, { passive: true });
     ['keydown', 'pointerdown'].forEach(t => addEventListener(t, e => { if (!e.target.closest || !e.target.closest('.hero')) finishIntro(); }, { once: true }));
@@ -1861,7 +1926,7 @@ button { font: inherit; color: inherit; }
   }
 
   /* =========================================================
-     Closing: the precise lines return into the brush, and the logo settles
+     Closing: the precise lines return into the brush, and 匠 is written again
      ========================================================= */
   const closing = $('#closing'), clArt = $('.cl-art'), clLogo = $('.logo-cl'), clKanji = $('.cl-kanji');
   function buildClosing(animated) {
@@ -1877,12 +1942,14 @@ button { font: inherit; color: inherit; }
     clArt.classList.toggle('is-static', !animated);
   }
   if (!reduce && 'IntersectionObserver' in window) {
+    clKanji.setAttribute('mask', 'url(#wrMask3)');
     const cio2 = new IntersectionObserver(es => es.forEach(e => {
       if (!e.isIntersecting) return;
       cio2.disconnect();
       buildClosing(true);
       requestAnimationFrame(() => closing.classList.add('run'));
-      setTimeout(() => closing.classList.add('done'), 3600);
+      setTimeout(() => clKanji.removeAttribute('mask'), 3840);
+      setTimeout(() => closing.classList.add('done'), 5580);
     }), { threshold: .35 });
     cio2.observe(clLogo);
   } else {
