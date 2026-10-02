@@ -61,6 +61,20 @@ describe("BRAND01 site branding", () => {
     expect(html).toContain('<span class="nav-label">トップページ</span>');
   });
 
+  test("internal theme switch is shared and remains separate from the customer preference", () => {
+    const internal = renderLayout({ title: "エージェント", body: "<main>agents</main>", currentPath: "/agents?view=org" });
+    const operator = renderLayout({ title: "運用状況", body: "<main>operator</main>", currentPath: "/operator" });
+    const customer = renderLayout({ title: "Dashboard", body: "<main>customer</main>", currentPath: "/" });
+    for (const html of [internal, operator]) {
+      expect(html).toContain('id="operator-theme-toggle"');
+      expect(html).toContain("takumi-operator-theme");
+      expect(html).toContain("document.documentElement.dataset.theme");
+    }
+    expect(customer).not.toContain('id="operator-theme-toggle"');
+    expect(customer).not.toContain("takumi-operator-theme");
+    expect(customer).toContain("takumi-customer-theme");
+  });
+
   test("canonical logo and compact mark assets are present", () => {
     const original = readFileSync(resolve(root, "pokemon-agents/web/public/brand/takumi-technologies-logo.jpg"));
     const mark = readFileSync(resolve(root, "pokemon-agents/web/public/brand/takumi-mark.png"));

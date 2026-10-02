@@ -9,7 +9,7 @@ import { icon } from "./icons";
 import { baseComponents, designTokens } from "./design-tokens";
 import type { CustomerWorkspaceView } from "../lib/customer-workspaces";
 
-export const DASHBOARD_STYLESHEET_VERSION = "hq-ui-20261002-command-center";
+export const DASHBOARD_STYLESHEET_VERSION = "hq-ui-20261002-theme-switch";
 
 export function dashboardStylesheetHref(): string {
   return `/styles.css?v=${DASHBOARD_STYLESHEET_VERSION}`;
@@ -198,14 +198,14 @@ export function renderLayout(opts: LayoutOpts): string {
       </details>` : "";
 
   return `<!DOCTYPE html>
-<html lang="ja"${!isCustomerDashboard ? ' data-theme="light"' : ""}>
+<html lang="ja">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>${escapeHtml(browserTitle)}</title>
   <meta name="application-name" content="${escapeHtml(brandName)}">
-  <meta name="theme-color" content="${isCustomerDashboard ? "#0b0f14" : "#312e81"}">
-  ${isCustomerDashboard ? `<script>(()=>{try{const saved=localStorage.getItem('takumi-customer-theme');const theme=saved==='light'||saved==='dark'?saved:(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');document.documentElement.dataset.customerTheme=theme}catch(_){}})();</script>` : ""}
+  <meta name="theme-color" content="${isCustomerDashboard ? "#0b0f14" : "#02030a"}">
+  ${isCustomerDashboard ? `<script>(()=>{try{const saved=localStorage.getItem('takumi-customer-theme');const theme=saved==='light'||saved==='dark'?saved:(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');document.documentElement.dataset.customerTheme=theme}catch(_){}})();</script>` : `<script>(()=>{try{const saved=localStorage.getItem('takumi-operator-theme');document.documentElement.dataset.theme=saved==='light'||saved==='dark'?saved:'dark'}catch(_){document.documentElement.dataset.theme='dark'}})();</script>`}
   ${brandMarkSrc ? `<link rel="icon" type="image/png" href="${brandMarkSrc}">
   <link rel="apple-touch-icon" href="${brandMarkSrc}">` : ""}
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -230,6 +230,10 @@ export function renderLayout(opts: LayoutOpts): string {
       ${internalHomeButton}
       ${workspaceSwitcher}
       <nav class="sidebar-nav" aria-label="${sidebarLabel}">${navMarkup}</nav>
+      ${isCustomerDashboard ? "" : `<button class="operator-theme-toggle" id="operator-theme-toggle" type="button" aria-label="ライトモードに切り替える">
+        <span class="operator-theme-icon" aria-hidden="true"></span>
+        <span id="operator-theme-label">ライト</span>
+      </button>`}
       ${isCustomerDashboard ? "" : `<details class="hq-mobile-nav"><summary>現在地 · ${escapeHtml(activeNavLabel)}</summary><nav class="hq-mobile-nav-panel" aria-label="${mobileLabel}">${navMarkup}</nav></details>`}
     </aside>
     <main class="main" id="main">
@@ -239,9 +243,29 @@ export function renderLayout(opts: LayoutOpts): string {
   </div>
   ${opts.csrfToken && !isOperator ? `<meta name="csrf-token" content="${escapeHtml(opts.csrfToken)}">` : ""}
   ${opts.csrfToken && !isOperator ? `<script>${internalSecurityScript(opts.csrfToken)}</script>` : ""}
-  ${isCustomerDashboard ? `<script>${customerEditorialNavScript()}</script>` : `<script>${liveScript(opts.currentPath)}</script>`}
+  ${isCustomerDashboard ? `<script>${customerEditorialNavScript()}</script>` : `<script>${operatorThemeScript()}${liveScript(opts.currentPath)}</script>`}
 </body>
 </html>`;
+}
+
+function operatorThemeScript(): string {
+  return `
+(() => {
+  const button = document.getElementById('operator-theme-toggle');
+  const label = document.getElementById('operator-theme-label');
+  const meta = document.querySelector('meta[name="theme-color"]');
+  if (!button || !label) return;
+  function apply(theme, save) {
+    const dark = theme === 'dark';
+    document.documentElement.dataset.theme = dark ? 'dark' : 'light';
+    label.textContent = dark ? 'ライト' : 'ダーク';
+    button.setAttribute('aria-label', (dark ? 'ライト' : 'ダーク') + 'モードに切り替える');
+    if (meta) meta.content = dark ? '#02030a' : '#f4f7fb';
+    if (save) try { localStorage.setItem('takumi-operator-theme', dark ? 'dark' : 'light'); } catch (_) {}
+  }
+  apply(document.documentElement.dataset.theme === 'light' ? 'light' : 'dark', false);
+  button.addEventListener('click', () => apply(document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark', true));
+})();`;
 }
 
 export function customerEditorialNavScript(): string {

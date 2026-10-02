@@ -1026,7 +1026,7 @@ html, body {
 body { background-color: var(--bg); min-height: 100vh; }
 a { color: inherit; text-decoration: none; font-weight: 600; }
 button { font-family: inherit; }
-strong, b { font-weight: 700; color: #000; }
+strong, b { font-weight: 700; color: var(--t-ink); }
 
 /* App layout — スタイル: outer padding 20 + gap 0 (sidebar 自身の margin で間隔) */
 .app { display: grid; grid-template-columns: 280px 1fr; gap: 4px; padding: 20px; min-height: 100vh; }
@@ -1085,6 +1085,18 @@ strong, b { font-weight: 700; color: #000; }
 .internal-shell .page-kicker::after { background: linear-gradient(90deg, #6366f1, #06b6d4); }
 .internal-shell .list-tabs { background: rgba(255,255,255,.72); border: 1px solid #dbeafe; box-shadow: 0 8px 20px rgba(49,46,129,.08); }
 .internal-shell .list-tab.active { color: #fff; background: linear-gradient(135deg, #4f46e5, #2563eb); }
+
+.operator-theme-toggle {
+  min-height: 44px; margin: 4px; padding: 9px 12px;
+  display: flex; align-items: center; justify-content: center; gap: 9px;
+  border: 1px solid rgba(255,255,255,.18); border-radius: 12px;
+  background: rgba(255,255,255,.07); color: #e2e8f0;
+  font: 800 12px/1 var(--t-font); cursor: pointer;
+  transition: background-color .16s ease, border-color .16s ease, transform .16s ease;
+}
+.operator-theme-toggle:hover { background: rgba(255,255,255,.13); border-color: rgba(103,232,249,.52); transform: translateY(-1px); }
+.operator-theme-icon::before { content: "☀"; display: block; font-size: 18px; line-height: 1; }
+html[data-theme="light"] .operator-theme-icon::before { content: "☾"; }
 
 .internal-home-button {
   margin: 0 4px 2px;
@@ -1449,6 +1461,88 @@ body:has(.command-page) { background: #02030a; }
   .org-person img, .org-avatar-fallback { width: 64px; height: 64px; }
   .org-speech { max-width: calc(100% - 20px); white-space: normal; }
 }
+
+/* Internal theme switch. Customer theming remains intentionally separate. */
+html[data-theme="dark"] .internal-shell { background: radial-gradient(circle at 78% -8%, rgba(56,189,248,.10), transparent 32%), #02030a; }
+html[data-theme="dark"] .internal-shell .main { color: var(--t-ink); }
+html[data-theme="dark"] .internal-shell .page-header h1,
+html[data-theme="dark"] .internal-shell h3,
+html[data-theme="dark"] .internal-shell :is(.metric-card .value,.list-row .grow,td,.approval-card .head h3,.approval-card .body-text,.kanban-col h3,.kanban-issue .title,.agent-card .name,.agent-card .body,.events-live,.include-pre-toggle,.events-table tbody td,.event-summary,.timeline-name,.timeline-unsched summary,.timeline-unsched-item,.rm-metrics>div>div,.refl-short,.refl-cell>strong:first-child,.refl-cell .md-body,.report-body,.refl-collapsible>summary,.md-body,.md-body h1,.md-body h2,.md-body h3,.md-body h4,.md-body strong,.md-body blockquote,.list-table tbody td,.list-agent-name) { color: var(--t-ink); }
+html[data-theme="dark"] .internal-shell :is(.metric-card,.section,.chart-card,.approval-card,.kanban-issue,.dept-section,.events-live,.report-section,.hypo-section,.list-table-wrap,.modal-inner) { background: var(--t-surface); border-color: var(--t-line); }
+html[data-theme="dark"] .internal-shell :is(.agent-card,.kanban-col) { background: var(--t-surface-2); }
+html[data-theme="dark"] .internal-shell :is(.events-filter select,.list-sort-select,.filter-checkbox,.modal-field input,.modal-field select) { color: var(--t-ink); background: var(--t-surface); border-color: var(--t-line); }
+html[data-theme="dark"] .internal-shell .filter-checkbox:hover { color: var(--t-ink); background: var(--t-surface-2); }
+
+html[data-theme="light"] body:has(.command-page),
+html[data-theme="light"] .app:has(.command-page) { background: radial-gradient(circle at 72% -8%, rgba(14,116,144,.11), transparent 34%), radial-gradient(circle at 34% 0%, rgba(180,83,9,.08), transparent 28%), #eef3f8; }
+html[data-theme="light"] .app:has(.command-page) .sidebar { color: #334155; background: rgba(255,255,255,.90); border-color: rgba(30,41,59,.14); box-shadow: 0 24px 60px rgba(15,23,42,.12); }
+html[data-theme="light"] .app:has(.command-page) :is(.brand-name,.nav-item) { color: #172554; }
+html[data-theme="light"] .app:has(.command-page) :is(.brand-sub,.nav-section-label) { color: #64748b; }
+html[data-theme="light"] .app:has(.command-page) .nav-item:hover { color: #0f172a; background: rgba(79,70,229,.07); }
+html[data-theme="light"] .app:has(.command-page) .nav-item.active { color: #3730a3; background: linear-gradient(100deg,rgba(99,102,241,.13),rgba(14,116,144,.07)); }
+html[data-theme="light"] .operator-theme-toggle { color: #334155; background: rgba(15,23,42,.04); border-color: rgba(30,41,59,.14); }
+html[data-theme="light"] .operator-theme-toggle:hover { color: #3730a3; background: rgba(79,70,229,.08); border-color: rgba(79,70,229,.30); }
+html[data-theme="light"] .command-page { --command-line: rgba(30,41,59,.14); --command-panel: rgba(255,255,255,.88); --command-gold: #a16207; --command-cyan: #0e7490; color: #0f172a; }
+html[data-theme="light"] .command-hero { border-color: var(--command-line); background: radial-gradient(circle at 78% 0,rgba(14,116,144,.13),transparent 32%),radial-gradient(circle at 22% -20%,rgba(180,83,9,.10),transparent 32%),linear-gradient(145deg,rgba(255,255,255,.97),rgba(241,245,249,.94)); box-shadow: 0 26px 70px rgba(15,23,42,.13), inset 0 1px #fff; }
+html[data-theme="light"] .command-hero::before { opacity: .48; background-image: linear-gradient(rgba(30,41,59,.06) 1px,transparent 1px),linear-gradient(90deg,rgba(30,41,59,.06) 1px,transparent 1px); }
+html[data-theme="light"] .command-hero :is(h1,.command-core strong),
+html[data-theme="light"] .command-section-head h2,
+html[data-theme="light"] .command-stat strong,
+html[data-theme="light"] .improvement-proposal h3,
+html[data-theme="light"] .command-guardrails strong,
+html[data-theme="light"] .command-empty strong,
+html[data-theme="light"] .agent-command .list-agent-name>span:first-child,
+html[data-theme="light"] .agent-detail-status strong { color: #0f172a; }
+html[data-theme="light"] .command-hero-copy>p,
+html[data-theme="light"] .command-cycle-step,
+html[data-theme="light"] .command-cycle-step b,
+html[data-theme="light"] .command-section-head>p,
+html[data-theme="light"] .improvement-proposal>p,
+html[data-theme="light"] .improvement-proposal dd,
+html[data-theme="light"] .improvement-history strong,
+html[data-theme="light"] .schedule-command .timeline-summary,
+html[data-theme="light"] .agent-command :is(td,.sortable-th),
+html[data-theme="light"] .agent-detail-grid dd { color: #334155; }
+html[data-theme="light"] .command-core,
+html[data-theme="light"] .command-stage-rail,
+html[data-theme="light"] .command-guardrails li,
+html[data-theme="light"] .command-empty,
+html[data-theme="light"] .schedule-command .timeline-wrap { background: rgba(255,255,255,.68); }
+html[data-theme="light"] .command-stat,
+html[data-theme="light"] .command-section { background: linear-gradient(145deg,rgba(255,255,255,.96),rgba(241,245,249,.92)); box-shadow: 0 18px 48px rgba(15,23,42,.10), inset 0 1px #fff; }
+html[data-theme="light"] .improvement-proposal { background: radial-gradient(circle at 100% 0%,rgba(14,116,144,.09),transparent 42%),rgba(255,255,255,.86); }
+html[data-theme="light"] .improvement-proposal dl>div,
+html[data-theme="light"] .agent-detail-status>div,
+html[data-theme="light"] .agent-detail-grid>div { background: #f8fafc; }
+html[data-theme="light"] .command-page .modal-inner { color:#334155; background:linear-gradient(145deg,#fff,#f1f5f9); border-color:var(--command-line); box-shadow:0 28px 80px rgba(15,23,42,.22); }
+html[data-theme="light"] .command-page .modal-inner h3,
+html[data-theme="light"] .command-page .report-section strong { color:#0f172a; }
+html[data-theme="light"] .command-page .report-section { background:#f8fafc; }
+html[data-theme="light"] .command-page .modal-close,
+html[data-theme="light"] .schedule-command .timeline-edit-btn { color:#334155; background:#fff; }
+html[data-theme="light"] .schedule-command .timeline-bar { background:#e2e8f0; }
+html[data-theme="light"] .agent-command table { background:rgba(255,255,255,.84); }
+html[data-theme="light"] .agent-command th { color:#475569; background:#eef2f7; }
+html[data-theme="light"] .agent-command tr:hover td { background:rgba(14,116,144,.05); }
+html[data-theme="light"] .agent-detail-trigger { color:#0f172a; }
+
+html[data-theme="light"] .org-board { color:#0f172a; background:radial-gradient(ellipse at 50% -8%,rgba(14,116,144,.13),transparent 38%),linear-gradient(180deg,#f8fafc 0%,#eef2ff 52%,#edf6fa 100%); border-color:rgba(30,41,59,.18); box-shadow:0 28px 74px rgba(15,23,42,.15),inset 0 1px #fff; }
+html[data-theme="light"] .org-board::before { opacity:.20; background-image:radial-gradient(circle,rgba(30,41,59,.38) 0 1px,transparent 1.6px),linear-gradient(rgba(30,41,59,.10) 1px,transparent 1px),linear-gradient(90deg,rgba(30,41,59,.10) 1px,transparent 1px); }
+html[data-theme="light"] .org-board::after { opacity:.34; }
+html[data-theme="light"] .org-hero { background:rgba(255,255,255,.76); border-color:rgba(30,41,59,.13); box-shadow:inset 0 1px #fff; }
+html[data-theme="light"] .org-hero h2,
+html[data-theme="light"] .org-stats strong { color:#0f172a; }
+html[data-theme="light"] .org-hero p,
+html[data-theme="light"] .org-stats strong small { color:#475569; }
+html[data-theme="light"] .org-stats>span { background:rgba(255,255,255,.62); border-color:rgba(79,70,229,.16); }
+html[data-theme="light"] .org-team>h3,
+html[data-theme="light"] .org-core>h3,
+html[data-theme="light"] .org-specialists>h3 { color:#3730a3; }
+html[data-theme="light"] .org-person { color:#0f172a; background:radial-gradient(circle at 100% 0%,color-mix(in srgb,var(--member-color) 13%,transparent),transparent 46%),linear-gradient(145deg,rgba(255,255,255,.96),rgba(241,245,249,.92)); box-shadow:inset 0 1px #fff,0 14px 32px color-mix(in srgb,var(--member-color) 15%,transparent); }
+html[data-theme="light"] .org-person-leader { color:#fff; background:radial-gradient(circle at 100% 0%,color-mix(in srgb,var(--member-color) 28%,transparent),transparent 46%),linear-gradient(135deg,rgba(88,28,135,.96),rgba(30,64,175,.94) 62%,rgba(8,47,73,.96)); }
+html[data-theme="light"] .org-person:not(.org-person-leader) .org-person-copy>span { color:#334155; }
+html[data-theme="light"] .org-person:not(.org-person-leader) .org-person-copy small { color:#64748b; }
+html[data-theme="light"] .org-person:not(.org-person-leader) .org-person-copy small.active { color:#047857; }
 
 /* Kanban */
 .kanban { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
