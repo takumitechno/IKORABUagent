@@ -28,29 +28,30 @@ const ROLE_LABEL_JP: Record<string, string> = {
   "risa-notifier": "通知・確認依頼の判断",
 };
 
-const MEMBER_ACCENT: Record<string, { color: string; label: string }> = {
-  "anna-supervisor": { color: "#3b82f6", label: "青" },
-  "hana-heartbeat": { color: "#f97316", label: "オレンジ" },
-  "risa-notifier": { color: "#38bdf8", label: "水色" },
-  "kiara-executor": { color: "#f9a8d4", label: "ピンク" },
-  "maika-hypothesizer": { color: "#f8fafc", label: "白" },
-  "hitomi-selector": { color: "#ef4444", label: "赤" },
-  "shoko-reporter": { color: "#facc15", label: "黄" },
-  "iori-validator": { color: "#a855f7", label: "紫" },
-  "sanatsun-knowledge-editor": { color: "#22c55e", label: "緑" },
-  "mirinya-cost-analyst": { color: "#c4b5fd", label: "薄紫" },
+const MEMBER_ACCENT: Record<string, string> = {
+  "anna-supervisor": "#3b82f6",
+  "hana-heartbeat": "#f97316",
+  "risa-notifier": "#38bdf8",
+  "kiara-executor": "#f9a8d4",
+  "maika-hypothesizer": "#f8fafc",
+  "hitomi-selector": "#ef4444",
+  "shoko-reporter": "#facc15",
+  "iori-validator": "#a855f7",
+  "sanatsun-knowledge-editor": "#22c55e",
+  "mirinya-cost-analyst": "#c4b5fd",
 };
 
 function renderAgentCard(agent: AgentBasic, leader = false): string {
   const active = agent.status === "active";
   const role = ROLE_LABEL_JP[agent.slug] || jpRole(agent.role);
-  const accent = MEMBER_ACCENT[agent.slug] ?? { color: "#ec4899", label: leader ? "ブランドカラー" : "チームカラー" };
-  return `<a class="org-person${leader ? " org-person-leader" : ""}" href="/agents" style="--member-color:${accent.color}" aria-label="${escapeHtml(agent.pokemon_jp)}、${escapeHtml(role)}、${escapeHtml(accent.label)}">
-    ${agent.avatar_url ? `<img src="${escapeHtml(agent.avatar_url)}" alt="" width="56" height="56">` : `<span class="org-avatar-fallback" aria-hidden="true">${escapeHtml(agent.pokemon_jp.slice(0, 1))}</span>`}
+  const accent = MEMBER_ACCENT[agent.slug] ?? "#ec4899";
+  const avatarUrl = agent.slug === "sashihara-orchestrator" ? "/internal-assets/equal-love-mark.png" : agent.avatar_url;
+  return `<a class="org-person${leader ? " org-person-leader" : ""}" href="/agents" style="--member-color:${accent}" aria-label="${escapeHtml(agent.pokemon_jp)}、${escapeHtml(role)}">
+    ${avatarUrl ? `<img src="${escapeHtml(avatarUrl)}" alt="" width="56" height="56">` : `<span class="org-avatar-fallback" aria-hidden="true">${escapeHtml(agent.pokemon_jp.slice(0, 1))}</span>`}
     <span class="org-person-copy">
       <strong>${escapeHtml(agent.pokemon_jp)}</strong>
       <span>${escapeHtml(role)}</span>
-      <span class="org-card-meta"><small class="${active ? "active" : "disabled"}"><i aria-hidden="true"></i>${active ? "稼働中" : "停止中"}</small><small class="org-member-mark"><i aria-hidden="true"></i>${escapeHtml(accent.label)}</small></span>
+      <small class="${active ? "active" : "disabled"}"><i aria-hidden="true"></i>${active ? "稼働中" : "停止中"}</small>
     </span>
   </a>`;
 }

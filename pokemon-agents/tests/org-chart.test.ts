@@ -19,8 +19,9 @@ describe("organization chart", () => {
     expect(html).toContain('class="org-stats"');
     expect(html).toContain("専門担当");
     expect(html).toContain('--member-color:#a855f7');
-    expect(html).toContain("ブランドカラー");
-    expect(html).toContain("紫");
+    expect(html).toContain('src="/internal-assets/equal-love-mark.png"');
+    expect(html).not.toContain("ブランドカラー");
+    expect(html).not.toContain(">紫<");
     expect(html).not.toContain("<svg");
   });
 });

@@ -1372,13 +1372,10 @@ details pre { background: #18181b; color: #e4e4e7; padding: 12px; border-radius:
 .org-person-copy strong { color: inherit; font-size: 15px; line-height: 1.25; }
 .org-person-copy > span { color: #dbeafe; font-size: 12px; font-weight: 650; line-height: 1.45; overflow-wrap: anywhere; }
 .org-person-copy small { display: flex; align-items: center; gap: 5px; color: #cbd5e1; font-size: 12px; font-weight: 700; }
-.org-card-meta { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
 .org-person-copy small.active { color: #6ee7b7; }
 .org-person-leader .org-person-copy small.active { color: #a7f3d0; }
 .org-person-copy small.disabled { color: #94a3b8; }
 .org-person-copy small i { width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
-.org-person-copy .org-member-mark { color: color-mix(in srgb, var(--member-color) 82%, #fff); }
-.org-person-copy .org-member-mark i { box-shadow: 0 0 9px var(--member-color); }
 .org-summary { margin-top: 12px; color: #64748b; }
 @keyframes org-aurora { to { transform: translate(-60px, 38px) scale(1.12); } }
 @keyframes org-pulse { 50% { opacity: .55; box-shadow: 0 0 0 9px rgba(52,211,153,0); } }
