@@ -46,6 +46,11 @@ function computeHash(db: Database): string {
        WHERE session_id IS NULL OR session_id NOT LIKE 'demo-%'`,
     )
     .get() as { c: number; max_id: number | null } | null;
+  const r4 = db
+    .query<{ c: number; max_sequence: number | null }, []>(
+      `SELECT COUNT(*) as c, MAX(sequence) as max_sequence FROM agent_activity_ledger`,
+    )
+    .get() as { c: number; max_sequence: number | null } | null;
   return [
     r1?.c ?? 0,
     r1?.max_id ?? 0,
@@ -56,6 +61,8 @@ function computeHash(db: Database): string {
     r2?.max_id ?? 0,
     r3?.c ?? 0,
     r3?.max_id ?? 0,
+    r4?.c ?? 0,
+    r4?.max_sequence ?? 0,
   ].join(":");
 }
 

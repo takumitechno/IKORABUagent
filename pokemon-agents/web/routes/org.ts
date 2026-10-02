@@ -14,6 +14,22 @@ interface OrgNode extends AgentBasic {
   reports: OrgNode[];
 }
 
+interface ActivitySpeechRow {
+  sequence: number;
+  timestamp: string;
+  agent_id: string | null;
+  action: string;
+  decision_status: string;
+  result_status: string;
+  next_action_owner: string | null;
+}
+
+interface IssueSpeechRow {
+  slug: string;
+  type: string;
+  status: string;
+}
+
 const ROLE_LABEL_JP: Record<string, string> = {
   "sashihara-orchestrator": "運用統括・最終判断",
   "anna-supervisor": "改善案の提案",
@@ -55,14 +71,137 @@ const AGENT_SPEECH: Record<string, [message: string, delaySeconds: number]> = {
   "shoko-reporter": ["新しい情報を調べてくるね。", 30],
 };
 
-function renderAgentCard(agent: AgentBasic, leader = false): string {
+const ACTION_SPEECH: Record<string, string> = {
+  next_action_selected: "次にやることを決めたよ。",
+  priority_assigned: "優先順位を整理したよ。",
+  owner_assigned: "担当を決めたよ。",
+  source_collected: "新しい情報を集めたよ。",
+  provenance_recorded: "情報の出どころを記録したよ。",
+  research_gap_reported: "追加で調べたい点を見つけたよ。",
+  evidence_validated: "根拠の確認が終わったよ。",
+  evidence_rejected: "使わない方がいい情報を見つけたよ。",
+  evidence_insufficient: "根拠がまだ足りないよ。",
+  contradiction_detected: "情報の食い違いを見つけたよ。",
+  freshness_checked: "情報の新しさを確認したよ。",
+  hypothesis_proposed: "次に試す仮説を考えたよ。",
+  alternative_hypothesis_proposed: "別の仮説も用意したよ。",
+  experiment_variable_selected: "検証する条件を決めたよ。",
+  offer_adopted: "使う施策を選んだよ。",
+  offer_held: "施策をいったん保留にしたよ。",
+  strategy_selected: "次の戦略を選んだよ。",
+  revenue_analyzed: "売上の分析が終わったよ。",
+  conversion_analyzed: "CVの動きを確認したよ。",
+  cost_analyzed: "コストの分析が終わったよ。",
+  margin_analyzed: "利益の状態を確認したよ。",
+  unit_economics_analyzed: "収益性を確認したよ。",
+  commercial_waste_flagged: "無駄になっている費用を見つけたよ。",
+  knowledge_versioned: "確認済みの知識を更新したよ。",
+  knowledge_marked_stale: "古くなった情報を見つけたよ。",
+  reliability_observed: "運用状況を確認したよ。",
+  status_missing_detected: "取得できない状態を見つけたよ。",
+  schedule_drift_detected: "予定とのずれを見つけたよ。",
+  notification_decided: "通知する内容を整理したよ。",
+  notification_suppressed: "重複する通知はまとめておいたよ。",
+  notification_escalated: "確認が必要だから知らせたよ。",
+  improvement_proposed: "改善案をまとめたよ。",
+  bounded_change_defined: "安全に直せる範囲を決めたよ。",
+  approved_change_executed: "承認済みの変更を反映したよ。",
+  approved_change_tested: "変更後のテストが終わったよ。",
+  approved_change_reverted: "安全のため変更を戻したよ。",
+  editorial_cycle_waiting: "次の投稿準備を待っているよ。",
+  editorial_draft_ready: "投稿案ができたよ。",
+  writer_canary_pending: "投稿案の確認を待っているよ。",
+  publication_state: "投稿状況を確認したよ。",
+  insights_collected: "投稿の分析結果を集めたよ。",
+  safety_state: "安全状態を確認したよ。",
+  workflow_checked: "運用の流れを確認したよ。",
+};
+
+const SYSTEM_ACTION_AGENT: Record<string, string> = {
+  editorial_cycle_waiting: "sashihara-orchestrator",
+  editorial_experiment_decided: "sashihara-orchestrator",
+  editorial_draft_ready: "sashihara-orchestrator",
+  editorial_cycle_approved: "sashihara-orchestrator",
+  writer_canary_pending: "sashihara-orchestrator",
+  human_approval: "sashihara-orchestrator",
+  publication_state: "kiara-executor",
+  insights_collected: "mirinya-cost-analyst",
+  safety_state: "hana-heartbeat",
+  workflow_checked: "hana-heartbeat",
+};
+
+function tableExists(db: Database, name: string): boolean {
+  return (db.query<{ n: number }, [string]>(
+    "SELECT COUNT(*) n FROM sqlite_master WHERE type='table' AND name=?",
+  ).get(name)?.n ?? 0) > 0;
+}
+
+function activitySpeech(row: ActivitySpeechRow): string {
+  if (row.next_action_owner === "human:approval") {
+    return row.action.startsWith("improvement") || row.action === "human_gate_requested"
+      ? "改善案の承認待ちだよ。"
+      : "投稿の承認待ちだよ。";
+  }
+  if (row.result_status === "failed") return "作業で問題が出たよ。確認してね。";
+  if (row.result_status === "blocked") return "確認が必要で、いったん止まっているよ。";
+  if (row.result_status === "pending" || row.decision_status === "pending") return "いま作業を進めているよ。";
+  return ACTION_SPEECH[row.action] ?? "最新の運用状況を確認したよ。";
+}
+
+function issueSpeech(issue: IssueSpeechRow): string {
+  if (issue.status === "blocked") return "確認が必要で、いったん止まっているよ。";
+  if (issue.type === "content_task" && issue.status === "in_review") return "投稿の承認待ちだよ。";
+  return ({
+    content_task: "投稿準備を進めているよ。",
+    hypothesis_run: "仮説の検証を進めているよ。",
+    data_sync: "データを同期しているよ。",
+    manual_followup: "確認してほしいことがあるよ。",
+    bug: "見つかった問題を確認しているよ。",
+    decision: "次の判断を整理しているよ。",
+    pilot_review: "試験運用の結果を確認しているよ。",
+    control_apply: "承認済みの変更を進めているよ。",
+  } as Record<string, string>)[issue.type] ?? "いま担当タスクを進めているよ。";
+}
+
+function loadLiveSpeech(db: Database, agentSlugs: Set<string>): Map<string, string> {
+  const speech = new Map<string, string>();
+  if (tableExists(db, "issues") && tableExists(db, "agents")) {
+    const issues = db.query<IssueSpeechRow, []>(`SELECT a.slug, i.type, i.status
+      FROM issues i JOIN agents a ON a.id=i.assignee_agent_id
+      WHERE i.status IN ('todo','in_progress','in_review','blocked')
+      ORDER BY i.updated_at DESC, i.id DESC`).all();
+    for (const issue of issues) if (!speech.has(issue.slug)) speech.set(issue.slug, issueSpeech(issue));
+  }
+  if (!tableExists(db, "agent_activity_ledger")) return speech;
+  const activities = db.query<ActivitySpeechRow, []>(`SELECT sequence,timestamp,agent_id,action,
+      decision_status,result_status,next_action_owner
+      FROM agent_activity_ledger ORDER BY sequence DESC LIMIT 100`).all();
+  const now = Date.now();
+  for (const activity of activities) {
+    const target = activity.agent_id && agentSlugs.has(activity.agent_id)
+      ? activity.agent_id
+      : SYSTEM_ACTION_AGENT[activity.action];
+    if (!target || speech.has(target)) continue;
+    const age = now - Date.parse(activity.timestamp);
+    const needsAttention = activity.decision_status === "pending"
+      || ["pending", "blocked", "failed"].includes(activity.result_status);
+    const maxAge = needsAttention ? 7 * 86_400_000 : 86_400_000;
+    if (!Number.isFinite(age) || age < -300_000 || age > maxAge) continue;
+    speech.set(target, activitySpeech(activity));
+  }
+  return speech;
+}
+
+function renderAgentCard(agent: AgentBasic, liveSpeech: Map<string, string>, leader = false): string {
   const active = agent.status === "active";
   const role = ROLE_LABEL_JP[agent.slug] || jpRole(agent.role);
   const accent = MEMBER_ACCENT[agent.slug] ?? "#ec4899";
-  const [speech, delaySeconds] = AGENT_SPEECH[agent.slug] ?? ["今日も稼働中です。", 0];
+  const [fallbackSpeech, delaySeconds] = AGENT_SPEECH[agent.slug] ?? ["今日も稼働中です。", 0];
+  const speech = liveSpeech.get(agent.slug) ?? fallbackSpeech;
+  const speechClass = liveSpeech.has(agent.slug) ? " org-speech-live" : "";
   const avatarUrl = agent.slug === "sashihara-orchestrator" ? "/internal-assets/equal-love-mark.png" : agent.avatar_url;
   return `<a class="org-person${leader ? " org-person-leader" : ""}" href="/agents" style="--member-color:${accent};--talk-delay:${delaySeconds}s" aria-label="${escapeHtml(agent.pokemon_jp)}、${escapeHtml(role)}">
-    <span class="org-speech" aria-hidden="true">${escapeHtml(speech)}</span>
+    <span class="org-speech${speechClass}" aria-hidden="true">${escapeHtml(speech)}</span>
     ${avatarUrl ? `<img src="${escapeHtml(avatarUrl)}" alt="" width="72" height="72">` : `<span class="org-avatar-fallback" aria-hidden="true">${escapeHtml(agent.pokemon_jp.slice(0, 1))}</span>`}
     <span class="org-person-copy">
       <strong>${escapeHtml(agent.pokemon_jp)}</strong>
@@ -94,9 +233,17 @@ export function renderOrgChart(db: Database, agentsList: AgentBasic[]): string {
   const leaders = roots.filter((agent) => agent.reports.length > 0);
   const specialists = roots.filter((agent) => agent.reports.length === 0);
   const activeCount = agentsList.filter((agent) => agent.status === "active").length;
+  const liveSpeech = loadLiveSpeech(db, new Set(agentsList.map((agent) => agent.slug)));
 
   return `<div class="org-board">
-    <span class="org-cosmos" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+    <span class="org-cosmos" aria-hidden="true">
+      <i style="--x:5%;--y:15%;--light:#ec4899;--delay:-.8s"></i><i style="--x:17%;--y:31%;--light:#38bdf8;--delay:-2.1s"></i>
+      <i style="--x:29%;--y:52%;--light:#a855f7;--delay:-1.4s"></i><i style="--x:41%;--y:74%;--light:#facc15;--delay:-3.2s"></i>
+      <i style="--x:53%;--y:21%;--light:#22c55e;--delay:-2.7s"></i><i style="--x:65%;--y:43%;--light:#f97316;--delay:-.3s"></i>
+      <i style="--x:77%;--y:67%;--light:#f9a8d4;--delay:-1.8s"></i><i style="--x:90%;--y:87%;--light:#60a5fa;--delay:-3.6s"></i>
+      <i style="--x:10%;--y:88%;--light:#c4b5fd;--delay:-2.4s"></i><i style="--x:35%;--y:92%;--light:#38bdf8;--delay:-.5s"></i>
+      <i style="--x:60%;--y:83%;--light:#ef4444;--delay:-3s"></i><i style="--x:84%;--y:28%;--light:#22c55e;--delay:-1.1s"></i>
+    </span>
     <header class="org-hero">
       <div>
         <span class="org-eyebrow">AI OPERATIONS NETWORK</span>
@@ -111,16 +258,16 @@ export function renderOrgChart(db: Database, agentsList: AgentBasic[]): string {
     </header>
     ${leaders.map((leader) => `<section class="org-team" aria-labelledby="org-team-${leader.id}">
       <h3 id="org-team-${leader.id}"><span>01</span> 運用統括</h3>
-      ${renderAgentCard(leader, true)}
+      ${renderAgentCard(leader, liveSpeech, true)}
       <div class="org-connector" aria-hidden="true"><i></i><i></i><i></i></div>
       <div class="org-core">
         <h3><span>02</span> 判断・実行チーム</h3>
-        <div class="org-report-grid" aria-label="判断・実行チーム">${leader.reports.map((agent) => renderAgentCard(agent)).join("")}</div>
+        <div class="org-report-grid" aria-label="判断・実行チーム">${leader.reports.map((agent) => renderAgentCard(agent, liveSpeech)).join("")}</div>
       </div>
     </section>`).join("")}
     ${specialists.length > 0 ? `<section class="org-specialists" aria-labelledby="org-specialists-title">
       <h3 id="org-specialists-title"><span>03</span> 専門ユニット</h3>
-      <div class="org-specialist-grid">${specialists.map((agent) => renderAgentCard(agent)).join("")}</div>
+      <div class="org-specialist-grid">${specialists.map((agent) => renderAgentCard(agent, liveSpeech)).join("")}</div>
     </section>` : ""}
   </div>
   <p class="muted small org-summary">各カードを押すと一覧で詳細を確認できます</p>`;

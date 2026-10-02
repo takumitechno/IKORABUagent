@@ -9,7 +9,7 @@ import { icon } from "./icons";
 import { baseComponents, designTokens } from "./design-tokens";
 import type { CustomerWorkspaceView } from "../lib/customer-workspaces";
 
-export const DASHBOARD_STYLESHEET_VERSION = "hq-ui-20261002-celebration";
+export const DASHBOARD_STYLESHEET_VERSION = "hq-ui-20261002-live-stage";
 
 export function dashboardStylesheetHref(): string {
   return `/styles.css?v=${DASHBOARD_STYLESHEET_VERSION}`;
@@ -327,13 +327,18 @@ function internalSecurityScript(token: string): string {
  */
 function liveScript(currentPath: string): string {
   // 注: "/" (overview) は overview.ts 自身が SSE で部分更新するので live swap は OFF
-  const isLive = currentPath === "/heartbeat";
+  const isLive = currentPath === "/heartbeat" || currentPath === "/agents";
+  const fragmentUrl = currentPath === "/agents"
+    ? "/api/fragments/agents-org"
+    : currentPath === "/"
+      ? "/api/fragments/dashboard"
+      : "/api/fragments/heartbeat";
   return `
 (() => {
   const dot = document.getElementById('live-dot');
   const txt = document.getElementById('live-text');
-  const isLive = ${JSON.stringify(isLive)};
-  const fragmentUrl = ${JSON.stringify(currentPath === "/" ? "/api/fragments/dashboard" : "/api/fragments/heartbeat")};
+  const isLive = ${JSON.stringify(isLive)} && (location.pathname !== '/agents' || new URLSearchParams(location.search).get('view') === 'org');
+  const fragmentUrl = ${JSON.stringify(fragmentUrl)};
   let es = null;
   let reconnectTimer = null;
   let lastSwap = 0;
