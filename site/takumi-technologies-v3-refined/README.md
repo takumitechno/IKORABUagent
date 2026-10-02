@@ -12,13 +12,13 @@ a clearer product, and philosophy reduced to one moment near the end.
 | # | Section | What the visitor learns |
 |---|---|---|
 | 01 | Hero | 事業の運用を、もっとシンプルに。 What the company does, in one sentence. The official logo appears whole (no partial brush strokes) |
-| 02 | Services `#services` | Four services as short lists: 運用代行 / メディア自動運用 / 業務改善・BPO / 広告・マーケティング |
+| 02 | Services `#services` | Four services, each with a small animated line illustration and a short list: 運用代行 / メディア自動運用 / 業務改善・BPO / 広告・マーケティング |
 | 03 | 環 — MEGURI `#meguri` | 自律型AI運用・改善プラットフォーム. 指示を待つAIではなく、運用を継続するAI。 Platform marks for Threads / X / Instagram / owned media connected to 環 |
-| 04 | Features `#features` | 環でできること: ten capabilities, one line each |
+| 04 | Features `#features` | 環でできること: ten capabilities, one line each; icons draw in on arrival |
 | 05 | Autonomous operation `#flow` | Seven specialist roles on one loop (AI / システム), including an AI safety check before publishing, with three short points on running without human involvement |
 | 06 | Product demo `#demo` | A conceptual operating board (表示例) that moves from draft through safety check to improvement ideas without manual steps; pause and step controls |
-| 07 | Cost model `#cost` | モデルケース（試算例）: 28万円 → 8万円 / 月, drawn to one scale, with the disclaimer |
-| 08 | Philosophy | The four fixed lines, once |
+| 07 | Cost model `#cost` | モデルケース（試算例）: 28万円 → 8万円 / 月, drawn to one scale, figures count up on arrival, with the disclaimer |
+| 08 | Philosophy | 繰り返しは、AIに。ひらめきは、人に。 A compact section: AI keeps operating and improving, so people can keep their own ひらめき. The four fixed lines sit below as a signature |
 | 09 | Closing | The company logo |
 
 ## Rules kept in the copy

@@ -247,61 +247,6 @@ button { font: inherit; color: inherit; }
 .is-static .ha-node, .is-static .ha-fade { animation: none !important; }
 .intro-skip .hero [data-hi], .intro-skip .hero .ln > span, .intro-skip .logo-sq, .intro-skip .logo-sq .sq-seal, .intro-skip .logo-sq .sq-word, .intro-skip .site-header, .intro-skip .hp-arc { animation: none !important; opacity: 1; }
 
-/* ---------- PHILOSOPHY (sumi) ---------- */
-.phil { --bgc: var(--sumi); }
-.phil-grid { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: var(--colgap); align-items: center; }
-.phil-v {
-  --vfs: clamp(24px, 2.2vw, 34px);
-  grid-column: 1 / span 5; justify-self: center;
-  writing-mode: vertical-rl; text-orientation: mixed;
-  font-family: var(--f-min); font-weight: 500; font-size: var(--vfs); letter-spacing: .12em; line-height: 1;
-  color: var(--wash); display: block; margin: 0;
-}
-.v-col { display: block; white-space: nowrap; position: relative; }
-.v-col > span { display: block; }
-/* English sits beside each Japanese line as a quiet, sideways echo */
-.v-en { display: block; white-space: nowrap; font-family: var(--f-lat); font-weight: 300; font-size: 11.5px; letter-spacing: .16em; line-height: 1; color: var(--wash-3); margin-block-start: 16px; padding-inline-start: .3em; }
-.v-en + .v-col { margin-block-start: clamp(30px, 3.2vw, 48px); padding-inline-start: 1.2em; }
-.v-en:last-child { padding-inline-start: calc(var(--vfs) * 1.2 + .3em); }
-.m-full .phil-v .v-col > span { clip-path: inset(0 0 100% 0); transition: clip-path 2s var(--ease-io); }
-.m-full .phil-v .v-en + .v-col > span { transition-delay: .55s; }
-.m-full .phil-v.is-in .v-col > span { clip-path: inset(0 0 0 0); }
-.m-full .phil-v .v-en { opacity: 0; transition: opacity 1.6s ease 1.25s; }
-.m-full .phil-v .v-en:last-child { transition-delay: 1.8s; }
-.m-full .phil-v.is-in .v-en { opacity: 1; }
-.phil-fig { grid-column: 7 / span 6; margin: 0; min-width: 0; }
-.pf-stage { position: relative; width: 100%; max-width: 600px; margin-inline: auto; aspect-ratio: 600 / 520; }
-.pf-svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; --sw: 1.15; }
-.pf-dotc { fill: var(--wash); }
-.pf-dots { opacity: .22; }
-.m-full .pf-dots { opacity: 0; transition: opacity 1.8s ease .1s; }
-.m-full .is-in .pf-dots { opacity: .22; }
-/* the opening: rays rest at their own angle; with motion they start folded together and open */
-.pf-ray { transform-box: view-box; transform-origin: 200px 340px; transform: rotate(var(--a)); }
-.m-full .pf-ray { transform: rotate(-16deg); transition: transform 1.9s var(--ease) calc(1.3s + var(--i) * 90ms); }
-.m-full .is-in .pf-ray { transform: rotate(var(--a)); }
-.pf-ray .gp { transition: stroke-dashoffset 1.5s var(--ease) calc(1.15s + var(--i) * 90ms); }
-.pf-node { fill: var(--sumi); stroke: var(--wash-2); stroke-width: 1.1; }
-.pf-node.kin { stroke: var(--kin); fill: var(--kin); }
-.pf-rep { fill: var(--sumi); stroke: var(--kin); stroke-width: 1.1; }
-.m-full .pf-node, .m-full .pf-rep { opacity: 0; transition: opacity .7s ease calc(2.6s + var(--k, 0) * 170ms); }
-.m-full .is-in .pf-node, .m-full .is-in .pf-rep { opacity: 1; }
-.pf-tag { position: absolute; display: grid; gap: 9px; }
-.pf-keep { left: 18%; top: 90%; }
-.pf-open { right: 0; top: 63%; justify-items: end; text-align: right; }
-.pf-name { display: flex; align-items: baseline; gap: 12px; }
-.pf-name .jp { font-family: var(--f-min); font-weight: 500; font-size: clamp(19px, 1.6vw, 23px); letter-spacing: .14em; color: var(--wash); }
-.pf-name [lang="en"] { font-family: var(--f-lat); font-weight: 300; font-size: 10.5px; letter-spacing: .3em; text-transform: uppercase; color: var(--kin); }
-.pf-terms { display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: 12.5px; letter-spacing: .14em; color: var(--wash-2); }
-.pf-open .pf-terms { justify-content: flex-end; }
-.pf-terms li { display: inline-flex; align-items: center; gap: 7px; white-space: nowrap; }
-.pf-terms li::before { content: ""; width: 3px; height: 3px; border-radius: 50%; background: var(--kin); flex: none; }
-.m-full .pf-tag { opacity: 0; transform: translateY(8px); transition: opacity 1.2s ease, transform 1.2s var(--ease); }
-.m-full .pf-keep { transition-delay: 1.2s; }
-.m-full .pf-open { transition-delay: 3s; }
-.m-full .is-in .pf-tag { opacity: 1; transform: none; }
-.pf-cap-unused { margin-top: clamp(76px, 8vw, 104px); font-family: var(--f-min); font-weight: 500; font-feature-settings: "palt"; font-size: clamp(17px, 1.5vw, 21px); letter-spacing: .1em; line-height: 1.8; color: var(--wash); text-align: center; }
-
 /* ---------- 環 — MEGURI (proprietary operating platform) ---------- */
 .mg { color: var(--wash); background: var(--shiro); --bgc: var(--ai); }
 .mg-bg { position: absolute; inset: 0; z-index: 0; background-color: var(--ai); background-image: radial-gradient(60% 70% at 72% 50%, rgba(44, 66, 110, .45), transparent 70%), var(--grain-l); clip-path: inset(0 var(--ci, 0px)); }
@@ -435,8 +380,6 @@ button { font: inherit; color: inherit; }
 .svc { display: flex; flex-direction: column; min-width: 0; padding: 34px clamp(18px, 1.8vw, 30px) 40px; border-left: 1px solid var(--rule-l); scroll-margin-top: calc(var(--header-h) + 8px); }
 .svc:first-child { border-left: 0; padding-left: 0; }
 .svc:last-child { padding-right: 0; }
-.svc-glyph { --sw: 3.4; width: 52px; height: 52px; margin-bottom: 24px; }
-.svc-glyph svg { display: block; width: 52px; height: 52px; overflow: visible; }
 .svc-name { font-family: var(--f-min); font-weight: 500; font-feature-settings: "palt"; font-size: clamp(20px, 1.7vw, 25px); letter-spacing: .08em; line-height: 1.45; }
 .svc-gloss { margin-top: 2px; font-size: 11.5px; letter-spacing: .08em; color: var(--ink-3); }
 .svc-desc { margin-top: 10px; font-size: 14px; line-height: 1.85; color: var(--ink-2); }
@@ -685,9 +628,98 @@ button { font: inherit; color: inherit; }
 .cr-stats dd b { margin-right: 2px; font-family: var(--f-lat); font-weight: 300; font-size: clamp(30px, 3vw, 44px); line-height: 1.2; color: var(--ink); font-variant-numeric: tabular-nums; }
 .cost-note { margin-top: clamp(28px, 3vw, 40px); padding: 14px 18px; border-left: 2px solid var(--kin); background: rgba(173, 149, 100, .07); font-size: 13px; line-height: 1.9; color: var(--ink-2); max-width: 52em; }
 
-/* ---------- PHILOSOPHY: one quiet moment ---------- */
-.phil { padding-block: clamp(96px, 11vw, 168px); }
-.pf-tag { gap: 0; }
+/* ---------- service illustrations: line art, gently moving ---------- */
+.svc-art { margin-bottom: 22px; }
+.sa { display: block; width: 100%; max-width: 300px; height: 150px; overflow: visible; }
+.sa .l { fill: none; stroke: var(--ink); stroke-opacity: .55; stroke-width: 1.15; stroke-linecap: round; stroke-linejoin: round; }
+.sa .lt { fill: none; stroke: var(--ink); stroke-opacity: .24; stroke-width: 1; stroke-linecap: round; }
+.sa .k { fill: none; stroke: var(--kin); stroke-width: 1.3; stroke-linecap: round; stroke-linejoin: round; }
+.sa .kf { fill: var(--kin); }
+.sa .inkf { fill: var(--ink); fill-opacity: .62; }
+.sa .dt { fill: var(--ink); fill-opacity: .2; }
+.sa .dtf { fill: var(--ink); fill-opacity: .07; }
+.sa .card { fill: rgba(250, 249, 246, .7); stroke: var(--ink); stroke-opacity: .2; stroke-width: 1; }
+.sa .node { fill: var(--kinari); stroke: var(--ink); stroke-opacity: .45; stroke-width: 1.1; }
+.sa .ic { color: var(--ink); }
+.sa .fic { fill: none; stroke: var(--kin-deep); stroke-width: 1.4; stroke-linecap: round; stroke-linejoin: round; }
+.sa-kanji { font-family: var(--f-min); font-weight: 500; font-size: 24px; fill: var(--ink); }
+.sa-new { fill: none; stroke: var(--kin); stroke-width: 1.3; opacity: 0; }
+.sa-arc { stroke-dasharray: .2 .8; }
+.sa-pulse { fill: none; stroke: var(--kin-deep); stroke-width: 2.4; stroke-linecap: round; stroke-dasharray: .14 .86; stroke-dashoffset: .14; opacity: 0; }
+.sa-flow { fill: none; stroke: var(--ink); stroke-opacity: .55; stroke-width: 1.6; stroke-linecap: round; stroke-dasharray: 5 15; }
+.sa-flow.k { stroke: var(--kin); stroke-opacity: 1; }
+.sa-click { fill: none; stroke: var(--kin); stroke-width: 1.2; opacity: 0; }
+.sa-target { fill: none; stroke: var(--kin); stroke-width: 1; opacity: .5; }
+.sa .sbar { transform-box: fill-box; transform-origin: 50% 100%; }
+.m-full .sa-feed { animation: saFeed 6s var(--ease-io) infinite; }
+.m-full .sa-new { animation: saNew 6s ease infinite; }
+.m-full .sa-tick { stroke-dasharray: 1 2; animation: saTick 6s var(--ease) infinite; }
+.m-full .sa .sbar { animation: saBar 3.6s var(--ease-io) calc(var(--i) * -.45s) infinite alternate; }
+.m-full .sa-orbit { transform-box: view-box; transform-origin: 140px 75px; animation: spin 7s linear infinite; }
+.m-full .sa-pulse { animation: saPulse 2.4s linear infinite; }
+.m-full .sa-flow { animation: saFlow 1.6s linear infinite; }
+.m-full .sa-tangle { animation: saTangle 5s ease-in-out calc(var(--i) * -1.1s) infinite alternate; }
+.m-full .sa-box { animation: saBox 3s ease-in-out infinite; }
+.m-full .sa-click { transform-box: fill-box; transform-origin: center; animation: saClick 3.2s ease-out infinite; }
+.m-full .sa-cta { animation: saCta 3.2s ease infinite; }
+.m-full .sa-trend { stroke-dasharray: 1 2; animation: saTrend 6.4s var(--ease) infinite; }
+.m-full .sa-target { transform-box: fill-box; transform-origin: center; animation: saTarget 3.2s ease-out infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes saFeed { 0%, 22% { transform: translateY(0); } 42%, 100% { transform: translateY(38px); } }
+@keyframes saNew { 0%, 30% { opacity: 0; } 45%, 88% { opacity: 1; } 100% { opacity: 0; } }
+@keyframes saTick { 0%, 40% { stroke-dashoffset: 1.01; } 58%, 92% { stroke-dashoffset: 0; opacity: 1; } 100% { stroke-dashoffset: 0; opacity: 0; } }
+@keyframes saBar { from { transform: scaleY(.62); } to { transform: scaleY(1); } }
+@keyframes saPulse { 0% { stroke-dashoffset: .14; opacity: 0; } 12% { opacity: 1; } 88% { opacity: 1; } 100% { stroke-dashoffset: -.86; opacity: 0; } }
+@keyframes saFlow { to { stroke-dashoffset: -20; } }
+@keyframes saTangle { from { transform: translateY(-3px); } to { transform: translateY(3px); } }
+@keyframes saBox { 0%, 100% { stroke: var(--ink); stroke-opacity: .45; } 50% { stroke: var(--kin); stroke-opacity: 1; } }
+@keyframes saClick { 0%, 8% { opacity: 0; transform: scale(.3); } 14% { opacity: 1; } 40%, 100% { opacity: 0; transform: scale(1.8); } }
+@keyframes saCta { 0%, 30% { fill-opacity: .55; } 42%, 70% { fill-opacity: 1; } 100% { fill-opacity: .55; } }
+@keyframes saTrend { 0%, 18% { stroke-dashoffset: 1.01; opacity: 1; } 55%, 90% { stroke-dashoffset: 0; opacity: 1; } 100% { stroke-dashoffset: 0; opacity: 0; } }
+@keyframes saTarget { 0%, 50% { opacity: 0; transform: scale(.4); } 60% { opacity: .9; } 100% { opacity: 0; transform: scale(2); } }
+
+/* ---------- features: icons in a ring badge, drawn in, lift on hover ---------- */
+.feat-grid .fi { box-sizing: content-box; width: 26px; height: 26px; padding: 14px; border: 1px solid var(--rule-l); border-radius: 50%; background: rgba(250, 249, 246, .55); transition: color .4s ease, transform .5s var(--ease), border-color .4s ease; }
+.feat-grid li:hover .fi { color: var(--kin-deep); border-color: var(--kin); transform: translateY(-3px); }
+.feat-grid li:nth-child(4) .fi { border-color: rgba(173, 149, 100, .6); }
+.m-full .feat-grid .fi { stroke-dasharray: 100; stroke-dashoffset: 100; transition: stroke-dashoffset 2s var(--ease) calc(var(--d, 0s) + .3s), color .4s ease, transform .5s var(--ease), border-color .4s ease; }
+.m-full .feat-grid li.is-in .fi { stroke-dashoffset: 0; }
+
+/* ---------- PHILOSOPHY: one compact moment ---------- */
+.phil { --bgc: var(--sumi); position: relative; padding-block: clamp(84px, 9vw, 132px); }
+.phil-in { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: var(--colgap); align-items: center; }
+.phil-text { grid-column: 1 / span 6; }
+.phil-title { font-family: var(--f-min); font-weight: 500; font-feature-settings: "palt"; font-size: clamp(28px, 3.1vw, 44px); line-height: 1.5; letter-spacing: .08em; color: var(--wash); }
+.phil-lead { margin-top: clamp(16px, 1.8vw, 24px); font-size: clamp(14.5px, 1.1vw, 16px); line-height: 2; color: var(--wash-2); max-width: 30em; word-break: auto-phrase; }
+.phil-sign { display: grid; gap: 12px; margin-top: clamp(28px, 3vw, 40px); padding-top: clamp(20px, 2vw, 26px); border-top: 1px solid var(--rule-d); max-width: 30em; }
+.phil-sign p { display: grid; gap: 1px; }
+.phil-sign .jp { font-family: var(--f-min); font-weight: 500; font-size: 15px; letter-spacing: .12em; color: var(--wash); }
+.phil-sign [lang="en"] { font-family: var(--f-lat); font-weight: 300; font-size: 11.5px; letter-spacing: .1em; color: var(--wash-2); }
+.phil-art { grid-column: 7 / span 6; margin: 0; min-width: 0; }
+.phil-art svg { display: block; width: 100%; max-width: 560px; height: auto; margin-inline: auto; overflow: visible; }
+.pa-base { fill: none; stroke: var(--wash); stroke-opacity: .2; stroke-width: 1; }
+.pa-inner { fill: none; stroke: var(--wash); stroke-opacity: .07; stroke-width: 1; }
+.pa-arc { fill: none; stroke: var(--kin); stroke-width: 1.6; stroke-linecap: round; stroke-dasharray: .26 .74; }
+.pa-head { fill: var(--kin-hi); }
+.pa-node { fill: var(--sumi); stroke: var(--wash-2); stroke-width: 1.1; }
+.pa-s { font-family: var(--f-got); font-size: 12px; letter-spacing: .14em; fill: var(--wash-2); }
+.pa-mid { font-size: 11.5px; fill: var(--kin-hi); }
+.pa-ai { font-family: var(--f-lat); font-weight: 300; font-size: 30px; letter-spacing: .12em; fill: var(--wash); }
+.pa-t { font-family: var(--f-min); font-weight: 500; font-size: 18px; letter-spacing: .14em; fill: var(--wash); }
+.pa-curve { fill: none; stroke: var(--wash); stroke-opacity: .2; stroke-width: 1; stroke-dasharray: 3 5; }
+.pa-run { fill: none; stroke-width: 2.4; stroke-linecap: round; stroke-dasharray: .1 .9; stroke-dashoffset: .1; opacity: 0; }
+.pa-run.up { stroke: var(--kin-hi); }
+.pa-run.back { stroke: var(--wash); }
+.pa-rays { fill: none; stroke: var(--kin-hi); stroke-width: 1.4; stroke-linecap: round; transform-box: view-box; transform-origin: 432px 170px; }
+.pa-core { fill: var(--kin-hi); }
+.pa-glow { transform-box: view-box; transform-origin: 432px 170px; }
+.m-full .pa-orbit { transform-box: view-box; transform-origin: 150px 170px; animation: spin 8s linear infinite; }
+.m-full .pa-run.up { animation: saPulse 3.2s linear infinite; }
+.m-full .pa-run.back { animation: saPulse 3.2s linear 1.6s infinite; }
+.m-full .pa-rays { animation: paTwinkle 3.2s ease-in-out infinite; }
+.m-full .pa-glow { animation: paGlow 3.2s ease-in-out infinite; }
+@keyframes paTwinkle { 0%, 100% { transform: scale(.82) rotate(0deg); opacity: .6; } 50% { transform: scale(1.08) rotate(22.5deg); opacity: 1; } }
+@keyframes paGlow { 0%, 100% { transform: scale(.85); opacity: .7; } 50% { transform: scale(1.1); opacity: 1; } }
 
 /* ---------- dark-ground small text at AA ---------- */
 .mg .label, .mg-flow .label { color: var(--wash-2); }
@@ -733,8 +765,6 @@ button { font: inherit; color: inherit; }
   .hero-copy { grid-column: 1 / -1; margin-top: 72px; }
   .hero-gap { height: 22px; }
   .hero-title { font-size: clamp(32px, 6.4vw, 52px); }
-  .phil-v { grid-column: 1 / -1; justify-self: start; margin-bottom: 72px; }
-  .phil-fig { grid-column: 1 / -1; }
   .cl-text, .cl-logo { grid-column: 1 / -1; }
   .cl-logo { justify-self: center; width: min(72vw, 340px); margin-top: 72px; }
   .sec-head > div, .sec-lead, .fl-head > div, .fl-points, .cost-badge { grid-column: 1 / -1; }
@@ -755,18 +785,11 @@ button { font: inherit; color: inherit; }
   .hero-cta { flex-direction: column; align-items: flex-start; }
   .btn-primary { width: 100%; justify-content: space-between; }
   .sec-lead br { display: none; }
-  .pf-name .jp { font-size: 17px; }
-  .pf-keep { left: 4%; }
-  .pf-open { right: auto; left: 0; top: 1%; justify-items: start; text-align: left; }
-  .phil-v { --vfs: clamp(24px, 7vw, 30px); }
-  .v-en { font-size: 10.5px; }
   .hero-foot .fig { display: none; }
   .svc-grid { grid-template-columns: minmax(0, 1fr); }
   .svc, .svc:nth-child(even) { border-left: 0; padding-inline: 0; }
   .svc:nth-child(n+2) { border-top: 1px solid var(--rule-l); }
   .svc { padding-block: 30px 34px; }
-  .svc-glyph, .svc-glyph svg { --sw: 4; width: 44px; height: 44px; }
-  .svc-glyph { margin-bottom: 16px; }
   .feat-grid h3 { font-size: 14.5px; }
   .feat-grid p { font-size: 12.5px; }
   .hub { grid-template-columns: minmax(0, 30fr) minmax(0, 12fr) minmax(0, 58fr); }
@@ -808,6 +831,17 @@ button { font: inherit; color: inherit; }
   .cr-stats div { display: flex; justify-content: space-between; align-items: baseline; padding: 0 0 10px; border-left: 0; border-bottom: 1px solid var(--rule-l); }
   .cost-rows > div { font-size: 13.5px; }
   .foot-in { flex-direction: column; align-items: flex-start; }
+}
+@media (max-width: 959px) {
+  .phil-text, .phil-art { grid-column: 1 / -1; }
+  .phil-art { margin-top: 48px; }
+  .phil-art svg { max-width: 480px; }
+}
+@media (max-width: 719px) {
+  .svc-art { margin-bottom: 16px; }
+  .sa { max-width: 280px; height: 140px; }
+  .svc-list { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); column-gap: 16px; }
+  .svc-list li { font-size: 13.5px; letter-spacing: .03em; }
 }
 @media (min-width: 600px) and (max-width: 959px) { .hero { justify-content: center; } }
 </style>
@@ -918,13 +952,30 @@ button { font: inherit; color: inherit; }
     </div>
     <div class="svc-grid">
         <article class="svc" id="svc-1" data-r="up" style="--d:0.00s">
-          <div class="svc-glyph" aria-hidden="true"><svg viewBox="0 0 200 200"></svg></div>
+          <div class="svc-art">
+          <svg class="sa" viewBox="0 0 280 150" preserveAspectRatio="xMinYMid meet" aria-hidden="true" focusable="false">
+            <defs><clipPath id="saFeed"><rect x="106" y="24" width="68" height="112" rx="4"/></clipPath></defs>
+            <rect class="l" x="14" y="38" width="64" height="58" rx="4"/><path class="l" d="M14 52H78M28 32V42M64 32V42"/><circle class="dt" cx="24" cy="64" r="1.6"/><circle class="dt" cx="37" cy="64" r="1.6"/><circle class="dt" cx="50" cy="64" r="1.6"/><circle class="dt" cx="63" cy="64" r="1.6"/><circle class="dt" cx="24" cy="76" r="1.6"/><circle class="dt" cx="37" cy="76" r="1.6"/><circle class="dt" cx="63" cy="76" r="1.6"/><circle class="dt" cx="24" cy="88" r="1.6"/><circle class="dt" cx="37" cy="88" r="1.6"/><circle class="dt" cx="50" cy="88" r="1.6"/><circle class="dt" cx="63" cy="88" r="1.6"/>
+            <path class="k sa-tick" pathLength="1" d="M45.5 76L49 79.5L56 72.5"/>
+            <rect class="l" x="98" y="8" width="84" height="138" rx="12"/><path class="lt" d="M130 16H150"/>
+            <g clip-path="url(#saFeed)"><g class="sa-feed"><rect class="card" x="108" y="-10" width="64" height="32" rx="3"/><circle class="dt" cx="116" cy="-1" r="3.6"/><path class="lt" d="M124 -2H150M112 9H166M112 15H154"/><rect class="card" x="108" y="28" width="64" height="32" rx="3"/><circle class="dt" cx="116" cy="37" r="3.6"/><path class="lt" d="M124 36H150M112 47H166M112 53H154"/><rect class="card" x="108" y="66" width="64" height="32" rx="3"/><circle class="dt" cx="116" cy="75" r="3.6"/><path class="lt" d="M124 74H150M112 85H166M112 91H154"/><rect class="card" x="108" y="104" width="64" height="32" rx="3"/><circle class="dt" cx="116" cy="113" r="3.6"/><path class="lt" d="M124 112H150M112 123H166M112 129H154"/><rect class="card" x="108" y="142" width="64" height="32" rx="3"/><circle class="dt" cx="116" cy="151" r="3.6"/><path class="lt" d="M124 150H150M112 161H166M112 167H154"/></g><rect class="sa-new" x="108" y="28" width="64" height="32" rx="3"/></g>
+            <g transform="translate(202 48)"><path class="lt" d="M0 62.5H66"/><rect class="sbar inkf" x="6" y="40" width="9" height="22" style="--i:0"/><rect class="sbar inkf" x="22" y="28" width="9" height="34" style="--i:1"/><rect class="sbar inkf" x="38" y="34" width="9" height="28" style="--i:2"/><rect class="sbar kf" x="54" y="16" width="9" height="46" style="--i:3"/></g>
+          </svg>
+          </div>
           <h3 class="svc-name">運用代行</h3>
           <p class="svc-desc">SNSの日々の運用を、まるごと代行。</p>
           <ul class="svc-list"><li>SNS運用</li><li>投稿企画</li><li>コンテンツ制作</li><li>投稿管理</li><li>KPI集計</li><li>レポート</li><li>改善提案</li></ul>
         </article>
         <article class="svc" id="svc-2" data-r="up" style="--d:0.08s">
-          <div class="svc-glyph" aria-hidden="true"><svg viewBox="0 0 200 200"></svg></div>
+          <div class="svc-art">
+          <svg class="sa" viewBox="0 0 280 150" preserveAspectRatio="xMinYMid meet" aria-hidden="true" focusable="false">
+            <path class="k" d="M102.5 61L51.9 42"/><path class="k" d="M102.5 89L51.9 108"/><path class="k" d="M177.5 61L228.1 42"/><path class="k" d="M177.5 89L228.1 108"/><path class="sa-pulse" pathLength="1" d="M102.5 61L51.9 42" style="animation-delay:0.0s"/><path class="sa-pulse" pathLength="1" d="M102.5 89L51.9 108" style="animation-delay:0.5s"/><path class="sa-pulse" pathLength="1" d="M177.5 61L228.1 42" style="animation-delay:1.0s"/><path class="sa-pulse" pathLength="1" d="M177.5 89L228.1 108" style="animation-delay:1.5s"/>
+            <circle class="lt" cx="140" cy="75" r="30"/><circle class="l" cx="140" cy="75" r="40"/>
+            <g class="sa-orbit"><circle class="k sa-arc" cx="140" cy="75" r="40" pathLength="1"/><circle class="kf" cx="140" cy="35" r="3.4"/></g>
+            <text class="sa-kanji" x="140" y="83" text-anchor="middle">環</text>
+            <circle class="node" cx="36" cy="36" r="17"/><use class="ic" href="#i-threads" x="28" y="28" width="16" height="16"/><circle class="node" cx="36" cy="114" r="17"/><use class="ic" href="#i-x" x="28" y="106" width="16" height="16"/><circle class="node" cx="244" cy="36" r="17"/><use class="ic" href="#i-instagram" x="236" y="28" width="16" height="16"/><circle class="node" cx="244" cy="114" r="17"/><use class="ic" href="#i-web" x="236" y="106" width="16" height="16"/>
+          </svg>
+          </div>
           <h3 class="svc-name">メディア自動運用</h3>
           <p class="svc-desc">投稿から分析まで、AIとシステムで自動化。</p>
           <ul class="svc-pl" aria-label="対象媒体">
@@ -938,13 +989,31 @@ button { font: inherit; color: inherit; }
           <a class="svc-link" href="#meguri"><span>自社開発の環 — <span lang="en">MEGURI</span>で動かします</span><span aria-hidden="true">→</span></a>
         </article>
         <article class="svc" id="svc-3" data-r="up" style="--d:0.16s">
-          <div class="svc-glyph" aria-hidden="true"><svg viewBox="0 0 200 200"></svg></div>
+          <div class="svc-art">
+          <svg class="sa" viewBox="0 0 280 150" preserveAspectRatio="xMinYMid meet" aria-hidden="true" focusable="false">
+            <path class="l sa-tangle" d="M8 30C34 26 46 70 70 64S96 40 116 62" style="--i:0"/><path class="l sa-tangle" d="M8 58C30 94 56 30 80 52S102 86 116 70" style="--i:1"/><path class="l sa-tangle" d="M8 96C40 108 50 60 78 84S100 70 116 78" style="--i:2"/><path class="l sa-tangle" d="M8 124C36 112 62 128 84 104S104 92 116 86" style="--i:3"/>
+            <rect class="node sa-box" x="116" y="48" width="48" height="52" rx="5"/><use class="fic" href="#f-chip" x="128" y="62" width="24" height="24"/>
+            <path class="lt" d="M164 62H262"/><path class="sa-flow" d="M164 62H262" style="animation-delay:0.00s"/><circle class="inkf" cx="266" cy="62" r="2.4"/><path class="lt" d="M164 70H262"/><path class="sa-flow k" d="M164 70H262" style="animation-delay:-0.35s"/><circle class="kf" cx="266" cy="70" r="2.4"/><path class="lt" d="M164 78H262"/><path class="sa-flow" d="M164 78H262" style="animation-delay:-0.70s"/><circle class="inkf" cx="266" cy="78" r="2.4"/><path class="lt" d="M164 86H262"/><path class="sa-flow" d="M164 86H262" style="animation-delay:-1.05s"/><circle class="inkf" cx="266" cy="86" r="2.4"/>
+          </svg>
+          </div>
           <h3 class="svc-name">業務改善・BPO</h3><p class="svc-gloss">BPO：業務の外部委託・代行</p>
           <p class="svc-desc">繰り返す業務を整理して、代行・自動化。</p>
           <ul class="svc-list"><li>業務整理</li><li>定型業務の代行</li><li>データ集計</li><li>レポート作成</li><li>AI導入</li><li>業務フロー自動化</li><li>ツール連携</li></ul>
         </article>
         <article class="svc" id="svc-4" data-r="up" style="--d:0.24s">
-          <div class="svc-glyph" aria-hidden="true"><svg viewBox="0 0 200 200"></svg></div>
+          <div class="svc-art">
+          <svg class="sa" viewBox="0 0 280 150" preserveAspectRatio="xMinYMid meet" aria-hidden="true" focusable="false">
+            <rect class="l" x="8" y="34" width="74" height="60" rx="4"/><rect class="dtf" x="14" y="40" width="62" height="28" rx="2"/><path class="lt" d="M14 76H62M14 84H48"/>
+            <circle class="sa-click" cx="62" cy="80" r="9"/><path class="inkf" d="M60 76L60 92L64.2 88.2L67.4 94.6L70 93.3L66.9 87L72.4 86.6Z"/>
+            <path class="l" d="M86 64H104M100 60L104 64L100 68"/>
+            <rect class="l" x="108" y="18" width="70" height="102" rx="4"/><path class="lt" d="M108 30H178"/><circle class="dt" cx="115" cy="24" r="1.6"/><circle class="dt" cx="121" cy="24" r="1.6"/>
+            <path class="lt" d="M116 42H170M116 50H160M116 58H166"/><rect class="dtf" x="116" y="66" width="54" height="18" rx="2"/>
+            <rect class="kf sa-cta" x="126" y="94" width="34" height="11" rx="2"/>
+            <path class="l" d="M182 64H196M192 60L196 64L192 68"/>
+            <path class="lt" d="M202 120.5H274M202 120V30"/><rect class="sbar inkf" x="208" y="98" width="10" height="22" style="--i:0"/><rect class="sbar inkf" x="224" y="86" width="10" height="34" style="--i:1"/><rect class="sbar inkf" x="240" y="72" width="10" height="48" style="--i:2"/><rect class="sbar kf" x="256" y="54" width="10" height="66" style="--i:3"/>
+            <path class="k sa-trend" pathLength="1" d="M210 104L226 92L242 78L262 48"/><circle class="sa-target" cx="262" cy="48" r="7"/><circle class="kf" cx="262" cy="48" r="2.6"/>
+          </svg>
+          </div>
           <h3 class="svc-name">広告・マーケティング</h3>
           <p class="svc-desc">広告からLP、計測まで、まとめて改善。</p>
           <ul class="svc-list"><li>広告運用</li><li>LP制作</li><li>クリエイティブ制作</li><li>計測設計</li><li>トラッキング</li><li>CRM</li><li>導線改善</li></ul>
@@ -1174,11 +1243,11 @@ button { font: inherit; color: inherit; }
         </div>
     </div>
     <div class="cost-result" data-r="up">
-      <p class="cr-main" aria-label="月28万円から月8万円へ"><span lang="en">28</span><small>万円</small><i aria-hidden="true"></i><span class="to" lang="en">8</span><small>万円 / 月</small></p>
+      <p class="cr-main" aria-label="月28万円から月8万円へ"><span lang="en" data-count="28">28</span><small>万円</small><i aria-hidden="true"></i><span class="to" lang="en" data-count="8" data-from="28">8</span><small>万円 / 月</small></p>
       <dl class="cr-stats">
-        <div><dt>月の削減余地</dt><dd><b lang="en">20</b>万円</dd></div>
-        <div><dt>年間</dt><dd><b lang="en">240</b>万円</dd></div>
-        <div><dt>削減率</dt><dd>約<b lang="en">71</b>%</dd></div>
+        <div><dt>月の削減余地</dt><dd><b lang="en" data-count="20">20</b>万円</dd></div>
+        <div><dt>年間</dt><dd><b lang="en" data-count="240">240</b>万円</dd></div>
+        <div><dt>削減率</dt><dd>約<b lang="en" data-count="71">71</b>%</dd></div>
       </dl>
     </div>
     <p class="cost-note" data-r="up">※上記は想定業務をもとにしたモデルケースです。実際の費用・削減額は、業務量・運用内容・契約条件によって異なります。</p>
@@ -1186,48 +1255,36 @@ button { font: inherit; color: inherit; }
 </section>
 
 <!-- ================= PHILOSOPHY ================= -->
-<section class="sec phil t-sumi t-dark" id="philosophy" data-tone="dark">
-  <div class="wrap">
-    <p class="label" data-r="up"><span lang="en">Philosophy</span><span class="jp">私たちの考え方</span></p>
-    <div class="phil-grid">
-      <h2 class="phil-v" data-r="vert">
-        <span class="v-col"><span>本質を守り、可能性をひらく。</span></span>
-        <span class="v-en" lang="en">Preserve the essence. Expand the possibility.</span>
-        <span class="v-col"><span>ひらめきを、一度きりで終わらせない。</span></span>
-        <span class="v-en" lang="en">Turn inspiration into something repeatable.</span>
-      </h2>
-      <figure class="phil-fig" data-r="fig" aria-label="守る土台から線がひらき、伸びていく図。">
-        <div class="pf-stage">
-          <svg class="pf-svg" viewBox="0 0 600 520" aria-hidden="true">
-            <defs>
-              <pattern id="pfDot" width="24" height="24" patternUnits="userSpaceOnUse"><circle class="pf-dotc" cx="12" cy="12" r="1.1"/></pattern>
-              <linearGradient id="pfFade" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset=".5" stop-color="#fff" stop-opacity="1"/></linearGradient>
-              <mask id="pfMask" maskUnits="userSpaceOnUse" x="0" y="0" width="600" height="520"><rect x="0" y="240" width="600" height="280" fill="url(#pfFade)"/></mask>
-            </defs>
-            <!-- foundation: a quiet grid and a ground line -->
-            <rect class="pf-dots" x="24" y="240" width="552" height="264" fill="url(#pfDot)" mask="url(#pfMask)"/>
-            <path class="gp thin" pathLength="1" style="--i:0" d="M60 452H340"/>
-            <path class="gp thin" pathLength="1" style="--i:1" d="M60 452v6M110 452v10M155 452v6M200 452v10M245 452v6M290 452v10M340 452v6"/>
-            <!-- 守る: the frame and the core -->
-            <path class="gp" pathLength="1" style="--i:2" d="M110 250H290V430H110Z"/>
-            <path class="gp thin" pathLength="1" style="--i:5" d="M140 280H260V400H140Z"/>
-            <path class="gp thin" pathLength="1" style="--i:7" d="M200 312V322M200 358V368M172 340H182M218 340H228"/>
-            <circle class="gd kin" cx="200" cy="340" r="3.4" style="--i:9"/>
-            <!-- ひらく: lines open from the core; the main line repeats itself -->
-            <path class="gp thin" pathLength="1" style="--i:26" d="M344.2 298.7A150 150 0 0 0 246.4 197.3"/>
-            <g class="pf-ray" style="--a:-16deg;--i:0"><path class="gp thin" pathLength="1" d="M200 340H530"/><circle class="pf-node" cx="530" cy="340" r="3.2" style="--k:0"/></g>
-            <g class="pf-ray" style="--a:-30deg;--i:1"><path class="gp thin" pathLength="1" d="M200 340H560"/><circle class="pf-node" cx="560" cy="340" r="3.2" style="--k:1"/></g>
-            <g class="pf-ray" style="--a:-58deg;--i:3"><path class="gp thin" pathLength="1" d="M200 340H500"/><circle class="pf-node" cx="500" cy="340" r="3.2" style="--k:2"/></g>
-            <g class="pf-ray" style="--a:-72deg;--i:4"><path class="gp thin" pathLength="1" d="M200 340H440"/><circle class="pf-node" cx="440" cy="340" r="3.2" style="--k:3"/></g>
-            <g class="pf-ray" style="--a:-44deg;--i:2"><path class="gp kin" pathLength="1" d="M200 340H580"/>
-              <circle class="pf-rep" cx="390" cy="340" r="4.4" style="--k:2"/><circle class="pf-rep" cx="436" cy="340" r="4.4" style="--k:3"/><circle class="pf-rep" cx="482" cy="340" r="4.4" style="--k:4"/><circle class="pf-rep" cx="528" cy="340" r="4.4" style="--k:5"/>
-              <circle class="pf-node kin" cx="580" cy="340" r="3.6" style="--k:6"/></g>
-          </svg>
-          <div class="pf-tag pf-keep"><p class="pf-name"><span class="jp">守る</span><span lang="en">Essence</span></p></div>
-          <div class="pf-tag pf-open"><p class="pf-name"><span class="jp">ひらく</span><span lang="en">Possibility</span></p></div>
-        </div>
-      </figure>
+<section class="phil t-sumi t-dark" id="philosophy" data-tone="dark">
+  <div class="wrap phil-in">
+    <div class="phil-text">
+      <p class="label" data-r="up"><span lang="en">Philosophy</span><span class="jp">私たちの考え方</span></p>
+      <h2 class="phil-title" data-r="lines"><span class="ln"><span>繰り返しは、AIに。</span></span><span class="ln"><span>ひらめきは、人に。</span></span></h2>
+      <p class="phil-lead" data-r="up">AIが自ら運用と改善を続けるから、人は本来のひらめきを大切にできる。</p>
+      <div class="phil-sign" data-r="up">
+        <p><span class="jp">本質を守り、可能性をひらく。</span><span lang="en">Preserve the essence. Expand the possibility.</span></p>
+        <p><span class="jp">ひらめきを、一度きりで終わらせない。</span><span lang="en">Turn inspiration into something repeatable.</span></p>
+      </div>
     </div>
+    <figure class="phil-art" data-r="fade" aria-label="AIが企画・投稿・分析・改善の循環を回し続けることで人の時間が生まれ、人のひらめきはまた循環に戻ってくり返し活かされる図。">
+      <svg viewBox="40 60 470 230" aria-hidden="true" focusable="false">
+        <defs><radialGradient id="paGlow"><stop offset="0" stop-color="#dcc796" stop-opacity=".55"/><stop offset="1" stop-color="#dcc796" stop-opacity="0"/></radialGradient></defs>
+        <path class="pa-curve" d="M232.7 146.3C292 92 362 96 410 150"/><path class="pa-run up" pathLength="1" d="M232.7 146.3C292 92 362 96 410 150"/>
+        <path class="pa-curve" d="M405 178C374 252 300 262 231.8 196.6"/><path class="pa-run back" pathLength="1" d="M405 178C374 252 300 262 231.8 196.6"/>
+        <text class="pa-s pa-mid" x="322" y="94" text-anchor="middle">人の時間が生まれる</text>
+        <text class="pa-s pa-mid" x="322" y="270" text-anchor="middle">ひらめきを、くり返し活かす</text>
+        <circle class="pa-base" cx="150" cy="170" r="80"/><circle class="pa-inner" cx="150" cy="170" r="58"/>
+        <g class="pa-orbit"><circle class="pa-arc" cx="150" cy="170" r="80" pathLength="1"/><circle class="pa-head" cx="150" cy="90" r="4.2"/></g>
+        <circle class="pa-node" cx="93.4" cy="113.4" r="4"/><circle class="pa-node" cx="206.6" cy="113.4" r="4"/><circle class="pa-node" cx="206.6" cy="226.6" r="4"/><circle class="pa-node" cx="93.4" cy="226.6" r="4"/><text class="pa-s" x="84.4" y="106.4" text-anchor="end">企画</text><text class="pa-s" x="215.6" y="106.4" text-anchor="start">投稿</text><text class="pa-s" x="215.6" y="243.6" text-anchor="start">分析</text><text class="pa-s" x="84.4" y="243.6" text-anchor="end">改善</text>
+        <text class="pa-ai" x="150" y="174" text-anchor="middle">AI</text>
+        <text class="pa-s" x="150" y="196" text-anchor="middle">自律改善</text>
+        <circle class="pa-glow" cx="432" cy="170" r="48" fill="url(#paGlow)"/>
+        <g class="pa-rays"><path d="M445 170L456 170"/><path d="M441.2 179.2L445.4 183.4"/><path d="M432 183L432 194"/><path d="M422.8 179.2L418.6 183.4"/><path d="M419 170L408 170"/><path d="M422.8 160.8L418.6 156.6"/><path d="M432 157L432 146"/><path d="M441.2 160.8L445.4 156.6"/></g>
+        <circle class="pa-core" cx="432" cy="170" r="5.5"/>
+        <text class="pa-t" x="436" y="228" text-anchor="middle">ひらめき</text>
+        <text class="pa-s" x="436" y="248" text-anchor="middle">人が考える</text>
+      </svg>
+    </figure>
   </div>
 </section>
 
@@ -1488,54 +1545,6 @@ button { font: inherit; color: inherit; }
   } else {
     $$('[data-r]').forEach(el => { el.classList.add('is-in'); onReveal(el); });
   }
-
-  /* =========================================================
-     Line glyphs for the four services
-     ========================================================= */
-  const arc = (cx, cy, r, a0, a1) => {
-    const p = a => [cx + r * Math.cos(a * Math.PI / 180), cy + r * Math.sin(a * Math.PI / 180)];
-    return `M${pt(p(a0))}A${r} ${r} 0 0 1 ${pt(p(a1))}`;
-  };
-  const P = (dd, cls = '', i = 0) => `<path class="gp ${cls}" pathLength="1" style="--i:${i}" d="${dd}"/>`;
-  const C = (x, y, r, cls = '', i = 0) => `<circle class="gp ${cls}" pathLength="1" style="--i:${i}" cx="${x}" cy="${y}" r="${r}"/>`;
-  const Dt = (x, y, r, cls = '', i = 0) => `<circle class="gd ${cls}" style="--i:${i}" cx="${r1(x)}" cy="${r1(y)}" r="${r}"/>`;
-  const GLYPHS = [
-    () => { // Reach
-      let s = C(44, 100, 9, '', 0) + Dt(44, 100, 3.2, 'kin', 1);
-      [32, 58, 84, 110].forEach((r, i) => { s += P(arc(44, 100, r, -38, 38), i === 3 ? 'thin' : '', i + 1); });
-      [[156, 62], [176, 104], [146, 140], [186, 150], [168, 36]].forEach(([x, y], i) => { s += Dt(x, y, 2.6, i === 1 ? 'kin' : '', 5 + i); });
-      return s;
-    },
-    () => { // Convert
-      let s = '';
-      [36, 68, 100, 132, 164].forEach((y, i) => { s += P(`M14 ${y}C70 ${y} 80 100 120 100`, i % 2 ? 'thin' : '', i); });
-      s += P('M120 80H138V120H120Z', 'kin', 5) + P('M138 100H184', '', 6) + P('M176 93L184 100L176 107', '', 7);
-      return s;
-    },
-    () => { // Measure
-      let s = P('M16 170H186', '', 0), t = '';
-      for (let x = 16; x <= 186; x += 10) t += `M${x} 170V${(x - 16) % 50 === 0 ? 158 : 164}`;
-      s += P(t, 'thin', 1) + P('M16 170V28', 'thin', 1);
-      const pts = [[16, 146], [48, 132], [80, 138], [112, 108], [144, 96], [178, 56]];
-      s += P('M' + pts.map(p => p.join(' ')).join('L'), '', 2);
-      pts.slice(0, 5).forEach(([x, y], i) => { s += Dt(x, y, 2.3, '', 3 + i); });
-      s += P('M144 170V96M16 96H144', 'thin', 4) + C(178, 56, 8, 'kin', 9) + Dt(178, 56, 3.2, 'kin', 9);
-      return s;
-    },
-    () => { // Systematize
-      let s = C(100, 100, 74, '', 0);
-      [0, 90, 180, 270].forEach((a, i) => { const q = a * Math.PI / 180; s += Dt(100 + 74 * Math.cos(q), 100 + 74 * Math.sin(q), 3.6, 'ring', 1 + i); });
-      [45, 135, 225, 315].forEach((a, i) => {
-        const q = a * Math.PI / 180, x = 100 + 74 * Math.cos(q), y = 100 + 74 * Math.sin(q);
-        const tx = -Math.sin(q), ty = Math.cos(q), nx = Math.cos(q), ny = Math.sin(q), L = 6;
-        s += P(`M${pt([x - tx * L + nx * L * .8, y - ty * L + ny * L * .8])}L${pt([x, y])}L${pt([x - tx * L - nx * L * .8, y - ty * L - ny * L * .8])}`, '', 2 + i);
-      });
-      for (let r = 0; r < 3; r++) for (let c = 0; c < 3; c++) s += P(`M${73 + c * 20} ${73 + r * 20}h14v14h-14Z`, r === 1 && c === 1 ? 'kin' : 'thin', 3 + r * 3 + c);
-      return s;
-    }
-  ];
-  // services: reach → loop → many-into-one → measured growth
-  [0, 3, 1, 2].forEach((g, i) => { const sv = $(`#svc-${i + 1} .svc-glyph svg`); if (sv) sv.innerHTML = GLYPHS[g](); });
 
   /* =========================================================
      環 — MEGURI: seven stages, one loop (brush circle → precise ring)
@@ -1801,6 +1810,26 @@ button { font: inherit; color: inherit; }
     el.addEventListener('mouseleave', () => on(false));
   });
 
+
+  /* =========================================================
+     Cost model: the figures count to their value as they arrive
+     ========================================================= */
+  const counts = $$('[data-count]');
+  if (counts.length && !reduce && 'IntersectionObserver' in window) {
+    const cnt = new IntersectionObserver(es => es.forEach(e => {
+      if (!e.isIntersecting) return;
+      cnt.unobserve(e.target);
+      const el = e.target, to = +el.dataset.count, from = +(el.dataset.from || 0), t0 = performance.now(), T = 1500;
+      el.textContent = from;
+      const step = now => {
+        const q = Math.min(1, (now - t0) / T), v = from + (to - from) * (1 - Math.pow(1 - q, 3));
+        el.textContent = Math.round(v);
+        if (q < 1) requestAnimationFrame(step);
+      };
+      requestAnimationFrame(step);
+    }), { threshold: .6 });
+    counts.forEach(el => cnt.observe(el));
+  }
 
   /* =========================================================
      Closing: the precise lines return into the brush, and the logo settles
