@@ -17,7 +17,7 @@ a clearer product, and philosophy reduced to one moment near the end.
 | 04 | Features `#features` | 環でできること: ten capabilities, one line each; icons draw in on arrival |
 | 05 | Autonomous operation `#flow` | Seven specialist roles on one loop (AI / システム), including an AI safety check before publishing, with three short points on running without human involvement |
 | 06 | Product demo `#demo` | 投稿、分析、改善。AIが自律して回し続ける。 A conceptual operating board (表示例, marked 自律運用中) that loops from draft through safety check to improvement ideas and back to the next post; pause and step controls |
-| 07 | Cost model `#cost` | モデルケース（試算例）: outsourcing at the median of published prices (初期15万円＋月25万円) against 環 (初期導入20万円＋月8万円). Bars show the first-year total to one scale; figures count up on arrival; method note and disclaimer below |
+| 07 | Cost model `#cost` | モデルケース（試算例）: outsourcing from published prices (初期30万円 = upper end of the commonly cited 10〜30万円 range, 月25万円 = median) against 環 (初期導入20万円＋月8万円). Bars show the first-year total to one scale; figures count up on arrival; method note and disclaimer below |
 | 08 | Philosophy | 繰り返しは、AIに。ひらめきは、人に。 A compact section: AI keeps operating and improving, so people can keep their own ひらめき. The four fixed lines sit below as a signature |
 | 09 | Contact `#contact` | 事業や運用について、まずはお話を聞かせてください。 A form that posts only to the server endpoint `POST /api/contact` (see below) |
 | 10 | Closing | The company logo, written again with the same brush animation |
@@ -29,7 +29,7 @@ a clearer product, and philosophy reduced to one moment near the end.
 - Media: Threads, X, Instagram and owned media are all presented as supported (自動運用), as instructed by the company.
 - Operation is presented as running without human involvement; the seven-role loop has no human step (role 04 is 安全確認, an AI check).
 - The cost section is a model case, not a customer result, and says so next to the numbers.
-  The outsourcing side is the median of published prices (see below); the 環 side is one implementation example of the company's plan, and the page says so.
+  The outsourcing side uses published prices (monthly: median; initial fee: upper end of the commonly cited range, labelled 相場上限 on the page); the 環 side is one implementation example of the company's plan, and the page says so.
 - Numbers in the product demo are labelled 表示例 and are not production data.
 - The four philosophy lines are fixed and are not edited.
 
@@ -63,7 +63,8 @@ Scope: SNS運用代行 plans that include 企画・投稿制作・投稿管理�
 | Published market ranges | 10〜30 → 20, 10〜50 → 30, 0〜30 → 15, 5〜30 → 17.5, 10〜20 → 15 |
 | Listed company prices | 0, 10, 10, 20〜40 → 30, 20, 15, 5 |
 
-Median: **15万円** (ranges only: 17.5万円, company prices only: 10万円).
+Median: 15万円 (ranges only: 17.5万円, company prices only: 10万円).
+The page uses **30万円**, the upper end of the most commonly cited range (10〜30万円), and labels it 相場上限, not 中央値.
 
 **Monthly fee (月額)** for the standard scope, 9 published ranges (midpoints):
 10〜30 → 20, 20〜30 → 25 (×4), 10〜50 → 30, 20〜40 → 30, 15〜30 → 22.5, 15〜40 → 27.5.
@@ -73,9 +74,10 @@ Median: **25万円** (listed company starting prices give 22.4万円).
 
 | | Outsourcing (median) | 環 model | Difference |
 |---|---|---|---|
-| Monthly | 25万円 | 8万円 | 17万円 (約68%) |
+| Initial fee | 30万円 (相場上限) | 20万円 | 10万円 |
+| Monthly | 25万円 (中央値) | 8万円 | 17万円 (約68%) |
 | Per year (monthly × 12) | 300万円 | 96万円 | 204万円 |
-| First year incl. initial fee | 315万円 | 116万円 | 199万円 |
+| First year incl. initial fee | 330万円 | 116万円 | 214万円 |
 
 Sources consulted:
 - https://s--line.co.jp/sns-agency-cost/
