@@ -766,6 +766,79 @@ html:not(.js) .sq-kanji, .m-reduce .sq-kanji { mask: none; }
 /* ---------- dark-ground small text at AA ---------- */
 .mg .label, .mg-flow .label { color: var(--wash-2); }
 
+/* ---------- CONTACT: practical, quiet, premium ---------- */
+.nav a.nav-contact { padding: 5px 16px; border: 1px solid currentColor; border-radius: 999px; transition: border-color .4s ease, color .4s ease, background-color .4s ease; }
+.nav a.nav-contact::after { display: none; }
+.nav a.nav-contact:hover, .nav a.nav-contact.is-cur { border-color: var(--kin); color: var(--kin-deep); }
+.site-header[data-tone="dark"] .nav a.nav-contact:hover, .site-header[data-tone="ai"] .nav a.nav-contact:hover, .site-header[data-tone="dark"] .nav a.nav-contact.is-cur, .site-header[data-tone="ai"] .nav a.nav-contact.is-cur { color: var(--kin-hi); }
+.ct { --bgc: var(--kinari); --err: #9f1813; }
+.ct-grid { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: var(--colgap); align-items: start; }
+.ct-intro { grid-column: 1 / span 5; position: sticky; top: calc(var(--header-h) + 56px); }
+.ct-title { font-size: clamp(28px, 3vw, 44px); }
+.ct-lead { font-size: clamp(14.5px, 1.1vw, 16px); line-height: 2; color: var(--ink-2); word-break: auto-phrase; }
+.ct-rule { display: block; width: 72px; height: 1px; margin-top: clamp(28px, 3vw, 40px); background: var(--kin); }
+.ct-panel { grid-column: 7 / span 6; position: relative; padding: clamp(28px, 3.4vw, 52px); background: rgba(250, 249, 246, .7); border: 1px solid rgba(20, 20, 22, .1); box-shadow: 0 50px 90px -70px rgba(18, 19, 20, .4); }
+.ct-panel::before, .ct-panel::after { content: ""; position: absolute; width: 22px; height: 22px; pointer-events: none; }
+.ct-panel::before { top: -1px; left: -1px; border-top: 1px solid var(--kin); border-left: 1px solid var(--kin); }
+.ct-panel::after { right: -1px; bottom: -1px; border-right: 1px solid var(--kin); border-bottom: 1px solid var(--kin); }
+.ct-form { display: grid; }
+.ct-req-note { display: flex; align-items: center; gap: 8px; margin-bottom: 22px; font-size: 12.5px; letter-spacing: .06em; color: var(--ink-2); }
+.ct-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); column-gap: 20px; }
+.ct-field { min-width: 0; }
+.ct-label { display: flex; align-items: center; flex-wrap: wrap; gap: 6px 10px; margin-bottom: 8px; font-size: 14px; font-weight: 500; letter-spacing: .08em; color: var(--ink); }
+.ct-badge { display: inline-block; padding: 0 7px; border-radius: 2px; font-size: 10.5px; font-weight: 500; letter-spacing: .12em; line-height: 1.75; }
+.ct-badge.req { color: var(--paper); background: var(--ink); }
+.ct-badge.opt { color: var(--ink-2); border: 1px solid rgba(20, 20, 22, .22); line-height: 1.6; }
+.ct-hint { margin: -2px 0 8px; font-size: 12px; line-height: 1.7; letter-spacing: .04em; color: var(--ink-3); word-break: auto-phrase; }
+.ct-control { position: relative; }
+.ct-control::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 2px; background: var(--kin); transform: scaleX(0); transform-origin: left; transition: transform .55s var(--ease); pointer-events: none; }
+.ct-control:focus-within::after { transform: scaleX(1); }
+.ct-input { display: block; width: 100%; min-height: 52px; margin: 0; padding: 13px 16px; font: inherit; font-size: 16px; letter-spacing: .04em; line-height: 1.6; color: var(--ink); background: rgba(255, 255, 255, .62); border: 1px solid rgba(20, 20, 22, .2); border-radius: 2px; transition: border-color .3s ease, background-color .3s ease; -webkit-appearance: none; appearance: none; }
+.ct-input::placeholder { color: var(--ink-3); opacity: .75; }
+.ct-input:hover { border-color: rgba(20, 20, 22, .36); }
+.ct-input:focus { outline: none; }
+.ct-input:focus-visible, .ct-input:focus { border-color: var(--kin-deep); background-color: #fff; box-shadow: 0 0 0 3px rgba(173, 149, 100, .22); }
+.ct-select { padding-right: 44px; cursor: pointer; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5l5 5 5-5' fill='none' stroke='%2346443f' stroke-width='1.4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 18px center; }
+.ct-select:invalid { color: var(--ink-3); }
+.ct-select option { color: var(--ink); }
+.ct-textarea { min-height: 200px; resize: vertical; line-height: 1.85; }
+.ct-meta { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; min-height: 40px; padding: 7px 0 12px; }
+.ct-err { display: flex; align-items: flex-start; gap: 7px; font-size: 12.5px; line-height: 1.6; letter-spacing: .04em; color: var(--err); }
+.ct-err:not(:empty)::before { content: "!"; flex: none; display: grid; place-items: center; width: 15px; height: 15px; margin-top: 2px; border-radius: 50%; background: var(--err); color: #fff; font-family: var(--f-lat); font-size: 10px; font-weight: 400; line-height: 1; }
+.ct-count { margin-left: auto; font-family: var(--f-lat); font-size: 11.5px; letter-spacing: .06em; color: var(--ink-3); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.ct-count.is-near { color: var(--ink); }
+.ct-field.is-invalid .ct-input { border-color: var(--err); background-color: #fff; }
+.ct-field.is-invalid .ct-control::after { background: var(--err); transform: scaleX(1); }
+.ct-hp { position: absolute; left: -10000px; top: auto; width: 1px; height: 1px; overflow: hidden; }
+.ct-consent { margin-top: 6px; }
+.ct-check { display: flex; align-items: center; gap: 12px; min-height: 44px; }
+.ct-check label { display: inline-flex; align-items: center; flex-wrap: wrap; gap: 6px 10px; font-size: 14px; letter-spacing: .06em; color: var(--ink); cursor: pointer; }
+.ct-check a { color: var(--ink); text-decoration: underline; text-decoration-color: var(--kin); text-underline-offset: 4px; }
+.ct-box { flex: none; width: 22px; height: 22px; margin: 0; border: 1px solid rgba(20, 20, 22, .4); border-radius: 2px; background: rgba(255, 255, 255, .7) no-repeat center / 14px 14px; cursor: pointer; -webkit-appearance: none; appearance: none; transition: background-color .25s ease, border-color .25s ease; }
+.ct-box:checked { background-color: var(--ink); border-color: var(--ink); background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 14 14'%3E%3Cpath d='M2.5 7.4l3 3 6-6.6' fill='none' stroke='%23dcc796' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"); }
+.ct-box:focus-visible { outline: 2px solid var(--kin-deep); outline-offset: 3px; }
+.ct-consent.is-invalid .ct-box { border-color: var(--err); }
+.ct-turnstile { margin: 4px 0 18px; }
+.ct-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 14px 24px; margin-top: 10px; }
+.ct-submit { min-height: 56px; padding-inline: 34px 28px; border: 0; cursor: pointer; font-family: var(--f-got); }
+.ct-submit .ct-submit-t { font-family: inherit; color: inherit; transform: none !important; }
+.ct-submit:focus-visible { outline: 2px solid var(--kin-deep); outline-offset: 4px; }
+.ct-submit:disabled { cursor: default; opacity: .55; }
+.ct-submit[aria-busy="true"] { opacity: 1; cursor: progress; }
+.ct-submit[aria-busy="true"] .ct-arrow { animation: ctPulse 1s ease-in-out infinite; }
+@keyframes ctPulse { 50% { opacity: .25; } }
+.ct-nojs { font-size: 12.5px; color: var(--ink-2); }
+.ct-status:empty { display: none; }
+.ct-status { display: flex; align-items: flex-start; gap: 12px; margin-top: 22px; padding: 14px 18px; border: 1px solid rgba(20, 20, 22, .18); border-left-width: 2px; background: rgba(255, 255, 255, .55); font-size: 13.5px; line-height: 1.8; color: var(--ink); animation: rise .6s var(--ease) both; }
+.ct-status::before { flex: none; display: grid; place-items: center; width: 20px; height: 20px; margin-top: 2px; border-radius: 50%; font-family: var(--f-lat); font-size: 11.5px; line-height: 1; }
+.ct-status[data-kind="preview"] { border-left-color: var(--ink-2); }
+.ct-status[data-kind="preview"]::before { content: "i"; border: 1px solid var(--ink-2); color: var(--ink-2); }
+.ct-status[data-kind="error"] { border-left-color: var(--err); }
+.ct-status[data-kind="error"]::before { content: "!"; background: var(--err); color: #fff; }
+.ct-status[data-kind="success"] { border-left-color: var(--kin); }
+.ct-status[data-kind="success"]::before { content: "✓"; background: var(--ink); color: var(--kin-hi); }
+.m-reduce .ct-status, .m-reduce .ct-control::after { animation: none; transition: none; }
+
 /* ---------- FOOTER ---------- */
 .foot { padding-block: 36px calc(36px + env(safe-area-inset-bottom, 0px)); color: var(--wash-2); }
 .foot-in { display: flex; justify-content: space-between; align-items: center; gap: 24px; flex-wrap: wrap; }
@@ -886,6 +959,18 @@ html:not(.js) .sq-kanji, .m-reduce .sq-kanji { mask: none; }
   .svc-list { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); column-gap: 16px; }
   .svc-list li { font-size: 13.5px; letter-spacing: .03em; }
 }
+@media (max-width: 959px) {
+  .ct-intro, .ct-panel { grid-column: 1 / -1; }
+  .ct-intro { position: static; }
+  .ct-panel { margin-top: 48px; }
+}
+@media (max-width: 719px) {
+  .ct-panel { padding: 26px 18px 28px; }
+  .ct-lead br.br-wide { display: none; }
+  .ct-actions { flex-direction: column; align-items: stretch; }
+  .ct-submit { width: 100%; justify-content: space-between; }
+  .ct-textarea { min-height: 180px; }
+}
 @media (min-width: 600px) and (max-width: 959px) { .hero { justify-content: center; } }
 </style>
 <!--HEAD-END-->
@@ -930,6 +1015,7 @@ html:not(.js) .sq-kanji, .m-reduce .sq-kanji { mask: none; }
       <a href="#flow">自律運用</a>
       <a href="#demo">画面イメージ</a>
       <a href="#cost">試算例</a>
+      <a class="nav-contact" href="#contact">お問い合わせ</a>
     </nav>
     <button class="menu-btn" type="button" aria-expanded="false" aria-controls="menu"><span class="menu-lines" aria-hidden="true"></span><span class="menu-txt">Menu</span></button>
   </div>
@@ -942,6 +1028,7 @@ html:not(.js) .sq-kanji, .m-reduce .sq-kanji { mask: none; }
     <a href="#flow"><span>Autonomous</span>自律運用</a>
     <a href="#demo"><span>Demo</span>画面イメージ</a>
     <a href="#cost"><span>Model case</span>試算例</a>
+    <a href="#contact"><span>Contact</span>お問い合わせ</a>
   </nav>
   <p class="menu-foot">合同会社 匠Technologies</p>
 </div>
@@ -1369,6 +1456,74 @@ html:not(.js) .sq-kanji, .m-reduce .sq-kanji { mask: none; }
         <text class="pa-s" x="436" y="248" text-anchor="middle">人が考える</text>
       </svg>
     </figure>
+  </div>
+</section>
+
+<!-- ================= CONTACT ================= -->
+<section class="sec ct t-kinari t-light" id="contact" data-tone="light">
+  <div class="wrap ct-grid">
+    <div class="ct-intro">
+      <p class="label" data-r="up"><span lang="en">Contact</span><span class="jp">お問い合わせ</span></p>
+      <h2 class="title ct-title" data-r="lines"><span class="ln"><span>事業や運用について、</span></span><span class="ln"><span><span class="nw">まずはお話を</span><span class="nw">聞かせてください。</span></span></span></h2>
+      <p class="ct-lead" data-r="up">運用のご相談、業務改善、自動化、広告運用など、<br class="br-wide">まずはお気軽にご相談ください。</p>
+      <span class="ct-rule" data-r="rule" aria-hidden="true"></span>
+    </div>
+    <div class="ct-panel" data-r="up">
+      <!-- Delivery runs only on the server (POST /api/contact). The recipient is configured there, never here.
+           data-mode: "preview" never sends; "live" posts to data-endpoint. data-turnstile-sitekey: Cloudflare Turnstile site key (public). -->
+      <form class="ct-form" id="contact-form" novalidate data-endpoint="/api/contact" data-mode="preview" data-turnstile-sitekey="" aria-label="お問い合わせフォーム">
+        <p class="ct-req-note"><span class="ct-badge req">必須</span>の項目は、入力が必要です。</p>
+          <div class="ct-row">
+            <div class="ct-field" data-field="name">
+            <label class="ct-label" for="ct-name">お名前<span class="ct-badge req">必須</span></label>
+            <div class="ct-control"><input class="ct-input" id="ct-name" name="name" type="text" autocomplete="name" maxlength="100" required aria-required="true" aria-describedby="ct-name-err" enterkeyhint="next"></div>
+            <div class="ct-meta"><p class="ct-err" id="ct-name-err"></p></div>
+          </div>
+          <div class="ct-field" data-field="company">
+            <label class="ct-label" for="ct-company">会社名・屋号<span class="ct-badge opt">任意</span></label>
+            <div class="ct-control"><input class="ct-input" id="ct-company" name="company" type="text" autocomplete="organization" maxlength="100" aria-describedby="ct-company-err" enterkeyhint="next"></div>
+            <div class="ct-meta"><p class="ct-err" id="ct-company-err"></p></div>
+          </div>
+          </div>
+          <div class="ct-field" data-field="email">
+            <label class="ct-label" for="ct-email">メールアドレス<span class="ct-badge req">必須</span></label>
+            <p class="ct-hint" id="ct-email-hint">ご返信は、こちらのアドレスにお送りします。</p>
+            <div class="ct-control"><input class="ct-input" id="ct-email" name="email" type="email" inputmode="email" autocomplete="email" maxlength="254" required aria-required="true" aria-describedby="ct-email-hint ct-email-err" placeholder="name@example.com" enterkeyhint="next"></div>
+            <div class="ct-meta"><p class="ct-err" id="ct-email-err"></p></div>
+          </div>
+          <div class="ct-field" data-field="topic">
+            <label class="ct-label" for="ct-topic">ご相談内容<span class="ct-badge req">必須</span></label>
+            <div class="ct-control"><select class="ct-input ct-select" id="ct-topic" name="topic" required aria-required="true" aria-describedby="ct-topic-err"><option value="" disabled selected>選択してください</option><option>運用代行</option><option>メディア自動運用</option><option>業務改善・BPO</option><option>広告運用・マーケティング</option><option>環 — MEGURIについて</option><option>その他</option></select></div>
+            <div class="ct-meta"><p class="ct-err" id="ct-topic-err"></p></div>
+          </div>
+          <div class="ct-field" data-field="message">
+            <label class="ct-label" for="ct-message">お問い合わせ内容<span class="ct-badge req">必須</span></label>
+            <p class="ct-hint" id="ct-message-hint">現在の運用状況や、お困りごとをお書きください。</p>
+            <div class="ct-control"><textarea class="ct-input ct-textarea" id="ct-message" name="message" rows="7" maxlength="2000" required aria-required="true" aria-describedby="ct-message-hint ct-message-err"></textarea></div>
+            <div class="ct-meta"><p class="ct-err" id="ct-message-err"></p><p class="ct-count" aria-hidden="true"><span>0</span> / 2000</p></div>
+          </div>
+          <div class="ct-field" data-field="url">
+            <label class="ct-label" for="ct-url">Webサイト / SNS URL<span class="ct-badge opt">任意</span></label>
+            <p class="ct-hint" id="ct-url-hint">サイトやSNSアカウントのURLがあれば、ご記入ください。</p>
+            <div class="ct-control"><input class="ct-input" id="ct-url" name="url" type="text" inputmode="url" autocomplete="url" maxlength="300" aria-describedby="ct-url-hint ct-url-err" placeholder="https://" enterkeyhint="done"></div>
+            <div class="ct-meta"><p class="ct-err" id="ct-url-err"></p></div>
+          </div>
+          <div class="ct-hp" aria-hidden="true"><label for="ct-fax">FAX番号（入力しないでください）</label><input id="ct-fax" name="fax" type="text" tabindex="-1" autocomplete="off"></div>
+          <div class="ct-field ct-consent" data-field="consent">
+            <div class="ct-check">
+              <input class="ct-box" id="ct-consent" name="consent" type="checkbox" required aria-required="true" aria-describedby="ct-consent-err">
+              <label for="ct-consent"><span><span class="ct-privacy" data-privacy-url="">プライバシーポリシー</span>に同意する</span><span class="ct-badge req">必須</span></label>
+            </div>
+            <div class="ct-meta"><p class="ct-err" id="ct-consent-err"></p></div>
+          </div>
+          <div class="ct-turnstile" hidden></div>
+          <div class="ct-actions">
+            <button class="btn-primary ct-submit" type="submit" disabled><span class="ct-submit-t">送信する</span><span class="ct-arrow" aria-hidden="true">→</span></button>
+            <noscript><p class="ct-nojs">フォームの送信には、JavaScriptを有効にしてください。</p></noscript>
+          </div>
+          <div class="ct-status" id="ct-status" role="status" aria-live="polite"></div>
+      </form>
+    </div>
   </div>
 </section>
 
@@ -1931,6 +2086,130 @@ html:not(.js) .sq-kanji, .m-reduce .sq-kanji { mask: none; }
       requestAnimationFrame(step);
     }), { threshold: .6 });
     counts.forEach(el => cnt.observe(el));
+  }
+
+  /* =========================================================
+     Contact: checked in the browser, delivered only by the server (POST /api/contact).
+     The page never knows the recipient address or any provider key.
+     ========================================================= */
+  const ctForm = $('#contact-form');
+  if (ctForm) {
+    const MODE = ctForm.dataset.mode === 'live' ? 'live' : 'preview';
+    const ENDPOINT = ctForm.dataset.endpoint || '/api/contact';
+    const TS_KEY = ctForm.dataset.turnstileSitekey || '';
+    const ctStatus = $('#ct-status'), ctBtn = $('.ct-submit', ctForm), ctBtnT = $('.ct-submit-t', ctForm);
+    const EMAIL_RE = /^[^\s@]+@[^\s@.]+(\.[^\s@.]+)+$/;
+    const isUrl = v => {
+      if (/\s/.test(v)) return false;
+      try { const u = new URL(/^[a-z][a-z\d+.-]*:\/\//i.test(v) ? v : 'https://' + v); return /^https?:$/.test(u.protocol) && u.hostname.includes('.'); } catch (e) { return false; }
+    };
+    const RULES = {
+      name: v => v ? '' : 'お名前を入力してください。',
+      email: v => !v ? 'メールアドレスを入力してください。' : EMAIL_RE.test(v) ? '' : 'メールアドレスの形式が正しくありません（例：name@example.com）。',
+      topic: v => v ? '' : 'ご相談内容を選択してください。',
+      message: v => v ? '' : 'お問い合わせ内容を入力してください。',
+      url: v => !v || isUrl(v) ? '' : 'URLの形式をご確認ください（例：https://example.com）。',
+      consent: (v, el) => el.checked ? '' : 'プライバシーポリシーへの同意が必要です。'
+    };
+    const ORDER = ['name', 'company', 'email', 'topic', 'message', 'url', 'consent'];
+    const el = n => ctForm.elements[n];
+    const val = n => (el(n).value || '').trim();
+    const t0 = performance.now();
+    let tsToken = '', busy = false;
+
+    // the privacy policy becomes a link once its page exists (set data-privacy-url)
+    $$('[data-privacy-url]', ctForm).forEach(sp => {
+      const u = sp.dataset.privacyUrl;
+      if (!u) return;
+      const a = d.createElement('a'); a.href = u; a.target = '_blank'; a.rel = 'noopener'; a.textContent = sp.textContent;
+      sp.replaceWith(a);
+    });
+
+    function setError(n, msg) {
+      const f = el(n), wrap = f.closest('.ct-field'), err = $(`#ct-${n}-err`);
+      if (err) err.textContent = msg;
+      wrap.classList.toggle('is-invalid', !!msg);
+      if (msg) f.setAttribute('aria-invalid', 'true'); else f.removeAttribute('aria-invalid');
+    }
+    const check = n => { const rule = RULES[n]; const msg = rule ? rule(val(n), el(n)) : ''; setError(n, msg); return !msg; };
+    const setStatus = (kind, text) => { ctStatus.dataset.kind = kind || ''; ctStatus.textContent = text || ''; };
+
+    ORDER.forEach(n => {
+      const f = el(n); if (!f) return;
+      f.addEventListener('blur', () => { if (f.dataset.touched || val(n)) { f.dataset.touched = '1'; check(n); } });
+      f.addEventListener(f.type === 'checkbox' || f.tagName === 'SELECT' ? 'change' : 'input', () => {
+        if (f.closest('.ct-field').classList.contains('is-invalid')) check(n);
+        if (ctStatus.dataset.kind === 'preview' || ctStatus.dataset.kind === 'error') setStatus('', '');
+      });
+    });
+    const msgEl = el('message'), count = $('.ct-count span', ctForm), countWrap = $('.ct-count', ctForm);
+    const updCount = () => { count.textContent = msgEl.value.length; countWrap.classList.toggle('is-near', msgEl.value.length > 1800); };
+    msgEl.addEventListener('input', updCount); updCount();
+
+    // Cloudflare Turnstile, only when a site key is configured and the form is live
+    if (MODE === 'live' && TS_KEY) {
+      const box = $('.ct-turnstile', ctForm); box.hidden = false;
+      window.__ctTurnstile = () => window.turnstile.render(box, { sitekey: TS_KEY, language: 'ja', theme: 'light',
+        callback: t => { tsToken = t; }, 'expired-callback': () => { tsToken = ''; }, 'error-callback': () => { tsToken = ''; } });
+      const sc = d.createElement('script');
+      sc.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit&onload=__ctTurnstile';
+      sc.async = true; sc.defer = true; d.head.appendChild(sc);
+    }
+
+    const setBusy = on => { busy = on; ctBtn.disabled = on; ctBtn.setAttribute('aria-busy', String(on)); ctBtnT.textContent = on ? '送信中…' : '送信する'; };
+    ctBtn.disabled = false;
+
+    ctForm.addEventListener('submit', async e => {
+      e.preventDefault();
+      if (busy) return;
+      setStatus('', '');
+      const bad = ORDER.filter(n => !check(n));
+      ORDER.forEach(n => { if (el(n)) el(n).dataset.touched = '1'; });
+      if (bad.length) {
+        setStatus('error', `入力内容をご確認ください（${bad.length}件）。`);
+        el(bad[0]).focus();
+        return;
+      }
+      if (MODE !== 'live') {
+        // no delivery path in this environment: say so plainly, never pretend it was sent
+        setStatus('preview', 'プレビュー環境のため、送信機能は現在接続されていません。');
+        return;
+      }
+      if (TS_KEY && !tsToken) { setStatus('error', '送信前に、確認のチェックを完了してください。'); return; }
+      const payload = {
+        name: val('name'), company: val('company'), email: val('email'), topic: val('topic'),
+        message: el('message').value.trim(), url: val('url'), consent: el('consent').checked,
+        fax: el('fax').value, elapsedMs: Math.round(performance.now() - t0), turnstileToken: tsToken
+      };
+      setBusy(true);
+      const ctrl = new AbortController(), timer = setTimeout(() => ctrl.abort(), 20000);
+      try {
+        const res = await fetch(ENDPOINT, { method: 'POST', headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' }, body: JSON.stringify(payload), credentials: 'same-origin', signal: ctrl.signal });
+        let data = {};
+        try { data = await res.json(); } catch (err) { data = {}; }
+        if (res.ok && data.ok === true) {
+          ctForm.reset(); updCount();
+          ORDER.forEach(n => { if (el(n)) { delete el(n).dataset.touched; setError(n, ''); } });
+          setStatus('success', 'お問い合わせを受け付けました。ご入力いただいたメールアドレス宛に、ご連絡いたします。');
+        } else if (res.status === 400 && data.errors) {
+          const names = Object.keys(data.errors).filter(n => el(n));
+          names.forEach(n => { if (check(n)) setError(n, '入力内容をご確認ください。'); });
+          setStatus('error', '入力内容をご確認ください。');
+          if (names[0]) el(names[0]).focus();
+        } else if (res.status === 429) {
+          setStatus('error', '送信が集中しています。しばらく時間をおいてから、もう一度お試しください。');
+        } else if (res.status === 503) {
+          setStatus('error', '現在、フォームからの送信を受け付けていません。時間をおいて、もう一度お試しください。');
+        } else {
+          setStatus('error', '送信できませんでした。時間をおいて、もう一度お試しください。');
+        }
+      } catch (err) {
+        setStatus('error', '送信できませんでした。通信環境をご確認のうえ、もう一度お試しください。');
+      } finally {
+        clearTimeout(timer); setBusy(false);
+        if (window.turnstile && TS_KEY) { window.turnstile.reset($('.ct-turnstile', ctForm)); tsToken = ''; }
+      }
+    });
   }
 
   /* =========================================================

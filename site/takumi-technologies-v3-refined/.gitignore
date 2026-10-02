@@ -1,0 +1,4 @@
+# local secrets and build output for Cloudflare Pages
+.dev.vars
+.wrangler/
+public/
