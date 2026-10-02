@@ -567,10 +567,14 @@ export async function loadThreadsDashboard(options: {
           && ["succeeded", "partial"].includes(text(row.status) ?? ""))
         .map((row) => text(row.content_id))
         .filter((contentId): contentId is string => Boolean(contentId)));
+      const latestPublishedContentId = livePublishedContentIds.values().next().value;
       const recentContents = recentContentRows.filter((row, index) =>
         index < 5 || text(row.state) === "metrics_collected"
           || livePublishedContentIds.has(text(row.content_id) ?? "")
       );
+      recentContents.sort((left, right) =>
+        Number(text(right.content_id) === latestPublishedContentId)
+          - Number(text(left.content_id) === latestPublishedContentId));
       const pipeline = record(summary.pipeline);
       const operations = operationsFrom(summary.operations);
       const safety = safetyFrom(await getContractJson(

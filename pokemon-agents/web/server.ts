@@ -766,12 +766,13 @@ const server = Bun.serve({
       if (path === "/internal") return redirect("/operator");
       if (path === "/operator") {
         const trustedTenant = tenantEnforced ? requireTenantSelection(tenantIdentity) : null;
-        const allowed = (await getThreadsAccounts(trustedTenant?.userId)).filter((account) =>
-          accountAllowed(account.accountId, INTERNAL_AUTH));
-        const allowedIds = new Set(allowed.map((account) => account.accountId));
         const dashboards = await Promise.all(OPERATOR_ACCOUNT_IDS
-          .filter((accountId) => allowedIds.has(accountId))
-          .map((accountId) => getThreadsDashboard(accountId, trustedTenant?.userId)));
+          .filter((accountId) => accountAllowed(accountId, INTERNAL_AUTH))
+          .map((accountId) => getThreadsDashboard(
+            accountId,
+            TENANT_AUTH.canaryScopes.find((scope) => scope.accountId === accountId)?.userId
+              ?? trustedTenant?.userId,
+          )));
         return lay("Operations", renderOperatorDashboard(dashboards));
       }
       if (path === "/internal/hq") {

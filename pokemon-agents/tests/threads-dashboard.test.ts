@@ -298,6 +298,7 @@ describe("read-only Threads dashboard connector", () => {
     });
 
     expect(detailRequests).toHaveLength(6);
+    expect(data.contents[0].contentId).toBe("cv-6");
     const measured = data.contents.find((content) => content.topic === "LINEの温度差");
     expect(measured?.metrics.views).toBe(189);
     expect(measured?.publication?.externalId).toBe("18125587639858005");
