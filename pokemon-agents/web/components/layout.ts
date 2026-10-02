@@ -193,7 +193,7 @@ export function renderLayout(opts: LayoutOpts): string {
   const currentWorkspace = opts.customerWorkspaces?.find((workspace) => workspace.current);
   const workspaceSwitcher = isCustomerDashboard && currentWorkspace
     ? `<details class="customer-workspace"${opts.customerWorkspaces!.length === 1 ? " open" : ""}>
-        <summary><small>現在のアカウント</small><span class="customer-workspace-current">${escapeHtml(currentWorkspace.displayName)}</span>${currentWorkspace.handle ? `<span class="customer-workspace-handle">${escapeHtml(currentWorkspace.handle)}</span>` : ""}</summary>
+        <summary><small>表示範囲</small><span class="customer-workspace-current">${escapeHtml(currentWorkspace.displayName)}</span>${currentWorkspace.handle ? `<span class="customer-workspace-handle">${escapeHtml(currentWorkspace.handle)}</span>` : ""}</summary>
         ${opts.customerWorkspaces!.length > 1 ? `<div class="customer-workspace-list">${opts.customerWorkspaces!.map((workspace) => `<form method="post" action="/api/customer/workspaces/select"><input type="hidden" name="selector" value="${escapeHtml(workspace.selector)}"><input type="hidden" name="csrf_token" value="${escapeHtml(opts.csrfToken || "")}"><button type="submit"${workspace.current ? " disabled aria-current=\"true\"" : ""}><b>${escapeHtml(workspace.displayName)}</b>${workspace.handle ? `<span>${escapeHtml(workspace.handle)}</span>` : ""}</button></form>`).join("")}</div>` : ""}
       </details>` : "";
 

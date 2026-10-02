@@ -12,10 +12,12 @@ export interface CustomerWorkspaceView {
   handle: string;
   selector: string;
   current: boolean;
+  aggregate: boolean;
 }
 
 export interface CustomerWorkspaceSelection {
   selected: ThreadsAccountOption | null;
+  aggregate: boolean;
   rejected: boolean;
   expired: boolean;
 }
@@ -41,7 +43,7 @@ export function customerSessionContract(
     authenticated: true,
     workspace: current
       ? { display_name: current.displayName, handle: current.handle } : null,
-    workspace_count: workspaces.length,
+    workspace_count: workspaces.filter((workspace) => !workspace.aggregate).length,
     selection_expired: selectionExpired,
   };
 }
@@ -60,7 +62,9 @@ function selectorAad(identity: ResolvedTenantIdentity): Buffer {
 export function workspaceSelectorToken(
   accountId: string, identity: ResolvedTenantIdentity, secret: string,
 ): string {
-  if (!/^acct_[a-zA-Z0-9_-]+$/.test(accountId)) throw new Error("invalid account ID");
+  if (accountId !== "all" && !/^acct_[a-zA-Z0-9_-]+$/.test(accountId)) {
+    throw new Error("invalid account ID");
+  }
   // AES-GCM keeps the internal identifier opaque while authenticating both
   // the token and its canonical user binding.
   const iv = randomBytes(12);
@@ -88,7 +92,8 @@ export function verifyWorkspaceSelector(
     const accountId = Buffer.concat([
       decipher.update(encrypted), decipher.final(),
     ]).toString("utf8");
-    return /^acct_[a-zA-Z0-9_-]+$/.test(accountId) ? accountId : null;
+    return accountId === "all" || /^acct_[a-zA-Z0-9_-]+$/.test(accountId)
+      ? accountId : null;
   } catch {
     return null;
   }
@@ -112,21 +117,35 @@ export function selectCustomerWorkspace(
   const url = new URL(req.url);
   // Raw identifiers are never a customer-side authority or selector.
   if (url.searchParams.has("account_id") || url.searchParams.has("user_id")
-    || url.searchParams.has("org_id")) {
-    return { selected: null, rejected: true, expired: false };
+    || url.searchParams.has("org_id") || url.searchParams.has("organization_id")) {
+    return { selected: null, aggregate: false, rejected: true, expired: false };
   }
   const token = cookieValue(req);
   if (!token) {
     return {
       selected: accounts.length === 1 ? accounts[0] : null,
+      aggregate: accounts.length > 1,
       rejected: false,
       expired: false,
     };
   }
   const accountId = verifyWorkspaceSelector(token, identity, secret);
-  if (!accountId) return { selected: null, rejected: true, expired: false };
+  if (!accountId) {
+    return { selected: null, aggregate: false, rejected: true, expired: false };
+  }
+  if (accountId === "all") {
+    return {
+      selected: null, aggregate: accounts.length > 0,
+      rejected: accounts.length === 0, expired: false,
+    };
+  }
   const selected = accounts.find((account) => account.accountId === accountId) ?? null;
-  return { selected, rejected: false, expired: selected === null };
+  return {
+    selected,
+    aggregate: selected === null && accounts.length > 0,
+    rejected: false,
+    expired: selected === null,
+  };
 }
 
 export function customerWorkspaceCookie(token: string, secure = true): string {
@@ -143,13 +162,21 @@ export function customerWorkspaceViews(
   identity: ResolvedTenantIdentity,
   secret: string,
 ): CustomerWorkspaceView[] {
-  return accounts.map((account) => ({
+  const views = accounts.map((account) => ({
     displayName: account.displayName || "Threadsアカウント",
     handle: account.handle
       ? (account.handle.startsWith("@") ? account.handle : `@${account.handle}`) : "",
     selector: workspaceSelectorToken(account.accountId, identity, secret),
     current: account.accountId === selectedAccountId,
+    aggregate: false,
   }));
+  return accounts.length > 1 ? [{
+    displayName: "すべて",
+    handle: `${accounts.length}アカウント`,
+    selector: workspaceSelectorToken("all", identity, secret),
+    current: selectedAccountId === null,
+    aggregate: true,
+  }, ...views] : views;
 }
 
 export function renderCustomerLogin(): string {

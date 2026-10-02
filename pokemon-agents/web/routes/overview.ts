@@ -99,7 +99,7 @@ function topicOrRoleLabel(topic: string | null, role: string | null): string {
   return label === "テーマ未設定" ? roleLabel(role) : label;
 }
 function accountStatusLabel(status: string | null): string {
-  return ({ active: "稼働中", paused: "一時停止中", disabled: "停止中" } as Record<string, string>)[status || ""] || "状態確認中";
+  return ({ ready: "準備完了", active: "稼働中", paused: "一時停止中", disabled: "停止中" } as Record<string, string>)[status || ""] || "状態確認中";
 }
 function contentStatus(content: ThreadsContent): { label: string; tone: string; stage: number } {
   const hasPublishedPart = content.publication?.mode === "live" && Boolean(content.publication.externalId);
@@ -141,6 +141,99 @@ function currentHypothesis(contents: ThreadsContent[]): string {
 function totalMetric(contents: ThreadsContent[], key: keyof ThreadsContent["metrics"]): number | null {
   const values = contents.map((content) => content.metrics[key]).filter((value): value is number => typeof value === "number");
   return values.length ? values.reduce((sum, value) => sum + value, 0) : null;
+}
+
+function customerAccountLabel(data: ThreadsDashboardData): string {
+  if (data.handle) return data.handle.startsWith("@") ? data.handle : `@${data.handle}`;
+  return data.displayName || "Threadsアカウント";
+}
+
+function latestCustomerActivity(
+  dashboards: ThreadsDashboardData[],
+): Array<{ account: string; content: ThreadsContent; at: string }> {
+  return dashboards.flatMap((dashboard) => dashboard.connected
+    ? dashboard.contents.map((content) => ({
+      account: customerAccountLabel(dashboard),
+      content,
+      at: content.publication?.publishedAt ?? content.updatedAt ?? content.createdAt,
+    })) : [])
+    .filter((item) => Boolean(item.at))
+    .sort((a, b) => b.at.localeCompare(a.at))
+    .slice(0, 8);
+}
+
+export function renderOverviewAggregate(
+  _db: Database, dashboards: ThreadsDashboardData[],
+): string {
+  const connected = dashboards.filter((dashboard) => dashboard.connected);
+  const contents = connected.flatMap((dashboard) => dashboard.contents.slice(0, 12));
+  const today = dayKey(new Date());
+  const pendingApproval = contents.filter((content) => content.state === "human_approval_pending").length;
+  const todayScheduled = contents.filter((content) =>
+    !content.publication?.externalId && dayKey(content.scheduledAt) === today).length;
+  const todayPublished = contents.filter((content) =>
+    content.publication?.mode === "live" && Boolean(content.publication.externalId)
+    && dayKey(content.publication.publishedAt) === today).length;
+  const metricKeys = [["views", "表示"], ["likes", "いいね"], ["replies", "返信"], ["reposts", "再投稿"]] as const;
+  const activity = latestCustomerActivity(dashboards);
+  const latestSync = connected.map((dashboard) => dashboard.fetchedAt)
+    .filter(Boolean).sort().at(-1) ?? null;
+
+  return `
+${renderCustomerHomeStyles()}
+<div id="overview" class="customer-dashboard customer-home">
+  <header class="home-overview-head">
+    <div><span>IKORABU SNS運用</span><h1>すべての運用アカウント</h1><p>${statusBadge({
+      status: connected.length === dashboards.length && dashboards.length > 0 ? "ok" : "warn",
+      icon: connected.length === dashboards.length && dashboards.length > 0 ? "✓" : "!",
+      label: `${connected.length}/${dashboards.length}アカウント接続`,
+    })}</p></div>
+    <button class="theme-toggle t-button t-button--secondary" id="theme-toggle" type="button" aria-label="表示テーマを切り替える">${dashboardIcon("sun")}<span id="theme-label">ダーク</span></button>
+  </header>
+  <section id="today" class="home-section" aria-labelledby="today-title">
+    ${sectionHeader({ id: "today-title", eyebrow: "全アカウント", title: "今日の運用", description: "許可されたアカウントの実データだけをまとめています。" })}
+    <div class="home-today-grid">
+      <div class="today-next">${kpiTile({ label: "運用中アカウント", value: connected.length, detail: `許可済み ${dashboards.length}アカウント` })}</div>
+      ${kpiTile({ label: "今日の投稿予定", value: todayScheduled, detail: "確認できた予定の合計" })}
+      ${kpiTile({ label: "承認待ち", value: pendingApproval, detail: "確認が必要な投稿案" })}
+      ${kpiTile({ label: "今日の公開済み", value: todayPublished, detail: "公開を確認できた投稿" })}
+    </div>
+    <p class="home-muted">最終同期 ${escapeHtml(formatDate(latestSync, "未接続"))} · 接続できないアカウントの値は推測で補いません。</p>
+  </section>
+  <section id="performance" class="home-section" aria-labelledby="performance-title">
+    ${sectionHeader({ id: "performance-title", eyebrow: "投稿済み・KPI", title: "全体の実績", description: "取得済みの実値だけを合計しています。" })}
+    <div class="home-kpi-grid">${metricKeys.map(([key, label]) => {
+      const total = totalMetric(contents, key);
+      return `<div class="home-kpi-item">${kpiTile({
+        label,
+        value: total === null ? "計測中" : total.toLocaleString("ja-JP"),
+        detail: total === null ? "実値の取得待ち" : "取得済み投稿の合計",
+      })}</div>`;
+    }).join("")}</div>
+    <div class="home-posts"><h3>アカウント別</h3><div class="post-list">${dashboards.map((dashboard) => {
+      const accountContents = dashboard.connected ? dashboard.contents.slice(0, 12) : [];
+      const accountPublished = accountContents.filter((content) =>
+        content.publication?.mode === "live" && Boolean(content.publication.externalId)).length;
+      const metrics = metricKeys.map(([key, label]) => {
+        const total = totalMetric(accountContents, key);
+        return `<span class="actual-metric metric-${key}${total === null ? " unavailable" : ""}"><b>${label}</b>${total === null ? "計測中" : total.toLocaleString("ja-JP")}</span>`;
+      }).join("");
+      return `<article class="post-card"><div class="post-card-heading"><h3>${escapeHtml(customerAccountLabel(dashboard))}</h3>${statusBadge({
+        status: dashboard.connected && (dashboard.accountStatus === "active" || dashboard.accountStatus === "ready") ? "ok" : "warn",
+        icon: dashboard.connected ? "✓" : "!",
+        label: dashboard.connected ? accountStatusLabel(dashboard.accountStatus) : "接続待ち",
+      })}</div><p class="home-muted">表示中の投稿 ${accountContents.length}件 · 公開済み ${accountPublished}件 · 承認待ち ${accountContents.filter((content) => content.state === "human_approval_pending").length}件</p><div class="actual-metrics">${metrics}</div></article>`;
+    }).join("")}</div></div>
+  </section>
+  <section id="schedule" class="home-section" aria-labelledby="schedule-title">
+    ${sectionHeader({ id: "schedule-title", eyebrow: "最新の動き", title: "アカウント横断の更新", description: "投稿案・予定・公開の記録を新しい順に表示します。" })}
+    ${activity.length ? `<div class="post-list">${activity.map(({ account, content, at }) => {
+      const status = contentStatus(content);
+      return `<article class="post-card"><div class="post-card-heading"><h3>${escapeHtml(topicOrRoleLabel(content.topic, content.contentRole))}</h3>${statusBadge({ status: status.tone === "completed" ? "ok" : "warn", icon: status.tone === "completed" ? "✓" : "◷", label: status.label })}</div><p class="home-muted">${escapeHtml(account)} · ${escapeHtml(formatDate(at, "時刻確認中"))}</p></article>`;
+    }).join("")}</div>` : emptyState({ title: "更新を取得中です", description: "実際の投稿記録が届くと、ここに表示します。" })}
+  </section>
+</div>
+<script>(()=>{${customerThemeScript}})();</script>`;
 }
 
 function renderSparkline(contents: ThreadsContent[], key: keyof ThreadsContent["metrics"]): string {

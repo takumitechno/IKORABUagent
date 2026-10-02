@@ -77,29 +77,37 @@ function tenantBridge() {
     }
 
     const userId = request.headers.get("x-threads-user-id");
-    const accountId = userId === "user_A" ? "acct_A" : userId === "user_B" ? "acct_B" : null;
-    if (!accountId) return new Response("denied", { status: 403 });
+    const allowed = userId === "user_A" ? ["acct_A", "acct_B"]
+      : userId === "user_B" ? ["acct_C"] : [];
+    if (!allowed.length) return new Response("denied", { status: 403 });
     if (url.pathname === "/operator/accounts") {
       return Response.json(accountsResponseV1([
-        accountSummaryV1({ account_id: accountId, handle: accountId, display_name: accountId }),
+        ...allowed.map((accountId) => accountSummaryV1({
+          account_id: accountId, handle: accountId, display_name: accountId,
+        })),
       ]));
     }
     if (url.pathname.startsWith("/operator/accounts/")) {
       const requested = decodeURIComponent(url.pathname.split("/")[3] ?? "");
-      if (requested !== accountId) return new Response("denied", { status: 403 });
+      if (!allowed.includes(requested)) return new Response("denied", { status: 403 });
       return Response.json(accountResponseV1({
-        account_id: accountId, handle: accountId, display_name: accountId,
+        account_id: requested, handle: requested, display_name: requested,
       }));
     }
     if (url.pathname.endsWith("/safety/status")) {
-      if (url.searchParams.get("account_id") !== accountId) return new Response("denied", { status: 403 });
-      return Response.json(safetyResponseV1({ account_id: accountId }));
+      const requested = url.searchParams.get("account_id") || "";
+      if (!allowed.includes(requested)) return new Response("denied", { status: 403 });
+      return Response.json(safetyResponseV1({ account_id: requested }));
     }
     if (url.pathname.endsWith("/editorial/internal")) {
-      return Response.json(editorialInternalV1({ account_id: accountId }));
+      return Response.json(editorialInternalV1({
+        account_id: url.searchParams.get("account_id") || allowed[0],
+      }));
     }
     if (url.pathname.endsWith("/editorial/customer")) {
-      return Response.json(editorialCustomerV1({ account_id: accountId }));
+      return Response.json(editorialCustomerV1({
+        account_id: url.searchParams.get("account_id") || allowed[0],
+      }));
     }
     return new Response("missing", { status: 404 });
   }) as typeof fetch;
@@ -107,13 +115,13 @@ function tenantBridge() {
 }
 
 describe("SAAS02E end-to-end tenant identity wiring", () => {
-  test("verified email resolves canonically and scopes accounts for users A and B", async () => {
+  test("one verified user gets two accounts while another tenant stays isolated", async () => {
     const bridge = tenantBridge();
     const directory = createBridgeTenantDirectory({ bridgeUrl, apiKey, fetcher: bridge.fetcher });
 
     for (const [email, userId, allowed, denied, role] of [
-      ["a@example.com", "user_A", "acct_A", "acct_B", "viewer"],
-      ["b@example.com", "user_B", "acct_B", "acct_A", "admin"],
+      ["a@example.com", "user_A", ["acct_A", "acct_B"], "acct_C", "viewer"],
+      ["b@example.com", "user_B", ["acct_C"], "acct_A", "admin"],
     ] as const) {
       const request = dashboardRequest(email);
       const identity = await resolveTrustedTenantIdentity(
@@ -127,15 +135,17 @@ describe("SAAS02E end-to-end tenant identity wiring", () => {
       const accounts = await loadThreadsAccounts({
         bridgeUrl, apiKey, tenantUserId: identity!.userId, fetcher: bridge.fetcher,
       });
-      expect(accounts.map((account) => account.accountId)).toEqual([allowed]);
-      expect(selectAuthorizedAccount(denied, accounts, allowed, true)).toMatchObject({
+      expect(accounts.map((account) => account.accountId)).toEqual([...allowed]);
+      expect(selectAuthorizedAccount(denied, accounts, allowed[0], true)).toMatchObject({
         selected: null, rejected: true,
       });
-      const dashboard = await loadThreadsDashboard({
-        bridgeUrl, apiKey, accountId: allowed, tenantUserId: identity!.userId,
-        fetcher: bridge.fetcher,
-      });
-      expect(dashboard.connected).toBe(true);
+      for (const accountId of allowed) {
+        const dashboard = await loadThreadsDashboard({
+          bridgeUrl, apiKey, accountId, tenantUserId: identity!.userId,
+          fetcher: bridge.fetcher,
+        });
+        expect(dashboard.connected).toBe(true);
+      }
       const finalGate = await loadThreadsDashboard({
         bridgeUrl, apiKey, accountId: denied, tenantUserId: identity!.userId,
         fetcher: bridge.fetcher,

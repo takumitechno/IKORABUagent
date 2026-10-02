@@ -17,7 +17,7 @@ import { resolve, dirname } from "path";
 import { fileURLToPath } from "url";
 import { startScheduler } from "../runtime/scheduler-loop";
 import { renderLayout, escapeHtml } from "./components/layout";
-import { renderOverview } from "./routes/overview";
+import { renderOverview, renderOverviewAggregate } from "./routes/overview";
 import { renderImprovementReport } from "./routes/improvement-report";
 import { renderInternalOperations } from "./routes/internal-operations";
 import { OPERATOR_ACCOUNT_IDS, renderOperatorDashboard } from "./routes/operator-dashboard";
@@ -345,10 +345,12 @@ const server = Bun.serve({
           const accounts = await authorizedCustomerAccounts(
             trustedTenant.userId, exactCanaryAccount,
           );
-          const accountId = verifyWorkspaceSelector(
+          const selectionId = verifyWorkspaceSelector(
             selector, trustedTenant, INTERNAL_AUTH.csrfSecret,
           );
-          if (!accountId || !accounts.some((account) => account.accountId === accountId)) {
+          if (!selectionId || (selectionId === "all"
+            ? accounts.length < 2
+            : !accounts.some((account) => account.accountId === selectionId))) {
             return new Response("Forbidden", { status: 403 });
           }
           return new Response(null, {
@@ -813,7 +815,7 @@ const server = Bun.serve({
           accounts, selection.selected?.accountId ?? null,
           trustedTenant, INTERNAL_AUTH.csrfSecret,
         );
-        if (!selection.selected) {
+        if (accounts.length === 0) {
           return lay(
             "アカウントを選ぶ",
             renderWorkspaceChoice(workspaces, routeCsrf, selection.expired),
@@ -826,6 +828,19 @@ const server = Bun.serve({
             } : undefined,
           );
         }
+        if (selection.aggregate) {
+          const dashboards = await Promise.all(accounts.map((account) =>
+            getThreadsDashboard(account.accountId, trustedTenant.userId)));
+          return lay(
+            "Dashboard", renderOverviewAggregate(db, dashboards), routeCsrf, workspaces,
+            selection.expired ? {
+              "Set-Cookie": clearCustomerWorkspaceCookie(
+                INTERNAL_AUTH.mode === "cloudflare-access",
+              ),
+            } : undefined,
+          );
+        }
+        if (!selection.selected) return new Response("Forbidden", { status: 403 });
         const [dashboard, reviews] = await Promise.all([
           getThreadsDashboard(selection.selected.accountId, trustedTenant.userId),
           getCustomerPendingReviews(selection.selected.accountId, trustedTenant.userId),
@@ -855,7 +870,7 @@ const server = Bun.serve({
           accounts, selection.selected?.accountId ?? null,
           trustedTenant, INTERNAL_AUTH.csrfSecret,
         );
-        if (!selection.selected) {
+        if (accounts.length === 0) {
           return lay(
             "アカウントを選ぶ",
             renderWorkspaceChoice(workspaces, routeCsrf, selection.expired),
@@ -868,6 +883,22 @@ const server = Bun.serve({
             } : undefined,
           );
         }
+        if (selection.aggregate) {
+          return lay(
+            "改善レポート",
+            renderWorkspaceChoice(
+              workspaces.filter((workspace) => !workspace.aggregate), routeCsrf,
+            ),
+            routeCsrf,
+            workspaces,
+            selection.expired ? {
+              "Set-Cookie": clearCustomerWorkspaceCookie(
+                INTERNAL_AUTH.mode === "cloudflare-access",
+              ),
+            } : undefined,
+          );
+        }
+        if (!selection.selected) return new Response("Forbidden", { status: 403 });
         return lay("AI改善レポート", renderImprovementReport(
           await getThreadsDashboard(selection.selected.accountId, trustedTenant.userId),
         ), routeCsrf, workspaces);
