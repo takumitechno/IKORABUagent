@@ -18,6 +18,9 @@ describe("organization chart", () => {
     expect(html).toContain("判断・実行チーム");
     expect(html).toContain('class="org-stats"');
     expect(html).toContain("専門担当");
+    expect(html).toContain('--member-color:#a855f7');
+    expect(html).toContain("ブランドカラー");
+    expect(html).toContain("紫");
     expect(html).not.toContain("<svg");
   });
 });
