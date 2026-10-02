@@ -16,7 +16,7 @@ a clearer product, and philosophy reduced to one moment near the end.
 | 03 | 環 — MEGURI `#meguri` | 自律型AI運用・改善プラットフォーム. 指示を待つAIではなく、運用を継続するAI。 Platform marks for Threads / X / Instagram / owned media connected to 環 |
 | 04 | Features `#features` | 環でできること: ten capabilities, one line each; icons draw in on arrival |
 | 05 | Autonomous operation `#flow` | Seven specialist roles on one loop (AI / システム), including an AI safety check before publishing, with three short points on running without human involvement |
-| 06 | Product demo `#demo` | A conceptual operating board (表示例) that moves from draft through safety check to improvement ideas without manual steps; pause and step controls |
+| 06 | Product demo `#demo` | 投稿、分析、改善。AIが自律して回し続ける。 A conceptual operating board (表示例, marked 自律運用中) that loops from draft through safety check to improvement ideas and back to the next post; pause and step controls |
 | 07 | Cost model `#cost` | モデルケース（試算例）: outsourcing at the median of published prices (初期15万円＋月25万円) against 環 (初期導入20万円＋月8万円). Bars show the first-year total to one scale; figures count up on arrival; method note and disclaimer below |
 | 08 | Philosophy | 繰り返しは、AIに。ひらめきは、人に。 A compact section: AI keeps operating and improving, so people can keep their own ひらめき. The four fixed lines sit below as a signature |
 | 09 | Closing | The company logo, written again with the same brush animation |

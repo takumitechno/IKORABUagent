@@ -613,6 +613,13 @@ html:not(.js) .sq-kanji, .m-reduce .sq-kanji { mask: none; }
 .m-reduce .app-log li, html:not(.js) .app-log li { animation: none; }
 .demo-note { margin-top: 18px; font-size: 12.5px; letter-spacing: .06em; color: var(--ink-2); }
 
+.demo .title { font-size: clamp(28px, 3.4vw, 50px); }
+.app-live { display: inline-flex; align-items: center; gap: 8px; font-size: 11.5px; letter-spacing: .14em; color: var(--kin-hi); white-space: nowrap; }
+.app-live i { position: relative; width: 7px; height: 7px; border-radius: 50%; background: var(--kin-hi); }
+.app-live i::after { content: ""; position: absolute; inset: -4px; border-radius: 50%; border: 1px solid var(--kin-hi); opacity: 0; }
+.m-full .app-live i::after { animation: livePing 2s ease-out infinite; }
+@keyframes livePing { 0% { opacity: .9; transform: scale(.5); } 100% { opacity: 0; transform: scale(1.7); } }
+
 /* ---------- COST MODEL: a model case, drawn to scale ---------- */
 .cost .title { font-size: clamp(28px, 3.4vw, 50px); }
 .cost-badge { grid-column: 9 / span 4; justify-self: end; align-self: end; padding: 6px 14px; border: 1px solid var(--kin); font-size: 13px; letter-spacing: .16em; color: var(--kin-deep); white-space: nowrap; }
@@ -1199,14 +1206,15 @@ html:not(.js) .sq-kanji, .m-reduce .sq-kanji { mask: none; }
     <div class="sec-head">
       <div>
         <p class="label" data-r="up"><span lang="en">Product demo</span><span class="jp">画面イメージ</span></p>
-        <h2 class="title" data-r="lines"><span class="ln"><span>投稿から改善まで、</span></span><span class="ln"><span>画面で見える。</span></span></h2>
+        <h2 class="title" data-r="lines"><span class="ln"><span>投稿、分析、改善。</span></span><span class="ln"><span><span class="nw">AIが自律して</span><span class="nw">回し続ける。</span></span></span></h2>
       </div>
-      <p class="sec-lead" data-r="up">投稿案の生成から改善案まで、<br>人が操作しなくても、状態が自動で進みます。</p>
+      <p class="sec-lead" data-r="up">AIが自ら投稿し、結果を分析し、改善して、また次の投稿へ。<br>人が指示しなくても、このサイクルが自律的に回り続けます。</p>
     </div>
     <div class="app has-kpi" role="group" aria-label="環 — MEGURI 運用画面の表示例" data-r="up">
       <div class="app-top">
         <span class="app-brand"><svg class="app-ring" viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="7"/><circle class="k" cx="10" cy="3" r="1.6"/></svg><span class="app-k">環</span><span lang="en">MEGURI</span></span>
         <span class="app-ws">運用ボード</span>
+        <span class="app-live"><i aria-hidden="true"></i>自律運用中</span>
         <span class="app-sample">表示例</span>
         <button class="app-play" type="button" aria-pressed="false"><i aria-hidden="true"></i><span>一時停止</span></button>
       </div>
