@@ -226,6 +226,8 @@ describe("read-only Threads dashboard connector", () => {
     expect(report).toContain('id="theme-toggle"');
     expect(report).toContain('role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="report-post-title" inert');
     expect(report).toContain('font-family:"LINE Seed JP","Poppins"');
+    expect(report).toContain('.improvement-page .hero-main h1{font-size:30px');
+    expect(report).toContain('.customer-shell:has(.improvement-page){font-size:14px');
     expect(report).toContain("addEventListener('pageshow',()=>scrollTo({top:0,left:0,behavior:'auto'}))");
     expect(report).not.toContain("must-not-surface");
     expect(report).not.toContain("internal-thread-id");
