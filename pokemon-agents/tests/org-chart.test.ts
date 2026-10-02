@@ -20,6 +20,9 @@ describe("organization chart", () => {
     expect(html).toContain("専門担当");
     expect(html).toContain('--member-color:#a855f7');
     expect(html).toContain('src="/internal-assets/equal-love-mark.png"');
+    expect(html).toContain('class="org-speech"');
+    expect(html).toContain("今日も、いい運用にしよう。");
+    expect(html).toContain("根拠までしっかり確認するよ。");
     expect(html).not.toContain("ブランドカラー");
     expect(html).not.toContain(">紫<");
     expect(html).not.toContain("<svg");

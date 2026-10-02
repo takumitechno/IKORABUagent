@@ -41,13 +41,29 @@ const MEMBER_ACCENT: Record<string, string> = {
   "mirinya-cost-analyst": "#c4b5fd",
 };
 
+const AGENT_SPEECH: Record<string, [message: string, delaySeconds: number]> = {
+  "sashihara-orchestrator": ["今日も、いい運用にしよう。", 0],
+  "iori-validator": ["根拠までしっかり確認するよ。", 3],
+  "maika-hypothesizer": ["次の仮説、試してみよう。", 6],
+  "hitomi-selector": ["いちばん効く施策を選ぶね。", 9],
+  "anna-supervisor": ["次の改善案、見つけたよ。", 12],
+  "hana-heartbeat": ["稼働状況、ちゃんと見てるよ。", 15],
+  "kiara-executor": ["承認済みの作業を進めます。", 18],
+  "mirinya-cost-analyst": ["数字から伸びしろを探すね。", 21],
+  "risa-notifier": ["確認が必要ならすぐ知らせるね。", 24],
+  "sanatsun-knowledge-editor": ["確認済みの知識を整理中。", 27],
+  "shoko-reporter": ["新しい情報を調べてくるね。", 30],
+};
+
 function renderAgentCard(agent: AgentBasic, leader = false): string {
   const active = agent.status === "active";
   const role = ROLE_LABEL_JP[agent.slug] || jpRole(agent.role);
   const accent = MEMBER_ACCENT[agent.slug] ?? "#ec4899";
+  const [speech, delaySeconds] = AGENT_SPEECH[agent.slug] ?? ["今日も稼働中です。", 0];
   const avatarUrl = agent.slug === "sashihara-orchestrator" ? "/internal-assets/equal-love-mark.png" : agent.avatar_url;
-  return `<a class="org-person${leader ? " org-person-leader" : ""}" href="/agents" style="--member-color:${accent}" aria-label="${escapeHtml(agent.pokemon_jp)}、${escapeHtml(role)}">
-    ${avatarUrl ? `<img src="${escapeHtml(avatarUrl)}" alt="" width="56" height="56">` : `<span class="org-avatar-fallback" aria-hidden="true">${escapeHtml(agent.pokemon_jp.slice(0, 1))}</span>`}
+  return `<a class="org-person${leader ? " org-person-leader" : ""}" href="/agents" style="--member-color:${accent};--talk-delay:${delaySeconds}s" aria-label="${escapeHtml(agent.pokemon_jp)}、${escapeHtml(role)}">
+    <span class="org-speech" aria-hidden="true">${escapeHtml(speech)}</span>
+    ${avatarUrl ? `<img src="${escapeHtml(avatarUrl)}" alt="" width="72" height="72">` : `<span class="org-avatar-fallback" aria-hidden="true">${escapeHtml(agent.pokemon_jp.slice(0, 1))}</span>`}
     <span class="org-person-copy">
       <strong>${escapeHtml(agent.pokemon_jp)}</strong>
       <span>${escapeHtml(role)}</span>
@@ -80,6 +96,7 @@ export function renderOrgChart(db: Database, agentsList: AgentBasic[]): string {
   const activeCount = agentsList.filter((agent) => agent.status === "active").length;
 
   return `<div class="org-board">
+    <span class="org-cosmos" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
     <header class="org-hero">
       <div>
         <span class="org-eyebrow">AI OPERATIONS NETWORK</span>
