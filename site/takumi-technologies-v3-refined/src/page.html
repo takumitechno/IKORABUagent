@@ -597,12 +597,14 @@ button { font: inherit; color: inherit; }
 .cost-badge { grid-column: 9 / span 4; justify-self: end; align-self: end; padding: 6px 14px; border: 1px solid var(--kin); font-size: 13px; letter-spacing: .16em; color: var(--kin-deep); white-space: nowrap; }
 .cost-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: clamp(40px, 6vw, 96px); }
 .cost-col h3 { margin-bottom: 18px; font-family: var(--f-min); font-weight: 500; font-size: clamp(18px, 1.6vw, 22px); letter-spacing: .1em; color: var(--ink); }
-.cbar { display: flex; height: 16px; margin-bottom: 22px; box-shadow: inset 0 -1px 0 var(--rule-l); }
-.cbar i { display: block; height: 100%; width: calc(var(--v) / 28 * 100% - 2px); margin-right: 2px; background: var(--ink-2); transform-origin: left; transition: opacity .3s ease; }
+.cbar { display: flex; height: 18px; margin-bottom: 22px; box-shadow: inset 0 -1px 0 var(--rule-l); }
+.cbar i { display: block; height: 100%; width: calc(var(--v) / var(--max, 28) * 100% - 2px); margin-right: 2px; background: var(--ink-2); transform-origin: left; transition: opacity .3s ease; }
 .cbar i:last-child { border-radius: 0 3px 3px 0; }
 .after .cbar i { background: var(--kin); }
 .after .cbar i:first-child { background: var(--kin-deep); }
-.before .cbar i:nth-child(even) { background: var(--ink-3); }
+.after .cbar i:last-child { background: #c9b17d; }
+.before .cbar i:first-child { background: var(--ink); }
+.before .cbar i:nth-child(2) { background: var(--ink-3); }
 .m-full .cost-col .cbar i { transform: scaleX(0); transition: transform 1.2s var(--ease) calc(.25s + var(--v) * 0s), opacity .3s ease; }
 .m-full .cost-col.is-in .cbar i { transform: none; }
 .cbar.has-hl i:not(.hl) { opacity: .3; }
@@ -612,20 +614,32 @@ button { font: inherit; color: inherit; }
 .cost-rows dd b { margin-right: 2px; font-family: var(--f-lat); font-weight: 400; font-size: 20px; color: var(--ink); font-variant-numeric: tabular-nums; }
 .cost-rows small { font-size: 12px; color: var(--ink-3); }
 .cost-rows .total { margin-top: 4px; padding-top: 16px; border-top: 1px solid var(--ink); border-bottom: 0; }
-.cost-rows .total dt { font-weight: 500; letter-spacing: .2em; }
+.cost-rows .total dt { font-weight: 500; letter-spacing: .14em; }
 .cost-rows .total dd b { font-weight: 300; font-size: clamp(34px, 3.2vw, 44px); }
 .after .cost-rows .total dd b { color: var(--kin-deep); }
 .cost-result { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: var(--colgap); align-items: end; margin-top: clamp(56px, 7vw, 96px); padding-top: clamp(36px, 4.5vw, 56px); border-top: 1px solid var(--rule-l); }
-.cr-main { grid-column: 1 / span 6; display: flex; flex-wrap: wrap; align-items: baseline; column-gap: .14em; font-family: var(--f-lat); font-weight: 200; font-size: clamp(56px, 7vw, 108px); line-height: 1; letter-spacing: 0; color: var(--ink); }
+.cr-main { grid-column: 1 / span 5; display: flex; flex-wrap: wrap; align-items: baseline; column-gap: .14em; font-family: var(--f-lat); font-weight: 200; font-size: clamp(56px, 7vw, 108px); line-height: 1; letter-spacing: 0; color: var(--ink); }
 .cr-main small { font-family: var(--f-got); font-weight: 400; font-size: max(14px, .2em); letter-spacing: .1em; color: var(--ink-2); }
 .cr-main i { align-self: center; position: relative; width: .7em; height: 1px; margin-inline: .2em; background: var(--ink-3); }
 .cr-main i::after { content: ""; position: absolute; right: 0; top: -4px; width: 8px; height: 8px; border-top: 1px solid var(--ink-3); border-right: 1px solid var(--ink-3); transform: rotate(45deg); }
 .cr-main .to { color: var(--kin-deep); font-weight: 300; }
-.cr-stats { grid-column: 7 / span 6; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.cr-stats { grid-column: 6 / span 7; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); }
 .cr-stats div { padding-left: clamp(14px, 1.6vw, 24px); border-left: 1px solid var(--rule-l); }
 .cr-stats dt { font-size: 12.5px; letter-spacing: .14em; color: var(--ink-2); }
 .cr-stats dd { font-size: 14px; color: var(--ink-2); white-space: nowrap; }
 .cr-stats dd b { margin-right: 2px; font-family: var(--f-lat); font-weight: 300; font-size: clamp(30px, 3vw, 44px); line-height: 1.2; color: var(--ink); font-variant-numeric: tabular-nums; }
+.cc-sub { display: block; margin-top: 4px; font-family: var(--f-got); font-weight: 400; font-size: 12px; letter-spacing: .1em; color: var(--ink-3); }
+.cost-rows dt { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; }
+.med { padding: 0 7px; border: 1px solid var(--kin); border-radius: 2px; font-size: 10.5px; letter-spacing: .12em; line-height: 1.6; color: var(--kin-deep); }
+.cr-scope { flex-basis: 100%; font-size: 11.5px; letter-spacing: .04em; color: var(--ink-3); }
+.cbar-key { display: flex; align-items: center; gap: 10px; margin-top: 24px; font-size: 12px; letter-spacing: .06em; color: var(--ink-2); }
+.cbar-key i { width: 22px; height: 8px; border-radius: 0 2px 2px 0; background: linear-gradient(90deg, var(--ink) 0 20%, var(--ink-3) 20%); }
+.cr-stats dt small { display: block; font-size: 11px; letter-spacing: .06em; color: var(--ink-3); }
+.cost-col { display: flex; flex-direction: column; }
+.cost-col .cost-rows { flex: 1; display: flex; flex-direction: column; }
+.cost-col .cost-rows .total { margin-top: auto; }
+.cr-stats > div { display: flex; flex-direction: column; justify-content: flex-end; }
+.cost-notes { display: grid; gap: 6px; margin-top: clamp(28px, 3vw, 40px); padding: 14px 18px; border-left: 2px solid var(--kin); background: rgba(173, 149, 100, .07); font-size: 12.5px; line-height: 1.9; color: var(--ink-2); max-width: 60em; word-break: auto-phrase; }
 .cost-note { margin-top: clamp(28px, 3vw, 40px); padding: 14px 18px; border-left: 2px solid var(--kin); background: rgba(173, 149, 100, .07); font-size: 13px; line-height: 1.9; color: var(--ink-2); max-width: 52em; }
 
 /* ---------- service illustrations: line art, gently moving ---------- */
@@ -754,6 +768,7 @@ button { font: inherit; color: inherit; }
   .svc:nth-child(n+3) { border-top: 1px solid var(--rule-l); }
   .cr-main, .cr-stats { grid-column: 1 / -1; }
   .cr-stats { margin-top: 36px; }
+  .cr-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); row-gap: 24px; }
 }
 @media (max-width: 959px) {
   :root { --header-h: 64px; }
@@ -828,7 +843,7 @@ button { font: inherit; color: inherit; }
   .app-right { grid-template-columns: minmax(0, 1fr); padding: 18px 14px; }
   .cr-main { font-size: clamp(44px, 14vw, 60px); }
   .cr-stats { grid-template-columns: minmax(0, 1fr); gap: 14px; }
-  .cr-stats div { display: flex; justify-content: space-between; align-items: baseline; padding: 0 0 10px; border-left: 0; border-bottom: 1px solid var(--rule-l); }
+  .cr-stats div, .cr-stats > div { display: flex; flex-direction: row; justify-content: space-between; align-items: flex-end; gap: 12px; padding: 0 0 10px; border-left: 0; border-bottom: 1px solid var(--rule-l); }
   .cost-rows > div { font-size: 13.5px; }
   .foot-in { flex-direction: column; align-items: flex-start; }
 }
@@ -1226,31 +1241,45 @@ button { font: inherit; color: inherit; }
     <div class="sec-head">
       <div>
         <p class="label" data-r="up"><span lang="en">Model case</span><span class="jp">試算例</span></p>
-        <h2 class="title" data-r="lines"><span class="ln"><span>作業をAIに任せると、</span></span><span class="ln"><span>運用コストはこう変わる。</span></span></h2>
+        <h2 class="title" data-r="lines"><span class="ln"><span>作業をAIに任せると、</span></span><span class="ln"><span>運用コストは<span class="nw">こう変わる。</span></span></span></h2>
       </div>
       <p class="cost-badge" data-r="up">モデルケース（試算例）</p>
     </div>
-    <div class="cost-grid">
+    <div class="cost-grid" style="--max:315">
         <div class="cost-col before" data-r="up">
-          <h3>従来のSNS運用</h3>
-          <div class="cbar" role="img" aria-label="従来のSNS運用：月28万円（28万円を全幅とした棒）"><i style="--v:12" data-seg="b0"></i><i style="--v:8" data-seg="b1"></i><i style="--v:3" data-seg="b2"></i><i style="--v:5" data-seg="b3"></i></div>
-          <dl class="cost-rows"><div data-seg="b0"><dt>SNS運用管理</dt><dd><b lang="en">12</b>万円<small> / 月</small></dd></div><div data-seg="b1"><dt>投稿企画・制作</dt><dd><b lang="en">8</b>万円<small> / 月</small></dd></div><div data-seg="b2"><dt>投稿・スケジュール管理</dt><dd><b lang="en">3</b>万円<small> / 月</small></dd></div><div data-seg="b3"><dt>KPI集計・レポート</dt><dd><b lang="en">5</b>万円<small> / 月</small></dd></div><div class="total"><dt>合計</dt><dd><b lang="en">28</b>万円<small> / 月</small></dd></div></dl>
+          <h3>従来の外注費<span class="cc-sub">SNS運用代行・公開相場の中央値</span></h3>
+          <div class="cbar" role="img" aria-label="従来の外注費：初年度の総額315万円（初期費用15万円＋月額25万円×12か月）"><i style="--v:15" data-seg="b0"></i><i style="--v:300" data-seg="b1"></i></div>
+          <dl class="cost-rows">
+            <div data-seg="b0"><dt>初期費用<span class="med">中央値</span></dt><dd><b lang="en" data-count="15">15</b>万円</dd></div>
+            <div data-seg="b1"><dt>月額費用<span class="med">中央値</span><span class="cr-scope">企画・投稿制作・投稿管理・月次レポート</span></dt><dd><b lang="en" data-count="25">25</b>万円<small> / 月</small></dd></div>
+            <div class="total"><dt>初年度の総額</dt><dd><b lang="en" data-count="315">315</b>万円</dd></div>
+          </dl>
         </div>
         <div class="cost-col after" data-r="up">
-          <h3>環を活用した運用モデル</h3>
-          <div class="cbar" role="img" aria-label="環を活用した運用モデル：月8万円（28万円を全幅とした棒）"><i style="--v:5" data-seg="a0"></i><i style="--v:3" data-seg="a1"></i></div>
-          <dl class="cost-rows"><div data-seg="a0"><dt>戦略設計・運用管理</dt><dd><b lang="en">5</b>万円<small> / 月</small></dd></div><div data-seg="a1"><dt>AI・システム運用</dt><dd><b lang="en">3</b>万円<small> / 月</small></dd></div><div class="total"><dt>合計</dt><dd><b lang="en">8</b>万円<small> / 月</small></dd></div></dl>
+          <h3>環を活用した運用モデル<span class="cc-sub">初期導入＋月額</span></h3>
+          <div class="cbar" role="img" aria-label="環を活用した運用モデル：初年度の総額116万円（初期導入費20万円＋月額8万円×12か月）"><i style="--v:20" data-seg="a0"></i><i style="--v:60" data-seg="a1"></i><i style="--v:36" data-seg="a2"></i></div>
+          <dl class="cost-rows">
+            <div data-seg="a0"><dt>初期導入費</dt><dd><b lang="en" data-count="20">20</b>万円</dd></div>
+            <div data-seg="a1"><dt>戦略設計・運用管理</dt><dd><b lang="en" data-count="5">5</b>万円<small> / 月</small></dd></div>
+            <div data-seg="a2"><dt>AI・システム運用</dt><dd><b lang="en" data-count="3">3</b>万円<small> / 月</small></dd></div>
+            <div class="total"><dt>初年度の総額</dt><dd><b lang="en" data-count="116">116</b>万円</dd></div>
+          </dl>
         </div>
     </div>
+    <p class="cbar-key" data-r="up"><i aria-hidden="true"></i>棒の長さは、初年度の総額（初期費用＋12か月分）です。</p>
     <div class="cost-result" data-r="up">
-      <p class="cr-main" aria-label="月28万円から月8万円へ"><span lang="en" data-count="28">28</span><small>万円</small><i aria-hidden="true"></i><span class="to" lang="en" data-count="8" data-from="28">8</span><small>万円 / 月</small></p>
+      <p class="cr-main" aria-label="月額25万円から月額8万円へ"><span lang="en" data-count="25">25</span><small>万円</small><i aria-hidden="true"></i><span class="to" lang="en" data-count="8" data-from="25">8</span><small>万円 / 月</small></p>
       <dl class="cr-stats">
-        <div><dt>月の削減余地</dt><dd><b lang="en" data-count="20">20</b>万円</dd></div>
-        <div><dt>年間</dt><dd><b lang="en" data-count="240">240</b>万円</dd></div>
-        <div><dt>削減率</dt><dd>約<b lang="en" data-count="71">71</b>%</dd></div>
+        <div><dt>月の削減余地</dt><dd><b lang="en" data-count="17">17</b>万円</dd></div>
+        <div><dt>年間</dt><dd><b lang="en" data-count="204">204</b>万円</dd></div>
+        <div><dt>削減率（月額）</dt><dd>約<b lang="en" data-count="68">68</b>%</dd></div>
+        <div><dt>初年度の差額<small>初期費用込み</small></dt><dd><b lang="en" data-count="199">199</b>万円</dd></div>
       </dl>
     </div>
-    <p class="cost-note" data-r="up">※上記は想定業務をもとにしたモデルケースです。実際の費用・削減額は、業務量・運用内容・契約条件によって異なります。</p>
+    <div class="cost-notes" data-r="up">
+      <p>※従来の外注費は、国内のSNS運用代行について公開されている料金情報（比較記事・各社の料金表、2026年10月時点）から、企画・投稿制作・投稿管理・月次レポートを含む標準的なプランの価格帯を集め、その中央値をもとに概算した金額です。</p>
+      <p>※上記は想定業務をもとにしたモデルケースです。実際の費用・削減額は、業務量・運用内容・契約条件によって異なります。</p>
+    </div>
   </div>
 </section>
 
