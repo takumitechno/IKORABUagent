@@ -65,9 +65,10 @@ describe("PRODUCT-UI-REDESIGN01 editorial navigation rail", () => {
       "addEventListener('click'",
       "addEventListener('hashchange'",
       "addEventListener('popstate'",
-      "scrollIntoView({ behavior: 'auto'",
+      "rail.scrollTo({ left:",
       "sync();",
     ]) expect(script.includes(contract)).toBe(true);
+    expect(script.includes("scrollIntoView")).toBe(false);
     expect(script.includes("setInterval")).toBe(false);
   });
 

@@ -295,7 +295,10 @@ export function customerEditorialNavScript(): string {
       }
     });
     if (active && matchMedia('(max-width: 700px)').matches) {
-      active.scrollIntoView({ behavior: 'auto', block: 'nearest', inline: 'nearest' });
+      const left = active.offsetLeft;
+      const right = left + active.offsetWidth;
+      if (left < rail.scrollLeft) rail.scrollTo({ left: Math.max(0, left - 8), behavior: 'auto' });
+      else if (right > rail.scrollLeft + rail.clientWidth) rail.scrollTo({ left: right - rail.clientWidth + 8, behavior: 'auto' });
     }
   }
   function sync() { applyKey(requestedKey(location.pathname, location.hash)); }

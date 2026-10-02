@@ -224,6 +224,9 @@ describe("read-only Threads dashboard connector", () => {
     expect(report).toContain("分析に使う");
     expect(report).toContain("改善学習には使わない");
     expect(report).toContain('id="theme-toggle"');
+    expect(report).toContain('role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="report-post-title" inert');
+    expect(report).toContain('font-family:"LINE Seed JP","Poppins"');
+    expect(report).toContain("addEventListener('pageshow',()=>scrollTo({top:0,left:0,behavior:'auto'}))");
     expect(report).not.toContain("must-not-surface");
     expect(report).not.toContain("internal-thread-id");
     for (const forbidden of ["request_id", "content_hash", "DB path", "batch_id", "currentAgent", "kiara-executor", "iori-validator", "sashihara-orchestrator"]) {
