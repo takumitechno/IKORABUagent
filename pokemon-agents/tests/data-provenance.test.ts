@@ -82,6 +82,9 @@ describe("demo provenance", () => {
     expect(hypotheses).not.toContain("legacy-hypothesis");
 
     const improvements = renderImprovements(db, new URLSearchParams("tab=all"));
+    expect(improvements).toContain("自律改善コックピット");
+    expect(improvements).toContain("IMPROVEMENT PIPELINE");
+    expect(improvements).toContain("安全境界");
     expect(improvements).toContain("prod-improvement");
     expect(improvements).not.toContain("demo-improvement");
     expect(improvements).not.toContain("legacy-improvement");

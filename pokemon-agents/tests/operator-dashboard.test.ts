@@ -56,6 +56,9 @@ describe("MVP operator dashboard", () => {
     expect(html).toContain("配置先");
     expect(html).toContain("未確認");
     expect(html).toContain("投稿確認済み");
+    expect(html).toContain("AI OPERATIONS COMMAND CENTER");
+    expect(html).toContain('class="op-flow"');
+    for (const label of ["生成", "承認", "予約", "投稿", "確認", "KPI"]) expect(html).toContain(`>${label}<`);
   });
 
   test("contains no live mutation or secret surface", () => {

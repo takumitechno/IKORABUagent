@@ -1,5 +1,6 @@
 import type { Database } from "bun:sqlite";
 import { escapeHtml, fmtInterval, fmtCents, jpRole, jpStatus } from "../components/layout";
+import { commandHero, commandStats } from "../components/operator-command";
 import { renderOrgChart } from "./org";
 import { renderHeartbeat } from "./heartbeat";
 import { renderCosts } from "./costs";
@@ -99,8 +100,23 @@ export function renderAgents(db: Database, view: AgentsView = "list", params?: U
   }
 
   if (view === "org") return header + toolbar + renderOrgChart(db, agents);
-  if (view === "list") return header + toolbar + renderListTable(db, agents, params);
-  if (view === "schedule") return header + renderScheduleTimeline(db, agents);
+  if (view === "list") {
+    const active = agents.filter((agent) => agent.status === "active").length;
+    const departments = new Set(agents.map((agent) => agent.department)).size;
+    return `<div class="command-page agent-command">${commandHero({
+      eyebrow: "AI OPERATIONS ROSTER",
+      title: "エージェント管制",
+      description: "11人の担当領域、稼働状態、スケジュールを一覧で確認します。内部思考ではなく運用上の要約だけを表示します。",
+      state: active === agents.length ? "全員稼働" : `${active}/${agents.length} 稼働`,
+      stateDetail: "詳細は実データがある項目のみ表示",
+      tone: active === agents.length ? "ok" : "warn",
+    })}${commandStats([
+      { label: "登録エージェント", value: agents.length, detail: "運用チーム" },
+      { label: "稼働中", value: active, detail: "現在の登録状態", tone: active ? "ok" : "neutral" },
+      { label: "担当ユニット", value: departments, detail: "専門領域" },
+    ])}<section class="command-section agent-roster"><header class="command-section-head"><div><span>AGENT STATUS</span><h2>担当・状態・次回起動</h2></div><p>列名を押すと並び替えできます。</p></header>${renderListTable(db, agents, params)}</section></div>`;
+  }
+  if (view === "schedule") return renderScheduleTimeline(db, agents);
   if (view === "cost") return header + stripHeader(renderCosts(db));
   return header;
 }
@@ -392,6 +408,10 @@ function renderScheduleTimeline(db: Database, agents: AgentRow[]): string {
   const disabledRows = rows.filter((r) => r.kind === "scheduled" && r.schedule?.enabled === 0);
   const unscheduled = rows.filter((r) => r.kind === "unscheduled" && SCHEDULABLE_ROLES.has(r.agent.role));
   const enabledFirings = enabledRows.reduce((sum, r) => sum + r.firings.length, 0);
+  const nextSchedule = enabledRows
+    .map((row) => row.schedule?.next_run_at)
+    .filter((value): value is string => Boolean(value))
+    .sort()[0] ?? null;
 
   const now = new Date();
   const nowMinutes = now.getHours() * 60 + now.getMinutes();
@@ -470,7 +490,26 @@ function renderScheduleTimeline(db: Database, agents: AgentRow[]): string {
     </div>`;
   };
 
-  return `
+  const hero = commandHero({
+    eyebrow: "AGENT SCHEDULER NETWORK",
+    title: "スケジュール管制",
+    description: "エージェントの起動時刻と連携関係を、24時間タイムラインで監督します。設定内容は既存スケジューラーの状態をそのまま表示します。",
+    state: enabledRows.length ? "スケジュールあり" : "停止中",
+    stateDetail: nextSchedule ? `次回予定 ${nextSchedule.replace("T", " ").slice(0, 16)}` : "次回予定データなし",
+    tone: enabledRows.length ? "ok" : "neutral",
+    cycle: ["登録", "待機", "起動", "連携", "処理", "記録"],
+  });
+  const stats = commandStats([
+    { label: "稼働スケジュール", value: enabledRows.length, detail: "有効", tone: enabledRows.length ? "ok" : "neutral" },
+    { label: "1日の起動予定", value: enabledFirings, detail: "推定回数" },
+    { label: "連携エージェント", value: linkedRows.length, detail: "親タスクに連動" },
+    { label: "停止中", value: disabledRows.length, detail: "無効設定", tone: disabledRows.length ? "warn" : "neutral" },
+    { label: "未設定", value: unscheduled.length, detail: "設定可能" },
+  ]);
+
+  return `<div class="command-page schedule-command">
+${hero}${stats}
+<section class="command-section schedule-timeline-section"><header class="command-section-head"><div><span>24H EXECUTION MAP</span><h2>今日の実行タイムライン</h2></div><p>現在 ${pad2(now.getHours())}:${pad2(now.getMinutes())} · 現在位置を縦線で表示</p></header>
 <div class="section compact">
   <div class="timeline-summary">
     <span>
@@ -505,7 +544,7 @@ function renderScheduleTimeline(db: Database, agents: AgentRow[]): string {
 </div>
 
 ${renderScheduleEditModal()}
-`;
+</section></div>`;
 }
 
 function renderScheduleEditModal(): string {
@@ -873,6 +912,18 @@ function renderListTable(db: Database, agents: AgentRow[], params?: URLSearchPar
     )
     .all();
   const lastFireByAgent = new Map(lastFireRows.map((r) => [r.agent_id, r.last_at]));
+  const runSummaryRows = db.query<{ agent_id: number; ok: number; fail: number; cost: number }, []>(
+    `SELECT agent_id,
+            SUM(CASE WHEN status='completed' THEN 1 ELSE 0 END) AS ok,
+            SUM(CASE WHEN status IN ('failed','timeout','error') THEN 1 ELSE 0 END) AS fail,
+            COALESCE(SUM(cost_usd),0) AS cost
+     FROM reflections
+     WHERE agent_id IS NOT NULL
+       AND (session_id IS NULL OR session_id NOT LIKE 'demo-%')
+       AND (work_dir IS NULL OR work_dir <> '/demo')
+     GROUP BY agent_id`,
+  ).all();
+  const runSummaryByAgent = new Map(runSummaryRows.map((row) => [row.agent_id, row]));
 
   // agent_edges から親子関係を解決
   const { childrenMap, isChild } = buildAgentTree(db, agents);
@@ -1039,6 +1090,28 @@ function renderListTable(db: Database, agents: AgentRow[], params?: URLSearchPar
           }
 
           const rowClass = r.depth === 0 && childrenMap.has(a.id) ? "tree-root" : r.depth > 0 ? "tree-child" : "tree-standalone";
+          const nextRun = timer && timer.enabled
+            ? fmtNextRun(computeNextRun(timer, lastFireByAgent.get(a.id) || null))
+            : "—";
+          const connected = [r.parent?.pokemon_jp, ...(childrenMap.get(a.id) || []).map((edge) => edge.child.pokemon_jp)].filter(Boolean).join("・") || "—";
+          const runSummary = runSummaryByAgent.get(a.id);
+          const detail = escapeJsonForScript({
+            name: a.pokemon_jp,
+            slug: a.slug,
+            avatar: a.slug === "sashihara-orchestrator" ? "/internal-assets/equal-love-mark.png" : a.avatar_url,
+            role: a.role_label || jpRole(a.role),
+            state: a.status === "active" ? "稼働中" : jpStatus(a.status),
+            health: a.status === "active" ? "正常" : "要確認",
+            currentTask: "—",
+            recentActivity: lastFireByAgent.get(a.id) || "—",
+            inputs: "—",
+            outputs: "—",
+            connected,
+            lastExecution: lastFireByAgent.get(a.id) || "—",
+            nextRun,
+            cost: runSummary?.cost ? `$${runSummary.cost.toFixed(4)}` : "—",
+            history: runSummary ? `成功 ${runSummary.ok} / 失敗 ${runSummary.fail}` : "—",
+          });
 
           // 操作: schedulable (orchestrator/supervisor/solo OR 親なし) のみ編集可
           //       子エージェント (parent あり + role が schedulable でない) は呼出専用 → "—"
@@ -1062,10 +1135,11 @@ function renderListTable(db: Database, agents: AgentRow[], params?: URLSearchPar
             ${a.avatar_url ? `<img src="${escapeHtml(a.avatar_url)}" alt="" width="36" height="36" class="list-avatar">` : `<span class="list-avatar list-avatar-placeholder"></span>`}
             <div class="list-agent-text">
               <div class="list-agent-name">
-                <span style="font-weight:${r.depth === 0 ? 700 : 600};">${escapeHtml(a.pokemon_jp)}</span>
+                <button type="button" class="agent-detail-trigger" onclick="openAgentDetail(${a.id})" style="font-weight:${r.depth === 0 ? 700 : 600};">${escapeHtml(a.pokemon_jp)} <span aria-hidden="true">↗</span></button>
                 <span class="dept-pill dept-${escapeHtml(a.department)}">${escapeHtml(a.department_label || a.department)}</span>
               </div>
               <div class="list-agent-slug">${escapeHtml(a.slug)}</div>
+              <script type="application/json" id="agent-detail-data-${a.id}">${detail}</script>
             </div>
           </div>
         </td>
@@ -1073,11 +1147,7 @@ function renderListTable(db: Database, agents: AgentRow[], params?: URLSearchPar
         <td class="muted">${escapeHtml(a.department_label || a.department)}</td>
         <td class="mono muted">${escapeHtml(a.model)}</td>
         <td>${schedDesc}</td>
-        <td class="mono muted tiny">${
-          timer && timer.enabled
-            ? fmtNextRun(computeNextRun(timer, lastFireByAgent.get(a.id) || null))
-            : "—"
-        }</td>
+        <td class="mono muted tiny">${nextRun}</td>
         <td style="text-align:right;">${actionBtn}</td>
       </tr>`;
         })
@@ -1087,14 +1157,33 @@ function renderListTable(db: Database, agents: AgentRow[], params?: URLSearchPar
   ${filteredRows.length === 0 ? `<div class="empty"><p class="muted">該当するエージェントがいません</p></div>` : ""}
 </div>
 
+<div id="agent-detail-modal" class="modal" style="display:none;">
+  <div class="modal-inner agent-detail-modal" role="dialog" aria-modal="true" aria-labelledby="agent-detail-name">
+    <header><div class="agent-detail-profile"><img id="agent-detail-avatar" alt="" width="72" height="72"><div><span>AGENT OPERATION PROFILE</span><h3 id="agent-detail-name"></h3><p id="agent-detail-role"></p></div></div><button class="modal-close" type="button" onclick="closeAgentDetail()" aria-label="閉じる">×</button></header>
+    <div class="agent-detail-status"><div><span>現在の状態</span><strong id="agent-detail-state"></strong></div><div><span>ヘルス</span><strong id="agent-detail-health"></strong></div><div><span>次回起動</span><strong id="agent-detail-next"></strong></div></div>
+    <dl class="agent-detail-grid"><div><dt>現在のタスク</dt><dd id="agent-detail-task"></dd></div><div><dt>直近の活動</dt><dd id="agent-detail-activity"></dd></div><div><dt>入力</dt><dd id="agent-detail-inputs"></dd></div><div><dt>出力</dt><dd id="agent-detail-outputs"></dd></div><div><dt>連携エージェント</dt><dd id="agent-detail-connected"></dd></div><div><dt>最終実行</dt><dd id="agent-detail-last"></dd></div><div><dt>コスト</dt><dd id="agent-detail-cost"></dd></div><div><dt>成功 / 失敗履歴</dt><dd id="agent-detail-history"></dd></div></dl>
+    <p class="agent-detail-note">運用上の要約だけを表示しています。内部思考は表示しません。</p>
+  </div>
+</div>
+
 <script>
-function runAgentNow(slug, name) {
-  if (!confirm(name + ' (' + slug + ') を今すぐ実行しますか？')) return;
-  alert('手動実行は未実装です (TODO)。');
+function openAgentDetail(id) {
+  const source = document.getElementById('agent-detail-data-' + id);
+  if (!source) return;
+  const data = JSON.parse(source.textContent);
+  const text = (id, value) => { const element = document.getElementById(id); if (element) element.textContent = value || '—'; };
+  text('agent-detail-name', data.name); text('agent-detail-role', data.role + ' · ' + data.slug);
+  text('agent-detail-state', data.state); text('agent-detail-health', data.health); text('agent-detail-next', data.nextRun);
+  text('agent-detail-task', data.currentTask); text('agent-detail-activity', data.recentActivity);
+  text('agent-detail-inputs', data.inputs); text('agent-detail-outputs', data.outputs); text('agent-detail-connected', data.connected);
+  text('agent-detail-last', data.lastExecution); text('agent-detail-cost', data.cost); text('agent-detail-history', data.history);
+  const avatar = document.getElementById('agent-detail-avatar');
+  if (avatar) { avatar.src = data.avatar || ''; avatar.hidden = !data.avatar; }
+  document.getElementById('agent-detail-modal').style.display = 'flex';
 }
-function openAgentMenu(id) {
-  alert('詳細メニューは未実装です (TODO agent id: ' + id + ')。');
-}
+function closeAgentDetail() { document.getElementById('agent-detail-modal').style.display = 'none'; }
+document.getElementById('agent-detail-modal').addEventListener('click', event => { if (event.target.id === 'agent-detail-modal') closeAgentDetail(); });
+document.addEventListener('keydown', event => { if (event.key === 'Escape') closeAgentDetail(); });
 // 行内トグルのクリックは label の onclick で openScheduleModal を直接呼ぶ
 // (旧 data-toggle-trigger / data-open-schedule の delegation 廃止 — 統一 modal に集約)
 </script>
@@ -1105,4 +1194,8 @@ ${renderScheduleEditModal()}
 
 function trigJp(t: string): string {
   return ({ timer: "タイマー", automation: "自動連鎖", on_demand: "手動", assignment: "割当" } as Record<string, string>)[t] || t;
+}
+
+function escapeJsonForScript(value: unknown): string {
+  return JSON.stringify(value).replace(/</g, "\\u003c").replace(/>/g, "\\u003e");
 }

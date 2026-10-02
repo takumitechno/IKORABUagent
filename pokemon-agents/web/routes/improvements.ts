@@ -1,5 +1,6 @@
 import type { Database } from "bun:sqlite";
 import { escapeHtml, statusBadge, jpStatus } from "../components/layout";
+import { commandEmpty, commandHero, commandStats } from "../components/operator-command";
 import { q1 } from "../lib/db-helpers";
 
 /**
@@ -32,6 +33,7 @@ type Tab = "all" | "pending_review" | "running" | "validated" | "falsified";
 interface Improvement {
   id: number;
   created_at: string;
+  updated_at: string;
   title: string;
   proposal: string;
   rationale: string | null;
@@ -74,21 +76,6 @@ export function renderImprovements(db: Database, params: URLSearchParams): strin
     { key: "falsified", label: "失敗", count: cnts.lost },
   ];
 
-  const header = `<div class="page-header">
-    <div>
-      <div class="page-kicker">Improvements</div>
-      <h1>自律改善</h1>
-    </div>
-  </div>
-  <div class="list-toolbar">
-    <div class="list-tabs">
-      ${tabLinks.map((t) => {
-        const active = tab === t.key;
-        return `<a href="/improvements?tab=${t.key}" class="list-tab ${active ? "active" : ""}"><span>${t.label}</span><span class="list-tab-count">${t.count}</span></a>`;
-      }).join("")}
-    </div>
-  </div>`;
-
   const where = tab === "all" ? "WHERE i.data_origin='production'" : `WHERE i.data_origin='production' AND i.status = '${tab}'`;
   const rows = db
     .query<Improvement, []>(
@@ -112,60 +99,60 @@ export function renderImprovements(db: Database, params: URLSearchParams): strin
     )
     .all();
 
-  if (rows.length === 0) {
-    return header + `<div class="section empty"><p class="muted">該当する自律改善案件がありません</p></div>`;
-  }
+  const recent = q1(db, `SELECT COUNT(*) FROM improvements WHERE data_origin='production' AND created_at >= datetime('now','-1 day')`);
+  const critical = q1(db, `SELECT COUNT(*) FROM improvements WHERE data_origin='production' AND priority >= 4 AND status IN ('pending_review','running')`);
+  const engineState = cnts.running > 0 ? "検証中" : cnts.pending > 0 ? "承認待ち" : cnts.all > 0 ? "監視中" : "データ待ち";
+  const engineTone = critical > 0 ? "bad" : cnts.pending > 0 ? "warn" : cnts.all > 0 ? "ok" : "neutral";
+  const header = commandHero({
+    eyebrow: "SYSTEM LEARNING LOOP",
+    title: "自律改善コックピット",
+    description: "運用結果を観測し、改善候補の検知・仮説・検証を追跡します。反映判断は安全境界の内側で行われます。",
+    state: engineState,
+    stateDetail: cnts.pending > 0 ? `${cnts.pending}件の確認・承認が必要です` : cnts.all > 0 ? "新しい評価データを待っています" : "本番由来の改善候補はまだありません",
+    tone: engineTone,
+    cycle: ["監視", "検知", "仮説", "提案", "検証", "反映"],
+  });
+  const stats = commandStats([
+    { label: "直近24hの検出", value: recent, detail: "本番由来", tone: recent ? "ok" : "neutral" },
+    { label: "評価中", value: cnts.running, detail: "検証を追跡", tone: cnts.running ? "ok" : "neutral" },
+    { label: "採用待ち", value: cnts.pending, detail: "人の確認が必要", tone: cnts.pending ? "warn" : "neutral" },
+    { label: "反映済み", value: cnts.won, detail: "検証成功", tone: cnts.won ? "ok" : "neutral" },
+    { label: "却下", value: cnts.lost, detail: "効果なし", tone: cnts.lost ? "bad" : "neutral" },
+    { label: "重大異常", value: critical, detail: "優先度4以上", tone: critical ? "bad" : "neutral" },
+  ]);
+  const stageCounts: Record<string, number | null> = {
+    "検知": null, "分析": null, "仮説": null, "検証": cnts.running,
+    "承認待ち": cnts.pending, "反映済み": cnts.won,
+  };
+  const pipeline = `<section class="command-section improvement-pipeline" aria-labelledby="improvement-pipeline-title">
+    <header class="command-section-head"><div><span>IMPROVEMENT PIPELINE</span><h2 id="improvement-pipeline-title">改善パイプライン</h2></div><p>DBに存在する状態だけを表示します。未対応の工程値は「—」です。</p></header>
+    <div class="command-stage-rail">${Object.entries(stageCounts).map(([label, count], index) => `<div class="command-stage ${count ? "is-active" : ""}"><i>${String(index + 1).padStart(2, "0")}</i><strong>${label}</strong><span>${count === null ? "—" : count}</span></div>`).join("")}</div>
+    <div class="command-filter"><nav aria-label="改善案件の絞り込み">${tabLinks.map((t) => `<a href="/improvements?tab=${t.key}" class="${tab === t.key ? "active" : ""}">${t.label}<b>${t.count}</b></a>`).join("")}</nav></div>
+    ${rows.length ? `<div class="improvement-list">${rows.map(renderRow).join("")}</div>` : commandEmpty("現在、対応が必要な改善提案はありません。", "システムは運用データを確認し、新しい本番由来の提案を待っています。")}
+  </section>`;
+  const guardrails = `<section class="command-grid command-grid-2">
+    <article class="command-section command-guardrails"><header class="command-section-head"><div><span>GUARDRAILS</span><h2>安全境界</h2></div></header><ul>
+      <li><i class="ok"></i><div><strong>本番由来のみ</strong><span>デモ・旧データは表示対象外</span></div></li>
+      <li><i class="warn"></i><div><strong>承認状態を明示</strong><span>pending_reviewを独立表示</span></div></li>
+      <li><i class="ok"></i><div><strong>実測結果のみ</strong><span>検証値がない場合は「—」</span></div></li>
+      <li><i class="ok"></i><div><strong>閲覧画面</strong><span>このページから本番状態を変更しません</span></div></li>
+    </ul></article>
+    <article class="command-section improvement-history"><header class="command-section-head"><div><span>ACTIVITY STREAM</span><h2>改善履歴</h2></div><p>直近の本番由来案件</p></header>${rows.length ? `<ol>${rows.slice(0, 8).map(renderHistory).join("")}</ol>` : commandEmpty("履歴はまだありません。", "検知・提案・検証の記録が作成されると、ここに時系列で表示します。")}</article>
+  </section>`;
 
-  const table = `<div class="section compact">
-    <table class="runs-table">
-      <thead>
-        <tr>
-          <th>ID</th>
-          <th>優先度</th>
-          <th style="min-width:320px;">タイトル</th>
-          <th>状態</th>
-          <th>対象エージェント</th>
-          <th style="min-width:280px;">施策 (要約)</th>
-          <th>起案日</th>
-        </tr>
-      </thead>
-      <tbody>${rows.map(renderRow).join("")}</tbody>
-    </table>
-  </div>${renderModal()}`;
-
-  return header + table;
+  return `<div class="command-page improvement-command">${header}${stats}${pipeline}${guardrails}${renderModal()}</div>`;
 }
 
 function renderRow(i: Improvement): string {
   const created = (i.created_at || "").split(" ")[0] || i.created_at;
-  const proposalShort = (i.proposal || "").slice(0, 120);
-  const priorityBadge = i.priority
-    ? `<span class="badge ${i.priority >= 4 ? "failed" : i.priority >= 3 ? "pending" : "queued"}" title="優先度 ${i.priority}/5">${"★".repeat(i.priority)}</span>`
-    : '<span class="muted tiny">—</span>';
-
-  const statusCell = i.status === "pending_review"
-    ? `${statusBadge(i.status)} ${i.guardrail_reason ? `<span class="muted tiny" title="${escapeHtml(i.guardrail_reason)}">!</span>` : ""}`
-    : statusBadge(i.status);
-
-  const agentCell = (jp: string | null, avatar: string | null, slug: string | null) => {
-    if (jp) {
-      return `<div style="display:flex;align-items:center;gap:10px;">
-         ${avatar ? `<img src="${escapeHtml(avatar)}" width="32" height="32" style="border-radius:8px;background:#f3f4f6;object-fit:cover;flex-shrink:0;">` : ""}
-         <span style="font-weight:600;color:#0f172a;">${escapeHtml(jp)}</span>
-       </div>`;
-    }
-    return slug ? `<span class="small muted">${escapeHtml(slug)}</span>` : '<span class="muted tiny">—</span>';
-  };
-
-  return `<tr class="run-row run-row-clickable" onclick='openImproveModal(${i.id})' style="cursor:pointer;">
-    <td class="mono muted-2 tiny">${i.id}</td>
-    <td>${priorityBadge}</td>
-    <td><strong>${escapeHtml(i.title)}</strong></td>
-    <td>${statusCell}</td>
-    <td>${agentCell(i.target_pokemon_jp, i.target_avatar_url, i.target_agent)}</td>
-    <td class="what-cell"><span class="muted small" title="${escapeHtml(i.proposal)}">${escapeHtml(proposalShort)}${i.proposal.length > 120 ? "…" : ""}</span></td>
-    <td class="mono muted tiny">${escapeHtml(created)}</td>
-    <td style="display:none;">
+  const proposalShort = (i.proposal || "").slice(0, 150);
+  const risk = i.priority && i.priority >= 4 ? "高" : i.priority && i.priority >= 3 ? "中" : i.priority ? "低" : "—";
+  return `<article class="improvement-proposal" tabindex="0" role="button" onclick='openImproveModal(${i.id})' onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openImproveModal(${i.id})}">
+    <div class="improvement-proposal-top"><span class="mono">IM-${String(i.id).padStart(3, "0")}</span>${statusBadge(i.status)}</div>
+    <h3>${escapeHtml(i.title)}</h3><p>${escapeHtml(proposalShort)}${i.proposal.length > 150 ? "…" : ""}</p>
+    <dl><div><dt>対象</dt><dd>${escapeHtml(i.target_pokemon_jp || i.target_agent || "—")}</dd></div><div><dt>期待効果</dt><dd>${escapeHtml(i.expected_impact || "—")}</dd></div><div><dt>リスク</dt><dd>${risk}</dd></div><div><dt>信頼度</dt><dd>—</dd></div></dl>
+    <footer><span>${escapeHtml(created)}</span><b>詳細を見る ↗</b></footer>
+    <span style="display:none;">
       <script type="application/json" id="improve-data-${i.id}">${escapeJson({
         id: i.id,
         title: i.title,
@@ -186,8 +173,12 @@ function renderRow(i: Improvement): string {
         executor_avatar_url: i.executor_avatar_url,
         created_at: i.created_at,
       })}</script>
-    </td>
-  </tr>`;
+    </span>
+  </article>`;
+}
+
+function renderHistory(i: Improvement): string {
+  return `<li><time>${escapeHtml((i.updated_at || i.created_at || "").replace("T", " ").slice(0, 16) || "—")}</time><span></span><div><strong>${escapeHtml(jpStatus(i.status))}</strong><p>${escapeHtml(i.title)}</p></div></li>`;
 }
 
 function renderModal(): string {
