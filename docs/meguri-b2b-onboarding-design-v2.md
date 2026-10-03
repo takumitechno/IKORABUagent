@@ -1,5 +1,8 @@
 # 環 — MEGURI B2B onboarding / account bootstrap design — v2 (corrective)
 
+> **Partly superseded by [`meguri-b2b-onboarding-design-v3.md`](meguri-b2b-onboarding-design-v3.md)**
+> (DOT re-audit NOT_READY). v3 §2 lists which v2 sections are replaced; all others remain the baseline. This v2 text is otherwise kept unchanged.
+
 Status: **design only, corrective revision.** No application code, no
 Production change, no MAINLINE runtime change, no deploy, no migration, no
 scheduler / credential / approval / arm / publication / live-account change.
