@@ -9,7 +9,7 @@ import { icon } from "./icons";
 import { baseComponents, designTokens } from "./design-tokens";
 import type { CustomerWorkspaceView } from "../lib/customer-workspaces";
 
-export const DASHBOARD_STYLESHEET_VERSION = "hq-ui-20261002-theme-switch";
+export const DASHBOARD_STYLESHEET_VERSION = "hq-ui-20261003-account-routing";
 
 export function dashboardStylesheetHref(): string {
   return `/styles.css?v=${DASHBOARD_STYLESHEET_VERSION}`;
@@ -51,16 +51,21 @@ export function resolveCustomerNavKey(pathname: string, hash: string): string | 
 export function buildCustomerNav(currentPath: string): NavSection[] {
   const pathOnly = currentPath.split("?")[0];
   const activeKey = resolveCustomerNavKey(pathOnly, "");
+  const requestedAccountId = new URL(currentPath, "https://dashboard.invalid")
+    .searchParams.get("account_id");
+  const accountQuery = requestedAccountId && /^acct_[a-zA-Z0-9_-]+$/.test(requestedAccountId)
+    ? `?account_id=${encodeURIComponent(requestedAccountId)}` : "";
   return [
     {
       items: [
         ...CUSTOMER_HOME_NAV.map((item) => ({
           ...item,
+          href: `/${accountQuery}${item.href.slice(1)}`,
           active: item.key === activeKey,
           current: item.key === activeKey ? "location" as const : undefined,
         })),
         {
-          key: "improvement-report", href: "/improvement", label: "改善レポート", iconName: "zap",
+          key: "improvement-report", href: `/improvement${accountQuery}`, label: "改善レポート", iconName: "zap",
           active: activeKey === "improvement-report",
           current: activeKey === "improvement-report" ? "page" : undefined,
         },
@@ -186,7 +191,9 @@ export function renderLayout(opts: LayoutOpts): string {
   const brandMark = brandMarkSrc
     ? `<img src="${brandMarkSrc}" alt="" width="34" height="34">`
     : `<span aria-hidden="true">I</span>`;
-  const brandHomeHref = isCustomerDashboard ? "/" : isOperator ? "/operator" : "/internal";
+  const brandHomeHref = isCustomerDashboard
+    ? nav[0]?.items.find((item) => item.key === "today")?.href ?? "/"
+    : isOperator ? "/operator" : "/internal";
   const shellClass = isCustomerDashboard ? "customer-shell" : isOperator ? "internal-shell operator-shell" : "internal-shell";
   const sidebarLabel = isCustomerDashboard ? "運用セクション" : isOperator ? "運用管理ナビゲーション" : "HQナビゲーション";
   const mobileLabel = isOperator ? "運用管理モバイルナビゲーション" : "HQモバイルナビゲーション";
@@ -194,7 +201,7 @@ export function renderLayout(opts: LayoutOpts): string {
   const workspaceSwitcher = isCustomerDashboard && currentWorkspace
     ? `<details class="customer-workspace"${opts.customerWorkspaces!.length === 1 ? " open" : ""}>
         <summary><small>表示範囲</small><span class="customer-workspace-current">${escapeHtml(currentWorkspace.displayName)}</span>${currentWorkspace.handle ? `<span class="customer-workspace-handle">${escapeHtml(currentWorkspace.handle)}</span>` : ""}</summary>
-        ${opts.customerWorkspaces!.length > 1 ? `<div class="customer-workspace-list">${opts.customerWorkspaces!.map((workspace) => `<form method="post" action="/api/customer/workspaces/select"><input type="hidden" name="selector" value="${escapeHtml(workspace.selector)}"><input type="hidden" name="csrf_token" value="${escapeHtml(opts.csrfToken || "")}"><button type="submit"${workspace.current ? " disabled aria-current=\"true\"" : ""}><b>${escapeHtml(workspace.displayName)}</b>${workspace.handle ? `<span>${escapeHtml(workspace.handle)}</span>` : ""}</button></form>`).join("")}</div>` : ""}
+        ${opts.customerWorkspaces!.length > 1 ? `<div class="customer-workspace-list">${opts.customerWorkspaces!.map((workspace) => `<a href="${escapeHtml(workspace.href)}"${workspace.current ? ' aria-current="page"' : ""}><b>${escapeHtml(workspace.displayName)}</b>${workspace.handle ? `<span>${escapeHtml(workspace.handle)}</span>` : ""}</a>`).join("")}</div>` : ""}
       </details>` : "";
 
   return `<!DOCTYPE html>

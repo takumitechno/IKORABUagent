@@ -2,7 +2,6 @@ import { describe, expect, test } from "bun:test";
 import { renderLayout } from "../web/components/layout";
 import { renderOverviewAggregate } from "../web/routes/overview";
 import {
-  CUSTOMER_WORKSPACE_COOKIE,
   customerSessionContract,
   customerWorkspaceStyles,
   customerWorkspaceViews,
@@ -10,6 +9,7 @@ import {
   renderCustomerLogin,
   renderWorkspaceChoice,
   selectCustomerWorkspace,
+  verifyWorkspaceSelector,
   workspaceSelectorToken,
 } from "../web/lib/customer-workspaces";
 import type { ResolvedTenantIdentity } from "../web/lib/dashboard-tenant";
@@ -30,45 +30,57 @@ const accounts = [
   account("acct_taku_ai_tech", "タク｜AI仕事術×副業", "taku_ai_tech"),
 ];
 
-function request(path = "/", token?: string): Request {
-  return new Request(`https://app.example.test${path}`, token ? {
-    headers: { Cookie: `${CUSTOMER_WORKSPACE_COOKIE}=${token}` },
-  } : undefined);
+function request(path = "/"): Request {
+  return new Request(`https://app.example.test${path}`);
 }
 
 describe("CUSTOMER-AUTH01 workspace selection", () => {
   test("single-account customers enter directly and multi-account customers default to all", () => {
-    expect(selectCustomerWorkspace(request(), identity, [accounts[0]], secret).selected)
+    expect(selectCustomerWorkspace(request(), [accounts[0]]).selected)
       .toEqual(accounts[0]);
-    expect(selectCustomerWorkspace(request(), identity, [], secret).selected).toBeNull();
-    expect(selectCustomerWorkspace(request(), identity, accounts, secret)).toMatchObject({
+    expect(selectCustomerWorkspace(request(), []).selected).toBeNull();
+    expect(selectCustomerWorkspace(request(), accounts)).toMatchObject({
       selected: null, aggregate: true, rejected: false,
     });
   });
 
-  test("signed selector is identity-bound and browser tampering is denied", () => {
-    const token = workspaceSelectorToken(accounts[1].accountId, identity, secret);
-    expect(selectCustomerWorkspace(request("/", token), identity, accounts, secret).selected)
+  test("direct account URLs select only accounts authorized for the current tenant", () => {
+    expect(selectCustomerWorkspace(request("/?account_id=acct_8ssana"), accounts).selected)
+      .toEqual(accounts[0]);
+    expect(selectCustomerWorkspace(request("/?account_id=acct_taku_ai_tech"), accounts).selected)
       .toEqual(accounts[1]);
-    expect(selectCustomerWorkspace(request("/", `${token}x`), identity, accounts, secret).rejected)
+    expect(selectCustomerWorkspace(request("/?account_id=acct_other"), accounts).rejected)
       .toBe(true);
-    expect(selectCustomerWorkspace(request("/", token), otherIdentity, accounts, secret).rejected)
+    expect(selectCustomerWorkspace(
+      request("/?account_id=acct_taku_ai_tech"), [accounts[0]],
+    ).rejected).toBe(true);
+    expect(selectCustomerWorkspace(request("/?account_id=bad"), accounts).rejected).toBe(true);
+    expect(selectCustomerWorkspace(
+      request("/?account_id=acct_8ssana&account_id=acct_taku_ai_tech"), accounts,
+    ).rejected).toBe(true);
+    expect(selectCustomerWorkspace(request("/?organization_id=org_other"), accounts).rejected)
       .toBe(true);
-    expect(selectCustomerWorkspace(request("/?account_id=acct_8ssana"), identity, accounts, secret).rejected)
-      .toBe(true);
-    expect(selectCustomerWorkspace(request("/?organization_id=org_other"), identity, accounts, secret).rejected)
-      .toBe(true);
-    const allToken = workspaceSelectorToken("all", identity, secret);
-    expect(selectCustomerWorkspace(request("/", allToken), identity, accounts, secret))
-      .toMatchObject({ selected: null, aggregate: true, rejected: false });
   });
 
-  test("membership removal invalidates the account selection and falls back to authorized all", () => {
+  test("signed API selector remains identity-bound and tamper evident", () => {
     const token = workspaceSelectorToken(accounts[1].accountId, identity, secret);
-    const result = selectCustomerWorkspace(request("/", token), identity, [accounts[0]], secret);
-    expect(result).toMatchObject({
-      selected: null, aggregate: true, rejected: false, expired: true,
+    expect(verifyWorkspaceSelector(token, identity, secret)).toBe(accounts[1].accountId);
+    expect(verifyWorkspaceSelector(`${token}x`, identity, secret)).toBeNull();
+    expect(verifyWorkspaceSelector(token, otherIdentity, secret)).toBeNull();
+    const allToken = workspaceSelectorToken("all", identity, secret);
+    expect(verifyWorkspaceSelector(allToken, identity, secret)).toBe("all");
+  });
+
+  test("reload and browser history URLs deterministically restore the selected view", () => {
+    const history = [
+      "/", "/?account_id=acct_8ssana", "/?account_id=acct_taku_ai_tech", "/",
+    ];
+    const selected = history.map((path) => {
+      const result = selectCustomerWorkspace(request(path), accounts);
+      return result.aggregate ? "all" : result.selected?.accountId;
     });
+    expect(selected).toEqual(["all", "acct_8ssana", "acct_taku_ai_tech", "all"]);
+    expect(selectCustomerWorkspace(request(history[1]), accounts).selected).toEqual(accounts[0]);
   });
 
   test("customer contracts are schema v1 and contain sanitized fields only", () => {
@@ -102,29 +114,25 @@ describe("CUSTOMER-AUTH01 customer UX", () => {
 
   test("multi-workspace selector and dashboard switcher use customer-safe copy", () => {
     const views = customerWorkspaceViews(accounts, accounts[0].accountId, identity, secret);
-    const choice = renderWorkspaceChoice(views, "csrf-token");
+    const choice = renderWorkspaceChoice(views);
     expect(choice).toContain("運用するアカウントを選ぶ");
     expect(choice).toContain("すべて");
     expect(choice).toContain("紗凪｜恋愛診断士");
     expect(choice).toContain("タク｜AI仕事術×副業");
-    expect(choice).toContain("csrf-token");
-    expect(choice.match(/action="\/api\/customer\/workspaces\/select"/g)).toHaveLength(3);
-    expect(choice).toContain(`name="selector" value="${views[0].selector}"`);
-    expect(choice).toContain(`name="selector" value="${views[1].selector}"`);
+    expect(choice).toContain('href="/"');
+    expect(choice).toContain('href="/?account_id=acct_8ssana"');
+    expect(choice).toContain('href="/?account_id=acct_taku_ai_tech"');
     const dashboard = renderLayout({
-      title: "Dashboard", body: "customer body", currentPath: "/",
+      title: "Dashboard", body: "customer body", currentPath: "/?account_id=acct_8ssana",
       csrfToken: "csrf-token", customerWorkspaces: views,
       internalAccessAllowed: false,
     });
     expect(dashboard).toContain("表示範囲");
-    expect(dashboard).toContain("/api/customer/workspaces/select");
-    expect(dashboard.match(/action="\/api\/customer\/workspaces\/select"/g)).toHaveLength(3);
-    expect(dashboard.match(/name="csrf_token" value="csrf-token"/g)).toHaveLength(3);
-    for (const workspace of views) {
-      expect(dashboard).toContain(`name="selector" value="${workspace.selector}"`);
-    }
-    expect(dashboard).toContain('disabled aria-current="true"');
-    expect(dashboard).not.toContain('name="account_id"');
+    expect(dashboard).toContain('href="/?account_id=acct_8ssana" aria-current="page"');
+    expect(dashboard).toContain('href="/?account_id=acct_taku_ai_tech"');
+    expect(dashboard).toContain('href="/?account_id=acct_8ssana#today"');
+    expect(dashboard).toContain('href="/improvement?account_id=acct_8ssana"');
+    expect(dashboard).not.toContain("/api/customer/workspaces/select");
     expect(dashboard).not.toContain("オフィスに戻る");
     expect(dashboard).not.toContain("/internal\"");
   });
@@ -139,7 +147,7 @@ describe("CUSTOMER-AUTH01 customer UX", () => {
     );
     expect(customerWorkspaceStyles).not.toContain(".customer-workspace>small{");
     expect(customerWorkspaceStyles).toContain(
-      ".customer-workspace-list button span{font-size:var(--t-type-caption-size,12px)",
+      ".customer-workspace-list a span{font-size:var(--t-type-caption-size,12px)",
     );
   });
 
@@ -153,13 +161,13 @@ describe("CUSTOMER-AUTH01 customer UX", () => {
     expect(dashboard).toContain('<details class="customer-workspace" open>');
     expect(dashboard).toContain("紗凪｜恋愛診断士");
     expect(dashboard).toContain("@8sssana");
-    expect(dashboard).not.toContain("/api/customer/workspaces/select");
+    expect(dashboard).not.toContain("customer-workspace-list");
   });
 
   test("zero-workspace and expired-selection states are friendly", () => {
-    expect(renderWorkspaceChoice([], "csrf")).toContain("表示できるアカウントがありません");
+    expect(renderWorkspaceChoice([])).toContain("表示できるアカウントがありません");
     expect(renderWorkspaceChoice(
-      customerWorkspaceViews(accounts, null, identity, secret), "csrf", true,
+      customerWorkspaceViews(accounts, null, identity, secret), true,
     )).toContain("選び直してください");
   });
 

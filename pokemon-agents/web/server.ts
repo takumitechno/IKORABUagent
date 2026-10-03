@@ -39,7 +39,7 @@ import {
   resolveCustomerIdentity, resolveInternalIdentity,
 } from "./lib/internal-auth";
 import {
-  clearCustomerWorkspaceCookie, customerWorkspaceCookie, customerWorkspaceStyles,
+  customerWorkspaceStyles,
   customerSessionContract, customerWorkspacesContract, customerWorkspaceViews,
   renderCustomerLogin, renderWorkspaceChoice,
   selectCustomerWorkspace, verifyWorkspaceSelector,
@@ -356,10 +356,8 @@ const server = Bun.serve({
           return new Response(null, {
             status: 303,
             headers: {
-              Location: "/",
-              "Set-Cookie": customerWorkspaceCookie(
-                selector, INTERNAL_AUTH.mode === "cloudflare-access",
-              ),
+              Location: selectionId === "all"
+                ? "/" : `/?account_id=${encodeURIComponent(selectionId)}`,
             },
           });
         }
@@ -395,7 +393,7 @@ const server = Bun.serve({
               feedback: String(form.get("feedback") || ""),
               body: String(form.get("body") || ""),
             });
-            return redirect(`/?review=${customerMatch[2]}`);
+            return redirect(`/?account_id=${encodeURIComponent(accountId)}&review=${customerMatch[2]}`);
           } catch (error) {
             if ((error as { status?: number }).status === 409) {
               return new Response("投稿案が更新されています。最新案を確認してください。", { status: 409 });
@@ -429,9 +427,9 @@ const server = Bun.serve({
               detectionId: decodeURIComponent(manualAnalysisMatch[1]),
               tenantUserId: trustedTenant.userId,
             });
-            return redirect(`/?manual_analysis=${state}`);
+            return redirect(`/?account_id=${encodeURIComponent(accountId)}&manual_analysis=${state}`);
           } catch {
-            return redirect("/?manual_analysis=failed");
+            return redirect(`/?account_id=${encodeURIComponent(accountId)}&manual_analysis=failed`);
           }
         }
         if (path === "/api/internal/manual-policy") {
@@ -601,7 +599,7 @@ const server = Bun.serve({
           trustedTenant.userId, exactCanaryAccount,
         );
         const selection = selectCustomerWorkspace(
-          req, trustedTenant, accounts, INTERNAL_AUTH.csrfSecret,
+          req, accounts,
         );
         if (selection.rejected) return new Response("Forbidden", { status: 403 });
         const views = customerWorkspaceViews(
@@ -807,7 +805,7 @@ const server = Bun.serve({
           trustedTenant.userId, exactCanaryAccount,
         );
         const selection = selectCustomerWorkspace(
-          req, trustedTenant, accounts, INTERNAL_AUTH.csrfSecret,
+          req, accounts,
         );
         if (selection.rejected) return new Response("Forbidden", { status: 403 });
         const routeCsrf = customerCsrfToken(trustedTenant, INTERNAL_AUTH);
@@ -818,14 +816,9 @@ const server = Bun.serve({
         if (accounts.length === 0) {
           return lay(
             "アカウントを選ぶ",
-            renderWorkspaceChoice(workspaces, routeCsrf, selection.expired),
+            renderWorkspaceChoice(workspaces, selection.expired),
             routeCsrf,
             workspaces,
-            selection.expired ? {
-              "Set-Cookie": clearCustomerWorkspaceCookie(
-                INTERNAL_AUTH.mode === "cloudflare-access",
-              ),
-            } : undefined,
           );
         }
         if (selection.aggregate) {
@@ -833,11 +826,6 @@ const server = Bun.serve({
             getThreadsDashboard(account.accountId, trustedTenant.userId)));
           return lay(
             "Dashboard", renderOverviewAggregate(db, dashboards), routeCsrf, workspaces,
-            selection.expired ? {
-              "Set-Cookie": clearCustomerWorkspaceCookie(
-                INTERNAL_AUTH.mode === "cloudflare-access",
-              ),
-            } : undefined,
           );
         }
         if (!selection.selected) return new Response("Forbidden", { status: 403 });
@@ -862,7 +850,7 @@ const server = Bun.serve({
           trustedTenant.userId, exactCanaryAccount,
         );
         const selection = selectCustomerWorkspace(
-          req, trustedTenant, accounts, INTERNAL_AUTH.csrfSecret,
+          req, accounts,
         );
         if (selection.rejected) return new Response("Forbidden", { status: 403 });
         const routeCsrf = customerCsrfToken(trustedTenant, INTERNAL_AUTH);
@@ -873,29 +861,19 @@ const server = Bun.serve({
         if (accounts.length === 0) {
           return lay(
             "アカウントを選ぶ",
-            renderWorkspaceChoice(workspaces, routeCsrf, selection.expired),
+            renderWorkspaceChoice(workspaces, selection.expired),
             routeCsrf,
             workspaces,
-            selection.expired ? {
-              "Set-Cookie": clearCustomerWorkspaceCookie(
-                INTERNAL_AUTH.mode === "cloudflare-access",
-              ),
-            } : undefined,
           );
         }
         if (selection.aggregate) {
           return lay(
             "改善レポート",
             renderWorkspaceChoice(
-              workspaces.filter((workspace) => !workspace.aggregate), routeCsrf,
+              workspaces.filter((workspace) => !workspace.aggregate),
             ),
             routeCsrf,
             workspaces,
-            selection.expired ? {
-              "Set-Cookie": clearCustomerWorkspaceCookie(
-                INTERNAL_AUTH.mode === "cloudflare-access",
-              ),
-            } : undefined,
           );
         }
         if (!selection.selected) return new Response("Forbidden", { status: 403 });
