@@ -3,6 +3,8 @@ param(
     [ValidateSet('IKORABU-Operator-UI')]
     [string]$TaskName = 'IKORABU-Operator-UI',
     [string]$ExpectedWorkingDirectory = (Split-Path $PSScriptRoot -Parent),
+    [ValidateRange(1, 65535)]
+    [int]$DashboardPort = 5733,
     [switch]$StatusOnly
 )
 
@@ -27,5 +29,30 @@ if ($StatusOnly) {
 
 if ([string]$task.State -eq 'Running') {
     Stop-ScheduledTask -TaskPath $taskPath -TaskName $TaskName
+}
+
+$listenerProcessIds = @(
+    Get-NetTCPConnection -State Listen -LocalPort $DashboardPort -ErrorAction SilentlyContinue |
+        Select-Object -ExpandProperty OwningProcess -Unique
+)
+if ($listenerProcessIds.Count -gt 1) {
+    throw 'operator UI port has multiple owners'
+}
+if ($listenerProcessIds.Count -eq 1) {
+    $listenerProcessId = [int]$listenerProcessIds[0]
+    $listenerProcess = Get-CimInstance Win32_Process -Filter "ProcessId=$listenerProcessId"
+    if ($null -eq $listenerProcess) {
+        throw 'operator UI listener process was not found'
+    }
+
+    $executableName = Split-Path -Leaf ([string]$listenerProcess.ExecutablePath)
+    $normalizedCommandLine = ([string]$listenerProcess.CommandLine) -replace '\\', '/'
+    if ($executableName -ne 'bun.exe' -or
+        -not $normalizedCommandLine.Contains('pokemon-agents/web/server.ts')) {
+        throw 'operator UI port ownership mismatch'
+    }
+
+    Stop-Process -Id $listenerProcessId -Force
+    Wait-Process -Id $listenerProcessId -Timeout 10 -ErrorAction SilentlyContinue
 }
 Start-ScheduledTask -TaskPath $taskPath -TaskName $TaskName

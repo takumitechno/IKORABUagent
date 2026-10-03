@@ -1,4 +1,5 @@
 import { describe, expect, test } from "bun:test";
+import { readFileSync } from "node:fs";
 import { renderLayout } from "../web/components/layout";
 import { loadThreadsDashboard, type ThreadsDashboardData } from "../web/lib/threads-dashboard";
 import { deriveOperatorNextAction, renderOperatorDashboard } from "../web/routes/operator-dashboard";
@@ -42,6 +43,15 @@ function account(accountId: string, handle: string, state = "metrics_pending"): 
 }
 
 describe("MVP operator dashboard", () => {
+  test("restart helper replaces only the validated dashboard listener", () => {
+    const restartScript = readFileSync(new URL("../../scripts/restart-operator-ui-task.ps1", import.meta.url), "utf8");
+    expect(restartScript).toContain("Get-NetTCPConnection -State Listen -LocalPort $DashboardPort");
+    expect(restartScript).toContain('Get-CimInstance Win32_Process -Filter "ProcessId=$listenerProcessId"');
+    expect(restartScript).toContain("pokemon-agents/web/server.ts");
+    expect(restartScript).toContain("Stop-Process -Id $listenerProcessId -Force");
+    expect(restartScript).not.toMatch(/Get-Process|Stop-Process\s+[^\r\n]*-(?:Name|InputObject)/);
+  });
+
   test("shows two separated accounts, one action each, and honest unknown states in Japanese", () => {
     const first = account("acct_8ssana", "8sssana");
     const second = account("acct_taku_ai_tech", "taku_ai_tech", "metrics_collected");
