@@ -1,4 +1,4 @@
-# 環 — MEGURI B2B onboarding / account bootstrap design — v3 (final corrective)
+# 環 — MEGURI B2B onboarding / account bootstrap design — v3 (final corrective) + errata v3.1
 
 Status: **design only, corrective revision.** No application code, no
 Production change, no MAINLINE runtime change, no deploy, no migration, no
@@ -10,7 +10,9 @@ scheduler / credential / approval / arm / publication / live-account change.
 | v2 audited at | `IKORABUagent` branch `claude/practical-wright-j9wk8p`, commit `a12a0671a135e545af8cced7f3eed751032c4e46` |
 | DOT re-audit result on v2 | **NOT_READY** |
 | This revision | Applies only the remaining contract corrections from the v2 re-audit (items 1–15 of the v3 corrective brief). It is **not** a redesign. |
-| Requested outcome | DOT final re-audit |
+| v3 audited at | `IKORABUagent` branch `claude/admiring-mccarthy-qxogva`, commit `4638fafae0d650ab95224feb9d779450d1979622` |
+| Errata v3.1 | Applies only the finite corrections from the **DOT final re-audit of v3** (limited corrective brief items 1–5). Edited in place, so `git diff 4638faf -- docs/meguri-b2b-onboarding-design-v3.md` is the exact diff. Change log: §19. |
+| Requested outcome | DOT diff re-audit of errata v3.1 |
 | Effect on the current two-account MVP | **None.** This project does not gate it (§15). |
 
 ### 0.1 Sources of authority used in v3
@@ -21,6 +23,7 @@ scheduler / credential / approval / arm / publication / live-account change.
 | DOT re-audit, current-state findings | §3, §10, §12, §7.3 | (a) the confirmed 1–120 s TTL / generation-bound `execution_authorities` belong to **CATFOOD-specific control**; (b) current live publication uses separate controls (§3.1); (c) current generation `request_json` may preserve fact values; (d) current readiness has **separate** `research` and `style_profile` blockers; (e) current cost capability (§10.1) |
 | DOT re-audit, recommendations | §5, §8 | restriction-only approvals: **SAFE WITH CONDITIONS**; cross-org membership: **explicit DELEGATION, not ownership** |
 | DOT Research Intelligence v1 compatibility audit | §9 | Unchanged from v2. Frozen v1 contract. |
+| DOT final re-audit of v3 | errata v3.1 (§19) | Authoritative for the v3.1 corrections. Statements about current behaviour taken from it are labelled "(DOT final re-audit)": (a) the four frozen advisory fields belong to the **planning-input / export envelope**, not to every `ri_packets` row; (b) research freshness is a **fixed** v1 classification, not a selectable policy; (c) manual TOPIC intake is **existing** v1 behaviour; (d) `ri_packets.payload_hash` exists; (e) frozen Research v1 has its own daily AI limits, USD budget limits and source/fetch limits. Not re-verified in this revision. |
 | v2 §0.1 sources | retained sections | Unchanged |
 
 The `takumitechno/Threads-` repository is not readable from this revision's
@@ -31,6 +34,9 @@ confirmed, v3 lists it as an unknown (§16).
 ### 0.2 How to read v3
 
 - v3 = v2 + the corrections below. Where v2 and v3 disagree, **v3 wins**.
+- Errata v3.1 (§19) is part of v3. Text added or changed by v3.1 is in the
+  sections it names. Where v3.1 and the original v3 text differ, **v3.1
+  wins**.
 - v2 sections not named in §2 remain the accepted baseline, word for word.
 - v2 §17 amendments to v1 remain in force. §18 adds the further amendments.
 
@@ -55,10 +61,14 @@ confirmed, v3 lists it as an unknown (§16).
 8. Cross-org membership is **explicit delegation, not ownership** (§8).
 9. Research v1 stays frozen: `authority = suggestions_only`,
    `verified_facts = []`, `requires_explicit_operator_plan_decision = true`,
-   `writer_input_authorized = false`. Selection mode is `operator_manual`
-   only (§9).
+   `writer_input_authorized = false`. These are checked on the
+   **planning-input / export envelope**, not required on every `ri_packets`
+   row. Selection mode is `operator_manual` only. Freshness is v1's fixed
+   classification. Manual TOPIC intake is existing behaviour (§9, v3.1).
 10. Monthly JPY is a **desired limit / estimate**. Only the paths that are
-    actually enforced today are described as enforced (§10).
+    actually enforced today are described as enforced: Writer daily limits
+    and frozen Research v1's own daily AI, USD budget and source/fetch
+    limits. None of them is a unified Cost Governor (§10, v3.1).
 11. One canonical **SelectedOfferFactSnapshot**, with typed price, feeds the
     Writer, request validation, QA and approval binding (§11).
 12. Current `request_json` may preserve fact values. It is still not the
@@ -66,11 +76,15 @@ confirmed, v3 lists it as an unknown (§16).
 13. CAREER is **NOT_READY**. The full acceptance test includes Research.
     Without Research it is only a **LIMITED CORE TEST** (§13).
 14. The first implementation-planning slice is only the **pure compiler +
-    field catalogue** (§17).
+    field catalogue** (§17). Its first catalogue freezes only with the
+    corrected field statuses of §17.6 (v3.1).
 
 ---
 
 ## 1. Change log from v2
+
+This table is the v2 → v3 history. Rows 5, 6, 10, 12, 13, 14, 16, 19 and 20
+are corrected further by errata v3.1 (§19).
 
 | # | v2 location | v2 said | v3 says | Brief item | v3 § |
 |---|---|---|---|---|---|
@@ -270,7 +284,12 @@ them must fail closed for the shadow principal.
 
 - **Trigger:** STOP, a pause or suspend request, an offboarding request, or a
   config promotion that can affect execution.
-- **Record:** `ingress_fence(account_id, reason, requested_by, fence_ts)`.
+- **Record (v3.1):** one **hold** per reason, not one shared flag:
+  `ingress_holds(hold_id, account_id, reason_kind, reason_ref, owner, raised_by, raised_at, bound_config_version NULL, expected_old_version NULL, released_by NULL, released_at NULL)`
+  (design sketch, not a migration). `ingress_fence(account_id)` is true
+  while **any** hold on the account is unreleased. `fence_ts` in §4.3 means
+  the `raised_at` of the hold being drained. Ownership and release rules:
+  §4.7.
 - **Effect, immediate:** `LIVE_ADMISSION` is false for every **new** item
   on the account. It is checked at admission and again at publication for
   items not yet started. `disarm()` is always allowed immediately.
@@ -285,7 +304,9 @@ them must fail closed for the shadow principal.
   approved MAINLINE change. Until it exists, the only fence available is the
   existing controls (`disarm()`, STOP, `allow_live` off), and execution-
   affecting config promotion is **not available** for onboarding-managed
-  accounts, except under the NEVER_LIVE proof (§4.5).
+  accounts, except under the NEVER_LIVE proof (§4.6). The G-FENCE design
+  note must satisfy the invariants F1–F7 (§4.7, v3.1) before G-FENCE
+  implementation can be planned.
 
 ### 4.3 Phase B — DRAIN COMPLETE / QUIESCENT
 
@@ -320,7 +341,7 @@ Read-only. Each condition comes from its own authoritative evidence source
 | STOP | is a fence | no | |
 | ACTIVE → PAUSED | yes | **no** | lifecycle becomes PAUSED as soon as the fence is in place |
 | ACTIVE → SUSPENDED (operator) | yes | **no** | same |
-| PAUSED → ACTIVE (resume) | releases it | no | gates re-checked. No live control restored. Arming stays separate. |
+| PAUSED → ACTIVE (resume) | releases **only the PAUSE hold** (§4.7 F6) | no (F7). A remaining hold keeps admission false; resume never waits for it. | gates re-checked. No live control restored. Arming stays separate. Returns to ACTIVE only when no other hold remains (F7). |
 | pure restriction (§5) | no | no | applies at admission and publication |
 | config promotion that can affect execution | yes | **yes** | re-checked inside the apply transaction (TOCTOU) |
 | ownership transfer, identity re-bind, publish-credential replacement | yes | **yes** | |
@@ -341,12 +362,16 @@ absence of STOP.
 
 ### 4.5 Promotion protocol (replaces v2 §3.6 protocol)
 
-1. **Fence** (Phase A).
+1. **Fence** (Phase A): raise a `CONFIG_CHANGE` hold bound to
+   `expected_old_version = vN` and `bound_config_version = vN+1` (§4.7 F2, F3).
 2. **Drain by evidence** (Phase B). Wait. Never kill or self-heal.
-3. **Apply** in one DB transaction: re-evaluate `quiescent()` (TOCTOU), then
-   promote the version pointer, write the legacy projection and append
-   audit. If the re-check fails, abort and keep the fence.
-4. **Release** the fence, unless a pause or suspend is also in effect.
+3. **Apply** in one serialized step (§4.7 F4): re-evaluate `quiescent()`
+   (TOCTOU), check that the active version is still `expected_old_version`,
+   then promote the version pointer, write the legacy projection and append
+   audit. If any re-check fails, abort and keep the hold.
+4. **Release** only the `CONFIG_CHANGE` hold raised in step 1. Every other
+   hold (STOP, pause, suspend, incident, offboarding, another change) stays
+   exactly as it is (§4.7 F6).
 
 ### 4.6 NEVER_LIVE: the simplified proof for accounts that never had live authority
 
@@ -370,6 +395,40 @@ proof is allowed **only** when absence is **positively verified**:
 - The proof is recorded with evidence (source, query identifier, count,
   timestamp). It is **re-proven every time**. It is not a sticky flag.
 - "No evidence found" is never the same as "positively verified absent".
+
+### 4.7 G-FENCE contract invariants (v3.1)
+
+These are requirements on the future **G-FENCE design note**. They must all
+be answered before G-FENCE implementation planning starts. They do **not**
+prescribe a mechanism. An epoch / generation counter is one acceptable
+mechanism, not a mandatory one: a single serialized DB transaction, a
+per-account claim row with a conflicting write, or another mechanism is
+equally acceptable if the note proves F1–F7.
+
+| # | Invariant | The G-FENCE note must state |
+|---|---|---|
+| F1 | **Covered durable claims.** The fence blocks every durable claim that can lead to a provider call without passing another admission check. | the exact list, at least: live queue insert / `publish_ready` transition, live slot reservation, NIGHT batch or loop-runner inclusion, publication record creation, provider container / creation claim, publish-purpose credential checkout. A claim type that is not listed is not covered, and G-FENCE is not complete. Continuation parts of a publication admitted **before** the hold are in-flight work (Q3, Q4), not new admission. Whether STOP halts them follows existing STOP semantics, unchanged. Inventory: U-F1. |
+| F2 | **Account / config generation binding.** Every admitted claim records the `account_id`, the active config version, and the account identity / credential binding it was admitted under. | where the binding is recorded, and that a publication-time re-check refuses a not-yet-started claim whose recorded binding is no longer current |
+| F3 | **Expected old version during transition.** A config switch is compare-and-set: it applies only if the active version still equals the hold's `expected_old_version`. | what happens to claims recorded under the old version: started ones drain (Phase B); not-yet-started ones are refused after the switch and need fresh admission under the new version (with a new snapshot, and approval per change class). An expected-version mismatch aborts the switch and keeps the hold. |
+| F4 | **Serialization.** Admission, hold state (raise / release / read) and the config switch are serialized per account. | how it is proven that an admission either commits before the hold (and is then visible to Q1–Q3 drain evidence) or observes the hold and refuses, never both; and that the switch re-reads holds, quiescence and the expected version in the same serialized step. Admission work outside the DB must hit the same serialization point (for example, through a claim row write) before any provider call. |
+| F5 | **Ownership per reason.** Each hold has exactly one owning reason and one owner. | the owner table below, and who may release |
+| F6 | **No cross-release.** Releasing one reason's hold never releases another's. | release acts on one `hold_id`, is refused for a principal that does not own that reason, and leaves every other hold active. `ingress_fence(account)` stays true while any hold is unreleased. |
+| F7 | **Resume.** Resume does not universally require drain, but never bypasses another active hold. | PAUSED → ACTIVE releases only the PAUSE hold, without waiting for QUIESCENT. If any other hold remains, the account stays PAUSED (or SUSPENDED) with the remaining hold named (customer copy 「停止中（担当者が確認しています）」), and admission stays false. A resume never releases, shortens or overrides a STOP, SUSPEND / incident, OFFBOARDING or CONFIG_CHANGE hold. |
+
+Owner per reason (F5):
+
+| `reason_kind` | Raised by | Owner (sole releaser) | Release rule |
+|---|---|---|---|
+| `STOP` | existing STOP control | existing STOP procedure | existing STOP semantics. G-FENCE reads STOP; it never owns, releases or clears it. |
+| `PAUSE` | customer admin / editor, or a pause rule | customer admin (resume) | §4.4 resume row and F7. A pause rule's hold is released only by an explicit resume, never by the rule's condition clearing. |
+| `SUSPEND` / `INCIDENT` | operator | operator, with reason code | an incident or recovery path in progress (Q9) is closed first |
+| `OFFBOARDING` | org admin request + operator | none | terminal. Never released. |
+| `CONFIG_CHANGE` | the promotion procedure (§4.5) | that promotion, on completion or abort | §4.5 step 4 |
+| `IDENTITY_CHANGE` (ownership transfer, identity re-bind, publish-credential replacement) | operator | that procedure, on completion or abort | §4.4 (needs QUIESCENT) |
+
+The exact list of claim types (F1) and where each is recorded is unknown
+U-F1. Until it is known, G-FENCE is not complete and §4.2's fail-closed
+default (no execution-affecting promotion) stays.
 
 ---
 
@@ -544,6 +603,50 @@ the `research` readiness blocker. That binding is part of U-S2.
 - Until then, a brand-new account with no posts and no references **cannot
   reach APPROVED** (E050). SHADOW may still run with `TEMPLATE_DEFAULT` or
   candidate `MANUALLY_APPROVED_STYLE`, with every sample labelled by class.
+- (v3.1) RA-1 and RA-2 remain **future contract work**. Nothing in v3 or
+  v3.1 makes either one current. Neither is part of slice 1 (§17.1).
+- (v3.1) A manual style **never silently** affects the `research` blocker.
+  No readiness report, adapter, gate, UI or summary may show research as
+  satisfied, partly satisfied or "not needed" because a style is accepted.
+  The research blocker changes only through RA-2.
+
+### 7.5 Re-review triggers for `MANUALLY_APPROVED_STYLE` (v3.1)
+
+An accepted manual style version is acceptance of **one exact style version
+under one exact context**. Any trigger below makes it `REVIEW_DUE`. A
+`REVIEW_DUE` style counts as **not accepted** (fail closed) until M3–M7 are
+repeated with new SHADOW samples:
+
+| # | Trigger | Examples |
+|---|---|---|
+| T1 | **persona change** | any change to tone, stance, persona profile, first person or signature phrases, or `persona.provenance` |
+| T2 | **template / style change** | new template version adopted, template lineage changed, the style specification edited (any change to its content hash) |
+| T3 | **provenance revocation** | the template version is withdrawn, a reference input in the lineage is revoked, the reviewer's or accepting operator's authority is found invalid for the acceptance time, or an isolation (M5) or source-copy (M6) finding is raised later |
+| T4 | **meaningful new quality evidence** | a QA hard-fail pattern, a customer NG or reject spike, a copy or isolation finding, or an operator-recorded quality finding attached to the style version |
+
+- RA-1 must define "meaningful" for T4 with explicit thresholds. Until then,
+  **every** operator-recorded quality finding attached to the style version
+  is meaningful.
+- A re-review never edits the old acceptance record. It produces a new
+  acceptance (or a rejection) for the then-current style version.
+- What `REVIEW_DUE` does to an account that already relies on the style is
+  RA-1 scope. Today that case cannot arise, because RA-1 does not exist.
+
+### 7.6 Manual Post Sync is not automatically a sufficient style corpus (v3.1)
+
+- Importing own posts through Manual Post Sync (v1 `account.use_past_posts`)
+  only **supplies input** to the existing style pipeline. Sync completion is
+  not style readiness.
+- Synced posts become `DERIVED_OWN_HISTORY` evidence only when the existing
+  style pipeline has **actually built and versioned** a style profile from
+  them under its existing requirements (own-account identity, analyse
+  enablement, and any corpus minimum it applies). The `style_profile`
+  blocker clears only through the existing predicate on that built profile.
+- A small, empty, unverified or unbuilt sync leaves the blocker in place
+  (E050). Onboarding never pads it with template, synthetic, benchmark or
+  `ri_*` rows (v2 §5.6).
+- Manual Post Sync never clears the `research` blocker.
+- The exact corpus requirements are part of U-S2.
 
 ---
 
@@ -622,7 +725,14 @@ behaviour is unchanged. Nothing is silently removed.
 
 ### 9.1 Frozen v1 contract, stated exactly
 
-Every v1 research output carries:
+**Two different objects (v3.1, DOT final re-audit):**
+
+| Object | What it is | Carries the four advisory fields? |
+|---|---|---|
+| `ri_packets` row | the stored, account-scoped packet | **not required.** A packet row is valid without them. It is identified by its packet id, its account id and `ri_packets.payload_hash` (exact column names other than `payload_hash`: U-R1). |
+| **planning-input / export envelope** | what v1 emits for downstream planning | **yes**, exactly as below |
+
+The planning-input / export envelope carries:
 
 ```
 authority                                  = "suggestions_only"
@@ -631,10 +741,19 @@ requires_explicit_operator_plan_decision   = true
 writer_input_authorized                    = false
 ```
 
-Onboarding never changes these values. Every onboarding adapter checks them
-and **fails closed** if any value differs, for example a packet claiming
-`writer_input_authorized = true`. Such a packet is rejected as a contract
-violation.
+- Onboarding never changes these values.
+- An onboarding adapter that consumes v1 output reads it **through the
+  envelope** and **fails closed** if the envelope is missing any of the four
+  fields or any value differs (for example `writer_input_authorized = true`).
+  Such an envelope is rejected as a contract violation.
+- The adapter does **not** require these envelope-only fields on each
+  `ri_packets` row, and does not reject a packet for lacking them. If a
+  packet row does carry one of them with a contradicting value, that is
+  also a contract violation (fail closed).
+- Reading `ri_packets` directly, bypassing the envelope, never grants more
+  than the envelope would. The four values above apply to everything v1
+  produces.
+- The exact envelope name and field paths are part of U-R1.
 
 ### 9.2 What a ResearchSelection is, and is not
 
@@ -663,8 +782,8 @@ copy guards stay.
 ```
 research_selections(
   selection_id, account_id, plan_id,
-  packet_id, packet_ref_hash,             -- §12.3: hash computed at selection time if v1 has none
-  item_refs_json,
+  packet_id, packet_payload_hash,         -- v3.1: ri_packets.payload_hash as read at selection time
+  item_refs_json,                         -- item refs; per-item hash only where payload_hash does not cover the ref (§12.3)
   selection_mode,                         -- CHECK (selection_mode = 'operator_manual')
   selected_by, selected_at,
   revoked_by NULL, revoked_at NULL
@@ -675,8 +794,15 @@ research_selections(
   There is **no** `policy_id` column. Policy-based selection is a separate
   future authority expansion and is not mixed into current behaviour.
 - Guards: `selection.account_id = packet.account_id = plan.account_id`.
+- (v3.1) At plan build, `ri_packets.payload_hash` is read again. If it
+  differs from `packet_payload_hash`, the selection is stale and the plan is
+  not built from it (fail closed). It needs a new `operator_manual`
+  selection.
 - Revocable before plan generation. After generation it is part of the
   immutable snapshot.
+- (v3.1) Selection is **only** `operator_manual`: a human operator act on the
+  existing planning path. No form field, template, catalogue entry, schedule
+  or score may select research.
 
 ### 9.4 Additional v1 constraints
 
@@ -690,6 +816,8 @@ research_selections(
 | V6 | **SourceSpec fields remain the known bounded contract.** A field that is not confirmed is MISSING (§9.5). |
 | V7 | A **`source_type` name does not prove the transport exists.** A type is selectable only when its transport is confirmed working. |
 | V8 | **Changing a source version does not automatically disable old sources.** Disabling a source is a separate explicit action. Old packets keep their source-version reference. |
+| V9 | (v3.1) **Freshness is a fixed v1 classification, not a selectable policy** (DOT final re-audit). v1 classifies items with its existing fixed rules. No form field, template, catalogue entry or operator setting chooses, tunes or switches a freshness rule set, window or threshold. Onboarding only **displays** the label v1 assigned, and V4 still applies. |
+| V10 | (v3.1) **Manual TOPIC intake is existing v1 behaviour** (DOT final re-audit). It is an operator act on the existing v1 path, account-scoped. Onboarding adds no new intake channel and no customer-facing upload into `ri_*`. It is separate from manual **STYLE** intake (benchmark posts → `account_research_posts`), and the two never cross-feed (v2 §5.6). |
 
 ### 9.5 Corrections to the v2 §5.5 field matrix
 
@@ -698,10 +826,15 @@ research_selections(
 | `topics[].weight` | ADAPT if v1 takes weights | **MISSING** until U-R2 confirms. Weights may still be used downstream in **planning** only. |
 | `topics[].subtopics` | ADAPT if v1 accepts them | **MISSING** until U-R2 confirms |
 | `exclude_keywords` / `exclude_topics` | ADAPT via v1 exclusion if present | **MISSING** on the research side until U-R2 confirms. A planning-side filter on **selection** stays allowed. It never mutates packets. |
-| `manual_intake` | ADAPT if a SourceSpec type covers it | **MISSING** on the research side until U-R2 confirms. It stays available as a STYLE intake. |
+| `manual_intake` (TOPIC) | ADAPT if a SourceSpec type covers it | v3: MISSING. **v3.1: COMPATIBLE as existing behaviour** (V10). It is an operator act, not a form or profile field. The compiler emits nothing for it. |
+| `manual_intake` (STYLE) | STYLE intake | unchanged: STYLE only (§7, v2 §5.6) |
 | `sources[].adapter` | ADAPT, existing types only | ADAPT only for existing types **whose transport is confirmed** (V7) |
-| `research.freshness` | labels mapping 1:1 to v1 rule sets | unchanged, plus V4 |
+| `research.freshness` | labels mapping 1:1 to v1 rule sets | v3: unchanged. **v3.1: CONFLICT, withdrawn as a form field** (V9). There is no selectable rule set. The fixed v1 classification is displayed, not configured. |
+| `topics[].intent` (news / evergreen) | ADAPT: mapped to a v1 freshness rule set | **v3.1: MISSING on the research side** (V9: nothing to map to). It may stay a **planning-side** preference only. |
 | relevance threshold | 0.55 withdrawn | unchanged, plus V5 |
+
+v3.1: §17.6 is the single field-status table used to freeze the first
+catalogue. Where §17.6 and this table differ, §17.6 wins.
 
 ---
 
@@ -712,17 +845,29 @@ research_selections(
 | Capability | Status | Used for |
 |---|---|---|
 | AI usage ledger | exists | attribution and reporting. The `shadow` lane is tagged where the path records it. |
-| **Writer-specific daily limits** | exist and are enforced on the Writer path | the **only** limit v3 describes as enforced |
+| **Writer-specific daily limits** | exist and are enforced on the Writer path | the Writer path. The only limit the onboarding desired-limit figure may feed (§10.3). |
+| **Research v1 daily AI limits** (v3.1, DOT final re-audit) | exist inside frozen Research v1 and are enforced by v1 on its own path | v1's AI calls (for example enrichment). Frozen: onboarding reads them, never sets, raises or parameterizes them. |
+| **Research v1 USD budget limits** (v3.1, DOT final re-audit) | exist inside frozen Research v1, in **USD**, enforced by v1 on its own path | v1's spend. They are **path-local**, not a monthly JPY customer cap and not a unified budget. Frozen, as above. |
+| **Research v1 source / fetch limits** (v3.1, DOT final re-audit) | exist inside frozen Research v1 | bound collection volume per source / run. Frozen, as above. |
 | Unknown-cost call handling | exists for some paths | where implemented, an unknown price is never counted as zero. Elsewhere the cost shows 「算出不可」. |
 | Deterministic / no-AI mode | exists where the template wording path supports it | `cost.no_ai_mode` |
+
+The exact names, units, windows and values of the Research v1 limits are
+unknown U-C4. v3.1 claims only that they exist and are enforced by v1 on the
+v1 path. It does **not** claim that they cover any non-Research path.
 
 ### 10.2 Not current
 
 - a universal, feature-wide, atomic monthly JPY hard cap
-- unified budget enforcement across every AI, research and SHADOW path
-- enforced per-feature daily caps on paths other than the Writer. Treated
-  as **not enforced** until enforcement on that specific path is confirmed
-  (U-C3).
+- unified budget enforcement across every AI, research and SHADOW path. The
+  Writer limits and the Research v1 limits are separate, path-local
+  controls. Together they are **not** a unified governor: there is no
+  shared reservation, no cross-path total and no JPY month.
+- enforced per-feature daily caps on paths other than the Writer and the
+  Research v1 path. Treated as **not enforced** until enforcement on that
+  specific path is confirmed (U-C3). v3.1 does **not** claim that every
+  non-Writer path is estimate-only: the Research v1 path has its own
+  enforced limits (§10.1).
 - the frozen **Cost Governor v2** and **CI-01** are **not Production**. Any
   integration is a separate promotion through the PROMOTION WINDOW
   (`docs/HQ_DECISIONS.md`).
@@ -733,7 +878,12 @@ research_selections(
   as `desired_monthly_jpy` intent (unchanged from v2).
 - The compiler may derive a **Writer daily-limit proposal** from it,
   conservatively. That is the only enforcement the figure can feed today.
-  Usage on every other path is **estimated and reported**, not limited.
+- (v3.1) The figure **never** changes the Research v1 daily AI, USD budget
+  or source/fetch limits. The Research v1 path stays limited by its own
+  frozen limits, whatever the customer enters. The estimate shows Research
+  v1 usage against those limits only as reporting.
+- Usage on paths that are neither the Writer nor Research v1, and have no
+  confirmed enforcement (U-C3), is **estimated and reported**, not limited.
 - Customer copy: 「目安です。実際の利用額がこの金額を超えないことを保証するものではありません」.
 - Wording that implies a monthly cap is enforced is withdrawn wherever it
   appears, including v1 `ops.pause_rules` 「月額上限に到達 (always on)」 and
@@ -749,6 +899,16 @@ research_selections(
 
 v2 §6.3 requirements retained. A customer-facing hard monthly cap claim
 needs a separately promoted Cost Governor integration.
+
+(v3.1) Current vs future, kept apart:
+
+| | Current (enforced today) | Future unified Cost Governor (not Production) |
+|---|---|---|
+| Scope | per path: Writer daily limits; Research v1 daily AI, USD budget, source/fetch limits | every AI / research / SHADOW path of an account and org |
+| Unit | calls / USD, per path | one reserved + confirmed ledger, with pricing version and FX |
+| Admission | each path checks its own limit | atomic reserve-or-refuse across paths |
+| Monthly JPY | not enforced anywhere | possible only after promotion |
+| Who changes limits | existing owners of each path. Onboarding changes none of the Research v1 limits. | the Governor's own policy, after promotion |
 
 ---
 
@@ -813,6 +973,23 @@ Rules:
 - A mismatch fails QA. A parse that is uncertain fails closed.
 - Price is mentioned only when the plan's role allows it (v2 §4.4).
 
+**Tax semantics (v3.1):**
+
+| `tax` | Meaning of `amount` | Content rule |
+|---|---|---|
+| `incl` | the verified amount **includes** consumption tax (税込), as shown by the verified source | content must state that amount with the 税込 basis, or with no basis where the compliance data says the total-price display needs no label |
+| `excl` | the verified amount **excludes** consumption tax (税別 / 税抜), as shown by the verified source | content must state it with an explicit 税別 / 税抜 label. Whether a tax-excluded amount may be shown at all is decided by **compliance data**, not by the compiler (for example the 総額表示 rule for consumer-facing prices). Default floor: a consumer-facing offer may mention only an `incl` price. An `excl` price is usable only where the compliance data explicitly allows it. |
+| `not_applicable` | the verified source states that no consumption tax applies | content must not add a 税込 or 税別 label |
+
+- The system **never converts** between `incl` and `excl`, never assumes a
+  tax rate, and never derives one amount from the other.
+- `incl` and `excl` amounts for the same offer are **two separate facts**,
+  each verified on its own.
+- A price whose tax basis is unknown is **not** a typed price. It cannot
+  enter SOFS, and no plan may mention it.
+- A content tax label that differs from the SOFS `tax` fails QA, even when
+  the number matches.
+
 ### 11.4 Legacy A1 aliases
 
 - A1 is **not** onboarding-managed. Until a separate migration decision, A1
@@ -831,6 +1008,21 @@ Rules:
   exist, they are compared after normalization. A mismatch **fails closed**:
   SOFS is not built, no plan is generated, and E160 is raised. Neither side
   is silently preferred.
+
+**Alias mapping rules (v3.1):**
+
+| # | Rule |
+|---|---|
+| L1 | **Direction.** An alias is a read-only **projection** from canonical → legacy, for legacy readers. Writes never flow legacy → canonical through an alias. |
+| L2 | **One-to-one.** Each `(account_id, legacy_key)` maps to exactly one `(offer_id, fact_type, projection)`. Two canonical sources for one legacy key is a catalogue load error. |
+| L3 | **Explicit projection per key**, declared in data, never inferred: |
+| | `destination_url → funnel_destination_url`: same URL after the declared normalization (scheme and host lowercased; no other rewriting) |
+| | `availability.status → free_reading_available`: `accepting → true`; `paused` / `ended → false`. This is **lossy**: `false` does not say which of `paused` / `ended`. |
+| | `application_method → free_reading_application_method`, `provider → free_reading_provider`: identical text |
+| | `goal → primary_threads_goal`: only values in the current fortune enum. A canonical goal outside it has **no** legacy projection, so that offer cannot be used on the legacy reader path (§11.5). |
+| | `price (typed) → price (A1 account-wide)`: only for the one declared A1 offer. The typed price must have `currency = JPY` and a known `tax`. The legacy value is compared on amount and, where the legacy value states it, tax basis. |
+| L4 | **Comparison** projects the canonical value through L3 and compares it with the legacy value. Outcome is `EQUAL`, `CONFLICT` or `INDETERMINATE`. `INDETERMINATE` (for example a legacy price that states no tax basis while the typed price has one, or a legacy value that cannot be parsed) is handled **as a conflict** (E160, fail closed) until an operator resolves it. |
+| L5 | **Import of existing legacy values** into the canonical model, if A1 is ever migrated, is a separate migration decision. It keeps the original verifier and time as provenance (`source_kind = legacy_import`) and never raises a value's status. A lossy legacy value (L3 `false`, L4 untaxed price) is not imported until an operator resolves it. |
 
 ### 11.5 Current readers do not understand SOFS
 
@@ -878,7 +1070,7 @@ implication that no fact values are kept was wrong.
 | offer identity / revision | not guaranteed | `selected_offer_id`, `offer_revision` |
 | config, catalogue, template, safety-floor versions + hash | not guaranteed | bound |
 | QA rule-set, approval, publishing, cost policy versions | not part of the request | bound |
-| research envelope | not guaranteed | selection ids + packet refs + hashes, or explicit `none` |
+| research envelope | not guaranteed | selection ids + packet ids + `ri_packets.payload_hash` + bounded item refs (§12.3), or explicit `none`. No raw bodies. |
 | style version + provenance class | version stored separately; class not bound | bound |
 | account identity `(platform, provider_account_id)` | not guaranteed | bound |
 | immutability enforced | not as a contract | append-only, hash-verified |
@@ -890,13 +1082,30 @@ exists, it is a derived artifact that request validation checks against
 SOFS (§11.1). The snapshot does not replace it, and it does not satisfy the
 snapshot contract.
 
-### 12.3 Research envelope without a v1 packet hash
+### 12.3 Research envelope in the snapshot (replaced in v3.1)
 
-If v1 packets have no stable hash (U-R4), the adapter computes a canonical
-hash of the selected items **as read at selection time** and stores those
-items' content in the snapshot's research envelope as reference evidence
-(still `suggestions_only`). U-R4 then affects efficiency only, not
-correctness.
+v3's "store the selected items' content in the snapshot" is **withdrawn**.
+
+- **Packet reference:** the snapshot's research envelope binds
+  `selection_id`, `packet_id` and `ri_packets.payload_hash` as recorded on
+  the selection (§9.3). This is the packet hash wherever a packet is
+  referenced. The adapter does not compute a substitute packet hash.
+- **Item reference:** item refs inside the packet are bound by id. Only
+  where `payload_hash` does not cover a referenced item does the adapter
+  compute a per-item canonical hash, at selection time, from the bounded
+  reference fields below (U-R4 remainder).
+- **Bounded copy:** the snapshot may hold, per selected item, only bounded
+  reference metadata: source id, canonical URL, `source_type`, published /
+  fetched time, the freshness label v1 assigned, and the item ref and hash.
+  It holds **no raw source body, no full packet payload and no full
+  article text**. Any short text the plan needs as context (for example an
+  angle or a title) is limited by a catalogue-declared maximum length and
+  stays subject to the research-leak and copy guards.
+- **Reproducibility without copying:** a later re-check compares hashes. If
+  the source item or packet is no longer available, the check reports
+  "source no longer available" for that snapshot. It never falls back to a
+  copied body, and it never makes the snapshot invalid retroactively.
+- Everything in the envelope stays `suggestions_only` (§9.1).
 
 ---
 
@@ -937,7 +1146,7 @@ and **no career-specific Python or TypeScript runtime branch**.
 | # | Criterion |
 |---|---|
 | P1 | `git diff T0..T1` touches only declared data paths. **Zero** `.py` / `.ts` / `.tsx` changes. |
-| P2 | no career-specific runtime branch (grep for `career`, `job_posting`, `salary` in non-data source returns only generic loader tests) |
+| P2 | (v3.1) **no industry-specific runtime branching** for CAREER, detected by control flow, not by vocabulary (see below) |
 | P3 | the template loads through the production loader (C5). No test-only shim, monkeypatch, fixture override or alternate registry. |
 | P4 | **offer isolation:** with several offers on the account (two `job_posting` offers and one `lead_magnet`), Writer input, QA and approval for a plan see only the selected offer |
 | P5 | **typed salary facts:** salary in content must match the typed `salary_range` (amount, currency, period). Key presence alone fails. Missing verification blocks salary-mentioning plans. |
@@ -950,30 +1159,62 @@ and **no career-specific Python or TypeScript runtime branch**.
 The LIMITED CORE TEST runs P1–P8 and P10 with `research envelope = none` and
 `selection = []`. Its result is never reported as a CAREER PASS.
 
+**P2 detection rule (v3.1, replaces the v3 word grep):**
+
+- The general word "career" (or 「キャリア」, `job_posting`, `salary`) appearing
+  in non-data source **does not fail P2** by itself. Comments, docs, generic
+  labels, test names, log text, the generic catalogue schema and the
+  generic closed `offer_type` list may contain it.
+- P2 **fails** when non-data runtime code (`.py` / `.ts` / `.tsx`, outside
+  the generic loader and catalogue schema) **branches on vertical
+  identity**. Examples that fail:
+  - a comparison or dispatch on a template id or vertical id
+    (`template_id == "career_recruitment"`, a `match` / `switch` / dict
+    dispatch keyed on a vertical)
+  - a branch on a vertical-specific offer type or fact type that changes
+    behaviour (`if offer_type == "job_posting": …`), instead of reading the
+    catalogue-declared value type or property (`money_range`,
+    `requires_eligibility`, …)
+  - a career-only module, registry entry, import path or feature flag
+  - career-only prompt or QA wording in code instead of catalogue data
+- Detection: (1) P1 already requires zero code change from T0 to T1;
+  (2) at T1, a static check lists every conditional, dispatch table and
+  registry in non-data runtime code whose key or comparand is a template id,
+  vertical id, or vertical-specific offer / fact type literal. Each hit is a
+  FAIL unless it is in the generic loader / schema. The check result is
+  reviewed by DOT; a reviewer may not wave a hit through by renaming it.
+- Branches that already exist at T0 for the fortune vertical
+  (`engine_ref: divination`) are baseline. They are not counted against
+  CAREER, and CAREER may not add a new one.
+
 ---
 
-## 14. ONB closure matrix (brief item 12)
+## 14. ONB closure matrix (brief item 12; updated in v3.1)
 
 Legend: **CLOSED** = the design contract is corrected and no open design
 dependency remains · **PARTIAL** = the contract is corrected, but a named
 inventory or separately approved design is still needed before the contract
-can be bound · **OPEN** = not addressed.
+can be bound · **OPEN** = not addressed · **DEFERRED** (v3.1) = separately
+approved future work that this design intentionally does not do. DEFERRED is
+**never** counted as CLOSED.
 
 A dependency is never counted as closed merely because it is deferred to
-implementation.
+implementation. An item is CLOSED only when its **design contract** needs
+nothing further. Implementation that is deferred is listed separately as
+DEFERRED below.
 
-| ID | Proposed status | What v3 does | Remaining dependency |
-|---|---|---|---|
-| **ONB-01** Research authority | **CLOSED** | Frozen v1 fields stated exactly (§9.1). Selection records who/what/account/plan, but grants no fact, Writer or planning authority (§9.2). `operator_manual` only. No policy column (§9.3). | none for the design. Policy-based or automatic selection is out of scope, not a dependency. |
-| **ONB-02** Research source of truth | **PARTIAL** | Reuse of `ri_*` kept (v2 §5.3). Conditional ADAPT rows → MISSING (§9.5). V1–V8 constraints (§9.4). | U-R1 (exact `ri_*` inventory) and U-R2 (SourceSpec fields) are needed to bind the adapter |
-| **ONB-03** Membership semantics | **PARTIAL** | Cross-org = explicit delegation. Five dimensions separated. No destructive UNIQUE. Allowlisting not planned (§8). | U-T1 ownership inventory and U-T3 cross-org membership classification (§8.4) |
-| **ONB-04** Active ≠ authority | **PARTIAL** | Six concepts (§3.2). CATFOOD authority scoped correctly (§3.1). Live admission predicate (§3.3). ACTIVE as an extra guard for onboarding-managed accounts only. No gate on A1/A2 (§3.4). SHADOW boundary rebound to the real controls (§3.6). | U-A1 (exact names and records of the current live controls) to bind §3.3; G-ACTIVE (separate approval) before any onboarding-managed account can go live |
-| **ONB-05** Claims vs verified | **CLOSED** | v2 §4.1–§4.2 retained. SOFS accepts VERIFIED facts only (§11.2). | U-V1 has a fail-closed default (operator-only verification). Widening it is a separate authority expansion. |
-| **ONB-06** Snapshot | **CLOSED** | Current `request_json` described correctly. Difference from the snapshot contract stated (§12.2). Research envelope hash computed at selection when v1 has none (§12.3). | none for the design. U-R4 affects efficiency only. |
-| **ONB-07** Approval | **CLOSED** | Restriction-only rule with ten conditions, no rebind, no revival, `ERROR` blocks (§5). Approver changes are REVIEW_REQUIRED (§6). | none |
-| **ONB-08** Cost model | **CLOSED** | Only Writer daily limits described as enforced. Monthly JPY = desired limit / estimate. Cap wording withdrawn (§10, §18). Cost Governor v2 / CI-01 stated as not Production. | none for the design. U-C3 can only **add** enforced paths. A hard-cap claim requires a separately promoted Cost Governor integration. |
-| **ONB-09** Lock ≠ quiescence | **PARTIAL** | Fence and quiescence separated. Q1–Q9 cover all required conditions. No circularity. NEVER_LIVE positive proof (§4). | U-Q1 (authoritative evidence source for each of Q1–Q9 and N1–N7); G-FENCE (separate approval) for execution-affecting promotion |
-| **ONB-10** Style / readiness | **PARTIAL** | `MANUALLY_APPROVED_STYLE` defined with M1–M7. Separate `research` and `style_profile` blockers. A manual style never clears the research blocker (§7). | U-S1 (product decision: is a manual style wanted?), U-S2 (exact blocker predicates), RA-1 and RA-2 readiness-contract changes (separate approval) |
+| ID | v3 status | v3.1 status | What v3 + v3.1 do | Remaining dependency |
+|---|---|---|---|---|
+| **ONB-01** Research authority | CLOSED | **PARTIAL** | Frozen v1 fields stated exactly, now on the **planning-input / export envelope**, not required on every `ri_packets` row (§9.1). Selection records who/what/account/plan, but grants no fact, Writer or planning authority (§9.2). `operator_manual` only. No policy column. Selection bound to `ri_packets.payload_hash` (§9.3). | U-R1: envelope name and field paths, needed to bind the §9.1 check. Default until then: an envelope that cannot be read is rejected. (v3 marked this CLOSED; the DOT final re-audit showed the check was bound to the wrong object.) |
+| **ONB-02** Research source of truth | PARTIAL | **PARTIAL** | Reuse of `ri_*` kept (v2 §5.3). Conditional ADAPT rows → MISSING. Freshness = fixed v1 classification (V9). Manual TOPIC intake = existing behaviour (V10). Catalogue statuses fixed in §17.6. | U-R1 (`ri_*` inventory), U-R2 (SourceSpec fields), U-R5 (confirmed transports) to bind the adapter |
+| **ONB-03** Membership semantics | PARTIAL | **PARTIAL** (unchanged) | Cross-org = explicit delegation. Five dimensions separated. No destructive UNIQUE. Allowlisting not planned (§8). | U-T1 ownership inventory and U-T3 cross-org membership classification (§8.4) |
+| **ONB-04** Active ≠ authority | PARTIAL | **PARTIAL** (unchanged) | Six concepts (§3.2). CATFOOD authority scoped correctly (§3.1). Live admission predicate (§3.3). ACTIVE as an extra guard for onboarding-managed accounts only. No gate on A1/A2 (§3.4). SHADOW boundary rebound to the real controls (§3.6). | U-A1 to bind §3.3; G-ACTIVE design (DEFERRED below) before any onboarding-managed account can go live |
+| **ONB-05** Claims vs verified | CLOSED | **CLOSED** (unchanged) | v2 §4.1–§4.2 retained. SOFS accepts VERIFIED facts only (§11.2). | none for the design. U-V1 has a fail-closed default (operator-only verification); widening it is a separate authority expansion. |
+| **ONB-06** Snapshot | CLOSED | **CLOSED** (corrected) | Current `request_json` described correctly (§12.2). Research envelope binds `ri_packets.payload_hash`; no substitute packet hash; **no raw bodies or full payloads** copied, only bounded reference metadata (§12.3). | none for the design. U-R4 remainder (item-level hash) has a fail-closed default and affects efficiency only. Snapshot implementation is slice 2 (DEFERRED below). |
+| **ONB-07** Approval | CLOSED | **CLOSED** (unchanged) | Restriction-only rule with ten conditions, no rebind, no revival, `ERROR` blocks (§5). Approver changes are REVIEW_REQUIRED (§6). | none |
+| **ONB-08** Cost model | CLOSED | **PARTIAL** | Writer daily limits **and** frozen Research v1 daily AI / USD budget / source-fetch limits described as the enforced, path-local controls. Not every non-Writer path is estimate-only. Monthly JPY = desired limit / estimate and never changes Research v1 limits. Current controls vs future unified Cost Governor separated. Cost Governor v2 / CI-01 not Production (§10). | U-C4: exact names / units / values of the Research v1 limits, to bind the §10.1 rows and the estimate display. U-C3 can only add enforced paths. Unified enforcement is DEFERRED (Cost Governor). (v3 marked this CLOSED while omitting the Research v1 limits.) |
+| **ONB-09** Lock ≠ quiescence | PARTIAL | **PARTIAL** | Fence and quiescence separated. Q1–Q9. No circularity. NEVER_LIVE positive proof. Holds are per reason, with an owner each; no cross-release; resume releases only its own hold and never bypasses another; config switch is compare-and-set on the expected old version; serialization invariant stated without prescribing a mechanism (§4.2, §4.4, §4.5, §4.7). | U-Q1 (evidence source per Q1–Q9, N1–N7), U-F1 (covered claim types for F1); G-FENCE design note meeting F1–F7 (DEFERRED below) |
+| **ONB-10** Style / readiness | PARTIAL | **PARTIAL** | `MANUALLY_APPROVED_STYLE` with M1–M7. Separate `research` and `style_profile` blockers. A manual style never silently affects the research blocker. Re-review triggers T1–T4 (§7.5). Manual Post Sync alone is not a sufficient style corpus (§7.6). | U-S1 (is a manual style wanted?), U-S2 (exact blocker predicates and corpus requirements); RA-1 and RA-2 (DEFERRED below) |
 
 No ONB item is OPEN. The PARTIAL items do not hide any capability as
 supported: every one is fail-closed until its dependency is resolved.
@@ -986,10 +1227,30 @@ Additional items:
 | Restriction-only rule | CLOSED | §5 |
 | Approver changes | CLOSED | §6 |
 | Cross-org delegation | PARTIAL (inventory U-T1/U-T3) | §8 |
+| (v3.1) Research envelope vs packet | PARTIAL (U-R1, as ONB-01) | §9.1 |
+| (v3.1) Fixed freshness classification; manual TOPIC intake as existing behaviour | CLOSED | §9.4 V9, V10 |
+| (v3.1) Bounded research copy in snapshots | CLOSED | §12.3 |
+| (v3.1) G-FENCE invariants F1–F7 | CLOSED as invariants. G-FENCE itself is DEFERRED and PARTIAL on U-F1. | §4.7 |
+| (v3.1) Manual style re-review triggers; Manual Post Sync sufficiency | CLOSED as contract. RA-1 / RA-2 DEFERRED. | §7.5, §7.6 |
 | Selected-offer / fact model | PARTIAL (reader adaptation C2/C4 before price or salary use) | §11 |
-| CAREER acceptance contract | CLOSED as a contract. The test itself is **NOT_READY**. | §13 |
+| (v3.1) Tax-basis semantics; legacy alias mapping rules L1–L5 | CLOSED as contract | §11.3, §11.4 |
+| CAREER acceptance contract (incl. v3.1 P2 control-flow rule) | CLOSED as a contract. The test itself is **NOT_READY**; running it is DEFERRED. | §13 |
 | MVP scope separation | CLOSED | §15 |
-| Smallest implementation slice | CLOSED | §17 |
+| Smallest implementation slice (scope definition) | CLOSED | §17.1 |
+| (v3.1) Field catalogue v1 pre-freeze statuses and finding rules | CLOSED as design, subject to the DOT diff re-audit | §17.6 |
+
+DEFERRED (separately approved future work; **not** CLOSED):
+
+| Item | Why it is not part of this design | Section |
+|---|---|---|
+| G-ACTIVE | MAINLINE admission change; own design note, tests, approval | §3.4 |
+| G-FENCE implementation | MAINLINE admission change; design note must meet F1–F7 | §4.2, §4.7 |
+| RA-1, RA-2 | readiness-contract changes | §7.4 |
+| C1–C6 (incl. C6 Research generalization) | common-core changes before CAREER | v2 §12.3 |
+| Cost Governor / CI-01 integration | not Production; PROMOTION WINDOW only | §10.4 |
+| Delegation record | future table | §8.3 |
+| Slices 2–6 | each needs its own planning and approval | §17.2 |
+| CAREER FULL ACCEPTANCE run | needs C1–C6 | §13 |
 
 ---
 
@@ -1019,17 +1280,19 @@ long soak as an MVP gate).
 
 | ID | Unknown | Needed for | Owner | Default until resolved |
 |---|---|---|---|---|
-| U-R1 | exact `ri_*` table / column inventory | §9 adapter binding | DOT (LAB) | no adapter is specified |
+| U-R1 | exact `ri_*` table / column inventory, **plus (v3.1) the planning-input / export envelope name and the field paths of its four advisory fields** | §9.1 envelope check, §9 adapter binding | DOT (LAB) | no adapter is specified; an envelope that cannot be read is rejected |
 | U-R2 | SourceSpec fields v1 accepts | §9.5 | DOT (LAB) | MISSING |
-| U-R3 | v1 freshness rule sets and labels | v2 §5.5 R3 | DOT (LAB) | field hidden |
-| U-R4 | stable v1 packet hash | §12.3 | DOT (LAB) | hash computed at selection |
+| U-R3 | v3.1: v1's fixed freshness classification labels, **for display only** (no rule-set selection exists, V9) | §9.4 V9 | DOT (LAB) | label not shown |
+| U-R4 | v3.1: **resolved for packets** (`ri_packets.payload_hash`, DOT final re-audit). Remaining: whether item-level refs inside a packet have their own stable hash | §12.3 | DOT (LAB) | per-item canonical hash computed at selection, from bounded reference fields only |
 | U-R5 | which `source_type`s have a confirmed working transport | §9.4 V7 | DOT (LAB) | not selectable |
 | U-A1 | exact names and records of the current live controls (§3.1) | §3.3 binding | DOT | no onboarding-managed account goes live |
 | U-A2 | full list of CATFOOD paths that require `execution_authorities` | §3.3, Q8, N7 | DOT | treated as applicable where unknown (fail closed) |
 | U-Q1 | authoritative evidence source per Q1–Q9 and N1–N7, and each source's coverage start | §4 | DOT | unknown = not quiescent / proof fails |
 | U-C1 | MAINLINE merge state of the cost tables | §10.1 | DOT / operator | reporting only |
 | U-C2 | per-post call estimate and pricing table version | §10.3 Writer-limit proposal | operator | no proposal; manual Writer limit |
-| U-C3 | which non-Writer paths enforce a daily cap | §10.2 | DOT | not enforced |
+| U-C3 | which paths other than the Writer and Research v1 enforce a daily cap | §10.2 | DOT | not enforced |
+| U-C4 | (v3.1) exact names, units, windows and values of the frozen Research v1 daily AI, USD budget and source/fetch limits | §10.1 rows; estimate display | DOT (LAB) | limits exist and are enforced by v1 (DOT final re-audit); onboarding shows no figure for them and changes none |
+| U-F1 | (v3.1) exact list of durable claim types that can lead to a provider call, and where each is recorded | §4.7 F1 | DOT | G-FENCE not complete; no execution-affecting promotion |
 | U-T1 | ownership inventory results | §8.5 | operator (read-only) | no ownership constraint |
 | U-T2 | provider account id availability at OAuth time | v2 §7.5 | DOT | handle check stays |
 | U-T3 | classification of existing cross-org memberships | §8.4 | operator + DOT | behaviour unchanged |
@@ -1074,13 +1337,13 @@ re-audit, the first implementation-planning slice is only:
 | K6 | no arm |
 | K7 | no publication |
 | K8 | unknown fields are **rejected** (not ignored) |
-| K9 | unsupported Research fields (MISSING / CONFLICT, §9.5, v2 §5.5) are **explicitly reported** in the CompileReport |
+| K9 | unsupported fields (MISSING / CONFLICT, §17.6) are **explicitly reported** in the CompileReport as findings, and are **never silently ADAPTed**: no fallback, approximation or substitute mapping (v3.1, §17.6) |
 | K10 | templates cannot create verified facts: the output has only CUSTOMER_ASSERTED assertions, and `kind: fact ⇒ defaultable: false` is enforced |
 | K11 | templates cannot create approvals: the output has no approval, config approval or content approval |
 | K12 | A1 / A2 **golden tests**: compiling the A1/A2 submissions reproduces their current `config_json` after normalization. Any difference is reported as EXACT_PARITY / INTENDED_DIVERGENCE / REGRESSION (§11.6). |
 
 **CompileReport** contains: input versions and hashes, output hash, rejected
-unknown fields, unsupported Research fields with their status, defaults
+unknown fields, unsupported-field findings (§17.6) with their status, defaults
 applied (with source), fact assertions produced, and blockers (for example,
 E043 for a third account, E050 for style).
 
@@ -1099,14 +1362,17 @@ The customer UI does **not** come first. It follows all of the above.
 
 ### 17.3 Read-only inventories (not implementation slices)
 
-U-A1, U-A2, U-Q1, U-R1, U-R2, U-R5, U-S2, U-T1 and U-T3 are read-only
-investigations. They can proceed independently and change nothing.
+U-A1, U-A2, U-Q1, U-R1, U-R2, U-R5, U-S2, U-T1 and U-T3, plus (v3.1) U-C4
+and U-F1, are read-only investigations. They can proceed independently and
+change nothing.
 
 ### 17.4 Separately approved dependencies (replaces the v2 §13.2 list)
 
 - **G-ACTIVE:** PRODUCT ACTIVE as an extra admission guard and `arm()`
   precondition, onboarding-managed accounts only (§3.4)
-- **G-FENCE:** ingress fence in the admission path (§4.2)
+- **G-FENCE:** ingress fence in the admission path (§4.2). Its design note
+  must satisfy F1–F7 (§4.7) before implementation planning. The mechanism is
+  not prescribed.
 - **RA-1 / RA-2:** readiness-contract changes for manual style and the
   research blocker (§7.4)
 - **C6:** Research account generalization (v2 §12.3)
@@ -1124,6 +1390,66 @@ investigations. They can proceed independently and change nothing.
 - policy-based ResearchSelection
 - fabricated packets, selections, research posts or benchmark rows
 - treating a `price` key's presence as authorization for any amount
+- (v3.1) a selectable freshness policy, rule set or window
+- (v3.1) onboarding-set values for any Research v1 daily AI, USD budget or
+  source/fetch limit
+- (v3.1) copying raw source bodies or full packet payloads into snapshots
+- (v3.1) silent ADAPT, fallback or approximate mapping of an unsupported
+  field
+
+### 17.6 Field catalogue v1: pre-freeze corrections (v3.1)
+
+The first PURE COMPILER catalogue may be frozen only with the statuses
+below. This table supersedes the research rows of v2 §5.5 and v3 §9.5 for
+catalogue purposes.
+
+**Statuses:** `SUPPORTED` (maps to a confirmed target) · `ADAPT` (a mapping
+declared in catalogue data, with an evidence reference) · `PLANNING_ONLY`
+(used by planning only, never sent to research) · `STYLE` (style input,
+never research) · `MISSING` · `CONFLICT`.
+
+| Field (v1 form key, or template data key) | Target | Catalogue v1 status | Compiler behaviour |
+|---|---|---|---|
+| `research.mode` | preference record | SUPPORTED (preference) | recorded. Selects template defaults only among SUPPORTED / ADAPT rows. |
+| `research.themes` → `topics[]` labels | v1 profile topic labels | ADAPT, **A1/A2 only** (v2 §5.5) | A1/A2: declared mapping. Any other account: not mapped, blocker E043. |
+| `research.keywords` → `include_keywords` | SourceSpec query parameters | ADAPT, **A1/A2 only** (v2 §5.5, R2) | as above |
+| `content.pillars` weights → `topics[].weight` | — | MISSING (research); PLANNING_ONLY | finding. Weights go to `planning.content_pillar_ratios` only. |
+| `content.subtopics` → `topics[].subtopics` | — | MISSING | finding. **Not** folded into keywords. |
+| `research.exclude_keywords`, `content.prohibited_topics` → `exclude_*` | — | MISSING (research); PLANNING_ONLY | finding for research. Recorded as a planning-side filter on what the operator is shown for selection. Never mutates packets. Compliance use of `prohibited_topics` is unaffected. |
+| template `topics[].intent` (news / evergreen) | — | MISSING (research); PLANNING_ONLY | finding (V9: no freshness rule set to map to) |
+| `research.freshness` | — | **CONFLICT** | finding (error). Value dropped. The fixed v1 classification applies (V9). |
+| `research.update_frequency` | — | MISSING (scheduler-owned) | finding |
+| `research.preferred_sources` (source types) | `sources[].adapter` | ADAPT only for types with a confirmed transport (V7, U-R5). Every other type: MISSING. | per type |
+| `research.preferred_sources` (free URLs), `research.blocked_sources` | — | MISSING (U-R2) | finding |
+| `entities_watch` | — | MISSING | finding |
+| template `relevance.*` | — | CONFLICT (V5) | template load error |
+| template `budget.max_items_per_cycle` / `max_llm_calls_per_cycle` | — | CONFLICT (Research v1 limits are frozen, §10.1) | template load error |
+| manual TOPIC intake | — | not a field (V10) | existing operator behaviour. Compiler emits nothing. |
+| `content.reference_accounts` | manual STYLE intake request | STYLE | never research |
+| `account.use_past_posts` | Manual Post Sync request | STYLE | never readiness by itself (§7.6) |
+| `cost.monthly_cap_jpy` | `desired_monthly_jpy` | SUPPORTED (intent) | Writer daily-limit proposal only. Never a Research v1 limit (§10.3). |
+| `cost.daily_call_cap` (operator) | Writer daily limit | SUPPORTED for the Writer only | another feature: finding (U-C3). A Research v1 feature: CONFLICT. |
+| `offer.price` | typed price assertion (§11.3) | SUPPORTED as CUSTOMER_ASSERTED | `amount`, `currency` and `tax` are all required. A missing `tax` basis is a submission validation error, not a default. |
+
+**Finding rules:**
+
+- Every field whose status is `MISSING` or `CONFLICT` and that has a value
+  in the submission produces **one CompileReport finding**: field key,
+  status, reason, section reference, and whether the value came from the
+  submission or a template. Severity: `MISSING → warn` (value not used),
+  `CONFLICT → error` (compile result is not a valid candidate). Unknown
+  keys stay rejected (K8).
+- The provenance map records `UNSUPPORTED:<status>` for each such field. The
+  output contains **no** value derived from it.
+- A template that supplies a default for a `MISSING` or `CONFLICT` field is
+  a **template load error**. Templates cannot hide an unsupported field
+  behind a default.
+- `ADAPT` exists **only** where the catalogue declares the mapping and its
+  evidence reference. The compiler contains no fallback or approximate
+  mapping (for example subtopics → keywords, intent → freshness, blocked
+  sources → exclusions).
+- Raising a field from `MISSING` to `ADAPT` or `SUPPORTED` needs a **new
+  catalogue version** with evidence, never only a compiler change.
 
 ---
 
@@ -1137,7 +1463,7 @@ These add to v2 §17. Where they disagree with v1 or v2, these win.
 | §2 journey flow (STEP 10) and §3.12 title | 月額の上限 | 月額の目安 |
 | §3.11 `ops.pause_rules` | 「月額上限に到達 (always on)」 | **withdrawn.** No monthly cap signal exists. A Writer daily-limit hit stops Writer generation for that UTC day. It is not a pause rule. |
 | §3.12 `cost.on_cap` | 「その月は新しい投稿を作らない」 (default) | **withdrawn** (MISSING until a Cost Governor exists). Options: 「その日の投稿文の作成を止める」 (Writer daily limit) and, only where the template supports it, deterministic mode. |
-| §4.2 CostPolicy row | "Cap reached ⇒ block or deterministic mode. Never overspend silently." Per-feature `ai_cost_policies` for writer / research_classify / research_angle / qa_semantic | Desired limit plus a Writer daily-limit proposal. Other features' rows are estimates and reporting only, unless enforcement on that path is confirmed (U-C3). "Never overspend silently" is withdrawn. |
+| §4.2 CostPolicy row | "Cap reached ⇒ block or deterministic mode. Never overspend silently." Per-feature `ai_cost_policies` for writer / research_classify / research_angle / qa_semantic | Desired limit plus a Writer daily-limit proposal. v1's proposed `research_classify` / `research_angle` rows are withdrawn as onboarding-set limits: AI use on the Research v1 path is governed by frozen Research v1's own daily AI, USD budget and source/fetch limits (v3.1, §10.1), which onboarding never sets. Other features' rows are estimates and reporting only, unless enforcement on that path is confirmed (U-C3). "Never overspend silently" is withdrawn. |
 | §5.2 PAUSED → ACTIVE | G9 (budget) re-checked | G9 is a review item on the desired limit, not a budget check |
 | §8.4 G9 | "no cap breach during shadow" | per §10.3 |
 | §11 E070 | 「月額上限が目安…」 | 「月額の目安が、想定の利用額（◯円〜）を下回っています」 |
@@ -1150,12 +1476,75 @@ These add to v2 §17. Where they disagree with v1 or v2, these win.
 
 ---
 
+## 19. Errata v3.1 — change log from v3 (DOT final re-audit)
+
+Applies only the finite corrections of the limited corrective brief. No
+redesign. No code. No MAINLINE or Production change.
+
+| # | Brief item | v3 said | v3.1 says | § |
+|---|---|---|---|---|
+| E1 | 1 Research | every v1 research output carries the four advisory fields; the adapter checks them on packets | the fields belong to the **planning-input / export envelope**; they are not required on every `ri_packets` row; the envelope check fails closed; a contradicting value on a packet is also a violation | §0.1, §0.3 #9, §9.1, U-R1 |
+| E2 | 1 Research | `packet_ref_hash`, computed at selection if v1 has none | `ri_packets.payload_hash` is the packet hash; re-read at plan build; mismatch = stale selection (fail closed); per-item hash only where `payload_hash` does not cover a ref | §9.3, §12.3, U-R4 |
+| E3 | 1 Research | `research.freshness`: labels mapping 1:1 to v1 rule sets | freshness is a **fixed** v1 classification; no selectable policy; `research.freshness` CONFLICT (withdrawn); `topics[].intent` MISSING on the research side; the label is displayed only | §9.4 V9, §9.5, §17.6, U-R3 |
+| E4 | 1 Research | `manual_intake` MISSING on the research side | manual TOPIC intake is **existing** v1 behaviour (operator act, account-scoped); no new intake channel; separate from STYLE intake | §9.4 V10, §9.5, §17.6 |
+| E5 | 1 Research | snapshot stores selected items' content | raw source bodies and full packet payloads are **not** copied; bounded reference metadata only; short context text capped by the catalogue and guarded | §12.2, §12.3, §17.5 |
+| E6 | 1 Research | — | selection is `operator_manual` only; nothing else may select | §9.3 |
+| E7 | 2 Cost | Writer daily limits are the **only** enforced limit | frozen Research v1 daily AI, USD budget and source/fetch limits are documented as existing, path-local and enforced by v1; onboarding never sets them; not every non-Writer path is estimate-only; current controls vs future unified Cost Governor table; Cost Governor v2 / CI-01 remain not Production | §0.1, §0.3 #10, §10.1–§10.4, §18, U-C3, U-C4 |
+| E8 | 3 G-FENCE | one `ingress_fence` record; release "unless a pause or suspend is also in effect" | one **hold per reason** with a sole owner; F1–F7 invariants: covered durable claims, account / config generation binding, expected old version (compare-and-set), serialization of admission / hold state / switch, owner per reason, no cross-release, resume never bypasses another hold; no mechanism (epoch or other) is prescribed | §4.2, §4.4, §4.5, §4.7, §17.4, U-F1 |
+| E9 | 4 Style | — | RA-1 / RA-2 restated as future contract work; re-review triggers T1–T4 (persona change, template/style change, provenance revocation, meaningful new quality evidence); manual style never silently affects research readiness; Manual Post Sync alone is not a sufficient style corpus | §7.4, §7.5, §7.6 |
+| E10 | 5 Catalogue | K9: unsupported Research fields reported | single pre-freeze field-status table; unsupported fields are explicit CompileReport findings (MISSING = warn, CONFLICT = error); templates cannot default them; no silent, fallback or approximate ADAPT | §17.1 K9, §17.5, §17.6 |
+| E11 | 5 Catalogue | P2: grep for `career`, `job_posting`, `salary` | the word alone never fails P2; P2 detects **industry-specific runtime branching** by control flow (template / vertical / vertical-specific type literals in conditionals, dispatch or registries) | §13.4 |
+| E12 | 5 Catalogue | alias list + conflict detection | alias rules L1–L5: canonical → legacy projection only, one-to-one, explicit per-key projection (lossy cases named), `INDETERMINATE` = conflict, legacy import is a separate decision | §11.4 |
+| E13 | 5 Catalogue | `tax`: incl / excl / not_applicable | tax-basis semantics: amount as verified, never converted, `incl` / `excl` are separate facts, unknown basis is not a typed price, label mismatch fails QA, `excl` display only where compliance data allows | §11.3, §17.6 |
+| E14 | matrix | ONB-01 and ONB-08 CLOSED | ONB-01 → PARTIAL (U-R1 envelope binding), ONB-08 → PARTIAL (U-C4); DEFERRED status added and never counted as CLOSED; new v3.1 rows | §14 |
+
+### 19.1 Remaining PARTIAL items after v3.1
+
+| Item | Blocking dependency |
+|---|---|
+| ONB-01 Research authority | U-R1 (envelope name and field paths) |
+| ONB-02 Research source of truth | U-R1, U-R2, U-R5 |
+| ONB-03 Membership semantics | U-T1, U-T3 |
+| ONB-04 Active ≠ authority | U-A1; G-ACTIVE (DEFERRED) |
+| ONB-08 Cost model | U-C4 |
+| ONB-09 Lock ≠ quiescence | U-Q1, U-F1; G-FENCE note meeting F1–F7 (DEFERRED) |
+| ONB-10 Style / readiness | U-S1, U-S2; RA-1, RA-2 (DEFERRED) |
+| Cross-org delegation | U-T1, U-T3 |
+| Selected-offer / fact model | C2 / C4 reader adaptation (DEFERRED) |
+
+### 19.2 Can PURE COMPILER + FIELD CATALOGUE planning start?
+
+**Yes, as planning only, once DOT accepts this diff.** Slice 1 (§17.1)
+needs none of the PARTIAL dependencies above:
+
+- it has no storage, live path, admission, fence, readiness or adapter, so
+  U-A1, U-Q1, U-F1, G-ACTIVE, G-FENCE and RA-1 / RA-2 do not apply;
+- every research field whose v1 mapping is unconfirmed is `MISSING` with an
+  explicit finding (§17.6), so U-R1 / U-R2 / U-R5 can only **raise**
+  statuses later through a new catalogue version;
+- the cost output is only `desired_monthly_jpy` plus a Writer daily-limit
+  proposal, so U-C4 does not apply.
+
+Conditions on that planning:
+
+1. The catalogue v1 freezes with exactly the §17.6 statuses and finding
+   rules.
+2. The K12 golden tests need the current A1 / A2 `config_json` as read-only
+   fixtures. Reading them is an inventory step; nothing in MAINLINE or
+   Production changes.
+3. Planning output is a plan, not code. Implementation needs its own
+   approval.
+
+---
+
 ## FINAL STATUS
 
-**DESIGN_V3_READY_FOR_FINAL_REAUDIT**
+**DESIGN_READY_FOR_DIFF_REAUDIT**
 
-All fifteen items of the v3 corrective brief are applied (§1). Each ONB
-finding has an explicit CLOSED / PARTIAL / OPEN status with its remaining
-dependency (§14). No ONB item is OPEN. Every PARTIAL item is fail-closed
-until its named inventory or separately approved change exists. No current
-capability is overstated. The current two-account MVP is unaffected.
+Errata v3.1 applies only the five corrective items of the DOT final
+re-audit (§19, E1–E14). The exact diff from v3 is
+`git diff 4638faf -- docs/meguri-b2b-onboarding-design-v3.md`. Remaining
+PARTIAL items and their dependencies are listed in §19.1; deferred work is
+listed as DEFERRED and is not counted as CLOSED (§14). No ONB item is OPEN.
+No current capability is overstated. The current two-account MVP is
+unaffected.
