@@ -1,5 +1,8 @@
 # 環 — MEGURI B2B onboarding / account bootstrap design
 
+> **Superseded by [`meguri-b2b-onboarding-design-v2.md`](meguri-b2b-onboarding-design-v2.md)**
+> (DOT audit PASS_WITH_CORRECTIONS, ONB-01 … ONB-10). This v1 text is kept unchanged as history.
+
 Status: **design only**. No implementation, no Production change, no deploy, no
 corporate-website change. Written for DOT audit and later Codex implementation.
 
