@@ -31,7 +31,7 @@ create role service_role nologin bypassrls;
 grant usage on schema public to anon, authenticated, service_role;
 SQL
 
-"${PSQL[@]}" -c "set client_min_messages = warning" -f supabase/migrations/0001_career_media.sql
+for m in supabase/migrations/*.sql; do "${PSQL[@]}" -c "set client_min_messages = warning" -f "$m"; done
 "${PSQL[@]}" -f supabase/seed.sql
 
 fail=0
@@ -62,6 +62,7 @@ expect_error "research_notes は読めない（列権限）" "permission denied"
 expect_error "査読記録は読めない" "permission denied" "set role anon; select count(*) from article_reviews"
 expect_error "実行ログは読めない" "permission denied" "set role anon; select count(*) from pipeline_runs"
 expect_error "記事は書き換えられない" "permission denied" "set role anon; update articles set title='x'"
+expect "入口タグ（職種）で絞り込める" "t" "set role anon; select count(*) > 0 from articles where 'jimu' = any(roles)"
 expect "検索 RPC（研修）" "t" "set role anon; select count(*) > 0 from search_articles('研修')"
 expect "検索 RPC は未公開記事を返さない（draft のみに含まれる語）" "0" "set role anon; select count(*) from search_articles('学歴不問')"
 expect "条件整理イベントは匿名 INSERT できる" "1" "set role anon; insert into condition_check_events (event, check_version, answers) values ('completed', 'test', '{}'); reset role; select count(*) from condition_check_events"

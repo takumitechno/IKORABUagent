@@ -65,7 +65,7 @@ export default async function NewsDetailPage({ params }: Props) {
         <article className="mt-6">
           <header className="rounded-[20px] bg-white px-5 py-7 ring-1 ring-line sm:px-10 sm:py-9">
             <div className="flex flex-wrap items-center gap-2 text-xs">
-              <span className="rounded-full bg-[#eef1f3] px-2.5 py-0.5 font-bold text-[#334452]">転職ニュース解説</span>
+              <span className="rounded-full bg-mist px-2.5 py-0.5 font-bold text-mist-ink">転職ニュース解説</span>
               <span className="text-muted">
                 発表元: {news.announcedBy}・施行・発表日: {formatDate(news.announcedAt)}
               </span>

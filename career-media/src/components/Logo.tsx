@@ -22,7 +22,7 @@ export function Logo({ compact = false }: { compact?: boolean }) {
       <BrandMark className="h-8 w-8 shrink-0 sm:h-9 sm:w-9" />
       <span className="flex flex-col leading-none">
         <span className="text-[17px] font-bold tracking-wide text-ink sm:text-lg">{partner.brandName}</span>
-        {!compact && <span className="mt-1 text-[11px] font-medium tracking-[0.12em] text-brand-strong">{site.name}</span>}
+        {!compact && <span className="mt-1 text-[10.5px] font-medium tracking-[0.06em] text-brand-strong">{partner.brandName === site.name ? site.tagline : site.name}</span>}
       </span>
     </Link>
   );

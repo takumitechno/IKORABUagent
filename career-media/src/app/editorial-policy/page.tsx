@@ -50,7 +50,7 @@ export default function EditorialPolicyPage() {
 
       <h2>当社サービスの案内について</h2>
       <p>
-        記事の中で、{partner.brandName}のキャリア相談サービスをご案内することがあります。詳しくは<Link href="/disclosure">広告・提携表記</Link>をご覧ください。
+        記事の中で、運営会社のキャリア相談サービスをご案内することがあります。詳しくは<Link href="/disclosure">広告・提携表記</Link>をご覧ください。
       </p>
 
       <h2>誤りを見つけたときは</h2>

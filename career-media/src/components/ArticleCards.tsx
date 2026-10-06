@@ -1,79 +1,129 @@
 import Link from "next/link";
 import type { ArticleSummary, Category } from "@/lib/content/types";
 import { articlePath } from "@/lib/seo";
-import { CategoryIcon, categoryTone } from "./CategoryIcon";
+import { findTaxonomy, taxonomyPath, type TaxonomyGroup } from "@/lib/taxonomy";
+import { categoryTone } from "./CategoryIcon";
 import { formatDateShort } from "./DateMeta";
-
-function CategoryChip({ category }: { category?: Category }) {
-  if (!category) return null;
-  const tone = categoryTone(category.slug);
-  return <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-[11px] font-bold ${tone.bg} ${tone.fg}`}>{category.name}</span>;
-}
+import { Eyecatch } from "./Eyecatch";
 
 export function findCategory(categories: Category[], slug?: string) {
   return categories.find((c) => c.slug === slug);
 }
 
-/** おすすめ記事用のカード */
-export function FeatureCard({ article, categories }: { article: ArticleSummary; categories: Category[] }) {
-  const category = findCategory(categories, article.categories[0]);
-  const tone = categoryTone(category?.slug ?? "");
+export function CategoryChip({ category }: { category?: Category }) {
+  if (!category) return null;
+  const tone = categoryTone(category.slug);
+  return <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-[11px] font-bold ${tone.bg} ${tone.fg}`}>{category.name}</span>;
+}
+
+function Meta({ article, category }: { article: ArticleSummary; category?: Category }) {
   return (
-    <Link
-      href={articlePath(article)}
-      className="group flex h-full flex-col overflow-hidden rounded-[var(--radius-card)] border border-line bg-white shadow-[var(--shadow-card)] transition hover:-translate-y-0.5 hover:shadow-[var(--shadow-raised)]"
-    >
-      <div className={`relative flex h-28 items-end justify-between px-5 pb-4 ${tone.bg}`}>
-        <span className={`${tone.fg} opacity-90`}>
-          <CategoryIcon name={category?.icon ?? "folder"} className="h-9 w-9" />
-        </span>
-        <span className={`text-[11px] font-bold tracking-wider ${tone.fg}`}>{category?.name}</span>
-        <svg className="pointer-events-none absolute right-0 top-0 h-full w-1/2 opacity-[0.18]" viewBox="0 0 200 120" aria-hidden="true">
-          <circle cx="170" cy="20" r="70" fill="none" stroke="currentColor" strokeWidth="1.5" className={tone.fg} />
-          <circle cx="170" cy="20" r="45" fill="none" stroke="currentColor" strokeWidth="1.5" className={tone.fg} />
-        </svg>
-      </div>
-      <div className="flex flex-1 flex-col p-5">
-        <h3 className="text-[17px] font-bold leading-7 text-ink group-hover:text-brand-strong">{article.title}</h3>
-        <p className="mt-2 line-clamp-3 text-[13.5px] leading-6 text-muted">{article.summary}</p>
-        <p className="mt-auto pt-4 text-xs text-muted">
-          <time dateTime={article.updatedAt}>更新 {formatDateShort(article.updatedAt)}</time>
-        </p>
+    <p className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-muted">
+      {article.kind === "news" ? <span className="rounded-full bg-mist px-2.5 py-0.5 text-[11px] font-bold text-mist-ink">ニュース解説</span> : <CategoryChip category={category} />}
+      <time dateTime={article.publishedAt ?? article.updatedAt}>{formatDateShort(article.publishedAt ?? article.updatedAt)}</time>
+    </p>
+  );
+}
+
+/** 大きな注目記事カード（デスクトップでは横並び） */
+export function LeadCard({ article, categories }: { article: ArticleSummary; categories: Category[] }) {
+  const category = findCategory(categories, article.categories[0]);
+  return (
+    <Link href={articlePath(article)} className="group grid overflow-hidden rounded-[18px] border border-line bg-white shadow-[var(--shadow-card)] transition hover:shadow-[var(--shadow-raised)] md:grid-cols-[1.15fr_1fr]">
+      <Eyecatch article={article} category={category} size="lg" className="rounded-none md:h-full md:aspect-auto md:min-h-[300px]" />
+      <div className="flex flex-col p-5 sm:p-7">
+        <Meta article={article} category={category} />
+        <h3 className="mt-3 text-[20px] font-bold leading-[1.5] text-ink group-hover:text-brand-strong sm:text-[23px]">{article.title}</h3>
+        <p className="mt-3 line-clamp-4 text-[14.5px] leading-7 text-body">{article.summary}</p>
+        <span className="mt-auto pt-5 text-sm font-bold text-brand-strong">記事を読む →</span>
       </div>
     </Link>
   );
 }
 
-/** 一覧・新着用の行 */
-export function ArticleRow({ article, categories }: { article: ArticleSummary; categories: Category[] }) {
+/** 中サイズのカード（アイキャッチ＋タイトル） */
+export function FeatureCard({ article, categories, showSummary = true }: { article: ArticleSummary; categories: Category[]; showSummary?: boolean }) {
+  const category = findCategory(categories, article.categories[0]);
+  return (
+    <Link href={articlePath(article)} className="group flex h-full flex-col overflow-hidden rounded-[16px] border border-line bg-white shadow-[var(--shadow-card)] transition hover:-translate-y-0.5 hover:shadow-[var(--shadow-raised)]">
+      <Eyecatch article={article} category={category} size="md" className="rounded-none" />
+      <div className="flex flex-1 flex-col p-4 sm:p-5">
+        <h3 className="text-[16px] font-bold leading-[1.6] text-ink group-hover:text-brand-strong">{article.title}</h3>
+        {showSummary && <p className="mt-2 line-clamp-2 text-[13px] leading-6 text-muted">{article.summary}</p>}
+        <div className="mt-auto pt-3">
+          <time dateTime={article.updatedAt} className="text-xs text-muted">
+            更新 {formatDateShort(article.updatedAt)}
+          </time>
+        </div>
+      </div>
+    </Link>
+  );
+}
+
+/** 一覧・新着用のコンパクトな行（小さなサムネイル付き） */
+export function ArticleRow({ article, categories, showSummary = true }: { article: ArticleSummary; categories: Category[]; showSummary?: boolean }) {
   const category = findCategory(categories, article.categories[0]);
   return (
     <li>
-      <Link href={articlePath(article)} className="group flex gap-4 py-5">
+      <Link href={articlePath(article)} className="group flex gap-4 py-4">
+        <Eyecatch article={article} category={category} size="sm" className="w-[72px] sm:w-[84px]" />
         <div className="min-w-0 flex-1">
-          <div className="flex flex-wrap items-center gap-2">
-            <CategoryChip category={category} />
-            {article.kind === "news" && <span className="rounded-full border border-line px-2 py-0.5 text-[11px] font-bold text-muted">解説</span>}
-            <time dateTime={article.publishedAt ?? article.updatedAt} className="text-xs text-muted">
-              {formatDateShort(article.publishedAt ?? article.updatedAt)}
-            </time>
-          </div>
-          <h3 className="mt-2 text-[16px] font-bold leading-7 text-ink group-hover:text-brand-strong sm:text-[17px]">{article.title}</h3>
-          <p className="mt-1 line-clamp-2 text-[13.5px] leading-6 text-muted">{article.summary}</p>
+          <Meta article={article} category={category} />
+          <h3 className="mt-1.5 text-[15px] font-bold leading-[1.6] text-ink group-hover:text-brand-strong sm:text-[16px]">{article.title}</h3>
+          {showSummary && (
+            <div className="hidden sm:block">
+              <p className="mt-1 line-clamp-2 text-[13px] leading-6 text-muted">{article.summary}</p>
+            </div>
+          )}
         </div>
       </Link>
     </li>
   );
 }
 
-export function ArticleList({ articles, categories }: { articles: ArticleSummary[]; categories: Category[] }) {
+export function ArticleList({ articles, categories, showSummary = true }: { articles: ArticleSummary[]; categories: Category[]; showSummary?: boolean }) {
   return (
     <ul className="divide-y divide-line">
       {articles.map((a) => (
-        <ArticleRow key={a.slug} article={a} categories={categories} />
+        <ArticleRow key={a.slug} article={a} categories={categories} showSummary={showSummary} />
       ))}
     </ul>
   );
 }
 
-export { CategoryChip };
+/** 番号付きの編集部おすすめ */
+export function RankList({ articles, categories }: { articles: ArticleSummary[]; categories: Category[] }) {
+  return (
+    <ol className="divide-y divide-line">
+      {articles.map((a, i) => {
+        const category = findCategory(categories, a.categories[0]);
+        return (
+          <li key={a.slug}>
+            <Link href={articlePath(a)} className="group flex items-center gap-3 py-3.5">
+              <span className="w-6 shrink-0 text-center text-[20px] font-bold leading-none text-brand tabular-nums">{i + 1}</span>
+              <Eyecatch article={a} category={category} size="sm" className="w-14" />
+              <span className="min-w-0 flex-1 text-[14px] font-bold leading-6 text-ink group-hover:text-brand-strong">{a.title}</span>
+            </Link>
+          </li>
+        );
+      })}
+    </ol>
+  );
+}
+
+/** 記事に付いている入口タグ（職種・悩み・状況） */
+export function TagChips({ article, groups = ["concerns", "situations", "roles"] }: { article: Pick<ArticleSummary, TaxonomyGroup>; groups?: TaxonomyGroup[] }) {
+  const tags = groups.flatMap((g) => article[g].map((slug) => ({ g, item: findTaxonomy(g, slug) }))).filter((t) => t.item);
+  if (tags.length === 0) return null;
+  return (
+    <ul className="flex flex-wrap gap-2">
+      {tags.map(({ g, item }) => (
+        <li key={`${g}-${item!.slug}`}>
+          <Link href={taxonomyPath(g, item!.slug)} className="inline-flex items-center rounded-full bg-white px-3 py-1 text-[12.5px] font-medium text-body ring-1 ring-line hover:text-brand-strong hover:ring-brand/40">
+            #{item!.label}
+          </Link>
+        </li>
+      ))}
+    </ul>
+  );
+}

@@ -1,12 +1,12 @@
 /**
- * 架空表記（PARTNER_PROFILE=demo）で起動したサイトの各ページを取り込み、
+ * 中立ブランド（既定の partner profile）で起動したサイトの各ページを取り込み、
  * claude.ai のアーティファクト（1枚の HTML）として閲覧できるスナップショットを作る。
  *
- *   PARTNER_PROFILE=demo NEXT_DIST_DIR=.next-demo npx next build
- *   PARTNER_PROFILE=demo NEXT_DIST_DIR=.next-demo npx next start -p 3200 -H 127.0.0.1
+ *   NEXT_DIST_DIR=.next-demo npx next build
+ *   NEXT_DIST_DIR=.next-demo npx next start -p 3200 -H 127.0.0.1
  *   npx tsx scripts/artifact/build-artifact.ts --base http://127.0.0.1:3200 --out <file.html>
  *
- * 実在企業の名義（MakeCareer 版の partner config）では作らない。
+ * 実在企業の名義（PARTNER_PROFILE=makecareer）では作らない。
  */
 import fs from "node:fs";
 import path from "node:path";
@@ -14,6 +14,8 @@ import { build } from "esbuild";
 import { LocalContentRepository } from "../../src/lib/content/local-repository";
 import { partner } from "../../src/config/partner";
 import { NAV_ITEMS } from "../../src/components/nav";
+import { site } from "../../src/config/site";
+import { TAXONOMY, taxonomyPath, type TaxonomyGroup } from "../../src/lib/taxonomy";
 
 const ROOT = path.resolve(__dirname, "../..");
 
@@ -40,13 +42,13 @@ const escAttr = (s: string) => s.replace(/&/g, "&amp;").replace(/"/g, "&quot;").
 const decodeTitle = (s: string) => s.replace(/&amp;/g, "&").replace(/&quot;/g, '"').replace(/&#x27;/g, "'").replace(/&lt;/g, "<").replace(/&gt;/g, ">");
 
 async function main() {
-  if (process.env.PARTNER_PROFILE !== "demo") throw new Error("PARTNER_PROFILE=demo で実行してください（実在企業の名義ではアーティファクトを作りません）");
+  if (partner.profile !== "neutral") throw new Error("中立ブランド（既定の partner profile）で実行してください（実在企業の名義ではアーティファクトを作りません）");
   const base = arg("base", "http://127.0.0.1:3200");
   const out = path.resolve(arg("out"));
 
   // 実在企業の名義のまま作らないためのガード
   const home = await get(base, "/");
-  if (!home.html.includes("架空")) throw new Error("デモ用プロファイル（PARTNER_PROFILE=demo）で起動したサーバーを指定してください");
+  if (!home.html.includes(partner.mediaName)) throw new Error("中立ブランドで起動したサーバーを指定してください");
   if (/MakeCareer|make-career\.co\.jp|13-ユ-313746/.test(home.html)) throw new Error("実在企業の表記が含まれています");
 
   const repo = new LocalContentRepository(path.join(ROOT, "content"));
@@ -64,6 +66,9 @@ async function main() {
     "/disclosure",
     "/privacy",
     "/disclaimer",
+    "/concerns",
+    "/situations",
+    ...(["roles", "concerns", "situations"] as TaxonomyGroup[]).flatMap((g) => TAXONOMY[g].map((t) => taxonomyPath(g, t.slug))),
     ...categories.filter((c) => c.slug !== "news").map((c) => `/categories/${c.slug}`),
     ...articles.map((a) => (a.kind === "news" ? `/news/${a.slug}` : `/articles/${a.slug}`)),
   ];
@@ -85,7 +90,7 @@ async function main() {
   // 記事一覧の行（検索結果の表示に使う）
   const listHtml = (await get(base, "/articles")).html;
   const rows = new Map<string, string>();
-  for (const m of listHtml.matchAll(/<li><a class="group flex gap-4 py-5" href="([^"]+)">[\s\S]*?<\/a><\/li>/g)) rows.set(m[1], m[0]);
+  for (const m of listHtml.matchAll(/<li><a class="group flex gap-4[^"]*" href="([^"]+)">[\s\S]*?<\/a><\/li>/g)) rows.set(m[1], m[0]);
   const searchIndex = await Promise.all(
     articles.map(async (a) => {
       const full = await repo.getArticle(a.slug);
@@ -139,7 +144,7 @@ async function main() {
     return u.toString();
   };
   const config = {
-    siteName: `未経験転職ノート by ${partner.brandName}`,
+    siteName: site.fullName,
     consultPrefix,
     checkConsultHref: consultHref("check-result"),
     checkConsultLabel: partner.consultationIsFree ? "キャリアアドバイザーに無料で相談する" : "キャリアアドバイザーに相談する",
@@ -184,7 +189,7 @@ html.menu-open body{overflow:hidden}
 @media (prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
 `;
 
-  const html = `<title>未経験転職ノート</title>
+  const html = `<title>${site.name}</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap">

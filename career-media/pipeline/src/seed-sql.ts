@@ -41,7 +41,7 @@ export function buildSeedSql(articles: Article[], categories: Category[], check:
     const initialStatus = a.status === "published" ? "review" : a.status;
     lines.push("", `-- ${a.kind}: ${a.slug} (${a.status})`);
     lines.push(
-      `insert into articles (slug, kind, title, summary, body_md, status, featured, published_at, updated_at, reviewed_at, reviewed_by, information_checked_at, seo_title, seo_description, related_slugs, faq, news_meta, research_notes) values (` +
+      `insert into articles (slug, kind, title, summary, body_md, status, featured, published_at, updated_at, reviewed_at, reviewed_by, information_checked_at, seo_title, seo_description, related_slugs, roles, concerns, situations, eyecatch, recommended, faq, news_meta, research_notes) values (` +
         [
           q(a.slug),
           q(a.kind),
@@ -58,6 +58,11 @@ export function buildSeedSql(articles: Article[], categories: Category[], check:
           q(a.seoTitle),
           q(a.seoDescription),
           arr(a.related),
+          arr(a.roles),
+          arr(a.concerns),
+          arr(a.situations),
+          arr(a.eyecatch),
+          String(a.recommended),
           j(a.faq.map((f) => ({ q: f.question, a: f.answer }))),
           a.news ? j(newsMeta(a)) : "null",
           a.researchNotes ? j(a.researchNotes) : "null",

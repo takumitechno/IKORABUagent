@@ -1,6 +1,6 @@
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import { isPubliclyVisible } from "./parse";
-import { sortByNewest, toSummary, type ContentRepository } from "./repository";
+import { applyListOptions, sortByNewest, toSummary, type ContentRepository } from "./repository";
 import type { Article, Category } from "./types";
 
 /**
@@ -25,6 +25,11 @@ const ARTICLE_COLUMNS = [
   "seo_title",
   "seo_description",
   "related_slugs",
+  "roles",
+  "concerns",
+  "situations",
+  "eyecatch",
+  "recommended",
   "faq",
   "news_meta",
   "article_categories(is_primary,categories(slug))",
@@ -71,6 +76,11 @@ export function mapArticleRow(row: Row): Article {
     seoTitle: row.seo_title ? String(row.seo_title) : undefined,
     seoDescription: row.seo_description ? String(row.seo_description) : undefined,
     related: (row.related_slugs as string[] | null) ?? [],
+    roles: (row.roles as string[] | null) ?? [],
+    concerns: (row.concerns as string[] | null) ?? [],
+    situations: (row.situations as string[] | null) ?? [],
+    eyecatch: (row.eyecatch as string[] | null) ?? [],
+    recommended: Boolean(row.recommended),
     faq: ((row.faq as Array<{ q: string; a: string }> | null) ?? []).map((f) => ({ question: f.q, answer: f.a })),
     sources,
     news: news
@@ -108,12 +118,8 @@ export class SupabaseContentRepository implements ContentRepository {
   }
 
   async listArticles(options: Parameters<ContentRepository["listArticles"]>[0] = {}) {
-    let items = await this.fetchPublished();
-    if (options.kind) items = items.filter((a) => a.kind === options.kind);
-    if (options.category) items = items.filter((a) => a.categories.includes(options.category!));
-    if (options.featured) items = items.filter((a) => a.featured);
-    if (options.limit) items = items.slice(0, options.limit);
-    return items.map(toSummary);
+    const items = await this.fetchPublished();
+    return applyListOptions(items, options).map(toSummary);
   }
 
   async getArticle(slug: string) {

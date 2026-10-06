@@ -58,6 +58,14 @@ export type Article = {
   seoTitle?: string;
   seoDescription?: string;
   related: string[];
+  /** 入口タグ（src/lib/taxonomy.ts の slug） */
+  roles: string[];
+  concerns: string[];
+  situations: string[];
+  /** カードのアイキャッチに出す短い文言（1〜2行） */
+  eyecatch: string[];
+  /** 編集部おすすめ（閲覧数ではなく編集判断） */
+  recommended: boolean;
   faq: Faq[];
   sources: Source[];
   news?: NewsMeta;

@@ -13,6 +13,7 @@
 import { isPubliclyVisible } from "../../src/lib/content/parse";
 import type { Article, Category } from "../../src/lib/content/types";
 import { JOB_ROLES } from "../../src/lib/jobs";
+import { TAXONOMY, type TaxonomyGroup } from "../../src/lib/taxonomy";
 
 export type Severity = "error" | "warning";
 export type Finding = { code: string; severity: Severity; message: string };
@@ -28,6 +29,10 @@ export type CheckContext = {
 
 /** 静的ページとして存在する内部パス */
 const STATIC_PATHS = new Set(["/", "/articles", "/news", "/jobs", "/check", "/consultation", "/about", "/editorial-policy", "/disclosure", "/privacy", "/disclaimer"]);
+
+/** 読者をラベリングする表現・硬い業界用語（画面上の言葉としては避ける） */
+const LABELING_PATTERNS: RegExp[] = [/年収\s*\d+\s*万円?以下(の人|向け|の方)/, /低所得/, /低年収層/];
+const JARGON = ["市場価値", "キャリア戦略", "人的資本", "ポータブルスキル"];
 
 /** 成果を保証する表現（禁止）。「必ず確認する」「必ずしも」などは対象外にする */
 const GUARANTEE_PATTERNS: RegExp[] = [
@@ -143,6 +148,12 @@ export function checkArticle(article: Article, ctx: CheckContext): Finding[] {
       if (!ctx.categories.some((c) => c.slug === cat[1])) err("C05", `存在しないカテゴリへのリンク: ${href}`);
       continue;
     }
+    const hub = pathname.match(/^\/(jobs|concerns|situations)\/([a-z0-9-]+)$/);
+    if (hub) {
+      const group: TaxonomyGroup = hub[1] === "jobs" ? "roles" : (hub[1] as TaxonomyGroup);
+      if (!TAXONOMY[group].some((t) => t.slug === hub[2])) err("C05", `存在しない入口ページへのリンク: ${href}`);
+      continue;
+    }
     if (!STATIC_PATHS.has(pathname)) err("C05", `存在しないページへのリンク: ${href}`);
     if (pathname === "/jobs" && hash && !JOB_ROLES.some((r) => r.slug === hash)) err("C05", `職種比較に存在しないアンカー: ${href}`);
   }
@@ -193,6 +204,22 @@ export function checkArticle(article: Article, ctx: CheckContext): Finding[] {
   article.faq.forEach((q, i) => {
     if (!q.question.trim() || !q.answer.trim()) err("C13", `faq[${i}] の質問または回答が空`);
   });
+
+  // C16 入口タグ（職種 / 悩み / 今の状況）とアイキャッチ
+  for (const group of ["roles", "concerns", "situations"] as TaxonomyGroup[]) {
+    for (const slug of article[group]) if (!TAXONOMY[group].some((t) => t.slug === slug)) err("C16", `${group} に未定義のタグ: ${slug}（src/lib/taxonomy.ts）`);
+  }
+  if (targetsPublic && article.kind === "article" && article.concerns.length + article.situations.length === 0) warn("C16", "悩み（concerns）か今の状況（situations）のタグがない。入口ページに出ない");
+  if (targetsPublic && article.eyecatch.length === 0) warn("C16", "eyecatch（カードの短い文言）がない。title で代用される");
+  if (article.eyecatch.length > 2) err("C16", "eyecatch は2行まで");
+  for (const line of article.eyecatch) if (line.length > 16) warn("C16", `eyecatch の1行が長い（${line.length}文字）: ${line}`);
+
+  // C17 読者をラベリングする表現・硬い業界用語
+  for (const re of LABELING_PATTERNS) {
+    const m = text.match(re);
+    if (m) err("C17", `読者をラベリングする表現: 「${m[0]}」`);
+  }
+  for (const word of JARGON) if (text.includes(word)) warn("C17", `硬い業界用語: 「${word}」→ 読者の言葉に言い換える`);
 
   // C14 長さの目安（文字数ノルマではなく、極端な過不足の検出）
   if (article.title.length > 60) warn("C14", `title が長い（${article.title.length}文字）`);

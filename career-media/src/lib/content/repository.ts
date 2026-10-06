@@ -1,4 +1,27 @@
+import type { TaxonomyGroup } from "../taxonomy";
 import type { Article, ArticleKind, ArticleSummary, Category } from "./types";
+
+export type ListOptions = {
+  kind?: ArticleKind;
+  category?: string;
+  limit?: number;
+  featured?: boolean;
+  recommended?: boolean;
+  /** 入口タグで絞る（例: { group: "concerns", slug: "donichi" }） */
+  tag?: { group: TaxonomyGroup; slug: string };
+};
+
+/** listArticles の絞り込み（local / supabase 共通） */
+export function applyListOptions<T extends Pick<Article, "kind" | "categories" | "featured" | "recommended" | "roles" | "concerns" | "situations">>(items: T[], options: ListOptions = {}): T[] {
+  let out = items;
+  if (options.kind) out = out.filter((a) => a.kind === options.kind);
+  if (options.category) out = out.filter((a) => a.categories.includes(options.category!));
+  if (options.featured) out = out.filter((a) => a.featured);
+  if (options.recommended) out = out.filter((a) => a.recommended);
+  if (options.tag) out = out.filter((a) => a[options.tag!.group].includes(options.tag!.slug));
+  if (options.limit) out = out.slice(0, options.limit);
+  return out;
+}
 
 /**
  * フロントが依存するのはこの interface だけ。
@@ -7,7 +30,7 @@ import type { Article, ArticleKind, ArticleSummary, Category } from "./types";
  */
 export interface ContentRepository {
   listCategories(): Promise<Category[]>;
-  listArticles(options?: { kind?: ArticleKind; category?: string; limit?: number; featured?: boolean }): Promise<ArticleSummary[]>;
+  listArticles(options?: ListOptions): Promise<ArticleSummary[]>;
   getArticle(slug: string): Promise<Article | null>;
   search(query: string): Promise<ArticleSummary[]>;
 }

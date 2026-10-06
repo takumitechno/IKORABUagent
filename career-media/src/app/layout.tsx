@@ -3,6 +3,8 @@ import { Noto_Sans_JP } from "next/font/google";
 import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
 import { PreviewBanner } from "@/components/PreviewBanner";
+import { DemoConsultDialog } from "@/components/DemoConsultDialog";
+import { partner } from "@/config/partner";
 import { site } from "@/config/site";
 import "./globals.css";
 
@@ -16,7 +18,7 @@ const notoSansJp = Noto_Sans_JP({
 
 export const metadata: Metadata = {
   metadataBase: new URL(site.url),
-  title: { default: `${site.fullName}｜未経験からの転職を調べて、整理して、相談できる`, template: `%s｜${site.fullName}` },
+  title: { default: `${site.fullName}｜はじめての転職・未経験転職の仕事選びメディア`, template: `%s｜${site.fullName}` },
   description: site.description,
   applicationName: site.fullName,
   robots: site.indexable ? { index: true, follow: true } : { index: false, follow: false },
@@ -40,6 +42,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <Header />
         <main id="main">{children}</main>
         <Footer />
+        {partner.consultationMode === "demo" && <DemoConsultDialog consultationOrigin={new URL(partner.consultationUrl).origin} />}
       </body>
     </html>
   );

@@ -4,6 +4,7 @@ import { ArticleList } from "@/components/ArticleCards";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { CategoryIcon } from "@/components/CategoryIcon";
 import { ConsultationCta } from "@/components/ConsultationCta";
+import { EntryGrid } from "@/components/EntryGrid";
 import { getRepository } from "@/lib/content";
 import { pageMetadata } from "@/lib/seo";
 
@@ -34,7 +35,7 @@ export default async function ArticlesPage({ searchParams }: Props) {
         <div>
           <h1 className="text-[26px] font-bold text-ink sm:text-[30px]">{query ? `「${query}」の検索結果` : "記事一覧"}</h1>
           <p className="mt-2 text-sm leading-7 text-muted">
-            {query ? `${articles.length}件の記事が見つかりました。` : "未経験からの転職について、テーマごとに記事を探せます。"}
+            {query ? `${articles.length}件の記事が見つかりました。` : `はじめての転職・未経験転職について、${articles.length}本の記事を公開しています。悩みや今の状況からも探せます。`}
           </p>
 
           <form action="/articles" method="get" role="search" className="mt-6">
@@ -66,6 +67,22 @@ export default async function ArticlesPage({ searchParams }: Props) {
         </div>
 
         <aside className="space-y-6">
+          <section aria-labelledby="concern-nav-title" className="rounded-[var(--radius-card)] border border-line bg-white p-5">
+            <p id="concern-nav-title" className="text-sm font-bold text-ink">
+              悩みから探す
+            </p>
+            <div className="mt-3">
+              <EntryGrid group="concerns" variant="chip" />
+            </div>
+          </section>
+          <section aria-labelledby="situation-nav-title" className="rounded-[var(--radius-card)] border border-line bg-white p-5">
+            <p id="situation-nav-title" className="text-sm font-bold text-ink">
+              今の状況から探す
+            </p>
+            <div className="mt-3">
+              <EntryGrid group="situations" variant="chip" />
+            </div>
+          </section>
           <nav aria-labelledby="category-nav-title" className="rounded-[var(--radius-card)] border border-line bg-white p-5">
             <p id="category-nav-title" className="text-sm font-bold text-ink">
               テーマから探す

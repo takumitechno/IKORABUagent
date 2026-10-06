@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { ArrowUpRight, CheckCircle2, MessageCircle } from "lucide-react";
-import { partner } from "@/config/partner";
+import { licenseLabel, partner } from "@/config/partner";
 import { buildConsultationUrl, type CtaPlacement } from "@/lib/consultation";
 
 type Props = {
@@ -71,7 +71,7 @@ export function ConsultationCta({ placement, contentSlug, variant = "band", head
             {heading ?? "整理した条件をもとに、キャリアアドバイザーに相談する"}
           </h2>
           <p className="mt-4 text-[15px] leading-8 text-white/80">
-            {lead ?? `${partner.brandName}のキャリアアドバイザーが、あなたの経験と希望をもとに、未経験からの選択肢を一緒に考えます。`}
+            {lead ?? "キャリアアドバイザーが、あなたの経験と希望をもとに、未経験からの選択肢を一緒に考えます。"}
           </p>
           <ul className="mt-5 space-y-2.5">
             {POINTS.map((p) => (
@@ -89,7 +89,7 @@ export function ConsultationCta({ placement, contentSlug, variant = "band", head
             相談の流れ・できることを見る
           </Link>
           <p className="mt-5 border-t border-white/10 pt-4 text-[11px] leading-5 text-white/60">
-            運営: {partner.operatorDisplay}（有料職業紹介事業許可番号 {partner.licenseNumber}）
+            運営: {partner.operatorDisplay}（有料職業紹介事業許可番号 {licenseLabel}）
           </p>
         </div>
       </div>

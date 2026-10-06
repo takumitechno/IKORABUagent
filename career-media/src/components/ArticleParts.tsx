@@ -4,12 +4,14 @@ import { partner } from "@/config/partner";
 import { site } from "@/config/site";
 import type { Article, ArticleSummary, Category } from "@/lib/content/types";
 import type { Heading } from "@/lib/markdown";
-import { CategoryChip, FeatureCard, findCategory } from "./ArticleCards";
+import { CategoryChip, FeatureCard, findCategory, TagChips } from "./ArticleCards";
+import { Eyecatch } from "./Eyecatch";
 import { formatDate } from "./DateMeta";
 
 export function ArticleHeader({ article, categories, readingMinutes }: { article: Article; categories: Category[]; readingMinutes: number }) {
   return (
     <header>
+      <Eyecatch article={article} category={findCategory(categories, article.categories[0])} size="banner" className="-mx-5 -mt-7 mb-6 rounded-b-none rounded-t-[20px] sm:-mx-10 sm:-mt-10 sm:mb-8" />
       <div className="flex flex-wrap gap-2">
         {article.categories.map((slug) => (
           <Link key={slug} href={slug === "news" ? "/news" : `/categories/${slug}`}>
@@ -51,6 +53,9 @@ export function ArticleHeader({ article, categories, readingMinutes }: { article
           <dd>約{readingMinutes}分</dd>
         </div>
       </dl>
+      <div className="mt-4">
+        <TagChips article={article} />
+      </div>
       <div className="mt-6 rounded-[var(--radius-card)] border border-brand/20 bg-brand-tint p-5">
         <p className="text-xs font-bold tracking-wider text-brand-strong">この記事でわかること</p>
         <p className="mt-2 text-[15px] leading-8 text-body">{article.summary}</p>

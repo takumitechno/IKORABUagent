@@ -49,6 +49,27 @@ research_notes:                       # 公開ページには出ない（DB で�
 `announced_by` / `announced_at` / `what_happened` / `who_is_affected` /
 `impact_for_career_changers` / `unknowns`（この情報だけでは分からないこと）/ `what_to_check`。
 
+## 入口タグ・アイキャッチ・おすすめ（frontmatter に追加）
+
+```yaml
+roles: [jimu]                       # 職種から探す（src/lib/taxonomy.ts の ROLES）
+concerns: [office, mikeiken-shokushu]   # 悩みから探す（CONCERNS）
+situations: [sekkyaku, pc-mikeiken]     # 今の状況から探す（SITUATIONS）
+eyecatch: ["PCが苦手でも、", "事務職って目指せる？"]  # カードに大きく出す1〜2行。1行12文字前後まで
+recommended: false                  # 編集部おすすめ（編集長が決める。Writer は false のまま）
+```
+
+- タグは記事の中身が本当に役立つ入口にだけ付ける（1グループ0〜3個）。悩みか状況のどちらかは必ず付ける
+- eyecatch は読者が「自分のことだ」と思える短い言葉。煽らない、数字を誇張しない
+- 語彙は `src/lib/taxonomy.ts` にあるものだけ（C16 で検査）
+
+## 読者像と言葉づかい
+
+`docs/PERSONA.md` を読む。要点:
+- 表向きは「はじめての転職・未経験転職で迷っている20代」。年収や属性で読者をラベリングしない（C17）
+- 見出しは読者の言葉（「何から始める？」「未経験でも大丈夫？」「給料は下がる？」）
+- 業界用語（市場価値、キャリア戦略、人的資本、ポータブルスキル）は使わない（C17）
+
 ## 文体ルール
 
 - 読者は未経験から転職を考える20代。専門用語は言い換えるか、初出で説明する

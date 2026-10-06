@@ -8,20 +8,33 @@
 @theme {
   --color-brand: #0f7b6c;
   --color-brand-strong: #0b5f54;
-  --color-brand-soft: #e6f3f0;
-  --color-brand-tint: #f2f8f6;
+  --color-brand-soft: #e3f3ec;
+  --color-brand-tint: #f0f8f4;
   --color-accent: #bf5208;
   --color-accent-strong: #a24506;
-  --color-accent-soft: #fdf1e7;
+  --color-accent-soft: #fdf0e4;
   --color-accent-bright: #f28c28;
   --color-ink: #142b3e;
   --color-body: #2a3846;
   --color-muted: #5b6b7a;
-  --color-line: #e3e7ea;
-  --color-line-strong: #cfd6dc;
-  --color-canvas: #f7f8f5;
+  --color-line: #e6e3dc;
+  --color-line-strong: #d3cfc6;
+  --color-canvas: #faf8f4;
   --color-surface: #ffffff;
-  --color-marker: #ffe8a3;
+  --color-marker: #ffe7a0;
+  /* アイキャッチ・入口タイルの柔らかい面（各トーンの文字色は WCAG AA を満たすものだけ） */
+  --color-mint: #e3f3ec;
+  --color-mint-ink: #0b5f54;
+  --color-sky: #e6f0fb;
+  --color-sky-ink: #1f4f7d;
+  --color-sand: #fbf0e1;
+  --color-sand-ink: #8a4a0c;
+  --color-coral: #fde9e4;
+  --color-coral-ink: #9c3a1e;
+  --color-lime: #ebf5df;
+  --color-lime-ink: #3c5f14;
+  --color-mist: #eef1f3;
+  --color-mist-ink: #33475a;
 
   --font-sans: var(--font-noto-sans-jp), "Hiragino Kaku Gothic ProN", "Hiragino Sans", "Yu Gothic", "Meiryo", system-ui, sans-serif;
 

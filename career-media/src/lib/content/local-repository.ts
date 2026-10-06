@@ -1,7 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { isPubliclyVisible, parseArticleFile } from "./parse";
-import { scoreMatch, sortByNewest, toSummary, type ContentRepository } from "./repository";
+import { applyListOptions, scoreMatch, sortByNewest, toSummary, type ContentRepository } from "./repository";
 import type { Article, Category } from "./types";
 
 const CONTENT_DIR = path.join(process.cwd(), "content");
@@ -49,12 +49,8 @@ export class LocalContentRepository implements ContentRepository {
   }
 
   async listArticles(options: Parameters<ContentRepository["listArticles"]>[0] = {}) {
-    let items = this.published();
-    if (options.kind) items = items.filter((a) => a.kind === options.kind);
-    if (options.category) items = items.filter((a) => a.categories.includes(options.category!));
-    if (options.featured) items = items.filter((a) => a.featured);
-    if (options.limit) items = items.slice(0, options.limit);
-    return items.map(toSummary);
+    const items = this.published();
+    return applyListOptions(items, options).map(toSummary);
   }
 
   async getArticle(slug: string) {

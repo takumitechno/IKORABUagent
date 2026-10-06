@@ -48,8 +48,8 @@ export function articlePath(article: Pick<Article, "kind" | "slug">): string {
 const organization = () => ({
   "@type": "Organization",
   "@id": `${site.url}/#organization`,
-  name: partner.partnerName,
-  url: partner.corporateUrl,
+  name: partner.profile === "neutral" ? partner.mediaName : partner.partnerName,
+  url: partner.corporateUrl ?? site.url,
 });
 
 export function organizationJsonLd() {

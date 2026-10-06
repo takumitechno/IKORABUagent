@@ -1,9 +1,14 @@
-# 未経験転職ノート by MakeCareer — オウンドメディア MVP
+# はじめて転職ガイド — 未経験転職オウンドメディア MVP
 
 > **提案用・非公開。** 正式な提携・ブランド利用許諾の前に、本番環境で公開しないでください。
 > `partner.brandUsageApproved` が `false` の間は、`robots.txt` が全ページのクロールを拒否し、全ページに `noindex` が付き、画面上部に「提案用プレビュー」バーが表示されます。
 
-未経験転職を考える20代が、仕事と経験と希望条件を整理し、必要なら人材紹介会社（MakeCareer）へ相談できる情報メディアの MVP です。
+はじめての転職・未経験転職で迷っている20代が、仕事・給料・休み・経験の活かし方を整理し、必要なら人材紹介会社へ相談できる情報メディアの MVP です。
+
+**ブランド表示**: 既定は実在企業名・ロゴ・許可番号を出さない中立ブランド「はじめて転職ガイド」（`src/config/partner.ts` の `neutral`）。
+正式な提携・ブランド利用の許諾後は `PARTNER_PROFILE=makecareer`（または `partner.ts` の既定を変更）で、メディア名・運営会社・許可番号・相談先 LP が1か所で切り替わります。
+中立ブランドでは相談ボタンは移動せず、「本番ではここから申込ページへ移動します」と設置場所（utm_content）を表示します。
+読者像（内部用）は `docs/PERSONA.md`。
 
 ```
 SNS / SEO 流入 → 記事・ニュース解説 → 職種比較・条件整理チェック → 相談意欲 → 相談 LP（partner config）
@@ -43,31 +48,33 @@ cd career-media && bash scripts/start-local.sh
 | `npm run db:verify` | 使い捨てのローカル Postgres に migration + seed を流し、RLS・列権限・公開ガード・検索を検証 |
 | `npm run screenshots` | 起動中のサーバーの主要画面をデスクトップ・スマホで撮影し、コンソールエラーと横スクロールを検出 |
 
-## デモ版（架空表記）のアーティファクト
+## アーティファクト（claude.ai で見る版）
 
-実在企業の名義のページは claude.ai のアーティファクトとして公開できないため、社名・許可番号・相談先を
-架空のサンプルに置き換えた `PARTNER_PROFILE=demo` で画面を取り込み、1枚の HTML にしたものを共有用に使う。
+中立ブランド（既定）で画面を取り込み、1枚の HTML にしたものを共有用に使う。実在企業の名義（`PARTNER_PROFILE=makecareer`）では作れない。
 
 ```bash
-PARTNER_PROFILE=demo NEXT_DIST_DIR=.next-demo npx next build
-PARTNER_PROFILE=demo NEXT_DIST_DIR=.next-demo npx next start -p 3200 -H 127.0.0.1 &
-PARTNER_PROFILE=demo npx tsx scripts/artifact/build-artifact.ts --base http://127.0.0.1:3200 --out <出力先>.html
+NEXT_DIST_DIR=.next-demo npx next build
+NEXT_DIST_DIR=.next-demo npx next start -p 3200 -H 127.0.0.1 &
+npx tsx scripts/artifact/build-artifact.ts --base http://127.0.0.1:3200 --out <出力先>.html
 ```
 
 画面遷移・検索・スマホメニューは `scripts/artifact/runtime.js`、条件整理チェックは本番と同じ React コンポーネントを
 esbuild でバンドルして動かす。相談ボタンは押すと「デモのため移動しない」旨と設置場所（utm_content）を表示する。
-スクリプトは demo 以外のプロファイルや実在企業の表記を含むページでは失敗する。
+スクリプトは中立ブランド以外のプロファイルや、実在企業の表記を含むページでは失敗する。
 
 ## 画面とルート
 
 | URL | 内容 |
 |---|---|
-| `/` | トップ（ヒーロー、使い方、信頼表示、カテゴリ、おすすめ・新着、ニュース、職種比較、条件整理チェック、相談 CTA） |
+| `/` | トップ（ヒーロー＋悩みの吹き出し、状況・悩み・職種の入口、まず読んでほしい記事、新着、編集部のおすすめ、ニュース、仕事ガイド、条件整理チェック、相談 CTA） |
+| `/situations`, `/situations/[slug]` | 今の状況から探す（フリーター・派遣・接客経験・第二新卒など8つ） |
+| `/concerns`, `/concerns/[slug]` | 悩みから探す（給料・土日休み・正社員・面接など8つ） |
+| `/jobs/[slug]` | 職種から探す（営業・事務・カスタマーサポート・ITサポート・人事・販売・その他） |
 | `/articles` | 記事一覧・検索（`?q=`、タイトル > 要約 > 本文の重み付き AND 検索） |
 | `/articles/[slug]` | 記事詳細（目次、要約、更新日・情報確認日、本文中 CTA、FAQ、出典、確認情報、関連記事、スマホ追従 CTA） |
 | `/categories/[slug]` | カテゴリ別一覧（7カテゴリ） |
 | `/news`, `/news/[slug]` | 転職ニュース解説ハブ（何が発表されたか／誰に関係するか／何が変わるか／分からないこと／確認すること） |
-| `/jobs` | 職種比較（法人営業・カスタマーサポート・ITサポート・一般/営業事務） |
+| `/jobs` | 職種から探す＋職種比較（法人営業・カスタマーサポート・ITサポート・一般/営業事務） |
 | `/check` | 未経験転職 条件整理チェック（13問・ルールベース・回答は送信しない） |
 | `/consultation` | キャリア相談について（メディアと相談の役割分担、流れ、FAQ） |
 | `/about`, `/editorial-policy`, `/disclosure` | 運営者情報・編集方針・広告/提携表記 |

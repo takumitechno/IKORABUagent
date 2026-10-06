@@ -22,6 +22,11 @@ function article(overrides: Partial<Article> = {}): Article {
     reviewedBy: null,
     informationCheckedAt: "2026-10-01",
     related: [],
+    roles: ["jimu"],
+    concerns: ["office"],
+    situations: ["sekkyaku"],
+    eyecatch: ["テスト記事の", "見出し"],
+    recommended: false,
     faq: [],
     sources: [
       { title: "出典A", publisher: "厚生労働省", url: "https://www.mhlw.go.jp/a", accessedAt: "2026-10-01", usedFor: "A" },
@@ -70,6 +75,15 @@ describe("reviewer checks (ported from ZIP check_article)", () => {
   it("C12: news must explain unknowns and what to check", () => {
     const news = article({ kind: "news", categories: ["news"], news: { announcedBy: "厚生労働省", announcedAt: "2025-04-01", whatHappened: "a", whoIsAffected: "b", impactForCareerChangers: "c", unknowns: [], whatToCheck: [] } });
     expect(codes(news)).toContain("error:C12");
+  });
+
+  it("C16/C17: rejects unknown entry tags, over-long eyecatch and income labeling", () => {
+    expect(codes(article({ concerns: ["unknown-concern"] }))).toContain("error:C16");
+    expect(codes(article({ eyecatch: ["1行目", "2行目", "3行目"] }))).toContain("error:C16");
+    expect(codes(article({ body: article().body + "\n年収350万円以下の人向けの記事です。" }))).toContain("error:C17");
+    expect(codes(article({ body: article().body + "\nあなたの市場価値を上げよう。" }))).toContain("warning:C17");
+    expect(codes(article({ body: article().body + "\n[入口](/concerns/donichi) [職種](/jobs/jimu)" })).filter((c) => c === "error:C05")).toEqual([]);
+    expect(codes(article({ body: article().body + "\n[入口](/concerns/nope)" }))).toContain("error:C05");
   });
 
   it("extracts markdown links", () => {

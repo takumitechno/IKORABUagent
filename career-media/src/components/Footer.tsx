@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { partner } from "@/config/partner";
+import { licenseLabel, partner } from "@/config/partner";
 import { site } from "@/config/site";
 import { Logo } from "./Logo";
 
@@ -8,9 +8,9 @@ const FOOTER_GROUPS = [
     title: "記事を探す",
     links: [
       { href: "/articles", label: "記事一覧" },
-      { href: "/categories/mikeiken", label: "未経験転職" },
-      { href: "/categories/shokushu", label: "職種を知る" },
-      { href: "/categories/keiken", label: "経験の活かし方" },
+      { href: "/concerns", label: "悩みから探す" },
+      { href: "/situations", label: "今の状況から探す" },
+      { href: "/jobs", label: "職種から探す" },
       { href: "/news", label: "転職ニュース・市場情報" },
     ],
   },
@@ -49,7 +49,7 @@ export function Footer() {
               </div>
               <div className="flex gap-2">
                 <dt className="shrink-0 font-medium text-body">有料職業紹介事業許可番号</dt>
-                <dd>{partner.licenseNumber}</dd>
+                <dd>{licenseLabel}</dd>
               </div>
             </dl>
           </div>
@@ -71,7 +71,7 @@ export function Footer() {
           </div>
         </div>
         <p className="mt-10 border-t border-line pt-6 text-xs leading-6 text-muted">{partner.disclosure}</p>
-        <p className="mt-3 text-xs text-muted">© {new Date().getFullYear()} {partner.partnerName}</p>
+        <p className="mt-3 text-xs text-muted">© {new Date().getFullYear()} {partner.brandName}</p>
       </div>
     </footer>
   );

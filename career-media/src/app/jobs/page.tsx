@@ -2,6 +2,7 @@ import Link from "next/link";
 import { CheckCircle2, ClipboardList, HelpCircle, Info, MessageSquareText, Search } from "lucide-react";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { ConsultationCta } from "@/components/ConsultationCta";
+import { EntryGrid } from "@/components/EntryGrid";
 import { JsonLd } from "@/components/JsonLd";
 import { LevelMeter } from "@/components/LevelMeter";
 import { getRepository } from "@/lib/content";
@@ -78,6 +79,7 @@ const AXES = [
 
 export default async function JobsPage() {
   const articles = await getRepository().listArticles({ kind: "article" });
+  const roleCounts = Object.fromEntries(["eigyo", "jimu", "customer-support", "it-support", "jinji", "hanbai", "sonota"].map((slug) => [slug, articles.filter((a) => a.roles.includes(slug)).length]));
   const titleOf = (slug: string) => articles.find((a) => a.slug === slug)?.title;
 
   const itemList = {
@@ -92,8 +94,8 @@ export default async function JobsPage() {
       <JsonLd data={itemList} />
       <Breadcrumbs items={[{ name: "ホーム", path: "/" }, { name: "職種を比べる", path: "/jobs" }]} />
       <header className="mt-6 max-w-3xl">
-        <p className="text-[11px] font-bold tracking-[0.2em] text-brand">COMPARE JOBS</p>
-        <h1 className="mt-1 text-[26px] font-bold leading-snug text-ink sm:text-[30px]">未経験から目指せる職種を比べる</h1>
+        <p className="text-[11px] font-bold tracking-[0.2em] text-brand">JOB GUIDE</p>
+        <h1 className="mt-1 text-[26px] font-bold leading-snug text-ink sm:text-[30px]">職種から探す・比べる</h1>
         <p className="mt-3 text-[15px] leading-8 text-body">
           未経験歓迎の求人でよく見かける4つの職種を、仕事内容・人と話す量・パソコン作業・数字の目標などで比べられるページです。求人の紹介ではなく、職種の違いを知って「何を確認すればいいか」を考えるための材料としてお使いください。
         </p>
@@ -103,7 +105,17 @@ export default async function JobsPage() {
         </p>
       </header>
 
-      <nav aria-label="職種へ移動" className="mt-6 flex gap-2 overflow-x-auto pb-2">
+      <section aria-labelledby="jobs-by-role" className="mt-8">
+        <h2 id="jobs-by-role" className="text-lg font-bold text-ink">
+          職種から記事を探す
+        </h2>
+        <div className="mt-3">
+          <EntryGrid group="roles" counts={roleCounts} />
+        </div>
+      </section>
+
+      <h2 className="mt-12 text-lg font-bold text-ink">4つの職種を比べる</h2>
+      <nav aria-label="職種へ移動" className="mt-3 flex gap-2 overflow-x-auto pb-2">
         {JOB_ROLES.map((r) => (
           <a key={r.slug} href={`#${r.slug}`} className="shrink-0 rounded-full bg-white px-4 py-2 text-[13px] font-bold text-ink ring-1 ring-line hover:text-brand-strong hover:ring-brand/40">
             {r.name}

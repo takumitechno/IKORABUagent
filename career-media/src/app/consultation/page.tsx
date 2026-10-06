@@ -3,12 +3,12 @@ import { BookOpen, ClipboardList, MessagesSquare } from "lucide-react";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { ConsultButton, ConsultationCta } from "@/components/ConsultationCta";
 import { JsonLd } from "@/components/JsonLd";
-import { partner } from "@/config/partner";
+import { licenseLabel, partner } from "@/config/partner";
 import { faqJsonLd, pageMetadata } from "@/lib/seo";
 
 export const metadata = pageMetadata({
   title: "キャリア相談について",
-  description: `${partner.brandName}のキャリアアドバイザーに、未経験からの転職について相談できます。相談でできること、相談の流れ、よくある質問をまとめています。`,
+  description: `キャリアアドバイザーに、未経験からの転職について相談できます。相談でできること、相談の流れ、よくある質問をまとめています。`,
   path: "/consultation",
 });
 
@@ -36,7 +36,7 @@ export default function ConsultationPage() {
             <p className="text-[11px] font-bold tracking-[0.2em] text-brand">CAREER CONSULTATION</p>
             <h1 className="mt-1 text-[26px] font-bold leading-snug text-ink sm:text-[32px]">キャリア相談について</h1>
             <p className="mt-4 text-[15px] leading-8 text-body">
-              当メディアを運営する{partner.partnerName}では、キャリアアドバイザーによる転職の相談を受け付けています。記事や条件整理チェックで整理したことをもとに、具体的な求人や転職の進め方を相談できます。
+              当メディアの運営会社では、キャリアアドバイザーによる転職の相談を受け付けています。記事や条件整理チェックで整理したことをもとに、具体的な求人や転職の進め方を相談できます。
             </p>
           </div>
           <div className="rounded-2xl bg-brand-tint p-5 ring-1 ring-brand/15">
@@ -44,7 +44,7 @@ export default function ConsultationPage() {
             <p className="mt-3 text-xs leading-5 text-muted">
               運営: {partner.operatorDisplay}
               <br />
-              有料職業紹介事業許可番号 {partner.licenseNumber}
+              有料職業紹介事業許可番号 {licenseLabel}
             </p>
           </div>
         </header>

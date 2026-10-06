@@ -2,6 +2,7 @@ import type { MetadataRoute } from "next";
 import { absoluteUrl } from "@/config/site";
 import { getRepository } from "@/lib/content";
 import { articlePath } from "@/lib/seo";
+import { TAXONOMY, taxonomyPath, type TaxonomyGroup } from "@/lib/taxonomy";
 
 export const revalidate = 600;
 
@@ -15,6 +16,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: absoluteUrl("/articles"), lastModified: latest, changeFrequency: "daily", priority: 0.8 },
     { url: absoluteUrl("/news"), lastModified: latest, changeFrequency: "weekly", priority: 0.7 },
     { url: absoluteUrl("/jobs"), changeFrequency: "monthly", priority: 0.8 },
+    { url: absoluteUrl("/concerns"), lastModified: latest, changeFrequency: "weekly", priority: 0.7 },
+    { url: absoluteUrl("/situations"), lastModified: latest, changeFrequency: "weekly", priority: 0.7 },
     { url: absoluteUrl("/check"), changeFrequency: "monthly", priority: 0.8 },
     { url: absoluteUrl("/consultation"), changeFrequency: "monthly", priority: 0.6 },
     { url: absoluteUrl("/about"), changeFrequency: "yearly", priority: 0.3 },
@@ -34,5 +37,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: a.kind === "news" ? 0.6 : 0.7,
   }));
 
-  return [...staticPages, ...categoryPages, ...articlePages];
+  // 入口ページ（職種 / 悩み / 今の状況）。記事が1本もない入口は載せない
+  const hubPages: MetadataRoute.Sitemap = (["roles", "concerns", "situations"] as TaxonomyGroup[]).flatMap((group) =>
+    TAXONOMY[group]
+      .filter((t) => articles.some((a) => a[group].includes(t.slug)))
+      .map((t) => ({ url: absoluteUrl(taxonomyPath(group, t.slug)), lastModified: latest, changeFrequency: "weekly" as const, priority: 0.6 })),
+  );
+
+  return [...staticPages, ...categoryPages, ...hubPages, ...articlePages];
 }

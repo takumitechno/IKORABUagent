@@ -1,16 +1,19 @@
 import { partner } from "./partner";
 
 /**
- * メディア自体の設定。ブランド色は src/app/globals.css の :root トークンが正本。
+ * メディア自体の設定。名前は partner config（ブランドの正本）から作る。
+ * ブランド色は src/app/globals.css の :root トークンが正本。
  * TODO(正式公開前にMakeCareer確認が必要): メディア名・ロゴ・ブランドカラーの確定
  */
+const sameBrand = partner.brandName === partner.mediaName;
+
 export const site = {
-  name: "未経験転職ノート",
+  name: partner.mediaName,
   /** ロゴ横・title などで使うフル表記 */
-  fullName: `未経験転職ノート by ${partner.brandName}`,
-  tagline: "調べて、比べて、整理して。未経験からの転職を、自分のペースで。",
+  fullName: sameBrand ? partner.mediaName : `${partner.mediaName} by ${partner.brandName}`,
+  tagline: partner.mediaTagline,
   description:
-    "未経験からの転職を考える20代のための情報メディア。仕事の種類や働き方の違い、経験の活かし方を調べ、希望条件を整理し、必要ならキャリアアドバイザーに相談できます。",
+    "はじめての転職・未経験転職で迷っている20代のための仕事選びメディア。仕事の種類、給料や休みの見方、経験の活かし方を、むずかしい言葉なしで一つずつ整理できます。",
   url: (process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000").replace(/\/$/, ""),
   locale: "ja_JP",
   /**
@@ -20,7 +23,7 @@ export const site = {
   indexable: process.env.SITE_INDEXABLE === "true" && partner.brandUsageApproved,
   /** 提案用プレビューであることを画面上部に表示する */
   showPreviewBanner: !partner.brandUsageApproved,
-  editorialTeam: `${partner.brandName} 編集部`,
+  editorialTeam: sameBrand ? `${partner.mediaName}編集部` : `${partner.brandName} 編集部`,
 } as const;
 
 export function absoluteUrl(path = "/"): string {
