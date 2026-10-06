@@ -1,0 +1,210 @@
+@import "tailwindcss";
+
+/*
+ * デザイントークン（ブランド色の正本）
+ * TODO(正式公開前にMakeCareer確認が必要): ブランドガイド受領後、--brand / --accent を差し替える
+ * 本文テキストと CTA は WCAG AA (4.5:1) 以上のコントラストで選定している。
+ */
+@theme {
+  --color-brand: #0f7b6c;
+  --color-brand-strong: #0b5f54;
+  --color-brand-soft: #e6f3f0;
+  --color-brand-tint: #f2f8f6;
+  --color-accent: #bf5208;
+  --color-accent-strong: #a24506;
+  --color-accent-soft: #fdf1e7;
+  --color-accent-bright: #f28c28;
+  --color-ink: #142b3e;
+  --color-body: #2a3846;
+  --color-muted: #5b6b7a;
+  --color-line: #e3e7ea;
+  --color-line-strong: #cfd6dc;
+  --color-canvas: #f7f8f5;
+  --color-surface: #ffffff;
+  --color-marker: #ffe8a3;
+
+  --font-sans: var(--font-noto-sans-jp), "Hiragino Kaku Gothic ProN", "Hiragino Sans", "Yu Gothic", "Meiryo", system-ui, sans-serif;
+
+  --radius-card: 14px;
+  --shadow-card: 0 1px 2px rgb(20 43 62 / 0.06), 0 1px 1px rgb(20 43 62 / 0.04);
+  --shadow-raised: 0 8px 24px -12px rgb(20 43 62 / 0.25);
+}
+
+:root {
+  color-scheme: light;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  scroll-behavior: smooth;
+  scroll-padding-top: 88px;
+}
+
+body {
+  background: var(--color-canvas);
+  color: var(--color-body);
+  font-family: var(--font-sans);
+  font-feature-settings: "palt" 1;
+  letter-spacing: 0.02em;
+  line-height: 1.75;
+  text-rendering: optimizeLegibility;
+  /* 日本語の短いUIテキストを文節で改行し、1文字だけの行を防ぐ（対応ブラウザのみ） */
+  word-break: auto-phrase;
+}
+
+:focus-visible {
+  outline: 3px solid var(--color-accent-bright);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* ---------------------------------------------------------------------------
+ * 記事本文
+ * ------------------------------------------------------------------------- */
+.article-body {
+  word-break: normal;
+  font-size: 1.0625rem;
+  line-height: 2;
+  color: var(--color-body);
+  font-feature-settings: normal;
+}
+.article-body > * + * {
+  margin-top: 1.4em;
+}
+.article-body h2 {
+  margin-top: 2.6em;
+  padding: 0.55em 0 0.55em 0.9em;
+  border-left: 5px solid var(--color-brand);
+  background: var(--color-brand-tint);
+  border-radius: 0 10px 10px 0;
+  font-size: 1.32rem;
+  line-height: 1.5;
+  font-weight: 700;
+  color: var(--color-ink);
+  letter-spacing: 0.03em;
+}
+.article-body h3 {
+  margin-top: 2em;
+  padding-bottom: 0.35em;
+  border-bottom: 1px solid var(--color-line);
+  font-size: 1.12rem;
+  line-height: 1.6;
+  font-weight: 700;
+  color: var(--color-ink);
+}
+.article-body h4 {
+  font-weight: 700;
+  color: var(--color-ink);
+}
+.article-body strong {
+  font-weight: 700;
+  color: var(--color-ink);
+  background: linear-gradient(transparent 62%, var(--color-marker) 62%);
+}
+.article-body a {
+  color: var(--color-brand-strong);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-thickness: 1px;
+}
+.article-body a:hover {
+  color: var(--color-accent-strong);
+}
+.article-body ul,
+.article-body ol {
+  padding-left: 1.4em;
+}
+.article-body ul {
+  list-style: none;
+  padding-left: 0;
+}
+.article-body ul > li {
+  position: relative;
+  padding-left: 1.3em;
+}
+.article-body ul > li::before {
+  content: "";
+  position: absolute;
+  left: 0.2em;
+  top: 0.85em;
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  background: var(--color-brand);
+}
+.article-body ol {
+  list-style: decimal;
+}
+.article-body ol > li::marker {
+  color: var(--color-brand-strong);
+  font-weight: 700;
+}
+.article-body li + li {
+  margin-top: 0.45em;
+}
+.article-body blockquote {
+  padding: 1em 1.2em;
+  border-radius: 12px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-line);
+  box-shadow: var(--shadow-card);
+  font-size: 0.98rem;
+  line-height: 1.95;
+}
+.article-body blockquote > * + * {
+  margin-top: 0.8em;
+}
+.article-body .table-wrap {
+  overflow-x: auto;
+  border: 1px solid var(--color-line);
+  border-radius: 12px;
+  background: var(--color-surface);
+  -webkit-overflow-scrolling: touch;
+}
+.article-body table {
+  width: 100%;
+  min-width: 520px;
+  border-collapse: collapse;
+  font-size: 0.93rem;
+  line-height: 1.7;
+}
+.article-body thead th {
+  background: var(--color-brand-soft);
+  color: var(--color-ink);
+  font-weight: 700;
+  text-align: left;
+}
+.article-body th,
+.article-body td {
+  padding: 0.7em 0.9em;
+  border-bottom: 1px solid var(--color-line);
+  vertical-align: top;
+}
+.article-body tbody th {
+  font-weight: 700;
+  color: var(--color-ink);
+  text-align: left;
+  white-space: nowrap;
+}
+.article-body tbody tr:last-child th,
+.article-body tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+/* 横スクロールの比較表で、先頭列を固定する */
+.sticky-col {
+  position: sticky;
+  left: 0;
+  z-index: 1;
+}
+
+@media print {
+  header,
+  footer,
+  .no-print {
+    display: none !important;
+  }
+  body {
+    background: #fff;
+  }
+}

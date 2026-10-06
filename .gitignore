@@ -6,3 +6,8 @@ node_modules/
 .runtime/
 .claude/db/agents-demo.db
 .claude/db/agents.db
+
+# secrets（.env.example 以外は commit しない）
+.env
+.env.*
+!.env.example

@@ -1,0 +1,9 @@
+[
+  { "slug": "mikeiken", "name": "未経験転職", "description": "未経験から正社員・新しい職種に挑戦するときの、最初の一歩と全体像。", "icon": "compass", "sort_order": 1 },
+  { "slug": "shokushu", "name": "職種を知る", "description": "仕事内容・向き不向き・入社後の働き方など、職種ごとの違いを知る。", "icon": "briefcase", "sort_order": 2 },
+  { "slug": "keiken", "name": "経験の活かし方", "description": "アルバイト・接客・前職など、これまでの経験を転職で言葉にする。", "icon": "sparkles", "sort_order": 3 },
+  { "slug": "shorui-mensetsu", "name": "面接・書類", "description": "履歴書・職務経歴書・面接で、伝え方に迷ったときに。", "icon": "file-text", "sort_order": 4 },
+  { "slug": "hatarakikata", "name": "年収・働き方", "description": "給与・休日・勤務時間など、条件の見方と比べ方。", "icon": "wallet", "sort_order": 5 },
+  { "slug": "junbi", "name": "転職準備", "description": "面談・応募の前に整理しておくこと、確認しておくこと。", "icon": "list-checks", "sort_order": 6 },
+  { "slug": "news", "name": "転職ニュース・市場情報", "description": "制度変更や市場の動きを、未経験転職者の目線で読み解く。", "icon": "newspaper", "sort_order": 7 }
+]

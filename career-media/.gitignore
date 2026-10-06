@@ -1,0 +1,15 @@
+# deps / build
+node_modules/
+.next/
+out/
+*.tsbuildinfo
+next-env.d.ts
+
+# secrets — 絶対にcommitしない
+.env
+.env.*
+!.env.example
+
+# local runtime (pipeline logs, local postgres, screenshots)
+.runtime/
+screenshots/

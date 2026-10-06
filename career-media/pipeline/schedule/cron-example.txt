@@ -1,0 +1,15 @@
+未経験転職メディア 記事パイプライン — cron 設定例（Linux）
+
+  crontab -e で以下を追加（パスは実環境に合わせる）。
+  編集長は draft → review（査読まで）を進めるだけで、公開はしない。公開は人間が
+  `npm run pipeline -- publish <slug> --approved-by <name>` で行う。
+
+# 毎日 9時5分に1回（記事メディアは高頻度で回す必要がない）
+5 9 * * * cd /path/to/career-media && /bin/bash pipeline/scripts/run-agent.sh career-orchestrator >> .runtime/logs/cron.log 2>&1
+
+# 毎週月曜 8時に、出典 URL の到達性と情報確認日の鮮度をチェック（エージェント不要・決定的な処理）
+0 8 * * 1 cd /path/to/career-media && npm run -s pipeline -- check --check-urls >> .runtime/logs/weekly-check.log 2>&1
+
+注意:
+  - cron は環境変数を引き継がないので、PATH に node / claude を含める
+  - .env.local は .gitignore 済み。agent に渡るのは JINA_API_KEY / DISCORD_WEBHOOK_URL だけ

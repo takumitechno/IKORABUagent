@@ -88,3 +88,9 @@ runtime demoのscheduleは画面確認用で、Windows launcherから自動実�
 
 詳細は [`docs/current-architecture-and-operations.md`](docs/current-architecture-and-operations.md)
 を参照してください。
+
+## career-media（未経験転職オウンドメディア MVP）
+
+`career-media/` は、未経験転職者向けオウンドメディアの提案用 MVP です（Next.js + Supabase schema +
+記事パイプライン）。=LOVE Agent OS とは独立して起動します。**正式な提携・ブランド利用許諾前のため非公開**です。
+起動方法・構成は [`career-media/README.md`](career-media/README.md) を参照してください。

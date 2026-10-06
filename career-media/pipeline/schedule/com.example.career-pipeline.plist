@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  未経験転職メディア 記事パイプライン（macOS launchd 例）
+  <YOUR_PROJECT_PATH> を career-media の絶対パスに置き換えて ~/Library/LaunchAgents/ に置く。
+  このファイルをリポジトリに置くだけでは OS に登録されない。
+-->
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>com.example.career-pipeline</string>
+  <key>ProgramArguments</key>
+  <array>
+    <string>/bin/bash</string>
+    <string>-c</string>
+    <string>cd &lt;YOUR_PROJECT_PATH&gt; &amp;&amp; bash pipeline/scripts/run-agent.sh career-orchestrator</string>
+  </array>
+  <key>StartCalendarInterval</key>
+  <dict>
+    <key>Hour</key>
+    <integer>9</integer>
+    <key>Minute</key>
+    <integer>5</integer>
+  </dict>
+  <key>RunAtLoad</key>
+  <false/>
+  <key>StandardOutPath</key>
+  <string>/tmp/career-pipeline.stdout.log</string>
+  <key>StandardErrorPath</key>
+  <string>/tmp/career-pipeline.stderr.log</string>
+  <key>EnvironmentVariables</key>
+  <dict>
+    <key>PATH</key>
+    <string>/usr/local/bin:/opt/homebrew/bin:/usr/bin:/bin</string>
+  </dict>
+</dict>
+</plist>

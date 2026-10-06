@@ -1,0 +1,70 @@
+---
+name: career-article-writer
+description: 未経験転職メディアの記事執筆手順。frontmatter 仕様、research_notes / sources の記録、文体ルール、禁止表現、自己チェック。career-writer 専用。
+user-invocable: false
+---
+
+# 記事執筆手順（Writer）
+
+## 実行フロー
+
+1. 対象を決める（編集長から渡された content brief、または `status: draft` の記事）
+2. 調査: 公的機関・業界団体・企業の公式情報など一次情報を開き、使った情報をすぐ `sources` に記録
+3. 執筆: `content/articles/<slug>.md`（ニュース解説は `content/news/<slug>.md`）
+4. 自己チェック: `npm run pipeline -- check --slug <slug>` でエラー0件にする
+5. `status: review` に変更して編集長に返す（published にはしない）
+
+## frontmatter
+
+```yaml
+slug: example-slug            # 英小文字・数字・ハイフン
+kind: article                 # article | news
+title: 32〜40文字程度。結論や読者の問いが分かる題名
+summary: この記事でわかること（40〜200文字）
+status: draft                 # draft → review（Writer はここまで）
+categories: [mikeiken, junbi] # 先頭が主カテゴリ。content/categories.json の slug
+featured: false
+updated_at: 2026-10-06
+information_checked_at: 2026-10-06   # 出典を確認した日
+related: [other-slug]                # 公開済みの記事だけ
+faq:                                  # 画面に表示し、FAQ JSON-LD にもなる
+  - q: 質問
+    a: 回答
+sources:
+  - title: 出典の題名
+    publisher: 発行元
+    url: https://...
+    accessed_at: 2026-10-06
+    used_for: 本文のどの記述に使ったか
+research_notes:                       # 公開ページには出ない（DB でも非公開列）
+  schema_version: 2
+  writer_agent: career-writer
+  quotes:
+    - source_url: https://...
+      text: 本文の根拠にした箇所の要約・短い引用
+      used_in: 本文の該当見出し
+```
+
+ニュース解説（kind: news）は、全文転載せずに次の構造で書く（`news:` に入れる）:
+`announced_by` / `announced_at` / `what_happened` / `who_is_affected` /
+`impact_for_career_changers` / `unknowns`（この情報だけでは分からないこと）/ `what_to_check`。
+
+## 文体ルール
+
+- 読者は未経験から転職を考える20代。専門用語は言い換えるか、初出で説明する
+- 結論を先に、具体例（書き出し例・質問例・計算例）を必ず入れる
+- 「会社によって違うこと」は断定しない。確認のしかたを書く
+- 時期は絶対日付で書く（「来月」「最近の」ではなく「2025年4月から」）— ZIP の時制ルールを継承
+- 本文に H1（`# `）を書かない。H2 から始める
+- 生の HTML を書かない（表示時にエスケープされる）
+
+## 禁止
+
+- 成果保証: 「必ず転職できる」「確実に内定」「年収が必ず上がる」など（C07）
+- AI臭フレーズ: 「することができます」「幅広く」「いかがでしたでしょうか」など（C08）— ZIP の禁止リストを継承
+- 求人の転載、特定企業への応募のすすめ、相談先 LP の URL の直書き
+
+## ZIP 版から廃止したルール
+
+対話形式（佐藤・室谷）/ 10,000文字以上 / `<mark>` 10回以上 / 「！」10回以上 / テーブル3つ以上 /
+図解画像2枚必須 / 競合の1.5〜2倍の情報量 / 公式 URL は .go.jp 等に限る — いずれも読者価値と無関係なため。
