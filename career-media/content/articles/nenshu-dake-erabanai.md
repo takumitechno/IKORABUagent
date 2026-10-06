@@ -7,9 +7,9 @@ categories: [hatarakikata, junbi]
 featured: false
 recommended: false
 published_at: 2026-09-18
-updated_at: 2026-09-18
-reviewed_at: 2026-09-18
-information_checked_at: 2026-09-18
+updated_at: 2026-10-06
+reviewed_at: 2026-10-06
+information_checked_at: 2026-10-06
 roles: []
 concerns: [kyuryo, yametai]
 situations: [hajimete, kaisu]
@@ -33,11 +33,11 @@ sources:
     url: https://www.mhlw.go.jp/stf/newpage_32105.html
     accessed_at: 2026-10-06
     used_for: 2024年4月から明示事項に「就業場所・業務の変更の範囲」が加わったこと
-  - title: 企業から受ける労働条件明示のルールが変わります！（求職者向けリーフレット）
+  - title: 募集時等に明示すべき事項の追加（2024年4月1日施行・職業安定法施行規則の改正）
     publisher: 厚生労働省
-    url: https://www.mhlw.go.jp/content/001114167.pdf
+    url: https://www.mhlw.go.jp/content/001114110.pdf
     accessed_at: 2026-10-06
-    used_for: 募集広告や職業紹介を受ける際に明示される労働条件が追加されたこと
+    used_for: 2024年4月から、求人の募集時などに明示する労働条件に「従事すべき業務の変更の範囲」「就業場所の変更の範囲」が加わったこと
 research_notes:
   schema_version: 2
   writer_agent: career-writer
@@ -45,12 +45,12 @@ research_notes:
   quotes:
     - source_url: https://www.mhlw.go.jp/content/11600000/000498453.pdf
       text: 固定残業代制を採用する場合は、募集要項や求人票などに、固定残業代を除いた基本給の額、固定残業代に関する労働時間数と金額等の計算方法、固定残業時間を超える時間外労働等に割増賃金を追加で支払う旨の3つを明示する（若者雇用促進法に基づく指針）
-      used_in: 年収が高い理由を確かめる
+      used_in: 年収が高いのはなぜ？
     - source_url: https://www.mhlw.go.jp/stf/newpage_32105.html
       text: 2024年4月1日から、労働条件の明示事項に就業場所・業務の変更の範囲が追加された。変更の範囲は将来の配置転換などの見込みも含む
       used_in: 続けられるかは「休み・時間・仕事内容」で変わる
-    - source_url: https://www.mhlw.go.jp/content/001114167.pdf
-      text: 2024年4月から、募集広告や職業紹介を受ける際に、求人企業などから明示される労働条件が追加される（求職者向け）
+    - source_url: https://www.mhlw.go.jp/content/001114110.pdf
+      text: 2024年4月1日から、労働者の募集や求人の申込みの際に明示すべき労働条件に、従事すべき業務の変更の範囲、就業場所の変更の範囲、有期労働契約を更新する場合の基準が追加された（改正職業安定法施行規則）
       used_in: 続けられるかは「休み・時間・仕事内容」で変わる
   not_used:
     - 早期離職率や平均勤続年数などの統計値は使っていない
@@ -60,7 +60,7 @@ research_notes:
 
 ただ、年収だけで選ぶと、入社してから「こんなに残業があるとは思わなかった」「休みが少なくて続けられない」と感じて、また転職を考えることになりかねません。ここでは、年収と一緒に見ておきたいことを、**その仕事を続けられるか**という目線で整理します。
 
-## 年収が高い理由を確かめる
+## 年収が高いのはなぜ？
 
 年収が高めの求人を見つけたら、まず「なぜ高いのか」を確かめてみましょう。理由によっては、自分に合う働き方かどうかが見えてきます。考えられる理由には、たとえば次のようなものがあります。
 
@@ -80,7 +80,7 @@ research_notes:
 
 未経験で入る場合は、**研修や入社後のフォロー**も続けやすさに関わります。研修の確かめ方は[未経験求人の「研修あり」で確認すべきこと](/articles/mikeiken-kenshu-kakunin)で紹介しています。
 
-## 次の転職にも影響する
+## 次に転職するときにも関係する？
 
 年収だけで選んで短い期間で辞めることになると、次の転職活動で、辞めた理由を聞かれることがあります。理由を説明できれば心配しすぎる必要はありませんが、短い期間での転職が続くと、自分でも気になってしまうものです。経歴の整理のしかたは[転職回数が気になるときに整理したいこと](/articles/tenshoku-kaisu-kininaru)にまとめています。
 

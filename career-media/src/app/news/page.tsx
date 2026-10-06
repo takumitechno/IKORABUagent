@@ -2,7 +2,7 @@ import Link from "next/link";
 import { ArrowRight, Info } from "lucide-react";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { ConsultationCta } from "@/components/ConsultationCta";
-import { formatDate, formatDateShort } from "@/components/DateMeta";
+import { announcedLabel, formatDate, formatDateShort } from "@/components/DateMeta";
 import { Eyecatch } from "@/components/Eyecatch";
 import { getRepository } from "@/lib/content";
 import { pageMetadata } from "@/lib/seo";
@@ -49,7 +49,9 @@ export default async function NewsIndexPage() {
               <div className="flex flex-1 flex-col p-5 sm:p-6">
                 <div className="flex flex-wrap items-center gap-2 text-xs text-muted">
                   <span className="rounded-full bg-mist px-2.5 py-0.5 font-bold text-mist-ink">{n.news?.announcedBy}</span>
-                  <span>施行・発表 {formatDate(n.news?.announcedAt)}</span>
+                  <span>
+                    {announcedLabel(n.news?.announcedAt)} {formatDate(n.news?.announcedAt)}
+                  </span>
                 </div>
                 <h2 className="mt-3 text-[18px] font-bold leading-7 text-ink group-hover:text-brand-strong">{n.title}</h2>
                 <p className="mt-2 line-clamp-3 text-[13.5px] leading-6 text-muted">{n.summary}</p>

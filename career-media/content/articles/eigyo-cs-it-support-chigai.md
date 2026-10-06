@@ -4,11 +4,16 @@ title: 営業・カスタマーサポート・ITサポートの違いは？仕�
 summary: 未経験歓迎の求人で目にすることが多い「営業」「カスタマーサポート」「ITサポート」。人と話す量、パソコン作業、数字の目標という3つの軸で、仕事内容の違いと入社前に確認したいことを整理します。
 status: published
 categories: [shokushu, mikeiken]
-featured: true
+featured: false
+recommended: true
 published_at: 2026-09-02
 updated_at: 2026-10-02
 reviewed_at: 2026-10-02
 information_checked_at: 2026-10-02
+roles: [eigyo, customer-support, it-support]
+concerns: [mikeiken-shokushu, yaritai]
+situations: []
+eyecatch: ["営業・サポート・IT、", "どこが違う？"]
 related: [sekkyaku-keiken-ikasu, ai-shigoto-mikeiken, mikeiken-kenshu-kakunin]
 faq:
   - q: 人と話すのが苦手でも、営業はできますか？

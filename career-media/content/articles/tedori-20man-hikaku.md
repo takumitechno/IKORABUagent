@@ -7,9 +7,9 @@ categories: [hatarakikata]
 featured: false
 recommended: false
 published_at: 2026-10-01
-updated_at: 2026-10-01
-reviewed_at: 2026-10-01
-information_checked_at: 2026-10-01
+updated_at: 2026-10-06
+reviewed_at: 2026-10-06
+information_checked_at: 2026-10-06
 roles: []
 concerns: [kyuryo, yametai]
 situations: [hajimete]
@@ -33,26 +33,21 @@ sources:
     url: https://www.nenkin.go.jp/service/kounen/hokenryo/hoshu/20150515-01.html
     accessed_at: 2026-10-06
     used_for: 厚生年金保険料は標準報酬月額などに保険料率をかけて計算し、事業主と被保険者が半分ずつ負担すること
-  - title: 費用の負担（健康保険制度の概要）
+  - title: 保険料率（協会けんぽの都道府県ごとの保険料率）
     publisher: 全国健康保険協会（協会けんぽ）
-    url: https://www.kyoukaikenpo.or.jp/about/business/overview/001/index.html
+    url: https://www.kyoukaikenpo.or.jp/about/business/insurance_rate/001
     accessed_at: 2026-10-06
-    used_for: 健康保険料は標準報酬月額などに保険料率をかけて計算し、事業主と被保険者が折半すること。協会けんぽの保険料率は都道府県ごとに異なること
-  - title: 雇用保険料率について
-    publisher: 厚生労働省
-    url: https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/0000108634.html
+    used_for: 協会けんぽの健康保険料率は都道府県ごとに決められていること、保険料は会社と本人で折半が原則であること
+  - title: 令和8年度 雇用保険料率のご案内
+    publisher: 栃木労働局（厚生労働省）
+    url: https://jsite.mhlw.go.jp/tochigi-roudoukyoku/newpage_01657.html
     accessed_at: 2026-10-06
-    used_for: 雇用保険料に労働者負担分があり、料率は年度ごとに示されること
-  - title: 個人住民税と特別徴収について（個人住民税の特別徴収推進ステーション）
+    used_for: 雇用保険料率は年度ごとに決められ、労働者負担分と事業主負担分に分かれていること
+  - title: 個人住民税の特別徴収推進ステーション
     publisher: 東京都主税局
     url: https://www.tax.metro.tokyo.lg.jp/kazei/life/kojin_ju/tokubetsu/about
     accessed_at: 2026-10-06
-    used_for: 給与所得者の住民税は、6月から翌年5月までの毎月の給与から差し引かれる（特別徴収）こと
-  - title: 個人住民税（暮らしと税金）
-    publisher: 東京都主税局
-    url: https://www.tax.metro.tokyo.lg.jp/kazei/life/kojin_ju
-    accessed_at: 2026-10-06
-    used_for: 住民税の所得割は前年の所得をもとに計算されること
+    used_for: 個人住民税の所得割は前年の所得金額に応じて課税されること。特別徴収では6月から翌年5月までの12回に分けて給与から差し引かれること
 research_notes:
   schema_version: 2
   writer_agent: career-writer
@@ -64,17 +59,14 @@ research_notes:
     - source_url: https://www.nenkin.go.jp/service/kounen/hokenryo/hoshu/20150515-01.html
       text: 厚生年金保険料は、標準報酬月額と標準賞与額に共通の保険料率をかけて計算し、事業主と被保険者が折半して負担する
       used_in: 「額面」と「手取り」は何が違う？
-    - source_url: https://www.kyoukaikenpo.or.jp/about/business/overview/001/index.html
-      text: 保険料は事業主と被保険者が折半で負担する。保険料の額は標準報酬月額・標準賞与額に保険料率をかけた額で、一般保険料率は平成21年9月分から都道府県ごとに異なる
+    - source_url: https://www.kyoukaikenpo.or.jp/about/business/insurance_rate/001
+      text: 協会けんぽの保険料率は都道府県支部ごとの医療費水準等にもとづき都道府県ごとに決められ、保険料は労使で折半負担するのが原則
       used_in: 「額面」と「手取り」は何が違う？
-    - source_url: https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/0000108634.html
-      text: 雇用保険料率は年度ごとに示され、労働者負担と事業主負担に分かれている
+    - source_url: https://jsite.mhlw.go.jp/tochigi-roudoukyoku/newpage_01657.html
+      text: 令和8年度（2026年4月1日〜2027年3月31日）の雇用保険料率の案内。料率は年度ごとに定められ、労働者負担と事業主負担に分かれている
       used_in: 「額面」と「手取り」は何が違う？
     - source_url: https://www.tax.metro.tokyo.lg.jp/kazei/life/kojin_ju/tokubetsu/about
-      text: 特別徴収は、事業主が従業員に代わり毎月の給与から個人住民税を差し引いて納入する制度。給与所得者は6月から翌年5月までの毎月の給料から徴収される
-      used_in: 転職した年は「住民税」に気をつける
-    - source_url: https://www.tax.metro.tokyo.lg.jp/kazei/life/kojin_ju
-      text: 個人住民税の所得割は、前年の所得金額をもとに課税される
+      text: 特別徴収は、事業主が従業員に代わり毎月の給与から個人住民税を差し引いて納入する制度で、6月から翌年5月までの12回に分けて差し引く。個人住民税は前年の所得金額に応じて課税される「所得割」と定額の「均等割」からなる
       used_in: 転職した年は「住民税」に気をつける
   not_used:
     - 「手取りは額面の約8割」などの一般的な割合は根拠が人によって変わるため書かない。0.8 は読者が自分の明細で出す割合の仮の例として使用

@@ -5,10 +5,15 @@ summary: 短期間での離職や転職回数の多さが気になるときは�
 status: published
 categories: [shorui-mensetsu, keiken]
 featured: false
+recommended: false
 published_at: 2026-09-16
 updated_at: 2026-09-29
 reviewed_at: 2026-09-29
 information_checked_at: 2026-09-29
+roles: []
+concerns: [mensetsu, yametai]
+situations: [kaisu, dainishinsotsu]
+eyecatch: ["転職回数が気になる。", "どう説明する？"]
 related: [shiboudouki-mikeiken, agent-mendan-mae, sekkyaku-keiken-ikasu]
 faq:
   - q: 短期間で辞めた職歴は、履歴書に書かなくてもいいですか？

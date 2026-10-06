@@ -5,10 +5,15 @@ summary: 接客の仕事には、相手の要望を聞き取る力や、混雑�
 status: published
 categories: [keiken, shorui-mensetsu]
 featured: true
+recommended: false
 published_at: 2026-08-25
 updated_at: 2026-09-28
 reviewed_at: 2026-09-28
 information_checked_at: 2026-09-28
+roles: [hanbai, customer-support, eigyo]
+concerns: [mikeiken-shokushu, mensetsu]
+situations: [sekkyaku]
+eyecatch: ["接客の経験、", "ほかの仕事で活かせる？"]
 related: [shiboudouki-mikeiken, eigyo-cs-it-support-chigai, mikeiken-tenshoku-hajimekata]
 faq:
   - q: アルバイトの接客経験でも、職務経歴書に書いていいのでしょうか？

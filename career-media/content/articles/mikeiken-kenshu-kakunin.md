@@ -5,10 +5,15 @@ summary: 「研修制度あり」「未経験でも安心」と書かれた求�
 status: published
 categories: [junbi, mikeiken]
 featured: false
+recommended: true
 published_at: 2026-09-12
 updated_at: 2026-09-30
 reviewed_at: 2026-09-30
 information_checked_at: 2026-09-30
+roles: []
+concerns: [mikeiken-shokushu, mensetsu]
+situations: [dainishinsotsu, hajimete]
+eyecatch: ["「研修あり」の求人、", "何を確かめる？"]
 related: [eigyo-cs-it-support-chigai, agent-mendan-mae, mikeiken-tenshoku-hajimekata]
 faq:
   - q: 研修について質問すると、やる気がないと思われませんか？

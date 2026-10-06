@@ -3,7 +3,7 @@ import { AlertCircle, CheckSquare, Megaphone, Sparkles, Users } from "lucide-rea
 import { EditorialNote, pickRelated, RelatedArticles, SourcesSection } from "@/components/ArticleParts";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { ConsultationCta } from "@/components/ConsultationCta";
-import { formatDate } from "@/components/DateMeta";
+import { announcedLabel, formatDate } from "@/components/DateMeta";
 import { JsonLd } from "@/components/JsonLd";
 import { partner } from "@/config/partner";
 import { site } from "@/config/site";
@@ -67,7 +67,7 @@ export default async function NewsDetailPage({ params }: Props) {
             <div className="flex flex-wrap items-center gap-2 text-xs">
               <span className="rounded-full bg-mist px-2.5 py-0.5 font-bold text-mist-ink">転職ニュース解説</span>
               <span className="text-muted">
-                発表元: {news.announcedBy}・施行・発表日: {formatDate(news.announcedAt)}
+                発表元: {news.announcedBy}・{announcedLabel(news.announcedAt)}日: {formatDate(news.announcedAt)}
               </span>
             </div>
             <h1 className="mt-4 text-[24px] font-bold leading-[1.55] text-ink sm:text-[28px]">{article.title}</h1>

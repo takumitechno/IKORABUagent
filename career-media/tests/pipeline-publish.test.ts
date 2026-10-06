@@ -64,12 +64,12 @@ describe("pipeline publish gate", () => {
 
   it("publishes only after approved review of the current body + human approval", () => {
     expect(run("review", "dainishinsotsu-tenshoku-timing").code).toBe(0);
-    const r = run("publish", "dainishinsotsu-tenshoku-timing", "--approved-by", "MakeCareer 編集部 山田");
+    const r = run("publish", "dainishinsotsu-tenshoku-timing", "--approved-by", "編集部 山田");
     expect(r.code).toBe(0);
     const raw = fs.readFileSync(file(), "utf8");
     expect(status()).toBe("published");
     expect(raw).toMatch(/^published_at: 2026-10-06$/m);
-    expect(raw).toMatch(/^reviewed_by: MakeCareer 編集部 山田$/m);
+    expect(raw).toMatch(/^reviewed_by: 編集部 山田$/m);
     const log = fs.readFileSync(path.join(dir, "runs.jsonl"), "utf8");
     expect(log).toContain('"action":"publish"');
   }, 60_000);

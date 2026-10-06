@@ -6,10 +6,15 @@ summary: 雇用保険の教育訓練給付は、2024年10月から給付率の�
 status: published
 categories: [news, junbi]
 featured: false
+recommended: false
 published_at: 2026-09-24
 updated_at: 2026-10-03
 reviewed_at: 2026-10-03
 information_checked_at: 2026-10-03
+roles: []
+concerns: [mikeiken-shokushu]
+situations: [pc-mikeiken]
+eyecatch: ["転職前に学びたい。", "講座の費用、補助ある？"]
 related: [ai-shigoto-mikeiken, news-koyou-hoken-kyufu-seigen, eigyo-cs-it-support-chigai]
 news:
   announced_by: 厚生労働省

@@ -53,6 +53,26 @@ for (const [vpName, viewport] of Object.entries(VIEWPORTS)) {
     // 横スクロールが発生していないか（モバイル崩れの検出）
     const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
     if (overflow > 1) problems.push(`[${vpName}] ${url} horizontal overflow ${overflow}px`);
+    // overflow-hidden の親に隠れて切れている文字・ボタンも検出する（横スクロール領域と装飾は除く）
+    const clipped = await page.evaluate(() => {
+      const vw = window.innerWidth;
+      const inScroller = (el) => {
+        for (let p = el.parentElement; p; p = p.parentElement) {
+          const ox = getComputedStyle(p).overflowX;
+          if (ox === "auto" || ox === "scroll") return true;
+        }
+        return false;
+      };
+      const out = [];
+      for (const el of document.querySelectorAll("h1, h2, h3, p, a, button, input, label, li")) {
+        if (el.closest("[aria-hidden='true']") || el.closest(".sr-only") || inScroller(el)) continue;
+        const r = el.getBoundingClientRect();
+        if (r.width === 0 || r.height === 0) continue;
+        if (r.right > vw + 1 || r.left < -1) out.push(`${el.tagName.toLowerCase()} "${(el.textContent ?? "").trim().slice(0, 24)}" ${Math.round(r.left)}..${Math.round(r.right)}`);
+      }
+      return out.slice(0, 5);
+    });
+    for (const c of clipped) problems.push(`[${vpName}] ${url} clipped: ${c}`);
     await page.screenshot({ path: path.join(OUT, `${vpName}-${name}.png`), fullPage: true });
     await page.close();
   }
@@ -70,7 +90,17 @@ for (const [vpName, viewport] of Object.entries(VIEWPORTS)) {
     ];
     for (let step = 0; step < answers.length; step++) {
       for (const [name, value] of answers[step]) {
-        await page.locator(`input[name="${name}"][value="${value}"]`).check({ force: true });
+        // 段の切り替え直後は再描画と重なってクリックが空振りすることがあるので数回だけやり直す
+        const input = page.locator(`input[name="${name}"][value="${value}"]`);
+        for (let attempt = 0; ; attempt++) {
+          try {
+            await input.check({ force: true, timeout: 3000 });
+            break;
+          } catch (err) {
+            if (attempt >= 2) throw err;
+            await page.waitForTimeout(400);
+          }
+        }
       }
       await page.getByRole("button", { name: step === answers.length - 1 ? "結果を見る" : "次へ進む" }).click();
     }

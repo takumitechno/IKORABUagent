@@ -4,7 +4,7 @@ title: 年収300万円から転職すると、給料は下がる？上げられ�
 summary: 未経験の仕事に移ると、給料は下がることもあれば、変わらない・上がることもあります。今の年収の中身、提示された年収の中身、1年目と数年後の見通し、生活に必要な金額の4つを順番に確かめると、自分の場合を判断しやすくなります。
 status: published
 categories: [hatarakikata, mikeiken]
-featured: false
+featured: true
 recommended: false
 published_at: 2026-10-06
 updated_at: 2026-10-06
@@ -33,11 +33,11 @@ sources:
     url: https://www.mhlw.go.jp/stf/newpage_32105.html
     accessed_at: 2026-10-06
     used_for: 2024年4月から明示事項に「就業場所・業務の変更の範囲」が加わったこと
-  - title: 企業から受ける労働条件明示のルールが変わります！（求職者向けリーフレット）
+  - title: 募集時等に明示すべき事項の追加（2024年4月1日施行・職業安定法施行規則の改正）
     publisher: 厚生労働省
-    url: https://www.mhlw.go.jp/content/001114167.pdf
+    url: https://www.mhlw.go.jp/content/001114110.pdf
     accessed_at: 2026-10-06
-    used_for: 募集広告や職業紹介を受ける際に明示される労働条件が追加されたこと
+    used_for: 2024年4月から、求人の募集時などに明示する労働条件に「従事すべき業務の変更の範囲」「就業場所の変更の範囲」が加わったこと
 research_notes:
   schema_version: 2
   writer_agent: career-writer
@@ -49,8 +49,8 @@ research_notes:
     - source_url: https://www.mhlw.go.jp/stf/newpage_32105.html
       text: 2024年4月1日から、労働条件の明示事項に就業場所・業務の変更の範囲が追加された
       used_in: 提示された年収は「中身」を確認する
-    - source_url: https://www.mhlw.go.jp/content/001114167.pdf
-      text: 2024年4月から、募集広告や職業紹介を受ける際に、求人企業などから明示される労働条件が追加される（求職者向け）
+    - source_url: https://www.mhlw.go.jp/content/001114110.pdf
+      text: 2024年4月1日から、労働者の募集や求人の申込みの際に明示すべき労働条件に、従事すべき業務の変更の範囲、就業場所の変更の範囲、有期労働契約を更新する場合の基準が追加された（改正職業安定法施行規則）
       used_in: 提示された年収は「中身」を確認する
   not_used:
     - 職種別・年齢別の平均年収などの統計値は使っていない。計算例はすべて仮の数字として明示

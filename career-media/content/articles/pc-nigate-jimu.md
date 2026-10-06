@@ -5,11 +5,11 @@ summary: パソコンに自信がなくても、事務職を目指すことは�
 status: published
 categories: [shokushu, junbi]
 featured: false
-recommended: false
+recommended: true
 published_at: 2026-09-29
-updated_at: 2026-09-29
-reviewed_at: 2026-09-29
-information_checked_at: 2026-09-29
+updated_at: 2026-10-06
+reviewed_at: 2026-10-06
+information_checked_at: 2026-10-06
 roles: [jimu]
 concerns: [office, mikeiken-shokushu]
 situations: [pc-mikeiken]
@@ -19,46 +19,54 @@ faq:
   - q: タイピングが遅くても、事務職に応募していいですか？
     a: 応募条件に入力の速さが書かれていなければ、応募して構いません。そのうえで、見ないで打てるように練習を続けておくと、入社後の負担が軽くなります。面接では「今どのくらい打てて、どんな練習をしているか」を伝えると印象が変わります。
   - q: MOSなどの資格は取ったほうがいいですか？
-    a: 応募条件に書かれていなければ、資格がなくても応募できます。MOSは受験資格がなく、実際にソフトを操作する実技の試験なので、練習の目標として使うのは一つの方法です。資格よりも「何ができるか」を具体的に言えることが大切です。
+    a: 応募条件に書かれていなければ、資格がなくても応募できます。MOSは受験資格の制限がなく、パソコンで実際にソフトを操作して答える試験なので、練習の目標として使うのは一つの方法です。資格よりも「何ができるか」を具体的に言えることが大切です。
   - q: パソコンを持っていなくても練習できますか？
-    a: 文字入力の練習やメールの書き方はスマートフォンでもある程度はできますが、表計算ソフトの操作はパソコンで練習したほうが身につきやすいです。退職後に転職活動をする場合は、ハローワークで公的職業訓練（ハロートレーニング）について相談する方法もあります。
+    a: 文字入力の練習やメールの書き方はスマートフォンでもある程度はできますが、表計算ソフトの操作はパソコンで練習したほうが身につきやすいです。仕事を探している人は、ハローワークで公的職業訓練（ハロートレーニング）について相談する方法もあります。
 sources:
   - title: 一般事務 - 職業詳細（job tag）
     publisher: 厚生労働省 職業情報提供サイト（job tag）
     url: https://shigoto.mhlw.go.jp/User/Occupation/Detail/428
     accessed_at: 2026-10-06
-    used_for: 一般事務で使う道具（文書作成ソフト・表計算ソフト・パソコン・プリンター・コピー機・FAX・電話など）
-  - title: 試験概要｜MOS公式サイト
+    used_for: 一般事務の仕事内容と、書類づくりや集計にパソコンを使い、コピー機・FAXなどの事務機器もよく使うこと
+  - title: マイクロソフト オフィス スペシャリスト（MOS）公式サイト
     publisher: 株式会社オデッセイコミュニケーションズ
-    url: https://mos.odyssey-com.co.jp/outline/
+    url: https://mos.odyssey-com.co.jp/
     accessed_at: 2026-10-06
-    used_for: MOSの試験科目（Word・Excelなど）、一般レベルと上級レベル、実技試験であること
-  - title: 試験全般に関するよくあるご質問｜MOS公式サイト
-    publisher: 株式会社オデッセイコミュニケーションズ
-    url: https://mos.odyssey-com.co.jp/faq/detail1.html
+    used_for: MOSの試験科目（Word・Excelなど）、一般レベルと上級レベル、パソコンで操作して答える試験であること、受験資格の制限がないこと
+  - title: MOS 365とは｜MOS 2019やMOS 2016と違う点・試験詳細まで解説
+    publisher: ユーキャン
+    url: https://www.u-can.co.jp/course/data/in_html/158/column/column07.html
     accessed_at: 2026-10-06
-    used_for: MOSに受験資格がないこと
+    used_for: Word・Excelに一般レベルと上級レベル（エキスパート）があること、実技形式の試験であること（公式サイトの補足）
   - title: ハロートレーニング（離職者訓練・求職者支援訓練）
     publisher: 厚生労働省
     url: https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/koyou_roudou/jinzaikaihatsu/rishokusha.html
     accessed_at: 2026-10-06
-    used_for: 公的職業訓練の対象者、受講料が無料（テキスト代等は自己負担）であること、事務・パソコンのコースがあること
+    used_for: 公的職業訓練の対象者、受講料が無料（テキスト代等は自己負担）であること
+  - title: ハロートレーニングとは
+    publisher: 厚生労働省
+    url: https://www.mhlw.go.jp/hellotraining/about
+    accessed_at: 2026-10-06
+    used_for: 受講料は原則無料であること、事務系やITなどの訓練コースがあること
 research_notes:
   schema_version: 2
   writer_agent: career-writer
   angle: 「PCが苦手」を分解し、事務でよく使う操作から順に練習する道筋を示す。資格は必須扱いしない
   quotes:
     - source_url: https://shigoto.mhlw.go.jp/User/Occupation/Detail/428
-      text: 一般事務で使う道具・情報技術として、文書作成ソフト（Word・一太郎など）、表計算ソフト（Excel・Googleスプレッドシートなど）、パソコン、プリンター、コピー機、FAX、電話が挙げられている。
+      text: 一般事務は書類の作成・整理、メール対応、伝票、データ入力などを行う。書類作成や集計にはパソコンを使い、コピー機・FAXなどの事務機器もよく使う。
       used_in: 事務でよく使うのは、どんな操作？
-    - source_url: https://mos.odyssey-com.co.jp/outline/
-      text: MOSはWord・Excel・PowerPoint・Access・Outlookの操作スキルを証明する資格。WordとExcelには一般レベルと上級レベルがある。試験は実際にアプリケーションを操作して解答する実技試験。
+    - source_url: https://mos.odyssey-com.co.jp/
+      text: MOSはWord・Excel・PowerPoint・Access・Outlookの操作スキルを証明する資格で、オデッセイコミュニケーションズが運営。CBT方式の実技試験で、年齢・国籍などの受験資格の制限はない（小学生以下は保護者の同意が必要）。
       used_in: 資格は取ったほうがいい？
-    - source_url: https://mos.odyssey-com.co.jp/faq/detail1.html
-      text: 受験に必要な資格や条件はなく、どなたでも受験できる。
+    - source_url: https://www.u-can.co.jp/course/data/in_html/158/column/column07.html
+      text: MOSには一般レベル（アソシエイト）と上級レベル（エキスパート）があり、WordとExcelは両方のレベルがある。筆記はなく実技で、結果はその場で表示される。
       used_in: 資格は取ったほうがいい？
     - source_url: https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/koyou_roudou/jinzaikaihatsu/rishokusha.html
-      text: 公共職業訓練（離職者訓練）は主に雇用保険を受給している求職者、求職者支援訓練は主に雇用保険を受給できない求職者が対象で、いずれも受講料は無料（テキスト代等は自己負担）。事務・パソコン関連のコースもある。
+      text: 公共職業訓練（離職者訓練）は主に雇用保険を受給している求職者、求職者支援訓練は主に雇用保険を受給できない求職者が対象で、いずれも受講料は無料（テキスト代等は自己負担）。
+      used_in: どうやって練習する？
+    - source_url: https://www.mhlw.go.jp/hellotraining/about
+      text: ハロートレーニング（公的職業訓練）は就職に必要な技能・知識を身につけるための職業訓練制度で、受講料は原則無料。事務系をはじめ、介護、IT、製造、建設、デザインなどのコースがある。
       used_in: どうやって練習する？
 ---
 
@@ -82,7 +90,7 @@ research_notes:
 
 ## 事務でよく使うのは、どんな操作？
 
-厚生労働省の職業情報提供サイト「job tag」では、一般事務で使う道具として、文書作成ソフト・表計算ソフト・パソコン・プリンター・コピー機・FAX・電話などが挙げられています。
+厚生労働省の職業情報提供サイト「job tag」では、一般事務は書類づくりや数字の集計にパソコンを使い、コピー機やFAXなどの事務機器もよく使う仕事だと説明されています。
 
 求人によって求められる水準は違いますが、未経験の人がまず目指したいのは次のあたりです。
 
@@ -103,13 +111,13 @@ research_notes:
 
 最後の職歴まとめは、そのまま応募書類の下書きにもなります。
 
-退職してから転職活動をする場合は、ハローワークで公的職業訓練（ハロートレーニング）について相談する方法もあります。厚生労働省によると、受講料は無料（テキスト代などは自己負担）で、事務やパソコンに関するコースも設けられています。対象になる人や申し込みの方法は、住んでいる地域のハローワークで確認してください。
+仕事を探している人は、ハローワークで公的職業訓練（ハロートレーニング）について相談する方法もあります。厚生労働省によると、受講料は原則無料（テキスト代などは自己負担）で、事務系やITなどのコースがあります。対象になる人や申し込みの方法は、住んでいる地域のハローワークで確認してください。
 
 ## 資格は取ったほうがいい？
 
 応募条件に資格が書かれていなければ、資格がなくても応募できます。
 
-パソコンの資格としてよく知られているのが MOS（マイクロソフト オフィス スペシャリスト）です。公式サイトによると、Word や Excel などのソフトごとに試験があり、Word と Excel には一般レベルと上級レベルがあります。受験資格はなく、実際にソフトを操作して答える実技の試験です。
+パソコンの資格としてよく知られているのが MOS（マイクロソフト オフィス スペシャリスト）です。Word や Excel などのソフトごとに試験があり、Word と Excel には一般レベルと上級レベルがあります。年齢などの受験資格の制限はなく、パソコンで実際にソフトを操作して答える試験です。
 
 資格は「取らないと応募できないもの」ではなく、**練習のゴールを決めるための目安**として考えると気が楽になります。
 

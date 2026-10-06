@@ -6,10 +6,15 @@ summary: 2025年4月1日以降に自己都合で退職した場合、雇用保�
 status: published
 categories: [news, junbi]
 featured: false
+recommended: false
 published_at: 2026-09-10
 updated_at: 2026-10-02
 reviewed_at: 2026-10-02
 information_checked_at: 2026-10-02
+roles: []
+concerns: [yametai]
+situations: [hajimete]
+eyecatch: ["辞めてから転職活動、", "手当はいつから？"]
 related: [agent-mendan-mae, mikeiken-tenshoku-hajimekata, news-kyouiku-kunren-kyufu]
 news:
   announced_by: 厚生労働省

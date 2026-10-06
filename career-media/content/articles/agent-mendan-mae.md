@@ -4,11 +4,16 @@ title: エージェント面談の前に決めておくこと・決めなくて�
 summary: 人材紹介会社のキャリアアドバイザーとの面談は、すべてを決めてから臨む必要はありません。事前に決めておくと面談が進めやすくなること、面談で一緒に考えればいいこと、面談で聞いておきたいことを整理しました。
 status: published
 categories: [junbi, mikeiken]
-featured: true
+featured: false
+recommended: true
 published_at: 2026-09-20
 updated_at: 2026-10-04
 reviewed_at: 2026-10-04
 information_checked_at: 2026-10-04
+roles: []
+concerns: [yaritai]
+situations: [hajimete]
+eyecatch: ["エージェント面談の前、", "何を決めておく？"]
 related: [mikeiken-tenshoku-hajimekata, donichi-yasumi-nenshu-hikaku, mikeiken-kenshu-kakunin]
 faq:
   - q: 人材紹介会社に相談すると、お金はかかりますか？

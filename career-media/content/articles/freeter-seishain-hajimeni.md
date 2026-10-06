@@ -5,10 +5,15 @@ summary: アルバイトから正社員を目指すときは、雇用形態に�
 status: published
 categories: [mikeiken, keiken]
 featured: true
+recommended: false
 published_at: 2026-09-30
 updated_at: 2026-10-05
 reviewed_at: 2026-10-05
 information_checked_at: 2026-10-05
+roles: []
+concerns: [seishain, mensetsu]
+situations: [freeter, seishain-keiken-sukunai]
+eyecatch: ["フリーターから正社員、", "最初に何を確認する？"]
 related: [mikeiken-tenshoku-hajimekata, sekkyaku-keiken-ikasu, agent-mendan-mae]
 faq:
   - q: アルバイト経験しかないと、正社員の書類選考に通らないのでしょうか？

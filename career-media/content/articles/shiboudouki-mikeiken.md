@@ -5,10 +5,15 @@ summary: 未経験の職種に応募するとき、志望動機に「経験が�
 status: published
 categories: [shorui-mensetsu]
 featured: false
+recommended: false
 published_at: 2026-10-02
 updated_at: 2026-10-05
 reviewed_at: 2026-10-05
 information_checked_at: 2026-10-05
+roles: []
+concerns: [mensetsu, mikeiken-shokushu]
+situations: [sekkyaku]
+eyecatch: ["未経験の志望動機、", "何を書けばいい？"]
 related: [sekkyaku-keiken-ikasu, tenshoku-kaisu-kininaru, eigyo-cs-it-support-chigai]
 faq:
   - q: 「未経験ですが頑張ります」だけでは伝わりませんか？

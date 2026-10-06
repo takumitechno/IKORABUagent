@@ -5,10 +5,15 @@ summary: 「年収は高いけれど休みが少ない」「土日休みだけ�
 status: published
 categories: [hatarakikata, junbi]
 featured: false
+recommended: true
 published_at: 2026-09-08
 updated_at: 2026-10-03
 reviewed_at: 2026-10-03
 information_checked_at: 2026-10-03
+roles: []
+concerns: [donichi, kyuryo]
+situations: []
+eyecatch: ["土日休みと年収、", "どう比べればいい？"]
 related: [mikeiken-tenshoku-hajimekata, agent-mendan-mae, news-roudou-jouken-meiji]
 faq:
   - q: 「週休2日制」と「完全週休2日制」は何が違いますか？

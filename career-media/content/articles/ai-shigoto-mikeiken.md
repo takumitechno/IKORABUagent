@@ -5,10 +5,15 @@ summary: 「AIに仕事を奪われる」という話を聞くと、これから
 status: published
 categories: [shokushu, news]
 featured: false
+recommended: false
 published_at: 2026-09-26
 updated_at: 2026-10-05
 reviewed_at: 2026-10-05
 information_checked_at: 2026-10-05
+roles: [sonota]
+concerns: [mikeiken-shokushu, yaritai]
+situations: []
+eyecatch: ["AIで変わる仕事、", "今から選んで大丈夫？"]
 related: [eigyo-cs-it-support-chigai, mikeiken-tenshoku-hajimekata, news-kyouiku-kunren-kyufu]
 faq:
   - q: AIが普及すると、未経験で入れる仕事はなくなりますか？

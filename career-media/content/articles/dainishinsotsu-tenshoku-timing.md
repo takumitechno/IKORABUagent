@@ -5,7 +5,12 @@ summary: 入社1〜3年目で転職を考え始めたときに、在職中に動
 status: review
 categories: [mikeiken, junbi]
 featured: false
+recommended: false
 updated_at: 2026-10-05
+roles: []
+concerns: [yametai]
+situations: [dainishinsotsu]
+eyecatch: ["第二新卒の転職、", "いつ動き始める？"]
 related: [mikeiken-tenshoku-hajimekata, agent-mendan-mae]
 sources:
   - title: 雇用保険制度の改正内容について

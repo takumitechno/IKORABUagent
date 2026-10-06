@@ -46,7 +46,7 @@ export default async function HomePage() {
   const lead = featuredAll.find((a) => a.slug === GUIDE_SLUG) ?? featuredAll[0];
   const featured = featuredAll.filter((a) => a !== lead).slice(0, 4);
   const latest = articles.slice(0, 10);
-  const recommended = articles.filter((a) => a.recommended).slice(0, 5);
+  const recommended = articles.filter((a) => a.recommended).slice(0, 6);
   const guideHref = articles.some((a) => a.slug === GUIDE_SLUG) ? `/articles/${GUIDE_SLUG}` : "/jobs";
   const counts = (group: TaxonomyGroup) => Object.fromEntries(TAXONOMY[group].map((t) => [t.slug, all.filter((a) => a[group].includes(t.slug)).length]));
   const lastUpdated = all.reduce((max, a) => (a.updatedAt > max ? a.updatedAt : max), "");
@@ -60,8 +60,8 @@ export default async function HomePage() {
       <section className="relative overflow-hidden border-b border-line bg-[linear-gradient(180deg,#ffffff_0%,var(--color-brand-tint)_100%)]">
         <div aria-hidden="true" className="pointer-events-none absolute -right-32 -top-40 h-[480px] w-[480px] rounded-full bg-mint/70" />
         <div aria-hidden="true" className="pointer-events-none absolute -bottom-28 left-[38%] hidden h-56 w-56 rounded-full bg-sand/80 md:block" />
-        <div className="relative mx-auto grid max-w-6xl gap-10 px-4 pb-10 pt-9 sm:px-6 md:grid-cols-[1.1fr_1fr] md:items-center md:pb-14 md:pt-14">
-          <div>
+        <div className="relative mx-auto grid max-w-6xl grid-cols-[minmax(0,1fr)] gap-10 px-4 pb-10 pt-9 sm:px-6 md:grid-cols-[1.1fr_1fr] md:items-center md:pb-14 md:pt-14">
+          <div className="min-w-0">
             <p className="inline-flex items-center gap-2 rounded-full bg-white px-3 py-1 text-xs font-bold text-brand-strong ring-1 ring-brand/20">
               <span className="h-1.5 w-1.5 rounded-full bg-accent-bright" aria-hidden="true" />
               20代・未経験転職のための仕事選びメディア
@@ -100,7 +100,7 @@ export default async function HomePage() {
           </div>
 
           {/* 読者の悩み（吹き出し） */}
-          <div>
+          <div className="min-w-0">
             <p className="text-[12px] font-bold text-muted">こんなこと、考えていませんか？</p>
             {/* スマホでは横スクロール、タブレット以上は2列 */}
             <ul className="-mx-4 mt-3 flex snap-x gap-2.5 overflow-x-auto px-4 pb-2 sm:mx-0 sm:grid sm:grid-cols-2 sm:overflow-visible sm:px-0 sm:pb-0">

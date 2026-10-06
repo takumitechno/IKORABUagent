@@ -6,10 +6,15 @@ summary: 2024年4月から、求人の募集時や労働契約を結ぶときに
 status: published
 categories: [news, hatarakikata]
 featured: false
+recommended: false
 published_at: 2026-09-05
 updated_at: 2026-10-01
 reviewed_at: 2026-10-01
 information_checked_at: 2026-10-01
+roles: []
+concerns: [mikeiken-shokushu]
+situations: [hajimete]
+eyecatch: ["入社後の仕事や勤務地、", "どこまで変わる？"]
 related: [donichi-yasumi-nenshu-hikaku, tenshoku-kaisu-kininaru, freeter-seishain-hajimeni]
 news:
   announced_by: 厚生労働省
