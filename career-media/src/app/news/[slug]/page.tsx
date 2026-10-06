@@ -1,9 +1,10 @@
 import { notFound } from "next/navigation";
-import { AlertCircle, CheckSquare, Megaphone, Sparkles, Users } from "lucide-react";
+import { AlertCircle, CalendarDays, CheckSquare, Megaphone, Sparkles, Users } from "lucide-react";
 import { EditorialNote, pickRelated, RelatedArticles, SourcesSection } from "@/components/ArticleParts";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { ConsultationCta } from "@/components/ConsultationCta";
 import { announcedLabel, formatDate } from "@/components/DateMeta";
+import { Eyecatch } from "@/components/Eyecatch";
 import { JsonLd } from "@/components/JsonLd";
 import { partner } from "@/config/partner";
 import { site } from "@/config/site";
@@ -38,9 +39,11 @@ export async function generateMetadata({ params }: Props) {
 function Block({ icon: Icon, title, children, tone = "default" }: { icon: typeof Megaphone; title: string; children: React.ReactNode; tone?: "default" | "brand" | "warn" }) {
   const toneClass = tone === "brand" ? "border-brand/25 bg-brand-tint" : tone === "warn" ? "border-accent/25 bg-accent-soft" : "border-line bg-white";
   return (
-    <section className={`rounded-[var(--radius-card)] border p-5 sm:p-6 ${toneClass}`}>
-      <h2 className="flex items-center gap-2 text-[17px] font-bold text-ink">
-        <Icon className="h-5 w-5 text-brand" aria-hidden="true" />
+    <section className={`reveal rounded-[var(--radius-card)] border p-5 sm:p-6 ${toneClass}`}>
+      <h2 className="flex items-center gap-2.5 text-[17px] font-bold text-ink">
+        <span className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full ${tone === "warn" ? "bg-white text-accent" : tone === "brand" ? "bg-brand text-white" : "bg-brand-soft text-brand-strong"}`}>
+          <Icon className="h-[18px] w-[18px]" aria-hidden="true" />
+        </span>
         {title}
       </h2>
       <div className="mt-3 text-[15px] leading-8 text-body">{children}</div>
@@ -63,13 +66,16 @@ export default async function NewsDetailPage({ params }: Props) {
       <div className="mx-auto max-w-4xl px-4 pt-6 sm:px-6">
         <Breadcrumbs items={articleCrumbs(article, categories)} />
         <article className="mt-6">
-          <header className="rounded-[20px] bg-white px-5 py-7 ring-1 ring-line sm:px-10 sm:py-9">
+          <header className="overflow-hidden rounded-[20px] bg-white px-5 pb-7 ring-1 ring-line sm:px-10 sm:pb-9">
+            <Eyecatch article={article} category={categories.find((c) => c.slug === "news")} size="banner" className="-mx-5 mb-6 rounded-none sm:-mx-10 sm:mb-8" />
             <div className="flex flex-wrap items-center gap-2 text-xs">
               <span className="rounded-full bg-mist px-2.5 py-0.5 font-bold text-mist-ink">転職ニュース解説</span>
-              <span className="text-muted">
-                発表元: {news.announcedBy}・{announcedLabel(news.announcedAt)}日: {formatDate(news.announcedAt)}
-              </span>
+              <span className="text-muted">発表元: {news.announcedBy}</span>
             </div>
+            <p className={`mt-3 inline-flex items-center gap-2 rounded-xl px-3 py-2 text-[13.5px] font-bold ${news.announcedAt > new Date().toISOString().slice(0, 10) ? "bg-sand text-sand-ink" : "bg-mist text-mist-ink"}`}>
+              <CalendarDays className="h-4 w-4" aria-hidden="true" />
+              {announcedLabel(news.announcedAt)}日: {formatDate(news.announcedAt)}
+            </p>
             <h1 className="mt-4 text-[24px] font-bold leading-[1.55] text-ink sm:text-[28px]">{article.title}</h1>
             <p className="mt-4 text-[15px] leading-8 text-body">{article.summary}</p>
             <p className="mt-4 text-xs text-muted">

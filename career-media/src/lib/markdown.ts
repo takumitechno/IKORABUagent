@@ -1,14 +1,21 @@
 import { Marked, type Tokens } from "marked";
+import { parseFigure, renderFigure } from "./figures";
 
 /**
  * 記事 Markdown → HTML。
  * - 本文は pipeline (AI Writer) 由来の可能性があるため、生 HTML は描画せずエスケープする
  * - h2 に連番 id を振り、目次と中間 CTA の挿入位置に使う
  * - 外部リンクは新しいタブ + noopener
+ * - ```figure ブロックは図解として描く（src/lib/figures.ts）
+ * - 表は、スマホでは横スクロールさせずに読めるよう、短い表は詰めて、長い表はカード型にする
  */
 
 export type Heading = { id: string; text: string };
 export type RenderedArticle = { sections: string[]; headings: Heading[] };
+
+const stripMd = (s: string) => s.replace(/\*\*|__|`/g, "").replace(/\[([^\]]*)\]\([^)]*\)/g, "$1").trim();
+/** 表のセルがこの文字数以下なら、スマホでも表のまま読める */
+const COMPACT_CELL = 12;
 
 const escapeHtml = (s: string) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 
@@ -28,10 +35,12 @@ export function renderMarkdown(markdown: string): RenderedArticle {
       heading(this: { parser: { parseInline(tokens: Tokens.Generic[]): string } }, token: Tokens.Heading) {
         const inner = this.parser.parseInline(token.tokens);
         if (token.depth === 2) {
-          const id = `section-${headings.length + 1}`;
+          const n = headings.length + 1;
+          const id = `section-${n}`;
           // 見出し自体に「1.」などの番号がある場合、目次では番号を重複させない
           headings.push({ id, text: token.text.replace(/\*\*/g, "").replace(/^\d+[.．、]\s*/, "") });
-          return `<h2 id="${id}">${inner}</h2>\n`;
+          const numbered = /^\s*[0-9０-９]/.test(token.text) ? "" : `<span class="h2-num" aria-hidden="true">${String(n).padStart(2, "0")}</span>`;
+          return `<h2 id="${id}">${numbered}<span class="h2-text">${inner}</span></h2>\n`;
         }
         const depth = Math.min(Math.max(token.depth, 3), 4);
         return `<h${depth}>${inner}</h${depth}>\n`;
@@ -49,11 +58,29 @@ export function renderMarkdown(markdown: string): RenderedArticle {
         return escapeHtml(token.text);
       },
       table(this: { parser: { parseInline(tokens: Tokens.Generic[]): string } }, token: Tokens.Table) {
-        const head = token.header.map((c) => `<th>${this.parser.parseInline(c.tokens)}</th>`).join("");
+        const labels = token.header.map((c) => escapeHtml(stripMd(c.text)));
+        const head = token.header.map((c) => `<th scope="col">${this.parser.parseInline(c.tokens)}</th>`).join("");
         const body = token.rows
-          .map((row) => `<tr>${row.map((c, i) => (i === 0 ? `<th scope="row">${this.parser.parseInline(c.tokens)}</th>` : `<td>${this.parser.parseInline(c.tokens)}</td>`)).join("")}</tr>`)
+          .map(
+            (row) =>
+              `<tr>${row
+                .map((c, i) => (i === 0 ? `<th scope="row">${this.parser.parseInline(c.tokens)}</th>` : `<td data-label="${labels[i] ?? ""}">${this.parser.parseInline(c.tokens)}</td>`))
+                .join("")}</tr>`,
+          )
           .join("");
-        return `<div class="table-wrap"><table><thead><tr>${head}</tr></thead><tbody>${body}</tbody></table></div>\n`;
+        // 値が短い表はそのまま詰めて表示し、長い文章が入る表はスマホでカード型にする
+        const longest = Math.max(0, ...token.rows.flatMap((row) => row.slice(1).map((c) => [...stripMd(c.text)].length)));
+        const layout = token.header.length <= 4 && longest <= COMPACT_CELL ? "compact" : "cards";
+        return `<div class="table-wrap reveal" data-layout="${layout}"><table><thead><tr>${head}</tr></thead><tbody>${body}</tbody></table></div>\n`;
+      },
+      code(token: Tokens.Code) {
+        if ((token.lang ?? "").trim() === "figure") {
+          const result = parseFigure(token.text);
+          if (result.ok) return renderFigure(result.spec);
+          // 公開前チェック（C18）で止まるはずだが、念のため中身をそのまま見せる
+          return `<pre class="fig-invalid"><code>${escapeHtml(token.text)}</code></pre>\n`;
+        }
+        return `<pre><code>${escapeHtml(token.text)}</code></pre>\n`;
       },
     },
   });

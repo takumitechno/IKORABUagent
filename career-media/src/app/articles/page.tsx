@@ -56,6 +56,7 @@ export default async function ArticlesPage({ searchParams }: Props) {
               <ArticleList articles={articles} categories={categories} />
             ) : (
               <div className="py-12 text-center">
+                <span className="motif motif-search mx-auto mb-3 block h-24 w-24 rounded-full bg-sky" aria-hidden="true" />
                 <p className="font-bold text-ink">該当する記事が見つかりませんでした</p>
                 <p className="mt-2 text-sm text-muted">別のキーワードで探すか、テーマから記事を選んでください。</p>
                 <Link href="/articles" className="mt-4 inline-block text-sm font-bold text-brand-strong underline">

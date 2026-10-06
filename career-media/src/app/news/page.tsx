@@ -4,6 +4,8 @@ import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { ConsultationCta } from "@/components/ConsultationCta";
 import { announcedLabel, formatDate, formatDateShort } from "@/components/DateMeta";
 import { Eyecatch } from "@/components/Eyecatch";
+import { Motif } from "@/components/illustrations/Motif";
+import { NewsTimeline } from "@/components/NewsTimeline";
 import { getRepository } from "@/lib/content";
 import { pageMetadata } from "@/lib/seo";
 
@@ -28,22 +30,31 @@ export default async function NewsIndexPage() {
           { name: "転職ニュース・市場情報", path: "/news" },
         ]}
       />
-      <header className="mt-6 max-w-3xl">
-        <p className="text-[11px] font-bold tracking-[0.2em] text-brand">NEWS HUB</p>
-        <h1 className="mt-1 text-[26px] font-bold text-ink sm:text-[30px]">転職ニュース・市場情報</h1>
-        <p className="mt-3 text-[15px] leading-8 text-body">制度の変更や市場の動きを、未経験から転職を考える人にとって「何が変わるのか」「何を確認すればいいのか」という視点で解説します。</p>
-        <p className="mt-4 flex items-start gap-2 rounded-xl bg-white p-4 text-[13px] leading-6 text-muted ring-1 ring-line">
-          <Info className="mt-0.5 h-4 w-4 shrink-0 text-brand" aria-hidden="true" />
-          発表内容の全文転載は行わず、要点の解説と確認ポイントをまとめています。正確な内容は各記事の出典（発表元）でご確認ください。
-        </p>
+      <header className="mt-6 flex items-start gap-4">
+        <div className="min-w-0 max-w-3xl flex-1">
+          <p className="text-[11px] font-bold tracking-[0.2em] text-brand">NEWS HUB</p>
+          <h1 className="mt-1 text-[26px] font-bold text-ink sm:text-[30px]">転職ニュース・市場情報</h1>
+          <p className="mt-3 text-[15px] leading-8 text-body">制度の変更や市場の動きを、未経験から転職を考える人にとって「何が変わるのか」「何を確認すればいいのか」という視点で解説します。</p>
+          <p className="mt-4 flex items-start gap-2 rounded-xl bg-white p-4 text-[13px] leading-6 text-muted ring-1 ring-line">
+            <Info className="mt-0.5 h-4 w-4 shrink-0 text-brand" aria-hidden="true" />
+            発表内容の全文転載は行わず、要点の解説と確認ポイントをまとめています。正確な内容は各記事の出典（発表元）でご確認ください。
+          </p>
+        </div>
+        <span className="enter-pop relative hidden aspect-square w-[132px] shrink-0 rounded-full bg-mist sm:block">
+          <Motif name="newspaper" className="anim-float-slow absolute inset-[4%]" />
+        </span>
       </header>
+
+      <div className="mt-6">
+        <NewsTimeline news={news} />
+      </div>
 
       <ul className="mt-8 grid gap-5 md:grid-cols-2">
         {news.map((n) => (
           <li key={n.slug}>
             <Link
               href={`/news/${n.slug}`}
-              className="group flex h-full flex-col overflow-hidden rounded-[var(--radius-card)] border border-line bg-white transition hover:border-brand/40 hover:shadow-[var(--shadow-card)]"
+              className="tap lift group flex h-full flex-col overflow-hidden rounded-[var(--radius-card)] border border-line bg-white hover:border-brand/40"
             >
               <Eyecatch article={n} category={newsCategory} size="md" className="rounded-none" />
               <div className="flex flex-1 flex-col p-5 sm:p-6">

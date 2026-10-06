@@ -5,8 +5,14 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { ArrowLeft, ArrowRight, Check, CheckCircle2, ClipboardCopy, Lightbulb, ListChecks, MessageSquareText, Printer, RotateCcw, Scale, Sparkles, Target } from "lucide-react";
 import { buildResult, resultToText, type CheckResult } from "@/lib/condition-check/engine";
 import { isStepComplete, sanitizeAnswers, STEPS, type Answers, type Question } from "@/lib/condition-check/questions";
+import type { MotifName } from "@/lib/illustrations/motifs";
+import { JOB_ROLE_SCENE } from "@/lib/illustrations/scenes";
 
 const STORAGE_KEY = "condition-check:v1";
+
+/** ステップごとのイラスト（状況 → 経験 → 条件 → スタイル → 結果） */
+const STEP_SCENES: MotifName[] = ["clock", "star", "calendar", "chat", "checklist"];
+const motif = (name: MotifName, className: string) => <span aria-hidden="true" className={`motif motif-${name} block ${className}`} />;
 
 type Props = { consultationHref: string; consultationLabel: string; allowPrint?: boolean };
 
@@ -14,7 +20,7 @@ function OptionButton({ question, optionId, label, selected, onToggle }: { quest
   const inputType = question.type === "single" ? "radio" : "checkbox";
   return (
     <label
-      className={`flex min-h-[52px] cursor-pointer items-center gap-3 rounded-xl border px-4 py-3 text-[14.5px] leading-6 transition ${
+      className={`tap flex min-h-[52px] cursor-pointer items-center gap-3 rounded-xl border px-4 py-3 text-[14.5px] leading-6 transition ${
         selected ? "border-brand bg-brand-tint font-bold text-ink ring-1 ring-brand" : "border-line bg-white text-body hover:border-brand/40"
       }`}
     >
@@ -25,7 +31,7 @@ function OptionButton({ question, optionId, label, selected, onToggle }: { quest
           selected ? "border-brand bg-brand text-white" : "border-line-strong bg-white"
         }`}
       >
-        {selected && <Check className="h-3.5 w-3.5" strokeWidth={3} />}
+        {selected && <Check className="enter-pop h-3.5 w-3.5" strokeWidth={3} />}
       </span>
       {label}
     </label>
@@ -115,30 +121,57 @@ export function ConditionCheck({ consultationHref, consultationLabel, allowPrint
 
   return (
     <div ref={topRef} className="scroll-mt-24">
-      {/* ステップ表示 */}
-      <ol className="no-print grid grid-cols-5 gap-1.5" aria-label="進み具合">
-        {[...STEPS.map((s) => ({ title: s.title, short: s.shortTitle })), { title: "結果", short: "結果" }].map(({ title, short }, i) => {
-          const done = showResult ? true : i < stepIndex;
-          const current = showResult ? i === STEPS.length : i === stepIndex;
-          return (
-            <li key={title} aria-current={current ? "step" : undefined}>
-              <div className={`h-1.5 rounded-full ${done || current ? "bg-brand" : "bg-line"}`} />
-              <p className={`mt-2 text-[11px] leading-4 sm:text-xs ${current ? "font-bold text-ink" : "text-muted"}`}>
-                <span className="hidden sm:inline">
-                  {i < STEPS.length ? `STEP ${i + 1} ` : ""}
-                  {title}
-                </span>
-                <span className="sm:hidden">{short}</span>
-              </p>
-            </li>
-          );
-        })}
-      </ol>
+      {/* ステップ表示（イラスト付き。進むと線が伸びる） */}
+      {(() => {
+        const steps = [...STEPS.map((st) => ({ title: st.title, short: st.shortTitle })), { title: "結果", short: "結果" }];
+        const currentIndex = showResult ? STEPS.length : stepIndex;
+        return (
+          <div className="no-print relative">
+            <div aria-hidden="true" className="absolute left-[10%] right-[10%] top-[22px] h-1 rounded-full bg-line sm:top-[26px]">
+              <div className="h-full rounded-full bg-brand transition-[width] duration-500 ease-out" style={{ width: `${(currentIndex / (steps.length - 1)) * 100}%` }} />
+            </div>
+            <ol className="relative grid grid-cols-5 gap-1" aria-label="進み具合">
+              {steps.map(({ title, short }, i) => {
+                const done = i < currentIndex;
+                const current = i === currentIndex;
+                return (
+                  <li key={title} aria-current={current ? "step" : undefined} className="flex flex-col items-center text-center">
+                    <span
+                      className={`relative block aspect-square w-11 rounded-full ring-[3px] transition sm:w-[52px] ${
+                        current ? "enter-pop bg-mint ring-brand" : done ? "bg-mint ring-brand/40" : "bg-white ring-line grayscale opacity-60"
+                      }`}
+                    >
+                      {motif(STEP_SCENES[i] ?? "checklist", "absolute inset-[6%]")}
+                      {done && (
+                        <span className="absolute -right-1 -top-1 flex h-[18px] w-[18px] items-center justify-center rounded-full bg-brand text-white ring-2 ring-white">
+                          <Check className="h-3 w-3" strokeWidth={3.2} aria-hidden="true" />
+                        </span>
+                      )}
+                    </span>
+                    <p className={`mt-1.5 text-[11px] leading-4 sm:text-xs ${current ? "font-bold text-ink" : "text-muted"}`}>
+                      <span className="hidden sm:inline">
+                        {i < STEPS.length ? `STEP ${i + 1} ` : ""}
+                        {title}
+                      </span>
+                      <span className="sm:hidden">{short}</span>
+                    </p>
+                  </li>
+                );
+              })}
+            </ol>
+          </div>
+        );
+      })()}
 
       {!result ? (
-        <div className="mt-8">
-          <h2 className="text-[22px] font-bold text-ink">{step.title}</h2>
-          <p className="mt-1 text-sm leading-7 text-muted">{step.description}</p>
+        <div key={stepIndex} className="enter mt-8">
+          <div className="flex items-center gap-3">
+            <span className="relative block aspect-square w-14 shrink-0 rounded-full bg-mint">{motif(STEP_SCENES[stepIndex] ?? "checklist", "absolute inset-[6%]")}</span>
+            <div className="min-w-0">
+              <h2 className="text-[21px] font-bold leading-snug text-ink sm:text-[22px]">{step.title}</h2>
+              <p className="mt-0.5 text-sm leading-6 text-muted">{step.description}</p>
+            </div>
+          </div>
           <div className="mt-6 space-y-8">
             {step.questions.map((q) => {
               const selected = answers[q.id] ?? [];
@@ -191,13 +224,13 @@ export function ConditionCheck({ consultationHref, consultationLabel, allowPrint
   );
 }
 
-function ResultSection({ icon: Icon, title, children, number }: { icon: typeof Target; title: string; number: number; children: React.ReactNode }) {
+const RESULT_SCENES: Record<number, MotifName> = { 1: "calendar", 2: "star", 3: "scale", 4: "checklist", 5: "chat", 6: "flag" };
+
+function ResultSection({ title, children, number }: { icon?: typeof Target; title: string; number: number; children: React.ReactNode }) {
   return (
-    <section className="rounded-[var(--radius-card)] border border-line bg-white p-5 sm:p-6">
+    <section className="reveal rounded-[var(--radius-card)] border border-line bg-white p-5 sm:p-6">
       <h3 className="flex items-center gap-3 text-[17px] font-bold text-ink">
-        <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-brand-soft text-brand-strong">
-          <Icon className="h-4 w-4" aria-hidden="true" />
-        </span>
+        <span className="relative block aspect-square w-11 shrink-0 rounded-full bg-mint">{motif(RESULT_SCENES[number] ?? "checklist", "absolute inset-[6%]")}</span>
         <span>
           <span className="mr-1.5 text-xs font-bold text-brand">{number}</span>
           {title}
@@ -230,9 +263,11 @@ function Result({
   const top = result.candidates.slice(0, 3);
   return (
     <div className="mt-8" aria-live="polite">
-      <div className="rounded-[20px] bg-ink p-6 text-white sm:p-8">
+      <div className="enter relative overflow-hidden rounded-[20px] bg-ink p-6 text-white sm:p-8">
+        <span aria-hidden="true" className="pointer-events-none absolute -right-6 -top-6 block h-28 w-28 rounded-full bg-white/[0.06] sm:h-40 sm:w-40" />
+        {motif("checklist", "anim-float-slow absolute right-4 top-4 h-16 w-16 rounded-full bg-white/90 sm:right-8 sm:top-8 sm:h-24 sm:w-24")}
         <p className="text-[11px] font-bold tracking-[0.2em] text-accent-bright">YOUR NOTE</p>
-        <h2 className="mt-2 text-[22px] font-bold leading-snug sm:text-[26px]">あなたの条件整理ノート</h2>
+        <h2 className="mt-2 pr-20 text-[22px] font-bold leading-snug sm:pr-28 sm:text-[26px]">あなたの条件整理ノート</h2>
         <p className="mt-3 text-sm leading-7 text-white/80">
           回答をもとに、希望条件・活かせそうな経験・比べてみたい職種などを整理しました。これは向き不向きや選考の結果を判定するものではなく、次に調べること・確認することを考えるための材料です。
         </p>
@@ -314,8 +349,13 @@ function Result({
           <ol className="mt-4 grid gap-4 md:grid-cols-3">
             {top.map((c, i) => (
               <li key={c.role.slug} className={`flex flex-col rounded-xl border p-4 ${i === 0 ? "border-brand bg-brand-tint" : "border-line"}`}>
-                <p className="text-xs font-bold text-brand">候補 {i + 1}</p>
-                <p className="mt-1 text-[16px] font-bold text-ink">{c.role.name}</p>
+                <div className="flex items-center gap-3">
+                  <span className="relative block aspect-square w-12 shrink-0 rounded-full bg-white">{motif(JOB_ROLE_SCENE[c.role.slug] ?? "briefcase", "absolute inset-[6%]")}</span>
+                  <div className="min-w-0">
+                    <p className="text-xs font-bold text-brand">候補 {i + 1}</p>
+                    <p className="text-[16px] font-bold leading-snug text-ink">{c.role.name}</p>
+                  </div>
+                </div>
                 <p className="mt-1 text-[12.5px] leading-5 text-muted">{c.role.oneLiner}</p>
                 {c.reasons.length > 0 && (
                   <ul className="mt-2 space-y-1 text-[13px] leading-6 text-body">

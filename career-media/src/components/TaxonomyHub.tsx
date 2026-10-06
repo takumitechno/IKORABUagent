@@ -1,13 +1,14 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ClipboardList, Scale } from "lucide-react";
+import { Scale } from "lucide-react";
 import { ArticleList, FeatureCard } from "@/components/ArticleCards";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
-import { CategoryIcon } from "@/components/CategoryIcon";
+import { Motif } from "@/components/illustrations/Motif";
 import { ConsultationCta } from "@/components/ConsultationCta";
 import { EntryGrid } from "@/components/EntryGrid";
 import { LevelMeter } from "@/components/LevelMeter";
 import { getRepository } from "@/lib/content";
+import { taxonomyScene } from "@/lib/illustrations/scenes";
 import { getJobRole, LEVEL_LABELS } from "@/lib/jobs";
 import { pageMetadata } from "@/lib/seo";
 import { findTaxonomy, ROLE_TO_COMPARISON, TAXONOMY, TAXONOMY_GROUPS, taxonomyPath, type TaxonomyGroup } from "@/lib/taxonomy";
@@ -43,34 +44,35 @@ export async function TaxonomyHub({ group, slug }: { group: TaxonomyGroup; slug:
           { name: item.label, path: taxonomyPath(group, slug) },
         ]}
       />
-      <header className="mt-6 rounded-[20px] bg-white p-5 ring-1 ring-line sm:p-8">
-        <div className="flex items-start gap-4">
-          <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-brand-soft text-brand-strong">
-            <CategoryIcon name={item.icon} className="h-6 w-6" />
-          </span>
-          <div className="min-w-0">
+      <header className="relative mt-6 overflow-hidden rounded-[22px] bg-white p-5 ring-1 ring-line sm:p-8">
+        <span aria-hidden="true" className="pointer-events-none absolute -right-16 -top-20 h-56 w-56 rounded-full bg-brand-tint" />
+        <div className="relative flex items-start gap-4 sm:gap-6">
+          <div className="min-w-0 flex-1">
             <p className="text-[11px] font-bold tracking-[0.2em] text-brand">
               {g.eyebrow}・{item.label}
             </p>
-            <h1 className="mt-1 text-[24px] font-bold leading-snug text-ink sm:text-[30px]">{item.heading}</h1>
+            <h1 className="mt-1 text-[22px] font-bold leading-snug text-ink sm:text-[30px]">{item.heading}</h1>
             <p className="mt-2 text-[14.5px] leading-7 text-body">{item.description}</p>
-            <p className="mt-2 text-xs text-muted">{articles.length}本の記事</p>
+            <p className="mt-3 inline-flex rounded-full bg-canvas px-3 py-0.5 text-xs font-bold text-muted ring-1 ring-line">{articles.length}本の記事</p>
           </div>
+          <span className="enter-pop relative block aspect-square w-[84px] shrink-0 rounded-full bg-mint sm:w-[132px]">
+            <Motif name={taxonomyScene(group, slug)} className="anim-float-slow absolute inset-[4%]" />
+          </span>
         </div>
         {comparison && (
-          <div className="mt-5 flex flex-col gap-4 rounded-xl bg-canvas p-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="relative mt-5 flex flex-col gap-4 rounded-xl bg-canvas p-4 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex flex-wrap gap-x-6 gap-y-2">
               <div>
                 <p className="text-xs text-muted">人と話す量</p>
-                <LevelMeter level={comparison.talkLevel} label={LEVEL_LABELS.talk[comparison.talkLevel]} srLabel="人と話す量" />
+                <LevelMeter level={comparison.talkLevel} label={LEVEL_LABELS.talk[comparison.talkLevel]} srLabel="人と話す量" animate />
               </div>
               <div>
                 <p className="text-xs text-muted">パソコン作業</p>
-                <LevelMeter level={comparison.pcLevel} label={LEVEL_LABELS.pc[comparison.pcLevel]} srLabel="パソコン作業" />
+                <LevelMeter level={comparison.pcLevel} label={LEVEL_LABELS.pc[comparison.pcLevel]} srLabel="パソコン作業" animate />
               </div>
               <div>
                 <p className="text-xs text-muted">数字の目標</p>
-                <LevelMeter level={comparison.targetLevel} label={LEVEL_LABELS.target[comparison.targetLevel]} srLabel="数字の目標" />
+                <LevelMeter level={comparison.targetLevel} label={LEVEL_LABELS.target[comparison.targetLevel]} srLabel="数字の目標" animate />
               </div>
             </div>
             <Link href={`/jobs#${comparison.slug}`} className="inline-flex shrink-0 items-center gap-1.5 text-sm font-bold text-brand-strong hover:underline">
@@ -100,11 +102,13 @@ export async function TaxonomyHub({ group, slug }: { group: TaxonomyGroup; slug:
             <p className="rounded-[var(--radius-card)] bg-white p-10 text-center text-sm text-muted ring-1 ring-line">このテーマの記事は準備中です。</p>
           ) : (
             <>
-              <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
+              <ul className="swipe md-grid reveal" style={{ ["--cols" as string]: 3 }}>
                 {top.map((a) => (
-                  <FeatureCard key={a.slug} article={a} categories={categories} />
+                  <li key={a.slug}>
+                    <FeatureCard article={a} categories={categories} />
+                  </li>
                 ))}
-              </div>
+              </ul>
               {rest.length > 0 && (
                 <div className="mt-8 rounded-[var(--radius-card)] border border-line bg-white px-5">
                   <ArticleList articles={rest} categories={categories} />
@@ -114,8 +118,8 @@ export async function TaxonomyHub({ group, slug }: { group: TaxonomyGroup; slug:
           )}
         </div>
         <aside className="space-y-6">
-          <Link href="/check" className="flex items-center gap-3 rounded-[var(--radius-card)] bg-brand p-5 text-white hover:bg-brand-strong">
-            <ClipboardList className="h-6 w-6 shrink-0" aria-hidden="true" />
+          <Link href="/check" className="tap lift flex items-center gap-3 rounded-[var(--radius-card)] bg-brand p-5 text-white hover:bg-brand-strong">
+            <span className="motif motif-checklist block h-14 w-14 shrink-0 rounded-full bg-white/90" aria-hidden="true" />
             <span>
               <span className="block font-bold">迷ったら、条件整理チェック</span>
               <span className="text-[12.5px] text-white/80">13の質問で、比べる職種と確認ポイントを整理</span>
@@ -144,12 +148,17 @@ export async function TaxonomyIndex({ group }: { group: TaxonomyGroup }) {
   return (
     <div className="mx-auto max-w-6xl px-4 pt-6 sm:px-6">
       <Breadcrumbs items={[{ name: "ホーム", path: "/" }, { name: g.title, path: g.basePath }]} />
-      <header className="mt-6 max-w-3xl">
-        <p className="text-[11px] font-bold tracking-[0.2em] text-brand">{g.eyebrow}</p>
-        <h1 className="mt-1 text-[26px] font-bold text-ink sm:text-[30px]">{g.title}</h1>
-        <p className="mt-2 text-[15px] leading-8 text-body">
-          {group === "concerns" ? "今いちばん気になっていることから、関係のある記事をまとめて読めます。" : "今の働き方や経歴に近いものを選ぶと、同じ状況の人に向けた記事をまとめて読めます。"}
-        </p>
+      <header className="mt-6 flex items-center gap-4">
+        <div className="min-w-0 flex-1">
+          <p className="text-[11px] font-bold tracking-[0.2em] text-brand">{g.eyebrow}</p>
+          <h1 className="mt-1 text-[26px] font-bold text-ink sm:text-[30px]">{g.title}</h1>
+          <p className="mt-2 max-w-3xl text-[15px] leading-8 text-body">
+            {group === "concerns" ? "今いちばん気になっていることから、関係のある記事をまとめて読めます。" : "今の働き方や経歴に近いものを選ぶと、同じ状況の人に向けた記事をまとめて読めます。"}
+          </p>
+        </div>
+        <span className="enter-pop relative hidden aspect-square w-[120px] shrink-0 rounded-full bg-mint sm:block">
+          <Motif name={group === "concerns" ? "chat" : "flag"} className="anim-float-slow absolute inset-[4%]" />
+        </span>
       </header>
       <div className="mt-6">
         <EntryGrid group={group} counts={counts} />

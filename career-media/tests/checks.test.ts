@@ -86,6 +86,18 @@ describe("reviewer checks (ported from ZIP check_article)", () => {
     expect(codes(article({ body: article().body + "\n[入口](/concerns/nope)" }))).toContain("error:C05");
   });
 
+  it("C18: figure blocks must be valid, short, and only use numbers that appear in the body", () => {
+    const fig = (yaml: string) => "\n\n```figure\n" + yaml + "\n```\n";
+    const steps = "type: steps\ntitle: 3つの手順\nitems:\n  - label: 書き出す\n    text: 1日の流れ\n  - label: 比べる\n  - label: 決める";
+    expect(codes(article({ body: article().body + "\n3つの手順と1日の流れ。" + fig(steps) })).filter((c) => c.endsWith(":C18"))).toEqual([]);
+    // 本文にない数字
+    expect(codes(article({ body: article().body + fig(steps.replace("1日の流れ", "120日の休み")) }))).toContain("error:C18");
+    // 形が違う・長すぎる
+    expect(codes(article({ body: article().body + fig("type: chart\nitems: []") }))).toContain("error:C18");
+    expect(codes(article({ body: article().body + fig("type: checklist\nitems:\n  - " + "あ".repeat(41) + "\n  - い") }))).toContain("error:C18");
+    expect(codes(article({ body: article().body + fig("type: steps\nitems: [") }))).toContain("error:C18");
+  });
+
   it("extracts markdown links", () => {
     expect(extractLinks("[a](/articles/x) and [b](https://e.com \"t\")")).toEqual(["/articles/x", "https://e.com"]);
   });

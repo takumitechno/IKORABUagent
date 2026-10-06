@@ -24,6 +24,9 @@ const FAQ = [
   { question: "相談すれば転職できますか？", answer: "相談は、内定や年収アップなどの結果を保証するものではありません。経験や希望をもとに、選択肢や進め方を一緒に考えるためのものです。" },
 ];
 
+/** 相談の流れの各ステップのイラスト（申し込み → 面談 → 求人の紹介 → 応募・面接 → 入社） */
+const FLOW_SCENES = ["laptop", "chat", "search", "interview", "flag"];
+
 export default function ConsultationPage() {
   return (
     <>
@@ -40,6 +43,7 @@ export default function ConsultationPage() {
             </p>
           </div>
           <div className="rounded-2xl bg-brand-tint p-5 ring-1 ring-brand/15">
+            <span aria-hidden="true" className="motif motif-chat mx-auto mb-3 block h-24 w-24 rounded-full bg-white" />
             <ConsultButton placement="consultation-page" />
             <p className="mt-3 text-xs leading-5 text-muted">
               運営: {partner.operatorDisplay}
@@ -92,12 +96,19 @@ export default function ConsultationPage() {
           <h2 id="flow" className="text-[22px] font-bold text-ink">
             相談の流れ
           </h2>
-          <ol className="mt-5 grid gap-3 md:grid-cols-5">
+          <ol className="relative mt-5 grid gap-3 md:grid-cols-5">
+            <span aria-hidden="true" className="reveal-grow-y absolute bottom-8 left-[35px] top-8 border-l-[3px] border-dashed border-brand/30 md:hidden" />
+            <span aria-hidden="true" className="reveal-grow-x absolute left-[10%] right-[10%] top-[44px] hidden border-t-[3px] border-dashed border-brand/30 md:block" />
             {partner.consultationSteps.map((s, i) => (
-              <li key={s.title} className="rounded-xl bg-white p-4 ring-1 ring-line">
-                <p className="text-xs font-bold text-brand">STEP {i + 1}</p>
-                <p className="mt-1 font-bold leading-6 text-ink">{s.title}</p>
-                <p className="mt-2 text-[13px] leading-6 text-muted">{s.body}</p>
+              <li key={s.title} className="reveal relative grid grid-cols-[72px_minmax(0,1fr)] items-start gap-3 rounded-xl bg-white p-3 ring-1 ring-line md:flex md:flex-col md:items-center md:p-4 md:text-center">
+                <span className="relative block aspect-square w-[72px] rounded-full bg-mint md:w-[76px]">
+                  <span aria-hidden="true" className={`motif motif-${FLOW_SCENES[i] ?? "chat"} absolute inset-[6%] block`} />
+                  <span className="absolute -left-1 -top-1 flex h-6 w-6 items-center justify-center rounded-full bg-ink text-[11px] font-bold text-white ring-2 ring-white">{i + 1}</span>
+                </span>
+                <span className="min-w-0 md:mt-2">
+                  <span className="block font-bold leading-6 text-ink">{s.title}</span>
+                  <span className="mt-1 block text-[13px] leading-6 text-muted">{s.body}</span>
+                </span>
               </li>
             ))}
           </ol>

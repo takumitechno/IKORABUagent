@@ -27,6 +27,8 @@ export type PartnerConfig = {
   brandName: string;
   /** サイト上の「運営:」表記 */
   operatorDisplay: string;
+  /** スマホなど狭い場所で使う短い運営者表記 */
+  operatorShort: string;
   /** 有料職業紹介事業許可番号。未確定（非表示）なら null */
   licenseNumber: string | null;
   /** 主な事業領域（運営者情報に表示） */
@@ -91,6 +93,7 @@ const neutral: PartnerConfig = {
   partnerName: "人材紹介会社（社名は正式公開時に掲載）",
   brandName: "はじめて転職ガイド",
   operatorDisplay: "人材紹介会社（社名は正式公開時に掲載）",
+  operatorShort: "人材紹介会社",
   licenseNumber: null,
   consultationUrl: "https://consultation.example/apply",
   consultationMode: "demo",
@@ -110,6 +113,7 @@ const makecareer: PartnerConfig = {
   partnerName: "MakeCareer株式会社",
   brandName: "MakeCareer",
   operatorDisplay: "MakeCareer株式会社",
+  operatorShort: "MakeCareer株式会社",
   licenseNumber: "13-ユ-313746",
   consultationUrl: "https://lp.make-career.co.jp/tenshoku-01/",
   consultationMode: "live",

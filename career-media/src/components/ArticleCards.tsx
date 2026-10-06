@@ -3,7 +3,7 @@ import type { ArticleSummary, Category } from "@/lib/content/types";
 import { articlePath } from "@/lib/seo";
 import { findTaxonomy, taxonomyPath, type TaxonomyGroup } from "@/lib/taxonomy";
 import { categoryTone } from "./CategoryIcon";
-import { formatDateShort } from "./DateMeta";
+import { announcedLabel, formatDate, formatDateShort } from "./DateMeta";
 import { Eyecatch } from "./Eyecatch";
 
 export function findCategory(categories: Category[], slug?: string) {
@@ -29,12 +29,12 @@ function Meta({ article, category }: { article: ArticleSummary; category?: Categ
 export function LeadCard({ article, categories }: { article: ArticleSummary; categories: Category[] }) {
   const category = findCategory(categories, article.categories[0]);
   return (
-    <Link href={articlePath(article)} className="group grid overflow-hidden rounded-[18px] border border-line bg-white shadow-[var(--shadow-card)] transition hover:shadow-[var(--shadow-raised)] md:grid-cols-[1.15fr_1fr]">
+    <Link href={articlePath(article)} className="tap lift group grid overflow-hidden rounded-[18px] border border-line bg-white shadow-[var(--shadow-card)] md:grid-cols-[1.15fr_1fr]">
       <Eyecatch article={article} category={category} size="lg" className="rounded-none md:h-full md:aspect-auto md:min-h-[300px]" />
       <div className="flex flex-col p-5 sm:p-7">
         <Meta article={article} category={category} />
         <h3 className="mt-3 text-[20px] font-bold leading-[1.5] text-ink group-hover:text-brand-strong sm:text-[23px]">{article.title}</h3>
-        <p className="mt-3 line-clamp-4 text-[14.5px] leading-7 text-body">{article.summary}</p>
+        <p className="mt-3 line-clamp-3 text-[14.5px] leading-7 text-body sm:line-clamp-4">{article.summary}</p>
         <span className="mt-auto pt-5 text-sm font-bold text-brand-strong">記事を読む →</span>
       </div>
     </Link>
@@ -44,16 +44,23 @@ export function LeadCard({ article, categories }: { article: ArticleSummary; cat
 /** 中サイズのカード（アイキャッチ＋タイトル） */
 export function FeatureCard({ article, categories, showSummary = true }: { article: ArticleSummary; categories: Category[]; showSummary?: boolean }) {
   const category = findCategory(categories, article.categories[0]);
+  const effective = article.kind === "news" ? article.news?.announcedAt : undefined;
   return (
-    <Link href={articlePath(article)} className="group flex h-full flex-col overflow-hidden rounded-[16px] border border-line bg-white shadow-[var(--shadow-card)] transition hover:-translate-y-0.5 hover:shadow-[var(--shadow-raised)]">
+    <Link href={articlePath(article)} className="tap lift group flex h-full flex-col overflow-hidden rounded-[16px] border border-line bg-white shadow-[var(--shadow-card)]">
       <Eyecatch article={article} category={category} size="md" className="rounded-none" />
       <div className="flex flex-1 flex-col p-4 sm:p-5">
         <h3 className="text-[16px] font-bold leading-[1.6] text-ink group-hover:text-brand-strong">{article.title}</h3>
         {showSummary && <p className="mt-2 line-clamp-2 text-[13px] leading-6 text-muted">{article.summary}</p>}
         <div className="mt-auto pt-3">
-          <time dateTime={article.updatedAt} className="text-xs text-muted">
-            更新 {formatDateShort(article.updatedAt)}
-          </time>
+          {effective ? (
+            <span className="inline-flex items-center rounded-full bg-mist px-2.5 py-0.5 text-[11.5px] font-bold text-mist-ink">
+              {announcedLabel(effective)} {formatDate(effective)}
+            </span>
+          ) : (
+            <time dateTime={article.updatedAt} className="text-xs text-muted">
+              更新 {formatDateShort(article.updatedAt)}
+            </time>
+          )}
         </div>
       </div>
     </Link>
@@ -65,7 +72,7 @@ export function ArticleRow({ article, categories, showSummary = true }: { articl
   const category = findCategory(categories, article.categories[0]);
   return (
     <li>
-      <Link href={articlePath(article)} className="group flex gap-4 py-4">
+      <Link href={articlePath(article)} className="tap group flex gap-4 py-4">
         <Eyecatch article={article} category={category} size="sm" className="w-[72px] sm:w-[84px]" />
         <div className="min-w-0 flex-1">
           <Meta article={article} category={category} />
@@ -81,9 +88,9 @@ export function ArticleRow({ article, categories, showSummary = true }: { articl
   );
 }
 
-export function ArticleList({ articles, categories, showSummary = true }: { articles: ArticleSummary[]; categories: Category[]; showSummary?: boolean }) {
+export function ArticleList({ articles, categories, showSummary = true, className = "" }: { articles: ArticleSummary[]; categories: Category[]; showSummary?: boolean; className?: string }) {
   return (
-    <ul className="divide-y divide-line">
+    <ul className={`divide-y divide-line ${className}`}>
       {articles.map((a) => (
         <ArticleRow key={a.slug} article={a} categories={categories} showSummary={showSummary} />
       ))}
@@ -99,7 +106,7 @@ export function RankList({ articles, categories }: { articles: ArticleSummary[];
         const category = findCategory(categories, a.categories[0]);
         return (
           <li key={a.slug}>
-            <Link href={articlePath(a)} className="group flex items-center gap-3 py-3.5">
+            <Link href={articlePath(a)} className="tap group flex items-center gap-3 py-3.5">
               <span className="w-6 shrink-0 text-center text-[20px] font-bold leading-none text-brand tabular-nums">{i + 1}</span>
               <Eyecatch article={a} category={category} size="sm" className="w-14" />
               <span className="min-w-0 flex-1 text-[14px] font-bold leading-6 text-ink group-hover:text-brand-strong">{a.title}</span>

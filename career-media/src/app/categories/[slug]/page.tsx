@@ -1,7 +1,9 @@
 import { notFound } from "next/navigation";
 import { ArticleList } from "@/components/ArticleCards";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
-import { CategoryIcon, categoryTone } from "@/components/CategoryIcon";
+import { categoryTone } from "@/components/CategoryIcon";
+import { Motif } from "@/components/illustrations/Motif";
+import { categoryScene } from "@/lib/illustrations/scenes";
 import { ConsultationCta } from "@/components/ConsultationCta";
 import { getRepository } from "@/lib/content";
 import { pageMetadata } from "@/lib/seo";
@@ -43,12 +45,12 @@ export default async function CategoryPage({ params }: Props) {
           { name: category.name, path: `/categories/${slug}` },
         ]}
       />
-      <header className="mt-6 flex items-start gap-4">
-        <span className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl ${tone.bg} ${tone.fg}`}>
-          <CategoryIcon name={category.icon} className="h-6 w-6" />
+      <header className="mt-6 flex items-center gap-4">
+        <span className={`enter-pop relative block aspect-square w-[72px] shrink-0 rounded-full sm:w-[104px] ${tone.bg}`}>
+          <Motif name={categoryScene(category.slug)} className="anim-float-slow absolute inset-[4%]" />
         </span>
-        <div>
-          <h1 className="text-[26px] font-bold text-ink sm:text-[30px]">{category.name}</h1>
+        <div className="min-w-0">
+          <h1 className="text-[24px] font-bold text-ink sm:text-[30px]">{category.name}</h1>
           <p className="mt-1 text-sm leading-7 text-muted">{category.description}</p>
         </div>
       </header>

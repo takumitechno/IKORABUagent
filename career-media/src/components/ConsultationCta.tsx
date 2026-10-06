@@ -2,6 +2,7 @@ import Link from "next/link";
 import { ArrowUpRight, CheckCircle2, MessageCircle } from "lucide-react";
 import { licenseLabel, partner } from "@/config/partner";
 import { buildConsultationUrl, type CtaPlacement } from "@/lib/consultation";
+import { ChatMock } from "./illustrations/ChatMock";
 
 type Props = {
   placement: CtaPlacement;
@@ -63,34 +64,42 @@ export function ConsultationCta({ placement, contentSlug, variant = "band", head
   }
 
   return (
-    <section aria-labelledby={`cta-${placement}`} className="no-print overflow-hidden rounded-[20px] bg-ink text-white">
-      <div className="grid gap-8 p-6 sm:p-10 md:grid-cols-[1.4fr_1fr] md:items-center">
+    <section aria-labelledby={`cta-${placement}`} className="no-print overflow-hidden rounded-[24px] bg-ink text-white">
+      <div className="grid gap-8 p-6 sm:p-10 md:grid-cols-[1.3fr_1fr] md:items-center">
         <div>
-          <p className="text-xs font-bold tracking-[0.2em] text-accent-bright">CAREER CONSULTATION</p>
-          <h2 id={`cta-${placement}`} className="mt-3 text-2xl font-bold leading-snug sm:text-[28px]">
+          <div className="flex items-center gap-3">
+            <span className="motif motif-chat block h-12 w-12 shrink-0 rounded-full bg-white/90 md:hidden" aria-hidden="true" />
+            <p className="text-xs font-bold tracking-[0.2em] text-accent-bright">CAREER CONSULTATION</p>
+          </div>
+          <h2 id={`cta-${placement}`} className="mt-3 text-[22px] font-bold leading-snug sm:text-[28px]">
             {heading ?? "整理した条件をもとに、キャリアアドバイザーに相談する"}
           </h2>
-          <p className="mt-4 text-[15px] leading-8 text-white/80">
+          <p className="mt-3 text-[15px] leading-7 text-white/80 sm:leading-8">
             {lead ?? "キャリアアドバイザーが、あなたの経験と希望をもとに、未経験からの選択肢を一緒に考えます。"}
           </p>
           <ul className="mt-5 space-y-2.5">
             {POINTS.map((p) => (
-              <li key={p} className="flex items-start gap-2 text-[15px] text-white/90">
+              <li key={p} className="flex items-start gap-2 text-[14.5px] text-white/90">
                 <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-accent-bright" aria-hidden="true" />
                 {p}
               </li>
             ))}
           </ul>
-        </div>
-        <div className="rounded-2xl bg-white/[0.06] p-5 ring-1 ring-white/10 sm:p-6">
-          <ConsultButton placement={placement} contentSlug={contentSlug} size="lg" />
-          <p className="mt-4 text-[13px] leading-6 text-white/75">相談したあとに応募するかどうかは、ご自身で決められます。</p>
-          <Link href="/consultation" className="mt-2 inline-block text-[13px] font-medium text-white underline underline-offset-4 hover:text-accent-bright">
-            相談の流れ・できることを見る
-          </Link>
+          <div className="mt-6">
+            <ConsultButton placement={placement} contentSlug={contentSlug} size="lg" />
+          </div>
+          <p className="mt-3 text-[13px] leading-6 text-white/75">
+            相談したあとに応募するかどうかは、ご自身で決められます。
+            <Link href="/consultation" className="ml-1 font-medium text-white underline underline-offset-4 hover:text-accent-bright">
+              相談の流れ・できることを見る
+            </Link>
+          </p>
           <p className="mt-5 border-t border-white/10 pt-4 text-[11px] leading-5 text-white/60">
             運営: {partner.operatorDisplay}（有料職業紹介事業許可番号 {licenseLabel}）
           </p>
+        </div>
+        <div className="hidden md:block">
+          <ChatMock />
         </div>
       </div>
     </section>

@@ -40,7 +40,15 @@ const problems = [];
 
 const browser = await chromium.launch();
 for (const [vpName, viewport] of Object.entries(VIEWPORTS)) {
-  const context = await browser.newContext({ viewport: { width: viewport.width, height: viewport.height }, isMobile: viewport.isMobile, deviceScaleFactor: viewport.deviceScaleFactor ?? 1, locale: "ja-JP" });
+  // 全体のスクリーンショットは「動きを減らす」設定で撮る（スクロールで現れる表現が途中の状態で写らないように）。
+  // MOTION=1 で動きありのまま撮る。
+  const context = await browser.newContext({
+    viewport: { width: viewport.width, height: viewport.height },
+    isMobile: viewport.isMobile,
+    deviceScaleFactor: viewport.deviceScaleFactor ?? 1,
+    locale: "ja-JP",
+    reducedMotion: process.env.MOTION === "1" ? "no-preference" : "reduce",
+  });
   for (const [name, url] of PAGES) {
     if (only.length && !only.includes(name)) continue;
     const page = await context.newPage();

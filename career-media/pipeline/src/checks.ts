@@ -12,6 +12,7 @@
  */
 import { isPubliclyVisible } from "../../src/lib/content/parse";
 import type { Article, Category } from "../../src/lib/content/types";
+import { extractNumbers, figureTexts, parseFigure, splitFigures } from "../../src/lib/figures";
 import { JOB_ROLES } from "../../src/lib/jobs";
 import { TAXONOMY, type TaxonomyGroup } from "../../src/lib/taxonomy";
 
@@ -220,6 +221,23 @@ export function checkArticle(article: Article, ctx: CheckContext): Finding[] {
     if (m) err("C17", `読者をラベリングする表現: 「${m[0]}」`);
   }
   for (const word of JARGON) if (text.includes(word)) warn("C17", `硬い業界用語: 「${word}」→ 読者の言葉に言い換える`);
+
+  // C18 図解（```figure）: 形が正しいか、スマホで読める長さか、本文にない数字を図解だけに書いていないか
+  const { figures, rest } = splitFigures(article.body);
+  const bodyNumbers = new Set(extractNumbers(`${rest}\n${article.summary}`));
+  figures.forEach((fig, i) => {
+    const label = `図解${i + 1}（本文${fig.line}行目）`;
+    const r = parseFigure(fig.source);
+    if (!r.ok) {
+      for (const e of r.errors) err("C18", `${label}: ${e}`);
+      return;
+    }
+    for (const n of new Set(figureTexts(r.spec).flatMap(extractNumbers))) {
+      if (!bodyNumbers.has(n)) err("C18", `${label}: 数字「${n}」が本文にない。図解は本文の内容を見やすくするもの（図解だけの事実を書かない）`);
+    }
+  });
+  if (figures.length > 4) warn("C18", `図解が多い（${figures.length}個）。1記事に1〜3個が目安`);
+  if (/^```(?!figure\b)[a-z]+/m.test(article.body)) warn("C18", "figure 以外のコードブロックがある。読者向けの記事ではコードブロックを使わない");
 
   // C14 長さの目安（文字数ノルマではなく、極端な過不足の検出）
   if (article.title.length > 60) warn("C14", `title が長い（${article.title.length}文字）`);

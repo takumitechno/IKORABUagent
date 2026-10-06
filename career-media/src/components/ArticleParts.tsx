@@ -8,7 +8,7 @@ import { CategoryChip, FeatureCard, findCategory, TagChips } from "./ArticleCard
 import { Eyecatch } from "./Eyecatch";
 import { formatDate } from "./DateMeta";
 
-export function ArticleHeader({ article, categories, readingMinutes }: { article: Article; categories: Category[]; readingMinutes: number }) {
+export function ArticleHeader({ article, categories, readingMinutes, headings = [] }: { article: Article; categories: Category[]; readingMinutes: number; headings?: Heading[] }) {
   return (
     <header>
       <Eyecatch article={article} category={findCategory(categories, article.categories[0])} size="banner" className="-mx-5 -mt-7 mb-6 rounded-b-none rounded-t-[20px] sm:-mx-10 sm:-mt-10 sm:mb-8" />
@@ -56,10 +56,25 @@ export function ArticleHeader({ article, categories, readingMinutes }: { article
       <div className="mt-4">
         <TagChips article={article} />
       </div>
-      <div className="mt-6 rounded-[var(--radius-card)] border border-brand/20 bg-brand-tint p-5">
-        <p className="text-xs font-bold tracking-wider text-brand-strong">この記事でわかること</p>
-        <p className="mt-2 text-[15px] leading-8 text-body">{article.summary}</p>
-      </div>
+      <p className="mt-5 text-[15px] leading-8 text-body">{article.summary}</p>
+      {headings.length > 1 && (
+        <nav aria-label="この記事でわかること" className="mt-6 rounded-[18px] bg-brand-tint p-4 ring-1 ring-brand/15 sm:p-5">
+          <p className="flex items-center gap-2 text-[13px] font-bold text-brand-strong">
+            <ListOrdered className="h-4 w-4" aria-hidden="true" />
+            この記事でわかること
+          </p>
+          <ol className="mt-3 grid gap-2 sm:grid-cols-2">
+            {headings.map((h, i) => (
+              <li key={h.id}>
+                <a href={`#${h.id}`} className="tap group flex h-full items-start gap-2.5 rounded-xl bg-white px-3 py-2.5 text-[13.5px] font-bold leading-6 text-ink ring-1 ring-line hover:ring-brand/40">
+                  <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-md bg-brand text-[11px] text-white">{i + 1}</span>
+                  <span className="group-hover:text-brand-strong">{h.text}</span>
+                </a>
+              </li>
+            ))}
+          </ol>
+        </nav>
+      )}
       <p className="mt-4 text-xs leading-6 text-muted">
         編集: {site.editorialTeam}（運営: {partner.operatorDisplay}）・
         <Link href="/editorial-policy" className="underline hover:text-brand-strong">
