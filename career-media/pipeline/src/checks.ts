@@ -224,7 +224,9 @@ export function checkArticle(article: Article, ctx: CheckContext): Finding[] {
 
   // C18 図解（```figure）: 形が正しいか、スマホで読める長さか、本文にない数字を図解だけに書いていないか
   const { figures, rest } = splitFigures(article.body);
-  const bodyNumbers = new Set(extractNumbers(`${rest}\n${article.summary}`));
+  // ニュースは、画面に出る解説欄（何が発表されたか など）も本文として扱う
+  const newsText = article.news ? [article.news.whatHappened, article.news.whoIsAffected, article.news.impactForCareerChangers, ...article.news.unknowns, ...article.news.whatToCheck].join("\n") : "";
+  const bodyNumbers = new Set(extractNumbers(`${rest}\n${article.summary}\n${newsText}`));
   figures.forEach((fig, i) => {
     const label = `図解${i + 1}（本文${fig.line}行目）`;
     const r = parseFigure(fig.source);

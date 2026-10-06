@@ -98,11 +98,13 @@ for (const [vpName, viewport] of Object.entries(VIEWPORTS)) {
     ];
     for (let step = 0; step < answers.length; step++) {
       for (const [name, value] of answers[step]) {
-        // 段の切り替え直後は再描画と重なってクリックが空振りすることがあるので数回だけやり直す
+        // 利用者と同じように、見えている選択肢（label）を押す。押せたかは input の状態で確かめる
         const input = page.locator(`input[name="${name}"][value="${value}"]`);
+        const option = page.locator("label", { has: input });
         for (let attempt = 0; ; attempt++) {
           try {
-            await input.check({ force: true, timeout: 3000 });
+            if (!(await input.isChecked())) await option.click({ timeout: 3000 });
+            if (!(await input.isChecked())) throw new Error(`${name}=${value} が選択されていない`);
             break;
           } catch (err) {
             if (attempt >= 2) throw err;
