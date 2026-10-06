@@ -15,6 +15,7 @@ roles: []
 concerns: [mikeiken-shokushu]
 situations: [pc-mikeiken]
 eyecatch: ["転職前に学びたい。", "講座の費用、補助ある？"]
+illustration: graduation
 related: [ai-shigoto-mikeiken, news-koyou-hoken-kyufu-seigen, eigyo-cs-it-support-chigai]
 news:
   announced_by: 厚生労働省

@@ -57,6 +57,7 @@ concerns: [office, mikeiken-shokushu]   # 悩みから探す（CONCERNS）
 situations: [sekkyaku, pc-mikeiken]     # 今の状況から探す（SITUATIONS）
 eyecatch: ["PCが苦手でも、", "事務職って目指せる？"]  # カードに大きく出す1〜2行。1行12文字前後まで
 recommended: false                  # 編集部おすすめ（編集長が決める。Writer は false のまま）
+# illustration: coins               # 任意。カードのイラストを指定したいときだけ（src/lib/illustrations/motifs.ts の名前。C16 で検査）
 ```
 
 - タグは記事の中身が本当に役立つ入口にだけ付ける（1グループ0〜3個）。悩みか状況のどちらかは必ず付ける

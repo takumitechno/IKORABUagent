@@ -84,6 +84,7 @@ export function parseArticleFile(raw: string, fileSlug: string): Article {
     concerns: toStringArray(data.concerns),
     situations: toStringArray(data.situations),
     eyecatch: toStringArray(data.eyecatch).map((l) => l.trim()).filter(Boolean),
+    illustration: data.illustration ? String(data.illustration).trim() : null,
     recommended: Boolean(data.recommended),
     faq: toFaq(data.faq),
     sources: toSources(data.sources),

@@ -2,7 +2,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
 import { MOTIF_NAMES, motifsCss } from "@/lib/illustrations/motifs";
-import { CATEGORY_SCENE, JOB_ROLE_SCENE, TAXONOMY_SCENE } from "@/lib/illustrations/scenes";
+import { articleScene, CATEGORY_SCENE, JOB_ROLE_SCENE, TAXONOMY_SCENE } from "@/lib/illustrations/scenes";
 import { loadCategories } from "@/lib/content/local-repository";
 import { JOB_ROLES } from "@/lib/jobs";
 import { TAXONOMY, type TaxonomyGroup } from "@/lib/taxonomy";
@@ -21,6 +21,14 @@ describe("illustrations", () => {
     }
     for (const c of loadCategories()) expect(MOTIF_NAMES).toContain(CATEGORY_SCENE[c.slug]);
     for (const r of JOB_ROLES) expect(MOTIF_NAMES).toContain(JOB_ROLE_SCENE[r.slug]);
+  });
+
+  it("an article's illustration comes from frontmatter first, then its tags and category", () => {
+    const base = { roles: [], concerns: ["kyuryo"], situations: ["freeter"], categories: ["news"] };
+    expect(articleScene({ ...base, illustration: "people" })).toBe("people");
+    expect(articleScene({ ...base, illustration: "unknown" })).toBe("coins");
+    expect(articleScene({ ...base, concerns: [], illustration: null })).toBe("clock");
+    expect(articleScene({ roles: [], concerns: [], situations: [], categories: ["news"] })).toBe("newspaper");
   });
 
   it("motifs are self-contained SVG (no external references or scripts)", () => {

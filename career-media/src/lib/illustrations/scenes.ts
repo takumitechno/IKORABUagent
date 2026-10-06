@@ -1,5 +1,5 @@
 import type { TaxonomyGroup } from "../taxonomy";
-import type { MotifName } from "./motifs";
+import { MOTIF_NAMES, type MotifName } from "./motifs";
 
 /** 入口（職種・悩み・状況）ごとのイラスト。同じ入口の中では重ならないようにしている */
 export const TAXONOMY_SCENE: Record<TaxonomyGroup, Record<string, MotifName>> = {
@@ -34,8 +34,11 @@ export function categoryScene(slug: string | undefined): MotifName {
   return (slug && CATEGORY_SCENE[slug]) || "flag";
 }
 
-/** 記事のイラスト: 職種 → 悩み → 状況 → カテゴリの順に、最初に当てはまるもの */
-export function articleScene(article: { roles: string[]; concerns: string[]; situations: string[]; categories: string[] }): MotifName {
+export const isMotifName = (name: unknown): name is MotifName => typeof name === "string" && (MOTIF_NAMES as string[]).includes(name);
+
+/** 記事のイラスト: frontmatter の illustration → 職種 → 悩み → 状況 → カテゴリの順に、最初に当てはまるもの */
+export function articleScene(article: { roles: string[]; concerns: string[]; situations: string[]; categories: string[]; illustration?: string | null }): MotifName {
+  if (isMotifName(article.illustration)) return article.illustration;
   const role = article.roles[0];
   if (role && TAXONOMY_SCENE.roles[role]) return TAXONOMY_SCENE.roles[role];
   const concern = article.concerns[0];

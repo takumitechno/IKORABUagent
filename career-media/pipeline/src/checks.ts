@@ -13,6 +13,7 @@
 import { isPubliclyVisible } from "../../src/lib/content/parse";
 import type { Article, Category } from "../../src/lib/content/types";
 import { extractNumbers, figureTexts, parseFigure, splitFigures } from "../../src/lib/figures";
+import { MOTIF_NAMES } from "../../src/lib/illustrations/motifs";
 import { JOB_ROLES } from "../../src/lib/jobs";
 import { TAXONOMY, type TaxonomyGroup } from "../../src/lib/taxonomy";
 
@@ -213,6 +214,7 @@ export function checkArticle(article: Article, ctx: CheckContext): Finding[] {
   if (targetsPublic && article.kind === "article" && article.concerns.length + article.situations.length === 0) warn("C16", "悩み（concerns）か今の状況（situations）のタグがない。入口ページに出ない");
   if (targetsPublic && article.eyecatch.length === 0) warn("C16", "eyecatch（カードの短い文言）がない。title で代用される");
   if (article.eyecatch.length > 2) err("C16", "eyecatch は2行まで");
+  if (article.illustration && !(MOTIF_NAMES as string[]).includes(article.illustration)) err("C16", `illustration は ${MOTIF_NAMES.join(" / ")} のどれか: ${article.illustration}`);
   for (const line of article.eyecatch) if (line.length > 16) warn("C16", `eyecatch の1行が長い（${line.length}文字）: ${line}`);
 
   // C17 読者をラベリングする表現・硬い業界用語

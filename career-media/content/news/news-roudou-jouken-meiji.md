@@ -15,6 +15,7 @@ roles: []
 concerns: [mikeiken-shokushu]
 situations: [hajimete]
 eyecatch: ["入社後の仕事や勤務地、", "どこまで変わる？"]
+illustration: search
 related: [donichi-yasumi-nenshu-hikaku, tenshoku-kaisu-kininaru, freeter-seishain-hajimeni]
 news:
   announced_by: 厚生労働省

@@ -92,7 +92,9 @@ career-media/
 │   ├── lib/condition-check/   条件整理チェックの設問とルールエンジン（純粋関数）
 │   ├── lib/jobs.ts            職種比較データ
 │   ├── lib/seo.ts             metadata / canonical / OGP / JSON-LD
-│   ├── lib/markdown.ts        Markdown → HTML（生 HTML はエスケープ、目次、中間 CTA 位置）
+│   ├── lib/markdown.ts        Markdown → HTML（生 HTML はエスケープ、目次、中間 CTA 位置、表のスマホ表示）
+│   ├── lib/figures.ts         記事の「図解」ブロック（```figure）の検証と描画
+│   ├── lib/illustrations/     オリジナルの小さなイラスト（motifs.ts）と、記事・入口ごとの割り当て
 │   └── app/                   Next.js App Router の各ページ
 ├── content/                   記事・ニュース（frontmatter + Markdown）、カテゴリ、査読記録
 ├── supabase/                  migration（schema + RLS + 公開ガード）と生成 seed
@@ -102,6 +104,8 @@ career-media/
 
 - **フロント**: Next.js 16（App Router）+ TypeScript + Tailwind CSS 4。記事ページは SSG + ISR（10分）。フォントは Noto Sans JP をビルド時に自己ホスト。
 - **データ**: フロントは `ContentRepository` interface だけに依存。既定は `content/` の Markdown（セットアップ不要）、`CONTENT_SOURCE=supabase` で Supabase（anon key のみ）。どちらも **status=published かつ公開日・査読日・情報確認日・出典がそろったもの** だけを返す。
+- **見て分かる UI**: 外部素材を使わずに描いたイラスト（`src/lib/illustrations/motifs.ts`）を CSS の背景画像として1回だけ配信し、記事カード・入口タイル・図解に使う。編集したら `npm run motifs` で `src/app/motifs.css` を作り直す（テストで生成漏れを検出）。記事本文には ```figure ブロックで図解（流れ・比較・数字・式・チェックリスト）を入れられ、図解の数字は本文にあるものだけに限る（C18）。カードのイラストは frontmatter の `illustration` で個別に指定もできる（C16）。
+- **動き**: ふわっと浮かぶイラスト、スクロールで現れる表現（`animation-timeline: view()` 対応ブラウザのみ）など。動きの始まりも文字が読める状態にしてあり、「視差効果を減らす」設定では一切動かない。`npm run screenshots` は動きを止めた状態で全画面を撮り、あわせて動きありの状態で「画面に入った要素が表示されきるか」を確かめる。
 - **相談導線**: CTA の遷移先はすべて `buildConsultationUrl(placement, slug)` で生成し、`partner.consultationUrl` に `utm_*` を付与。LP や計測 URL の差し替えは `partner.ts`（または `PARTNER_CONSULTATION_URL` / `PARTNER_CAMPAIGN_ID`）だけで済む。社名・LP・許可番号が `src/` の他所に直書きされていないことをテストで検証している。
 
 ## DB（Supabase / Postgres）

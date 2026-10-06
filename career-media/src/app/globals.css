@@ -730,12 +730,13 @@ body {
 @keyframes dash-move {
   to { stroke-dashoffset: -48; }
 }
+/* 動きの始まりも「見える状態」にしておく（まだスクロールしていない部分や、動きの途中で止まっても文字が読める） */
 @keyframes rise-in {
-  from { opacity: 0; transform: translateY(18px); }
+  from { opacity: 0.5; transform: translateY(18px); }
   to { opacity: 1; transform: none; }
 }
 @keyframes pop-in {
-  from { opacity: 0; transform: scale(0.86); }
+  from { opacity: 0.5; transform: scale(0.88); }
   to { opacity: 1; transform: none; }
 }
 @keyframes grow-x {

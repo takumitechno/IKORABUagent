@@ -80,6 +80,8 @@ describe("reviewer checks (ported from ZIP check_article)", () => {
   it("C16/C17: rejects unknown entry tags, over-long eyecatch and income labeling", () => {
     expect(codes(article({ concerns: ["unknown-concern"] }))).toContain("error:C16");
     expect(codes(article({ eyecatch: ["1行目", "2行目", "3行目"] }))).toContain("error:C16");
+    expect(codes(article({ illustration: "not-a-motif" }))).toContain("error:C16");
+    expect(codes(article({ illustration: "coins" })).filter((c) => c === "error:C16")).toEqual([]);
     expect(codes(article({ body: article().body + "\n年収350万円以下の人向けの記事です。" }))).toContain("error:C17");
     expect(codes(article({ body: article().body + "\nあなたの市場価値を上げよう。" }))).toContain("warning:C17");
     expect(codes(article({ body: article().body + "\n[入口](/concerns/donichi) [職種](/jobs/jimu)" })).filter((c) => c === "error:C05")).toEqual([]);

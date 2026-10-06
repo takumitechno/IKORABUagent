@@ -151,7 +151,7 @@ export default async function JobsPage() {
                         <span className="text-[12px] text-muted">{LEVEL_LABELS[axis.labelKey][level]}</span>
                       </span>
                       <span className="col-start-2 block h-2.5 overflow-hidden rounded-full bg-line" role="img" aria-label={`${r.name}の${axis.label}: 5段階中${level}`}>
-                        <span className="reveal-grow-x block h-full rounded-full bg-brand" style={{ width: `${level * 20}%` }} />
+                        <span className="block h-full rounded-full bg-brand" style={{ width: `${level * 20}%` }} />
                       </span>
                     </a>
                   </li>

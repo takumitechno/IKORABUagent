@@ -90,7 +90,7 @@ async function main() {
   // 記事一覧の行（検索結果の表示に使う）
   const listHtml = (await get(base, "/articles")).html;
   const rows = new Map<string, string>();
-  for (const m of listHtml.matchAll(/<li><a class="group flex gap-4[^"]*" href="([^"]+)">[\s\S]*?<\/a><\/li>/g)) rows.set(m[1], m[0]);
+  for (const m of listHtml.matchAll(/<li><a class="[^"]*\bgroup flex gap-4[^"]*" href="([^"]+)">[\s\S]*?<\/a><\/li>/g)) rows.set(m[1], m[0]);
   const searchIndex = await Promise.all(
     articles.map(async (a) => {
       const full = await repo.getArticle(a.slug);

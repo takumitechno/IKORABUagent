@@ -64,6 +64,8 @@ export type Article = {
   situations: string[];
   /** カードのアイキャッチに出す短い文言（1〜2行） */
   eyecatch: string[];
+  /** カードのイラストを明示したいときだけ指定（src/lib/illustrations/motifs.ts の名前）。なければタグから決まる */
+  illustration?: string | null;
   /** 編集部おすすめ（閲覧数ではなく編集判断） */
   recommended: boolean;
   faq: Faq[];

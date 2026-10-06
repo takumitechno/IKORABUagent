@@ -15,6 +15,7 @@ roles: []
 concerns: [yametai]
 situations: [hajimete]
 eyecatch: ["子育てと仕事、", "会社の制度どう見る？"]
+illustration: people
 related: [yametai-mae-kakunin, agent-mendan-mae, news-roudou-jouken-meiji]
 news:
   announced_by: 厚生労働省

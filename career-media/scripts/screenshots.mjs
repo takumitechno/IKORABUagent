@@ -124,6 +124,36 @@ for (const [vpName, viewport] of Object.entries(VIEWPORTS)) {
   }
   await context.close();
 }
+// 動きありの設定で、スクロールで現れる要素が画面に入ったあと、きちんと表示されきるか（消えたままにならないか）
+if (!only.length || only.includes("motion")) {
+  for (const [vpName, viewport] of Object.entries(VIEWPORTS)) {
+    const context = await browser.newContext({ viewport: { width: viewport.width, height: viewport.height }, isMobile: viewport.isMobile, deviceScaleFactor: 1, locale: "ja-JP", reducedMotion: "no-preference" });
+    for (const url of ["/", "/articles/mikeiken-tenshoku-hajimekata", "/jobs", "/news", "/check"]) {
+      const page = await context.newPage();
+      await page.goto(BASE_URL + url, { waitUntil: "load" });
+      await page.waitForTimeout(900);
+      const count = await page.locator(".reveal, .reveal-pop, .reveal-grow-x, .reveal-grow-y").count();
+      const hidden = [];
+      for (let i = 0; i < count; i++) {
+        const el = page.locator(".reveal, .reveal-pop, .reveal-grow-x, .reveal-grow-y").nth(i);
+        if (!(await el.isVisible())) continue;
+        await el.evaluate((node) => node.scrollIntoView({ block: "center", behavior: "instant" }));
+        await page.waitForTimeout(120);
+        const state = await el.evaluate((node) => {
+          const cs = getComputedStyle(node);
+          const m = cs.transform.match(/matrix\(([^)]+)\)/);
+          const scaleX = m ? Number(m[1].split(",")[0]) : 1;
+          return { opacity: Number(cs.opacity), scaleX, label: `${node.tagName.toLowerCase()}.${String(node.className).slice(0, 40)}` };
+        });
+        if (state.opacity < 0.98 || state.scaleX < 0.98) hidden.push(`${state.label} opacity=${state.opacity} scaleX=${state.scaleX}`);
+      }
+      for (const h of hidden.slice(0, 5)) problems.push(`[${vpName}] ${url} motion: still hidden after scrolling into view: ${h}`);
+      await page.close();
+    }
+    await context.close();
+  }
+}
+
 await browser.close();
 
 if (problems.length) {
