@@ -13,7 +13,8 @@
     "content:check": "tsx pipeline/src/cli.ts check",
     "db:seed-sql": "tsx pipeline/src/cli.ts seed-sql",
     "db:verify": "bash scripts/verify-db.sh",
-    "screenshots": "node scripts/screenshots.mjs"
+    "screenshots": "node scripts/screenshots.mjs",
+    "local": "bash scripts/start-local.sh"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.117.2",
@@ -30,10 +31,14 @@
     "@types/node": "^26.6.4",
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
+    "esbuild": "^0.28.2",
     "playwright": "^1.56.1",
     "tailwindcss": "^4.3.3",
     "tsx": "^4.23.15",
     "typescript": "5.9",
     "vitest": "^5.0.3"
+  },
+  "engines": {
+    "node": ">=20.9.0"
   }
 }

@@ -43,6 +43,8 @@ export type PartnerConfig = {
   brandUsageApproved: boolean;
   /** 運営者情報のうち、正式公開前に確定が必要な項目 */
   pendingCompanyInfo: { address: string | null; contact: string | null; representative: string | null };
+  /** 画面上部のプレビューバーの文言（brandUsageApproved=false の間だけ表示） */
+  previewNotice: string;
 };
 
 const base: PartnerConfig = {
@@ -75,10 +77,32 @@ const base: PartnerConfig = {
   brandUsageApproved: false,
   // TODO(正式公開前にMakeCareer確認が必要): 確定値を受領するまで null（画面には「確認中」と表示）
   pendingCompanyInfo: { address: null, contact: null, representative: null },
+  previewNotice: "提案用プレビュー（非公開）— 掲載内容・ブランド表記は正式公開前に確認予定です",
 };
 
-export const partner: PartnerConfig = {
+/**
+ * 社名・許可番号・相談先をすべて架空のサンプルに置き換えたデモ用プロファイル。
+ * 実在企業の名義を使わずに画面を共有するとき（例: デモ用の静的スナップショット）に
+ * PARTNER_PROFILE=demo で使う。
+ */
+const demo: PartnerConfig = {
   ...base,
-  consultationUrl: process.env.PARTNER_CONSULTATION_URL || base.consultationUrl,
-  campaignId: process.env.PARTNER_CAMPAIGN_ID || base.campaignId,
+  partnerName: "サンプルキャリア株式会社（架空）",
+  brandName: "SampleCareer",
+  operatorDisplay: "サンプルキャリア株式会社（架空の運営会社）",
+  licenseNumber: "00-ユ-000000（架空）",
+  consultationUrl: "https://consultation.example/apply",
+  campaignId: "demo",
+  corporateUrl: "https://company.example/",
+  disclosure:
+    "当メディアは、人材紹介サービスを提供する運営会社（デモでは架空のサンプルキャリア株式会社）が運営する想定です。記事や条件整理チェックの中で、運営会社のキャリア相談サービスをご案内します。記事の内容は特定の求人や企業への応募をすすめるものではありません。",
+  previewNotice: "デモ版 — 運営会社名・許可番号・相談先はすべて架空のサンプル表記です",
+};
+
+const selected = process.env.PARTNER_PROFILE === "demo" ? demo : base;
+
+export const partner: PartnerConfig = {
+  ...selected,
+  consultationUrl: process.env.PARTNER_CONSULTATION_URL || selected.consultationUrl,
+  campaignId: process.env.PARTNER_CAMPAIGN_ID || selected.campaignId,
 };

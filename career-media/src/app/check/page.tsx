@@ -38,7 +38,7 @@ export default function CheckPage() {
           </li>
         </ul>
       </header>
-      <div className="mt-8 rounded-[20px] bg-canvas">
+      <div id="condition-check-root" className="mt-8 rounded-[20px] bg-canvas">
         <ConditionCheck consultationHref={buildConsultationUrl("check-result")} consultationLabel={partner.consultationIsFree ? "キャリアアドバイザーに無料で相談する" : "キャリアアドバイザーに相談する"} />
       </div>
     </div>

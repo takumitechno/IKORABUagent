@@ -8,7 +8,6 @@ featured: true
 published_at: 2026-09-20
 updated_at: 2026-10-04
 reviewed_at: 2026-10-04
-reviewed_by: MakeCareer 編集部
 information_checked_at: 2026-10-04
 related: [mikeiken-tenshoku-hajimekata, donichi-yasumi-nenshu-hikaku, mikeiken-kenshu-kakunin]
 faq:

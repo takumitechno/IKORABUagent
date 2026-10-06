@@ -29,7 +29,7 @@ describe("consultation flow (partner config)", () => {
 
   it("does not hardcode the partner into article content", () => {
     const files = walk(path.join(process.cwd(), "content")).filter((f) => f.endsWith(".md"));
-    for (const f of files) expect(fs.readFileSync(f, "utf8")).not.toMatch(/make-career\.co\.jp|MakeCareer株式会社|13-ユ-313746/);
+    for (const f of files) expect(fs.readFileSync(f, "utf8")).not.toMatch(/make-career\.co\.jp|MakeCareer|13-ユ-313746/);
   });
 
   it("stays unindexable until brand usage is approved", async () => {

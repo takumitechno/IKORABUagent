@@ -8,7 +8,7 @@ import { isStepComplete, sanitizeAnswers, STEPS, type Answers, type Question } f
 
 const STORAGE_KEY = "condition-check:v1";
 
-type Props = { consultationHref: string; consultationLabel: string };
+type Props = { consultationHref: string; consultationLabel: string; allowPrint?: boolean };
 
 function OptionButton({ question, optionId, label, selected, onToggle }: { question: Question; optionId: string; label: string; selected: boolean; onToggle: () => void }) {
   const inputType = question.type === "single" ? "radio" : "checkbox";
@@ -32,7 +32,7 @@ function OptionButton({ question, optionId, label, selected, onToggle }: { quest
   );
 }
 
-export function ConditionCheck({ consultationHref, consultationLabel }: Props) {
+export function ConditionCheck({ consultationHref, consultationLabel, allowPrint = true }: Props) {
   const [answers, setAnswers] = useState<Answers>({});
   const [stepIndex, setStepIndex] = useState(0);
   const [showResult, setShowResult] = useState(false);
@@ -185,7 +185,7 @@ export function ConditionCheck({ consultationHref, consultationLabel }: Props) {
           </div>
         </div>
       ) : (
-        <Result result={result} consultationHref={consultationHref} consultationLabel={consultationLabel} onBack={back} onRestart={restart} onCopy={copy} copied={copied} />
+        <Result result={result} consultationHref={consultationHref} consultationLabel={consultationLabel} allowPrint={allowPrint} onBack={back} onRestart={restart} onCopy={copy} copied={copied} />
       )}
     </div>
   );
@@ -212,6 +212,7 @@ function Result({
   result,
   consultationHref,
   consultationLabel,
+  allowPrint,
   onBack,
   onRestart,
   onCopy,
@@ -220,6 +221,7 @@ function Result({
   result: CheckResult;
   consultationHref: string;
   consultationLabel: string;
+  allowPrint: boolean;
   onBack: () => void;
   onRestart: () => void;
   onCopy: () => void;
@@ -239,10 +241,12 @@ function Result({
             <ClipboardCopy className="h-4 w-4" aria-hidden="true" />
             {copied ? "コピーしました" : "結果をテキストでコピー"}
           </button>
-          <button type="button" onClick={() => window.print()} className="inline-flex items-center gap-1.5 rounded-full bg-white/10 px-4 py-2 text-[13px] font-bold ring-1 ring-white/20 hover:bg-white/20">
-            <Printer className="h-4 w-4" aria-hidden="true" />
-            印刷・PDFで保存
-          </button>
+          {allowPrint && (
+            <button type="button" onClick={() => window.print()} className="inline-flex items-center gap-1.5 rounded-full bg-white/10 px-4 py-2 text-[13px] font-bold ring-1 ring-white/20 hover:bg-white/20">
+              <Printer className="h-4 w-4" aria-hidden="true" />
+              印刷・PDFで保存
+            </button>
+          )}
         </div>
       </div>
 

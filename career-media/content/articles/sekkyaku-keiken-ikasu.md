@@ -8,7 +8,6 @@ featured: true
 published_at: 2026-08-25
 updated_at: 2026-09-28
 reviewed_at: 2026-09-28
-reviewed_by: MakeCareer 編集部
 information_checked_at: 2026-09-28
 related: [shiboudouki-mikeiken, eigyo-cs-it-support-chigai, mikeiken-tenshoku-hajimekata]
 faq:

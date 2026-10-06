@@ -2,6 +2,8 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   poweredByHeader: false,
+  // デモ用プロファイルのビルドを本番ビルドと分けて置けるようにする
+  distDir: process.env.NEXT_DIST_DIR || ".next",
   // 記事本文 (content/*.md) をサーバー側で読むため、トレース対象に含める
   outputFileTracingIncludes: {
     "/**": ["./content/**/*"],

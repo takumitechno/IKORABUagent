@@ -8,7 +8,6 @@ featured: true
 published_at: 2026-08-18
 updated_at: 2026-10-01
 reviewed_at: 2026-10-01
-reviewed_by: MakeCareer 編集部
 information_checked_at: 2026-10-01
 seo_title: 未経験転職は何から始める？最初に整理したい5つのこと
 seo_description: 未経験転職の最初の一歩は、求人探しより「整理」です。転職理由・経験・希望条件・比べる職種・スケジュールの5つを、書き出し例つきで解説します。
