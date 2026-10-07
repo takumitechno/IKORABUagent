@@ -19,17 +19,17 @@ export function MobileStickyCta({ contentSlug }: { contentSlug?: string }) {
   const tab = visible ? 0 : -1;
   return (
     <div
-      className={`no-print fixed inset-x-0 bottom-0 z-30 border-t border-line bg-white/95 px-4 pb-[calc(0.75rem+env(safe-area-inset-bottom,0px))] pt-3 backdrop-blur transition-transform duration-300 md:hidden ${
+      className={`no-print fixed inset-x-0 bottom-0 z-30 border-t border-line bg-white/95 px-3 pb-[calc(0.5rem+env(safe-area-inset-bottom,0px))] pt-2 backdrop-blur transition-transform duration-300 md:hidden ${
         visible ? "translate-y-0" : "translate-y-full"
       }`}
       aria-hidden={!visible}
     >
       <div className="grid grid-cols-2 gap-2">
-        <Link href="/check" tabIndex={tab} data-cta-placement="article-sticky" data-cta-kind="check" data-content-slug={contentSlug} className="flex items-center justify-center gap-1.5 rounded-full bg-brand py-3 text-[14px] font-bold text-white">
+        <Link href="/check" tabIndex={tab} data-cta-placement="article-sticky" data-cta-kind="check" data-content-slug={contentSlug} className="flex items-center justify-center gap-1.5 rounded-full bg-brand py-2.5 text-[13.5px] font-bold text-white">
           <ClipboardList className="h-4 w-4" aria-hidden="true" />
           条件を整理する
         </Link>
-        <Link href="/consultation" tabIndex={tab} data-cta-placement="article-sticky" data-cta-kind="consultation-info" data-content-slug={contentSlug} className="flex items-center justify-center gap-1.5 rounded-full border border-accent/50 bg-white py-3 text-[14px] font-bold text-accent-strong">
+        <Link href="/consultation" tabIndex={tab} data-cta-placement="article-sticky" data-cta-kind="consultation-info" data-content-slug={contentSlug} className="flex items-center justify-center gap-1.5 rounded-full border border-line-strong bg-white py-2.5 text-[13.5px] font-bold text-ink">
           <MessageCircle className="h-4 w-4" aria-hidden="true" />
           相談について
         </Link>

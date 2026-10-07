@@ -5,7 +5,7 @@ import { site } from "@/config/site";
 export function PreviewBanner() {
   if (!site.showPreviewBanner) return null;
   return (
-    <div className="no-print bg-ink px-4 py-1.5 text-center text-[11px] leading-5 tracking-wide text-white/85">
+    <div className="no-print bg-ink px-4 py-1 text-center text-[11px] leading-5 text-white/80">
       {partner.previewNotice}
     </div>
   );

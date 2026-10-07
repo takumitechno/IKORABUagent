@@ -114,7 +114,7 @@ const neutral: PartnerConfig = {
   disclosure:
     "このサイトは、人材紹介会社と組んで運営するオウンドメディアの提案用デモです（企画・制作: 匠Technologies）。正式に公開するときは、提携する人材紹介会社のキャリア相談を、記事や条件整理チェックの中でご案内する想定です。デモ版のため、相談ボタンを押しても申し込みページには移動しません。記事は、特定の求人や企業への応募をすすめるものではありません。",
   consultationStepsNote: "人材紹介サービスの一般的な流れです。実際の流れは、正式公開時に相談先の案内を掲載します。",
-  previewNotice: "提案用デモ（非公開）— 運営者・相談先は正式公開時に掲載します。相談ボタンを押しても申し込みページには移動しません",
+  previewNotice: "提案用デモ（非公開）｜相談ボタンは申し込みページに移動しません",
 };
 
 /** B. 提携候補企業との商談でだけ見せる完成イメージ（PARTNER_PROFILE=makecareer。ローカル・非公開・noindex） */
@@ -135,7 +135,7 @@ const makecareer: PartnerConfig = {
   disclosure:
     "このサイトは、MakeCareer株式会社が運営するオウンドメディアの完成イメージとして、匠Technologiesが商談用に試作したものです（正式提携・ブランド利用許諾前、非公開）。正式に公開する場合は、記事や条件整理チェックの中で MakeCareer株式会社のキャリア相談をご案内する想定です。商談用プレビューのため、相談ボタンを押しても申し込みページには移動しません。記事は、特定の求人や企業への応募をすすめるものではありません。",
   consultationStepsNote: "人材紹介サービスの一般的な流れの例です。MakeCareer株式会社の実際の流れ・対応範囲は、正式公開前に確認して掲載します。",
-  previewNotice: "MakeCareer様 商談用プレビュー（非公開・正式提携前）— 掲載内容は確認前です。相談ボタンは申し込みページへ移動しません",
+  previewNotice: "MakeCareer様 商談用プレビュー（非公開・正式提携前）｜相談ボタンは申し込みページに移動しません",
 };
 
 const selected = process.env.PARTNER_PROFILE === "makecareer" ? makecareer : neutral;

@@ -10,13 +10,11 @@ source:
 
 パンくず: [ホーム](/) › [今の状況から探す](/situations) › 第二新卒
 
-BY SITUATION・第二新卒
+今の状況・第二新卒
 
 # 第二新卒で転職を考えている
 
 入社して数年以内の転職で知っておきたいことや、動くタイミング。
-
-3本の記事
 
 [フリーター](/situations/freeter) ・ [派遣社員](/situations/haken) ・ [正社員経験が少ない](/situations/seishain-keiken-sukunai) ・ [接客・販売の経験](/situations/sekkyaku) ・ [第二新卒](/situations/dainishinsotsu) ・ [初めての転職](/situations/hajimete) ・ [転職回数が多い](/situations/kaisu) ・ [PC仕事が未経験](/situations/pc-mikeiken)
 

@@ -10,13 +10,11 @@ source:
 
 パンくず: [ホーム](/) › [今の状況から探す](/situations) › 初めての転職
 
-BY SITUATION・初めての転職
+今の状況・初めての転職
 
 # 初めての転職で、何から始める？
 
 転職活動の流れ、相談先の使い方、準備しておくこと。
-
-17本の記事
 
 [フリーター](/situations/freeter) ・ [派遣社員](/situations/haken) ・ [正社員経験が少ない](/situations/seishain-keiken-sukunai) ・ [接客・販売の経験](/situations/sekkyaku) ・ [第二新卒](/situations/dainishinsotsu) ・ [初めての転職](/situations/hajimete) ・ [転職回数が多い](/situations/kaisu) ・ [PC仕事が未経験](/situations/pc-mikeiken)
 

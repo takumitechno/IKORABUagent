@@ -10,13 +10,11 @@ source:
 
 パンくず: [ホーム](/) › [悩みから探す](/concerns) › 正社員になりたい
 
-BY CONCERN・正社員になりたい
+悩み・正社員になりたい
 
 # 正社員になりたい
 
 フリーター・派遣・契約社員から正社員を目指すときの進め方。
-
-7本の記事
 
 [給料を上げたい](/concerns/kyuryo) ・ [土日休みにしたい](/concerns/donichi) ・ [オフィスワークに行きたい](/concerns/office) ・ [正社員になりたい](/concerns/seishain) ・ [未経験の職種に挑戦したい](/concerns/mikeiken-shokushu) ・ [今の仕事を辞めたい](/concerns/yametai) ・ [面接・書類が不安](/concerns/mensetsu) ・ [やりたい仕事が分からない](/concerns/yaritai)
 

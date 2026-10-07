@@ -12,7 +12,7 @@ export function Breadcrumbs({ items }: { items: Crumb[] }) {
           {items.map((item, i) => {
             const last = i === items.length - 1;
             return (
-              <li key={item.path} className="flex min-w-0 items-center gap-1">
+              <li key={item.path} className={`min-w-0 items-center gap-1 ${last && i > 0 ? "hidden sm:flex" : "flex"}`}>
                 {last ? (
                   <span aria-current="page" className="line-clamp-1 text-body">
                     {item.name}
@@ -22,7 +22,7 @@ export function Breadcrumbs({ items }: { items: Crumb[] }) {
                     <Link href={item.path} className="hover:text-brand-strong hover:underline">
                       {item.name}
                     </Link>
-                    <ChevronRight className="h-3 w-3 shrink-0 text-line-strong" aria-hidden="true" />
+                    <ChevronRight className={`h-3 w-3 shrink-0 text-line-strong ${i === items.length - 2 ? "hidden sm:block" : ""}`} aria-hidden="true" />
                   </>
                 )}
               </li>

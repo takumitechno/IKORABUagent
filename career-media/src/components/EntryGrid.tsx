@@ -32,7 +32,6 @@ export function EntryGrid({ group, counts, variant = "tile" }: { group: Taxonomy
     <ul className="grid grid-cols-3 gap-2 sm:grid-cols-4 sm:gap-3 lg:grid-cols-8">
       {items.map((item, i) => {
         const tone = TONE_CLASSES[GROUP_TONE[group][i % 4]];
-        const count = counts?.[item.slug];
         return (
           <li key={item.slug}>
             <Link
@@ -43,7 +42,6 @@ export function EntryGrid({ group, counts, variant = "tile" }: { group: Taxonomy
                 <Motif name={taxonomyScene(group, item.slug)} className="motif-art absolute inset-[4%]" />
               </span>
               <span className="text-[12.5px] font-bold leading-[1.45] text-ink group-hover:text-brand-strong sm:text-[13.5px]">{item.label}</span>
-              {count !== undefined && <span className="mt-1 rounded-full bg-canvas px-2 text-[10.5px] leading-5 text-muted">{count}本</span>}
             </Link>
           </li>
         );
@@ -57,8 +55,7 @@ export function EntrySectionHeading({ group, id, extra }: { group: TaxonomyGroup
   return (
     <div className="mb-4 flex items-end justify-between gap-4">
       <div>
-        <p className="text-[11px] font-bold tracking-[0.2em] text-brand">{g.eyebrow}</p>
-        <h2 id={id} className="mt-1 text-[21px] font-bold leading-snug text-ink sm:text-[23px]">
+        <h2 id={id} className="text-[21px] font-bold leading-snug text-ink sm:text-[23px]">
           {g.title}
         </h2>
       </div>

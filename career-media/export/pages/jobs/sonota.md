@@ -10,13 +10,11 @@ source:
 
 パンくず: [ホーム](/) › [職種から探す](/jobs) › その他の職種
 
-BY JOB・その他の職種
+職種・その他の職種
 
 # ほかにはどんな仕事がある？
 
 職種名だけでは分かりにくい仕事の探し方や、やりたいことが決まっていないときの考え方。
-
-2本の記事
 
 [営業](/jobs/eigyo) ・ [事務](/jobs/jimu) ・ [カスタマーサポート](/jobs/customer-support) ・ [ITサポート](/jobs/it-support) ・ [人事・採用](/jobs/jinji) ・ [販売・接客](/jobs/hanbai) ・ [その他の職種](/jobs/sonota)
 

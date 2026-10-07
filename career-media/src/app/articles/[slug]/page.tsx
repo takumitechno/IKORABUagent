@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ClipboardList, Scale } from "lucide-react";
-import { ArticleHeader, EditorialNote, FaqSection, pickRelated, RelatedArticles, SourcesSection, TocList } from "@/components/ArticleParts";
+import { ArticleHeader, EditorialNote, FaqSection, pickRelated, RelatedArticles, TocList } from "@/components/ArticleParts";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { ConsultationCta } from "@/components/ConsultationCta";
 import { JsonLd } from "@/components/JsonLd";
@@ -56,8 +56,8 @@ export default async function ArticlePage({ params }: Props) {
       <JsonLd data={faqJsonLd(article)} />
       <div className="mx-auto max-w-6xl px-4 pt-6 sm:px-6">
         <Breadcrumbs items={articleCrumbs(article, categories)} />
-        <div className="mt-6 grid gap-10 lg:grid-cols-[minmax(0,1fr)_300px]">
-          <article className="min-w-0 rounded-[20px] bg-white px-5 py-7 ring-1 ring-line sm:px-10 sm:py-10">
+        <div className="mt-5 grid gap-10 lg:grid-cols-[minmax(0,1fr)_280px]">
+          <article className="min-w-0 sm:rounded-[20px] sm:bg-white sm:px-10 sm:py-10 sm:ring-1 sm:ring-line">
             <ArticleHeader article={article} categories={categories} readingMinutes={readingMinutes(article.body)} headings={headings} />
             <div className="article-body mt-8" dangerouslySetInnerHTML={{ __html: sections[0] }} />
             {sections[1] && (
@@ -68,7 +68,6 @@ export default async function ArticlePage({ params }: Props) {
             )}
             {inJourney && <JourneyNav journey={inJourney.journey} index={inJourney.index} articles={all} />}
             <FaqSection article={article} />
-            <SourcesSection article={article} />
             <EditorialNote article={article} />
           </article>
 

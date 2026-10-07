@@ -6,8 +6,7 @@ export function InfoPage({ title, path, eyebrow, lead, children }: { title: stri
       <Breadcrumbs items={[{ name: "ホーム", path: "/" }, { name: title, path }]} />
       <article className="mt-6 rounded-[20px] bg-white px-5 py-8 ring-1 ring-line sm:px-10 sm:py-10">
         <header>
-          {eyebrow && <p className="text-[11px] font-bold tracking-[0.2em] text-brand">{eyebrow}</p>}
-          <h1 className="mt-1 text-[26px] font-bold leading-snug text-ink sm:text-[30px]">{title}</h1>
+          <h1 className="text-[26px] font-bold leading-snug text-ink sm:text-[30px]">{title}</h1>
           {lead && <p className="mt-4 text-[15px] leading-8 text-body">{lead}</p>}
         </header>
         <div className="article-body mt-8">{children}</div>

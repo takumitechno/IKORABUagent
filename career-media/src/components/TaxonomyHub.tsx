@@ -51,12 +51,9 @@ export async function TaxonomyHub({ group, slug }: { group: TaxonomyGroup; slug:
         <span aria-hidden="true" className="pointer-events-none absolute -right-16 -top-20 h-56 w-56 rounded-full bg-brand-tint" />
         <div className="relative flex items-start gap-4 sm:gap-6">
           <div className="min-w-0 flex-1">
-            <p className="text-[11px] font-bold tracking-[0.2em] text-brand">
-              {g.eyebrow}・{item.label}
-            </p>
+            <p className="text-[13px] font-bold text-brand-strong">{g.title.replace("から探す", "")}・{item.label}</p>
             <h1 className="mt-1 text-[22px] font-bold leading-snug text-ink sm:text-[30px]">{item.heading}</h1>
             <p className="mt-2 text-[14.5px] leading-7 text-body">{item.description}</p>
-            <p className="mt-3 inline-flex rounded-full bg-canvas px-3 py-0.5 text-xs font-bold text-muted ring-1 ring-line">{articles.length}本の記事</p>
           </div>
           <span className="enter-pop relative block aspect-square w-[84px] shrink-0 rounded-full bg-mint sm:w-[132px]">
             <Motif name={taxonomyScene(group, slug)} className="anim-float-slow absolute inset-[4%]" />
@@ -155,8 +152,7 @@ export async function TaxonomyIndex({ group }: { group: TaxonomyGroup }) {
       <Breadcrumbs items={[{ name: "ホーム", path: "/" }, { name: g.title, path: g.basePath }]} />
       <header className="mt-6 flex items-center gap-4">
         <div className="min-w-0 flex-1">
-          <p className="text-[11px] font-bold tracking-[0.2em] text-brand">{g.eyebrow}</p>
-          <h1 className="mt-1 text-[26px] font-bold text-ink sm:text-[30px]">{g.title}</h1>
+          <h1 className="text-[26px] font-bold text-ink sm:text-[30px]">{g.title}</h1>
           <p className="mt-2 max-w-3xl text-[15px] leading-8 text-body">
             {group === "concerns" ? "今いちばん気になっていることから、関係のある記事をまとめて読めます。" : "今の働き方や経歴に近いものを選ぶと、同じ状況の人に向けた記事をまとめて読めます。"}
           </p>

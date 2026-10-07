@@ -1,87 +1,32 @@
 import Link from "next/link";
-import { BadgeCheck, BookMarked, CalendarCheck2, ChevronDown, ExternalLink, ListOrdered, RefreshCw } from "lucide-react";
+import { BookMarked, ChevronDown, ExternalLink, Info, ListOrdered } from "lucide-react";
 import { partner } from "@/config/partner";
 import { site } from "@/config/site";
 import type { Article, ArticleSummary, Category } from "@/lib/content/types";
 import type { Heading } from "@/lib/markdown";
-import { CategoryChip, FeatureCard, findCategory, TagChips } from "./ArticleCards";
-import { Eyecatch } from "./Eyecatch";
+import { ArticleList, findCategory } from "./ArticleCards";
 import { formatDate } from "./DateMeta";
 
 export function ArticleHeader({ article, categories, readingMinutes, headings = [] }: { article: Article; categories: Category[]; readingMinutes: number; headings?: Heading[] }) {
+  const category = findCategory(categories, article.categories[0]);
   return (
     <header>
-      <Eyecatch article={article} category={findCategory(categories, article.categories[0])} size="banner" className="-mx-5 -mt-7 mb-6 rounded-b-none rounded-t-[20px] sm:-mx-10 sm:-mt-10 sm:mb-8" />
-      <div className="flex flex-wrap gap-2">
-        {article.categories.map((slug) => (
-          <Link key={slug} href={slug === "news" ? "/news" : `/categories/${slug}`}>
-            <CategoryChip category={findCategory(categories, slug)} />
-          </Link>
-        ))}
-      </div>
-      <h1 className="mt-4 text-[24px] font-bold leading-[1.55] tracking-wide text-ink sm:text-[30px]">{article.title}</h1>
-      <dl className="mt-4 flex flex-wrap gap-x-5 gap-y-1.5 text-[12.5px] text-muted">
-        <div className="flex items-center gap-1.5">
-          <dt className="flex items-center gap-1">
-            <CalendarCheck2 className="h-3.5 w-3.5" aria-hidden="true" />
-            {site.sampleContent ? "作成" : "公開"}
-          </dt>
-          <dd>
-            <time dateTime={article.publishedAt ?? undefined}>{formatDate(article.publishedAt)}</time>
-          </dd>
-        </div>
-        <div className="flex items-center gap-1.5">
-          <dt className="flex items-center gap-1">
-            <RefreshCw className="h-3.5 w-3.5" aria-hidden="true" />
-            更新
-          </dt>
-          <dd>
-            <time dateTime={article.updatedAt}>{formatDate(article.updatedAt)}</time>
-          </dd>
-        </div>
-        <div className="flex items-center gap-1.5">
-          <dt className="flex items-center gap-1">
-            <BadgeCheck className="h-3.5 w-3.5" aria-hidden="true" />
-            情報確認日
-          </dt>
-          <dd>
-            <time dateTime={article.informationCheckedAt ?? undefined}>{formatDate(article.informationCheckedAt)}</time>
-          </dd>
-        </div>
-        <div className="flex items-center gap-1.5">
-          <dt>読了目安</dt>
-          <dd>約{readingMinutes}分</dd>
-        </div>
-      </dl>
-      <div className="mt-4">
-        <TagChips article={article} />
-      </div>
-      {site.sampleContent && <SampleNotice />}
-      <p className="mt-5 text-[15px] leading-8 text-body">{article.summary}</p>
-      {headings.length > 1 && (
-        <nav aria-label="この記事でわかること" className="mt-6 rounded-[18px] bg-brand-tint p-4 ring-1 ring-brand/15 sm:p-5">
-          <p className="flex items-center gap-2 text-[13px] font-bold text-brand-strong">
-            <ListOrdered className="h-4 w-4" aria-hidden="true" />
-            この記事でわかること
-          </p>
-          <ol className="mt-3 grid gap-2 sm:grid-cols-2">
-            {headings.map((h, i) => (
-              <li key={h.id}>
-                <a href={`#${h.id}`} className="tap group flex h-full items-start gap-2.5 rounded-xl bg-white px-3 py-2.5 text-[13.5px] font-bold leading-6 text-ink ring-1 ring-line hover:ring-brand/40">
-                  <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-md bg-brand text-[11px] text-white">{i + 1}</span>
-                  <span className="group-hover:text-brand-strong">{h.text}</span>
-                </a>
-              </li>
-            ))}
-          </ol>
-        </nav>
-      )}
-      <p className="mt-4 text-xs leading-6 text-muted">
-        編集: {site.editorialTeam}（運営: {partner.operatorShort}）・
-        <Link href="/editorial-policy" className="underline hover:text-brand-strong">
-          編集方針
+      {category && (
+        <Link href={`/categories/${category.slug}`} className="text-[13px] font-bold text-brand-strong hover:underline">
+          {category.name}
         </Link>
+      )}
+      <h1 className="mt-2 text-[24px] font-bold leading-[1.5] text-ink sm:text-[32px]">{article.title}</h1>
+      <p className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-[13px] text-muted">
+        <span>
+          <time dateTime={article.updatedAt}>{formatDate(article.updatedAt)}</time> 更新
+        </span>
+        <span aria-hidden="true" className="h-3 w-px bg-line-strong" />
+        <span>約{readingMinutes}分で読めます</span>
       </p>
+      {site.sampleContent && <SampleNotice />}
+      <p className="mt-6 text-[16px] leading-[1.95] text-body">{article.summary}</p>
+      <MobileToc headings={headings} />
     </header>
   );
 }
@@ -89,11 +34,14 @@ export function ArticleHeader({ article, categories, readingMinutes, headings = 
 /** 提案用のサンプル原稿であることの表示（人による最終確認の前であることを隠さない） */
 export function SampleNotice() {
   return (
-    <p className="mt-4 rounded-lg border border-dashed border-line-strong bg-canvas px-3 py-2 text-[12px] leading-5 text-muted">
-      提案用のサンプル原稿です。生成AIで下書きし、出典の確認と機械チェックを通していますが、人による最終確認・公開承認の前です。
-      <Link href="/editorial-policy" className="ml-1 underline hover:text-brand-strong">
-        編集方針
-      </Link>
+    <p className="mt-4 flex items-start gap-1.5 text-[12px] leading-5 text-muted">
+      <Info className="mt-0.5 h-3.5 w-3.5 shrink-0" aria-hidden="true" />
+      <span>
+        提案用のサンプル原稿です（人による最終確認・公開承認の前）。
+        <Link href="/editorial-policy" className="underline underline-offset-2 hover:text-brand-strong">
+          詳しく
+        </Link>
+      </span>
     </p>
   );
 }
@@ -113,19 +61,20 @@ export function TocList({ headings }: { headings: Heading[] }) {
   );
 }
 
-/** スマホ・タブレット用の折りたたみ目次 */
+/** スマホ・タブレット用の折りたたみ目次（最初は閉じておく） */
 export function MobileToc({ headings }: { headings: Heading[] }) {
   if (headings.length < 2) return null;
   return (
-    <details className="group mt-6 rounded-[var(--radius-card)] border border-line bg-white lg:hidden">
-      <summary className="flex cursor-pointer list-none items-center justify-between px-5 py-4 text-sm font-bold text-ink">
+    <details className="group mt-6 rounded-xl border border-line bg-white lg:hidden">
+      <summary className="flex cursor-pointer list-none items-center justify-between px-4 py-3 text-[14px] font-bold text-ink">
         <span className="flex items-center gap-2">
           <ListOrdered className="h-4 w-4 text-brand" aria-hidden="true" />
           目次
+          <span className="text-[12px] font-medium text-muted">{headings.length}項目</span>
         </span>
-        <ChevronDown className="h-4 w-4 transition group-open:rotate-180" aria-hidden="true" />
+        <ChevronDown className="h-4 w-4 text-muted transition group-open:rotate-180" aria-hidden="true" />
       </summary>
-      <div className="border-t border-line px-3 py-3">
+      <div className="border-t border-line px-2 py-2">
         <TocList headings={headings} />
       </div>
     </details>
@@ -136,21 +85,18 @@ export function FaqSection({ article }: { article: Pick<Article, "faq"> }) {
   if (article.faq.length === 0) return null;
   return (
     <section aria-labelledby="faq-title" className="mt-14">
-      <h2 id="faq-title" className="text-xl font-bold text-ink">
+      <h2 id="faq-title" className="text-[19px] font-bold text-ink">
         よくある質問
       </h2>
-      <div className="mt-5 space-y-3">
+      <div className="mt-4 divide-y divide-line border-y border-line">
         {article.faq.map((f) => (
-          <details key={f.question} className="group rounded-[var(--radius-card)] border border-line bg-white" open>
-            <summary className="flex cursor-pointer list-none items-start gap-3 px-5 py-4">
-              <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-brand text-xs font-bold text-white">Q</span>
+          <details key={f.question} className="group">
+            <summary className="flex cursor-pointer list-none items-start gap-3 py-4">
+              <span className="mt-0.5 text-[15px] font-bold text-brand">Q</span>
               <span className="flex-1 text-[15px] font-bold leading-7 text-ink">{f.question}</span>
               <ChevronDown className="mt-1.5 h-4 w-4 shrink-0 text-muted transition group-open:rotate-180" aria-hidden="true" />
             </summary>
-            <div className="flex gap-3 border-t border-line px-5 py-4">
-              <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-accent-soft text-xs font-bold text-accent">A</span>
-              <p className="flex-1 text-[15px] leading-8 text-body">{f.answer}</p>
-            </div>
+            <p className="pb-5 pl-7 text-[15px] leading-[1.95] text-body">{f.answer}</p>
           </details>
         ))}
       </div>
@@ -158,77 +104,78 @@ export function FaqSection({ article }: { article: Pick<Article, "faq"> }) {
   );
 }
 
+/** 出典の一覧（折りたたみの中で使う） */
 export function SourcesSection({ article }: { article: Pick<Article, "sources"> }) {
   return (
-    <section aria-labelledby="sources-title" className="mt-14">
-      <h2 id="sources-title" className="flex items-center gap-2 text-xl font-bold text-ink">
-        <BookMarked className="h-5 w-5 text-brand" aria-hidden="true" />
-        出典・参考情報
-      </h2>
-      <ol className="mt-5 space-y-3">
-        {article.sources.map((s, i) => (
-          <li key={s.url + i} className="rounded-xl border border-line bg-white p-4 text-sm">
-            <a href={s.url} target="_blank" rel="noopener noreferrer" className="inline-flex items-start gap-1.5 font-bold leading-6 text-brand-strong hover:underline">
-              {s.title}
-              <ExternalLink className="mt-1 h-3.5 w-3.5 shrink-0" aria-hidden="true" />
-              <span className="sr-only">（外部サイト）</span>
-            </a>
-            <p className="mt-1 text-xs leading-5 text-muted">
-              {s.publisher}・{formatDate(s.accessedAt)}確認{s.usedFor ? `・参照箇所: ${s.usedFor}` : ""}
-            </p>
-          </li>
-        ))}
-      </ol>
-    </section>
+    <ol className="space-y-3">
+      {article.sources.map((s, i) => (
+        <li key={s.url + i} className="text-[13px] leading-6">
+          <a href={s.url} target="_blank" rel="noopener noreferrer" className="inline-flex items-start gap-1 font-bold text-brand-strong hover:underline">
+            {s.title}
+            <ExternalLink className="mt-1 h-3 w-3 shrink-0" aria-hidden="true" />
+            <span className="sr-only">（外部サイト）</span>
+          </a>
+          <span className="block text-[12px] text-muted">
+            {s.publisher}・{formatDate(s.accessedAt)}確認
+          </span>
+        </li>
+      ))}
+    </ol>
   );
 }
 
+/**
+ * 記事の末尾にまとめる「出典とこの記事について」。読み物の邪魔にならないよう折りたたむが、
+ * 出典・日付・人による確認の状態・提携の表記は、開けばすべて見られる。
+ */
 export function EditorialNote({ article }: { article: Article }) {
+  const rows: [string, string][] = site.sampleContent
+    ? [
+        ["作成", formatDate(article.publishedAt)],
+        ["更新", formatDate(article.updatedAt)],
+        ["情報確認日", formatDate(article.informationCheckedAt)],
+        ["機械チェック・AI査読", formatDate(article.reviewedAt)],
+        ["人による最終確認", "正式公開前に実施"],
+      ]
+    : [
+        ["公開", formatDate(article.publishedAt)],
+        ["更新", formatDate(article.updatedAt)],
+        ["情報確認日", formatDate(article.informationCheckedAt)],
+        ["確認・編集", article.reviewedBy ?? site.editorialTeam],
+        ["最終確認日", formatDate(article.reviewedAt)],
+      ];
   return (
-    <section aria-label="記事の確認について" className="mt-10 rounded-[var(--radius-card)] bg-canvas p-5 ring-1 ring-line">
-      <p className="text-sm font-bold text-ink">この記事の確認について</p>
-      <dl className="mt-3 grid gap-x-6 gap-y-1 text-[13px] text-body sm:grid-cols-2">
-        {site.sampleContent ? (
-          <>
-            <div className="flex gap-2">
-              <dt className="text-muted">機械チェック・AI査読</dt>
-              <dd>{formatDate(article.reviewedAt)}</dd>
-            </div>
-            <div className="flex gap-2">
-              <dt className="text-muted">人による最終確認</dt>
-              <dd>正式公開前に実施</dd>
-            </div>
-          </>
-        ) : (
-          <>
-            <div className="flex gap-2">
-              <dt className="text-muted">確認・編集</dt>
-              <dd>{article.reviewedBy ?? site.editorialTeam}</dd>
-            </div>
-            <div className="flex gap-2">
-              <dt className="text-muted">最終確認日</dt>
-              <dd>{formatDate(article.reviewedAt)}</dd>
-            </div>
-          </>
-        )}
-        <div className="flex gap-2">
-          <dt className="text-muted">情報確認日</dt>
-          <dd>{formatDate(article.informationCheckedAt)}</dd>
+    <section aria-label="出典とこの記事について" className="mt-12">
+      <details className="group rounded-xl border border-line bg-canvas">
+        <summary className="flex cursor-pointer list-none items-center justify-between gap-3 px-4 py-3.5">
+          <span className="flex items-center gap-2 text-[14px] font-bold text-ink">
+            <BookMarked className="h-4 w-4 text-brand" aria-hidden="true" />
+            出典とこの記事について
+            <span className="text-[12px] font-medium text-muted">出典{article.sources.length}件</span>
+          </span>
+          <ChevronDown className="h-4 w-4 shrink-0 text-muted transition group-open:rotate-180" aria-hidden="true" />
+        </summary>
+        <div className="space-y-5 border-t border-line px-4 py-4">
+          <SourcesSection article={article} />
+          <dl className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-1 text-[12.5px]">
+            {rows.map(([k, v]) => (
+              <div key={k} className="contents">
+                <dt className="text-muted">{k}</dt>
+                <dd className="text-body">{v}</dd>
+              </div>
+            ))}
+          </dl>
+          <p className="text-[12px] leading-6 text-muted">
+            内容は情報確認日時点のものです。最新の情報は出典元でご確認ください。編集: {site.editorialTeam}（運営: {partner.operatorShort}）。
+            <Link href="/editorial-policy" className="ml-1 underline underline-offset-2 hover:text-brand-strong">
+              編集方針
+            </Link>
+            <Link href="/disclosure" className="ml-2 underline underline-offset-2 hover:text-brand-strong">
+              広告・提携表記
+            </Link>
+          </p>
         </div>
-        <div className="flex gap-2">
-          <dt className="text-muted">出典</dt>
-          <dd>{article.sources.length}件</dd>
-        </div>
-      </dl>
-      <p className="mt-3 text-[12.5px] leading-6 text-muted">
-        記事の内容は情報確認日時点のものです。制度や条件は変わることがあるため、最新の情報は出典元でご確認ください。個別の状況についての判断は、記事だけで決めずに専門の窓口や相談先にご相談ください。
-      </p>
-      <p className="mt-2 text-[12.5px] leading-6 text-muted">
-        {partner.disclosure}{" "}
-        <Link href="/disclosure" className="underline hover:text-brand-strong">
-          広告・提携表記
-        </Link>
-      </p>
+      </details>
     </section>
   );
 }
@@ -237,14 +184,10 @@ export function RelatedArticles({ articles, categories }: { articles: ArticleSum
   if (articles.length === 0) return null;
   return (
     <section aria-labelledby="related-title" className="mt-16">
-      <h2 id="related-title" className="text-xl font-bold text-ink">
-        あわせて読みたい記事
+      <h2 id="related-title" className="text-[19px] font-bold text-ink">
+        次に読むなら
       </h2>
-      <div className="mt-5 grid gap-5 md:grid-cols-3">
-        {articles.map((a) => (
-          <FeatureCard key={a.slug} article={a} categories={categories} />
-        ))}
-      </div>
+      <ArticleList articles={articles} categories={categories} showSummary={false} className="mt-2 md:grid md:grid-cols-3 md:gap-6 md:divide-y-0" />
     </section>
   );
 }

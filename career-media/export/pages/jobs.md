@@ -28,19 +28,12 @@ JOB GUIDE
 ## 職種から記事を探す
 
 - [営業](/jobs/eigyo)
-  3本
 - [事務](/jobs/jimu)
-  4本
 - [カスタマーサポート](/jobs/customer-support)
-  4本
 - [ITサポート](/jobs/it-support)
-  3本
 - [人事・採用](/jobs/jinji)
-  2本
 - [販売・接客](/jobs/hanbai)
-  2本
 - [その他の職種](/jobs/sonota)
-  2本
 
 ## 4つの職種を比べる
 
@@ -224,8 +217,6 @@ JOB GUIDE
 - [接客経験は転職でどう活かせる？職種別のつながりと伝え方](/articles/sekkyaku-keiken-ikasu)
 - [AIで変わる仕事を、未経験転職者はどう見るべきか](/articles/ai-shigoto-mikeiken)
 
-CAREER CONSULTATION
-
 ## 気になる職種が見つかったら、具体的な求人や働き方を相談する
 
 同じ職種でも、会社によって働き方は大きく違います。キャリアアドバイザーに、求人票だけでは分からない点を聞いてみましょう。
@@ -235,7 +226,5 @@ CAREER CONSULTATION
 - 応募書類・面接の準備のサポート
 
 [整理した内容をもとに相談する](/consultation/apply?placement=jobs) ・ [相談でできることを見る](/consultation)
-
-相談したあとに応募するかどうかは、ご自身で決められます。まだ迷っている段階の相談でも大丈夫です。
 
 相談先: 提携する人材紹介会社（正式公開時に掲載）（有料職業紹介事業許可番号: 正式公開時に掲載）

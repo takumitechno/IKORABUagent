@@ -10,13 +10,11 @@ source:
 
 パンくず: [ホーム](/) › [悩みから探す](/concerns) › 未経験の職種に挑戦したい
 
-BY CONCERN・未経験の職種に挑戦したい
+悩み・未経験の職種に挑戦したい
 
 # 未経験の仕事に挑戦したい
 
 経験のない仕事を選ぶときの調べ方、研修の確かめ方、伝え方。
-
-17本の記事
 
 [給料を上げたい](/concerns/kyuryo) ・ [土日休みにしたい](/concerns/donichi) ・ [オフィスワークに行きたい](/concerns/office) ・ [正社員になりたい](/concerns/seishain) ・ [未経験の職種に挑戦したい](/concerns/mikeiken-shokushu) ・ [今の仕事を辞めたい](/concerns/yametai) ・ [面接・書類が不安](/concerns/mensetsu) ・ [やりたい仕事が分からない](/concerns/yaritai)
 

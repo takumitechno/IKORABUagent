@@ -38,7 +38,7 @@ export function ConsultButton({ placement, contentSlug, label, size = "md" }: { 
       data-cta-placement={placement}
       data-cta-kind="consultation-apply"
       data-content-slug={contentSlug}
-      className={`inline-flex items-center justify-center gap-1.5 rounded-full bg-accent font-bold text-white shadow-[0_6px_16px_-6px_rgb(191_82_8/0.6)] transition-colors hover:bg-accent-strong ${
+      className={`inline-flex items-center justify-center gap-1.5 rounded-full bg-accent font-bold text-white transition-colors hover:bg-accent-strong ${
         size === "lg" ? "px-7 py-4 text-base" : "px-5 py-3 text-[15px]"
       }`}
     >
@@ -85,7 +85,7 @@ export function ConsultationCta({ placement, contentSlug, variant = "band", head
             <span aria-hidden="true" className="motif motif-checklist block h-14 w-14 shrink-0 rounded-full bg-white" />
             <div>
               <p className="text-[16px] font-bold leading-7 text-ink">{heading ?? "読みながら、自分の条件も整理してみる"}</p>
-              <p className="mt-1 text-sm leading-6 text-body">{lead ?? "13の質問に答えると、ゆずれない条件・比べたい職種・求人で確認することが一覧になります。登録不要、回答は送信されません。"}</p>
+              <p className="mt-1 text-sm leading-6 text-muted">{lead ?? "約3分・登録不要。回答はどこにも送信されません。"}</p>
             </div>
           </div>
           <Link
@@ -104,20 +104,16 @@ export function ConsultationCta({ placement, contentSlug, variant = "band", head
   }
 
   return (
-    <section aria-labelledby={`cta-${placement}`} className="no-print overflow-hidden rounded-[24px] bg-ink text-white">
+    <section aria-labelledby={`cta-${placement}`} className="no-print overflow-hidden rounded-2xl bg-ink text-white">
       <div className="grid gap-8 p-6 sm:p-10 md:grid-cols-[1.3fr_1fr] md:items-center">
         <div>
-          <div className="flex items-center gap-3">
-            <span className="motif motif-chat block h-12 w-12 shrink-0 rounded-full bg-white/90 md:hidden" aria-hidden="true" />
-            <p className="text-xs font-bold tracking-[0.2em] text-accent-bright">CAREER CONSULTATION</p>
-          </div>
-          <h2 id={`cta-${placement}`} className="mt-3 text-[22px] font-bold leading-snug sm:text-[28px]">
+          <h2 id={`cta-${placement}`} className="text-[21px] font-bold leading-snug sm:text-[26px]">
             {heading ?? "自分の場合を、一緒に整理してもらう"}
           </h2>
-          <p className="mt-3 text-[15px] leading-7 text-white/80 sm:leading-8">
-            {lead ?? "記事やチェックで整理したことをもとに、人材紹介会社のキャリアアドバイザーと、具体的な求人や進め方を話せます。"}
+          <p className="mt-3 text-[15px] leading-7 text-white/80">
+            {lead ?? "人材紹介会社のアドバイザーと、求人や進め方を話せます。応募するかどうかは、ご自身で決められます。"}
           </p>
-          <ul className="mt-5 space-y-2.5">
+          <ul className="mt-5 hidden space-y-2.5 md:block">
             {POINTS.map((p) => (
               <li key={p} className="flex items-start gap-2 text-[14.5px] text-white/90">
                 <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-accent-bright" aria-hidden="true" />
@@ -133,7 +129,6 @@ export function ConsultationCta({ placement, contentSlug, variant = "band", head
               className="inline-flex items-center justify-center gap-1.5 rounded-full px-4 py-3 text-[14px] font-bold text-white underline-offset-4 hover:underline"
             />
           </div>
-          <p className="mt-3 text-[13px] leading-6 text-white/75">相談したあとに応募するかどうかは、ご自身で決められます。まだ迷っている段階の相談でも大丈夫です。</p>
           <PartnerNote className="mt-5 border-t border-white/10 pt-4 text-[11px] leading-5 text-white/60" />
         </div>
         <div className="hidden md:block">

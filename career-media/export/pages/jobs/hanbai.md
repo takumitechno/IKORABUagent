@@ -10,13 +10,11 @@ source:
 
 パンくず: [ホーム](/) › [職種から探す](/jobs) › 販売・接客
 
-BY JOB・販売・接客
+職種・販売・接客
 
 # 販売・接客の経験をどう活かす？
 
 接客・販売で身についた経験を、正社員の仕事や別の職種にどうつなげるかを考えます。
-
-2本の記事
 
 [営業](/jobs/eigyo) ・ [事務](/jobs/jimu) ・ [カスタマーサポート](/jobs/customer-support) ・ [ITサポート](/jobs/it-support) ・ [人事・採用](/jobs/jinji) ・ [販売・接客](/jobs/hanbai) ・ [その他の職種](/jobs/sonota)
 

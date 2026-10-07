@@ -10,13 +10,11 @@ source:
 
 パンくず: [ホーム](/) › [今の状況から探す](/situations) › 派遣社員
 
-BY SITUATION・派遣社員
+今の状況・派遣社員
 
 # 派遣で働いている人の転職
 
 派遣から正社員を考えるときの比べ方や、派遣での経験の伝え方。
-
-4本の記事
 
 [フリーター](/situations/freeter) ・ [派遣社員](/situations/haken) ・ [正社員経験が少ない](/situations/seishain-keiken-sukunai) ・ [接客・販売の経験](/situations/sekkyaku) ・ [第二新卒](/situations/dainishinsotsu) ・ [初めての転職](/situations/hajimete) ・ [転職回数が多い](/situations/kaisu) ・ [PC仕事が未経験](/situations/pc-mikeiken)
 

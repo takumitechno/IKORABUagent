@@ -119,15 +119,19 @@ export function JourneyNav({ journey, index, articles }: { journey: Journey; ind
   const next = steps[current + 1] ?? null;
   const label = (s: JourneyStep) => s.label;
   return (
-    <nav aria-label={`ガイド「${journey.shortTitle}」の現在地`} className="no-print mt-8 rounded-[var(--radius-card)] border border-brand/25 bg-brand-tint p-4 sm:p-5">
-      <p className="flex flex-wrap items-center gap-x-2 text-[12.5px] font-bold text-brand-strong">
-        <Compass className="h-4 w-4" aria-hidden="true" />
-        ガイド「
-        <Link href={`${journey.hubs[0]}#${JOURNEY_ANCHOR}`} className="underline underline-offset-4">
-          {journey.title}
-        </Link>
-        」のステップ {current + 1} / {steps.length}
+    <nav aria-label={`ガイド「${journey.shortTitle}」の現在地`} className="no-print mt-10 rounded-2xl border border-brand/20 bg-brand-tint p-4 sm:p-5">
+      <p className="flex items-center justify-between gap-2 text-[12px] font-bold text-brand-strong">
+        <span className="flex items-center gap-1.5">
+          <Compass className="h-4 w-4" aria-hidden="true" />
+          読む順番ガイド
+        </span>
+        <span className="tabular-nums text-muted">
+          STEP {current + 1} / {steps.length}
+        </span>
       </p>
+      <Link href={`${journey.hubs[0]}#${JOURNEY_ANCHOR}`} className="mt-1 block text-[15px] font-bold leading-6 text-ink hover:text-brand-strong hover:underline">
+        {journey.title}
+      </Link>
       <div className="mt-3 grid gap-2 sm:grid-cols-2">
         {prev ? (
           <Link href={stepHref(prev, journey)} data-cta-placement="journey" data-cta-kind="journey-step" data-pattern-id={journey.patternId} className="flex items-start gap-2 rounded-xl bg-white p-3 text-[13.5px] leading-6 text-ink ring-1 ring-line hover:ring-brand/40">
@@ -165,7 +169,7 @@ export function JourneyCards() {
             data-cta-placement="home-journeys"
             data-cta-kind="journey-start"
             data-pattern-id={j.patternId}
-            className="tap lift group flex h-full flex-col overflow-hidden rounded-[var(--radius-card)] border border-line bg-white hover:border-brand/40"
+            className="tap lift group flex h-full flex-col overflow-hidden rounded-2xl border border-line bg-white hover:border-brand/40"
           >
             <span className={`flex items-center gap-3 p-4 ${j.tone}`}>
               <span className="relative block aspect-square w-14 shrink-0 rounded-full bg-white">
@@ -174,12 +178,7 @@ export function JourneyCards() {
               <span className="text-[16px] font-bold leading-snug text-ink group-hover:text-brand-strong">{j.title}</span>
             </span>
             <span className="flex flex-1 flex-col p-4">
-              <span className="text-[13px] leading-6 text-body">{j.who}</span>
-              <span className="mt-3 flex flex-wrap gap-1.5 text-[11.5px] font-medium text-muted">
-                <span className="rounded-full bg-canvas px-2 py-0.5 ring-1 ring-line">記事{j.steps.filter((s) => s.kind === "article").length}本</span>
-                <span className="rounded-full bg-canvas px-2 py-0.5 ring-1 ring-line">比べる・整理する</span>
-                <span className="rounded-full bg-canvas px-2 py-0.5 ring-1 ring-line">聞くことリスト</span>
-              </span>
+              <span className="line-clamp-2 text-[13px] leading-6 text-muted">{j.who}</span>
               <span className="mt-auto inline-flex items-center gap-1 pt-4 text-[13.5px] font-bold text-brand-strong">
                 順番に読む
                 <ArrowRight className="h-4 w-4 transition group-hover:translate-x-0.5" aria-hidden="true" />

@@ -10,13 +10,11 @@ source:
 
 パンくず: [ホーム](/) › [今の状況から探す](/situations) › 転職回数が多い
 
-BY SITUATION・転職回数が多い
+今の状況・転職回数が多い
 
 # 転職回数が気になる
 
 経歴の整理のしかたと、面接での説明の型。
-
-2本の記事
 
 [フリーター](/situations/freeter) ・ [派遣社員](/situations/haken) ・ [正社員経験が少ない](/situations/seishain-keiken-sukunai) ・ [接客・販売の経験](/situations/sekkyaku) ・ [第二新卒](/situations/dainishinsotsu) ・ [初めての転職](/situations/hajimete) ・ [転職回数が多い](/situations/kaisu) ・ [PC仕事が未経験](/situations/pc-mikeiken)
 

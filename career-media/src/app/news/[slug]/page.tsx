@@ -1,13 +1,11 @@
 import { notFound } from "next/navigation";
 import { AlertCircle, CalendarDays, CheckSquare, Megaphone, Sparkles, Users } from "lucide-react";
 import { TrackArticleView } from "@/components/MeasurementTracker";
-import { EditorialNote, pickRelated, RelatedArticles, SampleNotice, SourcesSection } from "@/components/ArticleParts";
+import { EditorialNote, pickRelated, RelatedArticles, SampleNotice } from "@/components/ArticleParts";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { ConsultationCta } from "@/components/ConsultationCta";
 import { announcedLabel, formatDate } from "@/components/DateMeta";
-import { Eyecatch } from "@/components/Eyecatch";
 import { JsonLd } from "@/components/JsonLd";
-import { partner } from "@/config/partner";
 import { site } from "@/config/site";
 import { getRepository } from "@/lib/content";
 import { renderMarkdown } from "@/lib/markdown";
@@ -68,8 +66,7 @@ export default async function NewsDetailPage({ params }: Props) {
       <div className="mx-auto max-w-4xl px-4 pt-6 sm:px-6">
         <Breadcrumbs items={articleCrumbs(article, categories)} />
         <article className="mt-6">
-          <header className="overflow-hidden rounded-[20px] bg-white px-5 pb-7 ring-1 ring-line sm:px-10 sm:pb-9">
-            <Eyecatch article={article} category={categories.find((c) => c.slug === "news")} size="banner" className="-mx-5 mb-6 rounded-none sm:-mx-10 sm:mb-8" />
+          <header className="overflow-hidden rounded-[20px] bg-white px-5 py-7 ring-1 ring-line sm:px-10 sm:py-9">
             <div className="flex flex-wrap items-center gap-2 text-xs">
               <span className="rounded-full bg-mist px-2.5 py-0.5 font-bold text-mist-ink">転職ニュース解説</span>
               <span className="text-muted">発表元: {news.announcedBy}</span>
@@ -79,10 +76,8 @@ export default async function NewsDetailPage({ params }: Props) {
               {announcedLabel(news.announcedAt)}日: {formatDate(news.announcedAt)}
             </p>
             <h1 className="mt-4 text-[24px] font-bold leading-[1.55] text-ink sm:text-[28px]">{article.title}</h1>
-            <p className="mt-4 text-[15px] leading-8 text-body">{article.summary}</p>
-            <p className="mt-4 text-xs text-muted">
-              {site.sampleContent ? "解説作成" : "解説公開"} {formatDate(article.publishedAt)}・更新 {formatDate(article.updatedAt)}・情報確認日 {formatDate(article.informationCheckedAt)}・編集: {site.editorialTeam}（運営: {partner.operatorShort}）
-            </p>
+            <p className="mt-4 text-[16px] leading-[1.95] text-body">{article.summary}</p>
+            <p className="mt-4 text-[13px] text-muted">{formatDate(article.updatedAt)} 更新</p>
             {site.sampleContent && <SampleNotice />}
           </header>
 
@@ -123,7 +118,6 @@ export default async function NewsDetailPage({ params }: Props) {
               編集部の解説
             </h2>
             <div className="article-body mt-4" dangerouslySetInnerHTML={{ __html: sections.join("") }} />
-            <SourcesSection article={article} />
             <EditorialNote article={article} />
           </section>
         </article>

@@ -10,13 +10,11 @@ source:
 
 パンくず: [ホーム](/) › [職種から探す](/jobs) › 人事・採用
 
-BY JOB・人事・採用
+職種・人事・採用
 
 # 人事・採用の仕事に未経験から近づくには
 
 人と関わる仕事をオフィスで。採用アシスタントなど入口になりやすい仕事と準備を紹介します。
-
-2本の記事
 
 [営業](/jobs/eigyo) ・ [事務](/jobs/jimu) ・ [カスタマーサポート](/jobs/customer-support) ・ [ITサポート](/jobs/it-support) ・ [人事・採用](/jobs/jinji) ・ [販売・接客](/jobs/hanbai) ・ [その他の職種](/jobs/sonota)
 

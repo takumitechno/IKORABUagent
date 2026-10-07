@@ -10,13 +10,11 @@ source:
 
 パンくず: [ホーム](/) › [悩みから探す](/concerns) › 今の仕事を辞めたい
 
-BY CONCERN・今の仕事を辞めたい
+悩み・今の仕事を辞めたい
 
 # 今の仕事を辞めたい・続けるのが不安
 
 辞める前に確認しておきたいことや、次の職場選びで同じことを繰り返さない考え方。
-
-6本の記事
 
 [給料を上げたい](/concerns/kyuryo) ・ [土日休みにしたい](/concerns/donichi) ・ [オフィスワークに行きたい](/concerns/office) ・ [正社員になりたい](/concerns/seishain) ・ [未経験の職種に挑戦したい](/concerns/mikeiken-shokushu) ・ [今の仕事を辞めたい](/concerns/yametai) ・ [面接・書類が不安](/concerns/mensetsu) ・ [やりたい仕事が分からない](/concerns/yaritai)
 

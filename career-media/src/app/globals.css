@@ -81,8 +81,8 @@ body {
  * ------------------------------------------------------------------------- */
 .article-body {
   word-break: normal;
-  font-size: 1.0625rem;
-  line-height: 2;
+  font-size: 1.03rem;
+  line-height: 1.95;
   color: var(--color-body);
   font-feature-settings: normal;
 }
@@ -91,38 +91,28 @@ body {
 }
 .article-body h2 {
   display: flex;
-  align-items: flex-start;
-  gap: 0.6em;
-  margin-top: 2.6em;
-  padding: 0.7em 0.9em;
-  background: var(--color-brand-tint);
-  border-radius: 14px;
-  font-size: 1.28rem;
+  align-items: baseline;
+  gap: 0.55em;
+  margin-top: 2.8em;
+  padding-top: 1.1em;
+  border-top: 1px solid var(--color-line);
+  font-size: 1.3rem;
   line-height: 1.5;
   font-weight: 700;
   color: var(--color-ink);
-  letter-spacing: 0.03em;
+  letter-spacing: 0.02em;
 }
 .article-body .h2-num {
   flex-shrink: 0;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 2.15em;
-  height: 2.15em;
-  margin-top: -0.18em;
-  border-radius: 10px;
-  background: var(--color-brand);
-  color: #fff;
-  font-size: 0.74em;
-  letter-spacing: 0.02em;
+  color: var(--color-brand);
+  font-size: 0.95em;
+  letter-spacing: 0;
   font-feature-settings: "tnum" 1;
 }
 .article-body h3 {
   position: relative;
   margin-top: 2em;
-  padding: 0 0 0.35em 0.9em;
-  border-bottom: 1px solid var(--color-line);
+  padding: 0 0 0 0.85em;
   font-size: 1.1rem;
   line-height: 1.6;
   font-weight: 700;
@@ -133,10 +123,10 @@ body {
   position: absolute;
   left: 0;
   top: 0.35em;
-  width: 0.35em;
-  height: 0.95em;
+  width: 0.22em;
+  height: 1em;
   border-radius: 999px;
-  background: var(--color-accent-bright);
+  background: var(--color-brand);
 }
 .article-body h4 {
   font-weight: 700;
@@ -892,7 +882,7 @@ body {
 .hero-grid {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
-  grid-template-areas: "art" "text" "worries" "search";
+  grid-template-areas: "art" "text" "search";
   column-gap: 48px;
 }
 .hero-grid > .hero-art { grid-area: art; }
@@ -903,7 +893,7 @@ body {
   .hero-grid {
     grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
     grid-template-rows: auto 1fr;
-    grid-template-areas: "text art" "search worries";
+    grid-template-areas: "text art" "search art";
     align-items: start;
   }
 }

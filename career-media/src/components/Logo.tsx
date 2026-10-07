@@ -19,9 +19,9 @@ export function BrandMark({ className = "h-8 w-8" }: { className?: string }) {
 export function Logo({ compact = false }: { compact?: boolean }) {
   return (
     <Link href="/" className="group flex items-center gap-2.5" aria-label={`${site.fullName} ホーム`}>
-      <BrandMark className="h-8 w-8 shrink-0 sm:h-9 sm:w-9" />
+      <BrandMark className={`shrink-0 ${compact ? "h-7 w-7" : "h-8 w-8 sm:h-9 sm:w-9"}`} />
       <span className="flex flex-col leading-none">
-        <span className="text-[17px] font-bold tracking-wide text-ink sm:text-lg">{partner.brandName}</span>
+        <span className={`font-bold tracking-wide text-ink ${compact ? "text-[16px]" : "text-[17px] sm:text-lg"}`}>{partner.brandName}</span>
         {!compact && <span className="mt-1 text-[10.5px] font-medium tracking-[0.06em] text-brand-strong">{partner.brandName === site.name ? site.tagline : site.name}</span>}
       </span>
     </Link>
