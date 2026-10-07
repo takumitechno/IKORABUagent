@@ -1,6 +1,6 @@
 ---
 name: career-article-reviewer
-description: 未経験転職メディアの査読手順。機械チェック C01〜C15（pipeline/src/checks.ts）と目視チェック、判定の記録。career-reviewer 専用。
+description: 未経験転職メディアの査読手順。機械チェック C01〜C18（pipeline/src/checks.ts）と目視チェック、判定の記録。career-reviewer 専用。
 user-invocable: false
 ---
 
@@ -33,6 +33,9 @@ ZIP の「チェックリストに追加したら check_article にも検出コ�
 | C13 | FAQ の空項目 | error |
 | C14 | 長さの目安（ノルマではなく極端な過不足） | warning |
 | C15 | 出典 URL の到達性（`--check-urls` 指定時） | warning |
+| C16 | 入口タグ（roles / concerns / situations）の語彙、eyecatch の行数・長さ、illustration の名前 | error / warning |
+| C17 | 読者をラベリングする表現（error）、硬い業界用語（warning） | error / warning |
+| C18 | 図解（```figure）の形と長さ、本文にない数字、図解の数、figure 以外のコードブロック | error / warning |
 
 ## 判定
 

@@ -15,6 +15,7 @@
     "db:verify": "bash scripts/verify-db.sh",
     "screenshots": "node scripts/screenshots.mjs",
     "motifs": "tsx scripts/gen-motifs.ts",
+    "export:static": "tsx scripts/export-static.ts",
     "local": "bash scripts/start-local.sh"
   },
   "dependencies": {

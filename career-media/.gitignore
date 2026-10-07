@@ -11,7 +11,8 @@ next-env.d.ts
 .env.*
 !.env.example
 
-# local runtime (pipeline logs, local postgres, screenshots)
+# local runtime (pipeline logs, local postgres, screenshots, export:static の静的 HTML)
 .runtime/
 screenshots/
 screenshots-*/
+export/site/

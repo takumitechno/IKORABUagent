@@ -43,10 +43,11 @@ cd career-media && bash scripts/start-local.sh
 |---|---|
 | `npm test` | ユニット・結合テスト（条件整理ロジック、査読チェック、公開ゲート、SEO、相談導線、コンテンツの整合性） |
 | `npm run lint` | TypeScript 型チェック |
-| `npm run content:check` | 全記事の機械チェック（C01〜C15）。review / published にエラーがあれば失敗 |
+| `npm run content:check` | 全記事の機械チェック（C01〜C18）。review / published にエラーがあれば失敗 |
 | `npm run db:seed-sql` | `content/` から `supabase/seed.sql` を生成 |
 | `npm run db:verify` | 使い捨てのローカル Postgres に migration + seed を流し、RLS・列権限・公開ガード・検索を検証 |
 | `npm run screenshots` | 起動中のサーバーの主要画面をデスクトップ・スマホで撮影し、コンソールエラーと横スクロールを検出 |
+| `npm run export:static` | 起動中のサーバーの全ページを Markdown（`export/pages/`）と静的 HTML（`export/site/`）に書き出す |
 
 ## アーティファクト（claude.ai で見る版）
 
@@ -61,6 +62,15 @@ npx tsx scripts/artifact/build-artifact.ts --base http://127.0.0.1:3200 --out <�
 画面遷移・検索・スマホメニューは `scripts/artifact/runtime.js`、条件整理チェックは本番と同じ React コンポーネントを
 esbuild でバンドルして動かす。相談ボタンは押すと「デモのため移動しない」旨と設置場所（utm_content）を表示する。
 スクリプトは中立ブランド以外のプロファイルや、実在企業の表記を含むページでは失敗する。
+
+## Codex などのエージェントに読ませる
+
+- 作業ガイドは `AGENTS.md`（Codex が自動で読む。リポジトリ直下の `AGENTS.md` からも案内している）。
+- 各ページに表示される内容は `export/pages/` に Markdown で置いてある（`INDEX.md` が一覧、各ファイル先頭の `source` が元のソース）。
+  ビルドしなくても読めるようにリポジトリに含めている。画面や記事を変えたら、サーバーを起動したうえで `npm run export:static` で書き出し直す。
+- 同じコマンドで `export/site/` に全ページの静的 HTML（JS・CSS・フォント込み、git 管理外）もできる。
+  `python3 -m http.server 8080 -d export/site` で http://localhost:8080 を開く（file:// では JS が読み込めない。記事検索の絞り込みはサーバー側の処理なので効かない）。
+- どちらも提案用の非公開資料。公開サーバーに置かない。
 
 ## 画面とルート
 
@@ -134,7 +144,7 @@ career-orchestrator ─▶ career-writer（draft → review）─▶ career-revi
                                          人間: npm run pipeline -- publish <slug> --approved-by <name>
 ```
 
-- `npm run pipeline -- check [--slug x] [--check-urls]` — 機械チェック（C01〜C15、`.claude/skills/career-article-reviewer` に一覧）
+- `npm run pipeline -- check [--slug x] [--check-urls]` — 機械チェック（C01〜C18、`.claude/skills/career-article-reviewer` に一覧）
 - `npm run pipeline -- review <slug>` — 判定を本文ハッシュつきで `content/reviews/<slug>.json` に記録
 - `npm run pipeline -- publish <slug> --approved-by <name>` — status=review・エラー0・現在の本文に対する approved・承認者名がそろったときだけ公開。査読後に本文が変わったら再査読が必要
 - 実行ログ: `.runtime/logs/pipeline-runs.jsonl`

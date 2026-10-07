@@ -1,0 +1,75 @@
+---
+url: /concerns/yaritai
+title: "やりたい仕事が分からない｜はじめて転職ガイド"
+description: "向いている仕事が分からないときに、経験と希望から候補をしぼる方法。"
+source:
+  - src/app/concerns/[slug]/page.tsx
+  - src/components/TaxonomyHub.tsx
+  - src/lib/taxonomy.ts
+---
+
+パンくず: [ホーム](/) › [悩みから探す](/concerns) › やりたい仕事が分からない
+
+BY CONCERN・やりたい仕事が分からない
+
+# やりたい仕事が分からない
+
+向いている仕事が分からないときに、経験と希望から候補をしぼる方法。
+
+7本の記事
+
+[給料を上げたい](/concerns/kyuryo) ・ [土日休みにしたい](/concerns/donichi) ・ [オフィスワークに行きたい](/concerns/office) ・ [正社員になりたい](/concerns/seishain) ・ [未経験の職種に挑戦したい](/concerns/mikeiken-shokushu) ・ [今の仕事を辞めたい](/concerns/yametai) ・ [面接・書類が不安](/concerns/mensetsu) ・ [やりたい仕事が分からない](/concerns/yaritai)
+
+- ### [やりたい仕事が分からない。自分に合う仕事の探し方3ステップ](/articles/shigoto-sagashikata)
+  「やりたいことが見つからない」と止まってしまったら、やりたいことから探すのをいったんやめてみましょう。「避けたいこと」「続けられた作業」「ゆずれない条件」の3つから候補を2〜3職種にしぼり、比べて確かめる方法を、書き出し例つきで紹介します。
+  更新 2026.10.06
+- ### [26歳で未経験の職種に転職するのは遅い？](/articles/26sai-mikeiken)
+  26歳で未経験の職種に移るのは遅いのか。求人では原則として年齢を制限できず、若い人を職務経験を問わず正社員として募集する例外もあります。「遅いかも」と感じる理由を分けて、職種の選び方と面接での伝え方まで整理します。
+  更新 2026.10.06
+- ### [AIで変わる仕事を、未経験転職者はどう見るべきか](/articles/ai-shigoto-mikeiken)
+  「AIに仕事を奪われる」という話を聞くと、これから選ぶ職種に不安を感じるかもしれません。職種名ではなく仕事の中の作業（タスク）に分けて考えると、変わりやすい部分と変わりにくい部分が見えてきます。職種選びと面接での確認のしかたを整理します。
+  更新 2026.10.05
+
+- 転職準備 2026.09.20
+  ### [エージェント面談の前に決めておくこと・決めなくていいこと](/articles/agent-mendan-mae)
+  人材紹介会社のキャリアアドバイザーとの面談は、すべてを決めてから臨む必要はありません。事前に決めておくと面談が進めやすくなること、面談で一緒に考えればいいこと、面談で聞いておきたいことを整理しました。
+- 転職準備 2026.09.16
+  ### [転職エージェントに、何を相談すればいい？相談できることと伝え方の例](/articles/agent-soudan-nani)
+  転職エージェント（人材紹介会社）には、求人の紹介だけでなく、やりたい仕事の整理や書類・面接の準備、聞きにくい条件の確認も相談できます。場面ごとに相談できることを整理し、そのまま使える相談の言い方の例を紹介します。
+- 職種を知る 2026.09.02
+  ### [営業・カスタマーサポート・ITサポートの違いは？仕事内容と向き不向きを比べる](/articles/eigyo-cs-it-support-chigai)
+  未経験歓迎の求人で目にすることが多い「営業」「カスタマーサポート」「ITサポート」。人と話す量、パソコン作業、数字の目標という3つの軸で、仕事内容の違いと入社前に確認したいことを整理します。
+- 未経験転職 2026.08.18
+  ### [未経験転職は何から始める？最初に整理したい5つのこと](/articles/mikeiken-tenshoku-hajimekata)
+  求人を眺める前に「転職したい理由」「経験」「希望条件」「比べる職種」「スケジュール」の5つを整理しておくと、求人の良し悪しを自分の基準で判断しやすくなります。それぞれの整理のしかたを具体的に紹介します。
+
+[迷ったら、条件整理チェック 13の質問で、比べる職種と確認ポイントを整理](/check)
+
+今の状況から探す
+
+- [フリーター](/situations/freeter)
+- [派遣社員](/situations/haken)
+- [正社員経験が少ない](/situations/seishain-keiken-sukunai)
+- [接客・販売の経験](/situations/sekkyaku)
+- [第二新卒](/situations/dainishinsotsu)
+- [初めての転職](/situations/hajimete)
+- [転職回数が多い](/situations/kaisu)
+- [PC仕事が未経験](/situations/pc-mikeiken)
+
+職種から探す
+
+- [営業](/jobs/eigyo)
+- [事務](/jobs/jimu)
+- [カスタマーサポート](/jobs/customer-support)
+- [ITサポート](/jobs/it-support)
+- [人事・採用](/jobs/jinji)
+- [販売・接客](/jobs/hanbai)
+- [その他の職種](/jobs/sonota)
+
+自分の場合はどうなる？
+
+整理した条件をもとに、キャリアアドバイザーに具体的な選択肢を相談できます。
+
+[無料で相談してみる](https://consultation.example/apply?utm_source=owned_media&utm_medium=referral&utm_campaign=owned-media-demo&utm_content=article-sidebar__concerns-yaritai)
+
+運営: 人材紹介会社（社名は正式公開時に掲載）

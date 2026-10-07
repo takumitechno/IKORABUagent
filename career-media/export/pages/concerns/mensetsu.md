@@ -1,0 +1,78 @@
+---
+url: /concerns/mensetsu
+title: "面接や書類に自信がない｜はじめて転職ガイド"
+description: "履歴書・職務経歴書に書くこと、面接で聞かれやすいことの準備。"
+source:
+  - src/app/concerns/[slug]/page.tsx
+  - src/components/TaxonomyHub.tsx
+  - src/lib/taxonomy.ts
+---
+
+パンくず: [ホーム](/) › [悩みから探す](/concerns) › 面接・書類が不安
+
+BY CONCERN・面接・書類が不安
+
+# 面接や書類に自信がない
+
+履歴書・職務経歴書に書くこと、面接で聞かれやすいことの準備。
+
+8本の記事
+
+[給料を上げたい](/concerns/kyuryo) ・ [土日休みにしたい](/concerns/donichi) ・ [オフィスワークに行きたい](/concerns/office) ・ [正社員になりたい](/concerns/seishain) ・ [未経験の職種に挑戦したい](/concerns/mikeiken-shokushu) ・ [今の仕事を辞めたい](/concerns/yametai) ・ [面接・書類が不安](/concerns/mensetsu) ・ [やりたい仕事が分からない](/concerns/yaritai)
+
+- ### [未経験職種の志望動機、何を書けばいい？3つの要素と例文](/articles/shiboudouki-mikeiken)
+  未経験の職種に応募するとき、志望動機に「経験がないこと」をどう書けばいいか迷う人は多いはずです。きっかけ・経験との接点・入社後に取り組みたいことの3つの要素で組み立てる方法を、例文つきで紹介します。
+  更新 2026.10.05
+- ### [フリーターから正社員を目指すとき、最初に確認したいこと](/articles/freeter-seishain-hajimeni)
+  アルバイトから正社員を目指すときは、雇用形態による働き方の違いを知り、アルバイト経験や空白期間をどう伝えるかを整理しておくことが大切です。求人の探し方の使い分けとあわせて紹介します。
+  更新 2026.10.05
+- ### [履歴書に書くことがないと思ったとき｜アルバイト歴・資格・自己PRの書き方](/articles/rirekisho-kakukoto-nai)
+  「正社員の経験がない」「資格もない」と、履歴書の欄が埋まらずに手が止まっていませんか。アルバイト歴の書き方、資格欄が空くとき、空白期間、自己PR欄の考え方を、厚生労働省の履歴書様式例やハローワークの資料をもとに欄ごとに整理します。
+  更新 2026.10.06
+
+- 面接・書類 2026.09.25
+  ### [未経験職種の面接、何を準備する？よく聞かれる質問と逆質問の例](/articles/mensetsu-junbi-mikeiken)
+  未経験の職種の面接では、志望動機・転職理由・これまでの経験・入社後のことを聞かれやすいものです。質問ごとの準備のしかたと答え方の例、逆質問の例、オンライン面接の確認ポイント、答えなくていい質問についてまとめました。
+- 面接・書類 2026.09.19
+  ### [アルバイト経験だけの職務経歴書、何を書けばいい？構成と書き出し例](/articles/shokumu-keirekisho-arubaito)
+  正社員の経験がなくても、アルバイトで担当した仕事や工夫したことは職務経歴書に書けます。職務要約・職務経歴・工夫したこと・活かせる経験・自己PRの5つの構成と書き出し例、雇用形態や数字の書き方で気をつけたいことをまとめました。
+- 面接・書類 2026.09.16
+  ### [転職回数が気になるときに整理したいこと｜説明のしかたと次の選び方](/articles/tenshoku-kaisu-kininaru)
+  短期間での離職や転職回数の多さが気になるときは、隠すよりも事実を整理し、次の職場で何を変えたいのかを説明できるようにしておくことが大切です。経歴の整理のしかたと、伝え方の型を紹介します。
+- 転職準備 2026.09.12
+  ### [未経験求人の「研修あり」で確認すべきこと｜期間・内容・その後のフォロー](/articles/mikeiken-kenshu-kakunin)
+  「研修制度あり」「未経験でも安心」と書かれた求人でも、研修の中身は会社によって大きく違います。期間・形式・教える人・研修後のフォローなど、応募前や面接で確認したいポイントを質問例つきでまとめました。
+- 経験の活かし方 2026.08.25
+  ### [接客経験は転職でどう活かせる？職種別のつながりと伝え方](/articles/sekkyaku-keiken-ikasu)
+  接客の仕事には、相手の要望を聞き取る力や、混雑時の段取り、クレーム対応など、ほかの職種でも使える経験が含まれています。経験を分解して、営業・カスタマーサポート・事務などにどうつながるかを整理します。
+
+[迷ったら、条件整理チェック 13の質問で、比べる職種と確認ポイントを整理](/check)
+
+今の状況から探す
+
+- [フリーター](/situations/freeter)
+- [派遣社員](/situations/haken)
+- [正社員経験が少ない](/situations/seishain-keiken-sukunai)
+- [接客・販売の経験](/situations/sekkyaku)
+- [第二新卒](/situations/dainishinsotsu)
+- [初めての転職](/situations/hajimete)
+- [転職回数が多い](/situations/kaisu)
+- [PC仕事が未経験](/situations/pc-mikeiken)
+
+職種から探す
+
+- [営業](/jobs/eigyo)
+- [事務](/jobs/jimu)
+- [カスタマーサポート](/jobs/customer-support)
+- [ITサポート](/jobs/it-support)
+- [人事・採用](/jobs/jinji)
+- [販売・接客](/jobs/hanbai)
+- [その他の職種](/jobs/sonota)
+
+自分の場合はどうなる？
+
+整理した条件をもとに、キャリアアドバイザーに具体的な選択肢を相談できます。
+
+[無料で相談してみる](https://consultation.example/apply?utm_source=owned_media&utm_medium=referral&utm_campaign=owned-media-demo&utm_content=article-sidebar__concerns-mensetsu)
+
+運営: 人材紹介会社（社名は正式公開時に掲載）

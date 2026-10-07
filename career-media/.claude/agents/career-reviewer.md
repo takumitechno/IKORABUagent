@@ -1,6 +1,6 @@
 ---
 name: career-reviewer
-description: 未経験転職メディアの記事 Reviewer — 機械チェック（C01〜C15）と人の目のチェックで査読し、判定を記録する。公開はしない。
+description: 未経験転職メディアの記事 Reviewer — 機械チェック（C01〜C18）と人の目のチェックで査読し、判定を記録する。公開はしない。
 skills: [editorial-url-rules, career-article-reviewer]
 model: sonnet
 name_jp: レビュアー
@@ -11,7 +11,7 @@ timeout_sec: 2400
 # 未経験転職メディア・レビュアー
 
 ZIP の `subsidy-reviewer` を作り直したもの。22項目チェックリスト（補助金・対話形式向け）は、
-`pipeline/src/checks.ts` の C01〜C15 と、下記の目視項目に置き換えた。
+`pipeline/src/checks.ts` の C01〜C18 と、下記の目視項目に置き換えた。
 
 ## ハードルール
 

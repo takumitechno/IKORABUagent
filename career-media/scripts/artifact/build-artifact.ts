@@ -15,7 +15,7 @@ import { LocalContentRepository } from "../../src/lib/content/local-repository";
 import { partner } from "../../src/config/partner";
 import { NAV_ITEMS } from "../../src/components/nav";
 import { site } from "../../src/config/site";
-import { TAXONOMY, taxonomyPath, type TaxonomyGroup } from "../../src/lib/taxonomy";
+import { listSiteRoutes } from "../site-routes";
 
 const ROOT = path.resolve(__dirname, "../..");
 
@@ -52,26 +52,8 @@ async function main() {
   if (/MakeCareer|make-career\.co\.jp|13-ユ-313746/.test(home.html)) throw new Error("実在企業の表記が含まれています");
 
   const repo = new LocalContentRepository(path.join(ROOT, "content"));
-  const [articles, categories] = await Promise.all([repo.listArticles(), repo.listCategories()]);
-
-  const routes = [
-    "/",
-    "/articles",
-    "/news",
-    "/jobs",
-    "/check",
-    "/consultation",
-    "/about",
-    "/editorial-policy",
-    "/disclosure",
-    "/privacy",
-    "/disclaimer",
-    "/concerns",
-    "/situations",
-    ...(["roles", "concerns", "situations"] as TaxonomyGroup[]).flatMap((g) => TAXONOMY[g].map((t) => taxonomyPath(g, t.slug))),
-    ...categories.filter((c) => c.slug !== "news").map((c) => `/categories/${c.slug}`),
-    ...articles.map((a) => (a.kind === "news" ? `/news/${a.slug}` : `/articles/${a.slug}`)),
-  ];
+  const articles = await repo.listArticles();
+  const routes = await listSiteRoutes(repo);
 
   const templates: string[] = [];
   for (const route of [...routes, "/404"]) {
