@@ -5,5 +5,6 @@
   { "slug": "shorui-mensetsu", "name": "面接・書類", "description": "履歴書・職務経歴書・面接で、伝え方に迷ったときに。", "icon": "file-text", "sort_order": 4 },
   { "slug": "hatarakikata", "name": "年収・働き方", "description": "給与・休日・勤務時間など、条件の見方と比べ方。", "icon": "wallet", "sort_order": 5 },
   { "slug": "junbi", "name": "転職準備", "description": "面談・応募の前に整理しておくこと、確認しておくこと。", "icon": "list-checks", "sort_order": 6 },
-  { "slug": "news", "name": "転職ニュース・市場情報", "description": "制度変更や市場の動きを、未経験転職者の目線で読み解く。", "icon": "newspaper", "sort_order": 7 }
+  { "slug": "seido", "name": "制度・手続き", "description": "失業手当・健康保険・年金・税金など、退職と転職のときに関わる国の制度と手続き。", "icon": "building", "sort_order": 7 },
+  { "slug": "news", "name": "転職ニュース・市場情報", "description": "制度変更や市場の動きを、未経験転職者の目線で読み解く。", "icon": "newspaper", "sort_order": 8 }
 ]

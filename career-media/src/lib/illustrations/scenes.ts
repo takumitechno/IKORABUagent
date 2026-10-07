@@ -15,6 +15,7 @@ export const CATEGORY_SCENE: Record<string, MotifName> = {
   "shorui-mensetsu": "interview",
   hatarakikata: "coins",
   junbi: "checklist",
+  seido: "idcard",
   news: "newspaper",
 };
 

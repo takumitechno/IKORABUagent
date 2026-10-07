@@ -79,6 +79,7 @@ const CATEGORY_TONE: Record<string, Tone> = {
   "shorui-mensetsu": "coral",
   hatarakikata: "lime",
   junbi: "mist",
+  seido: "sky",
   news: "mist",
 };
 
