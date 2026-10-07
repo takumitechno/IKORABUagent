@@ -6,10 +6,10 @@ status: published
 categories: [mikeiken, junbi]
 featured: true
 recommended: false
-published_at: 2026-08-18
-updated_at: 2026-10-01
-reviewed_at: 2026-10-01
-information_checked_at: 2026-10-01
+published_at: 2026-10-06
+updated_at: 2026-10-06
+reviewed_at: 2026-10-06
+information_checked_at: 2026-10-06
 seo_title: 未経験転職は何から始める？最初に整理したい5つのこと
 seo_description: 未経験転職の最初の一歩は、求人探しより「整理」です。転職理由・経験・希望条件・比べる職種・スケジュールの5つを、書き出し例つきで解説します。
 roles: []
@@ -28,12 +28,12 @@ sources:
   - title: 職業情報提供サイト（job tag）
     publisher: 厚生労働省
     url: https://shigoto.mhlw.go.jp/User/
-    accessed_at: 2026-10-01
+    accessed_at: 2026-10-06
     used_for: 職種ごとの仕事内容を調べる方法の紹介
   - title: 2024年4月から労働条件明示のルールが変わります
     publisher: 厚生労働省
     url: https://www.mhlw.go.jp/stf/newpage_32105.html
-    accessed_at: 2026-10-01
+    accessed_at: 2026-10-06
     used_for: 求人や内定時に確認できる労働条件の範囲
 research_notes:
   schema_version: 2

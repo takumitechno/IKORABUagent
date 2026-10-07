@@ -3,8 +3,6 @@ import { Noto_Sans_JP } from "next/font/google";
 import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
 import { PreviewBanner } from "@/components/PreviewBanner";
-import { DemoConsultDialog } from "@/components/DemoConsultDialog";
-import { partner } from "@/config/partner";
 import { site } from "@/config/site";
 import "./globals.css";
 
@@ -42,7 +40,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <Header />
         <main id="main">{children}</main>
         <Footer />
-        {partner.consultationMode === "demo" && <DemoConsultDialog consultationOrigin={new URL(partner.consultationUrl).origin} />}
       </body>
     </html>
   );

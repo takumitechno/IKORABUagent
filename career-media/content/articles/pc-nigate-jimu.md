@@ -6,7 +6,7 @@ status: published
 categories: [shokushu, junbi]
 featured: false
 recommended: true
-published_at: 2026-09-29
+published_at: 2026-10-06
 updated_at: 2026-10-06
 reviewed_at: 2026-10-06
 information_checked_at: 2026-10-06

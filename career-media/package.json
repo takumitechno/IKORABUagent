@@ -16,7 +16,9 @@
     "screenshots": "node scripts/screenshots.mjs",
     "motifs": "tsx scripts/gen-motifs.ts",
     "export:static": "tsx scripts/export-static.ts",
-    "local": "bash scripts/start-local.sh"
+    "local": "bash scripts/start-local.sh",
+    "demo": "node scripts/demo.mjs neutral",
+    "demo:makecareer": "node scripts/demo.mjs makecareer"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.117.2",

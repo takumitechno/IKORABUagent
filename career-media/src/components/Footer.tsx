@@ -48,8 +48,14 @@ export function Footer() {
                 <dd>{partner.operatorDisplay}</dd>
               </div>
               <div className="flex gap-2">
-                <dt className="shrink-0 font-medium text-body">有料職業紹介事業許可番号</dt>
-                <dd>{licenseLabel}</dd>
+                <dt className="shrink-0 font-medium text-body">企画・制作</dt>
+                <dd>{partner.producerDisplay}</dd>
+              </div>
+              <div className="flex gap-2">
+                <dt className="shrink-0 font-medium text-body">相談先</dt>
+                <dd>
+                  {partner.partnerName}（有料職業紹介事業許可番号: {licenseLabel}）
+                </dd>
               </div>
             </dl>
           </div>

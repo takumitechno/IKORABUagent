@@ -7,10 +7,10 @@ status: published
 categories: [news, hatarakikata]
 featured: false
 recommended: false
-published_at: 2026-09-05
-updated_at: 2026-10-01
-reviewed_at: 2026-10-01
-information_checked_at: 2026-10-01
+published_at: 2026-10-06
+updated_at: 2026-10-06
+reviewed_at: 2026-10-06
+information_checked_at: 2026-10-06
 roles: []
 concerns: [mikeiken-shokushu]
 situations: [hajimete]
@@ -34,12 +34,12 @@ sources:
   - title: 2024年4月から労働条件明示のルールが変わります
     publisher: 厚生労働省
     url: https://www.mhlw.go.jp/stf/newpage_32105.html
-    accessed_at: 2026-10-01
+    accessed_at: 2026-10-06
     used_for: 改正の概要と施行日
   - title: 企業から受ける労働条件明示のルールが変わります（求職者向けリーフレット）
     publisher: 厚生労働省
     url: https://www.mhlw.go.jp/content/001114112.pdf
-    accessed_at: 2026-10-01
+    accessed_at: 2026-10-06
     used_for: 募集時・職業紹介時に追加された明示事項
 ---
 

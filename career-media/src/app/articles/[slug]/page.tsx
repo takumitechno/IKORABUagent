@@ -6,8 +6,6 @@ import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { ConsultationCta } from "@/components/ConsultationCta";
 import { JsonLd } from "@/components/JsonLd";
 import { MobileStickyCta } from "@/components/MobileStickyCta";
-import { partner } from "@/config/partner";
-import { buildConsultationUrl } from "@/lib/consultation";
 import { getRepository } from "@/lib/content";
 import { readingMinutes, renderMarkdown } from "@/lib/markdown";
 import { articleCrumbs, articleJsonLd, faqJsonLd, pageMetadata } from "@/lib/seo";
@@ -98,7 +96,7 @@ export default async function ArticlePage({ params }: Props) {
         </div>
         <RelatedArticles articles={related} categories={categories} />
       </div>
-      <MobileStickyCta href={buildConsultationUrl("article-bottom", article.slug)} label={partner.consultationIsFree ? "無料でキャリア相談する" : "キャリア相談する"} />
+      <MobileStickyCta contentSlug={article.slug} />
     </>
   );
 }

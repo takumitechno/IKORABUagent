@@ -6,7 +6,7 @@ status: published
 categories: [mikeiken, shokushu]
 featured: true
 recommended: false
-published_at: 2026-10-04
+published_at: 2026-10-06
 updated_at: 2026-10-06
 reviewed_at: 2026-10-06
 information_checked_at: 2026-10-06

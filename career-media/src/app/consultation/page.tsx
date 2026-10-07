@@ -1,23 +1,22 @@
 import Link from "next/link";
 import { BookOpen, ClipboardList, MessagesSquare } from "lucide-react";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
-import { ConsultButton, ConsultationCta } from "@/components/ConsultationCta";
+import { ConsultButton, ConsultationCta, PartnerNote } from "@/components/ConsultationCta";
 import { JsonLd } from "@/components/JsonLd";
-import { licenseLabel, partner } from "@/config/partner";
+import { partner } from "@/config/partner";
 import { faqJsonLd, pageMetadata } from "@/lib/seo";
 
 export const metadata = pageMetadata({
   title: "キャリア相談について",
-  description: `キャリアアドバイザーに、未経験からの転職について相談できます。相談でできること、相談の流れ、よくある質問をまとめています。`,
+  description: `未経験からの転職を、人材紹介会社のキャリアアドバイザーに相談するときにできること・相談の流れ・相談前に準備しておくこと・よくある質問をまとめています。`,
   path: "/consultation",
 });
 
 const FAQ = [
   {
     question: "相談に費用はかかりますか？",
-    answer: partner.consultationIsFree
-      ? "相談は無料です。人材紹介サービスでは、職業安定法にもとづき原則として求職者から手数料を受け取ることはできず、採用した企業が紹介手数料を支払うしくみになっています。"
-      : "費用については申し込みページでご確認ください。",
+    answer:
+      "人材紹介会社（有料職業紹介事業者）は、職業安定法により、原則として求職者から手数料を受け取ることができません（一部の職業を除く）。紹介手数料は、採用した企業が支払うしくみです。実際の条件は、申し込みページで相談先の案内を確認してください。",
   },
   { question: "相談したら、必ず応募しないといけませんか？", answer: "いいえ。紹介された求人に応募するかどうかは、ご自身で決められます。情報収集のための相談でも構いません。" },
   { question: "まだ転職するか決めていなくても相談できますか？", answer: "はい。転職するかどうか迷っている段階でも、今の状況や選択肢を整理するために相談できます。" },
@@ -39,17 +38,14 @@ export default function ConsultationPage() {
             <p className="text-[11px] font-bold tracking-[0.2em] text-brand">CAREER CONSULTATION</p>
             <h1 className="mt-1 text-[26px] font-bold leading-snug text-ink sm:text-[32px]">キャリア相談について</h1>
             <p className="mt-4 text-[15px] leading-8 text-body">
-              当メディアの運営会社では、キャリアアドバイザーによる転職の相談を受け付けています。記事や条件整理チェックで整理したことをもとに、具体的な求人や転職の進め方を相談できます。
+              このメディアは、仕事や条件について自分で調べて整理するための場所です。自分の場合どんな求人や進め方があるかを具体的に考えたいときは、{partner.partnerName}のキャリアアドバイザーに相談できます。相談しなくても、記事とチェックだけで使えるように作っています。
             </p>
           </div>
           <div className="rounded-2xl bg-brand-tint p-5 ring-1 ring-brand/15">
             <span aria-hidden="true" className="motif motif-chat mx-auto mb-3 block h-24 w-24 rounded-full bg-white" />
-            <ConsultButton placement="consultation-page" />
-            <p className="mt-3 text-xs leading-5 text-muted">
-              運営: {partner.operatorDisplay}
-              <br />
-              有料職業紹介事業許可番号 {licenseLabel}
-            </p>
+            <ConsultButton placement="consultation-page" label="相談を申し込む" />
+            <p className="mt-3 text-xs leading-5 text-muted">先に条件を整理したい方は、下の「相談の前に準備しておくと話しやすいこと」から。</p>
+            <PartnerNote className="mt-2 text-xs leading-5 text-muted" />
           </div>
         </header>
 
@@ -61,27 +57,29 @@ export default function ConsultationPage() {
             <div className="rounded-[var(--radius-card)] border border-line bg-white p-6">
               <p className="flex items-center gap-2 font-bold text-ink">
                 <BookOpen className="h-5 w-5 text-brand" aria-hidden="true" />
-                このメディアでできること
+                このメディアでできること（自分で）
               </p>
               <ul className="mt-4 space-y-2.5 text-[14.5px] leading-7">
-                <li>・仕事内容や働き方、条件の見方などの一般的な情報を知る</li>
+                <li>・仕事内容や働き方、給料・休日の見方を知る</li>
                 <li>・職種ごとの違いを比べる</li>
-                <li>・条件整理チェックで、希望や経験を整理する</li>
+                <li>・条件整理チェックで、希望や経験・聞きたいことを整理する</li>
               </ul>
+              <p className="mt-3 text-[12.5px] leading-6 text-muted">求人の紹介や、個別の応募先の判断はしていません。</p>
             </div>
             <div className="rounded-[var(--radius-card)] border-2 border-accent/30 bg-white p-6">
               <p className="flex items-center gap-2 font-bold text-ink">
                 <MessagesSquare className="h-5 w-5 text-accent" aria-hidden="true" />
-                キャリア相談でできること
+                キャリア相談でできること（{partner.partnerName}）
               </p>
               <p className="mt-3 text-[14.5px] leading-7 text-body">{partner.serviceDescription}</p>
+              <p className="mt-3 text-[12.5px] leading-6 text-muted">内定や年収アップなどの結果を保証するものではありません。</p>
             </div>
           </div>
         </section>
 
         <section aria-labelledby="audience" className="mt-12">
           <h2 id="audience" className="text-[22px] font-bold text-ink">
-            こんな方の相談を受け付けています
+            こんな方の相談を想定しています
           </h2>
           <ul className="mt-5 grid gap-3 sm:grid-cols-2">
             {partner.serviceAudience.map((a) => (
@@ -96,6 +94,7 @@ export default function ConsultationPage() {
           <h2 id="flow" className="text-[22px] font-bold text-ink">
             相談の流れ
           </h2>
+          <p className="mt-2 text-[13px] leading-6 text-muted">{partner.consultationStepsNote}</p>
           <ol className="relative mt-5 grid gap-3 md:grid-cols-5">
             <span aria-hidden="true" className="reveal-grow-y absolute bottom-8 left-[35px] top-8 border-l-[3px] border-dashed border-brand/30 md:hidden" />
             <span aria-hidden="true" className="reveal-grow-x absolute left-[10%] right-[10%] top-[44px] hidden border-t-[3px] border-dashed border-brand/30 md:block" />

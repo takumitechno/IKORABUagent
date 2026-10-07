@@ -1,7 +1,5 @@
 import Link from "next/link";
-import { ArrowUpRight } from "lucide-react";
-import { buildConsultationUrl } from "@/lib/consultation";
-import { partner } from "@/config/partner";
+import { MessageCircle } from "lucide-react";
 import { Logo } from "./Logo";
 import { MobileNav } from "./MobileNav";
 import { NAV_ITEMS } from "./nav";
@@ -23,14 +21,16 @@ export function Header() {
           </ul>
         </nav>
         <div className="flex items-center gap-2">
-          <a
-            href={buildConsultationUrl("header")}
-            className="hidden items-center gap-1 rounded-full bg-accent px-4 py-2 text-[13px] font-bold text-white shadow-sm transition-colors hover:bg-accent-strong sm:inline-flex"
+          <Link
+            href="/consultation"
+            data-cta-placement="header"
+            data-cta-kind="consultation-info"
+            className="hidden items-center gap-1.5 rounded-full border border-accent/50 bg-white px-4 py-2 text-[13px] font-bold text-accent-strong transition-colors hover:border-accent hover:bg-accent-soft sm:inline-flex"
           >
-            {partner.consultationIsFree ? "無料で相談する" : "相談する"}
-            <ArrowUpRight className="h-4 w-4" aria-hidden="true" />
-          </a>
-          <MobileNav consultationHref={buildConsultationUrl("header")} consultationLabel={partner.consultationIsFree ? "無料でキャリア相談する" : "キャリア相談する"} />
+            <MessageCircle className="h-4 w-4" aria-hidden="true" />
+            キャリア相談について
+          </Link>
+          <MobileNav />
         </div>
       </div>
     </header>

@@ -6,10 +6,10 @@ status: published
 categories: [mikeiken, keiken]
 featured: true
 recommended: false
-published_at: 2026-09-30
-updated_at: 2026-10-05
-reviewed_at: 2026-10-05
-information_checked_at: 2026-10-05
+published_at: 2026-10-06
+updated_at: 2026-10-06
+reviewed_at: 2026-10-06
+information_checked_at: 2026-10-06
 roles: []
 concerns: [seishain, mensetsu]
 situations: [freeter, seishain-keiken-sukunai]
@@ -24,17 +24,17 @@ sources:
   - title: 2024年4月から労働条件明示のルールが変わります
     publisher: 厚生労働省
     url: https://www.mhlw.go.jp/stf/newpage_32105.html
-    accessed_at: 2026-10-05
+    accessed_at: 2026-10-06
     used_for: 契約期間・更新上限など、雇用形態にかかわる労働条件の明示
   - title: ハローワークインターネットサービス
     publisher: 厚生労働省
     url: https://www.hellowork.mhlw.go.jp/
-    accessed_at: 2026-10-05
+    accessed_at: 2026-10-06
     used_for: 公的な求人検索・職業相談の窓口の紹介
   - title: 人材サービス総合サイト（職業紹介事業所検索）
     publisher: 厚生労働省
     url: https://jinzai.hellowork.mhlw.go.jp/JinzaiWeb/GICB101010.do?action=transition&screenId=GICB101010&params=1
-    accessed_at: 2026-10-05
+    accessed_at: 2026-10-06
     used_for: 民間の職業紹介事業者の許可の確認方法
 ---
 

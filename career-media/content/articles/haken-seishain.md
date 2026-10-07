@@ -6,7 +6,7 @@ status: published
 categories: [mikeiken]
 featured: false
 recommended: false
-published_at: 2026-09-11
+published_at: 2026-10-06
 updated_at: 2026-10-06
 reviewed_at: 2026-10-06
 information_checked_at: 2026-10-06

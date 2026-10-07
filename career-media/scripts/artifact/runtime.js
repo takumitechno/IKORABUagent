@@ -229,7 +229,8 @@
   function openConsultDialog(href) {
     var content = "";
     try {
-      content = new URL(href).searchParams.get("utm_content") || "";
+      var u = new URL(href, location.href);
+      content = u.searchParams.get("placement") || u.searchParams.get("utm_content") || "";
     } catch (e) {}
     var place = dialog.querySelector("[data-placement]");
     place.textContent = content || "—";

@@ -6,10 +6,10 @@ status: published
 categories: [hatarakikata, junbi]
 featured: false
 recommended: true
-published_at: 2026-09-08
-updated_at: 2026-10-03
-reviewed_at: 2026-10-03
-information_checked_at: 2026-10-03
+published_at: 2026-10-06
+updated_at: 2026-10-06
+reviewed_at: 2026-10-06
+information_checked_at: 2026-10-06
 roles: []
 concerns: [donichi, kyuryo]
 situations: []
@@ -24,12 +24,12 @@ sources:
   - title: 労働基準法
     publisher: e-Gov法令検索（デジタル庁）
     url: https://laws.e-gov.go.jp/law/322AC0000000049
-    accessed_at: 2026-10-03
+    accessed_at: 2026-10-06
     used_for: 法定労働時間（第32条）と法定休日（第35条）
   - title: 2024年4月から労働条件明示のルールが変わります
     publisher: 厚生労働省
     url: https://www.mhlw.go.jp/stf/newpage_32105.html
-    accessed_at: 2026-10-03
+    accessed_at: 2026-10-06
     used_for: 労働条件の明示事項
 ---
 

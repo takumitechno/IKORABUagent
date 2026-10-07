@@ -6,7 +6,7 @@ status: review
 categories: [mikeiken, junbi]
 featured: false
 recommended: false
-updated_at: 2026-10-05
+updated_at: 2026-10-06
 roles: []
 concerns: [yametai]
 situations: [dainishinsotsu]
@@ -16,7 +16,7 @@ sources:
   - title: 雇用保険制度の改正内容について
     publisher: 厚生労働省
     url: https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/0000160564.html
-    accessed_at: 2026-10-05
+    accessed_at: 2026-10-06
     used_for: 自己都合退職時の給付制限期間
 research_notes:
   schema_version: 2

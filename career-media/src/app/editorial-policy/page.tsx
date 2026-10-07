@@ -12,7 +12,15 @@ export const metadata = pageMetadata({
 
 export default function EditorialPolicyPage() {
   return (
-    <InfoPage title="編集方針" path="/editorial-policy" eyebrow="EDITORIAL POLICY" lead={`${site.name}は、${partner.operatorDisplay}が運営し、${site.editorialTeam}が編集しています。読者が自分で判断するための材料を、正確で分かりやすく届けることを大切にしています。`}>
+    <InfoPage title="編集方針" path="/editorial-policy" eyebrow="EDITORIAL POLICY" lead={`${site.name}は、${site.editorialTeam}が編集しています（運営: ${partner.operatorDisplay}／企画・制作: ${partner.producerDisplay}）。読者が自分で判断するための材料を、正確で分かりやすく届けることを大切にしています。`}>
+      {!partner.brandUsageApproved && (
+        <>
+          <h2>このデモの記事について</h2>
+          <p>
+            現在掲載している記事・ニュース解説は、提案用に作成したサンプル原稿です。生成AIを使って下書きを作り、出典の確認・機械チェック（表現・リンク・日付・数字など）とAIによる査読を通していますが、<strong>人による最終確認と公開の承認はまだ行っていません</strong>。正式に公開するときは、下の「記事ができるまで」の手順で、人が確認・承認した記事だけを掲載します。
+          </p>
+        </>
+      )}
       <h2>誰のためのメディアか</h2>
       <p>既卒・第二新卒・フリーターの方や、正社員経験が少ない方、未経験の職種に挑戦したい20代の方など、これから転職を考える人のためのメディアです。専門用語をできるだけ使わず、普段の言葉で説明することを心がけています。</p>
 
@@ -48,9 +56,9 @@ export default function EditorialPolicyPage() {
       <h2>AIの利用について</h2>
       <p>記事制作の一部（情報の下調べ、構成案や下書きの作成、表記の確認など）で、生成AIを含むツールを利用することがあります。AIが作成した内容をそのまま公開することはなく、編集部が事実関係と出典を確認したうえで公開します。</p>
 
-      <h2>当社サービスの案内について</h2>
+      <h2>キャリア相談の案内について</h2>
       <p>
-        記事の中で、運営会社のキャリア相談サービスをご案内することがあります。詳しくは<Link href="/disclosure">広告・提携表記</Link>をご覧ください。
+        記事の中で、相談先（{partner.partnerName}）のキャリア相談をご案内することがあります。相談をすすめる前に、記事やチェックだけで判断の材料が手に入るように作っています。詳しくは<Link href="/disclosure">広告・提携表記</Link>をご覧ください。
       </p>
 
       <h2>誤りを見つけたときは</h2>

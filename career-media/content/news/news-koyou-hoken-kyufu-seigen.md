@@ -7,10 +7,10 @@ status: published
 categories: [news, junbi]
 featured: false
 recommended: false
-published_at: 2026-09-10
-updated_at: 2026-10-02
-reviewed_at: 2026-10-02
-information_checked_at: 2026-10-02
+published_at: 2026-10-06
+updated_at: 2026-10-06
+reviewed_at: 2026-10-06
+information_checked_at: 2026-10-06
 roles: []
 concerns: [yametai]
 situations: [hajimete]
@@ -35,12 +35,12 @@ sources:
   - title: 雇用保険制度の改正内容について
     publisher: 厚生労働省
     url: https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/0000160564.html
-    accessed_at: 2026-10-02
+    accessed_at: 2026-10-06
     used_for: 給付制限期間の見直し内容と施行日
   - title: 雇用保険法等の一部を改正する法律の概要
     publisher: 厚生労働省
     url: https://www.mhlw.go.jp/content/11600000/001255172.pdf
-    accessed_at: 2026-10-02
+    accessed_at: 2026-10-06
     used_for: 改正の全体像と施行期日
 ---
 

@@ -24,7 +24,7 @@ export function ArticleHeader({ article, categories, readingMinutes, headings = 
         <div className="flex items-center gap-1.5">
           <dt className="flex items-center gap-1">
             <CalendarCheck2 className="h-3.5 w-3.5" aria-hidden="true" />
-            公開
+            {site.sampleContent ? "作成" : "公開"}
           </dt>
           <dd>
             <time dateTime={article.publishedAt ?? undefined}>{formatDate(article.publishedAt)}</time>
@@ -56,6 +56,7 @@ export function ArticleHeader({ article, categories, readingMinutes, headings = 
       <div className="mt-4">
         <TagChips article={article} />
       </div>
+      {site.sampleContent && <SampleNotice />}
       <p className="mt-5 text-[15px] leading-8 text-body">{article.summary}</p>
       {headings.length > 1 && (
         <nav aria-label="この記事でわかること" className="mt-6 rounded-[18px] bg-brand-tint p-4 ring-1 ring-brand/15 sm:p-5">
@@ -76,12 +77,24 @@ export function ArticleHeader({ article, categories, readingMinutes, headings = 
         </nav>
       )}
       <p className="mt-4 text-xs leading-6 text-muted">
-        編集: {site.editorialTeam}（運営: {partner.operatorDisplay}）・
+        編集: {site.editorialTeam}（運営: {partner.operatorShort}）・
         <Link href="/editorial-policy" className="underline hover:text-brand-strong">
           編集方針
         </Link>
       </p>
     </header>
+  );
+}
+
+/** 提案用のサンプル原稿であることの表示（人による最終確認の前であることを隠さない） */
+export function SampleNotice() {
+  return (
+    <p className="mt-4 rounded-lg border border-dashed border-line-strong bg-canvas px-3 py-2 text-[12px] leading-5 text-muted">
+      提案用のサンプル原稿です。生成AIで下書きし、出典の確認と機械チェックを通していますが、人による最終確認・公開承認の前です。
+      <Link href="/editorial-policy" className="ml-1 underline hover:text-brand-strong">
+        編集方針
+      </Link>
+    </p>
   );
 }
 
@@ -175,14 +188,29 @@ export function EditorialNote({ article }: { article: Article }) {
     <section aria-label="記事の確認について" className="mt-10 rounded-[var(--radius-card)] bg-canvas p-5 ring-1 ring-line">
       <p className="text-sm font-bold text-ink">この記事の確認について</p>
       <dl className="mt-3 grid gap-x-6 gap-y-1 text-[13px] text-body sm:grid-cols-2">
-        <div className="flex gap-2">
-          <dt className="text-muted">確認・編集</dt>
-          <dd>{article.reviewedBy ?? site.editorialTeam}</dd>
-        </div>
-        <div className="flex gap-2">
-          <dt className="text-muted">最終確認日</dt>
-          <dd>{formatDate(article.reviewedAt)}</dd>
-        </div>
+        {site.sampleContent ? (
+          <>
+            <div className="flex gap-2">
+              <dt className="text-muted">機械チェック・AI査読</dt>
+              <dd>{formatDate(article.reviewedAt)}</dd>
+            </div>
+            <div className="flex gap-2">
+              <dt className="text-muted">人による最終確認</dt>
+              <dd>正式公開前に実施</dd>
+            </div>
+          </>
+        ) : (
+          <>
+            <div className="flex gap-2">
+              <dt className="text-muted">確認・編集</dt>
+              <dd>{article.reviewedBy ?? site.editorialTeam}</dd>
+            </div>
+            <div className="flex gap-2">
+              <dt className="text-muted">最終確認日</dt>
+              <dd>{formatDate(article.reviewedAt)}</dd>
+            </div>
+          </>
+        )}
         <div className="flex gap-2">
           <dt className="text-muted">情報確認日</dt>
           <dd>{formatDate(article.informationCheckedAt)}</dd>

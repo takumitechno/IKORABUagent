@@ -6,10 +6,10 @@ status: published
 categories: [junbi, mikeiken]
 featured: false
 recommended: true
-published_at: 2026-09-12
-updated_at: 2026-09-30
-reviewed_at: 2026-09-30
-information_checked_at: 2026-09-30
+published_at: 2026-10-06
+updated_at: 2026-10-06
+reviewed_at: 2026-10-06
+information_checked_at: 2026-10-06
 roles: []
 concerns: [mikeiken-shokushu, mensetsu]
 situations: [dainishinsotsu, hajimete]
@@ -24,12 +24,12 @@ sources:
   - title: 職場情報の提供制度
     publisher: 厚生労働省
     url: https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/0000122234.html
-    accessed_at: 2026-09-30
+    accessed_at: 2026-10-06
     used_for: 若者雇用促進法にもとづく職場情報（研修の有無及び内容など）の提供
   - title: 2024年4月から労働条件明示のルールが変わります
     publisher: 厚生労働省
     url: https://www.mhlw.go.jp/stf/newpage_32105.html
-    accessed_at: 2026-09-30
+    accessed_at: 2026-10-06
     used_for: 試用期間や業務の変更の範囲など、明示される労働条件の確認
 ---
 

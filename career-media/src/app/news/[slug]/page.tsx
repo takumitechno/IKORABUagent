@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import { AlertCircle, CalendarDays, CheckSquare, Megaphone, Sparkles, Users } from "lucide-react";
-import { EditorialNote, pickRelated, RelatedArticles, SourcesSection } from "@/components/ArticleParts";
+import { EditorialNote, pickRelated, RelatedArticles, SampleNotice, SourcesSection } from "@/components/ArticleParts";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { ConsultationCta } from "@/components/ConsultationCta";
 import { announcedLabel, formatDate } from "@/components/DateMeta";
@@ -79,8 +79,9 @@ export default async function NewsDetailPage({ params }: Props) {
             <h1 className="mt-4 text-[24px] font-bold leading-[1.55] text-ink sm:text-[28px]">{article.title}</h1>
             <p className="mt-4 text-[15px] leading-8 text-body">{article.summary}</p>
             <p className="mt-4 text-xs text-muted">
-              解説公開 {formatDate(article.publishedAt)}・更新 {formatDate(article.updatedAt)}・情報確認日 {formatDate(article.informationCheckedAt)}・編集: {site.editorialTeam}（運営: {partner.operatorDisplay}）
+              {site.sampleContent ? "解説作成" : "解説公開"} {formatDate(article.publishedAt)}・更新 {formatDate(article.updatedAt)}・情報確認日 {formatDate(article.informationCheckedAt)}・編集: {site.editorialTeam}（運営: {partner.operatorShort}）
             </p>
+            {site.sampleContent && <SampleNotice />}
           </header>
 
           <div className="mt-6 space-y-4">

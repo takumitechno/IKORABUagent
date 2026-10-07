@@ -6,10 +6,10 @@ status: published
 categories: [keiken, shorui-mensetsu]
 featured: true
 recommended: false
-published_at: 2026-08-25
-updated_at: 2026-09-28
-reviewed_at: 2026-09-28
-information_checked_at: 2026-09-28
+published_at: 2026-10-06
+updated_at: 2026-10-06
+reviewed_at: 2026-10-06
+information_checked_at: 2026-10-06
 roles: [hanbai, customer-support, eigyo]
 concerns: [mikeiken-shokushu, mensetsu]
 situations: [sekkyaku]
@@ -24,7 +24,7 @@ sources:
   - title: 職業情報提供サイト（job tag）
     publisher: 厚生労働省
     url: https://shigoto.mhlw.go.jp/User/
-    accessed_at: 2026-09-28
+    accessed_at: 2026-10-06
     used_for: 各職種の仕事内容・求められるスキルの確認
 ---
 

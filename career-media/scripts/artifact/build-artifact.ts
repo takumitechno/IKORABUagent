@@ -15,6 +15,7 @@ import { LocalContentRepository } from "../../src/lib/content/local-repository";
 import { partner } from "../../src/config/partner";
 import { NAV_ITEMS } from "../../src/components/nav";
 import { site } from "../../src/config/site";
+import { buildConsultationUrl, CONSULTATION_APPLY_PATH } from "../../src/lib/consultation";
 import { listSiteRoutes } from "../site-routes";
 
 const ROOT = path.resolve(__dirname, "../..");
@@ -116,32 +117,25 @@ async function main() {
   const checkJs = inlineSafe(bundle.outputFiles[0].text);
   const runtimeJs = inlineSafe(fs.readFileSync(path.join(__dirname, "runtime.js"), "utf8"));
 
-  const consultPrefix = new URL(partner.consultationUrl).origin;
-  const consultHref = (placement: string) => {
-    const u = new URL(partner.consultationUrl);
-    u.searchParams.set("utm_source", "owned_media");
-    u.searchParams.set("utm_medium", "referral");
-    u.searchParams.set("utm_campaign", partner.campaignId);
-    u.searchParams.set("utm_content", placement);
-    return u.toString();
-  };
+  // 相談の申し込みボタンはサイト内の説明ページ（/consultation/apply）を指す。アーティファクトでは押すと説明を出す
+  const consultPrefix = CONSULTATION_APPLY_PATH;
   const config = {
     siteName: site.fullName,
     consultPrefix,
-    checkConsultHref: consultHref("check-result"),
-    checkConsultLabel: partner.consultationIsFree ? "キャリアアドバイザーに無料で相談する" : "キャリアアドバイザーに相談する",
+    checkConsultHref: buildConsultationUrl("check-result"),
+    checkConsultLabel: "整理した内容をもとに相談する",
     searchIndex,
   };
 
   const mobileMenu = `<div id="mobile-menu" class="artifact-menu" hidden><nav aria-label="モバイルメニュー"><ul>${NAV_ITEMS.map(
     (i) => `<li><a href="${i.href}">${i.label}<span aria-hidden="true">→</span></a></li>`,
-  ).join("")}</ul><a class="artifact-menu-cta" href="${escAttr(consultHref("header"))}">無料でキャリア相談する</a></nav></div>`;
+  ).join("")}</ul><a class="artifact-menu-cta" href="/check">条件を整理する</a><a class="artifact-menu-cta artifact-menu-cta-sub" href="/consultation">キャリア相談について</a></nav></div>`;
 
   const dialog = `<div id="consult-dialog" class="artifact-dialog" role="dialog" aria-modal="true" aria-labelledby="consult-dialog-title" hidden>
   <div class="artifact-dialog-card">
     <p class="artifact-dialog-eyebrow">DEMO</p>
     <h2 id="consult-dialog-title">ここから相談の申し込みページへ移動します</h2>
-    <p>デモ版のため、実際の申し込みページには移動しません。本番では partner config に設定した相談先のページへ、どの導線から来たかが分かる計測パラメータを付けて移動します。</p>
+    <p>デモ版のため、実際の申し込みページには移動しません。正式に公開するときは、相談先の申し込みページへ、どの導線から来たかが分かる計測パラメータを付けて移動します。</p>
     <p class="artifact-dialog-meta">このボタンの設置場所: <code data-placement></code></p>
     <div class="artifact-dialog-actions"><a href="/consultation">相談サービスの説明を見る</a><button type="button" data-close>閉じる</button></div>
   </div>
@@ -157,7 +151,8 @@ html.menu-open body{overflow:hidden}
 .artifact-menu li+li{border-top:1px solid var(--color-line)}
 .artifact-menu li a{display:flex;justify-content:space-between;padding:16px 0;font-weight:500;color:var(--color-ink);text-decoration:none}
 .artifact-menu li a span{color:var(--color-brand)}
-.artifact-menu-cta{display:block;margin-top:24px;padding:14px 20px;border-radius:999px;background:var(--color-accent);color:#fff;font-weight:700;text-align:center;text-decoration:none}
+.artifact-menu-cta{display:block;margin-top:24px;padding:14px 20px;border-radius:999px;background:var(--color-brand);color:#fff;font-weight:700;text-align:center;text-decoration:none}
+.artifact-menu-cta-sub{margin-top:12px;background:#fff;color:var(--color-accent-strong);border:1px solid var(--color-accent)}
 .artifact-dialog{position:fixed;inset:0;z-index:60;display:flex;align-items:center;justify-content:center;padding:16px;background:rgb(20 43 62 / .55)}
 .artifact-dialog-card{max-width:440px;width:100%;border-radius:18px;background:var(--color-surface);color:var(--color-body);padding:24px;box-shadow:0 20px 50px -20px rgb(20 43 62 / .5);font-size:14.5px;line-height:1.85}
 .artifact-dialog-card h2{margin:4px 0 8px;font-size:18px;line-height:1.5;color:var(--color-ink)}

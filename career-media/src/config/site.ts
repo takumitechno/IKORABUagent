@@ -23,6 +23,11 @@ export const site = {
   indexable: process.env.SITE_INDEXABLE === "true" && partner.brandUsageApproved,
   /** 提案用プレビューであることを画面上部に表示する */
   showPreviewBanner: !partner.brandUsageApproved,
+  /**
+   * 掲載記事が提案用のサンプル原稿か（人による最終確認・公開承認の前）。
+   * true の間は「公開日」ではなく「作成日」と表示し、記事ごとにサンプル原稿であることを示す。
+   */
+  sampleContent: !partner.brandUsageApproved,
   editorialTeam: sameBrand ? `${partner.mediaName}編集部` : `${partner.brandName} 編集部`,
 } as const;
 

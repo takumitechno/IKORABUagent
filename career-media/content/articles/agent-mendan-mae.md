@@ -6,10 +6,10 @@ status: published
 categories: [junbi, mikeiken]
 featured: false
 recommended: true
-published_at: 2026-09-20
-updated_at: 2026-10-04
-reviewed_at: 2026-10-04
-information_checked_at: 2026-10-04
+published_at: 2026-10-06
+updated_at: 2026-10-06
+reviewed_at: 2026-10-06
+information_checked_at: 2026-10-06
 roles: []
 concerns: [yaritai]
 situations: [hajimete]
@@ -26,12 +26,12 @@ sources:
   - title: 職業安定法
     publisher: e-Gov法令検索（デジタル庁）
     url: https://laws.e-gov.go.jp/law/322AC0000000141
-    accessed_at: 2026-10-04
+    accessed_at: 2026-10-06
     used_for: 有料職業紹介事業の手数料に関する規定
   - title: 人材サービス総合サイト（職業紹介事業所検索）
     publisher: 厚生労働省
     url: https://jinzai.hellowork.mhlw.go.jp/JinzaiWeb/GICB101010.do?action=transition&screenId=GICB101010&params=1
-    accessed_at: 2026-10-04
+    accessed_at: 2026-10-06
     used_for: 職業紹介事業者の許可番号の確認方法
 ---
 

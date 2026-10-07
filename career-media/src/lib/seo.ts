@@ -48,7 +48,8 @@ export function articlePath(article: Pick<Article, "kind" | "slug">): string {
 const organization = () => ({
   "@type": "Organization",
   "@id": `${site.url}/#organization`,
-  name: partner.profile === "neutral" ? partner.mediaName : partner.partnerName,
+  // 正式な提携・ブランド利用許諾までは、提携先の社名を発行者として出さない
+  name: partner.brandUsageApproved ? partner.partnerName : partner.mediaName,
   url: partner.corporateUrl ?? site.url,
 });
 

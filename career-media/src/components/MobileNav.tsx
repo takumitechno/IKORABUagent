@@ -3,10 +3,10 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-import { ArrowUpRight, Menu, X } from "lucide-react";
+import { ClipboardList, Menu, MessageCircle, X } from "lucide-react";
 import { NAV_ITEMS } from "./nav";
 
-export function MobileNav({ consultationHref, consultationLabel }: { consultationHref: string; consultationLabel: string }) {
+export function MobileNav() {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
 
@@ -46,10 +46,16 @@ export function MobileNav({ consultationHref, consultationLabel }: { consultatio
                 </li>
               ))}
             </ul>
-            <a href={consultationHref} className="mt-6 flex items-center justify-center gap-1.5 rounded-full bg-accent px-5 py-3.5 text-base font-bold text-white">
-              {consultationLabel}
-              <ArrowUpRight className="h-5 w-5" aria-hidden="true" />
-            </a>
+            <div className="mt-6 grid gap-3">
+              <Link href="/check" data-cta-placement="header" data-cta-kind="check" className="flex items-center justify-center gap-1.5 rounded-full bg-brand px-5 py-3.5 text-base font-bold text-white">
+                <ClipboardList className="h-5 w-5" aria-hidden="true" />
+                条件を整理する
+              </Link>
+              <Link href="/consultation" data-cta-placement="header" data-cta-kind="consultation-info" className="flex items-center justify-center gap-1.5 rounded-full border border-accent/50 px-5 py-3.5 text-base font-bold text-accent-strong">
+                <MessageCircle className="h-5 w-5" aria-hidden="true" />
+                キャリア相談について
+              </Link>
+            </div>
           </nav>
         </div>
       )}

@@ -2,7 +2,6 @@ import { Clock, Lock, ShieldCheck } from "lucide-react";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { ConditionCheck } from "@/components/ConditionCheck";
 import { CheckIllustration } from "@/components/illustrations/CheckIllustration";
-import { partner } from "@/config/partner";
 import { buildConsultationUrl } from "@/lib/consultation";
 import { ALL_QUESTIONS } from "@/lib/condition-check/questions";
 import { pageMetadata } from "@/lib/seo";
@@ -42,7 +41,7 @@ export default function CheckPage() {
         <CheckIllustration className="order-1 mx-auto h-[120px] w-auto sm:order-2 sm:h-[180px]" />
       </header>
       <div id="condition-check-root" className="mt-8 rounded-[20px] bg-canvas">
-        <ConditionCheck consultationHref={buildConsultationUrl("check-result")} consultationLabel={partner.consultationIsFree ? "キャリアアドバイザーに無料で相談する" : "キャリアアドバイザーに相談する"} />
+        <ConditionCheck consultationHref={buildConsultationUrl("check-result")} consultationLabel="整理した内容をもとに相談する" />
       </div>
     </div>
   );

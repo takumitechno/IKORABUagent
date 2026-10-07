@@ -6,10 +6,10 @@ status: published
 categories: [shorui-mensetsu]
 featured: false
 recommended: false
-published_at: 2026-10-02
-updated_at: 2026-10-05
-reviewed_at: 2026-10-05
-information_checked_at: 2026-10-05
+published_at: 2026-10-06
+updated_at: 2026-10-06
+reviewed_at: 2026-10-06
+information_checked_at: 2026-10-06
 roles: []
 concerns: [mensetsu, mikeiken-shokushu]
 situations: [sekkyaku]
@@ -24,7 +24,7 @@ sources:
   - title: 職業情報提供サイト（job tag）
     publisher: 厚生労働省
     url: https://shigoto.mhlw.go.jp/User/
-    accessed_at: 2026-10-05
+    accessed_at: 2026-10-06
     used_for: 応募する職種の仕事内容を調べる方法
 ---
 

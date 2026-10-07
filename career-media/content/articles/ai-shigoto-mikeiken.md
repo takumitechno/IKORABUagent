@@ -6,10 +6,10 @@ status: published
 categories: [shokushu, news]
 featured: false
 recommended: false
-published_at: 2026-09-26
-updated_at: 2026-10-05
-reviewed_at: 2026-10-05
-information_checked_at: 2026-10-05
+published_at: 2026-10-06
+updated_at: 2026-10-06
+reviewed_at: 2026-10-06
+information_checked_at: 2026-10-06
 roles: [sonota]
 concerns: [mikeiken-shokushu, yaritai]
 situations: []
@@ -24,12 +24,12 @@ sources:
   - title: 情報通信白書
     publisher: 総務省
     url: https://www.soumu.go.jp/johotsusintokei/whitepaper/
-    accessed_at: 2026-10-05
+    accessed_at: 2026-10-06
     used_for: AIなどデジタル技術の利用状況に関する公的な情報源の紹介
   - title: 職業情報提供サイト（job tag）
     publisher: 厚生労働省
     url: https://shigoto.mhlw.go.jp/User/
-    accessed_at: 2026-10-05
+    accessed_at: 2026-10-06
     used_for: 職業を作業（タスク）やスキルの単位で調べる方法
 ---
 
