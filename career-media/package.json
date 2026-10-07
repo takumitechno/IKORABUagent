@@ -18,6 +18,9 @@
     "export:static": "tsx scripts/export-static.ts",
     "local": "bash scripts/start-local.sh",
     "demo": "node scripts/demo.mjs neutral",
+    "sales:docs": "tsx scripts/gen-sales-docs.ts",
+    "check:outbound": "tsx scripts/check-outbound.ts",
+    "sns:images": "node scripts/sns-images.mjs",
     "demo:makecareer": "node scripts/demo.mjs makecareer"
   },
   "dependencies": {

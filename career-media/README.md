@@ -5,9 +5,10 @@
 
 はじめての転職・未経験転職で迷っている20代が、仕事・給料・休み・経験の活かし方を整理し、必要なら人材紹介会社へ相談できる情報メディアの MVP です。
 
-**ブランド表示**: 既定は実在企業名・ロゴ・許可番号を出さない中立ブランド「はじめて転職ガイド」（`src/config/partner.ts` の `neutral`）。
-正式な提携・ブランド利用の許諾後は `PARTNER_PROFILE=makecareer`（または `partner.ts` の既定を変更）で、メディア名・運営会社・許可番号・相談先 LP が1か所で切り替わります。
-中立ブランドでは相談ボタンは移動せず、「本番ではここから申込ページへ移動します」と設置場所（utm_content）を表示します。
+**ブランド表示**: 既定は実在企業名・ロゴ・許可番号を出さない中立デモ「はじめて転職ガイド」（`src/config/partner.ts` の `neutral`。運営者は「提案用デモ」、企画・制作は匠Technologies と表示）。
+`PARTNER_PROFILE=makecareer` は商談でだけ見せる非公開プレビュー（ブランドの表示だけが切り替わる）。
+**本番送客（実際の申込ページへのリンク）はブランドの切り替えとは別**で、ブランド利用の許諾・人が書いた承認記録・`PARTNER_LIVE_OUTBOUND=on` の3つがそろったときだけ有効になる。
+それまでは、どの相談ボタンもサイト内の `/consultation/apply`（「ここから申込ページへ進む想定です」と設置場所を表示）を指す。
 読者像（内部用）は `docs/PERSONA.md`。
 
 ```
@@ -48,6 +49,8 @@ cd career-media && bash scripts/start-local.sh
 | `npm run db:verify` | 使い捨てのローカル Postgres に migration + seed を流し、RLS・列権限・公開ガード・検索を検証 |
 | `npm run screenshots` | 起動中のサーバーの主要画面をデスクトップ・スマホで撮影し、コンソールエラーと横スクロールを検出 |
 | `npm run export:static` | 起動中のサーバーの全ページを Markdown（`export/pages/`）と静的 HTML（`export/site/`）に書き出す |
+| `npm run demo` / `npm run demo:makecareer` | 中立デモ／商談用プレビューをローカル起動（商談用ページつき） |
+| `npm run check:outbound` | 本番の申込ページへのリンクがないことを全ページで確認 |
 
 ## アーティファクト（claude.ai で見る版）
 
@@ -62,6 +65,12 @@ npx tsx scripts/artifact/build-artifact.ts --base http://127.0.0.1:3200 --out <�
 画面遷移・検索・スマホメニューは `scripts/artifact/runtime.js`、条件整理チェックは本番と同じ React コンポーネントを
 esbuild でバンドルして動かす。相談ボタンは押すと「デモのため移動しない」旨と設置場所（utm_content）を表示する。
 スクリプトは中立ブランド以外のプロファイルや、実在企業の表記を含むページでは失敗する。
+
+## 商談デモ（MakeCareer 様・2026-10-13）
+
+入口は [START_HERE.md](START_HERE.md)。`npm run demo:makecareer` で商談用プレビュー（非公開）を http://localhost:3100 に起動し、
+/sales（商談メニュー）から順番に見せる。相談ボタンは本番の申込ページへ移動しない（`npm run check:outbound` で確認）。
+資料は [docs/sales/](docs/sales/)。
 
 ## Codex などのエージェントに読ませる
 

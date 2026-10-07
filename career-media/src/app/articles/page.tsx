@@ -51,17 +51,20 @@ export default async function ArticlesPage({ searchParams }: Props) {
             </div>
           </form>
 
-          <div className="mt-6 rounded-[var(--radius-card)] border border-line bg-white px-5">
+          <div className="mt-6 rounded-[var(--radius-card)] border border-line bg-white px-5" data-search-results={query ? "1" : undefined}>
             {articles.length > 0 ? (
               <ArticleList articles={articles} categories={categories} />
             ) : (
               <div className="py-12 text-center">
                 <span className="motif motif-search mx-auto mb-3 block h-24 w-24 rounded-full bg-sky" aria-hidden="true" />
                 <p className="font-bold text-ink">該当する記事が見つかりませんでした</p>
-                <p className="mt-2 text-sm text-muted">別のキーワードで探すか、テーマから記事を選んでください。</p>
-                <Link href="/articles" className="mt-4 inline-block text-sm font-bold text-brand-strong underline">
-                  すべての記事を見る
-                </Link>
+                <p className="mt-2 text-sm text-muted">短い言葉（例: 事務、休み、履歴書）で探すか、下の入口から選んでください。</p>
+                <div className="mt-5 flex flex-wrap justify-center gap-2 text-sm font-bold">
+                  <Link href="/concerns" className="rounded-full bg-white px-4 py-2 text-ink ring-1 ring-line hover:text-brand-strong">悩みから探す</Link>
+                  <Link href="/situations" className="rounded-full bg-white px-4 py-2 text-ink ring-1 ring-line hover:text-brand-strong">今の状況から探す</Link>
+                  <Link href="/check" className="rounded-full bg-brand px-4 py-2 text-white hover:bg-brand-strong">条件整理チェック</Link>
+                  <Link href="/articles" className="rounded-full bg-white px-4 py-2 text-ink ring-1 ring-line hover:text-brand-strong">すべての記事</Link>
+                </div>
               </div>
             )}
           </div>

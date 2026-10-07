@@ -2,7 +2,10 @@ import type { Metadata, Viewport } from "next";
 import { Noto_Sans_JP } from "next/font/google";
 import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
+import { MeasurementTracker } from "@/components/MeasurementTracker";
 import { PreviewBanner } from "@/components/PreviewBanner";
+import { SalesMenuButton } from "@/components/sales/SalesMenuButton";
+import { consultationMode } from "@/config/partner";
 import { site } from "@/config/site";
 import "./globals.css";
 
@@ -40,6 +43,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <Header />
         <main id="main">{children}</main>
         <Footer />
+        <MeasurementTracker mode={consultationMode} />
+        <SalesMenuButton />
       </body>
     </html>
   );

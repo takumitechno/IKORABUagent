@@ -7,8 +7,8 @@ categories: [keiken, shorui-mensetsu]
 featured: true
 recommended: false
 published_at: 2026-10-06
-updated_at: 2026-10-06
-reviewed_at: 2026-10-06
+updated_at: 2026-10-07
+reviewed_at: 2026-10-07
 information_checked_at: 2026-10-06
 roles: [hanbai, customer-support, eigyo]
 concerns: [mikeiken-shokushu, mensetsu]
@@ -28,7 +28,7 @@ sources:
     used_for: 各職種の仕事内容・求められるスキルの確認
 ---
 
-「接客しかしてこなかったから、アピールできることがない」。未経験転職の相談では、こうした声をよく聞きます。
+「接客しかしてこなかったから、アピールできることがない」。転職を考え始めたとき、そう感じて手が止まっていませんか。
 
 けれど、接客の仕事を細かく分けてみると、ほかの職種でも求められる経験がたくさん含まれています。大事なのは「接客をしていました」とまとめずに、**中身を分解して言葉にする**ことです。
 

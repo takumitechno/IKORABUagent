@@ -6,6 +6,8 @@ import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { Motif } from "@/components/illustrations/Motif";
 import { ConsultationCta } from "@/components/ConsultationCta";
 import { EntryGrid } from "@/components/EntryGrid";
+import { JourneyGuide } from "@/components/Journey";
+import { journeyForHub } from "@/lib/journeys";
 import { LevelMeter } from "@/components/LevelMeter";
 import { getRepository } from "@/lib/content";
 import { taxonomyScene } from "@/lib/illustrations/scenes";
@@ -29,7 +31,8 @@ export async function TaxonomyHub({ group, slug }: { group: TaxonomyGroup; slug:
   if (!item) notFound();
   const g = TAXONOMY_GROUPS[group];
   const repo = getRepository();
-  const [categories, articles] = await Promise.all([repo.listCategories(), repo.listArticles({ tag: { group, slug } })]);
+  const [categories, articles, all] = await Promise.all([repo.listCategories(), repo.listArticles({ tag: { group, slug } }), repo.listArticles()]);
+  const journey = journeyForHub(taxonomyPath(group, slug));
   const comparison = group === "roles" && ROLE_TO_COMPARISON[slug] ? getJobRole(ROLE_TO_COMPARISON[slug]) : undefined;
   const top = articles.slice(0, 3);
   const rest = articles.slice(3);
@@ -82,6 +85,8 @@ export async function TaxonomyHub({ group, slug }: { group: TaxonomyGroup; slug:
           </div>
         )}
       </header>
+
+      {journey && <JourneyGuide journey={journey} articles={all} />}
 
       <nav aria-label={`ほかの${g.label}`} className="mt-5 flex gap-2 overflow-x-auto pb-2">
         {TAXONOMY[group].map((t) => (

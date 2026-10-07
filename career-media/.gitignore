@@ -16,3 +16,5 @@ next-env.d.ts
 screenshots/
 screenshots-*/
 export/site/
+export/sns/
+export/makecareer-demo/

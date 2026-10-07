@@ -19,6 +19,12 @@ export type RoleCandidate = {
 
 export type NextAction = { title: string; description: string; href: string };
 
+/**
+ * 結果は「相談準備ノート」として7つに分ける。
+ * 1 ゆずれない条件 / 2 今までの経験から使えそうなこと / 3 比べてみたい職種 / 4 求人で確認すること /
+ * 5 面談で聞く質問 / 6 自分でできる次の一歩 / 7 相談する場合の次の一歩
+ * 判定（合否・適性・推定年収・確率）は出さない。
+ */
 export type CheckResult = {
   mustHave: ConditionItem[];
   niceToHave: ConditionItem[];
@@ -27,8 +33,21 @@ export type CheckResult = {
   candidates: RoleCandidate[];
   conditionsToConfirm: string[];
   interviewQuestions: string[];
-  nextActions: NextAction[];
+  /** 自分でできる次の一歩（相談は含まない） */
+  selfActions: NextAction[];
+  /** 相談する場合の次の一歩（相談は任意） */
+  consultSteps: string[];
 };
+
+export const RESULT_SECTIONS = [
+  "ゆずれない条件",
+  "今までの経験から使えそうなこと",
+  "比べてみたい職種",
+  "求人で確認すること",
+  "面談で聞く質問",
+  "自分でできる次の一歩",
+  "相談する場合の次の一歩",
+] as const;
 
 const one = (answers: Answers, id: QuestionId): string | undefined => answers[id]?.[0];
 const many = (answers: Answers, id: QuestionId): string[] => (answers[id] ?? []).filter((v) => v !== "none");
@@ -256,7 +275,8 @@ function conditionsToConfirm(answers: Answers): string[] {
   if (holidays === "weekends") push("「完全週休2日制」かどうかと、年間休日の日数");
   if (holidays === "fixed_any") push("シフト制かどうか、休みの曜日が固定されているか");
   if (hours === "no_overtime") push("月平均の残業時間と、固定残業代に含まれる時間数");
-  if (hours !== "no_overtime" && hours) push("繁忙期の時期と、その時期の残業の目安");
+  if (hours === "some_ok" || hours === "flexible") push("繁忙期の時期と、その時期の残業の目安");
+  if (hours === "undecided") push("月平均の残業時間（残業の多さを決める材料として）");
   if (location === "commute_home" || location === "relocate_ok") push("「就業場所の変更の範囲」（転勤・異動の可能性）");
   if (location === "remote") push("在宅勤務ができる条件と、研修期間中の出社の有無");
   if (priority === "growth") push("研修の期間・内容と、配属後のフォロー体制");
@@ -282,7 +302,7 @@ function interviewQuestions(answers: Answers, candidates: RoleCandidate[]): stri
 // 6. 次の行動
 // ---------------------------------------------------------------------------
 
-function nextActions(answers: Answers, candidates: RoleCandidate[]): NextAction[] {
+function selfActions(answers: Answers, candidates: RoleCandidate[]): NextAction[] {
   const actions: NextAction[] = [];
   const status = one(answers, "status");
   const timing = one(answers, "timing");
@@ -311,16 +331,25 @@ function nextActions(answers: Answers, candidates: RoleCandidate[]): NextAction[
     actions.push({ title: "学び直しの支援制度を確認する", description: "講座の受講費用の一部が支給される制度などをまとめています。", href: "/news/news-kyouiku-kunren-kyufu" });
   }
 
-  actions.push({
-    title: timing === "asap" || timing === "3months" ? "整理した内容をもとに、早めに相談する" : "情報を集めながら、迷ったら相談する",
-    description:
-      timing === "asap" || timing === "3months"
-        ? "働き始めたい時期が近い場合は、求人の状況やスケジュールの立て方をキャリアアドバイザーに相談すると進めやすくなります。"
-        : "まずは記事で情報を集めて大丈夫です。自分の場合どんな選択肢があるか知りたくなったら、相談してみてください。",
-    href: "/consultation",
-  });
+  if (timing === "undecided" || timing === "6months") {
+    actions.push({ title: "最初に整理したい5つのことを読む", description: "時期が決まっていなくても大丈夫です。理由・経験・条件・職種・スケジュールの順に整理できます。", href: "/articles/mikeiken-tenshoku-hajimekata" });
+  }
 
-  return actions;
+  return actions.filter((a, i, arr) => arr.findIndex((b) => b.href === a.href) === i);
+}
+
+/** 相談する場合の次の一歩（相談は任意。回答は自動では送られない） */
+function consultSteps(answers: Answers): string[] {
+  const timing = one(answers, "timing");
+  const soon = timing === "asap" || timing === "3months";
+  return [
+    "下の「面談で使うメモとしてコピー」で、このノートの要点を手元に残す（回答は相談先に自動では送られません）",
+    "相談でできること・できないことを確認する",
+    soon
+      ? "働き始めたい時期が近いので、申し込みのときに時期と、ゆずれない条件を最初に伝える"
+      : "時期が決まっていなくても相談できます。「まだ情報収集中」と最初に伝えると、話を合わせてもらいやすくなります",
+    "面談では、5 の質問から聞きたいものを選んで使う",
+  ];
 }
 
 // ---------------------------------------------------------------------------
@@ -336,28 +365,52 @@ export function buildResult(answers: Answers): CheckResult {
     candidates,
     conditionsToConfirm: conditionsToConfirm(answers),
     interviewQuestions: interviewQuestions(answers, candidates),
-    nextActions: nextActions(answers, candidates),
+    selfActions: selfActions(answers, candidates),
+    consultSteps: consultSteps(answers),
   };
 }
 
-/** 結果を相談時にそのまま使えるテキストにする（クリップボード用） */
+/** 結果全体をテキストにする（クリップボード・保存用）。7つの見出しで並べる */
 export function resultToText(result: CheckResult): string {
-  const lines: string[] = ["【未経験転職 条件整理チェックの結果】", ""];
-  lines.push("■ ゆずれない条件");
-  result.mustHave.forEach((c) => lines.push(`・${c.label}（${c.detail}）`));
+  const [s1, s2, s3, s4, s5, s6, s7] = RESULT_SECTIONS;
+  const lines: string[] = ["【未経験転職 条件整理ノート】", ""];
+  lines.push(`■ 1. ${s1}`);
+  if (result.mustHave.length) result.mustHave.forEach((c) => lines.push(`・${c.label}（${c.detail}）`));
+  else lines.push("・まだ決めていない");
   if (result.niceToHave.length) {
-    lines.push("", "■ できれば叶えたい条件");
+    lines.push("（できれば）");
     result.niceToHave.forEach((c) => lines.push(`・${c.label}`));
   }
-  if (result.skills.length) {
-    lines.push("", "■ 活かせそうな経験");
-    result.skills.forEach((s) => lines.push(`・${s.from} → ${s.skill}`));
-  }
-  lines.push("", "■ 比較してみたい職種");
+  lines.push("", `■ 2. ${s2}`);
+  if (result.skills.length) result.skills.forEach((s) => lines.push(`・${s.from} → ${s.skill}`));
+  else lines.push("・これから書き出す（学校生活や日常で続けてきたことも材料になります）");
+  lines.push("", `■ 3. ${s3}（向き不向きの判定ではなく、比べ始める候補）`);
   result.candidates.slice(0, 3).forEach((c) => lines.push(`・${c.role.name}${c.reasons.length ? `（${c.reasons.slice(0, 2).join("、")}）` : ""}`));
-  lines.push("", "■ 確認したい条件");
+  lines.push("", `■ 4. ${s4}`);
   result.conditionsToConfirm.forEach((t) => lines.push(`・${t}`));
-  lines.push("", "■ 面談で聞きたいこと");
+  lines.push("", `■ 5. ${s5}`);
   result.interviewQuestions.forEach((t) => lines.push(`・${t}`));
+  lines.push("", `■ 6. ${s6}`);
+  result.selfActions.forEach((a) => lines.push(`・${a.title}`));
+  lines.push("", `■ 7. ${s7}`);
+  result.consultSteps.forEach((t) => lines.push(`・${t}`));
+  return lines.join("\n");
+}
+
+/** 面談で使うメモ（相談のはじめに伝えると話が進みやすい要点だけ） */
+export function memoText(result: CheckResult, answers: Answers): string {
+  const status = one(answers, "status");
+  const timing = one(answers, "timing");
+  const lines: string[] = ["【相談メモ】（条件整理チェックで自分で整理した内容）"];
+  if (status && status !== "skip") lines.push(`・今の働き方: ${optionLabel("status", status)}`);
+  if (timing) lines.push(`・働き始めたい時期: ${optionLabel("timing", timing)}`);
+  if (result.mustHave.length) lines.push(`・ゆずれない条件: ${result.mustHave.map((c) => c.label).join("、")}`);
+  if (result.niceToHave.length) lines.push(`・できれば: ${result.niceToHave.map((c) => c.label).join("、")}`);
+  const exps = many(answers, "experiences").map((x) => optionLabel("experiences", x));
+  lines.push(`・これまでの経験: ${exps.length ? exps.join("、") : "仕事の経験はほとんどない"}`);
+  lines.push(`・比べてみたい職種: ${result.candidates.slice(0, 3).map((c) => c.role.shortName).join("、")}`);
+  lines.push("・聞きたいこと:");
+  result.interviewQuestions.slice(0, 4).forEach((q) => lines.push(`  - ${q}`));
+  lines.push("（このメモは自分で持ち帰るためのものです。サイトからは送信されていません）");
   return lines.join("\n");
 }

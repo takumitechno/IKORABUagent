@@ -1,9 +1,8 @@
 import Link from "next/link";
 import { ArrowRight, Clock, ClipboardList, FileCheck2, Lock, MessageCircle, Scale, Search, ShieldCheck } from "lucide-react";
-import { ArticleList, ArticleRow, FeatureCard, LeadCard, RankList } from "@/components/ArticleCards";
-import { categoryTone } from "@/components/CategoryIcon";
+import { JourneyCards } from "@/components/Journey";
+import { ArticleList, ArticleRow, FeatureCard, LeadCard } from "@/components/ArticleCards";
 import { ConsultationCta } from "@/components/ConsultationCta";
-import { formatDateShort } from "@/components/DateMeta";
 import { ExploreTabs } from "@/components/EntryGrid";
 import { CheckIllustration } from "@/components/illustrations/CheckIllustration";
 import { HeroIllustration } from "@/components/illustrations/HeroIllustration";
@@ -13,11 +12,11 @@ import { JsonLd } from "@/components/JsonLd";
 import { LevelMeter } from "@/components/LevelMeter";
 import { Roadmap, type RoadmapStep } from "@/components/Roadmap";
 import { SectionHeading } from "@/components/SectionHeading";
-import { licenseLabel, partner } from "@/config/partner";
+import { partner } from "@/config/partner";
 import { site } from "@/config/site";
 import { getRepository } from "@/lib/content";
 import { ALL_QUESTIONS } from "@/lib/condition-check/questions";
-import { categoryScene, JOB_ROLE_SCENE } from "@/lib/illustrations/scenes";
+import { JOB_ROLE_SCENE } from "@/lib/illustrations/scenes";
 import { JOB_ROLES, LEVEL_LABELS, type JobRole } from "@/lib/jobs";
 import { organizationJsonLd, pageMetadata, websiteJsonLd } from "@/lib/seo";
 import { HERO_SHORTCUTS, ROLE_TO_COMPARISON, TAXONOMY, type TaxonomyGroup } from "@/lib/taxonomy";
@@ -54,16 +53,21 @@ export default async function HomePage() {
   const repo = getRepository();
   const [categories, all] = await Promise.all([repo.listCategories(), repo.listArticles()]);
   const articles = all.filter((a) => a.kind === "article");
-  const news = all.filter((a) => a.kind === "news").slice(0, 5);
+  // 制度の変更は、施行・発表日の新しい順に並べる（解説を書いた日ではなく、制度の日付で見せる）
+  const news = all
+    .filter((a) => a.kind === "news")
+    .sort((a, b) => (b.news?.announcedAt ?? "").localeCompare(a.news?.announcedAt ?? ""))
+    .slice(0, 5);
+  // 「最初に読みたい記事」: 編集部が選んだ記事（featured → recommended の順）。ランキングではない
   const featuredAll = articles.filter((a) => a.featured);
   const lead = featuredAll.find((a) => a.slug === GUIDE_SLUG) ?? featuredAll[0];
-  const featured = featuredAll.filter((a) => a !== lead).slice(0, 4);
-  const latest = articles.slice(0, 8);
-  const recommended = articles.filter((a) => a.recommended).slice(0, 6);
+  const picks = [...featuredAll, ...articles.filter((a) => a.recommended)].filter((a, i, arr) => a !== lead && arr.indexOf(a) === i).slice(0, 6);
+  const shown = new Set([lead, ...picks].filter(Boolean).map((a) => a!.slug));
+  // 新着は、上で出した記事と重ならないように
+  const latest = articles.filter((a) => !shown.has(a.slug)).slice(0, 5);
   const has = (slug: string) => articles.some((a) => a.slug === slug);
   const guideHref = has(GUIDE_SLUG) ? `/articles/${GUIDE_SLUG}` : "/jobs";
   const counts = (group: TaxonomyGroup) => Object.fromEntries(TAXONOMY[group].map((t) => [t.slug, all.filter((a) => a[group].includes(t.slug)).length]));
-  const lastUpdated = all.reduce((max, a) => (a.updatedAt > max ? a.updatedAt : max), "");
 
   const roadmap: RoadmapStep[] = [
     { scene: "checklist", title: "整理する", text: "ゆずれない条件と、これまでの経験を書き出す", href: "/check", cta: "条件整理チェック", tone: "bg-mint" },
@@ -163,8 +167,8 @@ export default async function HomePage() {
       <section aria-label="このメディアについて" className="border-b border-line bg-white">
         <div className="mx-auto grid max-w-6xl grid-cols-3 divide-x divide-line">
           {[
-            { icon: ShieldCheck, short: `${partner.operatorShort}が運営`, title: `運営: ${partner.operatorDisplay}`, body: `有料職業紹介事業許可番号: ${licenseLabel}`, href: "/about" },
-            { icon: FileCheck2, short: `記事${articles.length}本・ニュース${all.length - articles.length}本`, title: `記事${articles.length}本・ニュース解説${all.length - articles.length}本`, body: `出典と情報確認日を記事ごとに記載（最終更新 ${formatDateShort(lastUpdated)}）`, href: "/editorial-policy" },
+            { icon: ShieldCheck, short: partner.brandUsageApproved ? `運営: ${partner.operatorShort}` : "運営者・相談先を明記", title: `運営: ${partner.operatorDisplay}`, body: `相談先: ${partner.partnerName}`, href: "/about" },
+            { icon: FileCheck2, short: "出典と確認日を記載", title: "出典と情報確認日を、記事ごとに記載", body: "制度や数字は一次情報を確認して書いています", href: "/editorial-policy" },
             { icon: Scale, short: "求人の宣伝ではなく比べる材料", title: "求人のおすすめではなく、比べる材料を", body: "特定の求人への応募をすすめる記事ではありません", href: "/disclosure" },
           ].map((item) => (
             <Link key={item.title} href={item.href} className="tap flex flex-col items-center gap-1.5 px-2 py-3.5 text-center hover:bg-brand-tint sm:flex-row sm:items-start sm:gap-3 sm:px-6 sm:py-4 sm:text-left">
@@ -180,28 +184,34 @@ export default async function HomePage() {
       </section>
 
       <div className="mx-auto max-w-6xl space-y-16 px-4 pt-10 sm:px-6 sm:pt-14">
-        {/* 進め方（図解） */}
-        <section aria-labelledby="home-howto">
-          <SectionHeading eyebrow="HOW TO" title="はじめての転職、4つのステップ" id="home-howto" />
-          <Roadmap steps={roadmap} />
-          <p className="mt-3 text-xs leading-5 text-muted">順番どおりでなくても大丈夫です。気になるところから始めてみてください。</p>
-        </section>
-
         {/* 入口: 今の状況 / 悩み / 職種 */}
         <section aria-labelledby="home-explore">
           <SectionHeading eyebrow="FIND" title="自分に近いところから探す" id="home-explore" />
           <ExploreTabs counts={{ situations: counts("situations"), concerns: counts("concerns"), roles: counts("roles") }} />
         </section>
 
-        {/* FEATURED */}
+        {/* はじめての転職ガイド: 進め方 + よくある3つのケース */}
+        <section aria-labelledby="home-howto">
+          <SectionHeading eyebrow="GUIDE" title="はじめての転職ガイド" id="home-howto" />
+          <Roadmap steps={roadmap} />
+          <p className="mt-3 text-xs leading-5 text-muted">順番どおりでなくても大丈夫です。気になるところから始めてみてください。</p>
+          <h3 className="mt-10 text-[17px] font-bold text-ink">よくある3つのケースを、順番に読む</h3>
+          <p className="mt-1 text-[13.5px] leading-6 text-muted">記事・比較・条件整理を読む順番に並べました。相談しなくても、比べる材料がそろいます。</p>
+          <div className="mt-4">
+            <JourneyCards />
+          </div>
+        </section>
+
+        {/* 最初に読みたい記事（編集部が選んだもの。ランキングではない） */}
         {lead && (
           <section aria-labelledby="home-featured">
-            <SectionHeading eyebrow="FEATURED" title="まず読んでほしい記事" id="home-featured" href="/articles" />
+            <SectionHeading eyebrow="EDITOR'S PICK" title="最初に読みたい記事" id="home-featured" href="/articles" />
+            <p className="-mt-2 mb-4 text-[12.5px] text-muted">はじめて転職を考える人に、編集部がまず読んでほしい記事です。</p>
             <div className="reveal">
               <LeadCard article={lead} categories={categories} />
             </div>
-            <ul className="swipe md-grid reveal mt-4 md:mt-5" style={{ ["--cols" as string]: 4 }}>
-              {featured.map((a) => (
+            <ul className="swipe md-grid reveal mt-4 md:mt-5" style={{ ["--cols" as string]: 3 }}>
+              {picks.map((a) => (
                 <li key={a.slug}>
                   <FeatureCard article={a} categories={categories} showSummary={false} />
                 </li>
@@ -210,68 +220,23 @@ export default async function HomePage() {
           </section>
         )}
 
-        {/* LATEST + おすすめ */}
-        <div className="grid gap-12 lg:grid-cols-[minmax(0,1fr)_340px]">
-          <section aria-labelledby="home-latest" className="min-w-0">
+        {/* 新着 */}
+        {latest.length > 0 && (
+          <section aria-labelledby="home-latest">
             <SectionHeading eyebrow="LATEST" title="新着記事" id="home-latest" href="/articles" />
             <div className="rounded-[var(--radius-card)] border border-line bg-white px-4 sm:px-5">
-              <ArticleList articles={latest} categories={categories} className="[&>li:nth-child(n+6)]:hidden sm:[&>li:nth-child(n+6)]:block" />
+              <ArticleList articles={latest} categories={categories} />
             </div>
             <Link href="/articles" className="tap mt-4 flex items-center justify-center gap-1 rounded-full border border-line-strong bg-white py-3 text-sm font-bold text-ink hover:border-brand hover:text-brand-strong">
-              記事をもっと見る（全{articles.length}本）
+              すべての記事を見る
               <ArrowRight className="h-4 w-4" aria-hidden="true" />
             </Link>
           </section>
-          {recommended.length > 0 && (
-            <aside aria-labelledby="home-recommended">
-              <section className="rounded-[var(--radius-card)] border border-line bg-white p-5">
-                <p className="text-[11px] font-bold tracking-[0.2em] text-brand">PICK UP</p>
-                <h2 id="home-recommended" className="mt-1 text-lg font-bold text-ink">
-                  編集部のおすすめ
-                </h2>
-                <div className="mt-2">
-                  <RankList articles={recommended} categories={categories} />
-                </div>
-              </section>
-            </aside>
-          )}
-        </div>
-
-        {/* テーマ */}
-        <section aria-labelledby="home-themes">
-          <SectionHeading eyebrow="THEME" title="テーマから探す" id="home-themes" />
-          <ul className="swipe md-grid reveal [--swipe-w:40%]" style={{ ["--cols" as string]: 4 }}>
-            {categories.map((c) => {
-              const tone = categoryTone(c.slug);
-              const n = all.filter((a) => a.categories.includes(c.slug)).length;
-              return (
-                <li key={c.slug}>
-                  <Link href={c.slug === "news" ? "/news" : `/categories/${c.slug}`} className="tap lift group flex h-full flex-col items-center rounded-2xl border border-line bg-white px-3 pb-4 pt-4 text-center hover:border-brand/40 md:flex-row md:gap-4 md:text-left">
-                    <span className={`relative block aspect-square w-20 shrink-0 rounded-full md:w-[72px] ${tone.bg}`}>
-                      <Motif name={categoryScene(c.slug)} className="motif-art absolute inset-[4%]" />
-                    </span>
-                    <span className="mt-2 md:mt-0">
-                      <span className="block text-[14px] font-bold leading-snug text-ink group-hover:text-brand-strong">{c.name}</span>
-                      <span className="mt-0.5 block text-[11.5px] text-muted">{n}本</span>
-                    </span>
-                  </Link>
-                </li>
-              );
-            })}
-            <li>
-              <Link href="/articles" className="tap lift group flex h-full flex-col items-center justify-center rounded-2xl border border-dashed border-line-strong bg-canvas px-3 pb-4 pt-4 text-center hover:border-brand/40 md:flex-row md:gap-3">
-                <span className="flex h-12 w-12 items-center justify-center rounded-full bg-white text-brand ring-1 ring-line">
-                  <ArrowRight className="h-5 w-5" aria-hidden="true" />
-                </span>
-                <span className="mt-2 text-[14px] font-bold text-ink group-hover:text-brand-strong md:mt-0">すべての記事</span>
-              </Link>
-            </li>
-          </ul>
-        </section>
+        )}
 
         {/* NEWS */}
         <section aria-labelledby="home-news">
-          <SectionHeading eyebrow="NEWS" title="最近の転職・仕事ニュース" id="home-news" href="/news" hrefLabel="ニュース一覧へ" />
+          <SectionHeading eyebrow="NEWS" title="知っておきたい制度の変更" id="home-news" href="/news" hrefLabel="ニュース解説の一覧へ" />
           <ul className="swipe md:hidden">
             {news.map((n) => (
               <li key={n.slug}>
@@ -293,7 +258,7 @@ export default async function HomePage() {
             ニュース一覧へ
             <ArrowRight className="h-4 w-4" aria-hidden="true" />
           </Link>
-          <p className="mt-3 text-xs leading-5 text-muted">発表内容の転載ではなく、はじめて転職する人にとって何が変わるかを編集部が解説しています。</p>
+          <p className="mt-3 text-xs leading-5 text-muted">施行・発表日の新しい順です。発表内容の転載ではなく、はじめて転職する人にとって何が変わるか・何を確認すればいいかを解説しています。</p>
         </section>
 
         {/* JOB GUIDE（職種マップ） */}
@@ -374,7 +339,7 @@ export default async function HomePage() {
           </div>
         </section>
 
-        <ConsultationCta placement="home-band" heading="希望に近い仕事があるか、相談してみる" />
+        <ConsultationCta placement="home-band" heading="整理したことをもとに、自分の場合を相談する" />
 
         <nav aria-label="運営に関する情報" className="flex flex-wrap gap-x-6 gap-y-2 border-t border-line pt-8 text-sm">
           <Link href="/about" className="text-muted hover:text-brand-strong hover:underline">運営者情報</Link>

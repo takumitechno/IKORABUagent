@@ -25,7 +25,7 @@ BY SITUATION・転職回数が多い
   更新 2026.10.06
 - ### [転職回数が気になるときに整理したいこと｜説明のしかたと次の選び方](/articles/tenshoku-kaisu-kininaru)
   短期間での離職や転職回数の多さが気になるときは、隠すよりも事実を整理し、次の職場で何を変えたいのかを説明できるようにしておくことが大切です。経歴の整理のしかたと、伝え方の型を紹介します。
-  更新 2026.09.29
+  更新 2026.10.06
 
 [迷ったら、条件整理チェック 13の質問で、比べる職種と確認ポイントを整理](/check)
 
@@ -52,8 +52,6 @@ BY SITUATION・転職回数が多い
 
 自分の場合はどうなる？
 
-整理した条件をもとに、キャリアアドバイザーに具体的な選択肢を相談できます。
+記事で整理したことをもとに、具体的な求人や進め方を人材紹介会社のキャリアアドバイザーに相談することもできます。
 
-[無料で相談してみる](https://consultation.example/apply?utm_source=owned_media&utm_medium=referral&utm_campaign=owned-media-demo&utm_content=article-sidebar__situations-kaisu)
-
-運営: 人材紹介会社（社名は正式公開時に掲載）
+[相談でできることを見る](/consultation)

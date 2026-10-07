@@ -98,27 +98,6 @@ export function ArticleList({ articles, categories, showSummary = true, classNam
   );
 }
 
-/** 番号付きの編集部おすすめ */
-export function RankList({ articles, categories }: { articles: ArticleSummary[]; categories: Category[] }) {
-  return (
-    <ol className="divide-y divide-line">
-      {articles.map((a, i) => {
-        const category = findCategory(categories, a.categories[0]);
-        return (
-          <li key={a.slug}>
-            <Link href={articlePath(a)} className="tap group flex items-center gap-3 py-3.5">
-              <span className="w-6 shrink-0 text-center text-[20px] font-bold leading-none text-brand tabular-nums">{i + 1}</span>
-              <Eyecatch article={a} category={category} size="sm" className="w-14" />
-              <span className="min-w-0 flex-1 text-[14px] font-bold leading-6 text-ink group-hover:text-brand-strong">{a.title}</span>
-            </Link>
-          </li>
-        );
-      })}
-    </ol>
-  );
-}
-
-/** 記事に付いている入口タグ（職種・悩み・状況） */
 export function TagChips({ article, groups = ["concerns", "situations", "roles"] }: { article: Pick<ArticleSummary, TaxonomyGroup>; groups?: TaxonomyGroup[] }) {
   const tags = groups.flatMap((g) => article[g].map((slug) => ({ g, item: findTaxonomy(g, slug) }))).filter((t) => t.item);
   if (tags.length === 0) return null;

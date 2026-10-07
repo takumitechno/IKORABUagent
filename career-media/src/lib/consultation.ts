@@ -11,6 +11,7 @@ export type CtaPlacement =
   | "article-sticky"
   | "news-bottom"
   | "journey"
+  | "home-journeys"
   | "jobs"
   | "check-result"
   | "consultation-page"

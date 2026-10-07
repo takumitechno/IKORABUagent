@@ -1,5 +1,7 @@
 // 主要画面をブラウザで開き、スクリーンショットとコンソールエラーを確認する。
 //   BASE_URL=http://localhost:3000 node scripts/screenshots.mjs
+//   BASE_URL=http://localhost:3100 SALES=1 node scripts/screenshots.mjs   # 商談用ページ（/sales）も撮る
+//   VIEWPORTS=mobile,mobile360 node scripts/screenshots.mjs              # 撮る画面幅をしぼる
 // 出力: screenshots/*.png（.gitignore 済み）
 import { chromium } from "playwright";
 import fs from "node:fs";
@@ -28,12 +30,33 @@ const PAGES = [
   ["about", "/about"],
   ["editorial-policy", "/editorial-policy"],
   ["not-found", "/articles/kyujin-hyo-yomikata"],
+  ["journey-a", "/situations/sekkyaku"],
+  ["journey-b", "/concerns/kyuryo"],
+  ["journey-c", "/situations/freeter"],
+  ["consultation-apply", "/consultation/apply?placement=article-bottom__sekkyaku-keiken-ikasu"],
+  ["search-zero", "/articles?q=" + encodeURIComponent("宇宙飛行士")],
+  ["disclosure", "/disclosure"],
+  ["privacy", "/privacy"],
+  ["disclaimer", "/disclaimer"],
+  ...(process.env.SALES === "1"
+    ? [
+        ["sales", "/sales"],
+        ["sales-sns", "/sales/sns"],
+        ["sales-sns-a", "/sales/sns/a"],
+        ["sales-sns-b", "/sales/sns/b"],
+        ["sales-sns-c", "/sales/sns/c"],
+        ["sales-proposal", "/sales/proposal"],
+        ["sales-measurement", "/sales/measurement"],
+      ]
+    : []),
 ];
 
-const VIEWPORTS = {
+const ALL_VIEWPORTS = {
   desktop: { width: 1440, height: 900 },
   mobile: { width: 390, height: 844, isMobile: true, deviceScaleFactor: 2 },
+  mobile360: { width: 360, height: 780, isMobile: true, deviceScaleFactor: 2 },
 };
+const VIEWPORTS = process.env.VIEWPORTS ? Object.fromEntries(Object.entries(ALL_VIEWPORTS).filter(([k]) => process.env.VIEWPORTS.split(",").includes(k))) : ALL_VIEWPORTS;
 
 const only = process.argv.slice(2);
 const problems = [];

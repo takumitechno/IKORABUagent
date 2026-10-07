@@ -8,9 +8,14 @@ Codex などのコーディングエージェント向けの作業ガイド。�
   記事・ニュース解説・職種比較・条件整理チェックで考えを整理してもらい、必要な人を人材紹介会社の相談へつなぐ。
 - **提案用・非公開。** 本番環境や公開 URL にデプロイしない（Vercel・Netlify・GitHub Pages なども含む）。
   `partner.brandUsageApproved` を `true` にしない。`SITE_INDEXABLE` を設定しない。
-- 画面の既定は中立ブランド「はじめて転職ガイド」。提携候補の実在企業の社名・ロゴ・許可番号・LP の URL は
-  `src/config/partner.ts`（`makecareer` プロファイル）と TODO コメントにだけ置く。画面・記事・他のファイルへ直書きしない
-  （`tests/consultation.test.ts` が検出する）。LP や企業サイトの文章・画像を写さない。
+- 画面の既定は中立デモ「はじめて転職ガイド」（提案用デモ。架空の人材紹介会社が運営しているようには見せない）。
+  提携候補の実在企業の社名・LP の URL は `src/config/partner.ts`（`makecareer` プロファイル＝商談用の非公開プレビュー）と
+  TODO コメントにだけ置く。画面・記事・他のファイルへ直書きしない（`tests/consultation.test.ts` が検出する）。
+  LP や企業サイトの文章・画像・ロゴ・実績を写さない。一次情報で確認していない許可番号は画面に出さない。
+- **本番送客（実際の申込ページへのリンク）を有効にしない。** 有効になるのは `brandUsageApproved: true`・人が書いた
+  `liveOutboundApproval`・`PARTNER_LIVE_OUTBOUND=on` の3つがそろったときだけ。エージェントはこのどれも書き換えない。
+  相談の申込ボタンは `buildConsultationUrl()` だけで作る（無効の間はサイト内の `/consultation/apply` を指す）。
+  確認: `npm run check:outbound -- --base <起動中のURL>`
 
 ## まず読むもの
 
@@ -36,6 +41,10 @@ Node.js 20.9 以上。依存は `npm ci`。環境変数なしで動く（記事�
 | `npm run motifs` | `src/lib/illustrations/motifs.ts` から `src/app/motifs.css` を作り直す |
 | `npm run db:verify` | ローカル Postgres で migration・seed・RLS を検証（Postgres が必要） |
 | `npm run screenshots` | 起動中のサーバーの主要画面をデスクトップ・スマホで撮影し、横スクロール・はみ出し・コンソールエラーを検出（Playwright の Chromium が必要） |
+| `npm run demo` / `npm run demo:makecareer` | 中立デモ（:3000）／商談用プレビュー（:3100）を、商談用ページ（/sales）つきでローカル起動 |
+| `npm run check:outbound` | 起動中のサーバーの全ページに、本番の申込ページへのリンクがないことを確認 |
+| `npm run sales:docs` | `src/lib/sales/*` と計測の定義から docs/sales/ の資料を作り直す |
+| `npm run sns:images` | 投稿案のカルーセルを 1080×1350 の PNG に書き出す（SALES_DEMO のデモが必要） |
 | `npm run export:static` | 起動中のサーバーの全ページを `export/pages/`（Markdown、リポジトリに置く）と `export/site/`（静的 HTML、git 管理外）に書き出す。対象は既定で http://127.0.0.1:3000（`--base` で変更） |
 
 変更したら、最後に `npm run lint`、`npm test`、`npm run content:check` を通す。画面や記事を変えたら `npm run build && npm run start` のうえで
@@ -56,6 +65,12 @@ Node.js 20.9 以上。依存は `npm ci`。環境変数なしで動く（記事�
 | `/about`、`/editorial-policy`、`/disclosure`、`/privacy`、`/disclaimer` | 各 `page.tsx` | `InfoPage` |
 | 全ページ共通 | `src/app/layout.tsx` | `Header`、`MobileNav`、`Footer`、`PreviewBanner`、`MobileStickyCta`、`src/app/globals.css` |
 
+| `/consultation/apply` | `src/app/consultation/apply/page.tsx` | 本番送客が無効な間の、相談の申込ボタンの行き先（noindex） |
+| `/sales/*`（SALES_DEMO=1 のときだけ） | `src/app/sales/` | 商談用ページ（Instagram 投稿案・提案・計測）。データは `src/lib/sales/` |
+
+読者導線（3つのガイド）は `src/lib/journeys.ts`（入口ページの「順番に読むなら」と、記事の「ガイドの現在地」に出る）。
+計測イベントは `src/lib/measurement/`（ブラウザ内に記録するだけで送信しない）。
+
 データは `src/lib/content/repository.ts` の `ContentRepository` 経由で読む（既定は Markdown、`CONTENT_SOURCE=supabase` で Supabase）。
 どちらも status=published で、公開日・査読日・情報確認日・出典がそろった記事だけを返す。
 
@@ -74,3 +89,8 @@ Node.js 20.9 以上。依存は `npm ci`。環境変数なしで動く（記事�
   （テストが生成漏れを検出する）。外部の画像・フォント・CDN を読み込まない。
 - 独自の CSS は `globals.css` の `@layer components` に書く（Tailwind のユーティリティで上書きできるように）。
 - `.env*` を読まない・commit しない。フロントで使う Supabase のキーは anon key だけ。
+- 記事の日付（published_at・updated_at・reviewed_at・information_checked_at）を、実際より前にさかのぼらせない。今日に変えて新しく見せることもしない。
+- 体験談・取材・監修・相談の実績・アクセス数・ランキング・口コミを作らない。架空の給与例は「仮の例」と書く。
+- 計測イベントに、氏名・連絡先・自由記述・検索語・条件整理チェックの回答を入れない。登録・面談などの成果イベントをフロントで発火しない。
+  本番の解析ツール（GA4・GTM・各種ピクセル）を入れない。
+- 商談用ページ（/sales）は読者向けのメディアと分ける。sitemap・ナビに載せない。

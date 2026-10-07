@@ -5,6 +5,9 @@ import { ArticleHeader, EditorialNote, FaqSection, pickRelated, RelatedArticles,
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { ConsultationCta } from "@/components/ConsultationCta";
 import { JsonLd } from "@/components/JsonLd";
+import { JourneyNav } from "@/components/Journey";
+import { TrackArticleView } from "@/components/MeasurementTracker";
+import { journeyForArticle } from "@/lib/journeys";
 import { MobileStickyCta } from "@/components/MobileStickyCta";
 import { getRepository } from "@/lib/content";
 import { readingMinutes, renderMarkdown } from "@/lib/markdown";
@@ -44,10 +47,12 @@ export default async function ArticlePage({ params }: Props) {
   const [categories, all] = await Promise.all([repo.listCategories(), repo.listArticles()]);
   const { sections, headings } = renderMarkdown(article.body);
   const related = pickRelated(article, all);
+  const inJourney = journeyForArticle(article.slug);
 
   return (
     <>
       <JsonLd data={articleJsonLd(article)} />
+      <TrackArticleView context={{ content_id: `article:${article.slug}`, content_slug: article.slug, content_version: article.updatedAt, theme_cluster: article.categories[0] ?? "", pattern_id: inJourney?.journey.patternId ?? "" }} />
       <JsonLd data={faqJsonLd(article)} />
       <div className="mx-auto max-w-6xl px-4 pt-6 sm:px-6">
         <Breadcrumbs items={articleCrumbs(article, categories)} />
@@ -61,6 +66,7 @@ export default async function ArticlePage({ params }: Props) {
                 <div className="article-body" dangerouslySetInnerHTML={{ __html: sections[1] }} />
               </>
             )}
+            {inJourney && <JourneyNav journey={inJourney.journey} index={inJourney.index} articles={all} />}
             <FaqSection article={article} />
             <SourcesSection article={article} />
             <EditorialNote article={article} />

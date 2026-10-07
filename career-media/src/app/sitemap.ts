@@ -6,6 +6,9 @@ import { TAXONOMY, taxonomyPath, type TaxonomyGroup } from "@/lib/taxonomy";
 
 export const revalidate = 600;
 
+/** sitemap に載せる入口ページの記事数の下限 */
+const MIN_HUB_ARTICLES = 3;
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const repo = getRepository();
   const [articles, categories] = await Promise.all([repo.listArticles(), repo.listCategories()]);
@@ -37,10 +40,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: a.kind === "news" ? 0.6 : 0.7,
   }));
 
-  // 入口ページ（職種 / 悩み / 今の状況）。記事が1本もない入口は載せない
+  // 入口ページ（職種 / 悩み / 今の状況）。記事が少ない入口（内容の薄いページ）は載せない。ページ自体は残し、サイト内からは開ける
   const hubPages: MetadataRoute.Sitemap = (["roles", "concerns", "situations"] as TaxonomyGroup[]).flatMap((group) =>
     TAXONOMY[group]
-      .filter((t) => articles.some((a) => a[group].includes(t.slug)))
+      .filter((t) => articles.filter((a) => a[group].includes(t.slug)).length >= MIN_HUB_ARTICLES)
       .map((t) => ({ url: absoluteUrl(taxonomyPath(group, t.slug)), lastModified: latest, changeFrequency: "weekly" as const, priority: 0.6 })),
   );
 

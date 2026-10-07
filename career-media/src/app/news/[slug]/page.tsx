@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { AlertCircle, CalendarDays, CheckSquare, Megaphone, Sparkles, Users } from "lucide-react";
+import { TrackArticleView } from "@/components/MeasurementTracker";
 import { EditorialNote, pickRelated, RelatedArticles, SampleNotice, SourcesSection } from "@/components/ArticleParts";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { ConsultationCta } from "@/components/ConsultationCta";
@@ -63,6 +64,7 @@ export default async function NewsDetailPage({ params }: Props) {
   return (
     <>
       <JsonLd data={articleJsonLd(article)} />
+      <TrackArticleView context={{ content_id: `news:${article.slug}`, content_slug: article.slug, content_version: article.updatedAt, theme_cluster: "news" }} />
       <div className="mx-auto max-w-4xl px-4 pt-6 sm:px-6">
         <Breadcrumbs items={articleCrumbs(article, categories)} />
         <article className="mt-6">

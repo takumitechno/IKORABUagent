@@ -1,0 +1,6 @@
+"partner_record_id","event_name","occurred_at","site_session_id","utm_source","utm_medium","utm_campaign","utm_content","landing_content_id","status_reason","approved_at","notes"
+"SYNTHETIC-0001","partner_registered","2026-11-04T10:12:00+09:00","synthetic-session-a","instagram","social","owned-media-pilot","theme-b-carousel","article:sekkyaku-keiken-ikasu","","","架空の例（形式の説明用。実データではない）"
+"SYNTHETIC-0001","meeting_reserved","2026-11-04T10:30:00+09:00","synthetic-session-a","instagram","social","owned-media-pilot","theme-b-carousel","article:sekkyaku-keiken-ikasu","","","架空の例"
+"SYNTHETIC-0001","meeting_completed","2026-11-08T14:00:00+09:00","synthetic-session-a","instagram","social","owned-media-pilot","theme-b-carousel","article:sekkyaku-keiken-ikasu","","","架空の例"
+"SYNTHETIC-0001","meeting_approved","2026-11-15T09:00:00+09:00","synthetic-session-a","instagram","social","owned-media-pilot","theme-b-carousel","article:sekkyaku-keiken-ikasu","","2026-11-15","架空の例"
+"SYNTHETIC-0002","meeting_rejected","2026-11-09T11:00:00+09:00","synthetic-session-b","","","","","article:donichi-yasumi-nenshu-hikaku","already_registered","","架空の例（既登録で否認）"

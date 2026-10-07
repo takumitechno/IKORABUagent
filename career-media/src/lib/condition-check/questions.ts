@@ -6,7 +6,7 @@
  * - 自由記述・氏名・連絡先などの個人情報は扱わない（選択肢 ID のみ）。
  */
 
-export const CHECK_VERSION = "2026-10-v1";
+export const CHECK_VERSION = "2026-10-v2";
 
 export type Option = { id: string; label: string };
 
@@ -53,6 +53,7 @@ export const STEPS: Step[] = [
           { id: "contract", label: "契約社員・派遣社員として働いている" },
           { id: "parttime", label: "アルバイト・パートで働いている" },
           { id: "not_working", label: "今は働いていない" },
+          { id: "skip", label: "答えたくない・どれにも当てはまらない" },
         ],
       },
       {
@@ -155,6 +156,7 @@ export const STEPS: Step[] = [
           { id: "no_overtime", label: "残業はできるだけ少ないほうがいい" },
           { id: "some_ok", label: "ある程度の残業なら大丈夫" },
           { id: "flexible", label: "時期によって忙しくても大丈夫" },
+          { id: "undecided", label: "まだ分からない" },
         ],
       },
       {

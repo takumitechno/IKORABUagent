@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { buildResult, resultToText } from "@/lib/condition-check/engine";
+import { buildResult, memoText, RESULT_SECTIONS, resultToText } from "@/lib/condition-check/engine";
 import { ALL_QUESTIONS, isStepComplete, sanitizeAnswers, STEPS, type Answers } from "@/lib/condition-check/questions";
 
 const base: Answers = {
@@ -67,21 +67,52 @@ describe("condition check engine", () => {
   it("ranks IT support first for a PC-oriented, learning-oriented profile", () => {
     const r = buildResult({ ...base, experiences: ["it"], strengths: ["research"], talk: ["little"], pc: ["love"], learning: ["daily"], avoid: ["none"] });
     expect(r.candidates[0].role.slug).toBe("it-support");
-    expect(r.nextActions.some((a) => a.href === "/news/news-kyouiku-kunren-kyufu")).toBe(true);
+    expect(r.selfActions.some((a) => a.href === "/news/news-kyouiku-kunren-kyufu")).toBe(true);
   });
 
   it("produces conditions to confirm, interview questions and next actions with valid internal links", () => {
     const r = buildResult(base);
     expect(r.conditionsToConfirm).toEqual(expect.arrayContaining(["「完全週休2日制」かどうかと、年間休日の日数", "月平均の残業時間と、固定残業代に含まれる時間数"]));
     expect(r.interviewQuestions.length).toBeGreaterThanOrEqual(3);
-    expect(r.nextActions.at(-1)?.href).toBe("/consultation");
-    expect(r.nextActions.some((a) => a.href === "/articles/freeter-seishain-hajimeni")).toBe(true);
+    expect(r.selfActions.some((a) => a.href === "/articles/freeter-seishain-hajimeni")).toBe(true);
+    // 「自分でできる次の一歩」に相談は入れない（相談は7番目の任意の一歩として別に出す）
+    expect(r.selfActions.every((a) => !a.href.startsWith("/consultation"))).toBe(true);
+    expect(r.selfActions.every((a) => /^\/(articles|news|jobs)/.test(a.href))).toBe(true);
+    expect(r.consultSteps.length).toBeGreaterThanOrEqual(3);
+    expect(r.consultSteps.join()).toContain("自動では送られません");
   });
 
-  it("never phrases results as pass/fail judgement", () => {
+  it("lays the result out as the 7-part consultation prep note", () => {
+    expect(RESULT_SECTIONS).toEqual(["ゆずれない条件", "今までの経験から使えそうなこと", "比べてみたい職種", "求人で確認すること", "面談で聞く質問", "自分でできる次の一歩", "相談する場合の次の一歩"]);
     const text = resultToText(buildResult(base));
-    expect(text).not.toMatch(/合格|不合格|向いていない|受かる|必ず/);
-    expect(text).toContain("確認したい条件");
+    RESULT_SECTIONS.forEach((title, i) => expect(text).toContain(`■ ${i + 1}. ${title}`));
+  });
+
+  it("never phrases results as pass/fail judgement, aptitude, probability or salary estimate", () => {
+    const r = buildResult(base);
+    const text = `${resultToText(r)}\n${memoText(r, base)}`;
+    expect(text).not.toMatch(/合格|不合格|向いていない|向いています|受かる|必ず|確率|成功率|市場価値|推定年収|スコア|点数/);
+    expect(text).toContain("求人で確認すること");
+  });
+
+  it("builds an interview memo from the answers without anything the reader did not choose", () => {
+    const memo = memoText(buildResult(base), base);
+    expect(memo).toContain("今の働き方: アルバイト・パートで働いている");
+    expect(memo).toContain("働き始めたい時期: 3か月以内");
+    expect(memo).toContain("ゆずれない条件: 土日祝休み");
+    expect(memo).toContain("送信されていません");
+    // 「答えたくない」を選んだ項目はメモに出さない
+    const skipped = memoText(buildResult({ ...base, status: ["skip"] }), { ...base, status: ["skip"] });
+    expect(skipped).not.toContain("今の働き方");
+  });
+
+  it("accepts 'not sure / prefer not to say' answers", () => {
+    const answers = sanitizeAnswers({ ...base, status: ["skip"], hours: ["undecided"], timing: ["undecided"] });
+    expect(answers.status).toEqual(["skip"]);
+    expect(answers.hours).toEqual(["undecided"]);
+    const r = buildResult(answers);
+    expect(r.conditionsToConfirm.some((c) => c.includes("繁忙期"))).toBe(false);
+    expect(r.selfActions.some((a) => a.href === "/articles/mikeiken-tenshoku-hajimekata")).toBe(true);
   });
 
   it("handles a profile with no experience", () => {

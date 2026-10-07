@@ -3,7 +3,7 @@ import { checkArticle, extractLinks, gateFailed, type CheckContext } from "../pi
 import { loadAllArticles, loadCategories } from "@/lib/content/local-repository";
 import type { Article } from "@/lib/content/types";
 
-const TODAY = "2026-10-06";
+const TODAY = "2026-10-07";
 const ctx = (): CheckContext => ({ articles: loadAllArticles(), categories: loadCategories(), today: TODAY });
 
 function article(overrides: Partial<Article> = {}): Article {

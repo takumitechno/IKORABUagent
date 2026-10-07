@@ -2,9 +2,10 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { ArrowLeft, ArrowRight, Check, CheckCircle2, ClipboardCopy, Lightbulb, ListChecks, MessageSquareText, Printer, RotateCcw, Scale, Sparkles, Target } from "lucide-react";
-import { buildResult, resultToText, type CheckResult } from "@/lib/condition-check/engine";
-import { isStepComplete, sanitizeAnswers, STEPS, type Answers, type Question } from "@/lib/condition-check/questions";
+import { ArrowLeft, ArrowRight, Check, CheckCircle2, ClipboardCopy, Lightbulb, MessageCircle, NotebookPen, Printer, RotateCcw } from "lucide-react";
+import { buildResult, memoText, RESULT_SECTIONS, resultToText, type CheckResult } from "@/lib/condition-check/engine";
+import { CHECK_VERSION, isStepComplete, sanitizeAnswers, STEPS, type Answers, type Question } from "@/lib/condition-check/questions";
+import { track } from "@/lib/measurement/client";
 import type { MotifName } from "@/lib/illustrations/motifs";
 import { JOB_ROLE_SCENE } from "@/lib/illustrations/scenes";
 
@@ -42,17 +43,20 @@ export function ConditionCheck({ consultationHref, consultationLabel, allowPrint
   const [answers, setAnswers] = useState<Answers>({});
   const [stepIndex, setStepIndex] = useState(0);
   const [showResult, setShowResult] = useState(false);
-  const [copied, setCopied] = useState(false);
+  const [copied, setCopied] = useState<"" | "all" | "memo" | "failed">("");
+  const [fallbackText, setFallbackText] = useState<string | null>(null);
   const [triedNext, setTriedNext] = useState(false);
+  const [storageOk, setStorageOk] = useState(true);
+  const started = useRef(false);
   const topRef = useRef<HTMLDivElement>(null);
 
-  // 前回の回答を復元（このブラウザのタブ内だけ。サーバーには送信しない）
+  // 前回の回答を復元（このブラウザのタブ内だけ。サーバーや相談先には送信しない）
   useEffect(() => {
     try {
       const raw = sessionStorage.getItem(STORAGE_KEY);
       if (raw) setAnswers(sanitizeAnswers(JSON.parse(raw)));
     } catch {
-      /* storage が使えない環境では何もしない */
+      setStorageOk(false);
     }
   }, []);
 
@@ -60,7 +64,12 @@ export function ConditionCheck({ consultationHref, consultationLabel, allowPrint
     try {
       sessionStorage.setItem(STORAGE_KEY, JSON.stringify(answers));
     } catch {
-      /* noop */
+      setStorageOk(false);
+    }
+    // 計測は「始めた」ことだけ（回答の中身は送らない・記録しない）
+    if (!started.current && Object.keys(answers).length > 0) {
+      started.current = true;
+      track("check_started", { page_type: "check", check_version: CHECK_VERSION });
     }
   }, [answers]);
 
@@ -90,7 +99,10 @@ export function ConditionCheck({ consultationHref, consultationLabel, allowPrint
     }
     setTriedNext(false);
     if (stepIndex < STEPS.length - 1) setStepIndex(stepIndex + 1);
-    else setShowResult(true);
+    else {
+      setShowResult(true);
+      track("check_completed", { page_type: "check", check_version: CHECK_VERSION });
+    }
     scrollTop();
   };
 
@@ -105,22 +117,37 @@ export function ConditionCheck({ consultationHref, consultationLabel, allowPrint
     setAnswers({});
     setStepIndex(0);
     setShowResult(false);
+    setFallbackText(null);
+    try {
+      sessionStorage.removeItem(STORAGE_KEY);
+    } catch {
+      /* noop */
+    }
     scrollTop();
   };
 
-  const copy = async () => {
+  // コピーできない環境（古いブラウザ・権限なし）では、文章を表示して手でコピーしてもらう
+  const copy = async (kind: "all" | "memo") => {
     if (!result) return;
+    const text = kind === "all" ? resultToText(result) : memoText(result, answers);
     try {
-      await navigator.clipboard.writeText(resultToText(result));
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2500);
+      await navigator.clipboard.writeText(text);
+      setCopied(kind);
+      setFallbackText(null);
+      setTimeout(() => setCopied(""), 2500);
     } catch {
-      setCopied(false);
+      setCopied("failed");
+      setFallbackText(text);
     }
   };
 
   return (
     <div ref={topRef} className="scroll-mt-24">
+      {!storageOk && (
+        <p role="status" className="no-print mb-4 rounded-xl border border-line bg-white px-4 py-3 text-[13px] leading-6 text-body">
+          このブラウザの設定では回答を一時保存できないため、ページを閉じたり再読み込みしたりすると回答が消えます。チェック自体はそのまま使えます。
+        </p>
+      )}
       {/* ステップ表示（イラスト付き。進むと線が伸びる） */}
       {(() => {
         const steps = [...STEPS.map((st) => ({ title: st.title, short: st.shortTitle })), { title: "結果", short: "結果" }];
@@ -218,24 +245,36 @@ export function ConditionCheck({ consultationHref, consultationLabel, allowPrint
           </div>
         </div>
       ) : (
-        <Result result={result} consultationHref={consultationHref} consultationLabel={consultationLabel} allowPrint={allowPrint} onBack={back} onRestart={restart} onCopy={copy} copied={copied} />
+        <Result
+          result={result}
+          consultationHref={consultationHref}
+          consultationLabel={consultationLabel}
+          allowPrint={allowPrint}
+          onBack={back}
+          onRestart={restart}
+          onCopy={copy}
+          copied={copied}
+          fallbackText={fallbackText}
+        />
       )}
     </div>
   );
 }
 
-const RESULT_SCENES: Record<number, MotifName> = { 1: "calendar", 2: "star", 3: "scale", 4: "checklist", 5: "chat", 6: "flag" };
 
-function ResultSection({ title, children, number }: { icon?: typeof Target; title: string; number: number; children: React.ReactNode }) {
+const RESULT_SCENES: MotifName[] = ["calendar", "star", "scale", "checklist", "chat", "flag", "interview"];
+
+function ResultSection({ title, children, number, note }: { title: string; number: number; note?: string; children: React.ReactNode }) {
   return (
-    <section className="reveal rounded-[var(--radius-card)] border border-line bg-white p-5 sm:p-6">
+    <section className="reveal break-inside-avoid rounded-[var(--radius-card)] border border-line bg-white p-5 sm:p-6">
       <h3 className="flex items-center gap-3 text-[17px] font-bold text-ink">
-        <span className="relative block aspect-square w-11 shrink-0 rounded-full bg-mint">{motif(RESULT_SCENES[number] ?? "checklist", "absolute inset-[6%]")}</span>
+        <span className="relative block aspect-square w-11 shrink-0 rounded-full bg-mint">{motif(RESULT_SCENES[number - 1] ?? "checklist", "absolute inset-[6%]")}</span>
         <span>
           <span className="mr-1.5 text-xs font-bold text-brand">{number}</span>
           {title}
         </span>
       </h3>
+      {note && <p className="mt-2 text-[12.5px] leading-6 text-muted">{note}</p>}
       <div className="mt-4">{children}</div>
     </section>
   );
@@ -250,6 +289,7 @@ function Result({
   onRestart,
   onCopy,
   copied,
+  fallbackText,
 }: {
   result: CheckResult;
   consultationHref: string;
@@ -257,10 +297,13 @@ function Result({
   allowPrint: boolean;
   onBack: () => void;
   onRestart: () => void;
-  onCopy: () => void;
-  copied: boolean;
+  onCopy: (kind: "all" | "memo") => void;
+  copied: "" | "all" | "memo" | "failed";
+  fallbackText: string | null;
 }) {
   const top = result.candidates.slice(0, 3);
+  const [s1, s2, s3, s4, s5, s6, s7] = RESULT_SECTIONS;
+  const button = "inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-[13px] font-bold ring-1";
   return (
     <div className="mt-8" aria-live="polite">
       <div className="enter relative overflow-hidden rounded-[20px] bg-ink p-6 text-white sm:p-8">
@@ -269,15 +312,19 @@ function Result({
         <p className="text-[11px] font-bold tracking-[0.2em] text-accent-bright">YOUR NOTE</p>
         <h2 className="mt-2 pr-20 text-[22px] font-bold leading-snug sm:pr-28 sm:text-[26px]">あなたの条件整理ノート</h2>
         <p className="mt-3 text-sm leading-7 text-white/80">
-          回答をもとに、希望条件・活かせそうな経験・比べてみたい職種などを整理しました。これは向き不向きや選考の結果を判定するものではなく、次に調べること・確認することを考えるための材料です。
+          回答をもとに、求人を比べるときと相談するときに使える形で整理しました。向き不向きや選考の結果を判定するものではありません。このノートは自分で持ち帰るためのもので、どこにも送信されていません。
         </p>
         <div className="no-print mt-5 flex flex-wrap gap-2">
-          <button type="button" onClick={onCopy} className="inline-flex items-center gap-1.5 rounded-full bg-white/10 px-4 py-2 text-[13px] font-bold ring-1 ring-white/20 hover:bg-white/20">
+          <button type="button" onClick={() => onCopy("memo")} className={`${button} bg-accent-bright text-ink ring-accent-bright hover:bg-white`}>
+            <NotebookPen className="h-4 w-4" aria-hidden="true" />
+            {copied === "memo" ? "メモをコピーしました" : "面談で使うメモとしてコピー"}
+          </button>
+          <button type="button" onClick={() => onCopy("all")} className={`${button} bg-white/10 ring-white/20 hover:bg-white/20`}>
             <ClipboardCopy className="h-4 w-4" aria-hidden="true" />
-            {copied ? "コピーしました" : "結果をテキストでコピー"}
+            {copied === "all" ? "コピーしました" : "結果をすべてコピー"}
           </button>
           {allowPrint && (
-            <button type="button" onClick={() => window.print()} className="inline-flex items-center gap-1.5 rounded-full bg-white/10 px-4 py-2 text-[13px] font-bold ring-1 ring-white/20 hover:bg-white/20">
+            <button type="button" onClick={() => window.print()} className={`${button} bg-white/10 ring-white/20 hover:bg-white/20`}>
               <Printer className="h-4 w-4" aria-hidden="true" />
               印刷・PDFで保存
             </button>
@@ -285,19 +332,32 @@ function Result({
         </div>
       </div>
 
+      {fallbackText && (
+        <div className="no-print mt-4 rounded-xl border border-line bg-white p-4">
+          <label htmlFor="copy-fallback" className="text-[13px] font-bold text-ink">
+            この環境では自動でコピーできませんでした。下の文章を選んでコピーしてください。
+          </label>
+          <textarea id="copy-fallback" readOnly value={fallbackText} rows={10} onFocus={(e) => e.currentTarget.select()} className="mt-2 w-full rounded-lg border border-line bg-canvas p-3 font-[inherit] text-[13px] leading-6 text-ink" />
+        </div>
+      )}
+
       <div className="mt-6 space-y-5">
-        <ResultSection icon={Target} title="希望条件の整理" number={1}>
+        <ResultSection title={s1} number={1}>
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="rounded-xl bg-accent-soft p-4">
               <p className="text-xs font-bold text-accent">ゆずれない条件</p>
-              <ul className="mt-2 space-y-2">
-                {result.mustHave.map((c) => (
-                  <li key={c.label}>
-                    <p className="font-bold text-ink">{c.label}</p>
-                    <p className="text-[13px] leading-6 text-body">{c.detail}</p>
-                  </li>
-                ))}
-              </ul>
+              {result.mustHave.length > 0 ? (
+                <ul className="mt-2 space-y-2">
+                  {result.mustHave.map((c) => (
+                    <li key={c.label}>
+                      <p className="font-bold text-ink">{c.label}</p>
+                      <p className="text-[13px] leading-6 text-body">{c.detail}</p>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p className="mt-2 text-sm text-body">まだ決めていなくて大丈夫です。比べていくうちに見えてきます。</p>
+              )}
             </div>
             <div className="rounded-xl bg-canvas p-4">
               <p className="text-xs font-bold text-muted">できれば叶えたい条件</p>
@@ -323,14 +383,14 @@ function Result({
           )}
         </ResultSection>
 
-        <ResultSection icon={Sparkles} title="活かせそうな経験" number={2}>
+        <ResultSection title={s2} number={2}>
           {result.skills.length > 0 ? (
             <ul className="space-y-3">
               {result.skills.map((s) => (
                 <li key={s.from + s.skill} className="rounded-xl bg-canvas p-4">
                   <p className="text-xs font-bold text-muted">{s.from}</p>
                   <p className="mt-1 font-bold leading-7 text-ink">{s.skill}</p>
-                  <p className="mt-1 text-xs text-brand-strong">活きやすい職種: {s.usefulIn.join("・")}</p>
+                  <p className="mt-1 text-xs text-brand-strong">つながりやすい仕事の例: {s.usefulIn.join("・")}</p>
                 </li>
               ))}
             </ul>
@@ -344,19 +404,15 @@ function Result({
           )}
         </ResultSection>
 
-        <ResultSection icon={Scale} title="比べてみたい職種" number={3}>
-          <p className="text-[13px] leading-6 text-muted">回答と各職種の一般的な特徴を照らし合わせた、比較の出発点です。ほかの職種を候補から外すものではありません。</p>
-          <ol className="mt-4 grid gap-4 md:grid-cols-3">
-            {top.map((c, i) => (
-              <li key={c.role.slug} className={`flex flex-col rounded-xl border p-4 ${i === 0 ? "border-brand bg-brand-tint" : "border-line"}`}>
+        <ResultSection title={s3} number={3} note="回答と、各職種の一般的な特徴を照らし合わせた「比べ始める候補」です。向き不向きの判定ではなく、ほかの職種を候補から外すものでもありません。">
+          <ul className="grid gap-4 md:grid-cols-3">
+            {top.map((c) => (
+              <li key={c.role.slug} className="flex flex-col rounded-xl border border-line p-4">
                 <div className="flex items-center gap-3">
-                  <span className="relative block aspect-square w-12 shrink-0 rounded-full bg-white">{motif(JOB_ROLE_SCENE[c.role.slug] ?? "briefcase", "absolute inset-[6%]")}</span>
-                  <div className="min-w-0">
-                    <p className="text-xs font-bold text-brand">候補 {i + 1}</p>
-                    <p className="text-[16px] font-bold leading-snug text-ink">{c.role.name}</p>
-                  </div>
+                  <span className="relative block aspect-square w-12 shrink-0 rounded-full bg-mint">{motif(JOB_ROLE_SCENE[c.role.slug] ?? "briefcase", "absolute inset-[6%]")}</span>
+                  <p className="min-w-0 text-[16px] font-bold leading-snug text-ink">{c.role.name}</p>
                 </div>
-                <p className="mt-1 text-[12.5px] leading-5 text-muted">{c.role.oneLiner}</p>
+                <p className="mt-2 text-[12.5px] leading-5 text-muted">{c.role.oneLiner}</p>
                 {c.reasons.length > 0 && (
                   <ul className="mt-2 space-y-1 text-[13px] leading-6 text-body">
                     {c.reasons.slice(0, 3).map((r) => (
@@ -368,20 +424,20 @@ function Result({
                   </ul>
                 )}
                 {c.cautions.length > 0 && (
-                  <p className="mt-2 rounded-lg bg-white/80 p-2 text-[12.5px] leading-5 text-body ring-1 ring-line">
+                  <p className="mt-2 rounded-lg bg-canvas p-2 text-[12.5px] leading-5 text-body">
                     <span className="font-bold text-accent">確認: </span>
                     {c.cautions[0]}
                   </p>
                 )}
                 <Link href={`/jobs#${c.role.slug}`} className="mt-auto pt-3 text-[13px] font-bold text-brand-strong underline underline-offset-4">
-                  仕事内容を詳しく見る
+                  仕事内容を比べる
                 </Link>
               </li>
             ))}
-          </ol>
+          </ul>
         </ResultSection>
 
-        <ResultSection icon={ListChecks} title="確認したい条件" number={4}>
+        <ResultSection title={s4} number={4} note="求人票や面接で確かめるときのチェックリストです。">
           <ul className="grid gap-2 sm:grid-cols-2">
             {result.conditionsToConfirm.map((t) => (
               <li key={t} className="flex gap-2 rounded-lg bg-canvas px-3 py-2.5 text-[14px] leading-6">
@@ -392,7 +448,7 @@ function Result({
           </ul>
         </ResultSection>
 
-        <ResultSection icon={MessageSquareText} title="面談・面接で聞きたいこと" number={5}>
+        <ResultSection title={s5} number={5} note="面接でも、人材紹介会社の面談でも使える質問です。">
           <ul className="space-y-2">
             {result.interviewQuestions.map((q) => (
               <li key={q} className="rounded-lg border-l-4 border-brand bg-canvas px-4 py-2.5 text-[14px] leading-6">
@@ -402,9 +458,9 @@ function Result({
           </ul>
         </ResultSection>
 
-        <ResultSection icon={ArrowRight} title="次にやること" number={6}>
+        <ResultSection title={s6} number={6} note="相談しなくても、ここから自分で進められます。">
           <ol className="grid gap-3 md:grid-cols-2">
-            {result.nextActions.map((a, i) => (
+            {result.selfActions.map((a, i) => (
               <li key={a.title}>
                 <Link href={a.href} className="group flex h-full gap-3 rounded-xl border border-line p-4 hover:border-brand/40 hover:bg-brand-tint">
                   <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-ink text-xs font-bold text-white">{i + 1}</span>
@@ -417,21 +473,33 @@ function Result({
             ))}
           </ol>
         </ResultSection>
-      </div>
 
-      <section aria-labelledby="check-cta" className="no-print mt-8 rounded-[20px] border-2 border-accent/30 bg-white p-6 text-center sm:p-8">
-        <h3 id="check-cta" className="text-[20px] font-bold leading-snug text-ink">
-          この整理結果をもとに、キャリアアドバイザーに相談する
-        </h3>
-        <p className="mx-auto mt-3 max-w-xl text-sm leading-7 text-body">
-          整理した条件や経験をもとに、自分の場合はどんな求人や進め方があるのかを、キャリアアドバイザーと具体的に話せます。上の「結果をテキストでコピー」を使うと、相談のときに整理した内容を伝えやすくなります。
-        </p>
-        <a href={consultationHref} className="mt-6 inline-flex items-center justify-center gap-1.5 rounded-full bg-accent px-8 py-4 text-base font-bold text-white shadow-[0_6px_16px_-6px_rgb(191_82_8/0.6)] hover:bg-accent-strong">
-          {consultationLabel}
-          <ArrowRight className="h-5 w-5" aria-hidden="true" />
-        </a>
-        <p className="mt-3 text-xs text-muted">回答内容が自動で相談先に送られることはありません。</p>
-      </section>
+        <ResultSection title={s7} number={7} note="相談は必須ではありません。具体的な求人で考えたくなったときの進め方です。">
+          <ol className="space-y-2">
+            {result.consultSteps.map((t, i) => (
+              <li key={t} className="flex gap-3 text-[14px] leading-6 text-body">
+                <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-accent-soft text-[12px] font-bold text-accent-strong">{i + 1}</span>
+                {t}
+              </li>
+            ))}
+          </ol>
+          <div className="no-print mt-5 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
+            <button type="button" onClick={() => onCopy("memo")} className="inline-flex items-center justify-center gap-1.5 rounded-full border border-line-strong bg-white px-5 py-3 text-sm font-bold text-ink hover:border-brand">
+              <NotebookPen className="h-4 w-4 text-brand" aria-hidden="true" />
+              {copied === "memo" ? "メモをコピーしました" : "面談で使うメモとしてコピー"}
+            </button>
+            <Link href="/consultation" data-cta-placement="check-result" data-cta-kind="consultation-info" className="inline-flex items-center justify-center gap-1.5 rounded-full border border-accent/50 bg-white px-5 py-3 text-sm font-bold text-accent-strong hover:border-accent">
+              <MessageCircle className="h-4 w-4" aria-hidden="true" />
+              相談でできることを見る
+            </Link>
+            <a href={consultationHref} data-cta-placement="check-result" data-cta-kind="consultation-apply" className="inline-flex items-center justify-center gap-1.5 rounded-full bg-accent px-6 py-3 text-sm font-bold text-white shadow-[0_6px_16px_-6px_rgb(191_82_8/0.6)] hover:bg-accent-strong">
+              {consultationLabel}
+              <ArrowRight className="h-4 w-4" aria-hidden="true" />
+            </a>
+          </div>
+          <p className="mt-3 text-xs text-muted">回答内容が自動で相談先に送られることはありません。伝えたいことだけを、メモから選んで伝えてください。</p>
+        </ResultSection>
+      </div>
 
       <div className="no-print mt-6 flex flex-wrap items-center justify-between gap-3">
         <button type="button" onClick={onBack} className="inline-flex items-center gap-1.5 rounded-full px-4 py-3 text-sm font-bold text-muted hover:text-ink">
@@ -440,7 +508,7 @@ function Result({
         </button>
         <button type="button" onClick={onRestart} className="inline-flex items-center gap-1.5 rounded-full px-4 py-3 text-sm font-bold text-muted hover:text-ink">
           <RotateCcw className="h-4 w-4" aria-hidden="true" />
-          最初からやり直す
+          最初からやり直す（回答を消す）
         </button>
       </div>
     </div>

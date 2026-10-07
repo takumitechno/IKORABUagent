@@ -35,7 +35,11 @@
     ".next/types/**/*.ts",
     ".next/dev/types/**/*.ts",
     ".next-demo/types/**/*.ts",
-    ".next-demo/dev/types/**/*.ts"
+    ".next-demo/dev/types/**/*.ts",
+    ".next-neutral/types/**/*.ts",
+    ".next-neutral/dev/types/**/*.ts",
+    ".next-makecareer/types/**/*.ts",
+    ".next-makecareer/dev/types/**/*.ts"
   ],
   "exclude": [
     "node_modules"
