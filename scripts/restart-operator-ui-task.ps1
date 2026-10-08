@@ -5,7 +5,8 @@ param(
     [string]$ExpectedWorkingDirectory = (Split-Path $PSScriptRoot -Parent),
     [ValidateRange(1, 65535)]
     [int]$DashboardPort = 5733,
-    [switch]$StatusOnly
+    [switch]$StatusOnly,
+    [switch]$EnableSupervisor
 )
 
 Set-StrictMode -Version Latest
@@ -25,6 +26,29 @@ if ($StatusOnly) {
     [pscustomobject]@{ TaskName = $task.TaskName; State = [string]$task.State } |
         ConvertTo-Json
     exit 0
+}
+
+if ($EnableSupervisor) {
+    $supervisor = Join-Path $ExpectedWorkingDirectory 'scripts\supervise-operator-ui.ps1'
+    if (-not (Test-Path -LiteralPath $supervisor -PathType Leaf) -or
+        $task.Actions[0].Arguments -notmatch '-EncodedCommand\s+(\S+)' -or
+        @($task.Triggers).Count -ne 1 -or
+        $task.Triggers[0].CimClass.CimClassName -ne 'MSFT_TaskLogonTrigger') {
+        throw 'operator UI supervisor installation prerequisites mismatch'
+    }
+    $command = [Text.Encoding]::Unicode.GetString([Convert]::FromBase64String($Matches[1]))
+    if (-not $command.Contains($supervisor)) {
+        $serverInvocation = [regex]::Match($command, "&\s*'[^']*bun\.exe'\s*'pokemon-agents/web/server\.ts'\s*;?\s*$")
+        if (-not $serverInvocation.Success) { throw 'operator UI launch command mismatch' }
+        $command = $command.Substring(0, $serverInvocation.Index) + "& '" + $supervisor.Replace("'", "''") + "'"
+    }
+    $encoded = [Convert]::ToBase64String([Text.Encoding]::Unicode.GetBytes($command))
+    $action = New-ScheduledTaskAction -Execute $task.Actions[0].Execute `
+        -Argument "-NoProfile -NonInteractive -WindowStyle Hidden -ExecutionPolicy Bypass -EncodedCommand $encoded" `
+        -WorkingDirectory $task.Actions[0].WorkingDirectory
+    # Repeat the existing task after a supervisor exit; IgnoreNew prevents duplicate running instances.
+    $task.Triggers[0].Repetition.Interval = 'PT1M'
+    Set-ScheduledTask -TaskPath $taskPath -TaskName $TaskName -Action $action -Trigger $task.Triggers | Out-Null
 }
 
 if ([string]$task.State -eq 'Running') {
