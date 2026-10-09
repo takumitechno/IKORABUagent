@@ -63,10 +63,14 @@ Node.js 20.9 以上。依存は `npm ci`。環境変数なしで動く（記事�
 | `/check` | `src/app/check/page.tsx` | `ConditionCheck`（クライアント）、`lib/condition-check/`（設問とルール） |
 | `/consultation` | `src/app/consultation/page.tsx` | `lib/consultation.ts`（相談ボタンの URL はすべて `buildConsultationUrl`） |
 | `/about`、`/editorial-policy`、`/disclosure`、`/privacy`、`/disclaimer` | 各 `page.tsx` | `InfoPage` |
-| 全ページ共通 | `src/app/layout.tsx` | `Header`、`MobileNav`、`Footer`、`PreviewBanner`、`MobileStickyCta`、`src/app/globals.css` |
+| 全ページ共通 | `src/app/layout.tsx` | `Header`、`MobileNav`、`Footer`、`PreviewBanner`、`MobileStickyCta`、`NavTracker`、`src/app/globals.css` |
+| パンくずと「戻る」 | `src/components/Breadcrumbs.tsx` | `BackButton`（サイト内で移動してきたときは履歴で戻る。直接開いたときはひとつ上の階層へ）。アーティファクト版は `scripts/artifact/runtime.js` がページ内の履歴で処理する |
 
 | `/consultation/apply` | `src/app/consultation/apply/page.tsx` | 本番送客が無効な間の、相談の申込ボタンの行き先（noindex） |
 | `/sales/*`（SALES_DEMO=1 のときだけ） | `src/app/sales/` | 商談用ページ（Instagram 投稿案・提案・計測）。データは `src/lib/sales/` |
+
+現在の掲載数: 記事52本（うち「制度・手続き」カテゴリ `seido` に失業手当・健康保険・年金・住民税・年末調整・試用期間・有休など）、ニュース解説7本。
+査読の記録は `content/reviews/<slug>.json`（`npm run pipeline -- review <slug>` が書く）。入口タイルのアイコンには、その入口の記事数をバッジで出している（`EntryGrid` の `counts`）。
 
 読者導線（3つのガイド）は `src/lib/journeys.ts`（入口ページの「順番に読むなら」と、記事の「ガイドの現在地」に出る）。
 計測イベントは `src/lib/measurement/`（ブラウザ内に記録するだけで送信しない）。
