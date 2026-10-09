@@ -1,7 +1,7 @@
 ---
 slug: web-marketing-mikeiken
 kind: article
-title: Webマーケティングってどんな仕事？仕事の種類と、未経験からの近づき方・アシスタント求人の見方
+title: Webマーケティングの仕事内容は？種類と、未経験からの近づき方・求人の見方
 summary: Webマーケティングは、Webサイトや広告、SNSを使ってお客さまを集め、アクセスの数字を見ながら改善していく仕事です。仕事の種類、使う力、未経験から近づくときの準備、アシスタント求人で確かめたいことを紹介します。
 status: review
 categories: [shokushu, mikeiken]
