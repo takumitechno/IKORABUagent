@@ -5,6 +5,7 @@ import { ArticleList, ArticleRow, LeadCard } from "@/components/ArticleCards";
 import { ConsultationCta } from "@/components/ConsultationCta";
 import { ExploreTabs } from "@/components/EntryGrid";
 import { GeneratedImage } from "@/components/GeneratedImage";
+import { Illustration } from "@/components/Illustration";
 import { LevelMeter } from "@/components/LevelMeter";
 import { JsonLd } from "@/components/JsonLd";
 import { Roadmap, type RoadmapStep } from "@/components/Roadmap";
@@ -88,7 +89,12 @@ export default async function HomePage() {
             </h1>
             <p className="mt-3 text-[15px] leading-7 text-white/85 sm:text-base">仕事・給料・休みのことを、一つずつ整理できるガイドです。</p>
 
-            <form action="/articles" method="get" role="search" className="mt-6 rounded-2xl bg-white p-3 text-ink shadow-[0_18px_40px_-18px_rgb(0_0_0/0.45)] sm:p-4">
+            {/* スマホ: 人物のイラストの下半分に検索ボックスを重ねる */}
+            <div className="relative mx-auto -mb-16 -mt-2 w-[280px] md:hidden">
+              <GeneratedImage slug="hero-home" priority sizes="290px" className="h-auto w-full" fallback={<Illustration name="hero-people" priority className="h-auto w-full" />} />
+            </div>
+
+            <form action="/articles" method="get" role="search" className="relative rounded-2xl md:mt-6 bg-white p-3 text-ink shadow-[0_18px_40px_-18px_rgb(0_0_0/0.45)] sm:p-4">
               <label htmlFor="hero-search" className="px-1 text-[12px] font-bold text-muted">
                 キーワードで記事を探す
               </label>
@@ -123,9 +129,9 @@ export default async function HomePage() {
             </div>
           </div>
 
-          {/* 右側: 写真を採用したら写真、なければ「このサイトでできること」の画面イメージ */}
-          <div className="hidden md:block">
-            <GeneratedImage slug="hero-home" priority sizes="520px" className="w-full rounded-2xl" fallback={<HeroCollage />} />
+          {/* 右側: 人物（写真を採用したら写真）と、このサイトでできることの小さなカード */}
+          <div className="hidden md:-mb-16 md:block md:self-end">
+            <HeroVisual />
           </div>
         </div>
       </section>
@@ -326,66 +332,52 @@ function ResultPreview() {
   );
 }
 
-/** ヒーロー右側: このサイトでできること（条件整理ノートと職種の比較）の画面イメージ */
-function HeroCollage() {
-  const roles: [string, number, number][] = [
-    ["一般事務", 2, 4],
-    ["カスタマーサポート", 4, 3],
-    ["ITサポート", 3, 4],
-  ];
-  const dots = (n: number) => (
-    <span className="flex gap-0.5">
-      {[1, 2, 3, 4, 5].map((i) => (
-        <span key={i} className={`h-1.5 w-1.5 rounded-full ${i <= n ? "bg-brand" : "bg-line-strong"}`} />
-      ))}
-    </span>
-  );
+/** ヒーロー右側: 人物のイラスト（写真を採用したら写真）に、このサイトでできることを小さなカードで重ねる */
+function HeroVisual() {
+  const card = "absolute rounded-2xl bg-white text-ink shadow-[0_18px_40px_-16px_rgb(0_0_0/0.45)]";
   return (
-    <div className="relative mx-auto h-[470px] w-full max-w-[480px]" aria-hidden="true">
-      <div className="absolute right-0 top-0 w-[78%] rounded-2xl bg-white p-5 text-ink shadow-[0_24px_50px_-20px_rgb(0_0_0/0.5)]">
-        <p className="flex items-center justify-between text-[12px] font-bold text-muted">
-          あなたの条件整理ノート
-          <span className="rounded-full bg-brand-tint px-2 py-0.5 text-[10.5px] text-brand-strong">約3分</span>
-        </p>
-        {[
-          ["ゆずれない条件", ["土日休み", "月給22万円以上"]],
-          ["使えそうな経験", ["接客", "電話対応"]],
-          ["比べてみたい職種", ["事務", "カスタマーサポート"]],
-        ].map(([label, chips]) => (
-          <div key={label as string} className="mt-3 border-t border-line pt-3">
-            <p className="text-[12px] font-bold">{label as string}</p>
-            <p className="mt-1.5 flex flex-wrap gap-1.5">
-              {(chips as string[]).map((c) => (
-                <span key={c} className="rounded-md bg-brand-tint px-2 py-0.5 text-[11.5px] font-bold text-brand-strong">
-                  {c}
-                </span>
-              ))}
-            </p>
-          </div>
-        ))}
-      </div>
-      <div className="absolute bottom-0 left-0 w-[70%] rounded-2xl bg-white p-4 text-ink shadow-[0_24px_50px_-20px_rgb(0_0_0/0.5)]">
-        <p className="text-[12px] font-bold text-muted">職種を同じものさしで比べる</p>
-        <table className="mt-2 w-full text-[11.5px]">
-          <thead>
-            <tr className="text-muted">
-              <th className="pb-1 text-left font-medium" />
-              <th className="pb-1 text-left font-medium">人と話す</th>
-              <th className="pb-1 text-left font-medium">パソコン</th>
-            </tr>
-          </thead>
-          <tbody>
-            {roles.map(([r, talk, pc]) => (
-              <tr key={r} className="border-t border-line">
-                <td className="py-1.5 pr-2 font-bold">{r}</td>
-                <td className="py-1.5">{dots(talk)}</td>
-                <td className="py-1.5">{dots(pc)}</td>
-              </tr>
+    <div className="relative mx-auto w-full max-w-[540px]">
+      <GeneratedImage slug="hero-home" priority sizes="540px" className="h-auto w-full" fallback={<Illustration name="hero-people" priority className="h-auto w-full" />} />
+      <div aria-hidden="true">
+        <div className={`${card} -left-[8%] top-[46%] w-[188px] p-3`}>
+          <p className="flex items-center gap-1.5 text-[11.5px] font-bold text-muted">
+            <span className="flex h-6 w-6 items-center justify-center rounded-lg bg-brand text-white">
+              <ListChecks className="h-3.5 w-3.5" />
+            </span>
+            ゆずれない条件
+          </p>
+          <p className="mt-2 flex flex-wrap gap-1">
+            {["土日休み", "月給22万円以上", "残業少なめ"].map((c) => (
+              <span key={c} className="rounded-md bg-brand-tint px-1.5 py-0.5 text-[11px] font-bold text-brand-strong">
+                {c}
+              </span>
             ))}
-          </tbody>
-        </table>
+          </p>
+        </div>
+        <div className={`${card} -right-[4%] top-[42%] w-[176px] p-3`}>
+          <p className="text-[11.5px] font-bold text-muted">職種を比べる</p>
+          {(
+            [
+              ["事務", 2],
+              ["カスタマーサポート", 4],
+            ] as const
+          ).map(([name, n]) => (
+            <p key={name} className="mt-1.5 flex items-center justify-between gap-2 text-[11.5px] font-bold">
+              {name}
+              <span className="flex gap-0.5">
+                {[1, 2, 3, 4, 5].map((i) => (
+                  <span key={i} className={`h-1.5 w-1.5 rounded-full ${i <= n ? "bg-accent" : "bg-line-strong"}`} />
+                ))}
+              </span>
+            </p>
+          ))}
+          <p className="mt-1 text-right text-[10px] text-muted">人と話す量</p>
+        </div>
+        <p className="absolute bottom-[9%] left-[4%] inline-flex items-center gap-1.5 rounded-full bg-accent px-3.5 py-2 text-[12.5px] font-bold text-white shadow-[0_12px_28px_-10px_rgb(0_0_0/0.5)]">
+          <ShieldCheck className="h-4 w-4" />
+          無料・登録不要で使える
+        </p>
       </div>
     </div>
   );
 }
-

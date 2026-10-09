@@ -1,8 +1,9 @@
 /**
- * 人物入りの場面イラスト（public/images/illustrations/*.svg。npm run illustrations で作る）。
+ * 人物入りの場面イラスト（public/images/illustrations/*.svg）。hero-people は手で描いたもの、ほかは npm run illustrations で作る。
  * 飾りなので alt は空。縦横を渡してレイアウトのずれを防ぐ。
  */
 export const ILLUSTRATIONS = {
+  "hero-people": { width: 500, height: 490 },
   "hero-home": { width: 1200, height: 800 },
   "check-support": { width: 600, height: 600 },
   "journey-sekkyaku-office": { width: 1280, height: 720 },

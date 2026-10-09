@@ -85,7 +85,7 @@ Node.js 20.9 以上。依存は `npm ci`。環境変数なしで動く（記事�
 ## 画像（生成画像）
 
 - 方針は `docs/ART_DIRECTION.md`、手順は `docs/image-briefs/README.md`。まず画像なしで成り立たせ、必要な場所だけに使う。文字は画像に入れない
-- 画像は `src/components/GeneratedImage.tsx` で出す（`content/images/index.json` で status が selected のものだけ。なければ fallback の SVG）。今の差し込み口: トップのヒーロー `hero-home`（なければ「条件整理ノート」のカード）、トップのチェック `check-support`（なければ結果の見本、デスクトップのみ）、`/sales/sns/*` の表紙 `sns-theme-*-cover`。`journey-*` の brief はあるが、今のケースカードには差し込み口がない
+- 画像は `src/components/GeneratedImage.tsx` で出す（`content/images/index.json` で status が selected のものだけ。なければ fallback の SVG）。今の差し込み口: トップのヒーロー `hero-home`（なければ人物のイラスト `public/images/illustrations/hero-people.svg`。デスクトップでは小さなカードを重ねる）、トップのチェック `check-support`（なければ結果の見本、デスクトップのみ）、`/sales/sns/*` の表紙 `sns-theme-*-cover`。`journey-*` の brief はあるが、今のケースカードには差し込み口がない
 - 生成した画像は draft のまま。実際のページで確認してから `image:status` で selected にする。気に入らなければ brief を直して `--force` で作り直す（前の画像は `.image-history/`）
 - API キー（`OPENAI_API_KEY`）は `.env.local` か環境変数にだけ置く。ロゴ・実在の企業やキャラクターは生成しない（`BLOCKED_TERMS`）
 
