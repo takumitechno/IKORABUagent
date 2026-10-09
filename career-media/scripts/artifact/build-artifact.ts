@@ -42,13 +42,13 @@ const stripScripts = (html: string) => html.replace(/<script\b[\s\S]*?<\/script>
 const escAttr = (s: string) => s.replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;");
 const decodeTitle = (s: string) => s.replace(/&amp;/g, "&").replace(/&quot;/g, '"').replace(/&#x27;/g, "'").replace(/&lt;/g, "<").replace(/&gt;/g, ">");
 
-/** 生成画像（public/images/generated/）は1ファイルに収めるため data URI に置き換える */
+/** 生成画像・場面イラスト（public/images/generated/, illustrations/）は1ファイルに収めるため data URI に置き換える */
 function inlineGeneratedImages(html: string): string {
   return html
     .replace(/\ssrcset="[^"]*\/images\/generated\/[^"]*"/g, "")
-    .replace(/(src=")(\/images\/generated\/[A-Za-z0-9_\-./]+\.(png|jpe?g|webp))(")/g, (_m, pre: string, src: string, ext: string, post: string) => {
+    .replace(/(src=")(\/images\/(?:generated|illustrations)\/[A-Za-z0-9_\-./]+\.(png|jpe?g|webp|svg))(")/g, (_m, pre: string, src: string, ext: string, post: string) => {
       const file = path.join(ROOT, "public", src);
-      const mime = ext === "png" ? "image/png" : ext === "webp" ? "image/webp" : "image/jpeg";
+      const mime = ext === "png" ? "image/png" : ext === "webp" ? "image/webp" : ext === "svg" ? "image/svg+xml" : "image/jpeg";
       return `${pre}data:${mime};base64,${fs.readFileSync(file).toString("base64")}${post}`;
     });
 }

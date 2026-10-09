@@ -1,10 +1,10 @@
 import Link from "next/link";
 import { ArrowLeft, ArrowRight, ClipboardList, Compass, MessageCircle, MessageSquareText } from "lucide-react";
 import type { ArticleSummary } from "@/lib/content/types";
-import { findSelectedImage } from "@/lib/generated-images";
 import { JOURNEY_ANCHOR, JOURNEYS, stepHref, type Journey, type JourneyStep } from "@/lib/journeys";
 import { ConsultButton } from "./ConsultationCta";
 import { GeneratedImage } from "./GeneratedImage";
+import { Illustration, type IllustrationName } from "./Illustration";
 import { Motif } from "./illustrations/Motif";
 
 const stepTitle = (step: JourneyStep, articles: ArticleSummary[]) =>
@@ -173,18 +173,16 @@ export function JourneyCards() {
             data-pattern-id={j.patternId}
             className="tap lift group flex h-full flex-col overflow-hidden rounded-2xl border border-line bg-white hover:border-brand/40"
           >
-            {findSelectedImage(`journey-${j.id}`) && (
-              <span className={`block ${j.tone}`}>
-                <GeneratedImage slug={`journey-${j.id}`} sizes="(min-width: 768px) 360px, 82vw" className="block aspect-[16/9] h-auto w-full object-cover" fallback={null} />
-              </span>
-            )}
-            <span className={`flex items-center gap-3 p-4 ${j.tone}`}>
-              <span className="relative block aspect-square w-14 shrink-0 rounded-full bg-white">
-                <Motif name={j.scene} className="absolute inset-[6%]" />
-              </span>
-              <span className="text-[16px] font-bold leading-snug text-ink group-hover:text-brand-strong">{j.title}</span>
+            <span className="block border-b border-line bg-white">
+              <GeneratedImage
+                slug={`journey-${j.id}`}
+                sizes="(min-width: 768px) 360px, 82vw"
+                className="block aspect-[16/9] h-auto w-full object-cover"
+                fallback={<Illustration name={`journey-${j.id}` as IllustrationName} className="block aspect-[16/9] h-auto w-full" />}
+              />
             </span>
-            <span className="flex flex-1 flex-col p-4">
+            <span className="px-4 pt-4 text-[16px] font-bold leading-snug text-ink group-hover:text-brand-strong">{j.title}</span>
+            <span className="flex flex-1 flex-col px-4 pb-4 pt-2">
               <span className="line-clamp-2 text-[13px] leading-6 text-muted">{j.who}</span>
               <span className="mt-auto inline-flex items-center gap-1 pt-4 text-[13.5px] font-bold text-brand-strong">
                 順番に読む

@@ -5,8 +5,7 @@ import { ArticleList, ArticleRow, LeadCard } from "@/components/ArticleCards";
 import { ConsultationCta } from "@/components/ConsultationCta";
 import { ExploreTabs } from "@/components/EntryGrid";
 import { GeneratedImage } from "@/components/GeneratedImage";
-import { CheckIllustration } from "@/components/illustrations/CheckIllustration";
-import { HeroIllustration } from "@/components/illustrations/HeroIllustration";
+import { Illustration } from "@/components/Illustration";
 import { Motif } from "@/components/illustrations/Motif";
 import { JobMap } from "@/components/JobMap";
 import { JsonLd } from "@/components/JsonLd";
@@ -81,7 +80,7 @@ export default async function HomePage() {
                 priority
                 sizes="(min-width: 768px) 560px, 270px"
                 className="mx-auto block h-[180px] w-auto max-w-full md:h-auto md:w-full"
-                fallback={<HeroIllustration className="mx-auto block h-[180px] w-auto max-w-full md:h-auto md:w-full" />}
+                fallback={<Illustration name="hero-home" priority className="mx-auto block h-[200px] w-auto max-w-full md:h-auto md:w-full" />}
               />
             </div>
             <div className="hero-text md:pt-8">
@@ -198,7 +197,7 @@ export default async function HomePage() {
                 slug="check-support"
                 sizes="(min-width: 768px) 160px, 96px"
                 className="h-[96px] w-auto shrink-0 md:h-[160px]"
-                fallback={<CheckIllustration className="h-[96px] w-auto shrink-0 md:h-[160px]" />}
+                fallback={<Illustration name="check-support" className="h-[104px] w-auto shrink-0 md:h-[180px]" />}
               />
               <div className="md:mt-3">
                 <h2 id="home-check" className="text-[21px] font-bold leading-snug text-ink sm:text-[26px]">

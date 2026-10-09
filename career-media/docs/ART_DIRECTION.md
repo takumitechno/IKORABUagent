@@ -40,6 +40,15 @@
 
 この方針は `scripts/images/lib.ts` の `HOUSE_STYLE` として、すべての生成 prompt の末尾に自動で付く。
 
+## 3.5 いま使っている場面イラスト
+
+トップのヒーロー・条件整理チェック・3つのガイドのカードは、`npm run illustrations`（`scripts/illustrations/build-scenes.ts`）で作った SVG（`public/images/illustrations/`）。
+
+- 人物: [Open Peeps](https://www.openpeeps.com/)（Pablo Stanley 作、CC0。商用利用・改変自由・表記不要）を [react-peeps](https://github.com/CeamKrier/react-peeps)（MIT）で描き出したもの
+- 背景・小物・色: このリポジトリで描いたもの（サイトのパレット）
+- 文字は入れていない。人物は髪型・服装を変えている
+- OpenAI で生成した画像を採用（`selected`）すると、同じ場所ではそちらが優先される
+
 ## 4. 使わないもの（禁止）
 
 - 実在の企業・サービスのロゴや公式ビジュアルの模倣（MakeCareer のロゴも、許諾なしに作らない・使わない）

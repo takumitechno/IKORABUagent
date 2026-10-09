@@ -45,6 +45,7 @@ Node.js 20.9 以上。依存は `npm ci`。環境変数なしで動く（記事�
 | `npm run check:outbound` | 起動中のサーバーの全ページに、本番の申込ページへのリンクがないことを確認 |
 | `npm run sales:docs` | `src/lib/sales/*` と計測の定義から docs/sales/ の資料を作り直す |
 | `npm run sns:images` | 投稿案のカルーセルを 1080×1350 の PNG に書き出す（SALES_DEMO のデモが必要） |
+| `npm run illustrations` | 人物入りの場面イラスト（Open Peeps＋サイトの色）を `public/images/illustrations/*.svg` に作り直す |
 | `npm run image:dry-run -- --brief docs/image-briefs/<slug>.md` | 画像生成の確認（API を呼ばない・無料）。保存先と最終 prompt を表示 |
 | `npm run image:generate -- --brief docs/image-briefs/<slug>.md` | OpenAI の画像生成 API で1枚作り、`public/images/generated/` と `content/images/meta/` に保存（要 `OPENAI_API_KEY`。状態は draft） |
 | `npm run image:status -- <slug> selected` / `image:index` / `image:validate` / `image:prune` | 採用・一覧の作り直し・記録と画像の検査・不採用の削除 |
