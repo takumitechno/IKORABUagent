@@ -6,6 +6,7 @@ import { ConsultationCta } from "@/components/ConsultationCta";
 import { ExploreTabs } from "@/components/EntryGrid";
 import { GeneratedImage } from "@/components/GeneratedImage";
 import { Illustration } from "@/components/Illustration";
+import { JobPostingDiagram, ProcessFlow } from "@/components/HomeDiagrams";
 import { LevelMeter } from "@/components/LevelMeter";
 import { JsonLd } from "@/components/JsonLd";
 import { Roadmap, type RoadmapStep } from "@/components/Roadmap";
@@ -153,6 +154,12 @@ export default async function HomePage() {
           </div>
         </section>
 
+        {/* 図: 転職活動の流れ（7ステップ。各ステップから記事へ） */}
+        <section aria-labelledby="home-flow">
+          <SectionHeading eyebrow="FLOW" title="転職活動の流れを図で見る" id="home-flow" href={has("tenshoku-schedule") ? "/articles/tenshoku-schedule" : undefined} hrefLabel="スケジュールの立て方" />
+          <ProcessFlow has={has} />
+        </section>
+
         {/* 最初に読みたい記事（編集部が選んだもの。ランキングではない） */}
         {lead && (
           <section aria-labelledby="home-featured">
@@ -252,6 +259,12 @@ export default async function HomePage() {
             </table>
           </div>
           <p className="mt-2 text-[12px] text-muted">一般的な傾向です。会社や配属先によって大きく異なります。</p>
+        </section>
+
+        {/* 図: 求人票の見るところ（見本に番号を振る） */}
+        <section aria-labelledby="home-posting">
+          <SectionHeading eyebrow="CHECK" title="求人票は、ここを見る" id="home-posting" href={has("kyujin-hyo-yomikata") ? "/articles/kyujin-hyo-yomikata" : undefined} hrefLabel="求人票の見方" />
+          <JobPostingDiagram has={has} />
         </section>
 
         {/* 条件整理チェック（転職サイトの「診断」のような入口。ただし判定はしない） */}

@@ -30,12 +30,12 @@ function Meta({ article, category }: { article: ArticleSummary; category?: Categ
 export function LeadCard({ article, categories }: { article: ArticleSummary; categories: Category[] }) {
   const category = findCategory(categories, article.categories[0]);
   return (
-    <Link href={articlePath(article)} className="tap lift group grid overflow-hidden rounded-2xl border border-line bg-white md:grid-cols-[1.15fr_1fr]">
-      <Eyecatch article={article} category={category} size="lg" className="rounded-none md:h-full md:aspect-auto md:min-h-[300px]" />
+    <Link href={articlePath(article)} className="tap lift group grid overflow-hidden rounded-2xl border border-line bg-white">
+      <Eyecatch article={article} category={category} size="lg" className="rounded-none" />
       <div className="flex flex-col p-5 sm:p-7">
         <Meta article={article} category={category} />
         <h3 className="mt-2 text-[19px] font-bold leading-[1.55] text-ink group-hover:text-brand-strong sm:text-[22px]">{article.title}</h3>
-        <p className="mt-2 line-clamp-2 text-[14px] leading-7 text-muted sm:line-clamp-3">{article.summary}</p>
+        <p className="mt-2 line-clamp-2 text-[14px] leading-7 text-muted">{article.summary}</p>
       </div>
     </Link>
   );
@@ -73,7 +73,7 @@ export function ArticleRow({ article, categories, showSummary = true }: { articl
   return (
     <li>
       <Link href={articlePath(article)} className="tap group flex gap-4 py-4">
-        <Eyecatch article={article} category={category} size="sm" className="w-[64px] sm:w-[76px]" />
+        <Eyecatch article={article} category={category} size="sm" className="w-[96px] self-start sm:w-[132px]" />
         <div className="min-w-0 flex-1">
           <Meta article={article} category={category} />
           <h3 className="mt-1 text-[15px] font-bold leading-[1.6] text-ink group-hover:text-brand-strong sm:text-[15.5px]">{article.title}</h3>

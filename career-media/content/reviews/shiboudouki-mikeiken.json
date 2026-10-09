@@ -1,0 +1,16 @@
+[
+  {
+    "slug": "shiboudouki-mikeiken",
+    "contentHash": "54b016e7214c412e7316ff726f2dbfe3dead43e5bd33c6bd6ab20146a43c5ad0",
+    "reviewer": "career-reviewer (automated checks)",
+    "verdict": "approved",
+    "findings": [
+      {
+        "code": "C03",
+        "severity": "warning",
+        "message": "出典が1件のみ。可能なら2件以上で裏付ける"
+      }
+    ],
+    "reviewedAt": "2026-10-09T15:11:19.288Z"
+  }
+]

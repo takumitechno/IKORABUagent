@@ -5,6 +5,7 @@ import { site } from "@/config/site";
 import type { Article, ArticleSummary, Category } from "@/lib/content/types";
 import type { Heading } from "@/lib/markdown";
 import { ArticleList, findCategory } from "./ArticleCards";
+import { Eyecatch } from "./Eyecatch";
 import { formatDate } from "./DateMeta";
 
 export function ArticleHeader({ article, categories, readingMinutes, headings = [] }: { article: Article; categories: Category[]; readingMinutes: number; headings?: Heading[] }) {
@@ -24,6 +25,7 @@ export function ArticleHeader({ article, categories, readingMinutes, headings = 
         <span aria-hidden="true" className="h-3 w-px bg-line-strong" />
         <span>約{readingMinutes}分で読めます</span>
       </p>
+      <Eyecatch article={article} category={category} size="banner" className="mt-5" />
       {site.sampleContent && <SampleNotice />}
       <p className="mt-6 text-[16px] leading-[1.95] text-body">{article.summary}</p>
       <MobileToc headings={headings} />

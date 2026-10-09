@@ -91,7 +91,7 @@ export function categoryTone(slug: string) {
   return TONE_CLASSES[categoryToneName(slug)];
 }
 
-export function CategoryIcon({ name, className = "h-5 w-5" }: { name: string; className?: string }) {
+export function CategoryIcon({ name, className = "h-5 w-5", style }: { name: string; className?: string; style?: React.CSSProperties }) {
   const Icon = ICONS[name] ?? Folder;
-  return <Icon className={className} aria-hidden="true" />;
+  return <Icon className={className} style={style} aria-hidden="true" />;
 }

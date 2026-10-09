@@ -1,0 +1,16 @@
+[
+  {
+    "slug": "sekkyaku-keiken-ikasu",
+    "contentHash": "6cc225f1218c151cde0ac138d0a9e481fa0b266ad01f6a7a1230dd8605681541",
+    "reviewer": "career-reviewer (automated checks)",
+    "verdict": "approved",
+    "findings": [
+      {
+        "code": "C03",
+        "severity": "warning",
+        "message": "出典が1件のみ。可能なら2件以上で裏付ける"
+      }
+    ],
+    "reviewedAt": "2026-10-09T15:11:18.387Z"
+  }
+]
