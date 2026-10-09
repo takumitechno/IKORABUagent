@@ -6,6 +6,8 @@ source:
   - src/app/news/page.tsx
 ---
 
+[戻る](/)
+
 パンくず: [ホーム](/) › 転職ニュース・市場情報
 
 NEWS HUB

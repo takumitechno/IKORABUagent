@@ -7,13 +7,15 @@ source:
   - content/categories.json
 ---
 
+[戻る](/articles)
+
 パンくず: [ホーム](/) › [記事一覧](/articles) › 経験の活かし方
 
 # 経験の活かし方
 
 アルバイト・接客・前職など、これまでの経験を転職で言葉にする。
 
-[未経験転職](/categories/mikeiken) ・ [職種を知る](/categories/shokushu) ・ [経験の活かし方](/categories/keiken) ・ [面接・書類](/categories/shorui-mensetsu) ・ [年収・働き方](/categories/hatarakikata) ・ [転職準備](/categories/junbi) ・ [転職ニュース・市場情報](/news)
+[未経験転職](/categories/mikeiken) ・ [職種を知る](/categories/shokushu) ・ [経験の活かし方](/categories/keiken) ・ [面接・書類](/categories/shorui-mensetsu) ・ [年収・働き方](/categories/hatarakikata) ・ [転職準備](/categories/junbi) ・ [制度・手続き](/categories/seido) ・ [転職ニュース・市場情報](/news)
 
 - 経験の活かし方 2026.10.06
   ### [接客経験は転職でどう活かせる？職種別のつながりと伝え方](/articles/sekkyaku-keiken-ikasu)

@@ -7,6 +7,8 @@ source:
   - src/app/articles/[slug]/page.tsx
 ---
 
+[戻る](/categories/shokushu)
+
 パンくず: [ホーム](/) › [記事一覧](/articles) › [職種を知る](/categories/shokushu) › 販売・接客の仕事で正社員を目指すという選択｜変わることと求人の確認ポイント
 
 [職種を知る](/categories/shokushu)

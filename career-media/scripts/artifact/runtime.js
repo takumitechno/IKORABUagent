@@ -93,7 +93,6 @@
   }
   function renderSearch(query) {
     var q = query.trim().slice(0, 100);
-    if (!q) return navigate("/articles");
     var node = document.createElement("div");
     node.appendChild(templates["/articles"].content.cloneNode(true));
     var hits = cfg.searchIndex
@@ -133,38 +132,82 @@
     window.scrollTo(0, 0);
   }
 
-  // ---------------------------------------------------------------- 遷移
+  // ---------------------------------------------------------------- 遷移と履歴
+  // アーティファクトは iframe の中で動くため、ブラウザの「戻る」がページ内の移動に使えないことがある。
+  // そこでページ内に履歴（どの画面を・どこまでスクロールして見ていたか）を持ち、「戻る」ボタンで1つ前に戻す。
+  // history.pushState が使える環境では、ブラウザの「戻る」も同じ履歴で動く。
+  var stack = [];
+  var entry = null; // { route, anchor } または { search }
+  var pushed = 0; // pushState できた回数（まだ戻っていない分）
+
+  function draw(e, scroll) {
+    if (e.search !== undefined) renderSearch(e.search);
+    else render(e.route, scroll === undefined ? e.anchor : "");
+    if (scroll !== undefined) {
+      setTimeout(function () {
+        window.scrollTo(0, scroll);
+      }, 0);
+    }
+  }
+  function sameEntry(a, b) {
+    return !!a && !!b && a.route === b.route && a.search === b.search && (a.anchor || "") === (b.anchor || "");
+  }
+  function go(next) {
+    if (sameEntry(entry, next)) return draw(next);
+    if (entry) stack.push({ entry: entry, scroll: window.scrollY });
+    entry = next;
+    try {
+      history.pushState({ artifactDepth: stack.length }, "", next.search !== undefined ? "#articles" : routeToHash(next.route));
+      pushed++;
+    } catch (err) {}
+    draw(next);
+  }
+  function restorePrevious() {
+    var prev = stack.pop();
+    if (!prev) return false;
+    entry = prev.entry;
+    draw(prev.entry, prev.scroll);
+    return true;
+  }
+  function goBack(fallbackHref) {
+    if (!stack.length) return navigate(fallbackHref || "/");
+    if (pushed > 0) {
+      history.back(); // popstate で restorePrevious する
+      return;
+    }
+    restorePrevious();
+  }
+  window.addEventListener("popstate", function () {
+    if (pushed > 0 && stack.length) {
+      pushed--;
+      restorePrevious();
+      return;
+    }
+    var route = hashToRoute(location.hash);
+    if (route) {
+      entry = { route: route, anchor: "" };
+      render(route, "");
+    }
+  });
+
   function navigate(href) {
     var url = new URL(href, "https://local.invalid");
     var route = url.pathname.replace(/\/$/, "") || "/";
     var q = url.searchParams.get("q");
-    if (route === "/articles" && q) return renderSearch(q);
+    if (route === "/articles" && q && q.trim()) return go({ search: q.trim().slice(0, 100) });
     var anchor = url.hash ? decodeURIComponent(url.hash.slice(1)) : "";
-    var target = routeToHash(templates[route] ? route : "/404");
-    pendingAnchor = anchor;
-    if (location.hash === target) {
-      render(templates[route] ? route : "/404", anchor);
-      return;
-    }
-    try {
-      location.hash = target; // hashchange で描画（ブラウザの「戻る」が使える）
-    } catch (e) {
-      render(templates[route] ? route : "/404", anchor);
-    }
+    go({ route: templates[route] ? route : "/404", anchor: anchor });
   }
-  var pendingAnchor = "";
-  window.addEventListener("hashchange", function () {
-    var route = hashToRoute(location.hash);
-    if (route) {
-      render(route, pendingAnchor);
-      pendingAnchor = "";
-    }
-  });
 
   document.addEventListener("click", function (e) {
     var a = e.target.closest && e.target.closest("a[href]");
     if (!a) return;
     var href = a.getAttribute("href");
+    if (a.hasAttribute("data-back")) {
+      e.preventDefault();
+      goBack(href);
+      return;
+    }
     if (href.indexOf(cfg.consultPrefix) === 0) {
       e.preventDefault();
       openConsultDialog(href);
@@ -186,7 +229,9 @@
     if (form.getAttribute("action") === "/articles") {
       e.preventDefault();
       var input = form.querySelector('input[name="q"]');
-      renderSearch(input ? input.value : "");
+      var q = input ? input.value.trim().slice(0, 100) : "";
+      if (q) go({ search: q });
+      else navigate("/articles");
     }
   });
 
@@ -247,5 +292,6 @@
 
   // ---------------------------------------------------------------- 初期表示
   var initial = hashToRoute(location.hash) || "/";
+  entry = { route: initial, anchor: "" };
   render(initial, "");
 })();

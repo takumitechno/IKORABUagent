@@ -7,6 +7,8 @@ source:
   - src/app/articles/[slug]/page.tsx
 ---
 
+[戻る](/categories/shokushu)
+
 パンくず: [ホーム](/) › [記事一覧](/articles) › [職種を知る](/categories/shokushu) › 営業・カスタマーサポート・ITサポートの違いは？仕事内容と向き不向きを比べる
 
 [職種を知る](/categories/shokushu)

@@ -8,6 +8,8 @@ source:
   - src/lib/taxonomy.ts
 ---
 
+[戻る](/situations)
+
 パンくず: [ホーム](/) › [今の状況から探す](/situations) › 接客・販売の経験
 
 今の状況・接客・販売の経験

@@ -8,6 +8,8 @@ source:
   - src/lib/taxonomy.ts
 ---
 
+[戻る](/situations)
+
 パンくず: [ホーム](/) › [今の状況から探す](/situations) › 転職回数が多い
 
 今の状況・転職回数が多い
@@ -18,6 +20,9 @@ source:
 
 [フリーター](/situations/freeter) ・ [派遣社員](/situations/haken) ・ [正社員経験が少ない](/situations/seishain-keiken-sukunai) ・ [接客・販売の経験](/situations/sekkyaku) ・ [第二新卒](/situations/dainishinsotsu) ・ [初めての転職](/situations/hajimete) ・ [転職回数が多い](/situations/kaisu) ・ [PC仕事が未経験](/situations/pc-mikeiken)
 
+- ### [トライアル雇用とは？未経験の仕事を原則3か月試しながら働ける制度のしくみと探し方](/articles/trial-koyou)
+  トライアル雇用は、職業経験の不足などで就職に不安のある人が、原則3か月の試しの雇用で仕事を経験し、会社と本人が納得したうえで常用雇用への移行をめざす国の制度です。しくみ、対象になる人、ハローワークでの探し方、注意点を整理します。
+  更新 2026.10.09
 - ### [年収だけで求人を選ばないほうがいい理由](/articles/nenshu-dake-erabanai)
   年収が高い求人は魅力的ですが、固定残業代や休日、仕事内容によっては、入社後に続けるのがつらくなることもあります。年収が高い理由の確かめ方、続けられるかを見るポイント、次の転職への影響を整理し、求人を比べるチェック表を紹介します。
   更新 2026.10.06

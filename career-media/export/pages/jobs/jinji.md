@@ -8,6 +8,8 @@ source:
   - src/lib/taxonomy.ts
 ---
 
+[戻る](/jobs)
+
 パンくず: [ホーム](/) › [職種から探す](/jobs) › 人事・採用
 
 職種・人事・採用

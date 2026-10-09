@@ -7,6 +7,8 @@ source:
   - src/app/articles/[slug]/page.tsx
 ---
 
+[戻る](/categories/hatarakikata)
+
 パンくず: [ホーム](/) › [記事一覧](/articles) › [年収・働き方](/categories/hatarakikata) › 「土日休み」を優先すると、どんな仕事がある？
 
 [年収・働き方](/categories/hatarakikata)

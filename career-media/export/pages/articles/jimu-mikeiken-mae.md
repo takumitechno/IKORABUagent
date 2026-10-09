@@ -7,6 +7,8 @@ source:
   - src/app/articles/[slug]/page.tsx
 ---
 
+[戻る](/categories/shokushu)
+
 パンくず: [ホーム](/) › [記事一覧](/articles) › [職種を知る](/categories/shokushu) › 未経験で事務職を目指す前に知っておきたいこと｜種類・PC・電話対応
 
 [職種を知る](/categories/shokushu)

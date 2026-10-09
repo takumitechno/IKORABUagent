@@ -6,6 +6,8 @@ source:
   - src/app/disclosure/page.tsx
 ---
 
+[戻る](/)
+
 パンくず: [ホーム](/) › 広告・提携表記
 
 # 広告・提携表記

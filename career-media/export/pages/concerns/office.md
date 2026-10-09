@@ -8,6 +8,8 @@ source:
   - src/lib/taxonomy.ts
 ---
 
+[戻る](/concerns)
+
 パンくず: [ホーム](/) › [悩みから探す](/concerns) › オフィスワークに行きたい
 
 悩み・オフィスワークに行きたい

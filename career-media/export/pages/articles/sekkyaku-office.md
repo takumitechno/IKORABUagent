@@ -7,6 +7,8 @@ source:
   - src/app/articles/[slug]/page.tsx
 ---
 
+[戻る](/categories/keiken)
+
 パンくず: [ホーム](/) › [記事一覧](/articles) › [経験の活かし方](/categories/keiken) › 接客からオフィスワークに移るとき、働き方はどう変わる？
 
 [経験の活かし方](/categories/keiken)

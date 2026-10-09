@@ -7,13 +7,15 @@ source:
   - content/categories.json
 ---
 
+[戻る](/articles)
+
 パンくず: [ホーム](/) › [記事一覧](/articles) › 職種を知る
 
 # 職種を知る
 
 仕事内容・向き不向き・入社後の働き方など、職種ごとの違いを知る。
 
-[未経験転職](/categories/mikeiken) ・ [職種を知る](/categories/shokushu) ・ [経験の活かし方](/categories/keiken) ・ [面接・書類](/categories/shorui-mensetsu) ・ [年収・働き方](/categories/hatarakikata) ・ [転職準備](/categories/junbi) ・ [転職ニュース・市場情報](/news)
+[未経験転職](/categories/mikeiken) ・ [職種を知る](/categories/shokushu) ・ [経験の活かし方](/categories/keiken) ・ [面接・書類](/categories/shorui-mensetsu) ・ [年収・働き方](/categories/hatarakikata) ・ [転職準備](/categories/junbi) ・ [制度・手続き](/categories/seido) ・ [転職ニュース・市場情報](/news)
 
 - 職種を知る 2026.10.06
   ### [AIで変わる仕事を、未経験転職者はどう見るべきか](/articles/ai-shigoto-mikeiken)

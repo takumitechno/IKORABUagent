@@ -7,6 +7,8 @@ source:
   - src/app/articles/[slug]/page.tsx
 ---
 
+[戻る](/categories/junbi)
+
 パンくず: [ホーム](/) › [記事一覧](/articles) › [転職準備](/categories/junbi) › 未経験求人の「研修あり」で確認すべきこと｜期間・内容・その後のフォロー
 
 [転職準備](/categories/junbi)

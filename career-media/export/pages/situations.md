@@ -6,20 +6,30 @@ source:
   - src/app/situations/page.tsx
 ---
 
+[戻る](/)
+
 パンくず: [ホーム](/) › 今の状況から探す
 
 # 今の状況から探す
 
 今の働き方や経歴に近いものを選ぶと、同じ状況の人に向けた記事をまとめて読めます。
 
-- [フリーター](/situations/freeter)
-- [派遣社員](/situations/haken)
-- [正社員経験が少ない](/situations/seishain-keiken-sukunai)
-- [接客・販売の経験](/situations/sekkyaku)
-- [第二新卒](/situations/dainishinsotsu)
-- [初めての転職](/situations/hajimete)
-- [転職回数が多い](/situations/kaisu)
-- [PC仕事が未経験](/situations/pc-mikeiken)
+- 11
+  [フリーター](/situations/freeter)
+- 4
+  [派遣社員](/situations/haken)
+- 11
+  [正社員経験が少ない](/situations/seishain-keiken-sukunai)
+- 10
+  [接客・販売の経験](/situations/sekkyaku)
+- 7
+  [第二新卒](/situations/dainishinsotsu)
+- 34
+  [初めての転職](/situations/hajimete)
+- 3
+  [転職回数が多い](/situations/kaisu)
+- 6
+  [PC仕事が未経験](/situations/pc-mikeiken)
 
 ## 自分の場合を、一緒に整理してもらう
 

@@ -32,6 +32,7 @@ export function EntryGrid({ group, counts, variant = "tile" }: { group: Taxonomy
     <ul className="grid grid-cols-3 gap-2 sm:grid-cols-4 sm:gap-3 lg:grid-cols-8">
       {items.map((item, i) => {
         const tone = TONE_CLASSES[GROUP_TONE[group][i % 4]];
+        const count = counts?.[item.slug];
         return (
           <li key={item.slug}>
             <Link
@@ -40,6 +41,11 @@ export function EntryGrid({ group, counts, variant = "tile" }: { group: Taxonomy
             >
               <span className={`relative mb-2 block aspect-square w-[64px] rounded-full sm:w-[72px] ${tone.bg}`}>
                 <Motif name={taxonomyScene(group, item.slug)} className="motif-art absolute inset-[4%]" />
+                {count !== undefined && (
+                  <span className="absolute -right-1.5 -top-1 flex h-6 min-w-6 items-center justify-center rounded-full bg-ink px-1.5 text-[11px] font-bold tabular-nums text-white ring-2 ring-white" aria-label={`記事${count}件`}>
+                    {count}
+                  </span>
+                )}
               </span>
               <span className="text-[12.5px] font-bold leading-[1.45] text-ink group-hover:text-brand-strong sm:text-[13.5px]">{item.label}</span>
             </Link>

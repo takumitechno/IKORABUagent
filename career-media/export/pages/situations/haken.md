@@ -8,6 +8,8 @@ source:
   - src/lib/taxonomy.ts
 ---
 
+[戻る](/situations)
+
 パンくず: [ホーム](/) › [今の状況から探す](/situations) › 派遣社員
 
 今の状況・派遣社員

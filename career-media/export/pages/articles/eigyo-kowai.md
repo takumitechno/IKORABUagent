@@ -7,6 +7,8 @@ source:
   - src/app/articles/[slug]/page.tsx
 ---
 
+[戻る](/categories/shokushu)
+
 パンくず: [ホーム](/) › [記事一覧](/articles) › [職種を知る](/categories/shokushu) › 営業が怖い人へ。不安を分けて確認したい仕事内容と面接での質問例
 
 [職種を知る](/categories/shokushu)

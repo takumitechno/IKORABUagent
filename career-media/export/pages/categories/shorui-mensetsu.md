@@ -7,14 +7,19 @@ source:
   - content/categories.json
 ---
 
+[戻る](/articles)
+
 パンくず: [ホーム](/) › [記事一覧](/articles) › 面接・書類
 
 # 面接・書類
 
 履歴書・職務経歴書・面接で、伝え方に迷ったときに。
 
-[未経験転職](/categories/mikeiken) ・ [職種を知る](/categories/shokushu) ・ [経験の活かし方](/categories/keiken) ・ [面接・書類](/categories/shorui-mensetsu) ・ [年収・働き方](/categories/hatarakikata) ・ [転職準備](/categories/junbi) ・ [転職ニュース・市場情報](/news)
+[未経験転職](/categories/mikeiken) ・ [職種を知る](/categories/shokushu) ・ [経験の活かし方](/categories/keiken) ・ [面接・書類](/categories/shorui-mensetsu) ・ [年収・働き方](/categories/hatarakikata) ・ [転職準備](/categories/junbi) ・ [制度・手続き](/categories/seido) ・ [転職ニュース・市場情報](/news)
 
+- 面接・書類 2026.10.09
+  ### [職歴に空白期間があるとき、面接でどう説明する？書類の書き方と答え方の例](/articles/kuhaku-kikan-setsumei)
+  働いていない期間があるときは、隠すよりも「その間のこと」と「今は働ける状態か」を短く伝えるほうが、面接で話しやすくなります。履歴書・職務経歴書での書き方、面接での説明の型と理由別の例文、その期間にやっていたことの言い方を紹介します。
 - 経験の活かし方 2026.10.06
   ### [接客経験は転職でどう活かせる？職種別のつながりと伝え方](/articles/sekkyaku-keiken-ikasu)
   接客の仕事には、相手の要望を聞き取る力や、混雑時の段取り、クレーム対応など、ほかの職種でも使える経験が含まれています。経験を分解して、営業・カスタマーサポート・事務などにどうつながるかを整理します。

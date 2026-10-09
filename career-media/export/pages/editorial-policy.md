@@ -6,6 +6,8 @@ source:
   - src/app/editorial-policy/page.tsx
 ---
 
+[戻る](/)
+
 パンくず: [ホーム](/) › 編集方針
 
 # 編集方針

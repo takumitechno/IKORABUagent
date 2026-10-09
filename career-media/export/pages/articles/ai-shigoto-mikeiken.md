@@ -7,6 +7,8 @@ source:
   - src/app/articles/[slug]/page.tsx
 ---
 
+[戻る](/categories/shokushu)
+
 パンくず: [ホーム](/) › [記事一覧](/articles) › [職種を知る](/categories/shokushu) › AIで変わる仕事を、未経験転職者はどう見るべきか
 
 [職種を知る](/categories/shokushu)

@@ -7,6 +7,8 @@ source:
   - src/app/articles/[slug]/page.tsx
 ---
 
+[戻る](/categories/shorui-mensetsu)
+
 パンくず: [ホーム](/) › [記事一覧](/articles) › [面接・書類](/categories/shorui-mensetsu) › アルバイト経験だけの職務経歴書、何を書けばいい？構成と書き出し例
 
 [面接・書類](/categories/shorui-mensetsu)

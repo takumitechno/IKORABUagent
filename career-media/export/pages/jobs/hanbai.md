@@ -8,6 +8,8 @@ source:
   - src/lib/taxonomy.ts
 ---
 
+[戻る](/jobs)
+
 パンくず: [ホーム](/) › [職種から探す](/jobs) › 販売・接客
 
 職種・販売・接客

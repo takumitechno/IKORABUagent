@@ -7,6 +7,8 @@ source:
   - src/app/articles/[slug]/page.tsx
 ---
 
+[戻る](/categories/shokushu)
+
 パンくず: [ホーム](/) › [記事一覧](/articles) › [職種を知る](/categories/shokushu) › PCが得意じゃなくても、事務職は目指せる？よく使う操作と練習のしかた
 
 [職種を知る](/categories/shokushu)

@@ -7,6 +7,8 @@ source:
   - src/app/articles/[slug]/page.tsx
 ---
 
+[戻る](/categories/shorui-mensetsu)
+
 パンくず: [ホーム](/) › [記事一覧](/articles) › [面接・書類](/categories/shorui-mensetsu) › 履歴書に書くことがないと思ったとき｜アルバイト歴・資格・自己PRの書き方
 
 [面接・書類](/categories/shorui-mensetsu)

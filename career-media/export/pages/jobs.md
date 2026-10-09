@@ -8,6 +8,8 @@ source:
   - src/lib/jobs.ts
 ---
 
+[戻る](/)
+
 パンくず: [ホーム](/) › 職種を比べる
 
 JOB GUIDE
@@ -27,13 +29,20 @@ JOB GUIDE
 
 ## 職種から記事を探す
 
-- [営業](/jobs/eigyo)
-- [事務](/jobs/jimu)
-- [カスタマーサポート](/jobs/customer-support)
-- [ITサポート](/jobs/it-support)
-- [人事・採用](/jobs/jinji)
-- [販売・接客](/jobs/hanbai)
-- [その他の職種](/jobs/sonota)
+- 3
+  [営業](/jobs/eigyo)
+- 4
+  [事務](/jobs/jimu)
+- 4
+  [カスタマーサポート](/jobs/customer-support)
+- 3
+  [ITサポート](/jobs/it-support)
+- 2
+  [人事・採用](/jobs/jinji)
+- 2
+  [販売・接客](/jobs/hanbai)
+- 2
+  [その他の職種](/jobs/sonota)
 
 ## 4つの職種を比べる
 

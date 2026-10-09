@@ -6,20 +6,30 @@ source:
   - src/app/concerns/page.tsx
 ---
 
+[戻る](/)
+
 パンくず: [ホーム](/) › 悩みから探す
 
 # 悩みから探す
 
 今いちばん気になっていることから、関係のある記事をまとめて読めます。
 
-- [給料を上げたい](/concerns/kyuryo)
-- [土日休みにしたい](/concerns/donichi)
-- [オフィスワークに行きたい](/concerns/office)
-- [正社員になりたい](/concerns/seishain)
-- [未経験の職種に挑戦したい](/concerns/mikeiken-shokushu)
-- [今の仕事を辞めたい](/concerns/yametai)
-- [面接・書類が不安](/concerns/mensetsu)
-- [やりたい仕事が分からない](/concerns/yaritai)
+- 11
+  [給料を上げたい](/concerns/kyuryo)
+- 4
+  [土日休みにしたい](/concerns/donichi)
+- 5
+  [オフィスワークに行きたい](/concerns/office)
+- 12
+  [正社員になりたい](/concerns/seishain)
+- 23
+  [未経験の職種に挑戦したい](/concerns/mikeiken-shokushu)
+- 17
+  [今の仕事を辞めたい](/concerns/yametai)
+- 9
+  [面接・書類が不安](/concerns/mensetsu)
+- 9
+  [やりたい仕事が分からない](/concerns/yaritai)
 
 ## 自分の場合を、一緒に整理してもらう
 

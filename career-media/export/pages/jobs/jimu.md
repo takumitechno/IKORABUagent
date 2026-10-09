@@ -8,6 +8,8 @@ source:
   - src/lib/taxonomy.ts
 ---
 
+[戻る](/jobs)
+
 パンくず: [ホーム](/) › [職種から探す](/jobs) › 事務
 
 職種・事務

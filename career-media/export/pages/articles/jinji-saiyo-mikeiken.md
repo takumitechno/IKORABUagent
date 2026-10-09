@@ -7,6 +7,8 @@ source:
   - src/app/articles/[slug]/page.tsx
 ---
 
+[戻る](/categories/shokushu)
+
 パンくず: [ホーム](/) › [記事一覧](/articles) › [職種を知る](/categories/shokushu) › 人事・採用の仕事に、未経験から近づくには？入口になりやすい仕事と準備
 
 [職種を知る](/categories/shokushu)

@@ -7,6 +7,8 @@ source:
   - src/app/articles/[slug]/page.tsx
 ---
 
+[戻る](/categories/hatarakikata)
+
 パンくず: [ホーム](/) › [記事一覧](/articles) › [年収・働き方](/categories/hatarakikata) › 手取り20万円から転職を考えるとき、何を比べればいい？
 
 [年収・働き方](/categories/hatarakikata)

@@ -7,6 +7,8 @@ source:
   - src/app/articles/[slug]/page.tsx
 ---
 
+[戻る](/categories/junbi)
+
 パンくず: [ホーム](/) › [記事一覧](/articles) › [転職準備](/categories/junbi) › 今の仕事を辞めたいとき、先に確認しておきたいこと
 
 [転職準備](/categories/junbi)

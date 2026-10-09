@@ -7,6 +7,8 @@ source:
   - src/app/articles/[slug]/page.tsx
 ---
 
+[戻る](/categories/shokushu)
+
 パンくず: [ホーム](/) › [記事一覧](/articles) › [職種を知る](/categories/shokushu) › 未経験のIT、どんな仕事から始まる？入口になりやすい仕事と入社前の確認
 
 [職種を知る](/categories/shokushu)

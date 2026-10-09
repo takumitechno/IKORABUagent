@@ -6,6 +6,8 @@ source:
   - src/app/disclaimer/page.tsx
 ---
 
+[戻る](/)
+
 パンくず: [ホーム](/) › 免責事項
 
 # 免責事項

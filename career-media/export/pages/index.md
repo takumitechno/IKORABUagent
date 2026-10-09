@@ -20,39 +20,62 @@ source:
 
 **［タブ: 今の状況から］**
 
-- [フリーター](/situations/freeter)
-- [派遣社員](/situations/haken)
-- [正社員経験が少ない](/situations/seishain-keiken-sukunai)
-- [接客・販売の経験](/situations/sekkyaku)
-- [第二新卒](/situations/dainishinsotsu)
-- [初めての転職](/situations/hajimete)
-- [転職回数が多い](/situations/kaisu)
-- [PC仕事が未経験](/situations/pc-mikeiken)
+- 11
+  [フリーター](/situations/freeter)
+- 4
+  [派遣社員](/situations/haken)
+- 11
+  [正社員経験が少ない](/situations/seishain-keiken-sukunai)
+- 10
+  [接客・販売の経験](/situations/sekkyaku)
+- 7
+  [第二新卒](/situations/dainishinsotsu)
+- 34
+  [初めての転職](/situations/hajimete)
+- 3
+  [転職回数が多い](/situations/kaisu)
+- 6
+  [PC仕事が未経験](/situations/pc-mikeiken)
 
 [状況の一覧](/situations)
 
 **［タブ: 悩みから］**
 
-- [給料を上げたい](/concerns/kyuryo)
-- [土日休みにしたい](/concerns/donichi)
-- [オフィスワークに行きたい](/concerns/office)
-- [正社員になりたい](/concerns/seishain)
-- [未経験の職種に挑戦したい](/concerns/mikeiken-shokushu)
-- [今の仕事を辞めたい](/concerns/yametai)
-- [面接・書類が不安](/concerns/mensetsu)
-- [やりたい仕事が分からない](/concerns/yaritai)
+- 11
+  [給料を上げたい](/concerns/kyuryo)
+- 4
+  [土日休みにしたい](/concerns/donichi)
+- 5
+  [オフィスワークに行きたい](/concerns/office)
+- 12
+  [正社員になりたい](/concerns/seishain)
+- 23
+  [未経験の職種に挑戦したい](/concerns/mikeiken-shokushu)
+- 17
+  [今の仕事を辞めたい](/concerns/yametai)
+- 9
+  [面接・書類が不安](/concerns/mensetsu)
+- 9
+  [やりたい仕事が分からない](/concerns/yaritai)
 
 [悩みの一覧](/concerns)
 
 **［タブ: 職種から］**
 
-- [営業](/jobs/eigyo)
-- [事務](/jobs/jimu)
-- [カスタマーサポート](/jobs/customer-support)
-- [ITサポート](/jobs/it-support)
-- [人事・採用](/jobs/jinji)
-- [販売・接客](/jobs/hanbai)
-- [その他の職種](/jobs/sonota)
+- 3
+  [営業](/jobs/eigyo)
+- 4
+  [事務](/jobs/jimu)
+- 4
+  [カスタマーサポート](/jobs/customer-support)
+- 3
+  [ITサポート](/jobs/it-support)
+- 2
+  [人事・採用](/jobs/jinji)
+- 2
+  [販売・接客](/jobs/hanbai)
+- 2
+  [その他の職種](/jobs/sonota)
 
 [職種を比べる](/jobs)
 
@@ -102,16 +125,16 @@ source:
 
 [すべて見る](/articles)
 
-- 転職準備 2026.10.06
-  ### [エージェント面談の前に決めておくこと・決めなくていいこと](/articles/agent-mendan-mae)
-- 転職準備 2026.10.06
-  ### [転職エージェントに、何を相談すればいい？相談できることと伝え方の例](/articles/agent-soudan-nani)
-- 職種を知る 2026.10.06
-  ### [AIで変わる仕事を、未経験転職者はどう見るべきか](/articles/ai-shigoto-mikeiken)
-- 未経験転職 2026.10.06
-  ### [第二新卒って何歳まで？使える場面と探し方](/articles/dainishinsotsu-nansai)
-- 年収・働き方 2026.10.06
-  ### [「土日休み」と「年収」をどう比較する？求人票の数字の読み方](/articles/donichi-yasumi-nenshu-hikaku)
+- 制度・手続き 2026.10.09
+  ### [ハロートレーニング（公共職業訓練）とは？未経験の仕事のスキルを無料で学ぶ流れ](/articles/hello-training)
+- 面接・書類 2026.10.09
+  ### [職歴に空白期間があるとき、面接でどう説明する？書類の書き方と答え方の例](/articles/kuhaku-kikan-setsumei)
+- 制度・手続き 2026.10.09
+  ### [教育訓練給付金の使い方｜3つの種類と、講座を申し込む前に確認すること](/articles/kyouiku-kunren-kyufu-tsukaikata)
+- 制度・手続き 2026.10.09
+  ### [求職者支援制度とは？失業手当がない人が無料で職業訓練を受けられるしくみ](/articles/kyushokusha-shien-seido)
+- 制度・手続き 2026.10.09
+  ### [契約社員と正社員は何が違う？「無期転換ルール」のしくみと求人で確認すること](/articles/muki-tenkan-keiyaku)
 
 ## 知っておきたい制度の変更
 

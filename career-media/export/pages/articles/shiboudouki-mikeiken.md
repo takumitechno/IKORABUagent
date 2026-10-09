@@ -7,6 +7,8 @@ source:
   - src/app/articles/[slug]/page.tsx
 ---
 
+[戻る](/categories/shorui-mensetsu)
+
 パンくず: [ホーム](/) › [記事一覧](/articles) › [面接・書類](/categories/shorui-mensetsu) › 未経験職種の志望動機、何を書けばいい？3つの要素と例文
 
 [面接・書類](/categories/shorui-mensetsu)

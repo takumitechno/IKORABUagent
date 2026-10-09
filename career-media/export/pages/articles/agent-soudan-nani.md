@@ -7,6 +7,8 @@ source:
   - src/app/articles/[slug]/page.tsx
 ---
 
+[戻る](/categories/junbi)
+
 パンくず: [ホーム](/) › [記事一覧](/articles) › [転職準備](/categories/junbi) › 転職エージェントに、何を相談すればいい？相談できることと伝え方の例
 
 [転職準備](/categories/junbi)

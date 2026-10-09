@@ -7,6 +7,8 @@ source:
   - src/app/articles/[slug]/page.tsx
 ---
 
+[戻る](/categories/keiken)
+
 パンくず: [ホーム](/) › [記事一覧](/articles) › [経験の活かし方](/categories/keiken) › 接客経験は転職でどう活かせる？職種別のつながりと伝え方
 
 [経験の活かし方](/categories/keiken)
