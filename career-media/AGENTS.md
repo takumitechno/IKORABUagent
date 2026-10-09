@@ -45,7 +45,7 @@ Node.js 20.9 以上。依存は `npm ci`。環境変数なしで動く（記事�
 | `npm run check:outbound` | 起動中のサーバーの全ページに、本番の申込ページへのリンクがないことを確認 |
 | `npm run sales:docs` | `src/lib/sales/*` と計測の定義から docs/sales/ の資料を作り直す |
 | `npm run sns:images` | 投稿案のカルーセルを 1080×1350 の PNG に書き出す（SALES_DEMO のデモが必要） |
-| `npm run illustrations` | 人物入りの場面イラスト（Open Peeps＋サイトの色）を `public/images/illustrations/*.svg` に作り直す |
+| `npm run illustrations` | 人物入りの場面イラスト（Open Peeps＋サイトの色）を `public/images/illustrations/*.svg` に作り直す（今のページでは使っていない。素材として残している） |
 | `npm run image:dry-run -- --brief docs/image-briefs/<slug>.md` | 画像生成の確認（API を呼ばない・無料）。保存先と最終 prompt を表示 |
 | `npm run image:generate -- --brief docs/image-briefs/<slug>.md` | OpenAI の画像生成 API で1枚作り、`public/images/generated/` と `content/images/meta/` に保存（要 `OPENAI_API_KEY`。状態は draft） |
 | `npm run image:status -- <slug> selected` / `image:index` / `image:validate` / `image:prune` | 採用・一覧の作り直し・記録と画像の検査・不採用の削除 |
@@ -58,7 +58,7 @@ Node.js 20.9 以上。依存は `npm ci`。環境変数なしで動く（記事�
 
 | URL | ページ | 主な部品・データ |
 |---|---|---|
-| `/` | `src/app/page.tsx` | `components/illustrations/*`、`Roadmap`、`EntryGrid`（入口タブ）、`ArticleCards`、`JobMap`、`ConsultationCta` |
+| `/` | `src/app/page.tsx` | `components/illustrations/*`、`Roadmap`、`EntryGrid`（入口タブ）、`ArticleCards`、職種の比較表（`LevelMeter`）、`ConsultationCta` |
 | `/articles`、`/articles/[slug]` | `src/app/articles/` | `ArticleCards`、`ArticleParts`、`lib/markdown.ts`、`lib/figures.ts`、`content/articles/*.md` |
 | `/news`、`/news/[slug]` | `src/app/news/` | `NewsTimeline`、`content/news/*.md` |
 | `/categories/[slug]` | `src/app/categories/[slug]/page.tsx` | `content/categories.json` |
@@ -85,7 +85,7 @@ Node.js 20.9 以上。依存は `npm ci`。環境変数なしで動く（記事�
 ## 画像（生成画像）
 
 - 方針は `docs/ART_DIRECTION.md`、手順は `docs/image-briefs/README.md`。まず画像なしで成り立たせ、必要な場所だけに使う。文字は画像に入れない
-- 画像は `src/components/GeneratedImage.tsx` で出す（`content/images/index.json` で status が selected のものだけ。なければ fallback の SVG）。今の差し込み口: トップのヒーロー `hero-home`、チェック `check-support`、3つのガイドのカード `journey-*`、`/sales/sns/*` の表紙 `sns-theme-*-cover`
+- 画像は `src/components/GeneratedImage.tsx` で出す（`content/images/index.json` で status が selected のものだけ。なければ fallback の SVG）。今の差し込み口: トップのヒーロー `hero-home`（なければ「条件整理ノート」のカード）、トップのチェック `check-support`（なければ結果の見本、デスクトップのみ）、`/sales/sns/*` の表紙 `sns-theme-*-cover`。`journey-*` の brief はあるが、今のケースカードには差し込み口がない
 - 生成した画像は draft のまま。実際のページで確認してから `image:status` で selected にする。気に入らなければ brief を直して `--force` で作り直す（前の画像は `.image-history/`）
 - API キー（`OPENAI_API_KEY`）は `.env.local` か環境変数にだけ置く。ロゴ・実在の企業やキャラクターは生成しない（`BLOCKED_TERMS`）
 

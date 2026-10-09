@@ -3,8 +3,6 @@ import { ArrowLeft, ArrowRight, ClipboardList, Compass, MessageCircle, MessageSq
 import type { ArticleSummary } from "@/lib/content/types";
 import { JOURNEY_ANCHOR, JOURNEYS, stepHref, type Journey, type JourneyStep } from "@/lib/journeys";
 import { ConsultButton } from "./ConsultationCta";
-import { GeneratedImage } from "./GeneratedImage";
-import { Illustration, type IllustrationName } from "./Illustration";
 import { Motif } from "./illustrations/Motif";
 
 const stepTitle = (step: JourneyStep, articles: ArticleSummary[]) =>
@@ -160,11 +158,13 @@ export function JourneyNav({ journey, index, articles }: { journey: Journey; ind
   );
 }
 
-/** トップに出す3つのガイドの入口 */
+const CASE_COLORS = ["#0b5f54", "#1f5f99", "#b85a12"];
+
+/** トップに出す3つのガイドの入口（写真の代わりに、色の帯と最初のステップを見せる） */
 export function JourneyCards() {
   return (
     <ul className="swipe md-grid reveal [--swipe-w:82%]" style={{ ["--cols" as string]: 3 }}>
-      {JOURNEYS.map((j) => (
+      {JOURNEYS.map((j, i) => (
         <li key={j.id}>
           <Link
             href={`${j.hubs[0]}#${JOURNEY_ANCHOR}`}
@@ -173,19 +173,24 @@ export function JourneyCards() {
             data-pattern-id={j.patternId}
             className="tap lift group flex h-full flex-col overflow-hidden rounded-2xl border border-line bg-white hover:border-brand/40"
           >
-            <span className="block border-b border-line bg-white">
-              <GeneratedImage
-                slug={`journey-${j.id}`}
-                sizes="(min-width: 768px) 360px, 82vw"
-                className="block aspect-[16/9] h-auto w-full object-cover"
-                fallback={<Illustration name={`journey-${j.id}` as IllustrationName} className="block aspect-[16/9] h-auto w-full" />}
-              />
+            <span className="relative block overflow-hidden px-4 pb-4 pt-4 text-white" style={{ background: CASE_COLORS[i % CASE_COLORS.length] }}>
+              <span aria-hidden="true" className="absolute -right-10 -top-12 h-36 w-36 rounded-full bg-white/[0.08]" />
+              <span className="relative block text-[11px] font-bold tracking-[0.2em] text-white/75">CASE {String(i + 1).padStart(2, "0")}</span>
+              <span className="relative mt-1.5 block text-[17px] font-bold leading-snug">{j.title}</span>
             </span>
-            <span className="px-4 pt-4 text-[16px] font-bold leading-snug text-ink group-hover:text-brand-strong">{j.title}</span>
-            <span className="flex flex-1 flex-col px-4 pb-4 pt-2">
-              <span className="line-clamp-2 text-[13px] leading-6 text-muted">{j.who}</span>
+            <span className="flex flex-1 flex-col px-4 pb-4 pt-3">
+              <span className="text-[11.5px] font-bold text-muted">こんな人に</span>
+              <span className="mt-0.5 line-clamp-2 text-[13px] leading-6 text-body">{j.who}</span>
+              <ol className="mt-3 space-y-1.5 border-t border-line pt-3">
+                {j.steps.slice(0, 3).map((st, n) => (
+                  <li key={n} className="flex items-start gap-2 text-[12.5px] leading-5 text-ink">
+                    <span className="mt-px flex h-4 w-4 shrink-0 items-center justify-center rounded bg-brand-tint text-[10px] font-bold text-brand-strong">{n + 1}</span>
+                    <span className="line-clamp-1">{st.label}</span>
+                  </li>
+                ))}
+              </ol>
               <span className="mt-auto inline-flex items-center gap-1 pt-4 text-[13.5px] font-bold text-brand-strong">
-                順番に読む
+                順番に読む（全{j.steps.length}ステップ）
                 <ArrowRight className="h-4 w-4 transition group-hover:translate-x-0.5" aria-hidden="true" />
               </span>
             </span>

@@ -1,7 +1,6 @@
-import { Clock, Lock, ShieldCheck } from "lucide-react";
+import { ClipboardList, Clock, Lock, ShieldCheck } from "lucide-react";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { ConditionCheck } from "@/components/ConditionCheck";
-import { Illustration } from "@/components/Illustration";
 import { buildConsultationUrl } from "@/lib/consultation";
 import { ALL_QUESTIONS } from "@/lib/condition-check/questions";
 import { pageMetadata } from "@/lib/seo";
@@ -38,7 +37,9 @@ export default function CheckPage() {
             </li>
           </ul>
         </div>
-        <Illustration name="check-support" priority className="order-1 mx-auto h-[130px] w-auto sm:order-2 sm:h-[190px]" />
+        <span aria-hidden="true" className="order-1 mx-auto hidden h-28 w-28 items-center justify-center rounded-3xl bg-brand text-white shadow-[0_18px_40px_-18px_rgb(15_123_108/0.8)] sm:order-2 sm:flex">
+          <ClipboardList className="h-14 w-14" />
+        </span>
       </header>
       <div id="condition-check-root" className="mt-8 rounded-[20px] bg-canvas">
         <ConditionCheck consultationHref={buildConsultationUrl("check-result")} consultationLabel="整理した内容をもとに相談する" />

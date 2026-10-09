@@ -1,6 +1,5 @@
 import Link from "next/link";
 import type { MotifName } from "@/lib/illustrations/motifs";
-import { Motif } from "./illustrations/Motif";
 
 export type RoadmapStep = { scene: MotifName; title: string; text: string; href: string; cta: string; tone: string };
 
@@ -13,17 +12,10 @@ export function Roadmap({ steps }: { steps: RoadmapStep[] }) {
     <ol className="grid grid-cols-2 gap-2.5 md:grid-cols-4 md:gap-4">
       {steps.map((s, i) => (
         <li key={s.title}>
-          <Link href={s.href} className="tap lift group flex h-full flex-col rounded-2xl border border-line bg-white p-3.5 hover:border-brand/40 md:p-4">
-            <span className="flex items-center gap-2.5">
-              <span className={`relative block aspect-square w-11 shrink-0 rounded-full ${s.tone}`}>
-                <Motif name={s.scene} className="motif-art absolute inset-[8%]" />
-              </span>
-              <span>
-                <span className="block text-[11px] font-bold text-muted">STEP {i + 1}</span>
-                <span className="block text-[16px] font-bold leading-tight text-ink group-hover:text-brand-strong">{s.title}</span>
-              </span>
-            </span>
-            <span className="mt-2 text-[12.5px] leading-5 text-muted">{s.text}</span>
+          <Link href={s.href} className="tap group flex h-full flex-col rounded-xl border border-line bg-white p-4 transition-colors hover:border-brand hover:bg-brand-tint">
+            <span className="text-[26px] font-bold leading-none tabular-nums text-brand">{String(i + 1).padStart(2, "0")}</span>
+            <span className="mt-2 block text-[16px] font-bold leading-tight text-ink group-hover:text-brand-strong">{s.title}</span>
+            <span className="mt-1 text-[12.5px] leading-5 text-muted">{s.text}</span>
           </Link>
         </li>
       ))}

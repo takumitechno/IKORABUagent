@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Noto_Sans_JP } from "next/font/google";
 import { NavTracker } from "@/components/BackButton";
+import { CategoryBar } from "@/components/CategoryBar";
 import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
 import { MeasurementTracker } from "@/components/MeasurementTracker";
@@ -42,6 +43,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         </a>
         <PreviewBanner />
         <Header />
+        <CategoryBar />
         <main id="main">{children}</main>
         <Footer />
         <MeasurementTracker mode={consultationMode} />

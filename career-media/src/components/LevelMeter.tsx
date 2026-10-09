@@ -1,9 +1,9 @@
 import type { Level } from "@/lib/jobs";
 
 /** 5段階の目安。animate を付けると、画面に入ったときに丸が順に埋まる（動きを減らす設定では最初から表示） */
-export function LevelMeter({ level, label, srLabel, animate = false }: { level: Level; label: string; srLabel: string; animate?: boolean }) {
+export function LevelMeter({ level, label, srLabel, animate = false, className = "" }: { level: Level; label: string; srLabel: string; animate?: boolean; className?: string }) {
   return (
-    <span className="inline-flex items-center gap-2">
+    <span className={`inline-flex items-center gap-2 ${className}`}>
       <span className="flex gap-1" role="img" aria-label={`${srLabel}: 5段階中${level}（${label}）`}>
         {[1, 2, 3, 4, 5].map((n) => (
           <span

@@ -1,23 +1,20 @@
 import Link from "next/link";
-import { ArrowRight, ClipboardList, Search } from "lucide-react";
+import { ArrowRight, ClipboardList, FileText, ListChecks, Search, ShieldCheck } from "lucide-react";
 import { JourneyCards } from "@/components/Journey";
 import { ArticleList, ArticleRow, LeadCard } from "@/components/ArticleCards";
 import { ConsultationCta } from "@/components/ConsultationCta";
 import { ExploreTabs } from "@/components/EntryGrid";
 import { GeneratedImage } from "@/components/GeneratedImage";
-import { Illustration } from "@/components/Illustration";
-import { Motif } from "@/components/illustrations/Motif";
-import { JobMap } from "@/components/JobMap";
+import { LevelMeter } from "@/components/LevelMeter";
 import { JsonLd } from "@/components/JsonLd";
 import { Roadmap, type RoadmapStep } from "@/components/Roadmap";
 import { SectionHeading } from "@/components/SectionHeading";
 import { site } from "@/config/site";
 import { getRepository } from "@/lib/content";
 import { ALL_QUESTIONS } from "@/lib/condition-check/questions";
-import { JOB_ROLE_SCENE } from "@/lib/illustrations/scenes";
-import { JOB_ROLES, type JobRole } from "@/lib/jobs";
+import { JOB_ROLES, LEVEL_LABELS, type JobRole } from "@/lib/jobs";
 import { organizationJsonLd, pageMetadata, websiteJsonLd } from "@/lib/seo";
-import { ROLE_TO_COMPARISON, TAXONOMY, type TaxonomyGroup } from "@/lib/taxonomy";
+import { HERO_SHORTCUTS, ROLE_TO_COMPARISON, TAXONOMY, type TaxonomyGroup } from "@/lib/taxonomy";
 
 export const revalidate = 600;
 
@@ -69,50 +66,66 @@ export default async function HomePage() {
       <JsonLd data={organizationJsonLd()} />
       <JsonLd data={websiteJsonLd()} />
 
-      {/* Hero: 見出し・ひとこと・2つの入口・検索だけにしぼる */}
-      <section className="relative overflow-hidden border-b border-line bg-[linear-gradient(180deg,#ffffff_0%,var(--color-brand-tint)_100%)]">
-        <div aria-hidden="true" className="pointer-events-none absolute -right-44 -top-52 h-[520px] w-[520px] rounded-full bg-mint/50" />
-        <div className="relative mx-auto max-w-6xl px-4 pb-9 pt-2 sm:px-6 md:pb-16 md:pt-12">
-          <div className="hero-grid">
-            <div className="hero-art enter-pop">
-              <GeneratedImage
-                slug="hero-home"
-                priority
-                sizes="(min-width: 768px) 560px, 270px"
-                className="mx-auto block h-[180px] w-auto max-w-full md:h-auto md:w-full"
-                fallback={<Illustration name="hero-home" priority className="mx-auto block h-[200px] w-auto max-w-full md:h-auto md:w-full" />}
-              />
-            </div>
-            <div className="hero-text md:pt-8">
-              <h1 className="enter text-[27px] font-bold leading-[1.45] text-ink min-[400px]:text-[29px] sm:text-[44px]">
-                転職したい。
-                <br />
-                でも、<span className="text-brand-strong">何から決めればいい？</span>
-              </h1>
-              <p className="enter enter-d1 mt-3 text-[15px] leading-7 text-muted sm:text-base">仕事・給料・休みのことを、一つずつ整理できるガイドです。</p>
-              <div className="enter enter-d2 mt-6 flex flex-col gap-2.5 sm:flex-row sm:flex-wrap">
-                <Link href={guideHref} className="tap inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-full bg-brand px-6 py-3.5 text-[15px] font-bold text-white transition-colors hover:bg-brand-strong">
-                  自分に合う仕事の探し方を見る
-                  <ArrowRight className="h-4 w-4" aria-hidden="true" />
-                </Link>
-                <Link href="/check" className="tap inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-full border border-line-strong bg-white px-6 py-3.5 text-[15px] font-bold text-ink transition-colors hover:border-brand hover:text-brand-strong">
-                  <ClipboardList className="h-5 w-5 text-brand" aria-hidden="true" />
-                  条件整理チェック（約3分）
-                </Link>
-              </div>
-            </div>
-            <form action="/articles" method="get" role="search" className="hero-search enter enter-d3 mt-6 md:mt-8">
-              <label htmlFor="hero-search" className="sr-only">
+      {/* Hero: ブランドの色の面に、見出し・検索・人気のキーワード・2つの入口（転職メディアでよくある構成） */}
+      <section className="relative overflow-hidden bg-[#0b5f54] text-white">
+        <div aria-hidden="true" className="pointer-events-none absolute inset-0">
+          <span className="absolute -right-40 -top-56 h-[560px] w-[560px] rounded-full bg-white/[0.06]" />
+          <span className="absolute -bottom-64 -left-32 h-[480px] w-[480px] rounded-full bg-black/[0.12]" />
+          <span className="absolute inset-0 bg-[radial-gradient(rgb(255_255_255/0.07)_1px,transparent_1.4px)] [background-size:22px_22px]" />
+        </div>
+        <div className="relative mx-auto grid max-w-6xl gap-10 px-4 pb-10 pt-8 sm:px-6 md:grid-cols-[minmax(0,1.08fr)_minmax(0,0.92fr)] md:items-center md:pb-16 md:pt-14">
+          <div>
+            <p className="inline-flex items-center gap-1.5 rounded-full bg-white/12 px-3 py-1 text-[12px] font-bold tracking-wide ring-1 ring-white/20">
+              <span className="h-1.5 w-1.5 rounded-full bg-accent-bright" aria-hidden="true" />
+              20代のはじめての転職・未経験転職ガイド
+            </p>
+            <h1 className="mt-4 text-[30px] font-bold leading-[1.4] min-[400px]:text-[32px] sm:text-[46px]">
+              転職したい。
+              <br />
+              でも、
+              <br className="sm:hidden" />
+              <span className="text-[#ffe08a]">何から決めればいい？</span>
+            </h1>
+            <p className="mt-3 text-[15px] leading-7 text-white/85 sm:text-base">仕事・給料・休みのことを、一つずつ整理できるガイドです。</p>
+
+            <form action="/articles" method="get" role="search" className="mt-6 rounded-2xl bg-white p-3 text-ink shadow-[0_18px_40px_-18px_rgb(0_0_0/0.45)] sm:p-4">
+              <label htmlFor="hero-search" className="px-1 text-[12px] font-bold text-muted">
                 キーワードで記事を探す
               </label>
-              <div className="flex overflow-hidden rounded-full border border-line-strong bg-white focus-within:border-brand focus-within:ring-2 focus-within:ring-brand/20">
-                <Search className="ml-4 h-4 w-4 shrink-0 self-center text-muted" aria-hidden="true" />
-                <input id="hero-search" name="q" type="search" placeholder="キーワードで探す" className="min-w-0 flex-1 bg-transparent px-3 py-3 text-[15px] outline-none placeholder:text-muted/70" />
-                <button type="submit" className="m-1 rounded-full bg-ink px-4 text-[13px] font-bold text-white hover:bg-brand-strong">
+              <div className="mt-1.5 flex overflow-hidden rounded-xl border border-line-strong focus-within:border-brand focus-within:ring-2 focus-within:ring-brand/20">
+                <Search className="ml-3 h-4 w-4 shrink-0 self-center text-muted" aria-hidden="true" />
+                <input id="hero-search" name="q" type="search" placeholder="例: 事務、土日休み、履歴書" className="min-w-0 flex-1 bg-transparent px-2.5 py-3 text-[15px] outline-none placeholder:text-muted/70" />
+                <button type="submit" className="m-1 rounded-lg bg-accent px-4 text-[14px] font-bold text-white hover:bg-accent-strong">
                   検索
                 </button>
               </div>
+              <p className="mt-3 px-1 text-[11.5px] font-bold text-muted">人気のキーワード</p>
+              <ul className="mt-1.5 flex flex-wrap gap-1.5">
+                {HERO_SHORTCUTS.map((k) => (
+                  <li key={k.href}>
+                    <Link href={k.href} className="inline-flex rounded-full bg-canvas px-2.5 py-1 text-[12.5px] font-medium text-ink ring-1 ring-line hover:text-brand-strong hover:ring-brand/40">
+                      {k.label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
             </form>
+
+            <div className="mt-5 grid grid-cols-2 gap-2.5 sm:flex sm:flex-wrap">
+              <Link href={guideHref} className="tap inline-flex items-center justify-center gap-1.5 rounded-xl bg-white px-4 py-3 text-[14px] font-bold text-brand-strong hover:bg-brand-tint sm:px-5">
+                仕事の探し方
+                <ArrowRight className="h-4 w-4" aria-hidden="true" />
+              </Link>
+              <Link href="/check" className="tap inline-flex items-center justify-center gap-1.5 rounded-xl px-4 py-3 text-[14px] font-bold text-white ring-1 ring-white/50 hover:bg-white/10 sm:px-5">
+                <ClipboardList className="h-4 w-4" aria-hidden="true" />
+                条件整理チェック
+              </Link>
+            </div>
+          </div>
+
+          {/* 右側: 写真を採用したら写真、なければ「このサイトでできること」の画面イメージ */}
+          <div className="hidden md:block">
+            <GeneratedImage slug="hero-home" priority sizes="520px" className="w-full rounded-2xl" fallback={<HeroCollage />} />
           </div>
         </div>
       </section>
@@ -165,61 +178,112 @@ export default async function HomePage() {
           </ul>
         </section>
 
-        {/* 職種マップ */}
+        {/* 職種の比較表（転職サイトの職種比較のように、同じものさしで並べる） */}
         <section aria-labelledby="home-jobs">
-          <SectionHeading eyebrow="JOB GUIDE" title="未経験から検討しやすい仕事" id="home-jobs" href="/jobs" hrefLabel="職種を比べる" />
-          <div className="grid grid-cols-[minmax(0,1fr)] gap-6 md:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] md:items-center">
-            <JobMap roles={JOB_ROLES} hrefFor={roleHub} className="mx-auto w-full max-w-[380px]" />
-            <ul className="min-w-0 divide-y divide-line border-y border-line">
-              {JOB_ROLES.map((r) => (
-                <li key={r.slug}>
-                  <Link href={roleHub(r)} className="tap group flex items-center gap-3 py-3">
-                    <span className="relative block aspect-square w-10 shrink-0 rounded-full bg-mint">
-                      <Motif name={JOB_ROLE_SCENE[r.slug] ?? "briefcase"} className="motif-art absolute inset-[8%]" />
-                    </span>
-                    <span className="min-w-0 flex-1">
-                      <span className="block text-[15px] font-bold text-ink group-hover:text-brand-strong">{r.name}</span>
-                      <span className="block truncate text-[12.5px] text-muted">{r.oneLiner}</span>
-                    </span>
-                    <ArrowRight className="h-4 w-4 shrink-0 text-muted" aria-hidden="true" />
-                  </Link>
-                </li>
-              ))}
-            </ul>
+          <SectionHeading eyebrow="JOB GUIDE" title="職種を比べる" id="home-jobs" href="/jobs" hrefLabel="くわしく比べる" />
+          {/* スマホ: 1職種1カード（表は横にはみ出すため） */}
+          <ul className="grid gap-2.5 sm:hidden">
+            {JOB_ROLES.map((r) => (
+              <li key={r.slug}>
+                <Link href={roleHub(r)} className="block rounded-xl border border-line bg-white p-4 active:bg-brand-tint/60">
+                  <span className="flex items-center justify-between gap-2">
+                    <span className="text-[15px] font-bold text-ink">{r.name}</span>
+                    <ArrowRight className="h-4 w-4 shrink-0 text-brand-strong" aria-hidden="true" />
+                  </span>
+                  <span className="mt-1 line-clamp-2 block text-[12.5px] leading-5 text-muted">{r.oneLiner}</span>
+                  <span className="mt-3 grid grid-cols-3 gap-2 border-t border-line pt-3 text-[11px] text-muted">
+                    {(
+                      [
+                        ["人と話す", r.talkLevel, LEVEL_LABELS.talk[r.talkLevel]],
+                        ["パソコン", r.pcLevel, LEVEL_LABELS.pc[r.pcLevel]],
+                        ["数字の目標", r.targetLevel, LEVEL_LABELS.target[r.targetLevel]],
+                      ] as const
+                    ).map(([name, level, label]) => (
+                      <span key={name} className="min-w-0">
+                        <span className="block font-bold">{name}</span>
+                        <span className="mt-1 block">
+                          <LevelMeter level={level} label={label} srLabel={name} className="flex-col !items-start !gap-1 [&>span:last-child]:text-[12px]" />
+                        </span>
+                      </span>
+                    ))}
+                  </span>
+                </Link>
+              </li>
+            ))}
+          </ul>
+          <div className="hidden overflow-x-auto rounded-xl border border-line bg-white sm:block">
+            <table className="w-full min-w-[560px] text-[13px]">
+              <thead className="bg-canvas text-left text-[12px] text-muted">
+                <tr>
+                  <th className="px-4 py-3 font-bold">職種</th>
+                  <th className="px-3 py-3 font-bold">人と話す量</th>
+                  <th className="px-3 py-3 font-bold">パソコン作業</th>
+                  <th className="px-3 py-3 font-bold">数字の目標</th>
+                  <th className="px-3 py-3" />
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-line">
+                {JOB_ROLES.map((r) => (
+                  <tr key={r.slug} className="hover:bg-brand-tint/60">
+                    <td className="px-4 py-3">
+                      <Link href={roleHub(r)} className="font-bold text-ink hover:text-brand-strong hover:underline">
+                        {r.name}
+                      </Link>
+                      <span className="mt-0.5 block max-w-[300px] truncate text-[12px] text-muted">{r.oneLiner}</span>
+                    </td>
+                    <td className="px-3 py-3"><LevelMeter level={r.talkLevel} label={LEVEL_LABELS.talk[r.talkLevel]} srLabel="人と話す量" /></td>
+                    <td className="px-3 py-3"><LevelMeter level={r.pcLevel} label={LEVEL_LABELS.pc[r.pcLevel]} srLabel="パソコン作業" /></td>
+                    <td className="px-3 py-3"><LevelMeter level={r.targetLevel} label={LEVEL_LABELS.target[r.targetLevel]} srLabel="数字の目標" /></td>
+                    <td className="px-3 py-3 text-right">
+                      <Link href={roleHub(r)} className="inline-flex items-center gap-0.5 whitespace-nowrap text-[12.5px] font-bold text-brand-strong hover:underline">
+                        記事を見る
+                        <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
+                      </Link>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
+          <p className="mt-2 text-[12px] text-muted">一般的な傾向です。会社や配属先によって大きく異なります。</p>
         </section>
 
-        {/* 条件整理チェック */}
-        <section aria-labelledby="home-check" className="overflow-hidden rounded-2xl bg-brand-tint ring-1 ring-brand/15">
-          <div className="grid gap-6 p-6 sm:p-10 md:grid-cols-2 md:items-center">
-            <div className="flex items-center gap-4 md:block">
-              <GeneratedImage
-                slug="check-support"
-                sizes="(min-width: 768px) 160px, 96px"
-                className="h-[96px] w-auto shrink-0 md:h-[160px]"
-                fallback={<Illustration name="check-support" className="h-[104px] w-auto shrink-0 md:h-[180px]" />}
-              />
-              <div className="md:mt-3">
-                <h2 id="home-check" className="text-[21px] font-bold leading-snug text-ink sm:text-[26px]">
-                  条件整理チェック
-                </h2>
-                <p className="mt-1.5 text-[14px] leading-6 text-muted">
-                  {ALL_QUESTIONS.length}の質問で、ゆずれない条件と比べたい職種が一覧に。約3分・登録不要・回答は送信されません。
-                </p>
-              </div>
-            </div>
-            <div className="md:hidden">
-              <Link href="/check" className="tap flex items-center justify-center gap-2 rounded-full bg-brand py-3.5 text-[15px] font-bold text-white hover:bg-brand-strong">
+        {/* 条件整理チェック（転職サイトの「診断」のような入口。ただし判定はしない） */}
+        <section aria-labelledby="home-check" className="overflow-hidden rounded-2xl border-2 border-brand/20 bg-white">
+          <div className="grid gap-6 p-5 sm:p-9 md:grid-cols-[minmax(0,1fr)_minmax(0,0.9fr)] md:items-center">
+            <div>
+              <p className="inline-flex items-center gap-1.5 rounded-full bg-brand-tint px-3 py-1 text-[12px] font-bold text-brand-strong">
+                <ClipboardList className="h-3.5 w-3.5" aria-hidden="true" />
+                無料・登録不要
+              </p>
+              <h2 id="home-check" className="mt-3 text-[22px] font-bold leading-snug text-ink sm:text-[28px]">
+                3分でできる、条件整理チェック
+              </h2>
+              <p className="mt-2 text-[14.5px] leading-7 text-muted">向いている仕事を判定するものではありません。迷っていることを、自分の言葉で整理するための道具です。</p>
+              <ul className="mt-5 grid gap-2.5">
+                {[
+                  { icon: ListChecks, t: `${ALL_QUESTIONS.length}の質問に答えるだけ`, d: "選ぶだけ。答えたくない質問は飛ばせます" },
+                  { icon: FileText, t: "条件・経験・比べたい職種が一覧に", d: "面談で使えるメモとしてコピーできます" },
+                  { icon: ShieldCheck, t: "回答はどこにも送信されません", d: "このブラウザの中だけで整理します" },
+                ].map((x) => (
+                  <li key={x.t} className="flex items-start gap-3">
+                    <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-brand text-white">
+                      <x.icon className="h-4.5 w-4.5" aria-hidden="true" />
+                    </span>
+                    <span>
+                      <span className="block text-[14.5px] font-bold text-ink">{x.t}</span>
+                      <span className="block text-[12.5px] leading-5 text-muted">{x.d}</span>
+                    </span>
+                  </li>
+                ))}
+              </ul>
+              <Link href="/check" className="tap mt-6 flex items-center justify-center gap-2 rounded-xl bg-accent py-3.5 text-[15px] font-bold text-white hover:bg-accent-strong md:inline-flex md:px-10">
                 チェックをはじめる
                 <ArrowRight className="h-4 w-4" aria-hidden="true" />
               </Link>
             </div>
             <div className="hidden md:block">
-              <ResultPreview />
-              <Link href="/check" className="tap mt-5 flex items-center justify-center gap-2 rounded-full bg-brand py-3.5 text-[15px] font-bold text-white hover:bg-brand-strong">
-                チェックをはじめる
-                <ArrowRight className="h-4 w-4" aria-hidden="true" />
-              </Link>
+              <GeneratedImage slug="check-support" sizes="440px" className="w-full rounded-2xl" fallback={<ResultPreview />} />
             </div>
           </div>
         </section>
@@ -261,3 +325,67 @@ function ResultPreview() {
     </div>
   );
 }
+
+/** ヒーロー右側: このサイトでできること（条件整理ノートと職種の比較）の画面イメージ */
+function HeroCollage() {
+  const roles: [string, number, number][] = [
+    ["一般事務", 2, 4],
+    ["カスタマーサポート", 4, 3],
+    ["ITサポート", 3, 4],
+  ];
+  const dots = (n: number) => (
+    <span className="flex gap-0.5">
+      {[1, 2, 3, 4, 5].map((i) => (
+        <span key={i} className={`h-1.5 w-1.5 rounded-full ${i <= n ? "bg-brand" : "bg-line-strong"}`} />
+      ))}
+    </span>
+  );
+  return (
+    <div className="relative mx-auto h-[470px] w-full max-w-[480px]" aria-hidden="true">
+      <div className="absolute right-0 top-0 w-[78%] rounded-2xl bg-white p-5 text-ink shadow-[0_24px_50px_-20px_rgb(0_0_0/0.5)]">
+        <p className="flex items-center justify-between text-[12px] font-bold text-muted">
+          あなたの条件整理ノート
+          <span className="rounded-full bg-brand-tint px-2 py-0.5 text-[10.5px] text-brand-strong">約3分</span>
+        </p>
+        {[
+          ["ゆずれない条件", ["土日休み", "月給22万円以上"]],
+          ["使えそうな経験", ["接客", "電話対応"]],
+          ["比べてみたい職種", ["事務", "カスタマーサポート"]],
+        ].map(([label, chips]) => (
+          <div key={label as string} className="mt-3 border-t border-line pt-3">
+            <p className="text-[12px] font-bold">{label as string}</p>
+            <p className="mt-1.5 flex flex-wrap gap-1.5">
+              {(chips as string[]).map((c) => (
+                <span key={c} className="rounded-md bg-brand-tint px-2 py-0.5 text-[11.5px] font-bold text-brand-strong">
+                  {c}
+                </span>
+              ))}
+            </p>
+          </div>
+        ))}
+      </div>
+      <div className="absolute bottom-0 left-0 w-[70%] rounded-2xl bg-white p-4 text-ink shadow-[0_24px_50px_-20px_rgb(0_0_0/0.5)]">
+        <p className="text-[12px] font-bold text-muted">職種を同じものさしで比べる</p>
+        <table className="mt-2 w-full text-[11.5px]">
+          <thead>
+            <tr className="text-muted">
+              <th className="pb-1 text-left font-medium" />
+              <th className="pb-1 text-left font-medium">人と話す</th>
+              <th className="pb-1 text-left font-medium">パソコン</th>
+            </tr>
+          </thead>
+          <tbody>
+            {roles.map(([r, talk, pc]) => (
+              <tr key={r} className="border-t border-line">
+                <td className="py-1.5 pr-2 font-bold">{r}</td>
+                <td className="py-1.5">{dots(talk)}</td>
+                <td className="py-1.5">{dots(pc)}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
+

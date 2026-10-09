@@ -1,9 +1,7 @@
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
-import { taxonomyScene } from "@/lib/illustrations/scenes";
 import { TAXONOMY, TAXONOMY_GROUPS, taxonomyPath, type TaxonomyGroup } from "@/lib/taxonomy";
 import { CategoryIcon, TONE_CLASSES, type Tone } from "./CategoryIcon";
-import { Motif } from "./illustrations/Motif";
 
 const GROUP_TONE: Record<TaxonomyGroup, Tone[]> = {
   situations: ["mint", "sky", "sand", "lime"],
@@ -37,12 +35,12 @@ export function EntryGrid({ group, counts, variant = "tile" }: { group: Taxonomy
           <li key={item.slug}>
             <Link
               href={taxonomyPath(group, item.slug)}
-              className="tap lift group flex h-full flex-col items-center rounded-2xl border border-line bg-white px-1.5 pb-3 pt-3 text-center hover:border-brand/40 sm:px-2"
+              className="tap group flex h-full flex-col items-center rounded-xl border border-line bg-white px-1.5 pb-3 pt-4 text-center transition-colors hover:border-brand hover:bg-brand-tint sm:px-2"
             >
-              <span className={`relative mb-2 block aspect-square w-[64px] rounded-full sm:w-[72px] ${tone.bg}`}>
-                <Motif name={taxonomyScene(group, item.slug)} className="motif-art absolute inset-[4%]" />
+              <span className={`relative mb-2.5 flex h-12 w-12 items-center justify-center rounded-xl ${tone.bg} ${tone.fg}`}>
+                <CategoryIcon name={item.icon} className="h-6 w-6" />
                 {count !== undefined && (
-                  <span className="absolute -right-1.5 -top-1 flex h-6 min-w-6 items-center justify-center rounded-full bg-ink px-1.5 text-[11px] font-bold tabular-nums text-white ring-2 ring-white" aria-label={`記事${count}件`}>
+                  <span className="absolute -right-2.5 -top-2 flex h-5 min-w-5 items-center justify-center rounded-full bg-accent px-1 text-[10.5px] font-bold tabular-nums text-white ring-2 ring-white" aria-label={`記事${count}件`}>
                     {count}
                   </span>
                 )}

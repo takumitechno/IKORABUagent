@@ -40,14 +40,16 @@
 
 この方針は `scripts/images/lib.ts` の `HOUSE_STYLE` として、すべての生成 prompt の末尾に自動で付く。
 
-## 3.5 いま使っている場面イラスト
+## 3.5 写真・画像がないときの見た目
 
-トップのヒーロー・条件整理チェック・3つのガイドのカードは、`npm run illustrations`（`scripts/illustrations/build-scenes.ts`）で作った SVG（`public/images/illustrations/`）。
+トップと記事一覧は、画像なしで転職サイトらしく見えるように作っている。
 
-- 人物: [Open Peeps](https://www.openpeeps.com/)（Pablo Stanley 作、CC0。商用利用・改変自由・表記不要）を [react-peeps](https://github.com/CeamKrier/react-peeps)（MIT）で描き出したもの
-- 背景・小物・色: このリポジトリで描いたもの（サイトのパレット）
-- 文字は入れていない。人物は髪型・服装を変えている
-- OpenAI で生成した画像を採用（`selected`）すると、同じ場所ではそちらが優先される
+- ヒーロー: 濃いティールの面＋検索ボックス＋「条件整理ノート」「職種の比べ方」のカード（HTML。`hero-home` を採用するとカードの代わりに画像が出る）
+- 記事のサムネイル: カテゴリの色の面に、記事の問い（frontmatter の `eyecatch`）を白い文字で置く文字サムネイル（`src/components/Eyecatch.tsx`）
+- 入口・ケース・ロードマップ: 色の四角＋アイコン、番号、色帯の見出し
+- `npm run illustrations` の Open Peeps 場面イラスト（CC0、`public/images/illustrations/`）は素材として残しているが、今のページでは使っていない
+
+人物の写真を使うときは、日本人のモデルが写った、商用利用できる素材（ライセンスを確認して記録する）を `hero-home` の位置に入れる。相談員・利用者・体験談に見える使い方はしない。
 
 ## 4. 使わないもの（禁止）
 
