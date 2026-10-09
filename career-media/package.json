@@ -21,7 +21,13 @@
     "sales:docs": "tsx scripts/gen-sales-docs.ts",
     "check:outbound": "tsx scripts/check-outbound.ts",
     "sns:images": "node scripts/sns-images.mjs",
-    "demo:makecareer": "node scripts/demo.mjs makecareer"
+    "demo:makecareer": "node scripts/demo.mjs makecareer",
+    "image:generate": "tsx scripts/images/cli.ts generate",
+    "image:dry-run": "tsx scripts/images/cli.ts generate --dry-run",
+    "image:status": "tsx scripts/images/cli.ts status",
+    "image:index": "tsx scripts/images/cli.ts index",
+    "image:validate": "tsx scripts/images/cli.ts validate",
+    "image:prune": "tsx scripts/images/cli.ts prune"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.117.2",

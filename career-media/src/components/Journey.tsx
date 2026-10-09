@@ -1,8 +1,10 @@
 import Link from "next/link";
 import { ArrowLeft, ArrowRight, ClipboardList, Compass, MessageCircle, MessageSquareText } from "lucide-react";
 import type { ArticleSummary } from "@/lib/content/types";
+import { findSelectedImage } from "@/lib/generated-images";
 import { JOURNEY_ANCHOR, JOURNEYS, stepHref, type Journey, type JourneyStep } from "@/lib/journeys";
 import { ConsultButton } from "./ConsultationCta";
+import { GeneratedImage } from "./GeneratedImage";
 import { Motif } from "./illustrations/Motif";
 
 const stepTitle = (step: JourneyStep, articles: ArticleSummary[]) =>
@@ -171,6 +173,11 @@ export function JourneyCards() {
             data-pattern-id={j.patternId}
             className="tap lift group flex h-full flex-col overflow-hidden rounded-2xl border border-line bg-white hover:border-brand/40"
           >
+            {findSelectedImage(`journey-${j.id}`) && (
+              <span className={`block ${j.tone}`}>
+                <GeneratedImage slug={`journey-${j.id}`} sizes="(min-width: 768px) 360px, 82vw" className="block aspect-[16/9] h-auto w-full object-cover" fallback={null} />
+              </span>
+            )}
             <span className={`flex items-center gap-3 p-4 ${j.tone}`}>
               <span className="relative block aspect-square w-14 shrink-0 rounded-full bg-white">
                 <Motif name={j.scene} className="absolute inset-[6%]" />

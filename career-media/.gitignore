@@ -18,3 +18,7 @@ screenshots-*/
 export/site/
 export/sns/
 export/makecareer-demo/
+
+# 画像生成で差し替えた前の画像（ローカルだけに残す）
+.image-history/
+public/images/generated/**/*.tmp-*

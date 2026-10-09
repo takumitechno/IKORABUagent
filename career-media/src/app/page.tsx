@@ -4,6 +4,7 @@ import { JourneyCards } from "@/components/Journey";
 import { ArticleList, ArticleRow, LeadCard } from "@/components/ArticleCards";
 import { ConsultationCta } from "@/components/ConsultationCta";
 import { ExploreTabs } from "@/components/EntryGrid";
+import { GeneratedImage } from "@/components/GeneratedImage";
 import { CheckIllustration } from "@/components/illustrations/CheckIllustration";
 import { HeroIllustration } from "@/components/illustrations/HeroIllustration";
 import { Motif } from "@/components/illustrations/Motif";
@@ -75,7 +76,13 @@ export default async function HomePage() {
         <div className="relative mx-auto max-w-6xl px-4 pb-9 pt-2 sm:px-6 md:pb-16 md:pt-12">
           <div className="hero-grid">
             <div className="hero-art enter-pop">
-              <HeroIllustration className="mx-auto block h-[180px] w-auto max-w-full md:h-auto md:w-full" />
+              <GeneratedImage
+                slug="hero-home"
+                priority
+                sizes="(min-width: 768px) 560px, 270px"
+                className="mx-auto block h-[180px] w-auto max-w-full md:h-auto md:w-full"
+                fallback={<HeroIllustration className="mx-auto block h-[180px] w-auto max-w-full md:h-auto md:w-full" />}
+              />
             </div>
             <div className="hero-text md:pt-8">
               <h1 className="enter text-[27px] font-bold leading-[1.45] text-ink min-[400px]:text-[29px] sm:text-[44px]">
@@ -187,7 +194,12 @@ export default async function HomePage() {
         <section aria-labelledby="home-check" className="overflow-hidden rounded-2xl bg-brand-tint ring-1 ring-brand/15">
           <div className="grid gap-6 p-6 sm:p-10 md:grid-cols-2 md:items-center">
             <div className="flex items-center gap-4 md:block">
-              <CheckIllustration className="h-[96px] w-auto shrink-0 md:h-[160px]" />
+              <GeneratedImage
+                slug="check-support"
+                sizes="(min-width: 768px) 160px, 96px"
+                className="h-[96px] w-auto shrink-0 md:h-[160px]"
+                fallback={<CheckIllustration className="h-[96px] w-auto shrink-0 md:h-[160px]" />}
+              />
               <div className="md:mt-3">
                 <h2 id="home-check" className="text-[21px] font-bold leading-snug text-ink sm:text-[26px]">
                   条件整理チェック

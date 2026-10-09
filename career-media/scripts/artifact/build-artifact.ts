@@ -42,6 +42,17 @@ const stripScripts = (html: string) => html.replace(/<script\b[\s\S]*?<\/script>
 const escAttr = (s: string) => s.replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;");
 const decodeTitle = (s: string) => s.replace(/&amp;/g, "&").replace(/&quot;/g, '"').replace(/&#x27;/g, "'").replace(/&lt;/g, "<").replace(/&gt;/g, ">");
 
+/** 生成画像（public/images/generated/）は1ファイルに収めるため data URI に置き換える */
+function inlineGeneratedImages(html: string): string {
+  return html
+    .replace(/\ssrcset="[^"]*\/images\/generated\/[^"]*"/g, "")
+    .replace(/(src=")(\/images\/generated\/[A-Za-z0-9_\-./]+\.(png|jpe?g|webp))(")/g, (_m, pre: string, src: string, ext: string, post: string) => {
+      const file = path.join(ROOT, "public", src);
+      const mime = ext === "png" ? "image/png" : ext === "webp" ? "image/webp" : "image/jpeg";
+      return `${pre}data:${mime};base64,${fs.readFileSync(file).toString("base64")}${post}`;
+    });
+}
+
 async function main() {
   if (partner.profile !== "neutral") throw new Error("中立ブランド（既定の partner profile）で実行してください（実在企業の名義ではアーティファクトを作りません）");
   const base = arg("base", "http://127.0.0.1:3200");
@@ -60,7 +71,7 @@ async function main() {
   for (const route of [...routes, "/404"]) {
     const page = await get(base, route === "/404" ? "/__artifact_not_found__" : route);
     if (route !== "/404" && page.status !== 200) throw new Error(`${route}: HTTP ${page.status}`);
-    const main = stripScripts(pick(page.html, /<main id="main">([\s\S]*?)<\/main>/, `${route} の main`));
+    const main = inlineGeneratedImages(stripScripts(pick(page.html, /<main id="main">([\s\S]*?)<\/main>/, `${route} の main`)));
     if (/MakeCareer|make-career\.co\.jp|13-ユ-313746/.test(main)) throw new Error(`${route} に実在企業の表記が含まれています`);
     const title = decodeTitle(pick(page.html, /<title>([\s\S]*?)<\/title>/, `${route} の title`));
     templates.push(`<template data-route="${route}" data-title="${escAttr(title)}">${main}</template>`);

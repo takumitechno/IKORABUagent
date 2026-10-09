@@ -2,6 +2,8 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowRight, ClipboardList, Clapperboard, Compass, FileText, Images, MessageCircle, Smartphone, Video } from "lucide-react";
 import { CarouselSlide } from "@/components/sales/CarouselSlide";
+import { GeneratedImage } from "@/components/GeneratedImage";
+import { findSelectedImage } from "@/lib/generated-images";
 import { site } from "@/config/site";
 import { getRepository } from "@/lib/content";
 import { SNS_THEMES, utm } from "@/lib/sales/sns";
@@ -64,6 +66,20 @@ export default async function SnsThemePage({ params }: Props) {
         </ol>
         {!article && <p className="mt-2 text-xs text-accent-strong">対応する記事が見つかりません（公開状態を確認）</p>}
       </section>
+
+      {/* 表紙用ビジュアル（OpenAI で生成し、採用済みのものがあるときだけ出す） */}
+      {findSelectedImage(`sns-theme-${theme.id}-cover`) && (
+        <section aria-labelledby="cover-visual" className="mt-6 rounded-[var(--radius-card)] bg-white p-4 ring-1 ring-line sm:p-5">
+          <h2 id="cover-visual" className="flex flex-wrap items-center gap-2 text-[15px] font-bold text-ink">
+            表紙用ビジュアル（生成画像）
+            <Badge />
+          </h2>
+          <p className="mt-1 text-[12.5px] text-muted">文字は入れていません。タイトルは投稿時に重ねる想定です。</p>
+          <div className="mt-3 max-w-[280px] overflow-hidden rounded-xl ring-1 ring-line">
+            <GeneratedImage slug={`sns-theme-${theme.id}-cover`} sizes="280px" className="h-auto w-full" fallback={null} />
+          </div>
+        </section>
+      )}
 
       {/* カルーセル */}
       <section id="carousel" aria-labelledby="carousel-title" className="mt-10 scroll-mt-24">
