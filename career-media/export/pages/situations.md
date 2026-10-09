@@ -14,21 +14,21 @@ source:
 
 今の働き方や経歴に近いものを選ぶと、同じ状況の人に向けた記事をまとめて読めます。
 
-- 11
+- 13
   [フリーター](/situations/freeter)
 - 4
   [派遣社員](/situations/haken)
-- 11
+- 17
   [正社員経験が少ない](/situations/seishain-keiken-sukunai)
-- 10
+- 16
   [接客・販売の経験](/situations/sekkyaku)
-- 7
+- 12
   [第二新卒](/situations/dainishinsotsu)
-- 34
+- 50
   [初めての転職](/situations/hajimete)
 - 3
   [転職回数が多い](/situations/kaisu)
-- 6
+- 11
   [PC仕事が未経験](/situations/pc-mikeiken)
 
 ## 自分の場合を、一緒に整理してもらう

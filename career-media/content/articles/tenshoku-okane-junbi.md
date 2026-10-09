@@ -3,7 +3,7 @@ slug: tenshoku-okane-junbi
 kind: article
 title: 転職活動にかかるお金と、退職後の生活費の準備｜住民税・保険・年金と失業給付の待期・給付制限
 summary: 転職活動では、面接の交通費や身だしなみなどの出費に加えて、仕事をしない期間ができると、住民税・健康保険・年金を自分で払う場面が出てきます。退職後に失業給付を受ける場合も、待期と給付制限があり、すぐには受け取れません。かかるお金の種類と、準備しておきたい生活費の考え方を紹介します。
-status: review
+status: published
 categories: [junbi, hatarakikata]
 featured: false
 recommended: false
@@ -15,7 +15,7 @@ roles: []
 concerns: [yametai, kyuryo]
 situations: [hajimete]
 eyecatch: ["転職と退職後、", "お金はいくら必要？"]
-related: [shitsugyo-teate-kihon, taishoku-juminzei, zaishoku-tenshoku-susumekata]
+related: [shitsugyo-teate-kihon, taishoku-juminzei, zaishoku-tenshoku-susumekata, tenshoku-schedule, tenshoku-koukai-shinai]
 faq:
   - q: 自己都合で辞めたら、失業給付はいつからもらえますか？
     a: 受給資格が決まった日から7日間の待期があり、正当な理由のない自己都合退職の場合は、そのあとさらに給付制限の期間があります。2025年4月1日以降に離職した場合の給付制限は原則1か月です。振り込まれるまでの生活費は、手元のお金でまかなう前提で準備しておきましょう。
@@ -66,6 +66,9 @@ research_notes:
     - 国民健康保険料・任意継続の保険料の金額は、住んでいる地域や前年の収入、退職時の給与で変わるため書かず、見積もりの取り方と既存記事へのリンクにとどめた
     - 「生活費の3か月分を準備」などの目安は公的な根拠を確認できなかったので書かず、自分の数字で計算する式を示した
     - 給付制限が3か月になる場合（5年間に2回以上の自己都合退職など）は、検索結果で触れられていたが本記事では深追いせず、既存記事 shitsugyo-teate-kihon へのリンクにとどめた
+published_at: 2026-10-09
+reviewed_at: 2026-10-09
+reviewed_by: プロジェクトオーナー（チャットで承認）
 ---
 
 「転職したいけど、お金がもつか心配」。転職活動そのものの出費に加えて、仕事を辞めてから次の会社に入るまでのあいだは、給料が入らないのに、税金や保険料の支払いは続きます。

@@ -2,7 +2,7 @@
 slug: mensetsu-fukusou
 title: 転職の面接、服装はスーツ？「私服可」「服装自由」「オフィスカジュアル」の考え方と身だしなみチェック
 summary: 転職の面接の服装は、指定がなければスーツを選ぶと迷いにくくなります。「私服可」「服装自由」「オフィスカジュアル」と書かれていたときの考え方、迷ったときの確かめ方と問い合わせの例、スーツがないときの選び方、当日の身だしなみチェックを紹介します。
-status: review
+status: published
 categories: [shorui-mensetsu, junbi]
 featured: false
 recommended: false
@@ -14,7 +14,7 @@ roles: []
 concerns: [mensetsu]
 situations: [hajimete, freeter]
 eyecatch: ["面接の服装、", "スーツじゃなきゃダメ？"]
-related: [mensetsu-junbi-mikeiken, shiboudouki-mikeiken, kuhaku-kikan-setsumei]
+related: [mensetsu-junbi-mikeiken, shiboudouki-mikeiken, kuhaku-kikan-setsumei, web-mensetsu-junbi, mensetsu-yokukiku-shitsumon]
 faq:
   - q: 「私服でお越しください」と書かれていたのに、スーツで行ってもいいですか？
     a: スーツで行っても失礼にはあたらないと考えられますが、会社が「私服で」とはっきり書いているなら、その意図に合わせるのがよいでしょう。ジャケットに襟のあるシャツ、落ち着いた色のパンツやスカートのように、きちんと感のある服装にすると迷いにくくなります。不安なら、採用の担当者に問い合わせてかまいません。
@@ -73,6 +73,9 @@ research_notes:
     - 服装が合否にどの程度影響するかの調査データは、公的な根拠を確認できなかったので書かない
     - 面接会場に何分前に着くかの目安は、資料によって異なり今回の主題でもないため書かない
     - 特定のスーツ店やレンタルサービスには触れない
+published_at: 2026-10-09
+reviewed_at: 2026-10-09
+reviewed_by: プロジェクトオーナー（チャットで承認）
 ---
 
 「面接の案内に『服装自由』と書いてあるけど、本当に私服でいいの？」「スーツを持っていない」。面接の準備では、話す内容と同じくらい、服装で迷う人が多いです。

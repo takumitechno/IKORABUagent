@@ -14,7 +14,7 @@ roles: []
 concerns: [mensetsu, mikeiken-shokushu]
 situations: [sekkyaku]
 eyecatch: ["未経験の志望動機、", "何を書けばいい？"]
-related: [sekkyaku-keiken-ikasu, tenshoku-kaisu-kininaru, eigyo-cs-it-support-chigai]
+related: [sekkyaku-keiken-ikasu, tenshoku-kaisu-kininaru, eigyo-cs-it-support-chigai, jiko-pr-mikeiken]
 faq:
   - q: 「未経験ですが頑張ります」だけでは伝わりませんか？
     a: 意欲は伝わりますが、それだけだとほかの応募者との違いが見えにくくなります。なぜその仕事に興味を持ったのか、これまでの経験のどこが活かせそうかを添えると、同じ意欲でも説得力が変わります。

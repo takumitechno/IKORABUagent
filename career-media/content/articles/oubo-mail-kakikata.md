@@ -3,7 +3,7 @@ slug: oubo-mail-kakikata
 kind: article
 title: 転職の応募・面接日程・お礼のメールはどう書く？件名の付け方と返信のタイミング、例文
 summary: 転職活動のメールは「件名で用件と名前が分かる」「結論を先に書く」「署名を入れる」の3つを押さえれば、むずかしい言い回しはいりません。応募書類を送るとき、面接の日程を調整するとき、面接のあとにお礼を送るときの例文と、返信のタイミングを紹介します。
-status: review
+status: published
 categories: [shorui-mensetsu, junbi]
 featured: false
 recommended: false
@@ -15,7 +15,7 @@ roles: []
 concerns: [mensetsu]
 situations: [hajimete, pc-mikeiken]
 eyecatch: ["応募のメール、", "何て書けばいい？"]
-related: [mensetsu-junbi-mikeiken, rirekisho-kakukoto-nai, zaishoku-tenshoku-susumekata]
+related: [mensetsu-junbi-mikeiken, rirekisho-kakukoto-nai, zaishoku-tenshoku-susumekata, naitei-jitai-tsutaekata, web-mensetsu-junbi]
 faq:
   - q: 会社からのメールに返信するとき、件名は変えたほうがいいですか？
     a: 返信のときは、件名の「Re:」を残したまま変えずに送るのが一般的です。担当者が、どのやりとりへの返事なのかをすぐに見つけられます。自分から新しく送るときは「応募書類送付の件／山田太郎」のように、用件と名前を入れます。
@@ -56,6 +56,9 @@ research_notes:
   not_used:
     - 「返信は24時間以内」「お礼メールで評価が上がる」などの目安・効果は公的な根拠を確認できなかったので、数字は書かず「できるだけその日のうちに」とし、効果は断定しない
     - 転職サイト各社のメールテンプレートは特定サービスに寄るため参考にとどめ、出典にしない
+published_at: 2026-10-09
+reviewed_at: 2026-10-09
+reviewed_by: プロジェクトオーナー（チャットで承認）
 ---
 
 転職活動を始めると、応募書類を送る、面接の日程を決める、面接のお礼を伝える、とメールを書く場面が続きます。「件名は何て書く？」「この敬語で合ってる？」と手が止まってしまう人も多いはずです。

@@ -3,7 +3,7 @@ slug: gyaku-shitsumon
 kind: article
 title: 面接の逆質問、何を聞けばいい？聞くとよいこと・避けたいことと未経験向けの質問例
 summary: 面接の最後の「何か質問はありますか？」は、入社後に自分が働けるかを確かめる時間です。質問の作り方、研修・最初の仕事・評価についての未経験向けの質問例、避けたい質問、給料や休みの聞き方、質問がなくなったときの言い方を紹介します。
-status: review
+status: published
 categories: [shorui-mensetsu, junbi]
 featured: false
 recommended: false
@@ -15,7 +15,7 @@ roles: []
 concerns: [mensetsu, mikeiken-shokushu]
 situations: [hajimete, seishain-keiken-sukunai]
 eyecatch: ["「何か質問は？」", "何を聞けばいい？"]
-related: [mensetsu-junbi-mikeiken, mikeiken-kenshu-kakunin, naitei-shodaku-mae]
+related: [mensetsu-junbi-mikeiken, mikeiken-kenshu-kakunin, naitei-shodaku-mae, mensetsu-yokukiku-shitsumon, web-mensetsu-junbi]
 faq:
   - q: 逆質問で「特にありません」と答えると、落ちますか？
     a: それだけで結果が決まるとは言えません。ただ、ハローワークの面接対策の資料では、逆質問で「特にありません」とはしないようにすすめています。面接の中で疑問が解消した場合は、「〇〇について詳しく教えていただいたので、今は大丈夫です」と、聞きたかったことが分かったと伝えるとよいでしょう。
@@ -57,6 +57,9 @@ research_notes:
     - 「逆質問は3つ用意する」「逆質問で合否が決まる割合」などの数や割合は、公的な根拠を確認できなかったので書かない
     - ホットラインの電話番号は変わる可能性があるため本文に書かず、ページ名の案内にとどめた
     - 面接の段階（一次・最終）ごとに面接官が誰かは会社によって違うため、断定せず「誰が面接官かを見て変える」にとどめた
+published_at: 2026-10-09
+reviewed_at: 2026-10-09
+reviewed_by: プロジェクトオーナー（チャットで承認）
 ---
 
 面接の最後に「何か質問はありますか？」と聞かれて、何を聞けばいいのか分からず「特にありません」と答えてしまった。そんな経験がある人もいるかもしれません。

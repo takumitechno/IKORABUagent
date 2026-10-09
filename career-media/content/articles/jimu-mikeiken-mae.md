@@ -14,7 +14,7 @@ roles: [jimu]
 concerns: [office, mikeiken-shokushu]
 situations: [sekkyaku, pc-mikeiken]
 eyecatch: ["未経験から事務職へ。", "最初に知っておきたいこと"]
-related: [pc-nigate-jimu, sekkyaku-keiken-ikasu, mikeiken-kenshu-kakunin]
+related: [pc-nigate-jimu, sekkyaku-keiken-ikasu, mikeiken-kenshu-kakunin, eigyo-jimu-shigoto, keiri-mikeiken]
 faq:
   - q: 事務職は、資格がないと応募できませんか？
     a: 求人によって違います。応募条件の欄に資格が書かれていなければ、資格がなくても応募できます。資格の有無よりも、「表計算ソフトで入力と合計の計算ができる」のように、できる操作を具体的に伝えられるほうが判断材料になりやすいです。

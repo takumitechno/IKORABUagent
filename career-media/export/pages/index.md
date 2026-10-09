@@ -32,61 +32,61 @@ source:
 
 **［タブ: 今の状況から］**
 
-- 11
+- 13
   [フリーター](/situations/freeter)
 - 4
   [派遣社員](/situations/haken)
-- 11
+- 17
   [正社員経験が少ない](/situations/seishain-keiken-sukunai)
-- 10
+- 16
   [接客・販売の経験](/situations/sekkyaku)
-- 7
+- 12
   [第二新卒](/situations/dainishinsotsu)
-- 34
+- 50
   [初めての転職](/situations/hajimete)
 - 3
   [転職回数が多い](/situations/kaisu)
-- 6
+- 11
   [PC仕事が未経験](/situations/pc-mikeiken)
 
 [状況の一覧](/situations)
 
 **［タブ: 悩みから］**
 
-- 11
+- 15
   [給料を上げたい](/concerns/kyuryo)
-- 4
-  [土日休みにしたい](/concerns/donichi)
 - 5
+  [土日休みにしたい](/concerns/donichi)
+- 7
   [オフィスワークに行きたい](/concerns/office)
-- 12
+- 13
   [正社員になりたい](/concerns/seishain)
-- 23
+- 32
   [未経験の職種に挑戦したい](/concerns/mikeiken-shokushu)
-- 17
+- 21
   [今の仕事を辞めたい](/concerns/yametai)
-- 9
+- 19
   [面接・書類が不安](/concerns/mensetsu)
-- 9
+- 10
   [やりたい仕事が分からない](/concerns/yaritai)
 
 [悩みの一覧](/concerns)
 
 **［タブ: 職種から］**
 
-- 3
+- 4
   [営業](/jobs/eigyo)
-- 4
+- 7
   [事務](/jobs/jimu)
-- 4
+- 5
   [カスタマーサポート](/jobs/customer-support)
-- 3
+- 4
   [ITサポート](/jobs/it-support)
 - 2
   [人事・採用](/jobs/jinji)
 - 2
   [販売・接客](/jobs/hanbai)
-- 2
+- 3
   [その他の職種](/jobs/sonota)
 
 [職種を比べる](/jobs)
@@ -152,16 +152,16 @@ source:
 
 [すべて見る](/articles)
 
+- 職種を知る 2026.10.09
+  ### [コールセンターの仕事内容は？受信と発信の違い・向き不向きと、接客経験の活かし方](/articles/callcenter-shigoto)
+- 職種を知る 2026.10.09
+  ### [営業事務ってどんな仕事？一般事務との違い・1日の流れと、応募前に求人で確認すること](/articles/eigyo-jimu-shigoto)
+- 面接・書類 2026.10.09
+  ### [面接の逆質問、何を聞けばいい？聞くとよいこと・避けたいことと未経験向けの質問例](/articles/gyaku-shitsumon)
 - 制度・手続き 2026.10.09
   ### [ハロートレーニング（公共職業訓練）とは？未経験の仕事のスキルを無料で学ぶ流れ](/articles/hello-training)
-- 面接・書類 2026.10.09
-  ### [職歴に空白期間があるとき、面接でどう説明する？書類の書き方と答え方の例](/articles/kuhaku-kikan-setsumei)
-- 制度・手続き 2026.10.09
-  ### [教育訓練給付金の使い方｜3つの種類と、講座を申し込む前に確認すること](/articles/kyouiku-kunren-kyufu-tsukaikata)
-- 制度・手続き 2026.10.09
-  ### [求職者支援制度とは？失業手当がない人が無料で職業訓練を受けられるしくみ](/articles/kyushokusha-shien-seido)
-- 制度・手続き 2026.10.09
-  ### [契約社員と正社員は何が違う？「無期転換ルール」のしくみと求人で確認すること](/articles/muki-tenkan-keiyaku)
+- 転職準備 2026.10.09
+  ### [転職のための自己分析のやり方｜経験の棚卸し・ゆずれない条件・やりたくないことの書き出し例](/articles/jiko-bunseki-yarikata)
 
 ## 知っておきたい制度の変更
 

@@ -14,7 +14,7 @@ roles: [hanbai, customer-support, eigyo]
 concerns: [mikeiken-shokushu, mensetsu]
 situations: [sekkyaku]
 eyecatch: ["接客の経験、", "ほかの仕事で活かせる？"]
-related: [shiboudouki-mikeiken, eigyo-cs-it-support-chigai, mikeiken-tenshoku-hajimekata]
+related: [shiboudouki-mikeiken, eigyo-cs-it-support-chigai, mikeiken-tenshoku-hajimekata, callcenter-shigoto]
 faq:
   - q: アルバイトの接客経験でも、職務経歴書に書いていいのでしょうか？
     a: 書いて構いません。雇用形態よりも、どんな業務をどのくらいの期間担当し、何を工夫したかが判断材料になります。正社員経験と区別がつくよう、雇用形態と期間は正確に書きましょう。

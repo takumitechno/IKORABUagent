@@ -2,7 +2,7 @@
 slug: kaigo-mikeiken
 title: 未経験から介護職へ転職するときに知っておきたいこと｜仕事内容・資格の段階・夜勤
 summary: 介護職は、施設や利用者の自宅で、食事・入浴・排せつなど日常生活の手助けをする仕事です。施設介護と訪問介護の違い、介護職員初任者研修から介護福祉士までの資格の段階、夜勤を含む働き方、応募前に確認することを紹介します。
-status: review
+status: published
 categories: [shokushu, mikeiken]
 featured: false
 recommended: false
@@ -14,7 +14,7 @@ roles: [sonota]
 concerns: [mikeiken-shokushu]
 situations: [hajimete, sekkyaku]
 eyecatch: ["介護職、", "未経験から始められる？"]
-related: [hello-training, kyouiku-kunren-kyufu-tsukaikata, mikeiken-kenshu-kakunin]
+related: [hello-training, kyouiku-kunren-kyufu-tsukaikata, mikeiken-kenshu-kakunin, mikeiken-shikaku, koteizangyo-kyujin]
 faq:
   - q: 資格がなくても、介護の仕事はできますか？
     a: 介護施設では、医療・福祉関係の資格がない人が介護の仕事に就いている場合もあります。その場合、事業者は認知症介護基礎研修を受けさせる措置をとることが義務づけられています。一方、利用者の自宅を訪問する訪問介護員（ホームヘルパー）として働くには、介護職員初任者研修の修了が必要です。求人の応募資格の欄で確認しましょう。
@@ -73,6 +73,9 @@ research_notes:
     - 新しく採用された無資格の職員に対する認知症介護基礎研修の猶予期間は、検索結果で一次情報を確認しきれなかったため書かない
     - 初任者研修の講座の費用・期間の相場は公的な根拠を確認できなかったので書かない
     - 初任者研修が教育訓練給付制度の対象かどうかは講座ごとに違うため断定せず、確かめ方の記事へのリンクにとどめた
+published_at: 2026-10-09
+reviewed_at: 2026-10-09
+reviewed_by: プロジェクトオーナー（チャットで承認）
 ---
 
 「人の役に立つ仕事がしたい」「資格を取って、長く続けられる仕事に就きたい」。そう考えて介護職を候補に入れる人は少なくありません。一方で、「資格がないと無理？」「夜勤はきつい？」と、最初の一歩で迷いやすい仕事でもあります。

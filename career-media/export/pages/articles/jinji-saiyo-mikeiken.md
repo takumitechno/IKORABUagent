@@ -176,5 +176,5 @@ source:
   ### [接客経験は転職でどう活かせる？職種別のつながりと伝え方](/articles/sekkyaku-keiken-ikasu)
 - 未経験転職 2026.10.06
   ### [未経験転職は何から始める？最初に整理したい5つのこと](/articles/mikeiken-tenshoku-hajimekata)
-- 職種を知る 2026.10.06
-  ### [AIで変わる仕事を、未経験転職者はどう見るべきか](/articles/ai-shigoto-mikeiken)
+- 職種を知る 2026.10.09
+  ### [コールセンターの仕事内容は？受信と発信の違い・向き不向きと、接客経験の活かし方](/articles/callcenter-shigoto)

@@ -2,7 +2,7 @@
 slug: jiko-bunseki-yarikata
 title: 転職のための自己分析のやり方｜経験の棚卸し・ゆずれない条件・やりたくないことの書き出し例
 summary: 転職の自己分析は、性格をくわしく調べることより「やってきたこと」「ゆずれない条件」「やりたくないこと」の3つを紙に書き出すことから始めると進めやすくなります。書き出しのワーク例と、まとめ方、書類や面接での使い方、無料で使える公的なツールを紹介します。
-status: review
+status: published
 categories: [junbi, mikeiken]
 featured: false
 recommended: false
@@ -14,7 +14,7 @@ roles: []
 concerns: [yaritai, mikeiken-shokushu]
 situations: [hajimete, sekkyaku]
 eyecatch: ["自己分析って、", "何を書けばいい？"]
-related: [shigoto-sagashikata, mikeiken-tenshoku-hajimekata, sekkyaku-keiken-ikasu]
+related: [shigoto-sagashikata, mikeiken-tenshoku-hajimekata, sekkyaku-keiken-ikasu, tenshoku-schedule, jiko-pr-mikeiken]
 faq:
   - q: 自己分析にはどのくらい時間をかければいいですか？
     a: 決まった時間はありません。最初から完璧にまとめようとせず、まずは3つの書き出し（やってきたこと・ゆずれない条件・やりたくないこと）を一度やってみて、求人を見たり面接を受けたりしながら書き足していくほうが進めやすくなります。
@@ -72,6 +72,9 @@ research_notes:
     - 「自己分析は〇時間・〇日で終わらせる」といった目安は根拠がないため書かない
     - job tag の「ポータブルスキル見える化ツール」は、主にミドルシニア層を想定したものと案内されているため、読者向けには紹介しない
     - 性格診断などの民間の診断サービスは、特定のサービスに触れないため扱わない
+published_at: 2026-10-09
+reviewed_at: 2026-10-09
+reviewed_by: プロジェクトオーナー（チャットで承認）
 ---
 
 「転職するなら、まず自己分析」と言われても、何を書けばいいのか分からず手が止まる人は多いです。

@@ -3,7 +3,7 @@ slug: web-mensetsu-junbi
 kind: article
 title: Web面接（オンライン面接）の準備は？通信・カメラ位置・背景・服装と、つながらないときの連絡
 summary: Web面接は、会場を自分で用意する面接です。前日までに通信・アプリ・カメラを本番と同じ条件で試し、当日は早めにログインして、つながらないときの連絡先を手元に置いておきます。カメラの高さや明るさ、背景、服装、当日の流れ、トラブル時の連絡の例文を紹介します。
-status: review
+status: published
 categories: [shorui-mensetsu, junbi]
 featured: false
 recommended: false
@@ -15,7 +15,7 @@ roles: []
 concerns: [mensetsu]
 situations: [hajimete, pc-mikeiken]
 eyecatch: ["Web面接、", "何を準備すればいい？"]
-related: [mensetsu-junbi-mikeiken, zaishoku-tenshoku-susumekata, pc-nigate-jimu]
+related: [mensetsu-junbi-mikeiken, zaishoku-tenshoku-susumekata, pc-nigate-jimu, mensetsu-fukusou, oubo-mail-kakikata]
 faq:
   - q: Web面接はスマホで受けても大丈夫ですか？
     a: 会社から指定がなければ、スマホで受けられる場合もあります。その場合は、手に持たずにスタンドなどで固定し、充電しながら、通知を切って受けましょう。パソコンかスマホか迷うときは、面接の案内に書かれていないかを確認し、分からなければ事前に問い合わせると安心です。
@@ -49,6 +49,9 @@ research_notes:
     - 兵庫労働局のチェックポイントにある通信速度の目安の数値は、抜粋だけでは正確な値と条件を確認できなかったため書かない
     - 背景ぼかし機能の可否は、ハローワークの資料によって扱いが分かれていた（使ってよいとする資料と、使わないことをすすめる資料がある）ため断定せず、「実際の背景を整えるのが無難」にとどめた
     - 使うアプリ（Zoom・Teams など）は会社によって違うため、特定のサービスの操作方法は書かない
+published_at: 2026-10-09
+reviewed_at: 2026-10-09
+reviewed_by: プロジェクトオーナー（チャットで承認）
 ---
 
 「Web面接で」と案内が来たけれど、家のどこで受ければいいのか、何を用意すればいいのか分からない。はじめてだと不安になりますよね。

@@ -29,19 +29,19 @@ JOB GUIDE
 
 ## 職種から記事を探す
 
-- 3
+- 4
   [営業](/jobs/eigyo)
-- 4
+- 7
   [事務](/jobs/jimu)
-- 4
+- 5
   [カスタマーサポート](/jobs/customer-support)
-- 3
+- 4
   [ITサポート](/jobs/it-support)
 - 2
   [人事・採用](/jobs/jinji)
 - 2
   [販売・接客](/jobs/hanbai)
-- 2
+- 3
   [その他の職種](/jobs/sonota)
 
 ## 4つの職種を比べる

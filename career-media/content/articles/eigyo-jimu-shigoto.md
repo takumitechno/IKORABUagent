@@ -3,7 +3,7 @@ slug: eigyo-jimu-shigoto
 kind: article
 title: 営業事務ってどんな仕事？一般事務との違い・1日の流れと、応募前に求人で確認すること
 summary: 営業事務は、営業担当の依頼を受けて見積書や受注の入力、取引先からの問い合わせ対応などを行い、営業活動を支える仕事です。一般事務との違い、1日の流れの例、よく使うスキル、未経験で応募する前に求人で確認しておきたいことをまとめました。
-status: review
+status: published
 categories: [shokushu, mikeiken]
 featured: false
 recommended: false
@@ -15,7 +15,7 @@ roles: [jimu, eigyo]
 concerns: [office, mikeiken-shokushu]
 situations: [sekkyaku, pc-mikeiken]
 eyecatch: ["営業事務って、", "一般事務と何が違う？"]
-related: [jimu-mikeiken-mae, pc-nigate-jimu, sekkyaku-keiken-ikasu]
+related: [jimu-mikeiken-mae, pc-nigate-jimu, sekkyaku-keiken-ikasu, keiri-mikeiken, mikeiken-shikaku]
 faq:
   - q: 営業事務は、営業のノルマがありますか？
     a: 営業事務は営業担当を支える仕事で、job tag（厚生労働省の職業情報提供サイト）でも、見積書の作成や受注の入力、問い合わせ対応などが仕事の中心とされています。ただ、職場によっては電話での受注や簡単な提案を任されることもあります。不安なときは、面接で「個人の売上目標はありますか」と聞いて確かめましょう。
@@ -53,6 +53,9 @@ research_notes:
     - 「営業事務は女性が多い」という job tag の記述は、読者を属性で分ける書き方になるため使わない
     - 1日の流れの具体的な時刻は出典にないため入れず、「朝・午前・昼すぎ・夕方」の書き方にとどめた
     - MOS などの資格の評価は会社によって違うため、資格の紹介は最小限にした
+published_at: 2026-10-09
+reviewed_at: 2026-10-09
+reviewed_by: プロジェクトオーナー（チャットで承認）
 ---
 
 「事務の仕事がしたい」と求人を探していると、「一般事務」と並んで「営業事務」という職種名をよく見かけます。営業と付いているけれど、営業をするのか、事務なのか。迷う人は多いと思います。

@@ -3,7 +3,7 @@ slug: naitei-jitai-tsutaekata
 kind: article
 title: 内定辞退の伝え方は？電話とメールの使い分け・例文と、承諾後に辞退するときの注意
 summary: 内定を辞退すると決めたら、できるだけ早く、まず電話で採用担当者に伝え、メールでも残すのが基本です。連絡のタイミング、電話での言い方とメールの例文、理由の伝え方、承諾したあとに辞退するときの民法の考え方と注意点を紹介します。
-status: review
+status: published
 categories: [junbi, shorui-mensetsu]
 featured: false
 recommended: false
@@ -15,7 +15,7 @@ roles: []
 concerns: [mensetsu]
 situations: [hajimete, dainishinsotsu]
 eyecatch: ["内定辞退、", "どう伝えればいい？"]
-related: [naitei-shodaku-mae, taishoku-tsutaekata, zaishoku-tenshoku-susumekata]
+related: [naitei-shodaku-mae, taishoku-tsutaekata, zaishoku-tenshoku-susumekata, tenshoku-koukai-shinai, oubo-mail-kakikata]
 faq:
   - q: 内定辞退はメールだけで伝えてもいいですか？
     a: 法律で連絡の方法が決まっているわけではありませんが、まず電話で採用担当者に伝え、そのあとメールでも送っておくと、行き違いが起きにくく丁寧です。担当者につながらないときは、メールで先に伝えたうえで、あらためて電話をかけましょう。
@@ -65,6 +65,9 @@ research_notes:
     - 「辞退は入社の〇か月前まで」などの目安は公的な根拠を確認できなかったので書かない
     - 損害賠償を求められた事例や金額は、個別の事情で変わり公的な根拠も確認できなかったため、「準備にかかった費用などで話し合いになることもある」と一般論にとどめ、断定しない
     - 契約期間の決まった雇用（契約社員など）の内定辞退は民法第627条の前提と違うため扱わず、契約内容の確認と相談をすすめるにとどめた
+published_at: 2026-10-09
+reviewed_at: 2026-10-09
+reviewed_by: プロジェクトオーナー（チャットで承認）
 ---
 
 複数の会社から内定をもらった、条件を確かめたら考えが変わった。理由はさまざまでも、内定を辞退するときは「どう伝えればいいのか」「怒られないか」と気が重くなるものです。

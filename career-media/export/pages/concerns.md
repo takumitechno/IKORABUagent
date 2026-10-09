@@ -14,21 +14,21 @@ source:
 
 今いちばん気になっていることから、関係のある記事をまとめて読めます。
 
-- 11
+- 15
   [給料を上げたい](/concerns/kyuryo)
-- 4
-  [土日休みにしたい](/concerns/donichi)
 - 5
+  [土日休みにしたい](/concerns/donichi)
+- 7
   [オフィスワークに行きたい](/concerns/office)
-- 12
+- 13
   [正社員になりたい](/concerns/seishain)
-- 23
+- 32
   [未経験の職種に挑戦したい](/concerns/mikeiken-shokushu)
-- 17
+- 21
   [今の仕事を辞めたい](/concerns/yametai)
-- 9
+- 19
   [面接・書類が不安](/concerns/mensetsu)
-- 9
+- 10
   [やりたい仕事が分からない](/concerns/yaritai)
 
 ## 自分の場合を、一緒に整理してもらう

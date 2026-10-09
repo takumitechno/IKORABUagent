@@ -16,7 +16,7 @@ roles: []
 concerns: [mikeiken-shokushu, yaritai]
 situations: [hajimete]
 eyecatch: ["未経験の転職、", "何から始める？"]
-related: [agent-mendan-mae, donichi-yasumi-nenshu-hikaku, eigyo-cs-it-support-chigai]
+related: [agent-mendan-mae, donichi-yasumi-nenshu-hikaku, eigyo-cs-it-support-chigai, tenshoku-schedule]
 faq:
   - q: 自分には強みと言えるような経験がありません。それでも整理する意味はありますか？
     a: あります。整理の目的は「すごい経験」を探すことではなく、どんな作業をどのくらい続けてきたかを事実として並べることです。アルバイトのシフト管理や新人への説明なども、書き出してみると仕事選びの材料になります。

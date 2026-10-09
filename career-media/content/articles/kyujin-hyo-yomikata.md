@@ -6,7 +6,7 @@ status: draft
 categories: [junbi]
 featured: false
 updated_at: 2026-10-06
-related: []
+related: [koteizangyo-kyujin, tenshoku-koukai-shinai]
 sources: []
 research_notes:
   schema_version: 2

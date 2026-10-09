@@ -2,7 +2,7 @@
 slug: mensetsu-yokukiku-shitsumon
 title: 転職の面接でよく聞かれる質問と答え方｜自己紹介・転職理由・志望動機の型と回答例
 summary: 転職の面接で聞かれることの多くは、「何ができるか」「どのくらい入りたいか」「どんな人か」を確かめる質問です。自己紹介・転職理由・志望動機・強み弱み・未経験の仕事を選んだ理由について、答え方の型と回答例を紹介します。応募者に聞いてはいけないとされている質問の考え方も紹介します。
-status: review
+status: published
 categories: [shorui-mensetsu, mikeiken]
 featured: false
 recommended: false
@@ -14,7 +14,7 @@ roles: []
 concerns: [mensetsu, mikeiken-shokushu]
 situations: [hajimete, sekkyaku]
 eyecatch: ["面接の質問、", "どう答えればいい？"]
-related: [mensetsu-junbi-mikeiken, shiboudouki-mikeiken, kuhaku-kikan-setsumei]
+related: [mensetsu-junbi-mikeiken, shiboudouki-mikeiken, kuhaku-kikan-setsumei, gyaku-shitsumon, taishoku-riyuu-mensetsu, jiko-pr-mikeiken]
 faq:
   - q: 面接の回答は、丸暗記して臨んだほうがいいですか？
     a: 文章をまるごと覚えると、少し違う聞き方をされたときに言葉が出なくなりがちです。質問ごとに「結論」と「話したいエピソード」だけを決めておき、あとは自分の言葉で話す練習をしておくほうが、落ち着いて答えやすくなります。
@@ -72,6 +72,9 @@ research_notes:
     - 「自己紹介は1分程度」「転職理由を重視する企業は約85%」などの時間・割合は、公的な根拠を確認できなかったので書かない
     - よく聞かれる質問のランキングは、調査の出どころが確認できないので使わない
     - 「その質問は違法です」と面接官に指摘するような対応は、法的な線引きを断定できないため書かず、相談先の案内にとどめた
+published_at: 2026-10-09
+reviewed_at: 2026-10-09
+reviewed_by: プロジェクトオーナー（チャットで承認）
 ---
 
 はじめての転職の面接は、「何を聞かれるんだろう」「うまく答えられなかったらどうしよう」と不安になりやすいものです。

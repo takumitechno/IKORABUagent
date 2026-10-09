@@ -363,6 +363,143 @@ insert into article_versions (article_id, version, title, summary, body_md, crea
 insert into article_reviews (article_id, version, reviewer, verdict, checks) select id, 1, 'seed', 'approved', '{"content_hash":"7187eb930615001345edb40a897c6c9cc489626b34ec2a878fb52bef84738f5e","findings":[]}'::jsonb from articles where slug = 'ai-shigoto-mikeiken';
 update articles set status = 'published' where slug = 'ai-shigoto-mikeiken';
 
+-- article: callcenter-shigoto (published)
+insert into articles (slug, kind, title, summary, body_md, status, featured, published_at, updated_at, reviewed_at, reviewed_by, information_checked_at, seo_title, seo_description, related_slugs, roles, concerns, situations, eyecatch, illustration, recommended, faq, news_meta, research_notes) values ('callcenter-shigoto', 'article', 'コールセンターの仕事内容は？受信と発信の違い・向き不向きと、接客経験の活かし方', 'コールセンターの仕事は、電話やメールでお客さまに応対し、聞き取った内容をパソコンに入力する仕事です。受信（インバウンド）と発信（アウトバウンド）の違い、向き不向き、接客経験の活かし方、応募前に求人で確認することを紹介します。', '「接客の仕事から離れたいけど、人と話すことはきらいじゃない」。そんなときに候補に挙がりやすいのが、コールセンターの仕事です。求人もよく見かけますが、実際に何をするのか、電話ばかりでつらくないのか、イメージしにくい人も多いはずです。
+
+先に結論を言うと、コールセンターの仕事は**お客さまの話を聞き、パソコンに入力し、必要なら担当者につなぐ仕事**です。受信（かかってきた電話に出る）と発信（こちらからかける）で中身がかなり違うので、まずはどちらの求人かを見分けるところから始めましょう。
+
+この記事で分かること：
+
+- コールセンターの**仕事内容**と、受信・発信の違い
+- **向いている人**と、合わないと感じやすい場面
+- **接客経験の活かし方**と、面接での伝え方の例
+- 応募前に**求人で確認すること**
+
+## コールセンターの仕事は「聞く・入力する・つなぐ」
+
+厚生労働省の職業情報提供サイト（job tag）では、コールセンターオペレーターを、電話やファックス、インターネット、メールなどを通じてお客さまと応対する仕事として紹介しています。仕事の中身として挙げられているのは、次のようなものです。
+
+- お客さまからの注文や質問に応対する
+- 必要なことを聞き取りながら、パソコンに入力する
+- 聞き取った内容を復唱して確認する
+- クレーム（苦情）に応対する
+- 内容に応じて、ほかの担当者に電話をつなぐ
+- 仕事の終わりに、電話の件数や結果を上司に報告する
+
+1本の電話の流れにすると、たとえばこんな形です（仮の例です）。
+
+> お客さま「先週注文した商品が、まだ届かないんですが」
+> オペレーター「ご不便をおかけしております。確認いたしますので、ご注文のときのお名前とお電話番号を教えていただけますか」（聞き取りながら画面で注文を検索）
+> オペレーター「〇〇様、〇月〇日のご注文ですね。発送の状況をお調べします」（状況を確認し、分からなければ担当部署へ取り次ぐ）
+
+話しながら画面を見て、入力する。この「同時に進める」動きが、コールセンターの基本になります。金融・保険、小売、メーカー、サービス業など、いろいろな業種の会社がコールセンターを置いているので、扱う商品やサービスによって覚えることも変わります。
+
+## 受信（インバウンド）と発信（アウトバウンド）の違い
+
+job tag でも、コールセンターの仕事は、お客さまから電話がかかってくる**インバウンド**と、お客さまに電話をかける**アウトバウンド**の2つに分けられています。
+
+```figure
+type: compare
+title: 受信と発信の違い
+columns:
+  - label: 受信（インバウンド）
+    tone: sky
+    items:
+      - かかってきた電話に出る
+      - 注文の受付、問い合わせへの回答
+      - 困っている人の話を聞く場面が多い
+  - label: 発信（アウトバウンド）
+    tone: sand
+    items:
+      - こちらから電話をかける
+      - 案内、勧誘、アンケート、予約の確認など
+      - 断られる場面もある
+```
+
+求人では「受電」「インバウンド」「お問い合わせ対応」と書かれていれば受信、「架電」「発信」「アウトバウンド」「テレアポ」と書かれていれば発信のことが多いです。両方を担当する職場もあるので、仕事内容の欄をよく読みましょう。
+
+## 向いている人・合わないと感じやすい場面
+
+### 向いている人
+
+- 相手の話を最後まで聞き、要点をつかむのが得意
+- 落ち着いた声で、ていねいな言葉づかいができる
+- マニュアルや決まった手順に沿って進めるのが苦にならない
+- 話しながらメモをとったり、入力したりするのに慣れている
+
+### 合わないと感じやすい場面
+
+- 一日の多くの時間、席について電話と画面に向き合う
+- 相手の顔が見えないので、声だけで気持ちをくみ取る必要がある
+- 発信の仕事では、断られることが続く日もある
+- 怒っているお客さまの電話を受けることもある
+
+「自分に向いているか」は、仕事内容の一つひとつを見て、**どの場面なら疲れにくいか**で考えると判断しやすくなります。営業やITサポートとの違いも比べたいときは、[営業・カスタマーサポート・ITサポートの違い](/articles/eigyo-cs-it-support-chigai)が参考になります。
+
+## 接客経験はどう活かせる？
+
+店頭での接客と電話の応対は、重なる部分が多い仕事です。
+
+| 接客でやってきたこと | コールセンターで活きる場面 |
+| --- | --- |
+| お客さまの要望を聞いて商品を案内した | 問い合わせの内容を聞き取り、答えを案内する |
+| レジや予約の受付をした | 注文や申し込みを、聞きながら正確に入力する |
+| 苦情を受けて、店長に引き継いだ | クレームに応対し、必要なら上の人につなぐ |
+| 混雑時も順番に対応した | 電話が続くときも、一件ずつ落ち着いて応対する |
+
+一方で、電話では**表情や身ぶりが使えない**こと、**パソコンの入力を同時に進める**ことが、店頭とは違います。面接では、重なる部分を具体的に話し、違う部分は「どう慣れていくか」を添えると伝わりやすくなります。
+
+> 「カフェで接客の仕事をしてきました。忙しい時間帯でも、注文を復唱して聞き間違いを防ぐことを心がけていました。電話では表情が見えない分、声のトーンと言葉で安心してもらえるよう、研修で応対の型を早く覚えたいと考えています。」（仮の例です）
+
+接客経験の言葉にし方は、[接客経験は転職でどう活かせる？](/articles/sekkyaku-keiken-ikasu)でも職種別に紹介しています。
+
+## 未経験でも大丈夫？入社後の流れ
+
+job tag では、コールセンターオペレーターになるのに学歴や資格は特に必要ないとされています。入社後は、扱う商品やサービスの知識を学び、ロールプレイ（練習の応対）を経て、上の立場の人の指導を受けながら、ひとりで応対できるようになっていく流れが紹介されています。
+
+研修の長さや内容、ひとりで電話を受け始める時期は、会社によって違います。「研修あり」と書かれている求人の確かめ方は、[未経験求人の「研修あり」で確認すべきこと](/articles/mikeiken-kenshu-kakunin)にまとめています。
+
+### クレームが不安なら、体制を確認する
+
+クレームへの応対は、コールセンターの仕事のひとつです。ただ、ひとりで抱え込むものではありません。2026年10月1日からは、カスタマーハラスメント（お客さまなどからの度を越えた言動）への対策が、事業主の義務になりました。会社は、働く人が相談できる体制を整えるなどの対策をとる必要があります。
+
+面接では、遠慮せずに次のように聞いてみましょう。
+
+> 「対応が難しいお電話のときは、どなたに、どのように引き継ぐ流れになっていますか。」
+
+## 応募前に、求人で確認すること
+
+job tag では、24時間365日対応のコールセンターもあり、交替制の勤務になる場合があると紹介されています。土日休みを希望する人は特に、勤務時間とシフトを先に確かめておきましょう。
+
+```figure
+type: checklist
+title: コールセンターの求人で確認すること
+items:
+  - 受信・発信のどちらか、両方か
+  - 扱う商品やサービスの内容
+  - 勤務時間とシフト、土日祝の出勤
+  - 研修の長さと、ひとりで応対し始める時期
+  - 困ったときに引き継げる人がいるか
+  - 電話の件数などの目標があるか
+  - 正社員・契約社員・派遣など雇用の形
+```
+
+求人に書かれていないことは、面接で質問してかまいません。たとえば次のような聞き方があります。
+
+- 「一日に受ける電話の件数や、目標の決め方を教えていただけますか」
+- 「入社後、ひとりで電話を受け始めるまでに、どのような練習がありますか」
+- 「シフトはどのくらい前に決まりますか。土日の出勤はどのくらいありますか」
+
+コールセンターの求人は、同じ「オペレーター」でも、受信か発信か、扱う商品は何か、シフトはどうかで働き方が大きく変わります。仕事内容の欄を読み比べ、自分が続けやすい条件かどうかを確かめてから応募しましょう。', 'review', false, '2026-10-09'::timestamptz, '2026-10-09'::timestamptz, '2026-10-09'::timestamptz, 'プロジェクトオーナー（チャットで承認）', '2026-10-09'::timestamptz, 'コールセンターの仕事内容｜受信・発信の違いと向き不向き', 'コールセンターの仕事内容を、受信（インバウンド）と発信（アウトバウンド）に分けて紹介します。向いている人・合わないと感じやすい場面、接客経験の活かし方と伝え方の例、応募前に求人で確認することが分かります。', array['eigyo-cs-it-support-chigai', 'sekkyaku-keiken-ikasu', 'mikeiken-kenshu-kakunin', 'jiko-pr-mikeiken', 'eigyo-jimu-shigoto']::text[], array['customer-support']::text[], array['mikeiken-shokushu']::text[], array['sekkyaku', 'hajimete']::text[], array['コールセンターって、', '接客経験が活きる？']::text[], null, false, '[{"q":"コールセンターの仕事に、資格や経験は必要ですか？","a":"厚生労働省の職業情報提供サイト（job tag）では、コールセンターオペレーターになるのに学歴や資格は特に必要ないとされています。入社後に商品やサービスの知識を学び、ロールプレイ（練習の応対）や上の立場の人の指導を受けてから、ひとりで応対するのが一般的な流れです。研修の期間や内容は会社によって違うので、求人や面接で確認しましょう。"},{"q":"受信（インバウンド）と発信（アウトバウンド）は、どちらが未経験向きですか？","a":"どちらが向いているかは人によって違います。受信はかかってきた問い合わせや注文に答える仕事、発信はこちらから電話をかけて案内や勧誘、アンケートなどを行う仕事です。「困っている人の話を聞くのが苦にならない」なら受信、「断られても気持ちを切り替えられる」なら発信、のように、自分が疲れにくい場面で考えるのがおすすめです。"},{"q":"クレームの電話がつらそうで不安です。","a":"クレームへの応対は仕事内容のひとつです。ただ、ひとりで抱え込む仕事ではなく、対応が難しいときは上の立場の人に引き継ぐのが一般的です。2026年10月1日からは、カスタマーハラスメント（顧客などからの度を越えた言動）への対策が事業主の義務になりました。面接で「難しい電話のときは、どう引き継ぎますか」と聞いてみると、職場の体制が分かります。"}]'::jsonb, null, '{"schema_version":2,"writer_agent":"career-writer","angle":"コールセンターを「受信」と「発信」に分けて、1本の電話の流れ（聞く→入力→確認→つなぐ）で仕事内容を具体的に見せる。接客経験と重なる部分・重ならない部分を分け、求人で確認することを質問例つきで示す","quotes":[{"source_url":"https://shigoto.mhlw.go.jp/User/Occupation/Detail/64","text":"コールセンターで、電話やファックス、インターネット、Eメールなどの通信メディアを通じてお客と応対する。業務は顧客から電話がかかってくるインバウンド業務と、顧客に電話をかけるアウトバウンド業務の2つに分けられる。タスクとして、注文や質問への応対、必要事項を聞き取りながらのパソコン入力、聞き取った情報の復唱確認、クレーム応対、他の担当者への取り次ぎ、業務終了時の架電件数や予約結果の報告がある（job tag へ直接接続できなかったため、検索結果に表示されたページ内容で確認）","used_in":"コールセンターの仕事は「聞く・入力する・つなぐ」"},{"source_url":"https://shigoto.mhlw.go.jp/User/Occupation/Detail/64","text":"入職に学歴や資格は特に必要とされない。入職後は商品・サービスの知識を学び、ロールプレイなどを経て、スーパーバイザーの指導を受けてから単独で応対する。24時間365日対応のコールセンターもあり、交替制勤務になる場合がある。金融・保険業、小売業、製造業、サービス業など多様な業種の企業・団体が設置し、職場は全国に広がっている（検索結果で確認）","used_in":"未経験でも大丈夫？入社後の流れ / 応募前に、求人で確認すること"},{"source_url":"https://www.mhlw.go.jp/web_magazine/series/20260820.html","text":"令和8年10月1日から、カスタマーハラスメント対策が事業主の義務となった（mhlw.go.jp へ直接接続できなかったため、検索結果に表示された内容で確認）","used_in":"クレームが不安なら、体制を確認する"},{"source_url":"https://www.no-harassment.mhlw.go.jp/foundation/law-amendment/","text":"改正労働施策総合推進法により、事業主は、顧客等の言動で社会通念上許容される範囲を超え、労働者の就業環境が害されることのないよう、雇用管理上必要な措置を講じる必要がある（検索結果で確認）","used_in":"クレームが不安なら、体制を確認する"}],"not_used":["コールセンターの賃金・労働時間の数字は、地域や雇用形態で大きく変わるため書かない","「テレコミュニケーター検定」などの民間検定は、job tag の関連資格欄で確認できなかったため扱わない","受信と発信のどちらが離職しやすいか等の評価は、公的な根拠を確認できなかったので書かない"]}'::jsonb) on conflict (slug) do nothing;
+insert into article_categories (article_id, category_id, is_primary) select a.id, c.id, true from articles a, categories c where a.slug = 'callcenter-shigoto' and c.slug = 'shokushu' on conflict do nothing;
+insert into article_categories (article_id, category_id, is_primary) select a.id, c.id, false from articles a, categories c where a.slug = 'callcenter-shigoto' and c.slug = 'keiken' on conflict do nothing;
+insert into article_sources (article_id, title, publisher, url, accessed_at, used_for, sort_order) select id, 'コールセンターオペレーター - 職業詳細（職業情報提供サイト job tag）', '厚生労働省', 'https://shigoto.mhlw.go.jp/User/Occupation/Detail/64', '2026-10-09'::date, '仕事内容（受信・発信の2種類、聞き取りながらのパソコン入力、復唱確認、クレーム応対、担当者への取り次ぎ、終業時の報告）、入職に学歴・資格が特に必要ないこと、入社後の研修の流れ、24時間365日のセンターでは交替制勤務があること、設置している業種', 0 from articles where slug = 'callcenter-shigoto';
+insert into article_sources (article_id, title, publisher, url, accessed_at, used_for, sort_order) select id, '従業員を守るために ― カスタマーハラスメント対策の新ルール（厚生労働省 Webマガジン）', '厚生労働省', 'https://www.mhlw.go.jp/web_magazine/series/20260820.html', '2026-10-09'::date, '2026年10月1日から、カスタマーハラスメント対策が事業主の義務になったこと', 1 from articles where slug = 'callcenter-shigoto';
+insert into article_sources (article_id, title, publisher, url, accessed_at, used_for, sort_order) select id, '改正労働施策総合推進法等特設ページ（あかるい職場応援団）', '厚生労働省', 'https://www.no-harassment.mhlw.go.jp/foundation/law-amendment/', '2026-10-09'::date, 'カスタマーハラスメント対策として、事業主が雇用管理上必要な措置（相談体制の整備など）を講じる必要があること', 2 from articles where slug = 'callcenter-shigoto';
+insert into article_versions (article_id, version, title, summary, body_md, created_by) select id, 1, title, summary, body_md, 'seed' from articles where slug = 'callcenter-shigoto' on conflict do nothing;
+insert into article_reviews (article_id, version, reviewer, verdict, checks) select id, 1, 'プロジェクトオーナー（チャットで承認）', 'approved', '{"content_hash":"6f6bdec2c46e0aa2ea7cb5ea95b634b93f98944a16ceba85b5476a87659b936a","findings":[]}'::jsonb from articles where slug = 'callcenter-shigoto';
+update articles set status = 'published' where slug = 'callcenter-shigoto';
+
 -- article: dainishinsotsu-nansai (published)
 insert into articles (slug, kind, title, summary, body_md, status, featured, published_at, updated_at, reviewed_at, reviewed_by, information_checked_at, seo_title, seo_description, related_slugs, roles, concerns, situations, eyecatch, illustration, recommended, faq, news_meta, research_notes) values ('dainishinsotsu-nansai', 'article', '第二新卒って何歳まで？使える場面と探し方', '第二新卒は、何歳までと一律に決まった言葉ではなく、学校を卒業しておおむね3年以内の人を指すことが多い呼び方です。年齢より卒業からの年数で考える理由、新卒の枠に応募できる場合、求人の探し方を整理します。', '求人を見ていると「第二新卒歓迎」という言葉をよく目にします。でも、自分がそれに当てはまるのか、何歳までなのか、はっきり分からない人も多いのではないでしょうか。
 
@@ -422,7 +559,7 @@ items:
 
 > 話し方の例：入社して2年、店舗で接客を担当しました。お客さまの問い合わせに対応するうちに、一人ひとりの困りごとにじっくり向き合う仕事がしたいと考えるようになり、カスタマーサポートを志望しています。
 
-経歴の整理のしかたは[転職回数が気になるときに整理したいこと](/articles/tenshoku-kaisu-kininaru)も参考にしてください。卒業から3年以上たっていても、未経験から応募できる中途採用の求人はあります。年齢で迷ったときは[26歳で未経験の職種に転職するのは遅い？](/articles/26sai-mikeiken)も読んでみてください。', 'review', false, '2026-10-06'::timestamptz, '2026-10-06'::timestamptz, '2026-10-06'::timestamptz, null, '2026-10-06'::timestamptz, null, null, array['26sai-mikeiken', 'agent-mendan-mae', 'tenshoku-kaisu-kininaru']::text[], '{}'::text[], array['mikeiken-shokushu']::text[], array['dainishinsotsu', 'hajimete']::text[], array['第二新卒って', '何歳まで？']::text[], null, false, '[{"q":"第二新卒は何歳までですか？","a":"何歳までと一律には決まっていません。学校を卒業しておおむね3年以内の人を指すことが多く、年齢より卒業からの年数で考えると分かりやすくなります。たとえば22歳で大学を卒業した場合、25歳前後までが目安です。応募できるかどうかは、求人ごとの応募条件で確認しましょう。"},{"q":"一度就職していても、新卒の枠に応募できますか？","a":"厚生労働省の指針では、卒業後少なくとも3年間は新卒の採用枠に応募できるよう、会社に努めることを求めています。ただし、すべての会社が受け付けているわけではなく、職歴のある人も応募できるかどうかは求人ごとに確かめる必要があります。募集要項の「既卒可」などの記載を確認してください。"},{"q":"卒業して3年以上たっていたら、もう応募できる求人はありませんか？","a":"そんなことはありません。「第二新卒歓迎」と書かれていなくても、未経験から応募できる中途採用の求人はあります。言葉の区切りにしばられず、仕事内容と応募条件で探してみてください。"}]'::jsonb, null, '{"schema_version":2,"writer_agent":"career-writer","angle":"「何歳まで」の答えを年齢で出さず、卒業からの年数と応募条件で考える。既存の review 記事 dainishinsotsu-tenshoku-timing（動くタイミング）とは別に、言葉の意味と使える場面・探し方に絞る","quotes":[{"source_url":"https://www.mhlw.go.jp/stf/houdou/2r9852000000wgq1.html","text":"青少年雇用機会確保指針を改正し、事業主は学校等の卒業者が新卒の採用枠に応募できるよう応募条件を設定し、少なくとも卒業後3年間は応募できるようにすることとした","used_in":"新卒の枠に、まだ応募できる？"},{"source_url":"https://jsite.mhlw.go.jp/tottori-roudoukyoku/hourei_seido_tetsuzuki/shokugyou_shoukai/22seishonen_shishin.html","text":"青少年の雇用の促進等に関する法律に基づく指針で、学校卒業見込者の採用枠について、既卒者が卒業後少なくとも3年間は応募できるように努めることとされている","used_in":"新卒の枠に、まだ応募できる？"},{"source_url":"https://jsite.mhlw.go.jp/tokyo-hellowork/kyushokusha/tokyo_shinsotsu/jobseeker.html","text":"大学・大学院・短大・高専・専修学校（専門課程）の学生と、卒業後おおむね3年以内の人が利用できる。卒業後3年以内であれば、在職中や就職後に離職した人も利用できる。卒業後3年を超える人などには、最寄りのハローワークやわかものハローワークの利用を案内している","used_in":"第二新卒の求人、どう探す？"}],"not_used":["第二新卒の採用数や求人倍率などの統計は使っていない","「第二新卒」の意味は公的な出典で確認できなかったため、一般的な使われ方として説明し、応募条件で確かめるよう書いた。「法律で年齢が決められた区分ではない」という記述は出典がないため削除","年齢の目安は卒業年齢からの計算例として示した"]}'::jsonb) on conflict (slug) do nothing;
+経歴の整理のしかたは[転職回数が気になるときに整理したいこと](/articles/tenshoku-kaisu-kininaru)も参考にしてください。卒業から3年以上たっていても、未経験から応募できる中途採用の求人はあります。年齢で迷ったときは[26歳で未経験の職種に転職するのは遅い？](/articles/26sai-mikeiken)も読んでみてください。', 'review', false, '2026-10-06'::timestamptz, '2026-10-06'::timestamptz, '2026-10-06'::timestamptz, null, '2026-10-06'::timestamptz, null, null, array['26sai-mikeiken', 'agent-mendan-mae', 'tenshoku-kaisu-kininaru', 'souki-rishoku-tenshoku']::text[], '{}'::text[], array['mikeiken-shokushu']::text[], array['dainishinsotsu', 'hajimete']::text[], array['第二新卒って', '何歳まで？']::text[], null, false, '[{"q":"第二新卒は何歳までですか？","a":"何歳までと一律には決まっていません。学校を卒業しておおむね3年以内の人を指すことが多く、年齢より卒業からの年数で考えると分かりやすくなります。たとえば22歳で大学を卒業した場合、25歳前後までが目安です。応募できるかどうかは、求人ごとの応募条件で確認しましょう。"},{"q":"一度就職していても、新卒の枠に応募できますか？","a":"厚生労働省の指針では、卒業後少なくとも3年間は新卒の採用枠に応募できるよう、会社に努めることを求めています。ただし、すべての会社が受け付けているわけではなく、職歴のある人も応募できるかどうかは求人ごとに確かめる必要があります。募集要項の「既卒可」などの記載を確認してください。"},{"q":"卒業して3年以上たっていたら、もう応募できる求人はありませんか？","a":"そんなことはありません。「第二新卒歓迎」と書かれていなくても、未経験から応募できる中途採用の求人はあります。言葉の区切りにしばられず、仕事内容と応募条件で探してみてください。"}]'::jsonb, null, '{"schema_version":2,"writer_agent":"career-writer","angle":"「何歳まで」の答えを年齢で出さず、卒業からの年数と応募条件で考える。既存の review 記事 dainishinsotsu-tenshoku-timing（動くタイミング）とは別に、言葉の意味と使える場面・探し方に絞る","quotes":[{"source_url":"https://www.mhlw.go.jp/stf/houdou/2r9852000000wgq1.html","text":"青少年雇用機会確保指針を改正し、事業主は学校等の卒業者が新卒の採用枠に応募できるよう応募条件を設定し、少なくとも卒業後3年間は応募できるようにすることとした","used_in":"新卒の枠に、まだ応募できる？"},{"source_url":"https://jsite.mhlw.go.jp/tottori-roudoukyoku/hourei_seido_tetsuzuki/shokugyou_shoukai/22seishonen_shishin.html","text":"青少年の雇用の促進等に関する法律に基づく指針で、学校卒業見込者の採用枠について、既卒者が卒業後少なくとも3年間は応募できるように努めることとされている","used_in":"新卒の枠に、まだ応募できる？"},{"source_url":"https://jsite.mhlw.go.jp/tokyo-hellowork/kyushokusha/tokyo_shinsotsu/jobseeker.html","text":"大学・大学院・短大・高専・専修学校（専門課程）の学生と、卒業後おおむね3年以内の人が利用できる。卒業後3年以内であれば、在職中や就職後に離職した人も利用できる。卒業後3年を超える人などには、最寄りのハローワークやわかものハローワークの利用を案内している","used_in":"第二新卒の求人、どう探す？"}],"not_used":["第二新卒の採用数や求人倍率などの統計は使っていない","「第二新卒」の意味は公的な出典で確認できなかったため、一般的な使われ方として説明し、応募条件で確かめるよう書いた。「法律で年齢が決められた区分ではない」という記述は出典がないため削除","年齢の目安は卒業年齢からの計算例として示した"]}'::jsonb) on conflict (slug) do nothing;
 insert into article_categories (article_id, category_id, is_primary) select a.id, c.id, true from articles a, categories c where a.slug = 'dainishinsotsu-nansai' and c.slug = 'mikeiken' on conflict do nothing;
 insert into article_categories (article_id, category_id, is_primary) select a.id, c.id, false from articles a, categories c where a.slug = 'dainishinsotsu-nansai' and c.slug = 'junbi' on conflict do nothing;
 insert into article_sources (article_id, title, publisher, url, accessed_at, used_for, sort_order) select id, '青少年雇用機会確保指針の改正について（報道発表）', '厚生労働省', 'https://www.mhlw.go.jp/stf/houdou/2r9852000000wgq1.html', '2026-10-06'::date, '卒業後少なくとも3年間は新卒の採用枠に応募できるようにすることを、事業主に求める指針の内容', 0 from articles where slug = 'dainishinsotsu-nansai';
@@ -722,6 +859,143 @@ insert into article_versions (article_id, version, title, summary, body_md, crea
 insert into article_reviews (article_id, version, reviewer, verdict, checks) select id, 1, 'seed', 'approved', '{"content_hash":"0942639fae6aeeb8cc6272ea8133f3ade7e1faa9f3a40605770906a8712ef0ec","findings":[]}'::jsonb from articles where slug = 'eigyo-cs-it-support-chigai';
 update articles set status = 'published' where slug = 'eigyo-cs-it-support-chigai';
 
+-- article: eigyo-jimu-shigoto (published)
+insert into articles (slug, kind, title, summary, body_md, status, featured, published_at, updated_at, reviewed_at, reviewed_by, information_checked_at, seo_title, seo_description, related_slugs, roles, concerns, situations, eyecatch, illustration, recommended, faq, news_meta, research_notes) values ('eigyo-jimu-shigoto', 'article', '営業事務ってどんな仕事？一般事務との違い・1日の流れと、応募前に求人で確認すること', '営業事務は、営業担当の依頼を受けて見積書や受注の入力、取引先からの問い合わせ対応などを行い、営業活動を支える仕事です。一般事務との違い、1日の流れの例、よく使うスキル、未経験で応募する前に求人で確認しておきたいことをまとめました。', '「事務の仕事がしたい」と求人を探していると、「一般事務」と並んで「営業事務」という職種名をよく見かけます。営業と付いているけれど、営業をするのか、事務なのか。迷う人は多いと思います。
+
+先に結論を言うと、営業事務は**営業担当の後ろで、見積書や受注の入力、取引先からの問い合わせ対応などを引き受けて、営業の仕事を支える事務**です。一般事務と比べると、**取引先とのやりとりと、数字や期限を扱う場面が多い**のが特徴です。
+
+この記事で分かること：
+
+- 営業事務の**仕事の中身**と、一般事務との違い
+- **1日の流れの例**
+- よく使う**スキル**
+- 未経験で応募する前に、**求人で確認すること**と面接での質問例
+
+## 営業事務って、どんな仕事？
+
+厚生労働省の職業情報提供サイト（job tag）では、営業事務は「営業担当の指示を受けて資料や見積書を作り、顧客への対応や管理の仕事を通して営業活動を補佐する仕事」と説明されています。別名として「営業アシスタント」「受発注管理事務員」も挙げられています。
+
+主な仕事は次のようなものです。
+
+- 見積書・納品書・請求書などの書類を作る
+- 受注（注文）の情報をシステムに入力する
+- 取引先からの電話やメールの問い合わせに答える
+- 在庫を確認し、足りないときは営業担当と納期を調整する
+- 仕入先への発注書を作る
+- 契約・売上・入金の状況を管理する
+
+job tag によると、仕事の中身は会社の規模や業種で変わります。営業部全体の契約や売上、入金の管理が中心の職場もあれば、営業担当一人ひとりのサポート（電話・メール対応や書類づくり）が中心の職場もあります。
+
+## 一般事務とは何が違う？
+
+一般事務は、特定の分野に限らず、書類の作成・整理、データ入力、電話の取り次ぎ、来客対応など、会社全体を支える定型的な事務を担当します。営業事務は、そのうち**営業部門の仕事に関わる事務を専門に受け持つ**イメージです。
+
+```figure
+type: compare
+title: 一般事務と営業事務の違い
+columns:
+  - label: 一般事務
+    tone: sky
+    items:
+      - 社内のいろいろな部署を支える
+      - 書類の整理・データ入力・電話の取り次ぎ
+      - やりとりの相手は社内が中心
+  - label: 営業事務
+    tone: mint
+    items:
+      - 営業部門を支える
+      - 見積書・受注入力・納期の調整
+      - 取引先とのやりとりも多い
+```
+
+違いをもう少し具体的に言うと、次の2つです。
+
+- **やりとりする相手**：営業事務は、取引先から「この商品はいつ届きますか」「見積もりを出し直してほしい」といった問い合わせを直接受けることが多くなります
+- **数字と期限**：見積もりの金額、注文の数量、納期など、間違えると取引先に迷惑がかかる数字を扱います。正確さと、期限を守るための段取りが大切になります
+
+どちらが向いているかは人によります。人と話すのが苦にならず、「頼まれたことを早く正確に返す」のが好きな人は、営業事務も候補に入れてみてください。事務職の種類全体は[未経験で事務職を目指す前に知っておきたいこと](/articles/jimu-mikeiken-mae)で比べています。
+
+## 1日の流れの例
+
+job tag に載っている仕事の例をもとに、営業担当をサポートする職場の1日を組み立てると、次のようになります（時間の配分や順番は職場によって違います）。
+
+```figure
+type: steps
+title: 営業事務の1日の例
+items:
+  - label: 朝
+    text: メールを確認し、営業担当からの依頼を整理する
+  - label: 午前
+    text: 見積書を作り、営業担当に確認してもらう
+  - label: 昼すぎ
+    text: 取引先の問い合わせに答え、在庫と納期を確認する
+  - label: 夕方
+    text: 受注の情報を入力し、日報をまとめる
+```
+
+この流れのあいだに、電話の対応や、急ぎの見積もりの依頼が入ってきます。営業担当が外出しているときは、取引先からの電話を受けて用件をメモし、あとで伝える役割も担います。
+
+> 取引先：「先週お願いした注文、納品日を早められますか？」
+> 営業事務：「確認いたします。担当の〇〇が外出しておりますので、在庫を確認したうえで、本日中に〇〇からご連絡いたします。」
+
+このように、**その場で答えられることと、営業担当に確認することを分けて返す**のが、営業事務の日常的なやりとりです。
+
+## よく使うスキル
+
+job tag では、営業事務に求められることとして、ビジネスマナー、相手の要望を正確に聞き取る力、納期や契約のスケジュールの管理、見積書や請求書を扱うためのパソコンの操作が挙げられています。外資系の会社などでは、英語が必要な場合もあります。
+
+これを、ふだんの仕事に置き換えるとこうなります。
+
+| スキル | 仕事での場面の例 |
+| --- | --- |
+| パソコンの操作 | 表計算ソフトで見積書の金額を計算する、受注を入力する |
+| 聞き取る力 | 電話で品名・数量・希望の納期を聞き漏らさずにメモする |
+| 段取り | 複数の営業担当からの依頼を、期限の近い順に片づける |
+| 言葉づかい | 取引先への電話やメールで、敬語を使って用件を伝える |
+
+接客や販売の仕事をしてきた人は、「お客様の話を聞いて、確認してから答える」「混んでいるときに優先順位をつける」経験が、そのまま営業事務の電話対応や段取りにつながります。経験の伝え方は[接客経験は転職でどう活かせる？](/articles/sekkyaku-keiken-ikasu)を参考にしてください。パソコンに自信がない人は、[PCが得意じゃなくても、事務職は目指せる？](/articles/pc-nigate-jimu)で練習のしかたを紹介しています。
+
+## 未経験で応募する前に、求人で確認すること
+
+job tag では、営業事務になるのに特別な学歴や資格は必要とされず、入社後に職場で教わりながら社内のシステムや仕事の進め方を覚えていくのが一般的とされています。雇用形態は正社員・契約社員・パートのほか、派遣で働く人もいます。
+
+ただ、同じ「営業事務」でも、求人によって仕事の範囲はかなり違います。応募する前に、次の点を確かめておきましょう。
+
+```figure
+type: checklist
+title: 営業事務の求人で確認すること
+items:
+  - 何人の営業担当をサポートするか
+  - 取引先との電話・メールはどのくらいあるか
+  - 扱う商品やサービスは何か
+  - 使うソフト（表計算・受発注システム）
+  - 個人の売上目標があるか
+  - 雇用形態と、研修・教わり方
+```
+
+求人票に書かれていないことは、面接で聞いてみましょう。
+
+> 「1日の仕事のうち、取引先との電話やメールはどのくらいの割合でしょうか。」
+> 「最初はどのような仕事から担当し、どなたに教わる形になりますか。」
+> 「見積書や受注の入力には、どのようなソフトを使っていますか。」
+
+job tag では、営業事務は一般に残業が少なく、週休2日制が基本とされています。ただし、月末や繁忙期の忙しさ、休日の決まり方は会社ごとに違います。休日や残業の時間は、求人票の記載と、内定後に受け取る労働条件の書面で確かめてください。
+
+## まとめ：営業事務は「営業の仕事を、事務で支える」
+
+- 営業事務は、見積書や受注の入力、取引先からの問い合わせ対応などで営業を支える仕事
+- 一般事務との違いは、取引先とのやりとりと、数字や期限を扱う場面が多いこと
+- 特別な資格がなくても目指せるが、仕事の範囲は求人ごとに違うので、求人票と面接で確かめる
+
+「人と話すことも、パソコンでの作業も、どちらも少しずつやりたい」という人にとって、営業事務は検討しやすい職種のひとつです。', 'review', false, '2026-10-09'::timestamptz, '2026-10-09'::timestamptz, '2026-10-09'::timestamptz, 'プロジェクトオーナー（チャットで承認）', '2026-10-09'::timestamptz, '営業事務の仕事内容｜一般事務との違いと1日の流れ', '営業事務はどんな仕事？見積書や受注入力、取引先からの問い合わせ対応など仕事の中身と、一般事務との違い、1日の流れの例、使うスキル、未経験で応募する前に求人で確認したいことと面接での質問例を紹介します。', array['jimu-mikeiken-mae', 'pc-nigate-jimu', 'sekkyaku-keiken-ikasu', 'keiri-mikeiken', 'mikeiken-shikaku']::text[], array['jimu', 'eigyo']::text[], array['office', 'mikeiken-shokushu']::text[], array['sekkyaku', 'pc-mikeiken']::text[], array['営業事務って、', '一般事務と何が違う？']::text[], null, false, '[{"q":"営業事務は、営業のノルマがありますか？","a":"営業事務は営業担当を支える仕事で、job tag（厚生労働省の職業情報提供サイト）でも、見積書の作成や受注の入力、問い合わせ対応などが仕事の中心とされています。ただ、職場によっては電話での受注や簡単な提案を任されることもあります。不安なときは、面接で「個人の売上目標はありますか」と聞いて確かめましょう。"},{"q":"営業事務と営業アシスタントは違う仕事ですか？","a":"job tag では、営業アシスタントは営業事務の別名として挙げられています。求人では会社ごとに呼び方が違うだけのことも多いので、職種名よりも「仕事内容」の欄に何が書かれているかを見て判断しましょう。"},{"q":"未経験でも営業事務に応募できますか？","a":"job tag では、営業事務になるのに特別な学歴や資格は必要とされず、入社後に職場で教わりながら社内のシステムや仕事の進め方を覚えていくのが一般的とされています。応募条件は求人ごとに違うので、「未経験可」かどうかと、求められるパソコン操作のレベルを確認しましょう。"}]'::jsonb, null, '{"schema_version":2,"writer_agent":"career-writer","angle":"営業事務を「営業の後ろで社外とやりとりする事務」と位置づけ、一般事務との違いを「相手（社内か取引先か）」「数字と期限」で見せる。1日の流れは job tag の例をもとに時刻を入れずに示し、求人の読み方と面接での質問例につなげる","quotes":[{"source_url":"https://shigoto.mhlw.go.jp/User/Occupation/Detail/431","text":"営業担当者の指示を受けて資料や見積書を作成し、顧客対応や管理業務を行って営業活動を補佐する。職場によって、契約・売上・入金の管理など営業全体の管理が中心の場合と、顧客からの電話・メール対応、見積書・納品書の作成など営業担当の直接のサポートが中心の場合がある。仕事の例として、営業担当からのメールの確認、顧客からの問い合わせ対応と在庫の確認、欠品時の納期調整、受注情報の入力と日報の作成、仕入先への発注書・販売先への見積書の作成など。別名に営業アシスタント、受発注管理事務員。（job tag への直接接続ができなかったため、検索結果に表示されたページの内容で確認）","used_in":"営業事務って、どんな仕事？ / 1日の流れの例"},{"source_url":"https://shigoto.mhlw.go.jp/User/Occupation/Detail/431","text":"特別な学歴や資格は必要とされず、入社後に OJT で社内システムや実務を覚えるのが一般的。ビジネスマナー、顧客の要望を正確に聞き取る力、納期や契約のスケジュール管理、見積書や請求書を扱うためのパソコンのスキルが求められる。外資系などでは英語が必要な場合もある。雇用形態は正社員・契約社員・パートのほか派遣もある。残業は一般に少なく、週休2日制が基本とされる","used_in":"よく使うスキル / 未経験で応募する前に、求人で確認すること"},{"source_url":"https://shigoto.mhlw.go.jp/User/Occupation/Detail/428","text":"一般事務は特定の分野に限らず定型的な事務を行う。書類の作成・整理、伝票の作成、データ入力、郵便物の仕分け、電話の取り次ぎ、来客対応など。入職にあたって学歴や資格は特に求められず、補助的な業務から経験を積む","used_in":"一般事務とは何が違う？"}],"not_used":["営業事務の平均年収・求人倍率などの数字は、年度で変わり、求人ごとの差も大きいため書かない","「営業事務は女性が多い」という job tag の記述は、読者を属性で分ける書き方になるため使わない","1日の流れの具体的な時刻は出典にないため入れず、「朝・午前・昼すぎ・夕方」の書き方にとどめた","MOS などの資格の評価は会社によって違うため、資格の紹介は最小限にした"]}'::jsonb) on conflict (slug) do nothing;
+insert into article_categories (article_id, category_id, is_primary) select a.id, c.id, true from articles a, categories c where a.slug = 'eigyo-jimu-shigoto' and c.slug = 'shokushu' on conflict do nothing;
+insert into article_categories (article_id, category_id, is_primary) select a.id, c.id, false from articles a, categories c where a.slug = 'eigyo-jimu-shigoto' and c.slug = 'mikeiken' on conflict do nothing;
+insert into article_sources (article_id, title, publisher, url, accessed_at, used_for, sort_order) select id, '営業事務 - 職業詳細（job tag）', '厚生労働省 職業情報提供サイト（job tag）', 'https://shigoto.mhlw.go.jp/User/Occupation/Detail/431', '2026-10-09'::date, '営業事務の仕事内容（見積書・納品書の作成、受注情報の入力、在庫確認と納期の調整、契約・売上・入金の管理、問い合わせ対応）、別名（営業アシスタント・受発注管理事務員）、入職に特別な学歴・資格は不要で入社後に覚えていくこと、求められる力、雇用形態や働き方の特徴', 0 from articles where slug = 'eigyo-jimu-shigoto';
+insert into article_sources (article_id, title, publisher, url, accessed_at, used_for, sort_order) select id, '一般事務 - 職業詳細（job tag）', '厚生労働省 職業情報提供サイト（job tag）', 'https://shigoto.mhlw.go.jp/User/Occupation/Detail/428', '2026-10-09'::date, '一般事務は特定の分野に限らず、書類の作成・整理、伝票、データ入力、電話の取り次ぎ、来客対応など定型的な事務を行うこと（営業事務との違いの説明）', 1 from articles where slug = 'eigyo-jimu-shigoto';
+insert into article_versions (article_id, version, title, summary, body_md, created_by) select id, 1, title, summary, body_md, 'seed' from articles where slug = 'eigyo-jimu-shigoto' on conflict do nothing;
+insert into article_reviews (article_id, version, reviewer, verdict, checks) select id, 1, 'プロジェクトオーナー（チャットで承認）', 'approved', '{"content_hash":"522c91468b5a343bfe30255e5b374e3bf39bf0e0af1ea708c82f06ca0fa3c90d","findings":[]}'::jsonb from articles where slug = 'eigyo-jimu-shigoto';
+update articles set status = 'published' where slug = 'eigyo-jimu-shigoto';
+
 -- article: eigyo-kowai (published)
 insert into articles (slug, kind, title, summary, body_md, status, featured, published_at, updated_at, reviewed_at, reviewed_by, information_checked_at, seo_title, seo_description, related_slugs, roles, concerns, situations, eyecatch, illustration, recommended, faq, news_meta, research_notes) values ('eigyo-kowai', 'article', '営業が怖い人へ。不安を分けて確認したい仕事内容と面接での質問例', '「ノルマがきつそう」「飛び込みや電話が怖い」。営業と一口に言っても、新規か既存か、会社か個人か、訪問か電話・オンラインかで、仕事の中身は大きく変わります。何が怖いのかを分けて、求人票や面接で確認したいことを質問例つきで紹介します。', '「営業はノルマがきつそう」「知らない人に電話するのが怖い」。営業の仕事に少し興味があっても、そんなイメージで候補から外している人もいると思います。
 
@@ -885,6 +1159,143 @@ insert into article_sources (article_id, title, publisher, url, accessed_at, use
 insert into article_versions (article_id, version, title, summary, body_md, created_by) select id, 1, title, summary, body_md, 'seed' from articles where slug = 'freeter-seishain-hajimeni' on conflict do nothing;
 insert into article_reviews (article_id, version, reviewer, verdict, checks) select id, 1, 'seed', 'approved', '{"content_hash":"50395607671c017630fb4e19aa0ca7d5bf5770d3a10212ecdc044fc7c2662627","findings":[]}'::jsonb from articles where slug = 'freeter-seishain-hajimeni';
 update articles set status = 'published' where slug = 'freeter-seishain-hajimeni';
+
+-- article: gyaku-shitsumon (published)
+insert into articles (slug, kind, title, summary, body_md, status, featured, published_at, updated_at, reviewed_at, reviewed_by, information_checked_at, seo_title, seo_description, related_slugs, roles, concerns, situations, eyecatch, illustration, recommended, faq, news_meta, research_notes) values ('gyaku-shitsumon', 'article', '面接の逆質問、何を聞けばいい？聞くとよいこと・避けたいことと未経験向けの質問例', '面接の最後の「何か質問はありますか？」は、入社後に自分が働けるかを確かめる時間です。質問の作り方、研修・最初の仕事・評価についての未経験向けの質問例、避けたい質問、給料や休みの聞き方、質問がなくなったときの言い方を紹介します。', '面接の最後に「何か質問はありますか？」と聞かれて、何を聞けばいいのか分からず「特にありません」と答えてしまった。そんな経験がある人もいるかもしれません。
+
+先に結論を言うと、逆質問は**「入社したら、自分はここで働けそうか」を確かめる時間**です。求人票を読んで分からなかったことを、**自分が働く場面を思い浮かべた質問**に直して聞くと、意欲も伝わり、自分の判断材料にもなります。
+
+この記事で分かること：
+
+- 逆質問の**作り方**（求人票から作る手順）
+- 研修・最初の仕事・評価についての**未経験向けの質問例**（仮の例）
+- **避けたい質問**と、給料や休みの**聞き方**
+- 質問が**なくなったとき**の言い方
+
+## そもそも逆質問は何のため？
+
+ハローワーク札幌の面接対策のページでは、面接でよく出る質問のひとつに「何か質問はありませんか」を挙げ、仕事の内容や労働条件で聞きたいことは事前にまとめておくようにすすめています。つまり、逆質問は「おまけ」ではなく、準備しておく質問のひとつです。
+
+逆質問には、2つの意味があります。
+
+- **会社にとって**：応募者がどのくらい仕事を調べ、入社後のことを考えているかが分かる
+- **あなたにとって**：求人票だけでは分からない、働き方や職場の様子を確かめられる
+
+未経験の仕事に応募するときは、特に2つめが大事です。入ってから「思っていた仕事と違った」とならないよう、気になることはこの時間に聞いておきましょう。
+
+## 逆質問は「求人票」から作る
+
+いきなり質問を考えようとすると、思いつかないものです。手元の求人票や会社のホームページから作ると、迷わずにすみます。
+
+```figure
+type: steps
+title: 逆質問の作り方
+items:
+  - label: 読む
+    text: 求人票と会社のホームページを読む
+  - label: 書き出す
+    text: 読んでも分からなかったこと、気になったことをメモする
+  - label: 直す
+    text: 「自分が入社したら」の形の質問に言い換える
+  - label: しぼる
+    text: 面接官の立場で答えられるものを選ぶ
+```
+
+たとえば求人票に「入社後は研修あり」とだけ書かれていたら、「研修あり」から次のように質問を作ります。
+
+- 気になったこと：研修のあと、すぐ一人で仕事をするのか
+- 質問にすると：「研修が終わったあと、一人で電話を受けるようになるまでは、どなたかがそばについてくださるのでしょうか」
+
+「研修はありますか？」のように、求人票に書いてあることをそのまま聞くのではなく、**書いてあることの先**を聞くのがポイントです。
+
+## 未経験向けの質問例（仮の例）
+
+ここからは、未経験の仕事に応募するときに聞いておきたいことを、テーマ別に紹介します。事務職やカスタマーサポートに応募する場合の仮の例です。応募する仕事に合わせて言い換えてください。
+
+### 研修・教わり方について
+
+- 「研修は、座学と実際の仕事を見ながら覚えるのと、どちらが中心ですか」
+- 「分からないことがあったとき、最初はどなたに聞くことが多いですか」
+- 「マニュアルや手順書のようなものはありますか」
+
+研修の中身で確かめたいことは、[未経験求人の「研修あり」で確認すべきこと](/articles/mikeiken-kenshu-kakunin)でくわしく紹介しています。
+
+### 最初の仕事について
+
+- 「入社してすぐの時期は、どんな作業から担当することが多いですか」
+- 「今いる方の中で、未経験から入った方はどんな流れで仕事を覚えていきましたか」
+- 「このポジションで、最初につまずきやすいのはどんなところですか」
+
+「つまずきやすいところ」を聞いておくと、入社前に何を練習しておけばいいかが分かります。
+
+### 評価・成長について
+
+- 「この仕事で、どんな働き方をしている方が評価されていますか」
+- 「評価の面談は、どのくらいの間隔で行われていますか」
+- 「経験を積んだあと、どんな仕事を任されるようになる方が多いですか」
+
+評価のしくみは会社によって大きく違います。分かりにくければ「たとえば、入社して一年ほどたった方はどんな仕事をしていますか」のように、**具体的な人の例**で聞くと答えてもらいやすくなります。
+
+### 職場について
+
+- 「チームは何人くらいで、どんな方が働いていますか」
+- 「一日の中で、忙しくなる時間帯はありますか」
+
+## 避けたい質問
+
+山形のハローワークの面接対策の資料では、逆質問で「特にありません」としないこと、調べれば分かる質問は避けることが挙げられています。ほかにも、次のような質問は避けたほうが無難です。
+
+| 避けたい質問 | 理由 | 言い換えるなら |
+| --- | --- | --- |
+| 「御社はどんな事業をしていますか」 | ホームページを見れば分かる | 「〇〇の事業で、この部署はどんな役割ですか」 |
+| 「研修はありますか」 | 求人票に書いてあることが多い | 「研修のあとは、どなたに教わりますか」 |
+| 面接中に説明されたこと | 話を聞いていなかったと思われる | 説明の続きとして、もう一歩くわしく聞く |
+| 「はい・いいえ」で終わる質問 | 話が広がらない | 「どんな」「どのように」で聞く |
+
+## 給料・休み・残業はどう聞く？
+
+給料や休み、残業は、働き続けるうえで大事な条件です。聞いてはいけないわけではありません。ただ、逆質問がこればかりだと「条件だけで選んでいる」と受け取られることもあるので、**求人票を読んだうえで、確かめたいこと**として聞きます。
+
+- 「求人票に残業は月平均で記載がありましたが、忙しくなる時期はありますか」
+- 「土日休みと伺っていますが、休日に出勤が必要になることはありますか」
+- 「試用期間中と、そのあとで、働き方や条件に違いはありますか」
+
+条件は、内定のあとに受け取る労働条件通知書でもう一度確認しましょう。見るところは[内定をもらったら、承諾の前に確認すること](/articles/naitei-shodaku-mae)で紹介しています。ハローワークの求人で、求人票と実際の条件が違うと感じたときは、「ハローワーク求人ホットライン」に申し出ることもできます。
+
+## 質問がなくなったときの言い方
+
+用意していた質問が、面接の中ですべて説明されてしまうこともあります。そのときは、無理に質問をひねり出すより、**聞きたかったことが分かった**と伝えるほうが自然です。
+
+> 「仕事の流れや研修について、くわしく教えていただいたので、今は大丈夫です。お話を伺って、入社後の働き方がよく分かりました。」
+
+ひとつだけ追加で聞けそうなら、面接中に出てきた話を広げます。
+
+> 「先ほど、問い合わせの多い時期があると伺いましたが、その時期はどのように乗り切っていますか。」
+
+## 最後に、結果の連絡時期を確かめる
+
+ハローワーク札幌のページでは、面接が終わっても気を抜かず、採否の結果がいつ分かるかを確認したうえで、お礼のひとことを忘れないようにとしています。連絡の時期が分かっていると、ほかの応募先との予定も立てやすくなります。
+
+```figure
+type: checklist
+title: 面接に持っていく逆質問メモ
+items:
+  - 求人票を読んで分からなかったことを書いた
+  - 研修・最初の仕事・評価の質問を用意した
+  - 調べれば分かる質問を外した
+  - 条件の質問は「確かめたいこと」の形にした
+  - 結果の連絡時期を聞くことをメモした
+```
+
+メモは見ても構いませんが、読み上げるのではなく、確かめる程度にしておきましょう。面接全体の準備は[未経験職種の面接、何を準備する？](/articles/mensetsu-junbi-mikeiken)で紹介しています。', 'review', false, '2026-10-09'::timestamptz, '2026-10-09'::timestamptz, '2026-10-09'::timestamptz, 'プロジェクトオーナー（チャットで承認）', '2026-10-09'::timestamptz, '面接の逆質問、何を聞く？未経験向けの質問例と避けたい質問', '面接の最後の「何か質問はありますか？」に何を聞けばいいかを紹介します。求人票から質問を作る手順、研修・最初の仕事・評価についての未経験向けの質問例、避けたい質問、給料や休みの聞き方、質問がなくなったときの言い方が分かります。', array['mensetsu-junbi-mikeiken', 'mikeiken-kenshu-kakunin', 'naitei-shodaku-mae', 'mensetsu-yokukiku-shitsumon', 'web-mensetsu-junbi']::text[], '{}'::text[], array['mensetsu', 'mikeiken-shokushu']::text[], array['hajimete', 'seishain-keiken-sukunai']::text[], array['「何か質問は？」', '何を聞けばいい？']::text[], null, false, '[{"q":"逆質問で「特にありません」と答えると、落ちますか？","a":"それだけで結果が決まるとは言えません。ただ、ハローワークの面接対策の資料では、逆質問で「特にありません」とはしないようにすすめています。面接の中で疑問が解消した場合は、「〇〇について詳しく教えていただいたので、今は大丈夫です」と、聞きたかったことが分かったと伝えるとよいでしょう。"},{"q":"給料や休み、残業のことを逆質問で聞いてもいいですか？","a":"働くうえで大事な条件なので、確かめて構いません。求人票に書いてあることをそのまま聞くのではなく、「求人票に月平均の残業時間が書かれていましたが、忙しい時期はありますか」のように、読んだうえで確かめたいことを聞くと伝わりやすくなります。条件は内定後に受け取る労働条件通知書でも確認しましょう。"},{"q":"逆質問はいくつ用意すればいいですか？","a":"決まった数はありませんが、面接の途中で説明されて聞く必要がなくなることもあるので、複数用意しておくと安心です。面接官の話を聞いて解消したものは、当日に聞かずに省きます。"}]'::jsonb, null, '{"schema_version":2,"writer_agent":"career-writer","angle":"逆質問を「意欲を見せる場」だけでなく「自分が入社後に働けるかを確かめる時間」と位置づけ、求人票から質問を作る手順と、未経験者が知りたい研修・最初の仕事・評価の質問例を中心にまとめる。既存記事（mensetsu-junbi-mikeiken）の4つの質問例と重ならない例にする","quotes":[{"source_url":"https://jsite.mhlw.go.jp/hokkaido-hellowork/list/sapporo/kyusyokusya/mitiannai-1/mensetsu.html","text":"面接でよくでる質問として「何か質問はありませんか」を挙げ、仕事の内容や労働条件等で聞きたいことは事前にまとめておくとよい、面接が終わっても気を抜かず、採否の結果がいつわかるのか確認したのち「ありがとうございました」「よろしくお願いします」の一言を忘れずに、としている（この環境から jsite.mhlw.go.jp に直接接続できなかったため、検索結果に表示されたページの抜粋で確認）","used_in":"そもそも逆質問は何のため？／最後に、結果の連絡時期を確かめる"},{"source_url":"https://jsite.mhlw.go.jp/yamagata-hellowork/content/contents/002350381.pdf","text":"逆質問では「特にありません」とはしない、調べれば分かる質問は避ける（直接開けなかったため、検索結果の抜粋で確認）","used_in":"避けたい質問／質問がなくなったときの言い方／FAQ"},{"source_url":"https://www.hellowork.mhlw.go.jp/member/hotline.html","text":"ハローワークの求人票の内容と実際の労働条件が異なる場合は「ハローワーク求人ホットライン」に申し出ることができ、担当のハローワークが事実を確認のうえ会社に是正指導を行う（直接開けなかったため、検索結果の抜粋で確認）","used_in":"給料・休み・残業はどう聞く？"}],"not_used":["「逆質問は3つ用意する」「逆質問で合否が決まる割合」などの数や割合は、公的な根拠を確認できなかったので書かない","ホットラインの電話番号は変わる可能性があるため本文に書かず、ページ名の案内にとどめた","面接の段階（一次・最終）ごとに面接官が誰かは会社によって違うため、断定せず「誰が面接官かを見て変える」にとどめた"]}'::jsonb) on conflict (slug) do nothing;
+insert into article_categories (article_id, category_id, is_primary) select a.id, c.id, true from articles a, categories c where a.slug = 'gyaku-shitsumon' and c.slug = 'shorui-mensetsu' on conflict do nothing;
+insert into article_categories (article_id, category_id, is_primary) select a.id, c.id, false from articles a, categories c where a.slug = 'gyaku-shitsumon' and c.slug = 'junbi' on conflict do nothing;
+insert into article_sources (article_id, title, publisher, url, accessed_at, used_for, sort_order) select id, 'さぁ！面接です', '北海道労働局（ハローワーク札幌）', 'https://jsite.mhlw.go.jp/hokkaido-hellowork/list/sapporo/kyusyokusya/mitiannai-1/mensetsu.html', '2026-10-09'::date, '面接でよく出る質問に「何か質問はありませんか」があること。仕事の内容や労働条件で聞きたいことは事前にまとめておくこと。面接の最後に採否の結果がいつ分かるかを確認すること', 0 from articles where slug = 'gyaku-shitsumon';
+insert into article_sources (article_id, title, publisher, url, accessed_at, used_for, sort_order) select id, '面接対策', '山形労働局（ハローワーク）', 'https://jsite.mhlw.go.jp/yamagata-hellowork/content/contents/002350381.pdf', '2026-10-09'::date, '逆質問で「特にありません」とはしないこと、調べれば分かる質問は避けること', 1 from articles where slug = 'gyaku-shitsumon';
+insert into article_sources (article_id, title, publisher, url, accessed_at, used_for, sort_order) select id, 'ハローワークの求人票と実際が異なる旨の申し出等について（ハローワーク求人ホットライン）', '厚生労働省（ハローワークインターネットサービス）', 'https://www.hellowork.mhlw.go.jp/member/hotline.html', '2026-10-09'::date, 'ハローワークの求人票の内容と実際の条件が違う場合に、ハローワーク求人ホットラインに申し出られること', 2 from articles where slug = 'gyaku-shitsumon';
+insert into article_versions (article_id, version, title, summary, body_md, created_by) select id, 1, title, summary, body_md, 'seed' from articles where slug = 'gyaku-shitsumon' on conflict do nothing;
+insert into article_reviews (article_id, version, reviewer, verdict, checks) select id, 1, 'プロジェクトオーナー（チャットで承認）', 'approved', '{"content_hash":"7ec266a65856b81af2b875f7dc33611f05cc9ed9b21e3b032145929504705633","findings":[]}'::jsonb from articles where slug = 'gyaku-shitsumon';
+update articles set status = 'published' where slug = 'gyaku-shitsumon';
 
 -- article: haken-seishain (published)
 insert into articles (slug, kind, title, summary, body_md, status, featured, published_at, updated_at, reviewed_at, reviewed_by, information_checked_at, seo_title, seo_description, related_slugs, roles, concerns, situations, eyecatch, illustration, recommended, faq, news_meta, research_notes) values ('haken-seishain', 'article', '派遣から正社員を考えるとき、最初に確認したいこと', '派遣から正社員を目指す道は、今の派遣先での直接雇用、紹介予定派遣、ほかの会社への応募などいくつかあります。派遣と正社員の違い、同じ職場で働ける期間のルール、給料の比べ方、派遣での経験の伝え方を整理します。', '派遣で働いていて、「このまま続けていいのかな」「そろそろ正社員になりたい」と考え始めた人もいると思います。派遣から正社員を目指す道はひとつではありません。最初に、**派遣と正社員の違い**と、**どんな道があるか**を確認しておきましょう。
@@ -1174,6 +1585,273 @@ insert into article_versions (article_id, version, title, summary, body_md, crea
 insert into article_reviews (article_id, version, reviewer, verdict, checks) select id, 1, 'プロジェクトオーナー（チャットで承認）', 'approved', '{"content_hash":"8c8ac3370c400ef4ce89ac5007ff360bd1633bdee83984401fba3e04cfe95d2d","findings":[]}'::jsonb from articles where slug = 'hello-training';
 update articles set status = 'published' where slug = 'hello-training';
 
+-- article: jiko-bunseki-yarikata (published)
+insert into articles (slug, kind, title, summary, body_md, status, featured, published_at, updated_at, reviewed_at, reviewed_by, information_checked_at, seo_title, seo_description, related_slugs, roles, concerns, situations, eyecatch, illustration, recommended, faq, news_meta, research_notes) values ('jiko-bunseki-yarikata', 'article', '転職のための自己分析のやり方｜経験の棚卸し・ゆずれない条件・やりたくないことの書き出し例', '転職の自己分析は、性格をくわしく調べることより「やってきたこと」「ゆずれない条件」「やりたくないこと」の3つを紙に書き出すことから始めると進めやすくなります。書き出しのワーク例と、まとめ方、書類や面接での使い方、無料で使える公的なツールを紹介します。', '「転職するなら、まず自己分析」と言われても、何を書けばいいのか分からず手が止まる人は多いです。
+
+先に結論を言うと、転職のための自己分析は、性格をくわしく調べることより、次の**3つを紙に書き出す**ことから始めると進めやすくなります。
+
+1. **やってきたこと**（経験の棚卸し）
+2. **ゆずれない条件**
+3. **やりたくないこと**
+
+この3つがあると、求人を選ぶときの基準になり、履歴書や面接で話す材料にもなります。
+
+この記事で分かること：
+
+- 3つの書き出しの**やり方と例**
+- 書き出したものの**まとめ方**
+- 書類・面接での**使い方**
+- ひとりでまとまらないときに使える**無料のツール**
+
+## 転職の自己分析は、何のためにやる？
+
+転職の自己分析には、大きく2つの役割があります。
+
+- **求人を選ぶ基準を作る**：基準がないと、求人を見るたびに「こっちもいいかも」と迷い続けてしまいます
+- **書類と面接の材料を作る**：「これまで何をしてきたか」「なぜこの仕事なのか」を、自分の言葉で話せるようになります
+
+「自分はどんな人間か」を深く掘り下げるより、**転職先を選ぶことと、自分を説明すること**に使えるかどうかを意識すると、書くことがしぼれます。
+
+## ワーク1：やってきたことを書き出す（経験の棚卸し）
+
+最初は、これまでの仕事やアルバイトで**やってきたこと**を書き出します。「たいしたことはしていない」と思っても、細かく分けると書けることは意外とあります。
+
+ひとつの仕事ごとに、次の4つを書き出してみましょう。
+
+```figure
+type: checklist
+title: 経験を書き出すときの4つの問い
+items:
+  - 毎日やっていた作業は？
+  - 自分なりに工夫したことは？
+  - 任されたこと・頼まれたことは？
+  - ほめられたこと・お礼を言われたことは？
+```
+
+書き出し例（飲食店のアルバイトの場合・仮の例）：
+
+| 問い | 書き出し |
+| --- | --- |
+| 毎日やっていた作業 | 注文を受ける、レジ、席への案内、閉店後の売上の集計 |
+| 工夫したこと | 混む時間の前に、よく出るメニューの準備を先に済ませた |
+| 任されたこと | 新人アルバイトに仕事の流れを教えた |
+| ほめられたこと | 「説明が分かりやすい」と常連のお客さまに言われた |
+
+ポイントは、**できるだけ具体的な行動で書く**ことです。「接客をがんばった」ではなく「混む時間の前に準備を済ませた」のように、何をしたかが分かる書き方にすると、あとで職務経歴書や面接でそのまま使えます。
+
+時期や順番が正確に思い出せなくても、まずは思いつくところから書いて大丈夫です。
+
+## ワーク2：ゆずれない条件を書き出す
+
+次に、次の仕事で**ゆずれない条件**を書き出します。条件を全部「ゆずれない」にすると、当てはまる求人がほとんどなくなってしまうので、2つに分けます。
+
+- **ゆずれない**：これがないと続けられない、生活できない
+- **できれば**：あるとうれしいが、ほかの条件しだいでは目をつぶれる
+
+書き出し例（仮の例）：
+
+| 項目 | ゆずれない | できれば |
+| --- | --- | --- |
+| 給料 | 今の手取りより下げない | 数年後に上がる見通しがある |
+| 休み | 土日のどちらかは休める | 土日とも休み |
+| 勤務地 | 家から通える範囲 | 乗り換えなしで通える |
+| 働き方 | 正社員 | 研修がある |
+
+「ゆずれない」は**3つくらいまで**にしぼるのがおすすめです。しぼれないときは、「この条件がなかったら、本当に応募しない？」と自分に聞いてみましょう。
+
+給料の「下げられない金額」は、気持ちではなく、生活費から計算して決めると迷いにくくなります。
+
+## ワーク3：やりたくないことを書き出す
+
+3つめは、**やりたくないこと**です。やりたいことが分からなくても、「これはつらかった」「これは避けたい」は書けることが多いです。
+
+書き出し例（仮の例）：
+
+- 立ちっぱなしの仕事は、体力的に続けられない
+- シフトが毎週変わって、予定が立てられないのがつらい
+- 一人で売上の数字を追いかけ続けるのは向いていなかった
+
+書き出したら、**「なぜつらかったのか」を一言そえる**と、次の仕事を選ぶヒントになります。たとえば「シフトが毎週変わるのがつらい」なら、「休みの曜日が決まっている仕事」を探す、という具合です。
+
+注意したいのは、やりたくないことは**面接でそのまま話す材料ではない**ということです。面接では「〇〇が嫌だった」ではなく「〇〇できる働き方をしたい」と、前向きな言い方に置き換えて伝えます。
+
+## 3つの書き出しを、ひとつにまとめる
+
+3つのワークが終わったら、次の形で**1〜2行にまとめて**みます。これが、求人を選ぶときの「自分の基準」になります。
+
+```figure
+type: steps
+title: 書き出しを1〜2行にまとめる
+items:
+  - label: やってきたこと
+    text: 経験から、続けられた作業・得意な作業を選ぶ
+  - label: ゆずれない条件
+    text: ゆずれない条件を3つくらいまでにしぼる
+  - label: やりたくないこと
+    text: 避けたい働き方を、望む働き方に言いかえる
+  - label: 1〜2行にまとめる
+    text: 「〇〇を活かして、△△な働き方で、□□の仕事」
+```
+
+まとめ方の例（仮の例）：
+
+> 接客で続けてきた「人の話を聞いて、分かりやすく説明する」ことを活かして、休みの曜日が決まっている働き方で、電話やメールでお客さまの問い合わせに答える仕事がしたい。
+
+うまくまとまらなくても大丈夫です。求人を見たり、仕事内容を調べたりするうちに、書き足したり書き直したりしていけば十分です。
+
+## 書類と面接で、どう使う？
+
+書き出したものは、そのまま応募書類と面接の材料になります。
+
+| 書き出し | 使うところ | 使い方の例 |
+| --- | --- | --- |
+| やってきたこと | 職務経歴書・自己PR | 「新人アルバイトに仕事の流れを教えていました」 |
+| ゆずれない条件 | 求人を選ぶとき | 応募する前に、条件に合うかを確かめる |
+| やりたくないこと | 転職理由 | 「休みの曜日が決まった働き方で、長く続けたい」 |
+| まとめた1〜2行 | 志望動機 | 経験と応募する仕事のつながりを話す |
+
+面接で「あなたの強みは？」と聞かれたときも、ワーク1の「工夫したこと」「ほめられたこと」から、具体的な場面をひとつ選んで話すと、説得力が出ます。
+
+職務経歴書の書き方は[アルバイト経験だけの職務経歴書、何を書けばいい？](/articles/shokumu-keirekisho-arubaito)、志望動機の組み立て方は[未経験職種の志望動機、何を書けばいい？](/articles/shiboudouki-mikeiken)で紹介しています。接客の経験をどう言いかえるか迷ったら、[接客経験は転職でどう活かせる？](/articles/sekkyaku-keiken-ikasu)も参考になります。
+
+## ひとりでまとまらないときに使える無料のツール
+
+書き出しが進まないときは、厚生労働省が用意している無料のツールを使ってみる方法もあります。
+
+- **職業情報提供サイト（job tag）**：職業ごとの仕事内容や必要な知識・スキルを調べられます。仕事への興味を調べる「職業興味検査」や、仕事で大切にしたいことを調べる「仕事価値観検査」などの自己診断ツールもあります
+- **しごと能力プロフィール（job tag）**：これまでの職歴から、身につけたスキルや知識を整理したプロフィールを作り、近い職業を検索できます
+- **ジョブ・カード**：職務経歴の整理から、自分の考え方やこだわりの整理、これからのプランづくりまで、シートに沿って順に書き進められます。様式はダウンロードでき、正確な時期が分からなくても記入を進めてよいとされています
+
+診断ツールの結果は、**そのまま仕事を決めるためのものではなく、考えるきっかけ**として使いましょう。job tag でも、診断結果の職業リストは学歴・職務経験・資格などを考慮していないため、参考として使うよう案内されています。
+
+やりたい仕事そのものが思い浮かばないときは、[やりたい仕事が分からない。自分に合う仕事の探し方3ステップ](/articles/shigoto-sagashikata)で、候補をしぼる方法を紹介しています。', 'review', false, '2026-10-09'::timestamptz, '2026-10-09'::timestamptz, '2026-10-09'::timestamptz, 'プロジェクトオーナー（チャットで承認）', '2026-10-09'::timestamptz, '転職の自己分析のやり方｜3つの書き出しワークと例', '転職のための自己分析は何をすればいい？経験の棚卸し、ゆずれない条件、やりたくないことの3つの書き出しワークを例つきで紹介します。まとめ方と、履歴書・面接での使い方、job tag やジョブ・カードなど無料の公的ツールも分かります。', array['shigoto-sagashikata', 'mikeiken-tenshoku-hajimekata', 'sekkyaku-keiken-ikasu', 'tenshoku-schedule', 'jiko-pr-mikeiken']::text[], '{}'::text[], array['yaritai', 'mikeiken-shokushu']::text[], array['hajimete', 'sekkyaku']::text[], array['自己分析って、', '何を書けばいい？']::text[], null, false, '[{"q":"自己分析にはどのくらい時間をかければいいですか？","a":"決まった時間はありません。最初から完璧にまとめようとせず、まずは3つの書き出し（やってきたこと・ゆずれない条件・やりたくないこと）を一度やってみて、求人を見たり面接を受けたりしながら書き足していくほうが進めやすくなります。"},{"q":"アルバイトや短い職歴しかなくても、自己分析はできますか？","a":"できます。アルバイトでも、毎日やっていた作業、自分なりに工夫したこと、任されたこと、ほめられたことは書き出せます。厚生労働省のジョブ・カードでも、正確な時期が分からなくても記入を進めてよいとされていて、まずは思い出せることから書くのがおすすめです。"},{"q":"自己診断のツールの結果どおりに仕事を選べばいいですか？","a":"結果は、考えるきっかけとして使うのがおすすめです。職業情報提供サイト job tag の職業興味検査などは、結果の職業リストが学歴や職務経験、資格などを考慮していないため参考として使うよう案内されています。結果に出た仕事の内容を調べ、自分の書き出しと照らし合わせてみましょう。"}]'::jsonb, null, '{"schema_version":2,"writer_agent":"career-writer","angle":"自己分析を「性格を知る作業」ではなく「求人を選ぶ基準と、書類・面接で話す材料を作る作業」と定義し、3つの書き出し（経験の棚卸し・ゆずれない条件・やりたくないこと）に分けて、書き出し例つきで示す。迷ったら公的な無料ツール（job tag、ジョブ・カード）を使う","quotes":[{"source_url":"https://shigoto.mhlw.go.jp/User","text":"job tag では職業の仕事の内容、求められる知識・スキル、どのような人が向いているかなどを調べられ、自己診断ツールとして職業興味検査、仕事価値観検査などがある（サイトへ直接接続できなかったため、検索結果に表示された内容で確認）","used_in":"ひとりでまとまらないときに使える無料のツール"},{"source_url":"https://shigoto.mhlw.go.jp/User/MyProfile/Step1","text":"しごと能力プロフィールは、これまでの職歴からスキルや知識を可視化して作成し、結果をもとに近い職業を検索できる（検索結果で確認）","used_in":"ひとりでまとまらないときに使える無料のツール"},{"source_url":"https://shigoto.mhlw.go.jp/User/faq","text":"職業興味検査と仕事価値観検査では、回答者の学歴・就業経験・取得資格・専門性は判定に使われていない。職業リストは興味や価値観の特徴との類似度から作成されているため、参考として活用する（Q17。検索結果に表示された内容で確認）","used_in":"ひとりでまとまらないときに使える無料のツール"},{"source_url":"https://www.job-card.mhlw.go.jp/guidance/jobseeker","text":"求職者は職務経歴シート、職業能力証明シート、キャリア・プラン作成補助シート、キャリア・プランシートの順に作るよう案内。職務経歴は正確な時期が分からなくても記入を進めてよい。就業経験のない人は、書ける内容がない場合は職務経歴シートなどを作成しなくてもよい（検索結果で確認）","used_in":"ひとりでまとまらないときに使える無料のツール"},{"source_url":"https://www.job-card.mhlw.go.jp/guidance/download_blank","text":"ジョブ・カードの様式は PDF と Excel でダウンロードできる（検索結果で確認）","used_in":"ひとりでまとまらないときに使える無料のツール"}],"not_used":["「自己分析は〇時間・〇日で終わらせる」といった目安は根拠がないため書かない","job tag の「ポータブルスキル見える化ツール」は、主にミドルシニア層を想定したものと案内されているため、読者向けには紹介しない","性格診断などの民間の診断サービスは、特定のサービスに触れないため扱わない"]}'::jsonb) on conflict (slug) do nothing;
+insert into article_categories (article_id, category_id, is_primary) select a.id, c.id, true from articles a, categories c where a.slug = 'jiko-bunseki-yarikata' and c.slug = 'junbi' on conflict do nothing;
+insert into article_categories (article_id, category_id, is_primary) select a.id, c.id, false from articles a, categories c where a.slug = 'jiko-bunseki-yarikata' and c.slug = 'mikeiken' on conflict do nothing;
+insert into article_sources (article_id, title, publisher, url, accessed_at, used_for, sort_order) select id, '職業情報提供サイト（job tag）', '厚生労働省', 'https://shigoto.mhlw.go.jp/User', '2026-10-09'::date, '仕事の内容や必要なスキル・知識などを調べられること。職業興味検査・仕事価値観検査などの自己診断ツールがあること', 0 from articles where slug = 'jiko-bunseki-yarikata';
+insert into article_sources (article_id, title, publisher, url, accessed_at, used_for, sort_order) select id, 'しごと能力プロフィールの作成（job tag）', '厚生労働省', 'https://shigoto.mhlw.go.jp/User/MyProfile/Step1', '2026-10-09'::date, 'これまでの職歴からスキルや知識を整理したプロフィールを作り、近い職業を検索できること', 1 from articles where slug = 'jiko-bunseki-yarikata';
+insert into article_sources (article_id, title, publisher, url, accessed_at, used_for, sort_order) select id, 'よくあるお問い合わせ（job tag）', '厚生労働省', 'https://shigoto.mhlw.go.jp/User/faq', '2026-10-09'::date, '自己診断の結果の職業リストは学歴・職務経験・資格などを考慮していないため、参考として使うこと', 2 from articles where slug = 'jiko-bunseki-yarikata';
+insert into article_sources (article_id, title, publisher, url, accessed_at, used_for, sort_order) select id, '求職者の方へ（ジョブ・カード制度総合サイト）', '厚生労働省', 'https://www.job-card.mhlw.go.jp/guidance/jobseeker', '2026-10-09'::date, 'ジョブ・カードで職務経歴の整理から自己理解、キャリア・プランの作成まで順に進められること。正確な時期が分からなくても記入を進めてよいこと。就業経験がない人は職務経歴シートを書ける内容がなければ作らなくてよいこと', 3 from articles where slug = 'jiko-bunseki-yarikata';
+insert into article_sources (article_id, title, publisher, url, accessed_at, used_for, sort_order) select id, 'ジョブ・カード様式のダウンロード', '厚生労働省', 'https://www.job-card.mhlw.go.jp/guidance/download_blank', '2026-10-09'::date, 'ジョブ・カードの様式を無料でダウンロードできること', 4 from articles where slug = 'jiko-bunseki-yarikata';
+insert into article_versions (article_id, version, title, summary, body_md, created_by) select id, 1, title, summary, body_md, 'seed' from articles where slug = 'jiko-bunseki-yarikata' on conflict do nothing;
+insert into article_reviews (article_id, version, reviewer, verdict, checks) select id, 1, 'プロジェクトオーナー（チャットで承認）', 'approved', '{"content_hash":"cd180c9f948985aeadea9b24d5d67ab66dadcbb89ed08a90b2eeb3acd0e9d64a","findings":[]}'::jsonb from articles where slug = 'jiko-bunseki-yarikata';
+update articles set status = 'published' where slug = 'jiko-bunseki-yarikata';
+
+-- article: jiko-pr-mikeiken (published)
+insert into articles (slug, kind, title, summary, body_md, status, featured, published_at, updated_at, reviewed_at, reviewed_by, information_checked_at, seo_title, seo_description, related_slugs, roles, concerns, situations, eyecatch, illustration, recommended, faq, news_meta, research_notes) values ('jiko-pr-mikeiken', 'article', '未経験の仕事の自己PR、何を書く？アルバイト・接客の経験から強みを見つける方法と例文', '未経験の仕事に応募するときの自己PRは、同じ仕事の経験がなくても、アルバイトや接客で「やってきたこと」から作れます。強みの見つけ方、接客の経験を強みの言葉にする言い換え、自己PRの型、職種別の例文、面接で話すときのコツを紹介します。', '「接客のアルバイトしかしていないのに、自己PRに何を書けばいいの？」。未経験の仕事に応募しようとして、ここで手が止まる人は多いと思います。
+
+先に結論を言うと、未経験の仕事の自己PRは、**同じ仕事の経験がなくても書けます**。大事なのは、**アルバイトや接客で自分がどう考えて動いたか**を、**応募する仕事でどう使うか**までつなげることです。
+
+この記事で分かること：
+
+- アルバイト・接客の経験から**強みを見つける方法**
+- 接客の行動を**強みの言葉**にする言い換え
+- 自己PRの**型**と、職種別の**例文**（仮の例）
+- 面接で**話すとき**のコツ
+
+## 自己PRと志望動機は何が違う？
+
+兵庫労働局が公開しているハローワークのコラムでは、志望動機は「応募先の会社や仕事内容に、なぜ応募したのか」を問われるもの、自己PRは「自分の経験や性格、長所・短所、得意なこと」を問われるものと説明しています。
+
+つまり自己PRは、**「私はこういう人で、こういうことができます」**を伝える欄です。会社への思いは志望動機で書くので、自己PRでは自分の経験に集中しましょう。志望動機の組み立て方は[未経験職種の志望動機、何を書けばいい？](/articles/shiboudouki-mikeiken)で紹介しています。
+
+## 強みは「やってきたこと」から探す
+
+「自分の強みは何か」と考えると、何も出てこないことがあります。そんなときは、強みを考えるのをいったんやめて、**アルバイトで実際にやったこと**を書き出してみましょう。
+
+```figure
+type: checklist
+title: 強みを見つけるための問い
+items:
+  - お客さんや店長に、ほめられたことは？
+  - 途中から任されるようになった仕事は？
+  - 困ったことを、自分なりに工夫して変えたことは？
+  - 面倒でも、ずっと続けてきたことは？
+  - 周りの人から、よく頼まれることは？
+```
+
+ひとつの問いに、ひとつでも答えが出れば十分です。たとえば「店長に、品出しが早くて丁寧だと言われた」「常連のお客さんの好みを覚えていて、声をかけていた」のような、小さなことで構いません。
+
+## 接客の行動を「強みの言葉」にする
+
+書き出したことは、そのままだと「アルバイトでやったこと」です。これを、ほかの仕事でも通じる言葉に置き換えます。
+
+| 接客・販売でやったこと | 強みの言葉にすると | 未経験の仕事での使いどころ |
+| --- | --- | --- |
+| お客さんの話を聞いて、合う商品をすすめた | 相手の希望を聞き出す力 | 営業、カスタマーサポート |
+| 品出しや在庫の数を、間違えないよう確認した | 正確に作業を進める力 | 事務、経理の補助 |
+| 混む時間の前に準備をしておいた | 先を読んで段取りする力 | 事務、営業事務 |
+| 怒っているお客さんにも落ち着いて対応した | 落ち着いて対応する力 | カスタマーサポート、ITサポート |
+| 新しいレジや機械の使い方をすぐ覚えた | 新しいことを覚える力 | ITサポート、事務 |
+
+接客の経験を職種ごとにどう活かすかは、[接客経験は転職でどう活かせる？](/articles/sekkyaku-keiken-ikasu)でもくわしく紹介しています。
+
+## 応募する仕事から、使う強みを選ぶ
+
+強みが複数見つかったら、**応募する仕事で必要とされること**に近いものを選びます。仕事の中身が分からないときは、厚生労働省の職業情報提供サイト「job tag」で、職業ごとの仕事の内容や必要なスキル・知識を調べられます。求人票の「仕事内容」や「求める人物像」もあわせて読み、重なるところを探しましょう。
+
+## 自己PRの型
+
+自己PRは、次の順番で組み立てると、短くまとまります。
+
+```figure
+type: steps
+title: 未経験の仕事の自己PRの型
+items:
+  - label: 強み
+    text: 最初に、強みをひとことで言う
+  - label: 場面と行動
+    text: その強みが出た場面と、自分がしたこと
+  - label: 結果
+    text: どう変わったか、周りの反応
+  - label: 活かし方
+    text: 応募する仕事で、どう使いたいか
+```
+
+### 「強みの言葉」だけでは伝わらない
+
+ハローワーク旭川の案内では、「〇〇ができます」「〇〇の性格です」と書いても根拠がないと、読む側に「なぜ？どうして？どのように？」と疑問を持たせてしまうと説明しています。
+
+> 悪い例：「私の強みはコミュニケーション力です。接客で培った力を御社でも活かしたいです。」
+
+これだと、どんな場面でどう話せるのかが分かりません。**「場面と行動」を具体的に書く**ことで、はじめて強みに根拠が生まれます。
+
+## 職種別の例文（仮の例）
+
+ここからは、型にそって書いた例文です。経験の内容は仮のものなので、自分の経験に置き換えてください。
+
+### 飲食店のアルバイトから事務職へ
+
+> 私の強みは、ミスが起きる原因を見つけて、仕組みで防ぐことです。飲食店のアルバイトで、食材の発注を担当していたとき、数を間違える日があったため、よく使う食材の在庫を書き込む確認表を作り、発注の前に必ず照らし合わせるようにしました。その後、発注の間違いはほとんどなくなり、ほかのスタッフも同じ表を使うようになりました。事務の仕事でも、入力や書類の確認でミスを防ぐ工夫を続けたいと考えています。
+
+### アパレル販売からカスタマーサポートへ
+
+> 私の強みは、相手が本当に困っていることを聞き出すことです。アパレルの販売で、返品の相談に来たお客様の話を聞くうちに、サイズではなく着方に迷っていると分かり、合わせ方を提案したところ、返品せずに使い続けていただけました。お問い合わせの対応でも、言葉の奥にある困りごとを聞き取り、解決につなげたいと考えています。
+
+### ドラッグストアの販売から営業へ
+
+> 私の強みは、お客様の顔と好みを覚えて、次の提案につなげることです。ドラッグストアで〇年働く中で、よく来店される方が使っている商品をメモしておき、新しい商品が入ったときに声をかけるようにしていました。「あなたに聞くと早い」と言っていただけることが増えました。営業の仕事でも、お客様一人ひとりのことを覚え、相手に合った提案をしたいと考えています。
+
+職務経歴書の中で自己PRをどこに書くかは、[アルバイト経験だけの職務経歴書、何を書けばいい？](/articles/shokumu-keirekisho-arubaito)で構成ごとに紹介しています。
+
+## 面接で話すときは
+
+兵庫労働局のコラムでは、書類を書くときに面接で話しやすい形を考えておくと、内容が整理され、面接の準備にもつながるとしています。書いた自己PRを、話す用に整えておきましょう。
+
+- **読み上げない**：書いた文章を暗記して読むより、型の4つの順番だけを覚えて、自分の言葉で話す
+- **最初の一文をはっきり**：「私の強みは〇〇です」から始める
+- **深く聞かれる準備をする**：「なぜそうしようと思ったのですか」「うまくいかなかったことはありますか」と聞かれても答えられるようにしておく
+- **盛らない**：数字や結果は本当のことだけを話す。大きく言うと、深く聞かれたときに困るのは自分です
+
+ひとりで考えても自信が持てないときは、ハローワークで応募書類の書き方や面接について相談できます。相談の方法や予約が必要かは、利用するハローワークで確認してください。', 'review', false, '2026-10-09'::timestamptz, '2026-10-09'::timestamptz, '2026-10-09'::timestamptz, 'プロジェクトオーナー（チャットで承認）', '2026-10-09'::timestamptz, '未経験の自己PRの書き方｜アルバイト経験から作る型と例文', '未経験の仕事に応募するときの自己PRの書き方を紹介します。アルバイトや接客の経験から強みを見つける問い、強みの言い換え表、強み→場面→結果→活かし方の型、事務・カスタマーサポート・営業の例文、面接で話すときのコツが分かります。', array['sekkyaku-keiken-ikasu', 'shokumu-keirekisho-arubaito', 'shiboudouki-mikeiken', 'mensetsu-yokukiku-shitsumon', 'jiko-bunseki-yarikata']::text[], '{}'::text[], array['mensetsu', 'mikeiken-shokushu']::text[], array['sekkyaku', 'freeter', 'seishain-keiken-sukunai']::text[], array['接客の経験、', '自己PRにできる？']::text[], null, false, '[{"q":"アルバイトの経験だけでも、自己PRに書いていいですか？","a":"書いて構いません。自己PRで伝えるのは、経験の長さや肩書きよりも、仕事の中で自分がどう考えて動いたかです。アルバイトで工夫したことや任されたことを、応募する仕事でどう活かすかまでつなげて書きましょう。"},{"q":"自己PRと志望動機は、何が違いますか？","a":"志望動機は「なぜこの会社・この仕事に応募したのか」、自己PRは「自分の経験や長所、得意なこと」を伝えるものです。自己PRで伝えた強みを、志望動機の「この仕事でこう活かしたい」につなげると、話に一貫性が出ます。"},{"q":"自己PRに書く強みは、いくつ書けばいいですか？","a":"決まりはありませんが、強みを並べるよりも、一つにしぼってエピソードで裏づけるほうが伝わりやすくなります。ほかの強みは、面接で聞かれたときに話せるように準備しておきましょう。"}]'::jsonb, null, '{"schema_version":2,"writer_agent":"career-writer","angle":"未経験の自己PRは「同じ仕事の経験」ではなく「行動」から作る。アルバイト・接客で実際にやったことを問いで掘り起こし、応募する仕事に必要なこと（job tag で調べる）と結びつけて、型と例文で示す。書類と面接での話し方の違いまで扱う","quotes":[{"source_url":"https://jsite.mhlw.go.jp/hyogo-roudoukyoku/content/contents/000836463.pdf","text":"志望動機は応募先の企業や仕事内容に対してなぜ応募したのかを問われるもの、自己PRは自分の経験や性格、長所・短所、得意なことなどを問われるもの。書類の内容を面接で話しやすい形で考えると整理され、面接対策にもつながる（この環境から jsite.mhlw.go.jp に直接接続できなかったため、検索結果に表示された資料の抜粋で確認）","used_in":"自己PRと志望動機は何が違う？／面接で話すときは／FAQ"},{"source_url":"https://jsite.mhlw.go.jp/hokkaido-hellowork/list/asahikawa/kyushokusha/shigoto05-2.html","text":"志望動機や自己PRでありがちなのは、「〇〇ができます。」「〇〇の性格です。」と記載したときにその根拠がなく、見る側に「なぜ？どうして？どのように？」と疑問を抱かせてしまうこと（直接開けなかったため、検索結果の抜粋で確認）","used_in":"「強みの言葉」だけでは伝わらない"},{"source_url":"https://shigoto.mhlw.go.jp/User/","text":"職業ごとに仕事内容、必要なスキル・知識などを調べられる厚生労働省の職業情報提供サイト（直接開けなかったため、検索結果と厚生労働省の案内ページの抜粋で確認）","used_in":"応募する仕事から、使う強みを選ぶ"}],"not_used":["「自己PRは〇〇文字が目安」「面接での自己PRは〇分」などの分量・時間は、公的な根拠を確認できなかったので書かない","例文には年数・件数などの数字を入れず「〇年」とした。架空の数字を実績のように見せないため"]}'::jsonb) on conflict (slug) do nothing;
+insert into article_categories (article_id, category_id, is_primary) select a.id, c.id, true from articles a, categories c where a.slug = 'jiko-pr-mikeiken' and c.slug = 'shorui-mensetsu' on conflict do nothing;
+insert into article_categories (article_id, category_id, is_primary) select a.id, c.id, false from articles a, categories c where a.slug = 'jiko-pr-mikeiken' and c.slug = 'keiken' on conflict do nothing;
+insert into article_sources (article_id, title, publisher, url, accessed_at, used_for, sort_order) select id, '就職活動の苦手を減らそう 自己PR編', '兵庫労働局（三宮わかものハローワーク）', 'https://jsite.mhlw.go.jp/hyogo-roudoukyoku/content/contents/000836463.pdf', '2026-10-09'::date, '志望動機は応募先や仕事内容になぜ応募したのかを問われるもの、自己PRは自分の経験や性格、長所・短所、得意なことを問われるものという違い。面接で話しやすい形で考えると整理しやすいこと', 0 from articles where slug = 'jiko-pr-mikeiken';
+insert into article_sources (article_id, title, publisher, url, accessed_at, used_for, sort_order) select id, '応募書類作成支援', '北海道労働局（ハローワーク旭川）', 'https://jsite.mhlw.go.jp/hokkaido-hellowork/list/asahikawa/kyushokusha/shigoto05-2.html', '2026-10-09'::date, '「〇〇ができます」「〇〇の性格です」と書いても根拠がないと、読む側に「なぜ？どうして？どのように？」と疑問を持たせてしまうこと。ハローワークで応募書類の作成を相談できること', 1 from articles where slug = 'jiko-pr-mikeiken';
+insert into article_sources (article_id, title, publisher, url, accessed_at, used_for, sort_order) select id, '職業情報提供サイト（job tag）', '厚生労働省', 'https://shigoto.mhlw.go.jp/User/', '2026-10-09'::date, '職業ごとに仕事の内容や、必要なスキル・知識を調べられること', 2 from articles where slug = 'jiko-pr-mikeiken';
+insert into article_versions (article_id, version, title, summary, body_md, created_by) select id, 1, title, summary, body_md, 'seed' from articles where slug = 'jiko-pr-mikeiken' on conflict do nothing;
+insert into article_reviews (article_id, version, reviewer, verdict, checks) select id, 1, 'プロジェクトオーナー（チャットで承認）', 'approved', '{"content_hash":"547b70f216c41297c0b4f2e7aeed89735d10523be2d6c7c94675c5354709e1ad","findings":[]}'::jsonb from articles where slug = 'jiko-pr-mikeiken';
+update articles set status = 'published' where slug = 'jiko-pr-mikeiken';
+
 -- article: jimu-mikeiken-mae (published)
 insert into articles (slug, kind, title, summary, body_md, status, featured, published_at, updated_at, reviewed_at, reviewed_by, information_checked_at, seo_title, seo_description, related_slugs, roles, concerns, situations, eyecatch, illustration, recommended, faq, news_meta, research_notes) values ('jimu-mikeiken-mae', 'article', '未経験で事務職を目指す前に知っておきたいこと｜種類・PC・電話対応', '「事務職」とひとことで言っても、一般事務・営業事務・経理事務・受付事務などで仕事の中身は変わります。種類ごとの違い、求められやすいパソコン操作の目安、電話や来客対応のこと、接客経験の伝え方まで、応募前に知っておきたいことをまとめました。', '「オフィスで落ち着いて働きたい」「土日休みの仕事にしたい」。そんな理由で事務職を考える人は多いと思います。
 
@@ -1244,7 +1922,7 @@ job tag では、一般事務は書類づくりや集計にパソコンを使い
 - 月末・月初など、忙しくなる時期と残業の目安
 - 入社後、誰にどのように仕事を教わるか
 
-最後の質問は、未経験の人にとって特に大事です。研修の確認のしかたは[未経験求人の「研修あり」で確認すべきこと](/articles/mikeiken-kenshu-kakunin)にまとめています。どの事務が自分に合いそうかを決めてから求人を見ると、比べやすくなります。', 'review', true, '2026-10-06'::timestamptz, '2026-10-06'::timestamptz, '2026-10-06'::timestamptz, null, '2026-10-06'::timestamptz, null, null, array['pc-nigate-jimu', 'sekkyaku-keiken-ikasu', 'mikeiken-kenshu-kakunin']::text[], array['jimu']::text[], array['office', 'mikeiken-shokushu']::text[], array['sekkyaku', 'pc-mikeiken']::text[], array['未経験から事務職へ。', '最初に知っておきたいこと']::text[], null, false, '[{"q":"事務職は、資格がないと応募できませんか？","a":"求人によって違います。応募条件の欄に資格が書かれていなければ、資格がなくても応募できます。資格の有無よりも、「表計算ソフトで入力と合計の計算ができる」のように、できる操作を具体的に伝えられるほうが判断材料になりやすいです。"},{"q":"一般事務と営業事務、未経験ならどちらがいいですか？","a":"どちらが向いているかは人によります。一般事務は書類やデータの管理、電話の取り次ぎなど社内の仕事を支えることが中心です。営業事務は営業担当の依頼で見積書を作ったり、取引先からの電話やメールに応えたりと、社外とのやりとりも入ってきます。人と話すのが苦にならないなら、営業事務も候補に入れてみてください。"},{"q":"事務職は、あまり人と話さない仕事ですか？","a":"パソコン作業が中心ですが、電話の取り次ぎや来客への対応、社内からの依頼の受け付けなど、人とのやりとりもあります。どのくらいの割合かは職場によって違うので、面接で「1日のうち電話や来客対応はどのくらいありますか」と聞いてみましょう。"}]'::jsonb, null, '{"schema_version":2,"writer_agent":"career-writer","angle":"「事務＝座ってPC作業」というイメージを、種類ごとの中身と電話・来客対応の実際に分けて整理する","quotes":[{"source_url":"https://shigoto.mhlw.go.jp/User/Occupation/Detail/428","text":"一般事務は特定の分野に限らず定型的な事務を行う。書類の作成・整理、メール対応、伝票の作成・管理、各種台帳の管理、データ入力、郵便物の発送・仕分け、電話の取り次ぎ、来客の対応やお茶出しの補助など。書類作成や集計にはパソコンを使い、コピー機・FAXなどの事務機器もよく使う。","used_in":"事務職って、どんな仕事？ / パソコンはどのくらい使える必要がある？ / 電話や来客の対応もある？"},{"source_url":"https://shigoto.mhlw.go.jp/User/Occupation/Detail/431","text":"営業事務は営業担当者の指示で資料や見積書を作成し、契約・売上・入金の管理、顧客からの電話・メールでの問い合わせ対応、見積書・納品書の作成などを行う。別名に営業アシスタント、受発注管理事務員。","used_in":"事務職って、どんな仕事？"},{"source_url":"https://shigoto.mhlw.go.jp/User/Occupation/Detail/430?media=4876","text":"経理事務は会計・財務管理のソフトやシステムを使い、入出金伝票や振替伝票の作成、現金出納帳・総勘定元帳への記録を行う。月末には勘定科目を集計して残高を確定し、実際の預金残高と照合する。","used_in":"事務職って、どんな仕事？"},{"source_url":"https://shigoto.mhlw.go.jp/User/Occupation/Detail/427","text":"受付事務（別名 案内係・会社受付係）は来訪者の用件を確認して担当部署に取り次ぎ、会議室などへ案内する。来訪者の記録や電話の取り次ぎの補助も行う。","used_in":"事務職って、どんな仕事？"},{"source_url":"https://shigoto.mhlw.go.jp/","text":"job tag は厚生労働省の職業情報提供サイトで、500以上の職業について仕事内容や必要なスキルなどを調べられる。","used_in":"未経験でも応募できる？"}]}'::jsonb) on conflict (slug) do nothing;
+最後の質問は、未経験の人にとって特に大事です。研修の確認のしかたは[未経験求人の「研修あり」で確認すべきこと](/articles/mikeiken-kenshu-kakunin)にまとめています。どの事務が自分に合いそうかを決めてから求人を見ると、比べやすくなります。', 'review', true, '2026-10-06'::timestamptz, '2026-10-06'::timestamptz, '2026-10-06'::timestamptz, null, '2026-10-06'::timestamptz, null, null, array['pc-nigate-jimu', 'sekkyaku-keiken-ikasu', 'mikeiken-kenshu-kakunin', 'eigyo-jimu-shigoto', 'keiri-mikeiken']::text[], array['jimu']::text[], array['office', 'mikeiken-shokushu']::text[], array['sekkyaku', 'pc-mikeiken']::text[], array['未経験から事務職へ。', '最初に知っておきたいこと']::text[], null, false, '[{"q":"事務職は、資格がないと応募できませんか？","a":"求人によって違います。応募条件の欄に資格が書かれていなければ、資格がなくても応募できます。資格の有無よりも、「表計算ソフトで入力と合計の計算ができる」のように、できる操作を具体的に伝えられるほうが判断材料になりやすいです。"},{"q":"一般事務と営業事務、未経験ならどちらがいいですか？","a":"どちらが向いているかは人によります。一般事務は書類やデータの管理、電話の取り次ぎなど社内の仕事を支えることが中心です。営業事務は営業担当の依頼で見積書を作ったり、取引先からの電話やメールに応えたりと、社外とのやりとりも入ってきます。人と話すのが苦にならないなら、営業事務も候補に入れてみてください。"},{"q":"事務職は、あまり人と話さない仕事ですか？","a":"パソコン作業が中心ですが、電話の取り次ぎや来客への対応、社内からの依頼の受け付けなど、人とのやりとりもあります。どのくらいの割合かは職場によって違うので、面接で「1日のうち電話や来客対応はどのくらいありますか」と聞いてみましょう。"}]'::jsonb, null, '{"schema_version":2,"writer_agent":"career-writer","angle":"「事務＝座ってPC作業」というイメージを、種類ごとの中身と電話・来客対応の実際に分けて整理する","quotes":[{"source_url":"https://shigoto.mhlw.go.jp/User/Occupation/Detail/428","text":"一般事務は特定の分野に限らず定型的な事務を行う。書類の作成・整理、メール対応、伝票の作成・管理、各種台帳の管理、データ入力、郵便物の発送・仕分け、電話の取り次ぎ、来客の対応やお茶出しの補助など。書類作成や集計にはパソコンを使い、コピー機・FAXなどの事務機器もよく使う。","used_in":"事務職って、どんな仕事？ / パソコンはどのくらい使える必要がある？ / 電話や来客の対応もある？"},{"source_url":"https://shigoto.mhlw.go.jp/User/Occupation/Detail/431","text":"営業事務は営業担当者の指示で資料や見積書を作成し、契約・売上・入金の管理、顧客からの電話・メールでの問い合わせ対応、見積書・納品書の作成などを行う。別名に営業アシスタント、受発注管理事務員。","used_in":"事務職って、どんな仕事？"},{"source_url":"https://shigoto.mhlw.go.jp/User/Occupation/Detail/430?media=4876","text":"経理事務は会計・財務管理のソフトやシステムを使い、入出金伝票や振替伝票の作成、現金出納帳・総勘定元帳への記録を行う。月末には勘定科目を集計して残高を確定し、実際の預金残高と照合する。","used_in":"事務職って、どんな仕事？"},{"source_url":"https://shigoto.mhlw.go.jp/User/Occupation/Detail/427","text":"受付事務（別名 案内係・会社受付係）は来訪者の用件を確認して担当部署に取り次ぎ、会議室などへ案内する。来訪者の記録や電話の取り次ぎの補助も行う。","used_in":"事務職って、どんな仕事？"},{"source_url":"https://shigoto.mhlw.go.jp/","text":"job tag は厚生労働省の職業情報提供サイトで、500以上の職業について仕事内容や必要なスキルなどを調べられる。","used_in":"未経験でも応募できる？"}]}'::jsonb) on conflict (slug) do nothing;
 insert into article_categories (article_id, category_id, is_primary) select a.id, c.id, true from articles a, categories c where a.slug = 'jimu-mikeiken-mae' and c.slug = 'shokushu' on conflict do nothing;
 insert into article_categories (article_id, category_id, is_primary) select a.id, c.id, false from articles a, categories c where a.slug = 'jimu-mikeiken-mae' and c.slug = 'mikeiken' on conflict do nothing;
 insert into article_sources (article_id, title, publisher, url, accessed_at, used_for, sort_order) select id, '一般事務 - 職業詳細（job tag）', '厚生労働省 職業情報提供サイト（job tag）', 'https://shigoto.mhlw.go.jp/User/Occupation/Detail/428', '2026-10-06'::date, '一般事務の仕事内容（書類の作成・整理、伝票、データ入力、郵便物の仕分け、電話の取り次ぎ、来客対応やお茶出しの補助など）と使う機器（パソコン・コピー機・FAXなど）', 0 from articles where slug = 'jimu-mikeiken-mae';
@@ -1343,6 +2021,567 @@ insert into article_sources (article_id, title, publisher, url, accessed_at, use
 insert into article_versions (article_id, version, title, summary, body_md, created_by) select id, 1, title, summary, body_md, 'seed' from articles where slug = 'jinji-saiyo-mikeiken' on conflict do nothing;
 insert into article_reviews (article_id, version, reviewer, verdict, checks) select id, 1, 'seed', 'approved', '{"content_hash":"3356cd6762455237137b256895b5356ca22040f3d76f06f1c089b74ad0924ef6","findings":[]}'::jsonb from articles where slug = 'jinji-saiyo-mikeiken';
 update articles set status = 'published' where slug = 'jinji-saiyo-mikeiken';
+
+-- article: kaigo-mikeiken (published)
+insert into articles (slug, kind, title, summary, body_md, status, featured, published_at, updated_at, reviewed_at, reviewed_by, information_checked_at, seo_title, seo_description, related_slugs, roles, concerns, situations, eyecatch, illustration, recommended, faq, news_meta, research_notes) values ('kaigo-mikeiken', 'article', '未経験から介護職へ転職するときに知っておきたいこと｜仕事内容・資格の段階・夜勤', '介護職は、施設や利用者の自宅で、食事・入浴・排せつなど日常生活の手助けをする仕事です。施設介護と訪問介護の違い、介護職員初任者研修から介護福祉士までの資格の段階、夜勤を含む働き方、応募前に確認することを紹介します。', '「人の役に立つ仕事がしたい」「資格を取って、長く続けられる仕事に就きたい」。そう考えて介護職を候補に入れる人は少なくありません。一方で、「資格がないと無理？」「夜勤はきつい？」と、最初の一歩で迷いやすい仕事でもあります。
+
+先に結論を言うと、介護職は**どこで働くか（施設・訪問・デイサービス）で、必要な資格も働く時間も変わる**仕事です。資格は段階を踏んで取っていくもので、最初から上の資格が必要なわけではありません。
+
+この記事で分かること：
+
+- 介護職の**仕事内容**と、働く場所による違い
+- 介護職員初任者研修から介護福祉士までの**資格の段階**
+- **夜勤**を含む働き方
+- 応募前に**確認すること**
+
+## 介護職の仕事内容は？
+
+厚生労働省の職業情報提供サイト（job tag）では、施設で働く介護職（施設介護員）を、社会福祉施設に入所したり通所したりする人の介護や援助をする仕事として紹介しています。中心になるのは、次のような日常生活の手助けです。
+
+- 食事の手助け（食べる・飲み込むのを見守る、介助する）
+- 入浴の手助け
+- 排せつ（トイレ・おむつ）の手助け
+- ベッドから車いすへの移動など、からだを支える介助
+- 身のまわりを清潔に保つ手伝い
+
+このほか、利用者の様子を記録したり、家族や看護職員などとやりとりしたりする仕事もあります。
+
+### 働く場所で、仕事の中身が変わる
+
+| 働く場所 | どんな仕事？ |
+| --- | --- |
+| 入所型の施設 | 施設で暮らす人の生活を、昼も夜も交替で支える |
+| デイサービス（通所） | 日中に通ってくる人の食事・入浴・レクリエーションなどを支える |
+| 訪問介護 | 利用者の自宅を訪ねて、介助や家事の手伝いをする |
+
+未経験の場合は、まず施設かデイサービスで、先輩と一緒に働きながら仕事を覚える形が多くなります。
+
+## 資格がなくても働ける？
+
+介護施設では、医療・福祉関係の資格がない人が介護の仕事に就いている場合もあります。その場合、介護サービスの事業者は、資格のない職員に**認知症介護基礎研修**を受けさせる措置をとることが義務づけられています（2024年4月に完全施行）。
+
+一方で、利用者の自宅を訪ねる**訪問介護員（ホームヘルパー）**として働くには、介護職員初任者研修の修了が必要です。資格のない人は訪問介護員としては働けません。
+
+「資格なしで応募できるか」は、求人の**応募資格**の欄で確認しましょう。「無資格可」と書かれていても、入社後にどの研修をいつ受けるのかは事業所によって違います。
+
+## 資格は3つの段階で考える
+
+介護の資格は、仕事をしながら段階的に取っていくのが一般的です。
+
+```figure
+type: steps
+title: 介護の資格の段階
+items:
+  - label: 介護職員初任者研修
+    text: 130時間の研修。介護の基本を学ぶ最初の資格
+  - label: 実務者研修
+    text: 450時間の研修。介護福祉士の受験に必要
+  - label: 介護福祉士（国家資格）
+    text: 実務経験3年以上と実務者研修のあと、国家試験に合格
+```
+
+- **介護職員初任者研修**：130時間の研修で、介護の基本的な知識と技術を学びます。訪問介護で働くときに必要になる資格です
+- **実務者研修**：450時間の研修で、より深い知識と技術を学びます
+- **介護福祉士**：介護の国家資格です。job tag では、3年以上の実務経験を積み、実務者研修を受けて国家試験に合格すると取得できる流れが紹介されています
+
+### 先に取る？働きながら取る？
+
+初任者研修を**先に取ってから応募する**か、**働きながら取る**かは、どちらの道もあります。考えるときのポイントは次のとおりです。
+
+- 先に取る：応募できる求人が増える。訪問介護も選べる。学ぶ時間と費用は自分で用意する
+- 働きながら取る：現場を知ってから学べる。会社が研修の費用を出す制度があるかは、事業所によって違う
+
+講座を選ぶときは、通学か通信か、修了までの期間、費用を講座の案内で比べましょう。国の制度を使って学ぶ方法は、[ハロートレーニング（公共職業訓練）とは？](/articles/hello-training)や[教育訓練給付金の使い方](/articles/kyouiku-kunren-kyufu-tsukaikata)で紹介しています。講座が給付の対象になっているかどうかも、申し込む前に確かめておきましょう。
+
+## 夜勤はある？働き方の違い
+
+job tag では、24時間介護サービスを提供している施設が多いため、交替勤務や夜間勤務があると説明されています。同じ介護の仕事でも、デイサービスは日中のみ、入居型の施設はシフト制、というように働き方が変わります。
+
+```figure
+type: compare
+title: 働く場所ごとの勤務の違い
+columns:
+  - label: 入所型の施設
+    tone: sky
+    items:
+      - シフト制
+      - 夜勤・交替勤務がある場合が多い
+  - label: デイサービス
+    tone: mint
+    items:
+      - 日中のみの勤務が中心
+      - 利用者は自宅から通ってくる
+  - label: 訪問介護
+    tone: sand
+    items:
+      - 訪問の予定に合わせて動く
+      - 初任者研修の修了が必要
+```
+
+夜勤がある職場では、夜勤の回数、夜勤のときに何人で働くか、夜勤明けの休みの扱いなどが働きやすさに関わります。土日休みを希望する場合は、シフトの決め方と土日の出勤も確認しておきましょう。
+
+## 向いている人・合わないと感じやすい場面
+
+### 向いている人
+
+- 相手のペースに合わせて、ゆっくり話を聞ける
+- 小さな変化（いつもより食べる量が少ない、など）に気づける
+- チームで情報を共有しながら働くのが苦にならない
+
+### 合わないと感じやすい場面
+
+- からだを使う介助が多く、体力がいる
+- 夜勤があると生活のリズムが変わる
+- 利用者や家族との関わりで、気持ちを使う場面がある
+
+接客や販売の経験がある人は、**相手の様子を見て声をかける**ことや、**ていねいな言葉づかい**が活かせます。面接では、たとえば次のように伝えられます。
+
+> 「飲食店で接客をしてきました。お客さまの様子を見て、こちらから声をかけることを大事にしてきました。介護の仕事でも、利用者の方の小さな変化に気づけるよう、まずは初任者研修で基本を学びたいと考えています。」（仮の例です）
+
+## 応募前に、確認すること
+
+```figure
+type: checklist
+title: 介護職の求人で確認すること
+items:
+  - 施設・デイサービス・訪問のどれか
+  - 応募資格（無資格可か、初任者研修が必要か）
+  - 入社後の研修と、ひとりで担当するまでの流れ
+  - 資格取得の費用を会社が出す制度があるか
+  - 夜勤の有無と回数、夜勤の人数
+  - シフトの決め方と、土日の出勤
+  - 正社員・契約社員・パートなど雇用の形
+```
+
+求人に書かれていないことは、面接や見学で質問してかまいません。
+
+- 「入社後、先輩と一緒に働く期間はどのくらいありますか」
+- 「夜勤は月に何回くらいで、何人体制ですか」
+- 「初任者研修や実務者研修を取るときの支援はありますか」
+
+「研修あり」と書かれた求人の見方は、[未経験求人の「研修あり」で確認すべきこと](/articles/mikeiken-kenshu-kakunin)にまとめています。介護職は、働く場所と資格の段階によって働き方が大きく変わる仕事です。どこで、どんな時間帯に働きたいかを先に決めてから求人を比べると、自分に合う職場を選びやすくなります。', 'review', false, '2026-10-09'::timestamptz, '2026-10-09'::timestamptz, '2026-10-09'::timestamptz, 'プロジェクトオーナー（チャットで承認）', '2026-10-09'::timestamptz, '未経験で介護職に転職するには？資格の段階と夜勤', '未経験から介護職を考える人へ。施設介護と訪問介護の仕事内容の違い、介護職員初任者研修・実務者研修・介護福祉士の資格の段階、夜勤やシフトの働き方、求人や面接で確認しておきたいことを紹介します。', array['hello-training', 'kyouiku-kunren-kyufu-tsukaikata', 'mikeiken-kenshu-kakunin', 'mikeiken-shikaku', 'koteizangyo-kyujin']::text[], array['sonota']::text[], array['mikeiken-shokushu']::text[], array['hajimete', 'sekkyaku']::text[], array['介護職、', '未経験から始められる？']::text[], null, false, '[{"q":"資格がなくても、介護の仕事はできますか？","a":"介護施設では、医療・福祉関係の資格がない人が介護の仕事に就いている場合もあります。その場合、事業者は認知症介護基礎研修を受けさせる措置をとることが義務づけられています。一方、利用者の自宅を訪問する訪問介護員（ホームヘルパー）として働くには、介護職員初任者研修の修了が必要です。求人の応募資格の欄で確認しましょう。"},{"q":"介護職員初任者研修は、どのくらいの時間がかかりますか？","a":"介護職員初任者研修は130時間の研修です。その上の段階の実務者研修は450時間です。通学か通信を組み合わせるか、修了までの期間、費用は講座によって違うので、申し込む前に講座の案内で確認しましょう。"},{"q":"介護職は夜勤が必ずありますか？","a":"働く場所によって違います。24時間介護をする入所型の施設では、交替勤務や夜勤がある場合が多いです。一方、通所のデイサービスは日中のみの勤務が中心です。夜勤の有無と回数は、求人票と面接で確認しましょう。"}]'::jsonb, null, '{"schema_version":2,"writer_agent":"career-writer","angle":"介護職を「どこで働くか（施設・訪問・デイ）」と「資格の段階」の2軸で整理し、未経験の人が最初に迷う「資格なしで入れる？」「夜勤は？」に、確認のしかたつきで答える","quotes":[{"source_url":"https://shigoto.mhlw.go.jp/User/Occupation/Detail/134","text":"社会福祉施設に入所・通所する人たちの保護・介護・援助を行う。食事、入浴、排泄の世話や身体介助、清潔の保持など。24時間介護サービスを提供している施設が多いため、交替勤務や夜間勤務がある。関連資格は介護福祉士、介護職員初任者研修修了者（job tag へ直接接続できなかったため、検索結果に表示されたページ内容で確認）","used_in":"介護職の仕事内容は？ / 夜勤はある？働き方の違い"},{"source_url":"https://shigoto.mhlw.go.jp/User/Occupation/Detail/133","text":"訪問介護員になるには「介護職員初任者研修課程」を修了する必要がある。3年以上の実務経験を積み、「実務者研修」を受講して国家試験に合格すると介護福祉士の資格を取得できる（検索結果で確認）","used_in":"資格は3つの段階で考える"},{"source_url":"https://shigoto.mhlw.go.jp/User/Occupation/Detail/410","text":"同じ介護施設でも、デイサービスは日勤のみで、入居型施設はシフト制となる（検索結果で確認）","used_in":"夜勤はある？働き方の違い"},{"source_url":"https://jsite.mhlw.go.jp/ishikawa-roudoukyoku/content/contents/001790771.pdf","text":"研修時間数は介護職員初任者研修130時間、実務者研修450時間。資格のない人は訪問介護員として従事できない（PDF へ直接接続できなかったため、検索結果に表示された内容で確認）","used_in":"資格は3つの段階で考える"},{"source_url":"https://www.mhlw.go.jp/content/12300000/001252331.pdf","text":"介護に直接携わる職員のうち医療・福祉関係の資格を有さない者に対し認知症介護基礎研修を受講させるための措置を講じることが介護サービス事業者に義務付けられた（3年間の経過措置期間を経て令和6年4月に完全施行）（検索結果で確認）","used_in":"資格がなくても働ける？"}],"not_used":["介護職の賃金や処遇改善加算の金額は、事業所や年度で変わるため書かない","新しく採用された無資格の職員に対する認知症介護基礎研修の猶予期間は、検索結果で一次情報を確認しきれなかったため書かない","初任者研修の講座の費用・期間の相場は公的な根拠を確認できなかったので書かない","初任者研修が教育訓練給付制度の対象かどうかは講座ごとに違うため断定せず、確かめ方の記事へのリンクにとどめた"]}'::jsonb) on conflict (slug) do nothing;
+insert into article_categories (article_id, category_id, is_primary) select a.id, c.id, true from articles a, categories c where a.slug = 'kaigo-mikeiken' and c.slug = 'shokushu' on conflict do nothing;
+insert into article_categories (article_id, category_id, is_primary) select a.id, c.id, false from articles a, categories c where a.slug = 'kaigo-mikeiken' and c.slug = 'mikeiken' on conflict do nothing;
+insert into article_sources (article_id, title, publisher, url, accessed_at, used_for, sort_order) select id, '施設介護員 - 職業詳細（職業情報提供サイト job tag）', '厚生労働省', 'https://shigoto.mhlw.go.jp/User/Occupation/Detail/134', '2026-10-09'::date, '施設介護員の仕事内容（入所・通所の利用者への食事・入浴・排せつの世話、身体介助など）、24時間サービスの施設が多く交替勤務・夜間勤務があること、関連資格（介護福祉士・介護職員初任者研修修了者）', 0 from articles where slug = 'kaigo-mikeiken';
+insert into article_sources (article_id, title, publisher, url, accessed_at, used_for, sort_order) select id, '訪問介護員/ホームヘルパー - 職業詳細（職業情報提供サイト job tag）', '厚生労働省', 'https://shigoto.mhlw.go.jp/User/Occupation/Detail/133', '2026-10-09'::date, '訪問介護員になるには介護職員初任者研修課程の修了が必要なこと、3年以上の実務経験と実務者研修の受講を経て国家試験に合格すると介護福祉士の資格を取得できること', 1 from articles where slug = 'kaigo-mikeiken';
+insert into article_sources (article_id, title, publisher, url, accessed_at, used_for, sort_order) select id, '施設管理者（介護施設） - 職業詳細（職業情報提供サイト job tag）', '厚生労働省', 'https://shigoto.mhlw.go.jp/User/Occupation/Detail/410', '2026-10-09'::date, 'デイサービスは日勤のみ、入居型施設はシフト制になること', 2 from articles where slug = 'kaigo-mikeiken';
+insert into article_sources (article_id, title, publisher, url, accessed_at, used_for, sort_order) select id, '介護職員の研修・資格の一覧（石川労働局の資料）', '石川労働局', 'https://jsite.mhlw.go.jp/ishikawa-roudoukyoku/content/contents/001790771.pdf', '2026-10-09'::date, '介護職員初任者研修が130時間、実務者研修が450時間であること、資格がない人は訪問介護員として働けないこと', 3 from articles where slug = 'kaigo-mikeiken';
+insert into article_sources (article_id, title, publisher, url, accessed_at, used_for, sort_order) select id, '認知症介護基礎研修受講義務付けの効果に関する調査研究事業 報告書（令和3年度介護報酬改定の効果検証及び調査研究に係る調査）', '厚生労働省', 'https://www.mhlw.go.jp/content/12300000/001252331.pdf', '2026-10-09'::date, '介護に直接携わる職員のうち医療・福祉関係の資格がない人に認知症介護基礎研修を受講させる措置が事業者に義務づけられ、2024年4月に完全施行されたこと', 4 from articles where slug = 'kaigo-mikeiken';
+insert into article_versions (article_id, version, title, summary, body_md, created_by) select id, 1, title, summary, body_md, 'seed' from articles where slug = 'kaigo-mikeiken' on conflict do nothing;
+insert into article_reviews (article_id, version, reviewer, verdict, checks) select id, 1, 'プロジェクトオーナー（チャットで承認）', 'approved', '{"content_hash":"f6c1af532da0073c9662713370d81f73612a068f51bce7a22f47e28de708bda1","findings":[]}'::jsonb from articles where slug = 'kaigo-mikeiken';
+update articles set status = 'published' where slug = 'kaigo-mikeiken';
+
+-- article: keiri-mikeiken (published)
+insert into articles (slug, kind, title, summary, body_md, status, featured, published_at, updated_at, reviewed_at, reviewed_by, information_checked_at, seo_title, seo_description, related_slugs, roles, concerns, situations, eyecatch, illustration, recommended, faq, news_meta, research_notes) values ('keiri-mikeiken', 'article', '経理の仕事内容は？日次・月次・年次の流れと、未経験から目指すときの準備', '経理は、会社のお金の出入りを記録し、月ごと・年ごとに集計して、経営の状態を数字でまとめる仕事です。日次・月次・年次の仕事の流れ、日商簿記の位置づけ、求人の「経理補助」「経理アシスタント」の読み方、未経験から目指すときの準備を紹介します。', '「数字を扱う仕事に興味がある」「事務の中でも、専門性のある仕事がしたい」。そんな理由で経理を考える人もいると思います。一方で、「簿記の資格がないと無理？」「未経験で応募していいの？」と迷う人も多い職種です。
+
+先に結論を言うと、経理は**会社のお金の出入りを毎日記録し、月ごと・年ごとに集計して、会社の状態を数字でまとめる仕事**です。未経験からの入口になりやすいのは、伝票づくりや入力などの**毎日の仕事**で、簿記はその土台になる知識です。
+
+この記事で分かること：
+
+- 経理の仕事を**日次・月次・年次**に分けた流れ
+- **簿記の資格**はどのくらい必要か
+- 求人の「**経理補助**」「経理アシスタント」の読み方
+- 未経験から目指すときの**準備**
+
+## 経理の仕事を「日次・月次・年次」で見る
+
+厚生労働省の職業情報提供サイト（job tag）では、経理事務は、会社の取引で生じるお金の出入りを記録・管理し、月末や決算期にそれを集計する仕事として説明されています。時間の区切りごとに分けると、次のようになります。
+
+```figure
+type: compare
+title: 経理の仕事を時間で分ける
+columns:
+  - label: 日次（毎日）
+    tone: mint
+    items:
+      - 入出金の伝票を作る
+      - 帳簿や会計ソフトに記録する
+      - 請求書の発行・入金の確認
+  - label: 月次（毎月）
+    tone: sky
+    items:
+      - 勘定科目ごとに集計する
+      - 帳簿と預金の残高を照らし合わせる
+      - 月次の決算書類を作る
+  - label: 年次（毎年）
+    tone: sand
+    items:
+      - 決算と財務諸表の作成
+      - 棚卸で在庫を確かめる
+      - 年末調整などの手続き
+```
+
+### 日次：お金の出入りを記録する
+
+毎日の仕事は、取引があるたびに**入出金伝票や振替伝票を作り、現金出納帳や総勘定元帳などの帳簿に記録する**ことです。job tag では、会計や財務管理のソフト・システムを使って記録するとされています。請求書の発行や、取引先からの入金の確認もこの段階の仕事に入ります。
+
+### 月次：月末に締めて、数字を確かめる
+
+月末には、**勘定科目（「売上」「交通費」などのお金の分類）ごとに集計**して帳簿の残高を確定させ、実際の預金の残高などと合っているかを照らし合わせます。そのうえで、月ごとの決算書類をまとめます。
+
+### 年次：決算と、1年に一度の手続き
+
+期末（会社の1年の区切り）には、試算表を作り、棚卸で在庫を確かめ、**貸借対照表や損益計算書などの財務諸表**を作ります。国税庁によると、法人税の確定申告書は、原則として事業年度が終わった日の翌日から2か月以内に提出することになっています。決算のあとも、申告に向けた準備が続きます。
+
+このほか、job tag では社員の給与計算も経理事務の仕事に挙げられています。給与の支払者が、毎月の給与から差し引いた所得税と1年間の税額との差額を精算する**年末調整**（国税庁によると通常は12月）を、経理が担当する会社もあります。給与計算や年末調整を総務や人事が担当する会社もあるので、担当範囲は求人で確かめましょう。
+
+## 簿記の資格はどのくらい必要？
+
+job tag では、経理事務になるのに学歴や資格は特に必要とされていません。ただし、日商簿記検定などの関連資格があると、仕事に役立つとされています。
+
+簿記の役割は、2つに分けて考えると整理しやすくなります。
+
+- **応募の条件として**：求人によっては「簿記3級以上」「簿記2級歓迎」のように書かれています。条件に入っているかどうかは求人ごとに違うので、応募条件の欄を確認しましょう
+- **入社後の土台として**：仕訳（取引を「何に・いくら」で記録するルール）が分かっていると、伝票や会計ソフトの入力の意味が理解しやすくなります
+
+日本商工会議所は、日商簿記の級を次のように位置づけています。
+
+| 級 | 公式の位置づけ（要約） |
+| --- | --- |
+| 3級 | 業種や職種にかかわらず、社会人が身につけておきたい基本的な商業簿記 |
+| 2級 | 商業簿記と工業簿記（原価計算を含む）を扱い、財務諸表の数字から経営内容をつかめるレベル |
+
+はじめて簿記を学ぶなら、まず3級で仕訳と帳簿の基本を身につけ、応募したい求人の条件を見ながら2級を考える順番が進めやすいです。講座を使う場合は、費用の一部が戻る制度もあります。くわしくは[教育訓練給付金の使い方](/articles/kyouiku-kunren-kyufu-tsukaikata)で紹介しています。
+
+## 求人の「経理補助」「経理アシスタント」はどう読む？
+
+未経験から応募しやすい求人には、「経理補助」「経理アシスタント」「経理事務（サポート）」のような職種名がついていることがあります。名前だけで仕事の範囲は決まらないので、**仕事内容の欄に何が書かれているか**を見ましょう。
+
+たとえば、仕事内容の書き方によって、次のように担当の範囲を読み取れます（書き方は仮の例です）。
+
+| 求人の書き方の例 | 読み取れること |
+| --- | --- |
+| 伝票の入力、経費精算のチェック、請求書の発行 | 日次の仕事が中心。未経験から始めやすい範囲 |
+| 月次決算の補助 | 月末の集計や照合も手伝う |
+| 決算業務、税務申告の対応 | 年次の仕事まで担当する。経験を求められることもある |
+
+job tag によると、経理は伝票の作成や記帳などの基礎の仕事から始め、予算・決算・資金計画の仕事へ進むのが一般的で、経理全般を身につけて一人前になるには数年程度かかるとされています。最初は日次の仕事から任されると考えておくと、求人を比べやすくなります。
+
+```figure
+type: checklist
+title: 経理の求人で確認すること
+items:
+  - 担当は日次・月次・年次のどこまでか
+  - 使う会計ソフトと表計算ソフト
+  - 簿記の資格は条件か、歓迎か
+  - 給与計算や年末調整も担当するか
+  - 決算の月と、その時期の残業の目安
+  - 誰に、どのように教わるか
+```
+
+求人票で分からないことは、面接で聞いてみましょう。
+
+> 「入社後は、どの仕事から担当することが多いでしょうか。」
+> 「決算の時期は、何月ごろ、どのくらい忙しくなりますか。」
+> 「会計ソフトは何を使っていますか。入社前に練習しておくとよいことはありますか。」
+
+## 未経験から目指すときの準備
+
+経理で求められることとして、job tag では、お金を扱うための正確さや注意力、几帳面さ、決算の締め切りに間に合わせる速さや粘り強さが挙げられています。未経験の人は、次の順番で準備を進めると、面接で話せることが増えていきます。
+
+1. **簿記の基本を学ぶ**：3級の範囲で、仕訳と帳簿のしくみを理解する
+2. **表計算ソフトに慣れる**：合計や並べ替え、簡単な関数を使えるようにする（練習のしかたは[PCが得意じゃなくても、事務職は目指せる？](/articles/pc-nigate-jimu)で紹介しています）
+3. **今の仕事の「お金」や「数字」の経験をふり返る**：レジ締めで金額を照らし合わせていた、在庫の数を数えて記録していた、などは経理の仕事とつながる経験です
+
+面接では、たとえば次のように伝えられます。
+
+> 「販売の仕事で、毎日のレジ締めで売上と現金を照らし合わせ、差額が出たときは原因を確認していました。数字を正確に合わせる仕事に関心を持ち、簿記3級の勉強を始めています。」
+
+経理は、ほかの事務と比べて専門の知識が必要になる場面が多い仕事です。ほかの事務職と比べながら考えたい人は、[未経験で事務職を目指す前に知っておきたいこと](/articles/jimu-mikeiken-mae)も参考にしてください。', 'review', false, '2026-10-09'::timestamptz, '2026-10-09'::timestamptz, '2026-10-09'::timestamptz, 'プロジェクトオーナー（チャットで承認）', '2026-10-09'::timestamptz, '経理の仕事内容と未経験からの準備｜簿記と経理補助の見方', '経理はどんな仕事？伝票や帳簿への記録などの日次の仕事、月末の締め、決算や年末調整などの年次の仕事を整理。日商簿記3級・2級の位置づけ、求人の「経理補助」の読み方、未経験から目指すときの準備を紹介します。', array['jimu-mikeiken-mae', 'pc-nigate-jimu', 'kyouiku-kunren-kyufu-tsukaikata', 'eigyo-jimu-shigoto', 'mikeiken-shikaku']::text[], array['jimu']::text[], array['mikeiken-shokushu', 'office']::text[], array['pc-mikeiken', 'seishain-keiken-sukunai']::text[], array['経理って、', '未経験からどう目指す？']::text[], null, false, '[{"q":"経理の仕事は、簿記の資格がないとできませんか？","a":"job tag（厚生労働省の職業情報提供サイト）では、経理事務になるのに学歴や資格は特に必要とされていません。ただし、日商簿記検定などの関連資格があると仕事に役立つとされています。求人によっては応募条件に「簿記3級以上」などと書かれていることもあるので、応募条件の欄を確認しましょう。"},{"q":"日商簿記は3級と2級、どちらを目指せばいいですか？","a":"日本商工会議所は、3級を業種や職種にかかわらず社会人が身につけておきたい基本的な商業簿記、2級を工業簿記も含めて財務諸表の数字から経営内容をつかめるレベルと位置づけています。簿記をはじめて学ぶなら、まず3級で仕訳や帳簿の基本を身につけ、応募したい求人の条件を見て2級を考える順番が進めやすいです。"},{"q":"経理は残業が少ない仕事ですか？","a":"job tag では、経理事務は基本的に残業が少なく土日祝日が休みのことが多い一方、決算の時期には日常の仕事と並行して決算の作業をするため、残業が増えることがあるとされています。決算の月や繁忙期の残業の目安は会社によって違うので、面接で確認しましょう。"}]'::jsonb, null, '{"schema_version":2,"writer_agent":"career-writer","angle":"経理を「毎日・毎月・毎年」の3つの時間軸で見せて、未経験の入口になりやすいのは日次の仕事（伝票・入力・経費精算のチェック）だと分かるようにする。簿記は「応募の条件」と「入社後の土台」の2つの役割に分けて説明し、資格を取れば転職できるとは書かない","quotes":[{"source_url":"https://shigoto.mhlw.go.jp/User/Occupation/Detail/430","text":"毎日の金銭管理として入出金伝票や振替伝票を作成し、現金出納帳や総勘定元帳などの帳簿に記入する。月末には勘定科目ごとに集計して帳簿残高を確定し、実際の預金残高などと照合して月次決算書類を作る。期末には試算表を作り、棚卸で在庫を把握し、貸借対照表や損益計算書などの財務諸表を作成する。社員の給与計算、請求書の発行や入金確認なども行う。（job tag への直接接続ができなかったため、検索結果に表示されたページの内容で確認）","used_in":"経理の仕事を「日次・月次・年次」で見る"},{"source_url":"https://shigoto.mhlw.go.jp/User/Occupation/Detail/430","text":"入職にあたって学歴や資格は特に必要とされないが、日商簿記検定、簿記能力検定などの関連資格があると仕事の役に立つ。伝票作成や記帳などの基礎業務から始め、予算・決算・資金計画の仕事へ進むのが一般的で、一人前になるには数年程度かかる。正確さ、注意力、几帳面さが求められる。基本的に残業は少なく土日祝日は休みが多いが、決算期には残業が増えることがある","used_in":"簿記の資格はどのくらい必要？ / 未経験から目指すときの準備"},{"source_url":"https://www.kentei.ne.jp/bookkeeping/class3","text":"3級は業種・職種にかかわらずビジネスパーソンが身につけておくべき基本的な商業簿記を修得し、小規模企業の経理関連書類の適切な処理を行うために求められるレベル（検索結果に表示された公式ページの内容で確認）","used_in":"簿記の資格はどのくらい必要？"},{"source_url":"https://www.kentei.ne.jp/bookkeeping/class2","text":"2級は商業簿記と工業簿記（原価計算を含む）を扱い、財務諸表の数字から経営内容を把握できるレベル。企業から求められる資格のひとつとされる（検索結果に表示された公式ページの内容で確認）","used_in":"簿記の資格はどのくらい必要？"},{"source_url":"https://www.nta.go.jp/taxes/shiraberu/taxanswer/gensen/2665.htm","text":"年末調整は、給与の支払者が、毎月の給与から源泉徴収した所得税等の合計額と、その人が1年間に納めるべき税額との差額を精算するもの。通常は12月に行う（検索結果で確認）","used_in":"経理の仕事を「日次・月次・年次」で見る"},{"source_url":"https://www.nta.go.jp/law/joho-zeikaishaku/hojin/group_faq/19.htm","text":"法人税の確定申告書は、原則として各事業年度終了の日の翌日から2か月以内に提出する（検索結果で確認）","used_in":"経理の仕事を「日次・月次・年次」で見る"}],"not_used":["民間サイトにある「経理事務の平均時給」「簿記2級以上が目安」などの数字・基準は、公的な根拠を確認できなかったので書かない","簿記の合格率や受験料は回ごとに変わるため書かない","給与計算や年末調整を経理・総務・人事のどこが担当するかは会社によって違うため、断定せず「担当することがある」にとどめた"]}'::jsonb) on conflict (slug) do nothing;
+insert into article_categories (article_id, category_id, is_primary) select a.id, c.id, true from articles a, categories c where a.slug = 'keiri-mikeiken' and c.slug = 'shokushu' on conflict do nothing;
+insert into article_categories (article_id, category_id, is_primary) select a.id, c.id, false from articles a, categories c where a.slug = 'keiri-mikeiken' and c.slug = 'mikeiken' on conflict do nothing;
+insert into article_sources (article_id, title, publisher, url, accessed_at, used_for, sort_order) select id, '経理事務 - 職業詳細（job tag）', '厚生労働省 職業情報提供サイト（job tag）', 'https://shigoto.mhlw.go.jp/User/Occupation/Detail/430', '2026-10-09'::date, '経理事務の仕事内容（入出金伝票・振替伝票の作成と帳簿への記入、月末の集計と残高の照合、決算時の試算表・棚卸・財務諸表の作成、給与計算や請求書の発行・入金確認）、入職に学歴・資格は特に必要とされず日商簿記検定などが役立つこと、基礎業務から始めて一人前には数年程度かかること、決算期には残業が増えることがあること', 0 from articles where slug = 'keiri-mikeiken';
+insert into article_sources (article_id, title, publisher, url, accessed_at, used_for, sort_order) select id, '簿記 3級', '日本商工会議所（商工会議所の検定試験）', 'https://www.kentei.ne.jp/bookkeeping/class3', '2026-10-09'::date, '日商簿記3級の位置づけ（業種・職種にかかわらず社会人が身につけておきたい基本的な商業簿記）', 1 from articles where slug = 'keiri-mikeiken';
+insert into article_sources (article_id, title, publisher, url, accessed_at, used_for, sort_order) select id, '簿記 2級', '日本商工会議所（商工会議所の検定試験）', 'https://www.kentei.ne.jp/bookkeeping/class2', '2026-10-09'::date, '日商簿記2級の位置づけ（商業簿記と工業簿記を扱い、財務諸表の数字から経営内容を把握できるレベル）', 2 from articles where slug = 'keiri-mikeiken';
+insert into article_sources (article_id, title, publisher, url, accessed_at, used_for, sort_order) select id, 'No.2665 年末調整の対象となる人 ほか（タックスアンサー）', '国税庁', 'https://www.nta.go.jp/taxes/shiraberu/taxanswer/gensen/2665.htm', '2026-10-09'::date, '年末調整は、給与の支払者が毎月の源泉徴収税額と1年間の税額との差額を精算する手続きであること', 3 from articles where slug = 'keiri-mikeiken';
+insert into article_sources (article_id, title, publisher, url, accessed_at, used_for, sort_order) select id, '確定申告書の提出期限', '国税庁', 'https://www.nta.go.jp/law/joho-zeikaishaku/hojin/group_faq/19.htm', '2026-10-09'::date, '法人税の確定申告書は、原則として事業年度終了の日の翌日から2か月以内に提出すること', 4 from articles where slug = 'keiri-mikeiken';
+insert into article_versions (article_id, version, title, summary, body_md, created_by) select id, 1, title, summary, body_md, 'seed' from articles where slug = 'keiri-mikeiken' on conflict do nothing;
+insert into article_reviews (article_id, version, reviewer, verdict, checks) select id, 1, 'プロジェクトオーナー（チャットで承認）', 'approved', '{"content_hash":"684d8b652e99e8a7e94d647068062d64f3aee75540a32587ab4ccca252f4e110","findings":[]}'::jsonb from articles where slug = 'keiri-mikeiken';
+update articles set status = 'published' where slug = 'keiri-mikeiken';
+
+-- article: kibou-nenshu-kakikata (published)
+insert into articles (slug, kind, title, summary, body_md, status, featured, published_at, updated_at, reviewed_at, reviewed_by, information_checked_at, seo_title, seo_description, related_slugs, roles, concerns, situations, eyecatch, illustration, recommended, faq, news_meta, research_notes) values ('kibou-nenshu-kakikata', 'article', '希望年収・希望給与の書き方と面接での答え方｜「貴社規定に従います」の使いどころと例文', '希望年収は、書類では「貴社規定に従います」を基本にしつつ、ゆずれない金額があるときは根拠をそえて書きます。面接では、額面の年額で、今の年収と希望をセットで伝えると話がずれません。手取りと額面の違い、今の年収の確かめ方、場面別の答え方の例を紹介します。', '応募書類の「希望給与」の欄や、面接での「希望年収はいくらですか？」という質問。高く言うと落とされそうで、低く言うと損をしそうで、どう答えればいいか迷う人は多いです。
+
+先に結論を言うと、次のように場面で分けて考えると迷いにくくなります。
+
+- **書類**：基本は「貴社の規定に従います」。ゆずれない金額があるときだけ、根拠をそえて書く
+- **面接**：**額面の年額**で、**今の年収と希望をセット**で、根拠をそえて伝える
+- **内定のあと**：提示された金額を**書面で確かめて**から返事をする
+
+この記事で分かること：
+
+- 「額面」と「手取り」の違いと、今の年収の確かめ方
+- 「貴社規定に従います」の**使いどころ**
+- 書類の**書き方の例**と、面接での**答え方の例**
+
+## まず「額面」と「手取り」をそろえる
+
+希望年収の話がずれるいちばんの原因は、**額面と手取りの取り違え**です。
+
+- **額面**：税金や社会保険料などが引かれる前の、支給される金額の合計
+- **手取り**：額面から、税金や社会保険料などが引かれたあとに、実際に振り込まれる金額
+
+たとえば厚生年金の保険料は、会社と本人が半分ずつ負担し、本人の分は給与から差し引かれます。ほかにも、健康保険料や雇用保険料、所得税、住民税などが引かれるため、手取りは額面より少なくなります。
+
+```figure
+type: compare
+title: 額面と手取りの違い
+columns:
+  - label: 額面
+    tone: sky
+    items:
+      - 引かれる前の、支給額の合計
+      - 求人の月給・年収はこちらで書かれることが多い
+      - 面接で年収を伝えるときはこちら
+  - label: 手取り
+    tone: sand
+    items:
+      - 税金や保険料が引かれたあとの金額
+      - 実際に口座に振り込まれる金額
+      - 生活費を考えるときはこちら
+```
+
+面接で「今の年収は？」と聞かれて手取りで答えると、会社は額面だと受け取り、実際より低い金額で話が進んでしまうことがあります。**会社と話すときは額面、生活費を考えるときは手取り**と覚えておきましょう。
+
+手取りの目安の出し方は[手取り20万円から転職を考えるとき、何を比べればいい？](/articles/tedori-20man-hikaku)で紹介しています。
+
+### 今の年収は、何で確かめる？
+
+今の年収（額面）は、会社から年末ごろや退職のときに受け取る**源泉徴収票**の「支払金額」の欄で確かめられます。ここには、その年に支払われることが決まった給与などの総額が書かれています。
+
+源泉徴収票が手元にないときは、給与明細の「総支給額」を1年分合計し、賞与があればそれも足して目安を出します。
+
+転職先に前の会社の源泉徴収票を出すこともあるので、今の年収を実際より多く伝えるのはやめましょう。
+
+## 「貴社規定に従います」は、どんなときに使う？
+
+「貴社の規定に従います」は、**給与を会社の決まりにまかせます**という意味の書き方です。次のようなときに使います。
+
+- 書類の本人希望記入欄で、**給与について特に希望がない**とき
+- 未経験の職種で、**給与の相場がまだ分からない**とき
+- 求人に書かれた**給与の幅に納得している**とき
+
+一方で、次のようなときは「貴社規定に従います」だけで済ませないほうがいいです。
+
+- **生活のために、これ以上は下げられない金額がある**とき
+- 求人の給与の幅が広く、**どこになるかで生活が大きく変わる**とき
+
+「貴社規定に従います」と書いたあとで、内定のときに「その金額では生活できません」と言うと、話がこじれやすくなります。ゆずれない金額があるなら、面接のどこかで伝えておくほうが、あとで困りません。
+
+## 履歴書・応募書類での書き方
+
+厚生労働省の履歴書様式例では、給料・職種・勤務時間・勤務地などの希望は「本人希望記入欄」に、希望があれば書くことになっています。
+
+**特に希望がないとき（書き方の例）**
+
+> 貴社の規定に従います。
+
+**ゆずれない金額があるとき（書き方の例・金額は仮の例）**
+
+> 給与につきましては、現在の年収（〇〇万円）を考慮いただけますと幸いです。そのほかは貴社の規定に従います。
+
+> 生活の事情により、月給〇〇万円以上を希望いたします。
+
+書くときのポイントは次の3つです。
+
+- **金額は額面で書く**
+- **一方的に要求する言い方にしない**（「〜を希望いたします」「考慮いただけますと幸いです」）
+- **給与以外の希望を書きすぎない**：希望が多いと、条件の合う人だけを探していると受け取られることがあります
+
+給与のほかに書いておきたいことがあれば、「在職中のため、平日の日中は電話に出られないことがあります」のような連絡の希望を書くこともできます。
+
+## 面接での答え方の例
+
+面接で希望年収を聞かれたら、次の順番で答えると短くまとまります。
+
+```figure
+type: steps
+title: 希望年収を聞かれたときの答え方
+items:
+  - label: 今の年収
+    text: 額面の年額で、賞与を含むかもそえる
+  - label: 希望
+    text: 希望額か、これ以上は下げられない金額
+  - label: 根拠
+    text: 今の年収・生活に必要な金額・求人の給与の幅
+  - label: 相談の姿勢
+    text: 「ご相談させてください」と結ぶ
+```
+
+### 今の年収を維持したいとき
+
+> 「現在の年収は、賞与を含めて額面で〇〇万円です。生活のことを考えると、同じくらいの金額を希望しております。ただ、未経験の職種ですので、御社の規定をふまえてご相談させてください。」
+
+### 未経験の職種で、下がってもいいと考えているとき
+
+> 「未経験からのスタートですので、御社の規定に従います。ただ、生活のために、年収〇〇万円は下回らないようにしたいと考えています。」
+
+「下がってもいい」と思っていても、**これ以上は下げられない金額**は決めておきましょう。生活費から計算しておくと、自信をもって伝えられます。
+
+### 今の年収を聞かれて、答えにくいとき
+
+> 「アルバイトでしたので、年によって変わりますが、20XX年分の源泉徴収票では額面で〇〇万円でした。」
+
+アルバイトや派遣で収入が月によって違う場合も、源泉徴収票などで分かる金額を、そのまま伝えれば大丈夫です。
+
+### 避けたい答え方
+
+| 答え方 | どう受け取られやすいか | 言い換えの例 |
+| --- | --- | --- |
+| 「いくらでもいいです」 | 何も考えていないように見える | 「御社の規定に従います。そのうえで、〇〇万円は下回らないようにしたいです」 |
+| 根拠なく高い金額だけを言う | 会社の考えと合わないと思われる | 今の年収や生活費を根拠としてそえる |
+| 手取りの金額で答える | 実際より低い金額で話が進む | 「額面で〇〇万円です」と言い添える |
+
+面接全体の準備は[未経験職種の面接、何を準備する？](/articles/mensetsu-junbi-mikeiken)で紹介しています。
+
+## 内定のあとは、書面で確かめる
+
+内定が出たら、提示された給与を**書面で確かめてから**返事をします。
+
+- 月給の内訳（基本給・手当・固定残業代があるか）
+- 賞与があるか、年に何回か、どう決まるか
+- 面接で伝えた希望と、提示された金額の差
+
+提示された金額が希望と大きく違うときは、承諾する前に「〇〇の点について、ご相談させていただけますか」と聞いてみましょう。給料が下がるかもしれないときの考え方は[年収300万円から転職すると、給料は下がる？上げられる？](/articles/nenshu-300man-tenshoku)にまとめています。', 'review', false, '2026-10-09'::timestamptz, '2026-10-09'::timestamptz, '2026-10-09'::timestamptz, 'プロジェクトオーナー（チャットで承認）', '2026-10-09'::timestamptz, '希望年収の書き方・答え方｜「貴社規定に従います」は使える？', '履歴書の希望給与はどう書く？「貴社規定に従います」の使いどころ、ゆずれない金額があるときの書き方、面接で希望年収や今の年収を聞かれたときの答え方の例、手取りと額面の違い、源泉徴収票での今の年収の確かめ方を紹介します。', array['nenshu-300man-tenshoku', 'tedori-20man-hikaku', 'mensetsu-junbi-mikeiken', 'koteizangyo-kyujin', 'mensetsu-yokukiku-shitsumon']::text[], '{}'::text[], array['kyuryo', 'mensetsu']::text[], array['hajimete', 'seishain-keiken-sukunai']::text[], array['希望年収、', 'なんて答えればいい？']::text[], null, false, '[{"q":"履歴書の希望給与の欄は、空欄でもいいですか？","a":"厚生労働省の履歴書様式例では、給料などの希望を書く欄は「本人希望記入欄」で、希望があれば記入する欄です。特に希望がなければ「貴社の規定に従います」と書くのが一般的です。空欄よりも、ひとこと書いておくほうが、書き忘れではないことが伝わります。"},{"q":"今の年収は、手取りと額面のどちらで答えればいいですか？","a":"額面（税金や社会保険料が引かれる前の金額）で答えるのが基本です。求人の月給や年収も額面で書かれていることが多いので、そろえておくと話がずれません。今の年収は、源泉徴収票の「支払金額」の欄で確かめられます。"},{"q":"希望年収を高めに言うと、落とされますか？","a":"金額だけで結果が決まるとは言えませんが、根拠のない金額だと、会社の考える金額と合わないと受け取られることがあります。求人に書かれた給与の幅を確かめ、その範囲の中で、生活に必要な金額や今の年収を根拠にして伝えると、話し合いになりやすくなります。"}]'::jsonb, null, '{"schema_version":2,"writer_agent":"career-writer","angle":"希望年収は「書類」と「面接」で伝え方を分ける。書類は「貴社規定に従います」を基本に、ゆずれない金額があるときだけ根拠つきで書く。面接では額面の年額で、今の年収と希望をセットで伝える。手取りと額面の取り違えが一番のずれの原因なので、源泉徴収票で今の年収を確かめる方法を示す","quotes":[{"source_url":"https://www.hellowork.mhlw.go.jp/doc/kouroushourirekisho.pdf","text":"厚生労働省履歴書様式例には「本人希望記入欄（特に給料・職種・勤務時間・勤務地・その他についての希望などがあれば記入）」がある（直接開けなかったため、検索結果に表示された内容で確認）","used_in":"履歴書・応募書類での書き方"},{"source_url":"https://www.nta.go.jp/publication/pamph/hotei/tebikihtml/2-2-3.htm","text":"「支払金額」欄には、その年中に支払の確定した給与等の総額を記載する。中途就職者で前の支払者の給与等を通算して年末調整した場合はその金額を含む（検索結果で確認）","used_in":"今の年収は、何で確かめる？"},{"source_url":"https://www.nenkin.go.jp/service/kounen/hokenryo/hoshu/20150515-01.html","text":"厚生年金保険料は、標準報酬月額・標準賞与額に保険料率をかけて計算し、事業主と被保険者が半分ずつ負担する。被保険者の負担分は給与から控除される（検索結果で確認）","used_in":"まず「額面」と「手取り」をそろえる"}],"not_used":["「希望年収は今の年収の〇割増しが目安」「〇万円上乗せが相場」などの数字は、公的な根拠がないため書かない","手取りの割合（額面の〇割前後）は、扶養や住民税、保険の種類で変わり、公的な目安を確認できなかったため書かない","厚生年金の保険料率や標準報酬月額の等級などの具体的な数字は、この記事の主題から外れるため書かない","年収の交渉を代行するサービスなど、特定のサービスには触れない"]}'::jsonb) on conflict (slug) do nothing;
+insert into article_categories (article_id, category_id, is_primary) select a.id, c.id, true from articles a, categories c where a.slug = 'kibou-nenshu-kakikata' and c.slug = 'hatarakikata' on conflict do nothing;
+insert into article_categories (article_id, category_id, is_primary) select a.id, c.id, false from articles a, categories c where a.slug = 'kibou-nenshu-kakikata' and c.slug = 'shorui-mensetsu' on conflict do nothing;
+insert into article_sources (article_id, title, publisher, url, accessed_at, used_for, sort_order) select id, '履歴書（厚生労働省履歴書様式例）', '厚生労働省（ハローワークインターネットサービス）', 'https://www.hellowork.mhlw.go.jp/doc/kouroushourirekisho.pdf', '2026-10-09'::date, '履歴書様式例に「本人希望記入欄」があり、給料・職種・勤務時間・勤務地などの希望があれば記入する欄であること', 0 from articles where slug = 'kibou-nenshu-kakikata';
+insert into article_sources (article_id, title, publisher, url, accessed_at, used_for, sort_order) select id, '「支払金額」欄（給与所得の源泉徴収票等の法定調書の作成と提出の手引）', '国税庁', 'https://www.nta.go.jp/publication/pamph/hotei/tebikihtml/2-2-3.htm', '2026-10-09'::date, '源泉徴収票の「支払金額」の欄には、その年中に支払の確定した給与等の総額が書かれること', 1 from articles where slug = 'kibou-nenshu-kakikata';
+insert into article_sources (article_id, title, publisher, url, accessed_at, used_for, sort_order) select id, '厚生年金保険の保険料', '日本年金機構', 'https://www.nenkin.go.jp/service/kounen/hokenryo/hoshu/20150515-01.html', '2026-10-09'::date, '厚生年金保険料は標準報酬月額に保険料率をかけて計算し、事業主と被保険者が半分ずつ負担し、本人の分は給与から差し引かれること', 2 from articles where slug = 'kibou-nenshu-kakikata';
+insert into article_versions (article_id, version, title, summary, body_md, created_by) select id, 1, title, summary, body_md, 'seed' from articles where slug = 'kibou-nenshu-kakikata' on conflict do nothing;
+insert into article_reviews (article_id, version, reviewer, verdict, checks) select id, 1, 'プロジェクトオーナー（チャットで承認）', 'approved', '{"content_hash":"10c976138de21b306a1412c37a3177e426bfa2b008df7d26da7ce6fc05bc2eac","findings":[]}'::jsonb from articles where slug = 'kibou-nenshu-kakikata';
+update articles set status = 'published' where slug = 'kibou-nenshu-kakikata';
+
+-- article: koteizangyo-kyujin (published)
+insert into articles (slug, kind, title, summary, body_md, status, featured, published_at, updated_at, reviewed_at, reviewed_by, information_checked_at, seo_title, seo_description, related_slugs, roles, concerns, situations, eyecatch, illustration, recommended, faq, news_meta, research_notes) values ('koteizangyo-kyujin', 'article', '固定残業代（みなし残業）がある求人の見方｜求人に書かれるべき3つの項目と確認のしかた', '固定残業代がある求人では、月給の合計だけでなく「固定残業代を除いた基本給」「何時間分でいくらか」「超えた分を追加で払うか」の3つを確かめます。若者雇用促進法に基づく指針と厚生労働省のリーフレットをもとに、求人の読み方、書いていないときの聞き方を紹介します。', '求人を見ていると、「月給〇〇万円（固定残業代含む）」「みなし残業〇時間分を含む」といった書き方を見かけることがあります。月給が高く見えても、その中身が分からないと、ほかの求人と正しく比べられません。
+
+先に結論を言うと、固定残業代がある求人は、**次の3つが書かれているか**を確かめます。
+
+1. **固定残業代を除いた基本給**はいくらか
+2. 固定残業代は**何時間分で、いくら**か
+3. その時間を**超えた分は追加で支払われる**か
+
+この記事で分かること：
+
+- 固定残業代（みなし残業）の**しくみ**
+- 求人に書かれるべき**3つの項目**と、求人の読み方の例
+- 書いていないときの**聞き方**と、入社前に確かめる書類
+
+## 固定残業代（みなし残業）とは？
+
+固定残業代は、**一定の時間分の残業代を、実際に残業したかどうかにかかわらず、毎月決まった金額で支払う**しくみです。時間外労働のほか、休日労働や深夜労働の割増賃金を定額で支払う場合もあります。
+
+求人では、次のようないろいろな名前で書かれます。
+
+- 固定残業代
+- みなし残業代
+- 定額残業手当
+
+厚生労働省のリーフレットでは、名前が「定額残業手当」や「みなし残業代」などでも、同じように扱うとされています。
+
+固定残業代は、**基本給とは別の手当として払われる場合**と、**基本給の中に含めて払われる場合**があります。どちらの場合も、残業代にあたる部分とそれ以外の部分を、はっきり区別する必要があるとされています。
+
+```figure
+type: equation
+title: 固定残業代がある月給の中身
+terms:
+  - 月給
+  - =
+  - 基本給
+  - +
+  - 固定残業代
+  - +
+  - そのほかの手当
+```
+
+## 求人に書かれるべき3つの項目
+
+若者雇用促進法（青少年の雇用の促進等に関する法律）に基づく指針では、固定残業代を採用する場合、次の3つを明示することとされています。厚生労働省・都道府県労働局・ハローワークのリーフレットでも、募集要項や求人票に**3つすべてを明示する**よう求めています。
+
+```figure
+type: checklist
+title: 固定残業代で書かれるべき3つの項目
+items:
+  - 固定残業代を除いた基本給の額
+  - 固定残業代の時間数と金額（計算方法）
+  - 超えた分の割増賃金を追加で支払うこと
+```
+
+求人の書き方の例を、よい例と足りない例で比べてみます（金額・時間数は「〇」で示した仮の例です）。
+
+| | 書き方の例 | 分かること |
+| --- | --- | --- |
+| 3つがそろっている | 基本給〇〇円、固定残業手当（時間外労働の有無にかかわらず、〇時間分の時間外手当として〇〇円を支給）、〇時間を超える時間外労働分は追加で支給 | 基本給、時間数と金額、超えた分の扱いがすべて分かる |
+| 足りない | 月給〇〇円（固定残業代を含む） | 基本給がいくらか、何時間分か、超えた分を払うかが分からない |
+
+「足りない」書き方の求人は、それだけで応募をやめる必要はありませんが、**応募前や面接で3つの項目を確かめる**ようにしましょう。
+
+## 固定残業代がある求人の比べ方
+
+固定残業代がある求人とない求人を比べるときは、**月給の合計ではなく、基本給どうしで比べる**のが基本です。
+
+たとえば、月給が同じに見える2つの求人でも、一方は固定残業代を含み、もう一方は含まない場合、基本給には差があります。固定残業代がない求人では、残業をした分は別に残業代として払われます。
+
+基本給の違いは、ほかのお金にも関わることがあります。
+
+- **賞与（ボーナス）**：基本給をもとに計算する会社では、基本給が低いと賞与も変わります
+- **昇給**：基本給が上がるしくみかどうかも、会社によって違います
+
+賞与や昇給の計算のしかたは会社によって違うので、気になるときは面接や内定のときに確認しましょう。休日や年収をあわせて比べる方法は、[「土日休み」と「年収」をどう比較する？](/articles/donichi-yasumi-nenshu-hikaku)で紹介しています。
+
+### 「〇時間分」は、残業しなければいけない時間ではない
+
+固定残業代の「〇時間分」は、その時間分の残業代を定額で払うという意味です。**その時間まで残業しなければならない**という意味ではありません。
+
+ただし、固定残業の時間数と、実際の残業時間は別のものです。実際にどのくらい残業があるかは、求人の「月平均の残業時間」の欄や、面接での質問で確かめましょう。
+
+## 書いていないとき、どう聞く？
+
+求人に3つの項目が書かれていないときや、書き方があいまいなときは、次のように聞いてみましょう。
+
+**応募前（問い合わせ・エージェント経由）の聞き方の例**
+
+> 「月給に含まれる固定残業代について、固定残業代を除いた基本給の額と、何時間分の残業代にあたるかを教えていただけますか。」
+
+**面接での聞き方の例**
+
+> 「入社後の働き方をイメージしたいので伺います。配属予定の部署では、月の残業時間はどのくらいでしょうか。また、固定残業の時間を超えた場合は、別に残業代が支払われるという理解でよろしいでしょうか。」
+
+聞きにくいと感じるかもしれませんが、給料のしくみを確かめるのは、働き始めてから困らないために大切なことです。言い方を丁寧にすれば、失礼にはなりません。
+
+### 内定のときは、書面で確かめる
+
+内定が出たら、承諾する前に**労働条件通知書**などの書面で、次の点を確かめます。
+
+- 基本給と、固定残業代の金額が分けて書かれているか
+- 固定残業代が何時間分か
+- 超えた分を追加で支払うことが書かれているか
+- 求人や面接で聞いた内容と違っていないか
+
+書面の見方は[内定をもらったら、承諾の前に確認すること](/articles/naitei-shodaku-mae)、月給から手取りの目安を出す方法は[手取り20万円から転職を考えるとき、何を比べればいい？](/articles/tedori-20man-hikaku)で紹介しています。
+
+## 入社してから気になったら
+
+固定残業代で決められた時間を超えて残業した場合や、法律の方法で計算した割増賃金が固定残業代の額を上回る場合は、**その差額を支払う必要がある**とされています。
+
+「固定残業代があるから、いくら残業しても残業代は出ない」と言われたり、超えた分が払われていないと感じたりしたときは、次のものを手元に残しておきましょう。
+
+- 給与明細
+- 勤務時間の記録（タイムカードの写し、自分でつけたメモなど）
+- 労働条件通知書、求人票の控え
+
+そのうえで、会社の人事などに確認し、話が進まないときは労働基準監督署などに相談します。
+
+若者の採用に力を入れている会社の残業時間などの情報を、応募前に確かめる方法は[求人で「職場の情報」を確かめるには？](/articles/shokuba-jouhou-wakamono)で紹介しています。', 'review', false, '2026-10-09'::timestamptz, '2026-10-09'::timestamptz, '2026-10-09'::timestamptz, 'プロジェクトオーナー（チャットで承認）', '2026-10-09'::timestamptz, '固定残業代（みなし残業）の求人の見方｜確認する3項目', '「固定残業代」「みなし残業」がある求人は、どこを見ればいい？若者雇用促進法に基づく指針と厚生労働省のリーフレットで示された3つの明示項目、求人票の読み方の例、書いていないときの質問のしかた、入社前に確認する書類を紹介します。', array['donichi-yasumi-nenshu-hikaku', 'naitei-shodaku-mae', 'tedori-20man-hikaku', 'tenshoku-koukai-shinai', 'kibou-nenshu-kakikata']::text[], '{}'::text[], array['kyuryo']::text[], array['hajimete', 'seishain-keiken-sukunai']::text[], array['「みなし残業」って', 'どこを見ればいい？']::text[], null, false, '[{"q":"固定残業代がある会社は、避けたほうがいいですか？","a":"固定残業代があること自体が、すぐに悪いというわけではありません。大事なのは、固定残業代を除いた基本給がいくらか、何時間分の残業代でいくらか、その時間を超えた分は追加で支払われるかが、はっきり示されているかどうかです。この3つが書かれていない場合は、応募前や面接で確かめましょう。"},{"q":"固定残業代が「〇時間分」とあれば、その時間までは残業しないといけないのですか？","a":"固定残業代は、決められた時間分の残業代を、残業の有無にかかわらず定額で支払うしくみです。その時間まで残業しなければならないという意味ではありません。実際にどのくらい残業があるかは、求人の「月平均の残業時間」の欄や、面接での質問で別に確かめましょう。"},{"q":"固定残業の時間を超えて働いた分は、払ってもらえますか？","a":"固定残業代で決められた時間を超えて残業した場合や、計算した割増賃金が固定残業代の額を上回る場合は、その差額を支払う必要があるとされています。払われていないと感じたら、給与明細と勤務時間の記録を手元に残し、労働基準監督署などに相談しましょう。"}]'::jsonb, null, '{"schema_version":2,"writer_agent":"career-writer","angle":"固定残業代は「あるかないか」より「3つの項目が書かれているか」で見る。月給の合計ではなく、固定残業代を除いた基本給で比べる。書いていないときは応募前・面接・内定時に聞き、労働条件通知書で確かめる","quotes":[{"source_url":"https://www.mhlw.go.jp/file/06-Seisakujouhou-11600000-Shokugyouanteikyoku/0000184068.pdf","text":"固定残業代制を採用する場合は、募集要項や求人票などに、①固定残業代を除いた基本給の額、②固定残業代に関する労働時間数と金額等の計算方法、③固定残業時間を超える時間外労働、休日労働及び深夜労働に対して割増賃金を追加で支払う旨、のすべてを明示する。名称が「定額残業手当」「みなし残業代」などでも同じ。記載例として「時間外労働の有無にかかわらず○時間分の時間外手当として△△円を支給し、○時間を超える時間外労働分についての割増賃金は追加で支給」が示されている（直接開けなかったため、資料のタイトルと検索結果に表示された内容で確認）","used_in":"求人に書かれるべき3つの項目"},{"source_url":"https://www.mhlw.go.jp/content/11600000/000534967.pdf","text":"若者雇用促進法に基づく指針として、固定残業代を採用する場合は、固定残業代を除いた基本給の額、固定残業代に関する労働時間数と金額等の計算方法、固定残業時間を超える時間外労働・休日労働・深夜労働への割増賃金を追加で支払う旨を明示すること（検索結果で確認）","used_in":"求人に書かれるべき3つの項目"},{"source_url":"https://www.check-roudou.mhlw.go.jp/qa/roudousya/chingin/q11.html","text":"定額残業制は、法律に明文規定はないが、法定時間外・法定休日・深夜労働の割増賃金を、あらかじめ定額の手当等の名目で、あるいは基本給の一部として支給する制度。基本給に含める場合は割増賃金相当部分とそれ以外の賃金部分を明確に区別することを要する。まかなわれる残業時間数等を超えて残業等が行われた場合は差額を別途支払う必要がある（検索結果で確認）","used_in":"固定残業代（みなし残業）とは？／入社してから気になったら"},{"source_url":"https://www.startup-roudou.mhlw.go.jp/qa/zigyonushi/chingin/q11.html","text":"固定残業代の金額が労基法37条等に定められた方法で計算した割増賃金の額を下回るときは、その差額を支払う必要がある（検索結果で確認）","used_in":"入社してから気になったら"}],"not_used":["「固定残業は月〇時間までが目安」「〇時間を超える求人は避ける」といった基準は、公的な目安として確認できなかったため書かない","割増率（25%など）の具体的な数字は、この記事の主題から外れるため書かない","固定残業代と「みなし労働時間制（裁量労働制・事業場外みなし）」の違いは、今回の出典で確認しきれなかったため扱わない","求人の金額例は、架空の数字を作らないよう「〇〇円」で示した"]}'::jsonb) on conflict (slug) do nothing;
+insert into article_categories (article_id, category_id, is_primary) select a.id, c.id, true from articles a, categories c where a.slug = 'koteizangyo-kyujin' and c.slug = 'hatarakikata' on conflict do nothing;
+insert into article_categories (article_id, category_id, is_primary) select a.id, c.id, false from articles a, categories c where a.slug = 'koteizangyo-kyujin' and c.slug = 'seido' on conflict do nothing;
+insert into article_sources (article_id, title, publisher, url, accessed_at, used_for, sort_order) select id, '固定残業代制を採用する場合は、募集要項や求人票などに、次の①～③の内容すべてを明示してください。', '厚生労働省・都道府県労働局・ハローワーク', 'https://www.mhlw.go.jp/file/06-Seisakujouhou-11600000-Shokugyouanteikyoku/0000184068.pdf', '2026-10-09'::date, '固定残業代制を採用する場合に、募集要項や求人票に①固定残業代を除いた基本給の額、②固定残業代に関する労働時間数と金額等の計算方法、③固定残業時間を超える時間外労働・休日労働・深夜労働に対して割増賃金を追加で支払う旨を明示すること。名称が「定額残業手当」「みなし残業代」などでも同じ扱いであること。記載例', 0 from articles where slug = 'koteizangyo-kyujin';
+insert into article_sources (article_id, title, publisher, url, accessed_at, used_for, sort_order) select id, '若者の募集・採用等に関する指針　ご対応いただきたい５つのポイントを紹介します', '厚生労働省', 'https://www.mhlw.go.jp/content/11600000/000534967.pdf', '2026-10-09'::date, '若者雇用促進法に基づく指針で、固定残業代を採用する場合に3つの項目を明示することとされていること', 1 from articles where slug = 'koteizangyo-kyujin';
+insert into article_sources (article_id, title, publisher, url, accessed_at, used_for, sort_order) select id, '基本給に含めた割増賃金って何？（確かめよう労働条件）', '厚生労働省', 'https://www.check-roudou.mhlw.go.jp/qa/roudousya/chingin/q11.html', '2026-10-09'::date, '定額残業制は、時間外・休日・深夜労働の割増賃金をあらかじめ定額の手当や基本給の一部として支払う制度であること。割増賃金にあたる部分とそれ以外を明確に区別する必要があること。まかなわれる時間数を超えて残業した場合は差額を別に支払う必要があること', 2 from articles where slug = 'koteizangyo-kyujin';
+insert into article_sources (article_id, title, publisher, url, accessed_at, used_for, sort_order) select id, '固定残業代を支払うこととすれば、残業や休日勤務をさせても別途に残業代を支払わなくてよいでしょうか？（スタートアップ労働条件）', '厚生労働省', 'https://www.startup-roudou.mhlw.go.jp/qa/zigyonushi/chingin/q11.html', '2026-10-09'::date, '固定残業代の金額が、法律の方法で計算した割増賃金の額を下回るときは、その差額を支払う必要があること', 3 from articles where slug = 'koteizangyo-kyujin';
+insert into article_versions (article_id, version, title, summary, body_md, created_by) select id, 1, title, summary, body_md, 'seed' from articles where slug = 'koteizangyo-kyujin' on conflict do nothing;
+insert into article_reviews (article_id, version, reviewer, verdict, checks) select id, 1, 'プロジェクトオーナー（チャットで承認）', 'approved', '{"content_hash":"05724d2cb70157ea96a74258e18683e3448d5ccd7e72c859b3b8c9ba6e49bdf4","findings":[]}'::jsonb from articles where slug = 'koteizangyo-kyujin';
+update articles set status = 'published' where slug = 'koteizangyo-kyujin';
 
 -- article: kuhaku-kikan-setsumei (published)
 insert into articles (slug, kind, title, summary, body_md, status, featured, published_at, updated_at, reviewed_at, reviewed_by, information_checked_at, seo_title, seo_description, related_slugs, roles, concerns, situations, eyecatch, illustration, recommended, faq, news_meta, research_notes) values ('kuhaku-kikan-setsumei', 'article', '職歴に空白期間があるとき、面接でどう説明する？書類の書き方と答え方の例', '働いていない期間があるときは、隠すよりも「その間のこと」と「今は働ける状態か」を短く伝えるほうが、面接で話しやすくなります。履歴書・職務経歴書での書き方、面接での説明の型と理由別の例文、その期間にやっていたことの言い方を紹介します。', '履歴書を書いていて、職歴と職歴のあいだに何も書けない期間がある。面接で「この期間は何をしていましたか？」と聞かれたらどうしよう。そんな不安を持つ人は少なくありません。
@@ -1601,7 +2840,7 @@ insert into articles (slug, kind, title, summary, body_md, status, featured, pub
 
 ## 「未経験歓迎」が意味すること
 
-「未経験歓迎」は、その職種の経験がない人の応募を受け付けているという意味で使われることが多い表現です。ただし、入社後の研修の内容や、求められる基本的なスキルは求人ごとに違います。', 'draft', false, null, '2026-10-06'::timestamptz, null, null, null, null, null, '{}'::text[], '{}'::text[], '{}'::text[], '{}'::text[], '{}'::text[], null, false, '[]'::jsonb, null, '{"schema_version":2,"writer_agent":"career-writer","brief":"求人票の定型表現の読み方。出典候補を調査中。"}'::jsonb) on conflict (slug) do nothing;
+「未経験歓迎」は、その職種の経験がない人の応募を受け付けているという意味で使われることが多い表現です。ただし、入社後の研修の内容や、求められる基本的なスキルは求人ごとに違います。', 'draft', false, null, '2026-10-06'::timestamptz, null, null, null, null, null, array['koteizangyo-kyujin', 'tenshoku-koukai-shinai']::text[], '{}'::text[], '{}'::text[], '{}'::text[], '{}'::text[], null, false, '[]'::jsonb, null, '{"schema_version":2,"writer_agent":"career-writer","brief":"求人票の定型表現の読み方。出典候補を調査中。"}'::jsonb) on conflict (slug) do nothing;
 insert into article_categories (article_id, category_id, is_primary) select a.id, c.id, true from articles a, categories c where a.slug = 'kyujin-hyo-yomikata' and c.slug = 'junbi' on conflict do nothing;
 insert into article_versions (article_id, version, title, summary, body_md, created_by) select id, 1, title, summary, body_md, 'seed' from articles where slug = 'kyujin-hyo-yomikata' on conflict do nothing;
 
@@ -1732,6 +2971,133 @@ insert into article_versions (article_id, version, title, summary, body_md, crea
 insert into article_reviews (article_id, version, reviewer, verdict, checks) select id, 1, 'プロジェクトオーナー（チャットで承認）', 'approved', '{"content_hash":"50305ae31e708b7fced71f6d14d89c3809108bdc4403d2bc6bb6aaa68029073d","findings":[]}'::jsonb from articles where slug = 'kyushokusha-shien-seido';
 update articles set status = 'published' where slug = 'kyushokusha-shien-seido';
 
+-- article: mensetsu-fukusou (published)
+insert into articles (slug, kind, title, summary, body_md, status, featured, published_at, updated_at, reviewed_at, reviewed_by, information_checked_at, seo_title, seo_description, related_slugs, roles, concerns, situations, eyecatch, illustration, recommended, faq, news_meta, research_notes) values ('mensetsu-fukusou', 'article', '転職の面接、服装はスーツ？「私服可」「服装自由」「オフィスカジュアル」の考え方と身だしなみチェック', '転職の面接の服装は、指定がなければスーツを選ぶと迷いにくくなります。「私服可」「服装自由」「オフィスカジュアル」と書かれていたときの考え方、迷ったときの確かめ方と問い合わせの例、スーツがないときの選び方、当日の身だしなみチェックを紹介します。', '「面接の案内に『服装自由』と書いてあるけど、本当に私服でいいの？」「スーツを持っていない」。面接の準備では、話す内容と同じくらい、服装で迷う人が多いです。
+
+先に結論を言うと、**服装の指定がなければスーツを選ぶと迷いにくく**、**指定があればその意図に合わせる**のが基本です。どちらの場合も、いちばん大事なのは**清潔感**です。
+
+この記事で分かること：
+
+- 指定がないときの**基本の服装**
+- 「私服可」「服装自由」「オフィスカジュアル」の**考え方**
+- 迷ったときの**確かめ方**と問い合わせの例
+- スーツがないとき、オンライン面接のときの**服装**
+- 当日の**身だしなみチェック**
+
+## 指定がなければスーツが無難
+
+ハローワークの面接対策の案内では、アパレルなど一部の業界を除き、面接の服装は**基本はスーツ**とされています。正社員の求人だけでなく、パートやアルバイトでも、清潔感や「きちんと感」を伝えるためにスーツをすすめる案内もあります。
+
+### スーツで行くときの基本
+
+ハローワークのセミナー資料では、次のような組み合わせが基本として紹介されています。
+
+- スーツ：黒・紺・グレーなど落ち着いた色
+- シャツ：白が基本
+- 靴：革靴
+- 靴下：黒・紺・グレーのビジネス用。ストッキングはベージュ系
+- カバン：黒が主流
+
+転職の面接では、新卒の就職活動ほど形が決まっているわけではありません。ただ、色や形で目立つ必要はないので、**落ち着いた色・シンプルな形**を選んでおけば大きく外しにくくなります。
+
+## 服装でいちばん大事なのは「清潔感」
+
+ハローワーク山形の面接対策の資料では、服装で個性を出す必要はなく、**無難で清潔感のある服装**を目指すようにと案内しています。髪や靴、爪といった細かいところにも目が向けられます。
+
+高いスーツかどうかより、**シワや汚れがないか、サイズが合っているか**のほうが印象に関わります。
+
+## 「私服可」「服装自由」「オフィスカジュアル」はどう考える？
+
+面接の案内に、服装について書かれていることがあります。公的な決まった定義があるわけではないので、ここでは一般的な受け止め方と、迷ったときの選び方を紹介します。
+
+| 案内の書き方 | 一般的な受け止め方 | 迷ったときの選び方 |
+| --- | --- | --- |
+| 書かれていない | 特に指定はない | スーツ |
+| 私服可 | スーツでも私服でもよい | スーツ、またはジャケットを着たきちんとした私服 |
+| 服装自由 | 形は問わない。ただし面接の場にふさわしい服装 | ジャケットに襟のあるシャツなど、きちんと感のある服 |
+| 私服でお越しください | 会社が私服を望んでいる | ジャケットを着た、落ち着いた色の私服 |
+| オフィスカジュアル | 職場で働くときのような、きちんとした服装 | ジャケット、襟のあるシャツやブラウス、無地のパンツやスカート |
+
+「自由」「私服」と書かれていても、**普段着でよいという意味とは限りません**。デニム、Tシャツ1枚、サンダル、派手な柄などは避け、「この服で、この会社の人と仕事の打ち合わせができるか」を基準に選ぶと考えやすくなります。
+
+## 迷ったときの確かめ方
+
+「会社の雰囲気が分からない」「どこまでくずしていいか分からない」ときは、次の順番で確かめましょう。
+
+```figure
+type: steps
+title: 服装に迷ったときの確かめ方
+items:
+  - label: 案内をもう一度読む
+    text: 面接の案内メールや求人に、服装の指定がないか
+  - label: 会社の様子を調べる
+    text: 会社のサイトや採用ページの写真で、社員の服装を見る
+  - label: 問い合わせる
+    text: 採用担当者に、服装の指定があるか聞く
+  - label: それでも迷ったら
+    text: スーツ、またはスーツに近いきちんとした服装にする
+```
+
+労働局の面接対策の資料でも、**会社や業界にふさわしい服装**で臨むこと、迷う場合は会社の社員の服装を確認する方法が紹介されています。
+
+問い合わせは失礼ではありません。メールなら、たとえば次のように聞けます。
+
+> 件名：面接当日の服装について（氏名）
+>
+> 〇月〇日に面接のお時間をいただいております、〇〇と申します。
+> 当日の服装について、ご指定があれば教えていただけますでしょうか。
+> お忙しいところ恐れ入りますが、よろしくお願いいたします。
+
+転職エージェント経由で応募している場合は、担当者に聞くのが早いです。
+
+## スーツを持っていないときは
+
+指定がなければスーツが無難ですが、すぐに用意できないこともあります。その場合は、手持ちの服で「きちんと感」を出す組み合わせを考えましょう。
+
+- 上：ジャケット（黒・紺・グレーなど）
+- 中：襟のあるシャツ、またはシンプルなブラウス
+- 下：無地で落ち着いた色のパンツやスカート
+- 靴：汚れのない革靴や、シンプルなパンプス
+
+面接のあとも転職活動が続くなら、スーツを1着用意しておくと、毎回迷わずにすみます。
+
+## オンライン面接の服装
+
+ハローワーク川崎の資料では、オンライン面接でも**通常の面接と同じ服装**で臨むこと、パソコンのカメラを目線の高さに合わせることが案内されています。
+
+- 上半身だけ整えるのではなく、全身を整えておく（立ち上がったときに見えることがある）
+- 背景は片づいた壁などにする
+- 画面に映る自分の顔が暗くないか、事前に確認する
+
+## 当日の身だしなみチェック
+
+家を出る前に、鏡の前で次の項目を確認しましょう。
+
+```figure
+type: checklist
+title: 面接当日の身だしなみチェック
+items:
+  - 服にシワ・汚れ・ほつれがない
+  - 髪が清潔で、顔にかからない
+  - 爪が短く、汚れていない
+  - 靴が汚れていない、かかとがすり減っていない
+  - 靴下・ストッキングが落ち着いた色
+  - カバンに書類が折れずに入る
+  - 香水などの香りが強すぎない
+```
+
+服装が整ったら、あとは話す内容の準備です。よく聞かれる質問と答え方は[未経験職種の面接、何を準備する？](/articles/mensetsu-junbi-mikeiken)に、志望動機の組み立て方は[未経験職種の志望動機、何を書けばいい？](/articles/shiboudouki-mikeiken)にまとめています。働きながら転職活動を進めていて、面接の日程の組み方に迷うときは、[働きながらの転職活動、何から？](/articles/zaishoku-tenshoku-susumekata)が参考になります。', 'review', false, '2026-10-09'::timestamptz, '2026-10-09'::timestamptz, '2026-10-09'::timestamptz, 'プロジェクトオーナー（チャットで承認）', '2026-10-09'::timestamptz, '転職の面接の服装｜スーツ？私服可・服装自由の考え方', '転職の面接はスーツで行くべき？「私服可」「服装自由」「オフィスカジュアル」と書かれていたときの考え方、迷ったときの確かめ方と問い合わせの例文、スーツがないときの服の選び方、オンライン面接の注意点、当日の身だしなみチェックを紹介します。', array['mensetsu-junbi-mikeiken', 'shiboudouki-mikeiken', 'kuhaku-kikan-setsumei', 'web-mensetsu-junbi', 'mensetsu-yokukiku-shitsumon']::text[], '{}'::text[], array['mensetsu']::text[], array['hajimete', 'freeter']::text[], array['面接の服装、', 'スーツじゃなきゃダメ？']::text[], null, false, '[{"q":"「私服でお越しください」と書かれていたのに、スーツで行ってもいいですか？","a":"スーツで行っても失礼にはあたらないと考えられますが、会社が「私服で」とはっきり書いているなら、その意図に合わせるのがよいでしょう。ジャケットに襟のあるシャツ、落ち着いた色のパンツやスカートのように、きちんと感のある服装にすると迷いにくくなります。不安なら、採用の担当者に問い合わせてかまいません。"},{"q":"スーツを持っていません。買わないといけませんか？","a":"指定がなければスーツが無難ですが、すぐに用意できない場合は、ジャケットと襟のあるシャツ、無地で落ち着いた色のパンツやスカートなど、手持ちの服で「きちんと感」を出す方法もあります。大事なのは、シワや汚れがなく清潔に見えることです。"},{"q":"オンライン面接でも、服装は対面と同じですか？","a":"ハローワークの面接対策の資料では、オンライン面接でも通常の面接と同じ服装で臨むことが案内されています。上半身しか映らないと思っても、立ち上がったときに見えることもあるので、全身を整えておきましょう。"}]'::jsonb, null, '{"schema_version":2,"writer_agent":"career-writer","angle":"面接の服装の「正解」を一つに決めつけず、「指定がなければスーツ」「指定があればその意図に合わせる」「迷ったら確かめる」の順で判断できるようにする。根拠はハローワーク・労働局の面接対策資料に絞り、身だしなみはチェックリストで見せる","quotes":[{"source_url":"https://jsite.mhlw.go.jp/yamagata-hellowork/content/contents/002350381.pdf","text":"服装で個性を出す必要はない。無難で、突っ込みどころのない、清潔感のある服装を目指す。髪や靴、爪などの注意点（jsite.mhlw.go.jp へ直接接続できなかったため、検索結果に表示された内容で確認）","used_in":"服装でいちばん大事なのは「清潔感」 / 当日の身だしなみチェック"},{"source_url":"https://jsite.mhlw.go.jp/aomori-roudoukyoku/content/contents/002105371.pdf","text":"会社や業界にふさわしい服装で臨む。迷う場合は会社を下見して社員の服装を確認する方法もある（検索結果で確認）","used_in":"迷ったときの確かめ方"},{"source_url":"https://jsite.mhlw.go.jp/osaka-hellowork/list/abeno/mother-syukatsutaikendan002_00002.html","text":"アパレルなど特殊な業界以外は「基本はスーツ」。パートやアルバイトでも清潔感や「きちんと感」を伝えるためにスーツをすすめている（検索結果で確認）","used_in":"指定がなければスーツが無難"},{"source_url":"https://jsite.mhlw.go.jp/osaka-hellowork/content/contents/002184437.pdf","text":"シャツは白が基本、スーツは黒・紺・グレーが基本。女性のストッキングはベージュ系、男性の靴下は黒・グレー・紺のビジネスソックス。カバンは黒が主流（検索結果で確認）","used_in":"スーツで行くときの基本"},{"source_url":"https://jsite.mhlw.go.jp/kanagawa-hellowork/content/contents/002604524.pdf","text":"髪は清潔に、黒や紺のソックス、革靴。オンライン面接では、PCのカメラを目線の高さに合わせ、通常の面接と同じ服装で臨む（検索結果で確認）","used_in":"オンライン面接の服装 / 当日の身だしなみチェック"}],"not_used":["「私服可」「服装自由」「オフィスカジュアル」の公的な定義は見つからなかったため、意味は一般的な受け止め方として書き、断定せず確認のしかたを示した","服装が合否にどの程度影響するかの調査データは、公的な根拠を確認できなかったので書かない","面接会場に何分前に着くかの目安は、資料によって異なり今回の主題でもないため書かない","特定のスーツ店やレンタルサービスには触れない"]}'::jsonb) on conflict (slug) do nothing;
+insert into article_categories (article_id, category_id, is_primary) select a.id, c.id, true from articles a, categories c where a.slug = 'mensetsu-fukusou' and c.slug = 'shorui-mensetsu' on conflict do nothing;
+insert into article_categories (article_id, category_id, is_primary) select a.id, c.id, false from articles a, categories c where a.slug = 'mensetsu-fukusou' and c.slug = 'junbi' on conflict do nothing;
+insert into article_sources (article_id, title, publisher, url, accessed_at, used_for, sort_order) select id, '面接対策（ハローワーク山形の資料）', '山形労働局（ハローワーク山形）', 'https://jsite.mhlw.go.jp/yamagata-hellowork/content/contents/002350381.pdf', '2026-10-09'::date, '服装で個性を出す必要はなく、無難で清潔感のある服装を目指すこと、髪・靴・爪などにも気を配ること', 0 from articles where slug = 'mensetsu-fukusou';
+insert into article_sources (article_id, title, publisher, url, accessed_at, used_for, sort_order) select id, '事前の準備が大事です 面接試験の受け方（青森労働局の資料）', '青森労働局', 'https://jsite.mhlw.go.jp/aomori-roudoukyoku/content/contents/002105371.pdf', '2026-10-09'::date, '会社や業界にふさわしい服装で臨むこと、迷ったときは会社の社員の服装を確認する方法があること', 1 from articles where slug = 'mensetsu-fukusou';
+insert into article_sources (article_id, title, publisher, url, accessed_at, used_for, sort_order) select id, 'ハローワーク阿倍野 マザーズコーナー 就活体験談', '大阪労働局（ハローワーク阿倍野）', 'https://jsite.mhlw.go.jp/osaka-hellowork/list/abeno/mother-syukatsutaikendan002_00002.html', '2026-10-09'::date, 'アパレルなど一部の業界を除き、面接の服装は基本はスーツとされていること', 2 from articles where slug = 'mensetsu-fukusou';
+insert into article_sources (article_id, title, publisher, url, accessed_at, used_for, sort_order) select id, 'ハローワーク布施 面接対策セミナー', '大阪労働局（ハローワーク布施）', 'https://jsite.mhlw.go.jp/osaka-hellowork/content/contents/002184437.pdf', '2026-10-09'::date, 'スーツは黒・紺・グレー、シャツは白が基本で、靴下・ストッキング・カバンも落ち着いた色にすること', 3 from articles where slug = 'mensetsu-fukusou';
+insert into article_sources (article_id, title, publisher, url, accessed_at, used_for, sort_order) select id, '面接対策 面接のマナーとよく聞かれる質問（ハローワーク川崎）', '神奈川労働局（ハローワーク川崎）', 'https://jsite.mhlw.go.jp/kanagawa-hellowork/content/contents/002604524.pdf', '2026-10-09'::date, '髪は清潔にし、靴は革靴にすること、オンライン面接でも通常の面接と同じ服装で臨み、カメラを目線の高さに合わせること', 4 from articles where slug = 'mensetsu-fukusou';
+insert into article_versions (article_id, version, title, summary, body_md, created_by) select id, 1, title, summary, body_md, 'seed' from articles where slug = 'mensetsu-fukusou' on conflict do nothing;
+insert into article_reviews (article_id, version, reviewer, verdict, checks) select id, 1, 'プロジェクトオーナー（チャットで承認）', 'approved', '{"content_hash":"3c63dc11df0a037e1c1006678523a6837814df7d02cac876f4997d705a048b4d","findings":[]}'::jsonb from articles where slug = 'mensetsu-fukusou';
+update articles set status = 'published' where slug = 'mensetsu-fukusou';
+
 -- article: mensetsu-junbi-mikeiken (published)
 insert into articles (slug, kind, title, summary, body_md, status, featured, published_at, updated_at, reviewed_at, reviewed_by, information_checked_at, seo_title, seo_description, related_slugs, roles, concerns, situations, eyecatch, illustration, recommended, faq, news_meta, research_notes) values ('mensetsu-junbi-mikeiken', 'article', '未経験職種の面接、何を準備する？よく聞かれる質問と逆質問の例', '未経験の職種の面接では、志望動機・転職理由・これまでの経験・入社後のことを聞かれやすいものです。質問ごとの準備のしかたと答え方の例、逆質問の例、オンライン面接の確認ポイント、答えなくていい質問についてまとめました。', '未経験の職種の面接は、「経験がないことを、どう話せばいいの？」と不安になりやすいものです。でも、聞かれることはある程度決まっています。質問ごとに**話す材料**を用意しておけば、当日あわてずにすみます。
 
@@ -1803,7 +3169,7 @@ items:
 
 厚生労働省は、採用選考は応募者の適性・能力だけを基準に行うべきだとしています。そのため、**本籍・出生地、家族の職業や収入、住まいの状況、宗教、支持政党**など、適性や能力に関係のないことを面接で尋ねるのは、就職差別につながるおそれがあるとして、企業に配慮を求めています。
 
-こうした質問に、無理に答える必要はありません。気になる質問をされたときは、ハローワーク（公共職業安定所）や都道府県労働局に相談できます。', 'review', false, '2026-10-06'::timestamptz, '2026-10-06'::timestamptz, '2026-10-06'::timestamptz, null, '2026-10-06'::timestamptz, null, null, array['shiboudouki-mikeiken', 'mikeiken-kenshu-kakunin', 'shokumu-keirekisho-arubaito']::text[], '{}'::text[], array['mensetsu', 'mikeiken-shokushu']::text[], array['hajimete', 'seishain-keiken-sukunai']::text[], array['面接が不安。', '何を準備する？']::text[], null, false, '[{"q":"面接で家族のことを聞かれたら、答えないといけませんか？","a":"厚生労働省は、家族の職業や収入など、本人の適性・能力と関係のない事項を面接で尋ねることは就職差別につながるおそれがあるとして、企業に配慮を求めています。答えにくい質問に無理に答える必要はありません。気になる質問をされたときは、ハローワークや都道府県労働局に相談できます。"},{"q":"逆質問で「特にありません」と答えるのはだめですか？","a":"だめというわけではありませんが、入社後の働き方を知るよい機会です。研修のあとの流れや、未経験で入社した人が最初に任される仕事など、自分が判断するために知りたいことを1〜2個用意しておくと安心です。"},{"q":"未経験であることは、どう伝えればいいですか？","a":"隠す必要はありません。聞かれたら未経験であることを認めたうえで、近い経験、今準備していること、入社後に取り組みたいことの順につなげて話すと伝わりやすくなります。"}]'::jsonb, null, '{"schema_version":2,"writer_agent":"career-writer","angle":"未経験職種の面接で聞かれやすい4つの質問ごとに準備のしかたと答え方の例を示し、逆質問・オンライン面接・答えなくていい質問（公正な採用選考）までを一つの準備リストとしてまとめる","quotes":[{"source_url":"https://kouseisaiyou.mhlw.go.jp/basic.html","text":"公正な採用選考の基本は、応募者の基本的人権を尊重すること、応募者の適性・能力のみを基準として行うこと","used_in":"答えなくていい質問もある"},{"source_url":"https://kouseisaiyou.mhlw.go.jp/consider.html","text":"就職差別につながるおそれがある14事項。本人に責任のない事項（本籍・出生地、家族、住宅状況、生活環境・家庭環境）と、本来自由であるべき事項（宗教、支持政党、人生観・生活信条、思想、労働組合・学生運動など）を応募書類や面接で把握しない","used_in":"答えなくていい質問もある／FAQ"},{"source_url":"https://kouseisaiyou.mhlw.go.jp/jobseekers.html","text":"面接などで本人の適性・能力以外の事項を把握された事例を紹介し、不適切な質問があった場合は最寄りのハローワークや都道府県労働局に相談できると案内","used_in":"答えなくていい質問もある／FAQ"},{"source_url":"https://www.hellowork.mhlw.go.jp/doc/oubosyorui_pamphlet_202406.pdf","text":"面接では提出した履歴書（職務経歴書を含む）の記載内容に基づいて質問されることが多いので、完成した書類をコピーしておき、面接前に確認する","used_in":"何を聞かれる？まずは4つを準備"}],"not_used":["面接でよく聞かれる質問のランキングや、面接の通過率などの統計は使っていない","オンライン面接の確認事項は一般的な準備として書き、公的な基準としては扱っていない"]}'::jsonb) on conflict (slug) do nothing;
+こうした質問に、無理に答える必要はありません。気になる質問をされたときは、ハローワーク（公共職業安定所）や都道府県労働局に相談できます。', 'review', false, '2026-10-06'::timestamptz, '2026-10-06'::timestamptz, '2026-10-06'::timestamptz, null, '2026-10-06'::timestamptz, null, null, array['shiboudouki-mikeiken', 'mikeiken-kenshu-kakunin', 'shokumu-keirekisho-arubaito', 'mensetsu-yokukiku-shitsumon', 'gyaku-shitsumon']::text[], '{}'::text[], array['mensetsu', 'mikeiken-shokushu']::text[], array['hajimete', 'seishain-keiken-sukunai']::text[], array['面接が不安。', '何を準備する？']::text[], null, false, '[{"q":"面接で家族のことを聞かれたら、答えないといけませんか？","a":"厚生労働省は、家族の職業や収入など、本人の適性・能力と関係のない事項を面接で尋ねることは就職差別につながるおそれがあるとして、企業に配慮を求めています。答えにくい質問に無理に答える必要はありません。気になる質問をされたときは、ハローワークや都道府県労働局に相談できます。"},{"q":"逆質問で「特にありません」と答えるのはだめですか？","a":"だめというわけではありませんが、入社後の働き方を知るよい機会です。研修のあとの流れや、未経験で入社した人が最初に任される仕事など、自分が判断するために知りたいことを1〜2個用意しておくと安心です。"},{"q":"未経験であることは、どう伝えればいいですか？","a":"隠す必要はありません。聞かれたら未経験であることを認めたうえで、近い経験、今準備していること、入社後に取り組みたいことの順につなげて話すと伝わりやすくなります。"}]'::jsonb, null, '{"schema_version":2,"writer_agent":"career-writer","angle":"未経験職種の面接で聞かれやすい4つの質問ごとに準備のしかたと答え方の例を示し、逆質問・オンライン面接・答えなくていい質問（公正な採用選考）までを一つの準備リストとしてまとめる","quotes":[{"source_url":"https://kouseisaiyou.mhlw.go.jp/basic.html","text":"公正な採用選考の基本は、応募者の基本的人権を尊重すること、応募者の適性・能力のみを基準として行うこと","used_in":"答えなくていい質問もある"},{"source_url":"https://kouseisaiyou.mhlw.go.jp/consider.html","text":"就職差別につながるおそれがある14事項。本人に責任のない事項（本籍・出生地、家族、住宅状況、生活環境・家庭環境）と、本来自由であるべき事項（宗教、支持政党、人生観・生活信条、思想、労働組合・学生運動など）を応募書類や面接で把握しない","used_in":"答えなくていい質問もある／FAQ"},{"source_url":"https://kouseisaiyou.mhlw.go.jp/jobseekers.html","text":"面接などで本人の適性・能力以外の事項を把握された事例を紹介し、不適切な質問があった場合は最寄りのハローワークや都道府県労働局に相談できると案内","used_in":"答えなくていい質問もある／FAQ"},{"source_url":"https://www.hellowork.mhlw.go.jp/doc/oubosyorui_pamphlet_202406.pdf","text":"面接では提出した履歴書（職務経歴書を含む）の記載内容に基づいて質問されることが多いので、完成した書類をコピーしておき、面接前に確認する","used_in":"何を聞かれる？まずは4つを準備"}],"not_used":["面接でよく聞かれる質問のランキングや、面接の通過率などの統計は使っていない","オンライン面接の確認事項は一般的な準備として書き、公的な基準としては扱っていない"]}'::jsonb) on conflict (slug) do nothing;
 insert into article_categories (article_id, category_id, is_primary) select a.id, c.id, true from articles a, categories c where a.slug = 'mensetsu-junbi-mikeiken' and c.slug = 'shorui-mensetsu' on conflict do nothing;
 insert into article_sources (article_id, title, publisher, url, accessed_at, used_for, sort_order) select id, '公正な採用選考の基本', '厚生労働省', 'https://kouseisaiyou.mhlw.go.jp/basic.html', '2026-10-06'::date, '採用選考は応募者の適性・能力のみを基準として行うという考え方', 0 from articles where slug = 'mensetsu-junbi-mikeiken';
 insert into article_sources (article_id, title, publisher, url, accessed_at, used_for, sort_order) select id, '採用選考時に配慮すべき事項', '厚生労働省', 'https://kouseisaiyou.mhlw.go.jp/consider.html', '2026-10-06'::date, '本籍・出生地、家族、住宅状況、宗教、支持政党などを面接で尋ねることが就職差別につながるおそれがあること', 1 from articles where slug = 'mensetsu-junbi-mikeiken';
@@ -1812,6 +3178,159 @@ insert into article_sources (article_id, title, publisher, url, accessed_at, use
 insert into article_versions (article_id, version, title, summary, body_md, created_by) select id, 1, title, summary, body_md, 'seed' from articles where slug = 'mensetsu-junbi-mikeiken' on conflict do nothing;
 insert into article_reviews (article_id, version, reviewer, verdict, checks) select id, 1, 'seed', 'approved', '{"content_hash":"b0bb1c5946484238e6098e22740a437a99cfc137b169ec3c711e3f9c97ec4997","findings":[]}'::jsonb from articles where slug = 'mensetsu-junbi-mikeiken';
 update articles set status = 'published' where slug = 'mensetsu-junbi-mikeiken';
+
+-- article: mensetsu-yokukiku-shitsumon (published)
+insert into articles (slug, kind, title, summary, body_md, status, featured, published_at, updated_at, reviewed_at, reviewed_by, information_checked_at, seo_title, seo_description, related_slugs, roles, concerns, situations, eyecatch, illustration, recommended, faq, news_meta, research_notes) values ('mensetsu-yokukiku-shitsumon', 'article', '転職の面接でよく聞かれる質問と答え方｜自己紹介・転職理由・志望動機の型と回答例', '転職の面接で聞かれることの多くは、「何ができるか」「どのくらい入りたいか」「どんな人か」を確かめる質問です。自己紹介・転職理由・志望動機・強み弱み・未経験の仕事を選んだ理由について、答え方の型と回答例を紹介します。応募者に聞いてはいけないとされている質問の考え方も紹介します。', 'はじめての転職の面接は、「何を聞かれるんだろう」「うまく答えられなかったらどうしよう」と不安になりやすいものです。
+
+先に結論を言うと、面接の質問はたくさんあるように見えても、多くは**「何ができるか」「どのくらい入りたいか」「どんな人か」**を確かめるためのものです。どの質問にも使える**答え方の型**をひとつ持っておくと、知らない聞き方をされても組み立て直せます。
+
+この記事で分かること：
+
+- 面接官が質問で**確かめたいこと**
+- どの質問にも使える**答え方の型**
+- 自己紹介・転職理由・志望動機・強み弱み・未経験の仕事を選んだ理由の**回答例**（仮の例）
+- 応募者に**聞いてはいけない**とされている質問の考え方
+
+## 面接官は、何を知りたい？
+
+ハローワークの面接対策の資料では、面接に決まったマニュアルはなく、答える内容は一人ひとり違うとしたうえで、企業は**能力・適性・経験**や**意欲**を見ていると説明しています。よく聞かれる質問を、確かめたいことと並べると次のようになります。
+
+| よく聞かれる質問 | 面接官が確かめたいこと |
+| --- | --- |
+| 自己紹介をお願いします | 経歴の大まかな流れ、話し方や人柄 |
+| なぜ転職を考えたのですか | 同じ理由ですぐ辞めないか、前向きに動いているか |
+| なぜこの会社に応募したのですか | 会社や仕事をどのくらい調べ、理解しているか |
+| あなたの強みと弱みは | 自分のことを客観的に見られているか |
+| なぜ未経験の仕事を選んだのですか | 仕事の中身を知ったうえで選んでいるか |
+| 入社後にやりたいことは | 入ってからの姿が具体的に想像できているか |
+
+「正しい答え」を当てる試験ではありません。**自分の経験を材料に、質問の奥にあることに答える**と考えると、準備しやすくなります。
+
+## どの質問にも使える「答え方の型」
+
+答えるときは、次の順番を意識すると、短く、伝わりやすくまとまります。
+
+```figure
+type: steps
+title: どの質問にも使える答え方の型
+items:
+  - label: 結論
+    text: 聞かれたことに、最初にひとことで答える
+  - label: 具体例
+    text: そう言える理由を、経験やエピソードで話す
+  - label: これから
+    text: 応募先の仕事でどう活かすか、何をしたいか
+```
+
+いちばん大事なのは**最初の「結論」**です。エピソードから話し始めると、何の話か分からないまま長くなりがちです。結論を言ってから理由を足し、最後に「だから御社で〇〇したい」とつなげます。
+
+## 質問別の答え方と回答例
+
+ここからの回答例は、接客・販売のアルバイトから事務職やカスタマーサポートに応募する場合の**仮の例**です。自分の経験に置き換えて使ってください。
+
+### 自己紹介
+
+自己紹介は、名前に続けて「これまでの経歴の要点」と「今回応募した理由をひとこと」を話します。時間を指定されたらそれに合わせ、指定がなければ短くまとめて、詳しいことは次の質問で話せば大丈夫です。
+
+> 「〇〇と申します。大学卒業後、カフェでアルバイトとして働き、接客のほかに、新人スタッフへの仕事の教え方やシフト表の作成も担当してきました。お客様やスタッフから相談を受けることが多く、人の困りごとを聞いて整理する仕事をしたいと考え、今回応募いたしました。本日はよろしくお願いいたします。」
+
+### 転職理由（退職理由）
+
+不満がきっかけでも、**「次に何をしたいか」**に言い換えて話します。前の職場の悪口にならないように気をつけましょう。
+
+> 「接客の仕事を続ける中で、お客様の困りごとを聞いて解決することにやりがいを感じるようになりました。その経験を、問い合わせ対応を専門にする仕事で深めたいと考え、転職を決めました。」
+
+言い換えのしかたは、[転職回数が気になるときに整理したいこと](/articles/tenshoku-kaisu-kininaru)の説明の型も参考になります。
+
+### 志望動機
+
+志望動機は「この仕事を選んだ理由」と「この会社を選んだ理由」の両方が入っていると、説得力が増します。
+
+> 「御社の求人で、未経験で入った方が先輩について電話対応から始めると知り、教わりながら一つずつ覚えられる環境だと感じました。接客で身につけた、相手の話を最後まで聞く姿勢を、お客様からの問い合わせ対応で活かしたいと考えています。」
+
+組み立て方は[未経験職種の志望動機、何を書けばいい？](/articles/shiboudouki-mikeiken)でくわしく紹介しています。
+
+### 強み（長所）
+
+強みは**ひとつに絞って、エピソードで裏づけ**ます。ハローワークの資料でも、自己PRには具体的な根拠やエピソード（上司やお客様からの評価など）を入れるとよいとされています。
+
+> 「私の強みは、相手に合わせて説明を変えられることです。アルバイトで新人スタッフに仕事を教える担当をしていたとき、覚え方は人によって違うと気づき、口で説明するだけでなく、手順を紙にまとめて渡すようにしました。店長からは『教え方が分かりやすい』と言ってもらえました。」
+
+接客の経験をどう言葉にするか迷うときは、[接客経験は転職でどう活かせる？](/articles/sekkyaku-keiken-ikasu)も参考にしてください。
+
+### 弱み（短所）
+
+弱みは、仕事に大きく差し支えるものを避け、**「気をつけていること」とセット**で話します。
+
+> 「心配性なところがあり、確認に時間をかけすぎてしまうことがあります。今は、確認する項目を先にメモに書き出し、それが終わったら次に進むようにしています。」
+
+「弱みはありません」と答えると、自分を見つめ直していない印象になりやすいので、ひとつは用意しておきましょう。
+
+### なぜ未経験の仕事を選んだのですか
+
+未経験の転職では、聞かれることが多いと考えて準備しておきたい質問です。**仕事の中身を調べたうえで選んだこと**と、**今の経験との接点**を話します。
+
+> 「事務の仕事は未経験ですが、アルバイトではレジ締めや発注の数量入力を担当していて、数字を正確に扱うことにやりがいを感じていました。事務の求人を調べる中で、毎日の入力や書類の確認が仕事の中心だと知り、自分に合っていると考えました。今は表計算ソフトの基本操作を練習しています。」
+
+「なんとなく興味があって」だけで終わらせず、**調べて分かったこと**と**今やっている準備**を入れると、本気度が伝わります。
+
+### 入社後にやりたいこと
+
+入社後のことは、遠い目標より「最初の数か月で何をできるようになりたいか」を具体的に話すほうが伝わりやすいです。
+
+> 「まずは研修で教わる仕事を早く一人でできるようになりたいです。そのうえで、よくある問い合わせをまとめて、ほかの方にも共有できるようになりたいと考えています。」
+
+## 答えに詰まったときの言い方
+
+想定していなかった質問をされても、黙り込む必要はありません。次のような言い方で、考える時間をもらえます。
+
+- 「少し考えてからお答えしてもよろしいでしょうか」
+- 「〇〇ということでしょうか」（質問の意味を確かめる）
+- 「うまくまとまっていないのですが、〇〇だと考えています」
+
+分からないことを知っているふりをするより、正直に言ってから答えるほうが、落ち着いた印象になります。
+
+## 応募者に聞いてはいけない質問もある
+
+厚生労働省は、採用選考は応募者の適性・能力にもとづいて行うべきだとしています。そのため、次のような**本人の適性・能力に関係のないこと**を、応募書類や面接で把握することは、就職差別につながるおそれがあるとしています。
+
+- 本籍・出生地
+- 家族のこと（職業・続柄・健康・収入など）
+- 住宅のこと（間取り・部屋数・住宅の種類など）
+- 生活環境・家庭環境
+- 宗教、支持政党、人生観、尊敬する人物、思想など
+
+こうした質問に、無理に答える必要はありません。その場では「仕事に関わることでしたら、お答えします」のように、やわらかく伝える方法もあります。気になる質問をされたときは、**最寄りのハローワークや都道府県労働局**に相談できます。
+
+## 練習は「書類を見返す」ところから
+
+ハローワークの資料では、面接では提出した履歴書や職務経歴書の内容をもとに質問されることが多いとして、書類のコピーを取っておき、面接の前に見直すようすすめています。
+
+```figure
+type: checklist
+title: 面接の前にやっておきたい練習
+items:
+  - 提出した書類のコピーを読み返した
+  - 質問ごとに「結論」をひとことで書き出した
+  - 結論を支えるエピソードを決めた
+  - 未経験の仕事を選んだ理由を声に出して話した
+  - 弱みと、気をつけていることをセットにした
+  - 家族など、答えなくていい質問を知っている
+```
+
+声に出して話してみると、書いたときには気づかなかった言いにくさが分かります。ひとりで練習するのが不安なら、ハローワークでは応募書類の添削や面接に向けた相談を無料で受けられます。
+
+面接の準備全体（逆質問やオンライン面接の確認を含む）は[未経験職種の面接、何を準備する？](/articles/mensetsu-junbi-mikeiken)、働いていない期間の説明は[職歴に空白期間があるとき、面接でどう説明する？](/articles/kuhaku-kikan-setsumei)で紹介しています。', 'review', false, '2026-10-09'::timestamptz, '2026-10-09'::timestamptz, '2026-10-09'::timestamptz, 'プロジェクトオーナー（チャットで承認）', '2026-10-09'::timestamptz, '転職の面接でよく聞かれる質問｜答え方の型と回答例', '転職の面接でよく聞かれる自己紹介・転職理由・志望動機・強みと弱み・未経験の仕事を選んだ理由の答え方を、型と回答例で紹介します。答えに詰まったときの言い方や、応募者に聞いてはいけない質問の考え方も分かります。', array['mensetsu-junbi-mikeiken', 'shiboudouki-mikeiken', 'kuhaku-kikan-setsumei', 'gyaku-shitsumon', 'taishoku-riyuu-mensetsu', 'jiko-pr-mikeiken']::text[], '{}'::text[], array['mensetsu', 'mikeiken-shokushu']::text[], array['hajimete', 'sekkyaku']::text[], array['面接の質問、', 'どう答えればいい？']::text[], null, false, '[{"q":"面接の回答は、丸暗記して臨んだほうがいいですか？","a":"文章をまるごと覚えると、少し違う聞き方をされたときに言葉が出なくなりがちです。質問ごとに「結論」と「話したいエピソード」だけを決めておき、あとは自分の言葉で話す練習をしておくほうが、落ち着いて答えやすくなります。"},{"q":"弱み（短所）を聞かれたら、何と答えればいいですか？","a":"仕事に大きく差し支えるものを避け、ひとつに絞って正直に伝えます。そのうえで「気をつけていること」をセットで話すと、自分を客観的に見られていることが伝わります。たとえば「心配性なところがあり、確認に時間をかけすぎることがあります。今は確認する項目を先に決めてから作業するようにしています」のような形です。"},{"q":"面接で家族のことや住まいのことを聞かれたら、答えないといけませんか？","a":"厚生労働省は、家族の職業や収入、住宅の状況など、本人の適性・能力に関係のないことを応募書類や面接で把握することは、就職差別につながるおそれがあるとしています。無理に答える必要はありません。気になる質問をされたときは、最寄りのハローワークや都道府県労働局に相談できます。"}]'::jsonb, null, '{"schema_version":2,"writer_agent":"career-writer","angle":"「よく聞かれる質問」を一覧で並べるだけでなく、面接官が確かめたいこと（できること・意欲・人柄）から逆算して、全質問に使える「結論→具体例→これから」の型を示す。未経験の仕事を選んだ理由を独立した質問として扱い、聞いてはいけない質問の考え方（公正な採用選考）で締める","quotes":[{"source_url":"https://jsite.mhlw.go.jp/osaka-hellowork/content/contents/002184437.pdf","text":"面接にマニュアルは無く、答える内容も1人ひとり異なる。企業側は「能力、適性、経験」を見ており、何ができるのか（どのような経験をし、どんな能力があるのか）、意欲（その会社にどのように貢献するのか、どのような存在になりたいのか）を伝える。自己PRには具体的な根拠やエピソード（上司や顧客からの評価など）を入れる（この環境から jsite.mhlw.go.jp に直接接続できなかったため、検索結果に表示された資料の抜粋で確認）","used_in":"面接官は、何を知りたい？／質問別の答え方と回答例"},{"source_url":"https://www.hellowork.mhlw.go.jp/doc/oubosyorui_pamphlet_202406.pdf","text":"面接では提出した履歴書・職務経歴書の内容に基づいて質問されることが多いので、完成した書類はコピーしておき、面接前に確認する（直接開けなかったため、検索結果と既存記事 mensetsu-junbi-mikeiken の記録で確認）","used_in":"練習は「書類を見返す」ところから"},{"source_url":"https://kouseisaiyou.mhlw.go.jp/consider.html","text":"就職差別につながるおそれがある14事項。本人に責任のない事項（本籍・出生地、家族、住宅状況、生活環境・家庭環境）、本来自由であるべき事項（宗教、支持政党、人生観・生活信条、尊敬する人物、思想など）を、応募用紙や面接で把握しない（直接開けなかったため、各労働局が公開している同内容の資料の検索結果で確認）","used_in":"応募者に聞いてはいけない質問もある"},{"source_url":"https://kouseisaiyou.mhlw.go.jp/jobseekers.html","text":"面接で適性・能力に関係のない質問をされ、就職差別につながると感じた場合は、最寄りのハローワークや都道府県労働局に相談できる（直接開けなかったため、愛媛労働局など各労働局の案内ページの検索結果で確認）","used_in":"応募者に聞いてはいけない質問もある／FAQ"},{"source_url":"https://www.mhlw.go.jp/content/11600000/001441500.pdf","text":"ハローワークでは応募書類の作成方法などのセミナーを実施し、希望に応じて応募書類の添削や面接に向けた相談も行っている。利用は無料（直接開けなかったため、検索結果の抜粋で確認）","used_in":"練習は「書類を見返す」ところから"}],"not_used":["「自己紹介は1分程度」「転職理由を重視する企業は約85%」などの時間・割合は、公的な根拠を確認できなかったので書かない","よく聞かれる質問のランキングは、調査の出どころが確認できないので使わない","「その質問は違法です」と面接官に指摘するような対応は、法的な線引きを断定できないため書かず、相談先の案内にとどめた"]}'::jsonb) on conflict (slug) do nothing;
+insert into article_categories (article_id, category_id, is_primary) select a.id, c.id, true from articles a, categories c where a.slug = 'mensetsu-yokukiku-shitsumon' and c.slug = 'shorui-mensetsu' on conflict do nothing;
+insert into article_categories (article_id, category_id, is_primary) select a.id, c.id, false from articles a, categories c where a.slug = 'mensetsu-yokukiku-shitsumon' and c.slug = 'mikeiken' on conflict do nothing;
+insert into article_sources (article_id, title, publisher, url, accessed_at, used_for, sort_order) select id, 'ハローワーク布施 面接対策セミナー', '大阪労働局 ハローワーク布施', 'https://jsite.mhlw.go.jp/osaka-hellowork/content/contents/002184437.pdf', '2026-10-09'::date, '面接に決まったマニュアルはなく、答える内容は一人ひとり違うこと。企業は能力・適性・経験や意欲を見ていること。自己PRには具体的な根拠やエピソードを入れること', 0 from articles where slug = 'mensetsu-yokukiku-shitsumon';
+insert into article_sources (article_id, title, publisher, url, accessed_at, used_for, sort_order) select id, '応募書類（パンフレット）', 'ハローワークインターネットサービス（厚生労働省）', 'https://www.hellowork.mhlw.go.jp/doc/oubosyorui_pamphlet_202406.pdf', '2026-10-09'::date, '面接では提出した応募書類の内容をもとに質問されることが多いので、書類のコピーを取り、面接の前に見直すこと', 1 from articles where slug = 'mensetsu-yokukiku-shitsumon';
+insert into article_sources (article_id, title, publisher, url, accessed_at, used_for, sort_order) select id, '採用選考時に配慮すべき事項（公正採用選考特設サイト）', '厚生労働省', 'https://kouseisaiyou.mhlw.go.jp/consider.html', '2026-10-09'::date, '本籍・出生地、家族、住宅状況、生活環境・家庭環境、宗教、支持政党などを応募書類や面接で把握することは、就職差別につながるおそれがあるとされていること', 2 from articles where slug = 'mensetsu-yokukiku-shitsumon';
+insert into article_sources (article_id, title, publisher, url, accessed_at, used_for, sort_order) select id, '求職者の皆様へ（公正採用選考特設サイト）', '厚生労働省', 'https://kouseisaiyou.mhlw.go.jp/jobseekers.html', '2026-10-09'::date, '不適切な質問をされたときに、ハローワークや都道府県労働局に相談できること', 3 from articles where slug = 'mensetsu-yokukiku-shitsumon';
+insert into article_sources (article_id, title, publisher, url, accessed_at, used_for, sort_order) select id, 'ハローワークのご案内（リーフレット）', '厚生労働省', 'https://www.mhlw.go.jp/content/11600000/001441500.pdf', '2026-10-09'::date, 'ハローワークで、応募書類の添削や面接に向けた相談を無料で受けられること', 4 from articles where slug = 'mensetsu-yokukiku-shitsumon';
+insert into article_versions (article_id, version, title, summary, body_md, created_by) select id, 1, title, summary, body_md, 'seed' from articles where slug = 'mensetsu-yokukiku-shitsumon' on conflict do nothing;
+insert into article_reviews (article_id, version, reviewer, verdict, checks) select id, 1, 'プロジェクトオーナー（チャットで承認）', 'approved', '{"content_hash":"a927fb3d9313ebca8ea1ad8345075d9a2aa87672afbe014c842961fe0ac2c871","findings":[]}'::jsonb from articles where slug = 'mensetsu-yokukiku-shitsumon';
+update articles set status = 'published' where slug = 'mensetsu-yokukiku-shitsumon';
 
 -- article: mikeiken-it-hajimari (published)
 insert into articles (slug, kind, title, summary, body_md, status, featured, published_at, updated_at, reviewed_at, reviewed_by, information_checked_at, seo_title, seo_description, related_slugs, roles, concerns, situations, eyecatch, illustration, recommended, faq, news_meta, research_notes) values ('mikeiken-it-hajimari', 'article', '未経験のIT、どんな仕事から始まる？入口になりやすい仕事と入社前の確認', 'ITの仕事はプログラミングだけではありません。未経験から検討しやすいのは、ヘルプデスク、運用・管理（監視など）、テストのように、システムを支えたり確かめたりする仕事です。それぞれの仕事内容と、研修・勤務時間・働く場所など入社前に確認したいこと、ITパスポートの考え方を紹介します。', '「ITの仕事に興味はあるけど、プログラミングはしたことがない」。そんなときにまず知っておきたいのは、ITの仕事は「作る」だけではないということです。
@@ -1976,6 +3495,129 @@ insert into article_versions (article_id, version, title, summary, body_md, crea
 insert into article_reviews (article_id, version, reviewer, verdict, checks) select id, 1, 'seed', 'approved', '{"content_hash":"d39860228964ecca491787762e4d4293b7c21cafb1a4b22efb840dc640a079fd","findings":[]}'::jsonb from articles where slug = 'mikeiken-kenshu-kakunin';
 update articles set status = 'published' where slug = 'mikeiken-kenshu-kakunin';
 
+-- article: mikeiken-shikaku (published)
+insert into articles (slug, kind, title, summary, body_md, status, featured, published_at, updated_at, reviewed_at, reviewed_by, information_checked_at, seo_title, seo_description, related_slugs, roles, concerns, situations, eyecatch, illustration, recommended, faq, news_meta, research_notes) values ('mikeiken-shikaku', 'article', '未経験の転職に資格は必要？取る前に考えたいことと、職種別に検討されやすい資格の例', '未経験の転職では、資格があれば採用されるわけではありません。大事なのは、目指す仕事で「なくては働けない資格」か「あると役立つ資格」かを見分けることです。資格より先に考えたいこと、MOS・日商簿記・ITパスポート・介護職員初任者研修などの例、取る前に確認することを紹介します。', '「未経験の仕事に応募するなら、何か資格を取っておいたほうがいい？」。転職を考え始めると、まず資格の勉強から始めようとする人は多いです。
+
+先に結論を言うと、**資格があれば未経験でも採用される、というわけではありません**。大事なのは、目指す仕事で**「なくては働けない資格」なのか、「あると役立つ資格」なのか**を見分けることです。そのうえで、取るかどうか、いつ取るかを決めましょう。
+
+この記事で分かること：
+
+- 資格より**先に考えたいこと**
+- 「なくては働けない資格」と「あると役立つ資格」の**違い**
+- 職種別に検討されやすい**資格の例**
+- 資格を**取る前に確認すること**
+
+## 資格より先に考えたいこと
+
+資格の勉強を始める前に、次の2つを先に考えておくと、遠回りを防げます。
+
+### 1. どの仕事を目指すかを決める
+
+「とりあえず役に立ちそうだから」と資格を選ぶと、取ったあとに応募したい仕事とつながらないことがあります。先に、**どの職種の求人に応募したいか**を決め、その仕事でどんな知識が使われるかを調べましょう。厚生労働省の職業情報提供サイト（job tag）では、職種ごとに仕事内容や関連する資格を調べられます。
+
+やりたい仕事がまだ決まらないときは、気になる職種をいくつか挙げて、仕事内容を読み比べるところから始めましょう。
+
+### 2. 今までの経験を言葉にする
+
+未経験の職種への応募でも、面接で聞かれるのは資格だけではありません。アルバイトや接客で身につけたこと、仕事への向き合い方も見られています。たとえば事務職について、job tag では、一般事務は入職に学歴や資格は特に必要とされないと紹介されています。
+
+資格の勉強と並行して、これまでの経験を書類に書ける形にしておきましょう。書き方は[履歴書に書くことがないと思ったとき](/articles/rirekisho-kakukoto-nai)で紹介しています。
+
+## 「なくては働けない資格」と「あると役立つ資格」
+
+資格には、大きく分けて2つの種類があります。
+
+```figure
+type: compare
+title: 資格の2つの種類
+columns:
+  - label: なくては働けない資格
+    tone: coral
+    items:
+      - その資格がないと、その仕事に就けない
+      - 求人の「必須」欄に書かれる
+      - 例：訪問介護員の介護職員初任者研修
+  - label: あると役立つ資格
+    tone: mint
+    items:
+      - なくても応募できる
+      - 求人の「歓迎」「優遇」欄に書かれる
+      - 例：事務職のMOSや日商簿記
+```
+
+たとえば、利用者の自宅を訪ねる訪問介護員（ホームヘルパー）として働くには、介護職員初任者研修の修了が必要です。こうした仕事を目指すなら、資格の取得は避けて通れません。
+
+一方、事務職のように、資格がなくても応募できる仕事では、資格は**知識の証明や、勉強していることを伝える材料**になります。資格よりも、実際に使えるかどうかを面接で聞かれることもあります。
+
+## 職種別に検討されやすい資格の例
+
+ここでは、未経験の転職でよく名前が挙がる資格を、職種ごとに紹介します。取るかどうかは、応募したい求人の内容を見て決めましょう。
+
+| 目指す職種 | 資格の例 | どんな場面で役立つ？ |
+| --- | --- | --- |
+| 一般事務 | MOS（マイクロソフト オフィス スペシャリスト） | ExcelやWordの操作ができることを伝える |
+| 経理事務 | 日商簿記検定 | お金の出入りを記録するしくみを理解していることを伝える |
+| ITサポート | ITパスポート試験 | ITの基礎知識を学んだことを伝える |
+| 介護職 | 介護職員初任者研修 | 介護の基本を学んだ証明。訪問介護では必須 |
+
+### 事務職：MOSと日商簿記
+
+job tag では、一般事務の関連資格としてMOSや秘書検定などが、経理事務の関連資格として日商簿記検定などが挙げられています。一般事務では、仕事によってパソコンの操作や簿記の知識が求められる場合もあるとされています。
+
+PCの操作に自信がない人は、資格の前に、よく使う操作を練習しておくのも一つの方法です。[PCが得意じゃなくても、事務職は目指せる？](/articles/pc-nigate-jimu)で、練習のしかたを紹介しています。
+
+### ITサポート：ITパスポート試験
+
+ITパスポート試験は、ITに関する基礎的な知識を証明する国家試験で、受験資格はありません。情報処理推進機構（IPA）は、2027年度から新しい試験制度に移る予定だと案内しているので、受ける前に公式サイトで最新の試験の内容を確認しましょう。IT系の入口になりやすい仕事は、[未経験のIT、どんな仕事から始まる？](/articles/mikeiken-it-hajimari)にまとめています。
+
+### 介護職：介護職員初任者研修
+
+介護職員初任者研修は、介護の基本的な知識と技術を学ぶ研修です。訪問介護で働くには修了が必要です。施設で働く場合は、応募資格の欄で、資格がなくても応募できるか、入社後に研修を受ける形かを確認しましょう。
+
+## 取る前に確認すること
+
+資格の勉強には、時間もお金もかかります。申し込む前に、次のことを確認しておきましょう。
+
+```figure
+type: checklist
+title: 資格を取る前に確認すること
+items:
+  - 応募したい求人で「必須」か「歓迎」か
+  - 求人に資格名が書かれているか
+  - 受験料・講座代はいくらか
+  - 勉強にどのくらいの期間がかかりそうか
+  - 試験の日程や申し込みの締め切り
+  - 取ったあと、面接でどう話すか
+```
+
+いちばん手軽な確認方法は、**応募したい求人を何件か読んで、資格名が書かれているかを数えてみる**ことです。「歓迎」欄によく出てくる資格は検討する価値がありますが、ほとんど書かれていないなら、資格より先に応募書類の準備を進めたほうが早いこともあります。
+
+### 勉強中でも書類に書ける
+
+資格を取り終える前に応募を始めてもかまいません。履歴書の資格欄や自己PRには、たとえば次のように書けます。
+
+> 日商簿記検定3級 取得に向けて勉強中（〇年〇月受験予定）
+
+取得していない資格を、取得済みのように書くのはやめましょう。
+
+## 講座代の負担を軽くする制度
+
+国には、仕事に役立つ講座の受講費用の一部を支給する**教育訓練給付制度**があります。専門実践教育訓練・特定一般教育訓練・一般教育訓練の3つの種類があり、対象の講座は厚生労働省の検索システムで調べられます。
+
+雇用保険に入っていた期間などの条件があるので、使えるかどうかは申し込む前にハローワークで確認しましょう。種類ごとの違いや申し込みの流れは、[教育訓練給付金の使い方](/articles/kyouiku-kunren-kyufu-tsukaikata)で紹介しています。
+
+資格は、目指す仕事に近づくための道具のひとつです。「何の資格を取るか」から考えるのではなく、「どの仕事に就きたいか」から逆算して、必要なものから順に準備していきましょう。', 'review', false, '2026-10-09'::timestamptz, '2026-10-09'::timestamptz, '2026-10-09'::timestamptz, 'プロジェクトオーナー（チャットで承認）', '2026-10-09'::timestamptz, '未経験の転職に資格は必要？選び方と職種別の例', '未経験の転職に資格は必要？「なくては働けない資格」と「あると役立つ資格」の違い、資格より先に考えたいこと、MOS・日商簿記・ITパスポート・介護職員初任者研修など職種別の例、取る前に確認することと教育訓練給付制度を紹介します。', array['pc-nigate-jimu', 'kyouiku-kunren-kyufu-tsukaikata', 'rirekisho-kakukoto-nai', 'keiri-mikeiken', 'kaigo-mikeiken']::text[], array['jimu', 'it-support']::text[], array['mikeiken-shokushu']::text[], array['hajimete', 'pc-mikeiken']::text[], array['未経験の転職、', '資格は取るべき？']::text[], null, false, '[{"q":"資格がないと、未経験の職種には応募できませんか？","a":"職種によります。厚生労働省の職業情報提供サイト（job tag）では、一般事務は入職に学歴や資格は必要とされないと紹介されています。一方、訪問介護員（ホームヘルパー）のように、介護職員初任者研修の修了が必要な仕事もあります。応募したい求人の「応募資格」「必須」「歓迎」の欄を見て判断しましょう。"},{"q":"勉強中の資格は、履歴書に書いてもいいですか？","a":"書いてかまいません。資格欄や自己PRに「日商簿記3級の取得に向けて勉強中（〇年〇月受験予定）」のように書くと、仕事に向けて準備していることが伝わります。取得していない資格を取得済みのように書くのはやめましょう。"},{"q":"資格の講座代を、国の制度で補助してもらえますか？","a":"雇用保険に入っていた期間などの条件を満たすと、厚生労働大臣が指定した講座を受けて修了したときに、費用の一部が教育訓練給付金として支給される制度があります。対象になる講座は厚生労働省の検索システムで調べられます。自分が条件を満たすかは、申し込む前にハローワークで確認しましょう。"}]'::jsonb, null, '{"schema_version":2,"writer_agent":"career-writer","angle":"「資格を取れば未経験でも採用される」という期待をほどき、目指す職種で「必須の資格」と「あると役立つ資格」を分けて考える順番を示す。資格の例は job tag の関連資格欄や公式情報で確認できたものに絞る","quotes":[{"source_url":"https://shigoto.mhlw.go.jp/User/Occupation/Detail/428","text":"入職に学歴や資格は特に必要とされない。事務処理の高度化、専門化により、パソコンスキル、文書作成能力、簿記、英会話など業務に関連のある技能や資格が求められる場合もある。関連資格として、ビジネス・キャリア検定、コンピュータサービス技能評価試験、秘書検定、マイクロソフトオフィススペシャリスト（MOS）（job tag へ直接接続できなかったため、検索結果に表示されたページ内容で確認）","used_in":"資格より先に考えたいこと / 職種別に検討されやすい資格の例"},{"source_url":"https://shigoto.mhlw.go.jp/User/Occupation/Detail/430","text":"関連資格として「日商簿記検定」「簿記能力検定」があり、取得していると仕事の役に立つ（検索結果で確認）","used_in":"職種別に検討されやすい資格の例"},{"source_url":"https://shigoto.mhlw.go.jp/User/Occupation/Detail/133","text":"訪問介護員になるには「介護職員初任者研修課程」を修了する必要がある（検索結果で確認）","used_in":"「なくては働けない資格」と「あると役立つ資格」"},{"source_url":"https://www.ipa.go.jp/shiken/kubun/ip.html","text":"ITパスポート試験は、ITに関する共通的な基礎知識を証明する国家試験。受験資格は特にない。CBT方式で随時実施。2027年度から新試験制度に移行する予定（ipa.go.jp へ直接接続できなかったため、検索結果に表示された内容で確認）","used_in":"職種別に検討されやすい資格の例"},{"source_url":"https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/koyou_roudou/jinzaikaihatsu/kyouiku.html","text":"教育訓練給付には専門実践教育訓練、特定一般教育訓練、一般教育訓練の3種類があり、対象講座は厚生労働大臣指定教育訓練講座検索システムで検索できる。支給には雇用保険の被保険者期間などの要件がある（検索結果で確認）","used_in":"講座代の負担を軽くする制度"}],"not_used":["各資格の合格率・学習時間の目安・受験料は、年度や回によって変わり、公式情報を今回すべて確認できなかったため書かない","教育訓練給付金の支給率・上限額は、種類や受講開始日で変わるため本文では書かず、既存記事へのリンクにとどめた","「資格があると年収が上がる」といった効果は公的な根拠を確認できなかったので書かない"]}'::jsonb) on conflict (slug) do nothing;
+insert into article_categories (article_id, category_id, is_primary) select a.id, c.id, true from articles a, categories c where a.slug = 'mikeiken-shikaku' and c.slug = 'mikeiken' on conflict do nothing;
+insert into article_categories (article_id, category_id, is_primary) select a.id, c.id, false from articles a, categories c where a.slug = 'mikeiken-shikaku' and c.slug = 'junbi' on conflict do nothing;
+insert into article_sources (article_id, title, publisher, url, accessed_at, used_for, sort_order) select id, '一般事務 - 職業詳細（職業情報提供サイト job tag）', '厚生労働省', 'https://shigoto.mhlw.go.jp/User/Occupation/Detail/428', '2026-10-09'::date, '一般事務は入職に学歴や資格は必要とされないこと、パソコンスキルや簿記などが求められる場合もあること、関連資格としてMOS・秘書検定などが挙げられていること', 0 from articles where slug = 'mikeiken-shikaku';
+insert into article_sources (article_id, title, publisher, url, accessed_at, used_for, sort_order) select id, '経理事務 - 職業詳細（職業情報提供サイト job tag）', '厚生労働省', 'https://shigoto.mhlw.go.jp/User/Occupation/Detail/430', '2026-10-09'::date, '経理事務の関連資格として日商簿記検定・簿記能力検定が挙げられ、取得していると仕事の役に立つとされていること', 1 from articles where slug = 'mikeiken-shikaku';
+insert into article_sources (article_id, title, publisher, url, accessed_at, used_for, sort_order) select id, '訪問介護員/ホームヘルパー - 職業詳細（職業情報提供サイト job tag）', '厚生労働省', 'https://shigoto.mhlw.go.jp/User/Occupation/Detail/133', '2026-10-09'::date, '訪問介護員になるには介護職員初任者研修課程の修了が必要なこと', 2 from articles where slug = 'mikeiken-shikaku';
+insert into article_sources (article_id, title, publisher, url, accessed_at, used_for, sort_order) select id, 'ITパスポート試験', '独立行政法人情報処理推進機構（IPA）', 'https://www.ipa.go.jp/shiken/kubun/ip.html', '2026-10-09'::date, 'ITパスポート試験がITに関する共通的な基礎知識を証明する国家試験で、受験資格がないこと、2027年度から新しい試験制度に移る予定であること', 3 from articles where slug = 'mikeiken-shikaku';
+insert into article_sources (article_id, title, publisher, url, accessed_at, used_for, sort_order) select id, '教育訓練給付金', '厚生労働省', 'https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/koyou_roudou/jinzaikaihatsu/kyouiku.html', '2026-10-09'::date, '教育訓練給付制度に3つの種類があること、対象講座を検索システムで調べられること', 4 from articles where slug = 'mikeiken-shikaku';
+insert into article_versions (article_id, version, title, summary, body_md, created_by) select id, 1, title, summary, body_md, 'seed' from articles where slug = 'mikeiken-shikaku' on conflict do nothing;
+insert into article_reviews (article_id, version, reviewer, verdict, checks) select id, 1, 'プロジェクトオーナー（チャットで承認）', 'approved', '{"content_hash":"30ef4b0f729e3f878108becb98d96b0f401fbcee54203468933e0fb931891d72","findings":[]}'::jsonb from articles where slug = 'mikeiken-shikaku';
+update articles set status = 'published' where slug = 'mikeiken-shikaku';
+
 -- article: mikeiken-tenshoku-hajimekata (published)
 insert into articles (slug, kind, title, summary, body_md, status, featured, published_at, updated_at, reviewed_at, reviewed_by, information_checked_at, seo_title, seo_description, related_slugs, roles, concerns, situations, eyecatch, illustration, recommended, faq, news_meta, research_notes) values ('mikeiken-tenshoku-hajimekata', 'article', '未経験転職は何から始める？最初に整理したい5つのこと', '求人を眺める前に「転職したい理由」「経験」「希望条件」「比べる職種」「スケジュール」の5つを整理しておくと、求人の良し悪しを自分の基準で判断しやすくなります。それぞれの整理のしかたを具体的に紹介します。', '未経験から転職を考え始めたとき、最初につまずきやすいのは「何から手をつければいいのか分からない」ことです。求人サイトを開いても、職種も条件も幅が広すぎて、どれが自分に合っているのか判断できません。
 
@@ -2080,7 +3722,7 @@ columns:
 2. [条件整理チェック](/check)で、希望条件と経験をもう一度まとめてみる
 3. 整理したメモを持って、キャリアアドバイザーに相談する
 
-整理したメモは完成品である必要はありません。調べたり人と話したりする中で、何度書き直しても大丈夫です。大切なのは、求人を見る前に「自分にとって何が大事か」の手がかりを持っておくことです。', 'review', true, '2026-10-06'::timestamptz, '2026-10-07'::timestamptz, '2026-10-07'::timestamptz, null, '2026-10-06'::timestamptz, '未経験転職は何から始める？最初に整理したい5つのこと', '未経験転職の最初の一歩は、求人探しより「整理」です。転職理由・経験・希望条件・比べる職種・スケジュールの5つを、書き出し例つきで解説します。', array['agent-mendan-mae', 'donichi-yasumi-nenshu-hikaku', 'eigyo-cs-it-support-chigai']::text[], '{}'::text[], array['mikeiken-shokushu', 'yaritai']::text[], array['hajimete']::text[], array['未経験の転職、', '何から始める？']::text[], null, false, '[{"q":"自分には強みと言えるような経験がありません。それでも整理する意味はありますか？","a":"あります。整理の目的は「すごい経験」を探すことではなく、どんな作業をどのくらい続けてきたかを事実として並べることです。アルバイトのシフト管理や新人への説明なども、書き出してみると仕事選びの材料になります。"},{"q":"転職したい理由が不満ばかりです。ネガティブでも大丈夫でしょうか？","a":"最初は不満のままで構いません。そのうえで「その不満がなくなったら、次はどうなっていたいか」に言い換えると、求人を比べるときの基準として使えるようになります。"},{"q":"整理にはどれくらい時間をかければいいですか？","a":"目安は1〜2週間です。完璧に仕上げる必要はなく、5つの項目に一度メモを書けたら、職種を調べたり相談したりしながら書き直していくほうが進めやすくなります。"}]'::jsonb, null, '{"schema_version":2,"writer_agent":"career-writer","angle":"求人探しの前に、比較の基準を作る"}'::jsonb) on conflict (slug) do nothing;
+整理したメモは完成品である必要はありません。調べたり人と話したりする中で、何度書き直しても大丈夫です。大切なのは、求人を見る前に「自分にとって何が大事か」の手がかりを持っておくことです。', 'review', true, '2026-10-06'::timestamptz, '2026-10-07'::timestamptz, '2026-10-07'::timestamptz, null, '2026-10-06'::timestamptz, '未経験転職は何から始める？最初に整理したい5つのこと', '未経験転職の最初の一歩は、求人探しより「整理」です。転職理由・経験・希望条件・比べる職種・スケジュールの5つを、書き出し例つきで解説します。', array['agent-mendan-mae', 'donichi-yasumi-nenshu-hikaku', 'eigyo-cs-it-support-chigai', 'tenshoku-schedule']::text[], '{}'::text[], array['mikeiken-shokushu', 'yaritai']::text[], array['hajimete']::text[], array['未経験の転職、', '何から始める？']::text[], null, false, '[{"q":"自分には強みと言えるような経験がありません。それでも整理する意味はありますか？","a":"あります。整理の目的は「すごい経験」を探すことではなく、どんな作業をどのくらい続けてきたかを事実として並べることです。アルバイトのシフト管理や新人への説明なども、書き出してみると仕事選びの材料になります。"},{"q":"転職したい理由が不満ばかりです。ネガティブでも大丈夫でしょうか？","a":"最初は不満のままで構いません。そのうえで「その不満がなくなったら、次はどうなっていたいか」に言い換えると、求人を比べるときの基準として使えるようになります。"},{"q":"整理にはどれくらい時間をかければいいですか？","a":"目安は1〜2週間です。完璧に仕上げる必要はなく、5つの項目に一度メモを書けたら、職種を調べたり相談したりしながら書き直していくほうが進めやすくなります。"}]'::jsonb, null, '{"schema_version":2,"writer_agent":"career-writer","angle":"求人探しの前に、比較の基準を作る"}'::jsonb) on conflict (slug) do nothing;
 insert into article_categories (article_id, category_id, is_primary) select a.id, c.id, true from articles a, categories c where a.slug = 'mikeiken-tenshoku-hajimekata' and c.slug = 'mikeiken' on conflict do nothing;
 insert into article_categories (article_id, category_id, is_primary) select a.id, c.id, false from articles a, categories c where a.slug = 'mikeiken-tenshoku-hajimekata' and c.slug = 'junbi' on conflict do nothing;
 insert into article_sources (article_id, title, publisher, url, accessed_at, used_for, sort_order) select id, '職業情報提供サイト（job tag）', '厚生労働省', 'https://shigoto.mhlw.go.jp/User/', '2026-10-06'::date, '職種ごとの仕事内容を調べる方法の紹介', 0 from articles where slug = 'mikeiken-tenshoku-hajimekata';
@@ -2219,6 +3861,161 @@ insert into article_versions (article_id, version, title, summary, body_md, crea
 insert into article_reviews (article_id, version, reviewer, verdict, checks) select id, 1, 'プロジェクトオーナー（チャットで承認）', 'approved', '{"content_hash":"0337cf041f3bbd459f3e885d4d3fc30bbce6414aba35bd172dc3c9376b6912c6","findings":[]}'::jsonb from articles where slug = 'muki-tenkan-keiyaku';
 update articles set status = 'published' where slug = 'muki-tenkan-keiyaku';
 
+-- article: naitei-jitai-tsutaekata (published)
+insert into articles (slug, kind, title, summary, body_md, status, featured, published_at, updated_at, reviewed_at, reviewed_by, information_checked_at, seo_title, seo_description, related_slugs, roles, concerns, situations, eyecatch, illustration, recommended, faq, news_meta, research_notes) values ('naitei-jitai-tsutaekata', 'article', '内定辞退の伝え方は？電話とメールの使い分け・例文と、承諾後に辞退するときの注意', '内定を辞退すると決めたら、できるだけ早く、まず電話で採用担当者に伝え、メールでも残すのが基本です。連絡のタイミング、電話での言い方とメールの例文、理由の伝え方、承諾したあとに辞退するときの民法の考え方と注意点を紹介します。', '複数の会社から内定をもらった、条件を確かめたら考えが変わった。理由はさまざまでも、内定を辞退するときは「どう伝えればいいのか」「怒られないか」と気が重くなるものです。
+
+先に結論を言うと、内定辞退は**決めたらすぐに、まず電話で、理由は短く**伝えるのが基本です。電話のあとにメールでも送っておくと、行き違いが起きにくくなります。
+
+この記事で分かること：
+
+- 辞退を**いつ**伝えるか
+- **電話とメール**の使い分けと、それぞれの例文
+- **理由**の伝え方と、引き止められたときの答え方
+- **内定を承諾したあと**に辞退したいときの考え方
+
+## いつ伝える？決めたらすぐに
+
+辞退すると決めたら、**その日のうちか、遅くとも翌営業日**には連絡しましょう。会社は、内定を出した人が入社する前提で、ほかの応募者への連絡や受け入れの準備を進めています。返事が遅れるほど、会社がほかの人に声をかける機会を減らしてしまいます。
+
+東京都の資料でも、内定の辞退は一度した約束を取り消すことになるので、**なるべく早く、はっきりと**意思を伝えることが大切だとされています。複数の内定があるときは、早めに入社する会社を決め、入社しない会社には速やかに辞退を伝えるのが基本です。
+
+連絡する時間帯は、相手の会社の営業時間内にします。始業すぐや昼休み、終業まぎわは担当者が忙しいことが多いので、避けたほうがつながりやすいでしょう。
+
+### 返事の期限が来る前でも、決まったら連絡する
+
+返事の期限が先でも、辞退を決めたなら期限まで待つ必要はありません。「期限までに連絡すればいい」と保留したままにせず、決まった時点で伝えましょう。
+
+まだ迷っていて期限に間に合わないときは、辞退ではなく**期限の相談**をします。言い方の例は[内定をもらったら、承諾の前に確認すること](/articles/naitei-shodaku-mae)で紹介しています。
+
+## 電話とメール、どちらで伝える？
+
+法律で連絡の方法が決まっているわけではありません。ただ、内定辞退は相手にとって大事な連絡なので、**まず電話、そのあとメール**の順にすると丁寧で、確実に伝わります。
+
+```figure
+type: steps
+title: 内定辞退を伝える流れ
+items:
+  - label: 入社しないと決める
+    text: 迷いが残っていないか、もう一度確かめる
+  - label: 電話で伝える
+    text: 採用担当者に、おわびと辞退の意思を伝える
+  - label: メールでも送る
+    text: 電話で伝えたことを、文面でも残す
+  - label: 書類などを返す
+    text: 会社から受け取ったものがあれば、指示に従う
+```
+
+- **電話**：声で直接おわびを伝えられ、相手が受け取ったことをその場で確かめられます
+- **メール**：電話で話した内容が文面で残り、「言った・聞いていない」の行き違いを防げます。担当者が電話に出られないときの連絡にも使えます
+
+担当者が不在で電話がつながらないときは、電話に出た人に伝言を頼むより、「あらためてお電話します」と伝えて、メールで先に辞退の連絡を送っておく方法があります。
+
+## 電話での言い方の例
+
+電話では、**名乗る → 担当者につないでもらう → おわびと結論 → 理由を一言 → お礼**の順に話すと、短くまとまります（会社名・名前は仮の例です）。
+
+> 「お世話になっております。〇月〇日に内定のご連絡をいただきました、山田太郎と申します。採用ご担当の佐藤様はいらっしゃいますでしょうか。」
+>
+> 「お忙しいところ失礼いたします。内定のご連絡をいただき、ありがとうございました。大変申し訳ないのですが、検討を重ねた結果、今回は内定を辞退させていただきたく、ご連絡いたしました。選考に時間を割いていただいたのに、このようなお返事となり、申し訳ありません。」
+
+ポイントは次の3つです。
+
+- **最初に結論を言う**：前置きが長いと、相手が用件をつかみにくくなります
+- **「辞退させていただきます」とはっきり言う**：「迷っていて」と言うと、相談だと受け取られます
+- **静かな場所からかける**：周りの音で聞き取りにくいと、おたがいに話しづらくなります
+
+## メールの例文
+
+電話で伝えたあとに送るメールの例です。電話がつながらず、先にメールで伝える場合は、2行目を「お電話を差し上げましたが、ご不在とのことでしたので、メールにて失礼いたします」と変えて使えます（会社名・名前は仮の例です）。
+
+> 件名：内定辞退のご連絡（山田太郎）
+>
+> 株式会社〇〇　人事部　佐藤様
+>
+> お世話になっております。山田太郎です。
+> 先ほどお電話でもお伝えしましたが、このたびいただいた内定を辞退させていただきたく、あらためてご連絡いたしました。
+>
+> 選考では、お時間を割いて丁寧にご対応いただき、ありがとうございました。
+> 検討を重ねた結果、別の会社への入社を決めました。
+> ご期待に沿えず、また直前のご連絡となりましたこと、心よりおわび申し上げます。
+>
+> 本来であれば直接お伺いすべきところ、メールでのご連絡となり申し訳ありません。
+> 末筆ながら、貴社のますますのご発展をお祈り申し上げます。
+>
+> 山田太郎
+> 電話：090-XXXX-XXXX
+> メール：xxxx@example.com
+
+件名だけで用件と名前が分かるようにしておくと、担当者がほかのメールに埋もれさせずに済みます。
+
+## 理由はどこまで言う？
+
+理由は、**細かく話す必要はありません**。聞かれたら、短く答えれば十分です。
+
+| よくある理由 | 伝え方の例 |
+| --- | --- |
+| 別の会社に決めた | 「検討を重ねた結果、別の会社への入社を決めました」 |
+| 仕事内容が合わないと感じた | 「自分の希望する働き方とあらためて照らし合わせ、今回は辞退することにしました」 |
+| 今の職場に残ることにした | 「家族とも話し合い、今の職場で働き続けることにしました」 |
+
+相手の会社の条件や社員への不満を理由として並べるのは避けましょう。伝えても辞退の結論は変わらず、おたがいに気まずくなるだけです。
+
+### 強く引き止められたら
+
+引き止められたら、まずお礼を伝え、そのうえで**結論は変えない**ことが大切です。
+
+> 「そのようにおっしゃっていただき、ありがとうございます。十分に考えたうえで決めたことですので、辞退させていただきたいと思います。」
+
+会社に来て説明するよう何度も求められたり、強い言葉で辞退を認めないと言われたりして話が進まないときは、ひとりで抱え込まずに相談しましょう。都道府県労働局や労働基準監督署などにある**総合労働相談コーナー**では、職場のトラブルについて、予約なし・無料で相談できます。
+
+## 承諾したあとに辞退したいときは
+
+内定を承諾したあとや、内定承諾書を出したあとで「やっぱり辞退したい」と思うこともあるかもしれません。
+
+### 法律の考え方
+
+民法第627条では、期間の定めのない雇用（正社員など）は、働く人がいつでも解約を申し入れることができ、申し入れの日から**2週間**がたつと終わるとされています。
+
+厚生労働省の京都新卒応援ハローワークのページでは、職業選択の自由（憲法第22条）があることから、内定承諾書を出したあとでも、民法第627条に準じて**2週間以上前**に辞退を申し入れることは、法的に問題はないと考えられると説明されています。内定承諾書には強い拘束力はないとも書かれています。
+
+ただし、これは「法律上は辞退を申し入れられる」という話です。契約期間が決まっている雇用（契約社員など）の場合は前提が違うので、契約の内容を確かめ、迷ったら相談窓口で聞いてみましょう。
+
+### 承諾後の辞退で気をつけること
+
+承諾したあとは、会社はあなたの入社に向けて、受け入れの準備や、ほかの応募者へのお断りを進めています。辞退は法律上できるとされていても、相手には大きな負担がかかります。
+
+```figure
+type: checklist
+title: 承諾後に辞退するときの確認
+items:
+  - 迷いがなく、辞退すると決めたか
+  - 決めたその日のうちに連絡できるか
+  - 電話で、本人から直接おわびを伝えるか
+  - 会社から受け取った書類や物はないか
+  - 今の職場に退職を伝えてしまっていないか
+```
+
+- **連絡は電話で、本人から**：承諾前の辞退より、いっそう丁寧に伝えます
+- **おわびをはっきり伝える**：「承諾のお返事をしておきながら、このようなご連絡となり、大変申し訳ありません」
+- **受け取ったものを確認する**：入社書類や貸与品があれば、返し方を聞きます
+
+準備にかかった費用などをめぐって話し合いになることもあるかもしれません。その場で約束や支払いに応じず、内容を確かめてから、総合労働相談コーナーなどに相談しましょう。
+
+### そもそも承諾後の辞退を防ぐには
+
+承諾後の辞退をしないで済むように、**承諾の前に労働条件を書面で確かめ、迷いがあれば返事の期限を相談する**ことが大切です。
+
+また、働きながら転職活動をしている人は、**内定を承諾してから**今の職場に退職を伝える順番にすると、辞退や条件の行き違いがあっても困らずに済みます。進める順番は[働きながらの転職活動、何から？](/articles/zaishoku-tenshoku-susumekata)、今の職場への伝え方は[退職の伝え方は？誰に・いつ・どう言うか](/articles/taishoku-tsutaekata)で紹介しています。', 'review', false, '2026-10-09'::timestamptz, '2026-10-09'::timestamptz, '2026-10-09'::timestamptz, 'プロジェクトオーナー（チャットで承認）', '2026-10-09'::timestamptz, '内定辞退の伝え方｜電話・メールの例文と承諾後の注意', '内定辞退はいつ、どう伝える？決めたらすぐ連絡する理由、電話での言い方とメールの例文、理由の伝え方、引き止められたときの答え方、承諾後に辞退するときの民法の考え方と注意点を紹介します。', array['naitei-shodaku-mae', 'taishoku-tsutaekata', 'zaishoku-tenshoku-susumekata', 'tenshoku-koukai-shinai', 'oubo-mail-kakikata']::text[], '{}'::text[], array['mensetsu']::text[], array['hajimete', 'dainishinsotsu']::text[], array['内定辞退、', 'どう伝えればいい？']::text[], null, false, '[{"q":"内定辞退はメールだけで伝えてもいいですか？","a":"法律で連絡の方法が決まっているわけではありませんが、まず電話で採用担当者に伝え、そのあとメールでも送っておくと、行き違いが起きにくく丁寧です。担当者につながらないときは、メールで先に伝えたうえで、あらためて電話をかけましょう。"},{"q":"内定を承諾したあとでも辞退できますか？","a":"厚生労働省の京都新卒応援ハローワークのページでは、内定承諾書を出したあとでも、民法第627条に準じて2週間以上前に辞退を申し入れることは、法的に問題はないと考えられると説明されています。ただし、会社にはすでに入社の準備を進めてもらっているので、決めたらすぐに、おわびとともに連絡しましょう。"},{"q":"辞退の理由は正直に言わないといけませんか？","a":"細かい理由まで話す必要はありません。「検討を重ねた結果、別の会社への入社を決めました」のように短く伝えれば十分です。相手の会社への不満を理由として並べるのは避けましょう。"}]'::jsonb, null, '{"schema_version":2,"writer_agent":"career-writer","angle":"内定辞退は「早く・まず電話・理由は短く」が基本。承諾後の辞退も法的にはできるとされるが、会社の負担が大きいので、法律の話を前面に出さずに、誠意をもって早く伝えることを中心にする","quotes":[{"source_url":"https://jsite.mhlw.go.jp/nisizinkarasumaoike-kyoto-plaza/home/shinsotsu/kyu-shoku/kosokoso_00003.html","text":"憲法22条の規定（職業選択の自由）により、内定承諾書を提出した後でも、民法第627条に準じて2週間以上前に解約（内定辞退）の申し入れをすることは、法的に問題はないと考えられる。内定承諾書に強い拘束力はないと言える（2026-10-09 時点で jsite.mhlw.go.jp に直接接続できなかったため、WebSearch の検索結果に表示されたページの記述で確認）","used_in":"承諾したあとに辞退したいときは"},{"source_url":"https://laws.e-gov.go.jp/law/129AC0000000089","text":"第六百二十七条第一項「当事者が雇用の期間を定めなかったときは、各当事者は、いつでも解約の申入れをすることができる。この場合において、雇用は、解約の申入れの日から二週間を経過することによって終了する。」（e-Gov に直接接続できなかったため、検索結果に表示された条文で確認）","used_in":"承諾したあとに辞退したいときは"},{"source_url":"https://www.hataraku.metro.tokyo.lg.jp/shiryo/2-3_naiteisyakaranozitai.pdf","text":"内定を辞退することは一度した約束を取り消すことになるため、なるべく早く、はっきりと意思表示することが大切。複数社から内定を得た場合は早めに就職先を決め、就職する予定のない会社には速やかに辞退を伝える（直接接続できなかったため、WebSearch の検索結果に表示された資料の記述で確認）","used_in":"いつ伝える？決めたらすぐに"},{"source_url":"https://www.mhlw.go.jp/general/seido/chihou/kaiketu/soudan.html","text":"総合労働相談コーナーは各都道府県労働局、全国の労働基準監督署内などに設置。あらゆる分野の労働問題を対象に、予約不要・無料で相談できる（既存記事 taishoku-tsutaekata と同じ出典。今回は直接接続できず、内容は既存記事の確認記録と照合）","used_in":"強く引き止められたら"}],"not_used":["「辞退は入社の〇か月前まで」などの目安は公的な根拠を確認できなかったので書かない","損害賠償を求められた事例や金額は、個別の事情で変わり公的な根拠も確認できなかったため、「準備にかかった費用などで話し合いになることもある」と一般論にとどめ、断定しない","契約期間の決まった雇用（契約社員など）の内定辞退は民法第627条の前提と違うため扱わず、契約内容の確認と相談をすすめるにとどめた"]}'::jsonb) on conflict (slug) do nothing;
+insert into article_categories (article_id, category_id, is_primary) select a.id, c.id, true from articles a, categories c where a.slug = 'naitei-jitai-tsutaekata' and c.slug = 'junbi' on conflict do nothing;
+insert into article_categories (article_id, category_id, is_primary) select a.id, c.id, false from articles a, categories c where a.slug = 'naitei-jitai-tsutaekata' and c.slug = 'shorui-mensetsu' on conflict do nothing;
+insert into article_sources (article_id, title, publisher, url, accessed_at, used_for, sort_order) select id, '内定後のこと（京都新卒応援ハローワーク）', '厚生労働省 京都労働局', 'https://jsite.mhlw.go.jp/nisizinkarasumaoike-kyoto-plaza/home/shinsotsu/kyu-shoku/kosokoso_00003.html', '2026-10-09'::date, '内定承諾書を出したあとでも、職業選択の自由（憲法第22条）から、民法第627条に準じて2週間以上前に内定辞退を申し入れることは法的に問題はないと考えられること。内定承諾書に強い拘束力はないと言えること', 0 from articles where slug = 'naitei-jitai-tsutaekata';
+insert into article_sources (article_id, title, publisher, url, accessed_at, used_for, sort_order) select id, '民法（明治二十九年法律第八十九号）第六百二十七条', 'e-Gov法令検索（デジタル庁）', 'https://laws.e-gov.go.jp/law/129AC0000000089', '2026-10-09'::date, '期間の定めのない雇用は、各当事者がいつでも解約の申入れができ、申入れの日から2週間を経過すると終了すること', 1 from articles where slug = 'naitei-jitai-tsutaekata';
+insert into article_sources (article_id, title, publisher, url, accessed_at, used_for, sort_order) select id, '内定者からの辞退（TOKYOはたらくネット 資料）', '東京都産業労働局', 'https://www.hataraku.metro.tokyo.lg.jp/shiryo/2-3_naiteisyakaranozitai.pdf', '2026-10-09'::date, '内定の辞退は一度した約束を取り消すことになるため、なるべく早く、はっきりと意思表示することが大切なこと。複数の内定があるときは早めに就職先を決め、就職しない会社には速やかに辞退を伝えること', 2 from articles where slug = 'naitei-jitai-tsutaekata';
+insert into article_sources (article_id, title, publisher, url, accessed_at, used_for, sort_order) select id, '総合労働相談コーナーのご案内', '厚生労働省', 'https://www.mhlw.go.jp/general/seido/chihou/kaiketu/soudan.html', '2026-10-09'::date, '都道府県労働局・労働基準監督署内などの総合労働相談コーナーで、職場のトラブルを予約不要・無料で相談できること', 3 from articles where slug = 'naitei-jitai-tsutaekata';
+insert into article_versions (article_id, version, title, summary, body_md, created_by) select id, 1, title, summary, body_md, 'seed' from articles where slug = 'naitei-jitai-tsutaekata' on conflict do nothing;
+insert into article_reviews (article_id, version, reviewer, verdict, checks) select id, 1, 'プロジェクトオーナー（チャットで承認）', 'approved', '{"content_hash":"ab1c3880c0e62352e44fcf5d50a00bafd6c2491ca0edc0ede68ca734225f997a","findings":[]}'::jsonb from articles where slug = 'naitei-jitai-tsutaekata';
+update articles set status = 'published' where slug = 'naitei-jitai-tsutaekata';
+
 -- article: naitei-shodaku-mae (published)
 insert into articles (slug, kind, title, summary, body_md, status, featured, published_at, updated_at, reviewed_at, reviewed_by, information_checked_at, seo_title, seo_description, related_slugs, roles, concerns, situations, eyecatch, illustration, recommended, faq, news_meta, research_notes) values ('naitei-shodaku-mae', 'article', '内定をもらったら、承諾の前に確認すること｜労働条件通知書の見方と返事のしかた', '内定が出たら、返事をする前に労働条件を書面で確かめましょう。労働条件通知書で見るところ（2024年4月から加わった「変更の範囲」なども）、返事の期限を相談するときの言い方、複数の内定があるときの考え方、承諾したあとに辞退したくなったときの対応を紹介します。', '内定の連絡をもらうと、うれしくて、すぐに「お受けします」と言いたくなるかもしれません。でも、承諾は「この条件で働きます」という約束です。返事をする前に、**働く条件を書面で確かめる**時間をとりましょう。
 
@@ -2340,7 +4137,7 @@ columns:
 - **まず電話で、本人から伝える**：つながらなければ、メールでも連絡し、あらためて電話する
 - **理由は短く、おわびを伝える**：「検討を重ねた結果、別の会社に入社することを決めました。ご迷惑をおかけし、申し訳ありません」
 
-とはいえ、承諾後の辞退は、相手の会社に大きな迷惑がかかります。そうならないためにも、**承諾の前に条件を確かめ、迷いがあれば返事の期限を相談する**ことが大切です。', 'review', false, '2026-10-09'::timestamptz, '2026-10-09'::timestamptz, '2026-10-09'::timestamptz, 'プロジェクトオーナー（チャットで承認）', '2026-10-07'::timestamptz, '内定承諾の前に確認すること｜労働条件通知書の見方と返事の期限', '内定をもらったら、承諾の前に労働条件を書面で確認しましょう。労働条件通知書で見る項目、2024年4月からの明示ルール（変更の範囲・更新上限）、返事の期限の相談のしかた、複数内定の考え方、承諾後の辞退について紹介します。', array['nenshu-dake-erabanai', 'donichi-yasumi-nenshu-hikaku', 'tedori-20man-hikaku']::text[], '{}'::text[], array['kyuryo']::text[], array['hajimete']::text[], array['内定が出た！', '承諾の前に見ること']::text[], null, false, '[{"q":"労働条件通知書をもらえないまま、承諾を求められています。どうすればいいですか？","a":"労働契約を結ぶときには、会社は契約期間、就業の場所と業務、労働時間、賃金、退職に関することなどを、原則として書面で明示しなければならないとされています。「承諾の前に、労働条件を書面で確認させてください」とお願いしてみましょう。ハローワークの求人で応募した場合は、ハローワークの窓口にも相談できます。"},{"q":"内定の返事は、いつまでに必要ですか？","a":"決まった期限があるわけではなく、会社ごとに違います。内定の連絡のときに期限を確認し、間に合いそうにないときは、理由と希望の日付を添えて早めに相談しましょう。延ばせるかどうかは会社の判断なので、希望どおりにならないこともあります。"},{"q":"内定を承諾したあとに辞退すると、違法になりますか？","a":"内定を承諾したあとでも、辞退すること自体は可能だと考えられています。厚生労働省の新卒応援ハローワークのページでも、内定承諾書を出したあとでも、民法第627条に準じて2週間以上前に申し入れることは法的に問題がないと考えられる、と説明されています。ただし、会社に迷惑がかかるので、決めたらすぐに電話で連絡しましょう。"}]'::jsonb, null, '{"schema_version":2,"writer_agent":"career-writer","angle":"内定の喜びで勢いのまま承諾せず、労働条件を書面で確かめてから返事をする。2024年4月の明示ルールの追加点を、読者が通知書のどこを見ればいいかに置き換える。返事の期限・複数内定・承諾後の辞退は、断定せず相談のしかたを書く","quotes":[{"source_url":"https://www.mhlw.go.jp/bunya/roudoukijun/faq_kijyunhou_4.html","text":"労働基準法第15条第1項、施行規則第5条第1項。(1)労働契約の期間、(2)有期契約を更新する場合の基準、(3)就業の場所及び従事すべき業務、(4)始業・終業の時刻、所定労働時間を超える労働の有無、休憩時間、休日、休暇など、(5)賃金の決定・計算・支払いの方法、締切り・支払の時期（昇給を除く）、(6)退職に関する事項（解雇の事由を含む）は書面の交付により明示。労働者が希望した場合は、FAXやWebメールサービス等で、出力して書面を作成できるものに限り明示できる","used_in":"労働条件通知書で見るところ"},{"source_url":"https://www.mhlw.go.jp/stf/newpage_32105.html","text":"2024年4月1日から、労働契約の締結・更新時に明示すべき労働条件に、就業場所・業務の変更の範囲などが加わった","used_in":"2024年4月から加わった項目"},{"source_url":"https://muki.mhlw.go.jp/rule.html","text":"全ての労働契約の締結と有期労働契約の更新のタイミングごとに、雇い入れ直後の就業場所・業務の内容に加え、変更の範囲の明示が必要。有期労働契約では更新上限の有無と内容、無期転換申込権が発生する更新ごとに無期転換申込機会と無期転換後の労働条件の明示が必要","used_in":"2024年4月から加わった項目"},{"source_url":"https://www.check-roudou.mhlw.go.jp/qa/roudousya/koyou/q5.html","text":"求人票や求人広告の条件が面接で説明された条件と異なる場合、まず異なる理由を確認する。ハローワークの求人票の場合は、ハローワークの窓口またはハローワーク求人ホットラインに申し出ると、ハローワークが事実確認と必要な指導などを行う","used_in":"求人票と違うところがあったら"},{"source_url":"https://jsite.mhlw.go.jp/nisizinkarasumaoike-kyoto-plaza/home/shinsotsu/kyu-shoku/kosokoso_00003.html","text":"内定承諾書を提出した後でも、憲法22条の職業選択の自由と民法第627条に準じて2週間以上前に解約（内定辞退）の申し入れをすることは法的に問題がないと考えられる。ただし特殊な備品を購入していた場合などは損害賠償を請求される可能性がある。辞退する場合は早急に連絡を入れることが重要","used_in":"承諾したあとに辞退したくなったら"},{"source_url":"https://laws.e-gov.go.jp/law/129AC0000000089","text":"第六百二十七条第一項「当事者が雇用の期間を定めなかったときは、各当事者は、いつでも解約の申入れをすることができる。この場合において、雇用は、解約の申入れの日から二週間を経過することによって終了する。」（e-Gov への直接接続ができなかったため、e-Gov 法令検索の検索結果に表示された条文で確認）","used_in":"承諾したあとに辞退したくなったら"}],"not_used":["内定の返事の期限の「一般的な日数（1週間程度など）」は公的な根拠を確認できなかったので書かない","求人の虚偽表示に対する罰則の内容は、2025年6月の刑法改正（拘禁刑）による表記の変化を一次情報で確認しきれなかったので書かない","内定の法的な性質（始期付解約権留保付労働契約）の詳しい説明は、読者に必要な範囲を超えるため扱わない","京都新卒応援ハローワークのページは新卒者向けの説明だが、内定辞退と民法第627条の関係の説明として引用した"]}'::jsonb) on conflict (slug) do nothing;
+とはいえ、承諾後の辞退は、相手の会社に大きな迷惑がかかります。そうならないためにも、**承諾の前に条件を確かめ、迷いがあれば返事の期限を相談する**ことが大切です。', 'review', false, '2026-10-09'::timestamptz, '2026-10-09'::timestamptz, '2026-10-09'::timestamptz, 'プロジェクトオーナー（チャットで承認）', '2026-10-07'::timestamptz, '内定承諾の前に確認すること｜労働条件通知書の見方と返事の期限', '内定をもらったら、承諾の前に労働条件を書面で確認しましょう。労働条件通知書で見る項目、2024年4月からの明示ルール（変更の範囲・更新上限）、返事の期限の相談のしかた、複数内定の考え方、承諾後の辞退について紹介します。', array['nenshu-dake-erabanai', 'donichi-yasumi-nenshu-hikaku', 'tedori-20man-hikaku', 'naitei-jitai-tsutaekata']::text[], '{}'::text[], array['kyuryo']::text[], array['hajimete']::text[], array['内定が出た！', '承諾の前に見ること']::text[], null, false, '[{"q":"労働条件通知書をもらえないまま、承諾を求められています。どうすればいいですか？","a":"労働契約を結ぶときには、会社は契約期間、就業の場所と業務、労働時間、賃金、退職に関することなどを、原則として書面で明示しなければならないとされています。「承諾の前に、労働条件を書面で確認させてください」とお願いしてみましょう。ハローワークの求人で応募した場合は、ハローワークの窓口にも相談できます。"},{"q":"内定の返事は、いつまでに必要ですか？","a":"決まった期限があるわけではなく、会社ごとに違います。内定の連絡のときに期限を確認し、間に合いそうにないときは、理由と希望の日付を添えて早めに相談しましょう。延ばせるかどうかは会社の判断なので、希望どおりにならないこともあります。"},{"q":"内定を承諾したあとに辞退すると、違法になりますか？","a":"内定を承諾したあとでも、辞退すること自体は可能だと考えられています。厚生労働省の新卒応援ハローワークのページでも、内定承諾書を出したあとでも、民法第627条に準じて2週間以上前に申し入れることは法的に問題がないと考えられる、と説明されています。ただし、会社に迷惑がかかるので、決めたらすぐに電話で連絡しましょう。"}]'::jsonb, null, '{"schema_version":2,"writer_agent":"career-writer","angle":"内定の喜びで勢いのまま承諾せず、労働条件を書面で確かめてから返事をする。2024年4月の明示ルールの追加点を、読者が通知書のどこを見ればいいかに置き換える。返事の期限・複数内定・承諾後の辞退は、断定せず相談のしかたを書く","quotes":[{"source_url":"https://www.mhlw.go.jp/bunya/roudoukijun/faq_kijyunhou_4.html","text":"労働基準法第15条第1項、施行規則第5条第1項。(1)労働契約の期間、(2)有期契約を更新する場合の基準、(3)就業の場所及び従事すべき業務、(4)始業・終業の時刻、所定労働時間を超える労働の有無、休憩時間、休日、休暇など、(5)賃金の決定・計算・支払いの方法、締切り・支払の時期（昇給を除く）、(6)退職に関する事項（解雇の事由を含む）は書面の交付により明示。労働者が希望した場合は、FAXやWebメールサービス等で、出力して書面を作成できるものに限り明示できる","used_in":"労働条件通知書で見るところ"},{"source_url":"https://www.mhlw.go.jp/stf/newpage_32105.html","text":"2024年4月1日から、労働契約の締結・更新時に明示すべき労働条件に、就業場所・業務の変更の範囲などが加わった","used_in":"2024年4月から加わった項目"},{"source_url":"https://muki.mhlw.go.jp/rule.html","text":"全ての労働契約の締結と有期労働契約の更新のタイミングごとに、雇い入れ直後の就業場所・業務の内容に加え、変更の範囲の明示が必要。有期労働契約では更新上限の有無と内容、無期転換申込権が発生する更新ごとに無期転換申込機会と無期転換後の労働条件の明示が必要","used_in":"2024年4月から加わった項目"},{"source_url":"https://www.check-roudou.mhlw.go.jp/qa/roudousya/koyou/q5.html","text":"求人票や求人広告の条件が面接で説明された条件と異なる場合、まず異なる理由を確認する。ハローワークの求人票の場合は、ハローワークの窓口またはハローワーク求人ホットラインに申し出ると、ハローワークが事実確認と必要な指導などを行う","used_in":"求人票と違うところがあったら"},{"source_url":"https://jsite.mhlw.go.jp/nisizinkarasumaoike-kyoto-plaza/home/shinsotsu/kyu-shoku/kosokoso_00003.html","text":"内定承諾書を提出した後でも、憲法22条の職業選択の自由と民法第627条に準じて2週間以上前に解約（内定辞退）の申し入れをすることは法的に問題がないと考えられる。ただし特殊な備品を購入していた場合などは損害賠償を請求される可能性がある。辞退する場合は早急に連絡を入れることが重要","used_in":"承諾したあとに辞退したくなったら"},{"source_url":"https://laws.e-gov.go.jp/law/129AC0000000089","text":"第六百二十七条第一項「当事者が雇用の期間を定めなかったときは、各当事者は、いつでも解約の申入れをすることができる。この場合において、雇用は、解約の申入れの日から二週間を経過することによって終了する。」（e-Gov への直接接続ができなかったため、e-Gov 法令検索の検索結果に表示された条文で確認）","used_in":"承諾したあとに辞退したくなったら"}],"not_used":["内定の返事の期限の「一般的な日数（1週間程度など）」は公的な根拠を確認できなかったので書かない","求人の虚偽表示に対する罰則の内容は、2025年6月の刑法改正（拘禁刑）による表記の変化を一次情報で確認しきれなかったので書かない","内定の法的な性質（始期付解約権留保付労働契約）の詳しい説明は、読者に必要な範囲を超えるため扱わない","京都新卒応援ハローワークのページは新卒者向けの説明だが、内定辞退と民法第627条の関係の説明として引用した"]}'::jsonb) on conflict (slug) do nothing;
 insert into article_categories (article_id, category_id, is_primary) select a.id, c.id, true from articles a, categories c where a.slug = 'naitei-shodaku-mae' and c.slug = 'junbi' on conflict do nothing;
 insert into article_categories (article_id, category_id, is_primary) select a.id, c.id, false from articles a, categories c where a.slug = 'naitei-shodaku-mae' and c.slug = 'hatarakikata' on conflict do nothing;
 insert into article_sources (article_id, title, publisher, url, accessed_at, used_for, sort_order) select id, '採用時に労働条件を明示しなければならないと聞きました。具体的には何を明示すればよいのでしょうか。', '厚生労働省', 'https://www.mhlw.go.jp/bunya/roudoukijun/faq_kijyunhou_4.html', '2026-10-07'::date, '労働契約を結ぶときに書面で明示しなければならない事項（契約期間、更新の基準、就業の場所・業務、労働時間・休日、賃金、退職）と、労働者が希望した場合はFAXやメールなどでも明示できること', 0 from articles where slug = 'naitei-shodaku-mae';
@@ -2517,6 +4314,201 @@ insert into article_sources (article_id, title, publisher, url, accessed_at, use
 insert into article_versions (article_id, version, title, summary, body_md, created_by) select id, 1, title, summary, body_md, 'seed' from articles where slug = 'nenshu-dake-erabanai' on conflict do nothing;
 insert into article_reviews (article_id, version, reviewer, verdict, checks) select id, 1, 'seed', 'approved', '{"content_hash":"1adc9fad3c687351837b4a1c7e44cc52399c7acd32850f4494085268ee2c8cd1","findings":[]}'::jsonb from articles where slug = 'nenshu-dake-erabanai';
 update articles set status = 'published' where slug = 'nenshu-dake-erabanai';
+
+-- article: oubo-mail-kakikata (published)
+insert into articles (slug, kind, title, summary, body_md, status, featured, published_at, updated_at, reviewed_at, reviewed_by, information_checked_at, seo_title, seo_description, related_slugs, roles, concerns, situations, eyecatch, illustration, recommended, faq, news_meta, research_notes) values ('oubo-mail-kakikata', 'article', '転職の応募・面接日程・お礼のメールはどう書く？件名の付け方と返信のタイミング、例文', '転職活動のメールは「件名で用件と名前が分かる」「結論を先に書く」「署名を入れる」の3つを押さえれば、むずかしい言い回しはいりません。応募書類を送るとき、面接の日程を調整するとき、面接のあとにお礼を送るときの例文と、返信のタイミングを紹介します。', '転職活動を始めると、応募書類を送る、面接の日程を決める、面接のお礼を伝える、とメールを書く場面が続きます。「件名は何て書く？」「この敬語で合ってる？」と手が止まってしまう人も多いはずです。
+
+先に結論を言うと、転職活動のメールで大事なのは、むずかしい言い回しより、**担当者が読んですぐに用件が分かること**です。次の3つを押さえれば、形は整います。
+
+- **件名**で、用件と自分の名前が分かる
+- **本文**は、結論（何をしてほしいか・何を伝えたいか）を先に書く
+- **署名**に、名前と連絡先を入れる
+
+この記事で分かること：
+
+- メールの**基本の形**
+- **応募書類**を送るときの例文
+- **面接の日程調整**の返信・候補日の出し方・変更のお願い
+- 面接のあとの**お礼メール**
+- **返信のタイミング**
+
+## 転職活動のメール、基本の形
+
+採用担当者は、たくさんの応募者とメールでやりとりしています。件名と最初の数行で、誰から・何の用件かが分かるメールは、それだけで読みやすくなります。
+
+```figure
+type: steps
+title: メールは上からこの順番で
+items:
+  - label: 件名
+    text: 用件と名前（例：応募書類送付の件／山田太郎）
+  - label: 宛名
+    text: 会社名・部署名・担当者名
+  - label: あいさつと名乗り
+    text: 「お世話になっております。山田太郎です。」
+  - label: 本文
+    text: 結論を先に、用件を短く
+  - label: 署名
+    text: 名前・電話番号・メールアドレス
+```
+
+### 件名は「用件と名前」
+
+青森労働局の資料では、件名は**「用件と氏名」で簡潔に**と示されています。
+
+- 自分から送るとき：「応募書類送付の件／山田太郎」「面接日程のご相談／山田太郎」
+- 会社からのメールに返信するとき：件名の「Re:」は残し、件名を変えずに返信するのが一般的です。担当者が、どのやりとりへの返事かをすぐに見つけられます
+
+### 宛名と署名
+
+宛名は「株式会社〇〇　人事部　佐藤様」のように、会社名・部署名・名前の順に書きます。担当者の名前が分からないときは「採用ご担当者様」とします。
+
+署名には、名前と連絡先を入れます。青森労働局の資料では、氏名・郵便番号・住所・電話番号・メールアドレスの順で書く例が示されています（郵便番号と住所は省くこともあります）。
+
+> 山田太郎（やまだ たろう）
+> 電話：090-XXXX-XXXX
+> メール：xxxx@example.com
+
+メールソフトの署名機能に登録しておくと、毎回入力する手間が省け、書き忘れも防げます。
+
+## 応募書類をメールで送るとき
+
+求人で「応募書類はメールで」と指定されているときの例です（会社名・名前は仮の例です）。メールの本文が、紙の書類を送るときの送付状の代わりになります。
+
+> 件名：応募書類送付の件／山田太郎
+>
+> 株式会社〇〇　人事部　採用ご担当者様
+>
+> はじめまして。山田太郎と申します。
+> 貴社の求人を拝見し、一般事務職に応募したく、ご連絡いたしました。
+> 履歴書と職務経歴書を添付いたしますので、ご確認いただけますと幸いです。
+>
+> ・履歴書（山田太郎）.pdf
+> ・職務経歴書（山田太郎）.pdf
+>
+> お忙しいところ恐れ入りますが、どうぞよろしくお願いいたします。
+>
+> （署名）
+
+書くときのポイントは次のとおりです。
+
+- **志望動機は本文に長く書かない**：添付する書類に書いてあることは繰り返さず、応募したいことと、何を添付したかが分かれば十分です
+- **添付ファイルはPDFに**：会社から指定がなければ、レイアウトが崩れにくいPDFにするのがすすめられています
+- **ファイル名は「書類名と名前」**：「履歴書（山田太郎）.pdf」のように、開かなくても中身と送り主が分かる名前にします
+- **送る前に確かめる**：宛先のメールアドレス、担当者名、添付ファイルを付け忘れていないか
+
+書類の中身を整えたいときは、[履歴書に書くことがないと思ったとき](/articles/rirekisho-kakukoto-nai)や[アルバイト経験だけの職務経歴書、何を書けばいい？](/articles/shokumu-keirekisho-arubaito)を参考にしてください。
+
+## 面接の日程を調整するとき
+
+### 会社から候補日が届いたら
+
+会社から「以下の日程からご都合のよい日時をお知らせください」と届いたときは、**選んだ日時を本文に書き写して**返信します。日時を書いておくと、おたがいの思い違いを防げます。
+
+> 件名：Re: 面接日程のご連絡
+>
+> 株式会社〇〇　人事部　佐藤様
+>
+> お世話になっております。山田太郎です。
+> 面接日程のご連絡をいただき、ありがとうございます。
+> 以下の日時でお願いできますでしょうか。
+>
+> 10月15日（木）14時00分〜
+>
+> 当日はどうぞよろしくお願いいたします。
+>
+> （署名）
+
+### 自分から候補日を出すとき
+
+「ご都合のよい日時をいくつかお知らせください」と言われたら、**候補を複数**、日付と時間の幅で書きます。
+
+> 以下の日時でしたら、伺うことができます。
+>
+> ・10月15日（木）13時〜17時
+> ・10月16日（金）終日
+> ・10月19日（月）10時〜12時
+>
+> ご調整いただけますと幸いです。
+
+働きながら活動している人は、始業前や終業後、昼休みなど、出せる時間帯をあらかじめ決めておくと返事が早くなります。時間の作り方は[働きながらの転職活動、何から？](/articles/zaishoku-tenshoku-susumekata)で紹介しています。
+
+### 日程を変えてほしいとき
+
+決まった日程の都合が悪くなったら、分かった時点ですぐに連絡します。面接の直前なら、メールより電話のほうが確実です。
+
+> 件名：面接日程変更のお願い／山田太郎
+>
+> 株式会社〇〇　人事部　佐藤様
+>
+> お世話になっております。10月15日（木）14時から面接のお約束をいただいております、山田太郎です。
+> 大変申し訳ないのですが、仕事の都合により、当日伺うことがむずかしくなりました。
+> お手数をおかけしますが、以下の日時でご調整いただくことは可能でしょうか。
+>
+> ・10月20日（火）13時〜17時
+> ・10月21日（水）終日
+>
+> こちらの都合で申し訳ありません。どうぞよろしくお願いいたします。
+>
+> （署名）
+
+## 面接のあとのお礼メール
+
+お礼メールは、送らなければいけないものではありません。送る場合は、**時間をとってもらったお礼と、面接で印象に残ったことを短く**書きます。長い自己PRを付け足すと、かえって読む負担になります。
+
+> 件名：本日の面接のお礼／山田太郎
+>
+> 株式会社〇〇　人事部　佐藤様
+>
+> お世話になっております。本日14時より面接をしていただきました、山田太郎です。
+> お忙しいなか、お時間をいただき、ありがとうございました。
+>
+> 入社後の研修の進め方や、チームで電話対応を分担していることをうかがい、未経験からでも仕事を覚えていけるイメージを持つことができました。
+> あらためて、貴社で働きたいという気持ちが強くなりました。
+>
+> 取り急ぎ、お礼を申し上げたくご連絡いたしました。
+> どうぞよろしくお願いいたします。
+>
+> （署名）
+
+「面接で聞いた話のうち、自分に響いたこと」を一つ入れると、定型文だけのお礼よりも気持ちが伝わります。
+
+## 返信はいつまでに？
+
+会社からのメールには、**できるだけその日のうちに**返信しましょう。とくに面接の日程は、返事が遅れると候補の日時が埋まってしまうことがあります。
+
+- 会社の営業時間内に送るのが無難です。夜遅くに書いた場合は、メールソフトの予約送信を使う方法もあります
+- すぐに答えられない内容（日程の確定など）でも、「メールを拝見しました。〇日までにお返事いたします」とまず返すと、相手が待たずに済みます
+- お礼メールを送るなら、面接の当日か翌日までに
+
+### 送る前のチェック
+
+```figure
+type: checklist
+title: 送信ボタンを押す前に
+items:
+  - 件名に用件と名前が入っているか
+  - 宛名の会社名・担当者名に誤りはないか
+  - 日時を書き写したなら、曜日まで合っているか
+  - 添付ファイルを付け忘れていないか
+  - 署名に電話番号とメールアドレスがあるか
+```
+
+## 敬語に自信がないときは
+
+ハローワーク浦和のコラムでは、就職活動では問い合わせや面接の日程調整、お礼などメールを使う機会が多い一方で、本文の敬語はむずかしいと書かれています。迷ったときはハローワークに相談できると案内されています。
+
+ハローワークでは、応募書類の作り方や面接の受け答えについて、無料で相談できます。書いたメールを身近な人に読んでもらうのも、誤字や分かりにくいところに気づくきっかけになります。
+
+敬語は完璧でなくても、**用件が分かり、相手への気づかいが伝わる**メールであれば十分です。面接そのものの準備は[未経験職種の面接、何を準備する？](/articles/mensetsu-junbi-mikeiken)で紹介しています。', 'review', false, '2026-10-09'::timestamptz, '2026-10-09'::timestamptz, '2026-10-09'::timestamptz, 'プロジェクトオーナー（チャットで承認）', '2026-10-09'::timestamptz, '転職の応募メール・日程調整・お礼メールの書き方と例文', '転職活動で送るメールの書き方を紹介します。件名の付け方、応募書類を送るときの本文と添付ファイル、面接日程の返信・候補日の出し方・変更のお願い、面接後のお礼メールの例文、返信のタイミングが分かります。', array['mensetsu-junbi-mikeiken', 'rirekisho-kakukoto-nai', 'zaishoku-tenshoku-susumekata', 'naitei-jitai-tsutaekata', 'web-mensetsu-junbi']::text[], '{}'::text[], array['mensetsu']::text[], array['hajimete', 'pc-mikeiken']::text[], array['応募のメール、', '何て書けばいい？']::text[], null, false, '[{"q":"会社からのメールに返信するとき、件名は変えたほうがいいですか？","a":"返信のときは、件名の「Re:」を残したまま変えずに送るのが一般的です。担当者が、どのやりとりへの返事なのかをすぐに見つけられます。自分から新しく送るときは「応募書類送付の件／山田太郎」のように、用件と名前を入れます。"},{"q":"面接のあとのお礼メールは、送らないと不利になりますか？","a":"お礼メールを送るかどうかで結果が決まるとは言えません。送る場合は、長い自己PRは書かず、時間をとってもらったお礼と、面接で印象に残ったことを短く書けば十分です。送るなら、面接の当日か翌日までに送りましょう。"},{"q":"敬語が合っているか不安です。誰かに見てもらえますか？","a":"ハローワークでは、応募書類の作り方や面接の受け方について無料で相談でき、メールの書き方に迷ったときに相談できると案内しているハローワークもあります。身近な人に読んでもらうのも、誤字や分かりにくいところに気づくきっかけになります。"}]'::jsonb, null, '{"schema_version":2,"writer_agent":"career-writer","angle":"メールのマナーを「覚える決まり」ではなく「担当者が迷わず処理できるか」で説明する。件名・結論・署名の3点と、場面ごとにそのまま使える例文を出す","quotes":[{"source_url":"https://jsite.mhlw.go.jp/aomori-roudoukyoku/content/contents/002105366.pdf","text":"件名は簡潔に「用件と氏名」（例：応募書類送付の件／青森太郎）。メールの本文が送付状になるので送付状と同様の文面を入力する。添付ファイルは企業の指示がない限りPDF形式に変換することをすすめ、ファイル名は「書類名、名前」など分かりやすいものに。署名は氏名・郵便番号・住所・電話番号・メールアドレスの順。宛先と添付ファイルを確認してから送信する（jsite.mhlw.go.jp に直接接続できなかったため、WebSearch の検索結果に表示された資料の記述で確認。資料の正式な題名は確認できなかったため、内容を表す題名で記録）","used_in":"応募書類をメールで送るとき"},{"source_url":"https://jsite.mhlw.go.jp/saitama-hellowork/content/contents/001671336.pdf","text":"就活では「説明会の問い合わせ」「ESの提出」「面接の日程調整」「お礼」などメールを利用する機会が多々ある。宛名・挨拶・署名の書き方はおおよそ調べれば分かるが、本文で使う敬語はむずかしい。迷ったらハローワークに相談できる（直接接続できなかったため、検索結果に表示された冒頭部分で確認）","used_in":"敬語に自信がないときは"},{"source_url":"https://www.mhlw.go.jp/stf/newpage_27742.html","text":"応募書類の作成、面接対策まで専門スタッフが無料でサポート。応募する求人に合わせた応募書類の書き方や面接の受け答えなどについて助言を行う（検索結果に表示されたページの記述で確認）","used_in":"敬語に自信がないときは"}],"not_used":["「返信は24時間以内」「お礼メールで評価が上がる」などの目安・効果は公的な根拠を確認できなかったので、数字は書かず「できるだけその日のうちに」とし、効果は断定しない","転職サイト各社のメールテンプレートは特定サービスに寄るため参考にとどめ、出典にしない"]}'::jsonb) on conflict (slug) do nothing;
+insert into article_categories (article_id, category_id, is_primary) select a.id, c.id, true from articles a, categories c where a.slug = 'oubo-mail-kakikata' and c.slug = 'shorui-mensetsu' on conflict do nothing;
+insert into article_categories (article_id, category_id, is_primary) select a.id, c.id, false from articles a, categories c where a.slug = 'oubo-mail-kakikata' and c.slug = 'junbi' on conflict do nothing;
+insert into article_sources (article_id, title, publisher, url, accessed_at, used_for, sort_order) select id, '応募書類をメールで送る場合の例（資料）', '厚生労働省 青森労働局', 'https://jsite.mhlw.go.jp/aomori-roudoukyoku/content/contents/002105366.pdf', '2026-10-09'::date, '件名は「用件と氏名」で簡潔にすること（例：応募書類送付の件／氏名）、メール本文が送付状の役割をすること、添付ファイルは企業の指示がなければPDFにし、ファイル名を「書類名と氏名」にすること、署名に氏名と連絡先を入れること、送信前に宛先と添付ファイルを確かめること', 0 from articles where slug = 'oubo-mail-kakikata';
+insert into article_sources (article_id, title, publisher, url, accessed_at, used_for, sort_order) select id, '就活メールに困ったら（ハローワーク浦和 就職支援ナビゲーターのコラム）', '厚生労働省 埼玉労働局 ハローワーク浦和', 'https://jsite.mhlw.go.jp/saitama-hellowork/content/contents/001671336.pdf', '2026-10-09'::date, '就職活動では問い合わせ・面接の日程調整・お礼などでメールを使う機会が多いこと、本文の敬語はむずかしく、迷ったらハローワークに相談できること', 1 from articles where slug = 'oubo-mail-kakikata';
+insert into article_sources (article_id, title, publisher, url, accessed_at, used_for, sort_order) select id, 'ハローワークの相談支援', '厚生労働省', 'https://www.mhlw.go.jp/stf/newpage_27742.html', '2026-10-09'::date, 'ハローワークで応募書類の作り方や面接の受け答えについて、無料で相談できること', 2 from articles where slug = 'oubo-mail-kakikata';
+insert into article_versions (article_id, version, title, summary, body_md, created_by) select id, 1, title, summary, body_md, 'seed' from articles where slug = 'oubo-mail-kakikata' on conflict do nothing;
+insert into article_reviews (article_id, version, reviewer, verdict, checks) select id, 1, 'プロジェクトオーナー（チャットで承認）', 'approved', '{"content_hash":"6834a69570d6bea9ab3d7013afc30b09ee19e6b6bad4c2244e7acc4bc36441cd","findings":[]}'::jsonb from articles where slug = 'oubo-mail-kakikata';
+update articles set status = 'published' where slug = 'oubo-mail-kakikata';
 
 -- article: pc-nigate-jimu (published)
 insert into articles (slug, kind, title, summary, body_md, status, featured, published_at, updated_at, reviewed_at, reviewed_by, information_checked_at, seo_title, seo_description, related_slugs, roles, concerns, situations, eyecatch, illustration, recommended, faq, news_meta, research_notes) values ('pc-nigate-jimu', 'article', 'PCが得意じゃなくても、事務職は目指せる？よく使う操作と練習のしかた', 'パソコンに自信がなくても、事務職を目指すことはできます。大事なのは「苦手」の中身を分けて、事務でよく使う操作から順に練習することです。求められやすい操作の目安、家でできる練習、資格の考え方、面接での伝え方を紹介します。', '「事務職に興味はあるけど、パソコンが得意じゃない」。そう感じて、応募をためらっている人もいると思います。
@@ -2905,7 +4897,7 @@ items:
 
 志望動機での伝え方は、[未経験職種の志望動機、何を書けばいい？](/articles/shiboudouki-mikeiken)で例文つきで紹介しています。
 
-接客の経験は、どの職種でも「人を相手にする仕事」の基礎になります。自分では当たり前だと思っていた工夫こそ、書き出してみる価値があります。', 'review', true, '2026-10-06'::timestamptz, '2026-10-07'::timestamptz, '2026-10-07'::timestamptz, null, '2026-10-06'::timestamptz, null, null, array['shiboudouki-mikeiken', 'eigyo-cs-it-support-chigai', 'mikeiken-tenshoku-hajimekata']::text[], array['hanbai', 'customer-support', 'eigyo']::text[], array['mikeiken-shokushu', 'mensetsu']::text[], array['sekkyaku']::text[], array['接客の経験、', 'ほかの仕事で活かせる？']::text[], null, false, '[{"q":"アルバイトの接客経験でも、職務経歴書に書いていいのでしょうか？","a":"書いて構いません。雇用形態よりも、どんな業務をどのくらいの期間担当し、何を工夫したかが判断材料になります。正社員経験と区別がつくよう、雇用形態と期間は正確に書きましょう。"},{"q":"「コミュニケーション力があります」とだけ書くのはダメですか？","a":"ダメではありませんが、読み手に伝わりにくくなります。「1日に何人くらいのお客さまに対応していたか」「どんな問い合わせが多かったか」など、場面が浮かぶ事実を添えると説得力が増します。"}]'::jsonb, null, null) on conflict (slug) do nothing;
+接客の経験は、どの職種でも「人を相手にする仕事」の基礎になります。自分では当たり前だと思っていた工夫こそ、書き出してみる価値があります。', 'review', true, '2026-10-06'::timestamptz, '2026-10-07'::timestamptz, '2026-10-07'::timestamptz, null, '2026-10-06'::timestamptz, null, null, array['shiboudouki-mikeiken', 'eigyo-cs-it-support-chigai', 'mikeiken-tenshoku-hajimekata', 'callcenter-shigoto']::text[], array['hanbai', 'customer-support', 'eigyo']::text[], array['mikeiken-shokushu', 'mensetsu']::text[], array['sekkyaku']::text[], array['接客の経験、', 'ほかの仕事で活かせる？']::text[], null, false, '[{"q":"アルバイトの接客経験でも、職務経歴書に書いていいのでしょうか？","a":"書いて構いません。雇用形態よりも、どんな業務をどのくらいの期間担当し、何を工夫したかが判断材料になります。正社員経験と区別がつくよう、雇用形態と期間は正確に書きましょう。"},{"q":"「コミュニケーション力があります」とだけ書くのはダメですか？","a":"ダメではありませんが、読み手に伝わりにくくなります。「1日に何人くらいのお客さまに対応していたか」「どんな問い合わせが多かったか」など、場面が浮かぶ事実を添えると説得力が増します。"}]'::jsonb, null, null) on conflict (slug) do nothing;
 insert into article_categories (article_id, category_id, is_primary) select a.id, c.id, true from articles a, categories c where a.slug = 'sekkyaku-keiken-ikasu' and c.slug = 'keiken' on conflict do nothing;
 insert into article_categories (article_id, category_id, is_primary) select a.id, c.id, false from articles a, categories c where a.slug = 'sekkyaku-keiken-ikasu' and c.slug = 'shorui-mensetsu' on conflict do nothing;
 insert into article_sources (article_id, title, publisher, url, accessed_at, used_for, sort_order) select id, '職業情報提供サイト（job tag）', '厚生労働省', 'https://shigoto.mhlw.go.jp/User/', '2026-10-06'::date, '各職種の仕事内容・求められるスキルの確認', 0 from articles where slug = 'sekkyaku-keiken-ikasu';
@@ -3069,7 +5061,7 @@ items:
 - 書いた経験について、面接で具体的に聞かれても答えられるか
 - 応募する会社の仕事内容と、書いた内容がずれていないか
 
-経験の言葉にしかたで迷ったら[接客経験は転職でどう活かせる？](/articles/sekkyaku-keiken-ikasu)を、経歴の説明に不安があれば[転職回数が気になるときに整理したいこと](/articles/tenshoku-kaisu-kininaru)も参考にしてください。', 'review', false, '2026-10-06'::timestamptz, '2026-10-06'::timestamptz, '2026-10-06'::timestamptz, null, '2026-10-06'::timestamptz, null, null, array['sekkyaku-keiken-ikasu', 'tenshoku-kaisu-kininaru', 'eigyo-cs-it-support-chigai']::text[], '{}'::text[], array['mensetsu', 'mikeiken-shokushu']::text[], array['sekkyaku']::text[], array['未経験の志望動機、', '何を書けばいい？']::text[], null, false, '[{"q":"「未経験ですが頑張ります」だけでは伝わりませんか？","a":"意欲は伝わりますが、それだけだとほかの応募者との違いが見えにくくなります。なぜその仕事に興味を持ったのか、これまでの経験のどこが活かせそうかを添えると、同じ意欲でも説得力が変わります。"},{"q":"志望動機はどれくらいの長さで書けばいいですか？","a":"履歴書の志望動機欄なら、200〜300文字程度にまとめると読みやすくなります。面接では、その内容を1分前後で話せるように準備しておくと安心です。"}]'::jsonb, null, null) on conflict (slug) do nothing;
+経験の言葉にしかたで迷ったら[接客経験は転職でどう活かせる？](/articles/sekkyaku-keiken-ikasu)を、経歴の説明に不安があれば[転職回数が気になるときに整理したいこと](/articles/tenshoku-kaisu-kininaru)も参考にしてください。', 'review', false, '2026-10-06'::timestamptz, '2026-10-06'::timestamptz, '2026-10-06'::timestamptz, null, '2026-10-06'::timestamptz, null, null, array['sekkyaku-keiken-ikasu', 'tenshoku-kaisu-kininaru', 'eigyo-cs-it-support-chigai', 'jiko-pr-mikeiken']::text[], '{}'::text[], array['mensetsu', 'mikeiken-shokushu']::text[], array['sekkyaku']::text[], array['未経験の志望動機、', '何を書けばいい？']::text[], null, false, '[{"q":"「未経験ですが頑張ります」だけでは伝わりませんか？","a":"意欲は伝わりますが、それだけだとほかの応募者との違いが見えにくくなります。なぜその仕事に興味を持ったのか、これまでの経験のどこが活かせそうかを添えると、同じ意欲でも説得力が変わります。"},{"q":"志望動機はどれくらいの長さで書けばいいですか？","a":"履歴書の志望動機欄なら、200〜300文字程度にまとめると読みやすくなります。面接では、その内容を1分前後で話せるように準備しておくと安心です。"}]'::jsonb, null, null) on conflict (slug) do nothing;
 insert into article_categories (article_id, category_id, is_primary) select a.id, c.id, true from articles a, categories c where a.slug = 'shiboudouki-mikeiken' and c.slug = 'shorui-mensetsu' on conflict do nothing;
 insert into article_sources (article_id, title, publisher, url, accessed_at, used_for, sort_order) select id, '職業情報提供サイト（job tag）', '厚生労働省', 'https://shigoto.mhlw.go.jp/User/', '2026-10-06'::date, '応募する職種の仕事内容を調べる方法', 0 from articles where slug = 'shiboudouki-mikeiken';
 insert into article_versions (article_id, version, title, summary, body_md, created_by) select id, 1, title, summary, body_md, 'seed' from articles where slug = 'shiboudouki-mikeiken' on conflict do nothing;
@@ -3167,7 +5159,7 @@ job tag には、職業興味検査や仕事価値観検査など、興味や大
 
 ひとりで決めきれないときは、書き出したメモを持って相談するのも一つの方法です。正社員を目指すおおむね35歳未満の人は、わかものハローワークで担当者に無料で相談できます。キャリアアドバイザーへの相談については[キャリア相談について](/consultation)で紹介しています。
 
-候補が決まったあとの準備の流れは、[未経験転職は何から始める？](/articles/mikeiken-tenshoku-hajimekata)にまとめています。', 'review', true, '2026-10-06'::timestamptz, '2026-10-06'::timestamptz, '2026-10-06'::timestamptz, null, '2026-10-06'::timestamptz, null, null, array['mikeiken-tenshoku-hajimekata', 'eigyo-cs-it-support-chigai', 'sekkyaku-keiken-ikasu']::text[], array['sonota']::text[], array['yaritai', 'mikeiken-shokushu']::text[], array['hajimete', 'seishain-keiken-sukunai']::text[], array['やりたい仕事が', '分からないときは。']::text[], null, false, '[{"q":"やりたいことが決まっていないまま、転職活動を始めてもいいですか？","a":"始めて大丈夫です。やりたいことがはっきりしていなくても、避けたいこと・続けられた作業・ゆずれない条件の3つを書き出せば、候補をしぼって比べることはできます。働きながら、やりたいことが見えてくる人もいます。"},{"q":"適職診断の結果は、どこまで参考にしていいですか？","a":"結果は候補を広げるヒントとして使うのがおすすめです。job tag のよくある質問でも、職業興味検査や仕事価値観検査で出てくる職業は、学歴・職務経験・資格などを考えずに挙げたものなので、参考として使うよう案内されています。出てきた職業は、この記事の3ステップで確かめてみてください。"},{"q":"候補の職種はいくつくらいにしぼればいいですか？","a":"2〜3職種がおすすめです。1つだけだと比べる相手がなく、多すぎると一つひとつを調べきれなくなります。比べてみて合わないと分かった職種は、外して入れ替えて構いません。"}]'::jsonb, null, '{"schema_version":2,"writer_agent":"career-writer","angle":"ホームのメイン導線の着地先。「やりたいこと」から探さず、避けたいこと・続けられた作業・ゆずれない条件の3ステップで候補を2〜3職種にしぼり、比べて確かめる。mikeiken-tenshoku-hajimekata（転職準備の5項目）とは重ならないよう、職種の候補を見つける手順に絞る","quotes":[{"source_url":"https://shigoto.mhlw.go.jp/Search/WorkActivity","text":"job tag では、仕事の内容（具体的な作業）から職業を検索できる。","used_in":"ステップ2：続けられた作業は？"},{"source_url":"https://shigoto.mhlw.go.jp/User/faq","text":"職業興味検査や仕事価値観検査で表示される職業リストは、回答者の学歴・職務経験・取得資格・専門性などを考慮しておらず、興味や価値観の特徴と職業との類似度から作成されているので、参考として利用すること。","used_in":"調べてもしぼれないときは？"},{"source_url":"https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/0000181329.html","text":"わかものハローワークは、正社員を目指す若者（おおむね35歳未満）を対象に、担当者制による職業相談や自己理解・職務理解のサポートなどを無料で行っている。","used_in":"調べてもしぼれないときは？"}]}'::jsonb) on conflict (slug) do nothing;
+候補が決まったあとの準備の流れは、[未経験転職は何から始める？](/articles/mikeiken-tenshoku-hajimekata)にまとめています。', 'review', true, '2026-10-06'::timestamptz, '2026-10-06'::timestamptz, '2026-10-06'::timestamptz, null, '2026-10-06'::timestamptz, null, null, array['mikeiken-tenshoku-hajimekata', 'eigyo-cs-it-support-chigai', 'sekkyaku-keiken-ikasu', 'jiko-bunseki-yarikata']::text[], array['sonota']::text[], array['yaritai', 'mikeiken-shokushu']::text[], array['hajimete', 'seishain-keiken-sukunai']::text[], array['やりたい仕事が', '分からないときは。']::text[], null, false, '[{"q":"やりたいことが決まっていないまま、転職活動を始めてもいいですか？","a":"始めて大丈夫です。やりたいことがはっきりしていなくても、避けたいこと・続けられた作業・ゆずれない条件の3つを書き出せば、候補をしぼって比べることはできます。働きながら、やりたいことが見えてくる人もいます。"},{"q":"適職診断の結果は、どこまで参考にしていいですか？","a":"結果は候補を広げるヒントとして使うのがおすすめです。job tag のよくある質問でも、職業興味検査や仕事価値観検査で出てくる職業は、学歴・職務経験・資格などを考えずに挙げたものなので、参考として使うよう案内されています。出てきた職業は、この記事の3ステップで確かめてみてください。"},{"q":"候補の職種はいくつくらいにしぼればいいですか？","a":"2〜3職種がおすすめです。1つだけだと比べる相手がなく、多すぎると一つひとつを調べきれなくなります。比べてみて合わないと分かった職種は、外して入れ替えて構いません。"}]'::jsonb, null, '{"schema_version":2,"writer_agent":"career-writer","angle":"ホームのメイン導線の着地先。「やりたいこと」から探さず、避けたいこと・続けられた作業・ゆずれない条件の3ステップで候補を2〜3職種にしぼり、比べて確かめる。mikeiken-tenshoku-hajimekata（転職準備の5項目）とは重ならないよう、職種の候補を見つける手順に絞る","quotes":[{"source_url":"https://shigoto.mhlw.go.jp/Search/WorkActivity","text":"job tag では、仕事の内容（具体的な作業）から職業を検索できる。","used_in":"ステップ2：続けられた作業は？"},{"source_url":"https://shigoto.mhlw.go.jp/User/faq","text":"職業興味検査や仕事価値観検査で表示される職業リストは、回答者の学歴・職務経験・取得資格・専門性などを考慮しておらず、興味や価値観の特徴と職業との類似度から作成されているので、参考として利用すること。","used_in":"調べてもしぼれないときは？"},{"source_url":"https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/0000181329.html","text":"わかものハローワークは、正社員を目指す若者（おおむね35歳未満）を対象に、担当者制による職業相談や自己理解・職務理解のサポートなどを無料で行っている。","used_in":"調べてもしぼれないときは？"}]}'::jsonb) on conflict (slug) do nothing;
 insert into article_categories (article_id, category_id, is_primary) select a.id, c.id, true from articles a, categories c where a.slug = 'shigoto-sagashikata' and c.slug = 'mikeiken' on conflict do nothing;
 insert into article_categories (article_id, category_id, is_primary) select a.id, c.id, false from articles a, categories c where a.slug = 'shigoto-sagashikata' and c.slug = 'shokushu' on conflict do nothing;
 insert into article_sources (article_id, title, publisher, url, accessed_at, used_for, sort_order) select id, '仕事の内容で検索（job tag）', '厚生労働省 職業情報提供サイト（job tag）', 'https://shigoto.mhlw.go.jp/Search/WorkActivity', '2026-10-06'::date, '仕事の内容から職業を探せる検索があること', 0 from articles where slug = 'shigoto-sagashikata';
@@ -3681,6 +5673,142 @@ insert into article_versions (article_id, version, title, summary, body_md, crea
 insert into article_reviews (article_id, version, reviewer, verdict, checks) select id, 1, 'seed', 'approved', '{"content_hash":"5bf7f1c7f810faa6457ca7c631860e1431ae24c50ab6b7f0b5a4e88154772569","findings":[]}'::jsonb from articles where slug = 'shokumu-keirekisho-arubaito';
 update articles set status = 'published' where slug = 'shokumu-keirekisho-arubaito';
 
+-- article: souki-rishoku-tenshoku (published)
+insert into articles (slug, kind, title, summary, body_md, status, featured, published_at, updated_at, reviewed_at, reviewed_by, information_checked_at, seo_title, seo_description, related_slugs, roles, concerns, situations, eyecatch, illustration, recommended, faq, news_meta, research_notes) values ('souki-rishoku-tenshoku', 'article', '入社1年以内に辞めた・辞めたいときの転職｜面接での説明のしかたと、次に同じことを繰り返さない確認', '入社して早く辞めた経験は、隠すより「何が合わなかったか」と「次は何を確かめて選んだか」をセットで話すほうが伝わりやすくなります。面接での説明の型と例文、次の会社で同じことを繰り返さないための確認ポイント、第二新卒としての応募の考え方と相談先を紹介します。', '「入社して半年で辞めてしまった」「1年もたたずに、もう辞めたいと思っている」。早く辞めた経験があると、次の面接で何を言われるか不安になり、転職活動そのものに踏み出しにくくなるかもしれません。
+
+先に結論を言うと、早く辞めた経験は、**「何が合わなかったか」と「次は何を確かめて選んだか」をセットで話す**と、面接で伝わりやすくなります。そして、この2つを整理する作業は、そのまま**次の会社で同じことを繰り返さないための準備**にもなります。
+
+この記事で分かること：
+
+- 面接官が早期退職について**何を知りたいか**
+- 面接での**説明の型**と、理由別の**例文**（仮の例）
+- 次は同じことを繰り返さないための**確認ポイント**
+- **第二新卒**として応募するときの考え方
+
+## 面接官は、早く辞めたことの何を知りたい？
+
+職歴の期間が短いと、面接では理由を聞かれることが多いです。ただ、責めるためではなく、多くは次のことを確かめるためです。
+
+- 入社したら、続けて働けそうか
+- 辞めた理由が、うちの会社でも起きそうなことか
+- 自分の経験から何を学び、どう考えているか
+
+つまり、聞かれているのは「辞めたこと」そのものより、**「次は続けられるのか」**です。答えもここを中心に組み立てます。
+
+## 面接での説明は「4つの順番」で
+
+次の順番で話すと、言い訳に聞こえにくく、前向きにまとまります。
+
+```figure
+type: steps
+title: 早く辞めた理由の説明の型
+items:
+  - label: 事実
+    text: いつ入社して、いつ辞めたか（辞める予定か）
+  - label: 合わなかったこと
+    text: 何が希望と違ったかを、自分の言葉で短く
+  - label: 学んだこと
+    text: 入社前に確かめるべきだったこと
+  - label: これから
+    text: 今回は何を確かめて、この会社に応募したか
+```
+
+話す量は、「事実」と「合わなかったこと」を短く、「学んだこと」と「これから」を少し厚めにするのがコツです。全体で1分くらいを目安にしましょう。
+
+### 言わないほうがいいこと
+
+- **前の会社や上司の悪口**：事実であっても、聞く側は「うちでも同じことを言われるのでは」と感じやすくなります
+- **「なんとなく合わなかった」**：理由が分からないと、次も同じことが起きるのではと思われます
+- **事実と違う理由**：深く聞かれたときに話が食い違います
+
+## 理由別の例文（仮の例）
+
+自分の言葉に置き換えて使ってください。
+
+### 仕事の内容が聞いていた話と違った
+
+> 「新卒で入社した会社では、企画の仕事と聞いていましたが、配属後は飛び込みの営業が中心でした。続けるうちに、自分は相手の困りごとを聞いて解決する仕事のほうが力を出せると気づき、8か月で退職を決めました。入社前に、配属先と仕事の中身を具体的に確かめなかったことは反省しています。今回は、求人票と面接で、入社後の担当業務と1日の流れをうかがったうえで応募しました。」
+
+### 働く時間や休みが合わなかった
+
+> 「前職では、残業が多い月が続き、体調を崩しかけたため、10か月で退職しました。働く時間について、入社前に実際の残業の様子を確かめていなかったのが反省点です。御社については、求人に記載のある残業時間の実績を確認し、面接でも繁忙期の働き方をうかがったうえで、長く続けられると考えて応募しています。」
+
+### 人間関係で悩んだ
+
+> 「前職では、上司と相談しながら仕事を進める機会が少なく、ひとりで判断することが多い環境でした。私は、分からないことを確かめながら進めるほうが力を発揮できると分かり、退職を決めました。今回は、研修やチームでの仕事の進め方を面接でうかがい、相談しながら仕事を覚えられる環境だと感じて志望しています。」
+
+人間関係の理由は、「〇〇さんが合わなかった」ではなく、**「どんな環境なら力を出せるか」**の言葉に置き換えるのがポイントです。
+
+## 次は同じことを繰り返さない確認ポイント
+
+面接の説明で使った「合わなかったこと」は、次の会社選びでいちばん大事な確認ポイントになります。
+
+### 1. 辞めた理由を「確認すること」に言い換える
+
+まず、辞めた理由（辞めたい理由）を書き出し、それぞれ**入社前に何を確かめれば防げたか**に言い換えます。
+
+| 合わなかったこと | 次に確かめること |
+| --- | --- |
+| 仕事の内容が聞いていた話と違った | 入社直後の担当業務、仕事内容の変更の範囲、配属の決まり方 |
+| 残業が多かった | 平均の残業時間の実績、繁忙期の働き方、固定残業代の有無 |
+| 休みが取りにくかった | 年間休日の日数、有給休暇の取得の実績 |
+| 教えてもらえる人がいなかった | 研修の期間と内容、相談できる先輩や担当者がいるか |
+| 若手がすぐ辞めていく職場だった | 新卒などの採用者数と離職者数の実績 |
+
+### 2. 求人票・面接・書面で確かめる
+
+言い換えた確認ポイントは、次の3か所で確かめます。
+
+```figure
+type: checklist
+title: 応募から内定までに確かめること
+items:
+  - 求人票：仕事内容・休日・残業時間の実績
+  - 職場の情報：採用者数と離職者数・研修の有無
+  - 面接の逆質問：入社後の仕事と1日の流れ
+  - 労働条件通知書：仕事内容と働く場所の変更の範囲
+  - 迷ったら：承諾の前に返事の期限を相談する
+```
+
+新卒などを対象にした求人では、採用者数と離職者数、研修の有無、残業の実績といった「職場の情報」を確認できることがあります。見方は[求人で「職場の情報」を確かめるには？](/articles/shokuba-jouhou-wakamono)で紹介しています。
+
+### 3. まだ在職中なら、辞める前にもう一度考える
+
+いま「辞めたい」と思っている段階なら、辞める前に、異動や働き方の相談で解決できないかも考えてみましょう。辞めると決めた場合も、次の仕事を決めてから辞めるか、先に辞めるかで、お金や手続きの準備が変わります。確認しておきたいことは[今の仕事を辞めたいとき、先に確認しておきたいこと](/articles/yametai-mae-kakunin)にまとめています。
+
+## 「第二新卒」として応募するときは
+
+学校を卒業して数年以内に転職する人は「第二新卒」と呼ばれることがあります。ただ、何歳まで・卒業後何年までという決まった定義はありません。くわしくは[第二新卒って何歳まで？](/articles/dainishinsotsu-nansai)で紹介しています。
+
+### 新卒の採用枠に応募できることもある
+
+厚生労働省の青少年雇用機会確保指針では、事業主は、学校を卒業した人が**卒業後少なくとも3年間**は新卒の採用枠に応募できるよう努め、できる限り上限の年齢を設けないよう努めることとされています。
+
+ただし、一度就職して辞めた人を新卒枠の対象にするかどうかは、会社によって違います。募集要項に「既卒可」「卒業後〇年以内」などの書き方がないかを確かめ、分からなければ応募の前に問い合わせましょう。
+
+> 「〇年3月に大学を卒業し、一度就職したのち、現在は退職しております。新卒の採用枠に応募することは可能でしょうか。」
+
+### 中途採用の枠で応募するとき
+
+中途採用の枠では、「社会人としての基本的な経験があること」を前提にした求人もあれば、「未経験歓迎」として育てることを前提にした求人もあります。短い期間でも、前の職場で身につけた電話の受け答えやメールの書き方、報告のしかたなどは、職務経歴書に具体的に書いておきましょう。
+
+## ひとりで整理しきれないときの相談先
+
+辞めた理由をうまく言葉にできないときは、人に聞いてもらうのがいちばんの近道です。
+
+- **新卒応援ハローワーク**：学生や、学校を卒業しておおむね3年以内の人の就職を支援しています
+- **わかものハローワーク**：正社員の仕事を目指すおおむね35歳未満の人を支援しています。働いた経験が少ないことや、転職を繰り返していることに悩む人の相談も受け付けています
+
+早く辞めたことは、次の選び方を見直すきっかけにもなります。転職回数そのものが気になる人は、[転職回数が気になるときに整理したいこと](/articles/tenshoku-kaisu-kininaru)も読んでみてください。', 'review', false, '2026-10-09'::timestamptz, '2026-10-09'::timestamptz, '2026-10-09'::timestamptz, 'プロジェクトオーナー（チャットで承認）', '2026-10-09'::timestamptz, '入社1年以内に辞めた人の転職｜面接での説明と次の選び方', '入社1年以内に辞めた・辞めたいときの転職の進め方を紹介します。面接での退職理由の説明の型と例文、言わないほうがいいこと、次は同じことを繰り返さないための確認ポイント、第二新卒・既卒としての応募と相談先が分かります。', array['dainishinsotsu-nansai', 'tenshoku-kaisu-kininaru', 'shokuba-jouhou-wakamono', 'taishoku-riyuu-mensetsu', 'tenshoku-koukai-shinai']::text[], '{}'::text[], array['mensetsu', 'yametai']::text[], array['dainishinsotsu', 'seishain-keiken-sukunai']::text[], array['早く辞めた経験、', '面接でどう話す？']::text[], null, false, '[{"q":"入社して数か月で辞めた職歴は、履歴書に書かなくてもいいですか？","a":"短い期間でも、正社員などとして雇われていた職歴は書くのが基本です。書かずにいて、あとで分かると、説明が食い違って信用を失うおそれがあります。期間が短いことは面接で聞かれやすいので、話す内容を準備しておきましょう。"},{"q":"早く辞めた理由が「人間関係」でも、正直に話していいですか？","a":"うそをつく必要はありませんが、特定の人への不満として話すと、「次の職場でも同じことが起きるのでは」と受け取られやすくなります。「何が合わなかったのか」を自分の希望の言葉に置き換え、「だから次は〇〇を確かめて応募した」とつなげると伝わりやすくなります。"},{"q":"第二新卒として新卒の採用枠に応募できますか？","a":"厚生労働省の青少年雇用機会確保指針では、事業主は学校を卒業した人が卒業後少なくとも3年間は新卒の採用枠に応募できるよう努めることとされています。ただし、一度就職した人を新卒枠の対象にするかどうかは会社によって違うので、募集要項を確かめ、分からなければ問い合わせましょう。"}]'::jsonb, null, '{"schema_version":2,"writer_agent":"career-writer","angle":"早期離職を「弱み」として隠すのではなく、「合わなかったこと」を次の会社選びの確認ポイントに変える。面接の説明と、次の選び方を同じ材料で組み立てる","quotes":[{"source_url":"https://jsite.mhlw.go.jp/tottori-roudoukyoku/hourei_seido_tetsuzuki/shokugyou_shoukai/22seishonen_shishin.html","text":"青少年雇用機会確保指針では、学校卒業見込者の採用枠について、既卒者が卒業後少なくとも3年間は応募できるよう努めること、できる限り上限年齢を設けないよう努めることとしている（jsite.mhlw.go.jp に直接接続できなかったため、WebSearch の検索結果に表示されたページの記述で確認）","used_in":"「第二新卒」として応募するときは"},{"source_url":"https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/koyou_roudou/koyou/jakunen/index.html","text":"新卒応援ハローワークは大学・短大・高専・専修学校などの学生や学校卒業後おおむね3年以内の人の就職を支援。わかものハローワークは正社員就職を目指すおおむね35歳未満の若者を支援（直接接続できなかったため、検索結果に表示された記述で確認）","used_in":"ひとりで整理しきれないときの相談先"},{"source_url":"https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/0000132151.html","text":"「就業経験が少ない」「さまざまな事情で離転職を繰り返している」ことにひとりで悩んでいないかと呼びかけ、正社員就職を目指す若者を支援している（直接接続できなかったため、検索結果に表示された記述で確認）","used_in":"ひとりで整理しきれないときの相談先"}],"not_used":["新規学卒者の3年以内離職率などの統計は、年度で数字が変わり、本記事の主題（説明と選び方）に直接必要ないため使わない","「1年未満の職歴は書類選考で不利」などの評価に関する一般論は公的な根拠を確認できなかったので書かない","第二新卒の年齢・卒業後年数の定義は法律で決まっていないため断定せず、既存記事 dainishinsotsu-nansai へのリンクにとどめた"]}'::jsonb) on conflict (slug) do nothing;
+insert into article_categories (article_id, category_id, is_primary) select a.id, c.id, true from articles a, categories c where a.slug = 'souki-rishoku-tenshoku' and c.slug = 'junbi' on conflict do nothing;
+insert into article_categories (article_id, category_id, is_primary) select a.id, c.id, false from articles a, categories c where a.slug = 'souki-rishoku-tenshoku' and c.slug = 'mikeiken' on conflict do nothing;
+insert into article_sources (article_id, title, publisher, url, accessed_at, used_for, sort_order) select id, '青少年雇用機会確保指針について', '厚生労働省 鳥取労働局', 'https://jsite.mhlw.go.jp/tottori-roudoukyoku/hourei_seido_tetsuzuki/shokugyou_shoukai/22seishonen_shishin.html', '2026-10-09'::date, '学校卒業見込者の採用枠について、既卒者が卒業後少なくとも3年間は応募できるよう努めること、できる限り上限年齢を設けないよう努めることが指針に示されていること', 0 from articles where slug = 'souki-rishoku-tenshoku';
+insert into article_sources (article_id, title, publisher, url, accessed_at, used_for, sort_order) select id, '若者への就職支援', '厚生労働省', 'https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/koyou_roudou/koyou/jakunen/index.html', '2026-10-09'::date, '新卒応援ハローワークが学生や学校卒業後おおむね3年以内の人の就職を支援していること、わかものハローワークが正社員就職を目指すおおむね35歳未満の若者を支援していること', 1 from articles where slug = 'souki-rishoku-tenshoku';
+insert into article_sources (article_id, title, publisher, url, accessed_at, used_for, sort_order) select id, '正社員就職を目指す若者の皆さまへ', '厚生労働省', 'https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/0000132151.html', '2026-10-09'::date, '就業経験が少ないことや、離転職を繰り返していることに悩む若者を、わかものハローワークなどで支援していること', 2 from articles where slug = 'souki-rishoku-tenshoku';
+insert into article_versions (article_id, version, title, summary, body_md, created_by) select id, 1, title, summary, body_md, 'seed' from articles where slug = 'souki-rishoku-tenshoku' on conflict do nothing;
+insert into article_reviews (article_id, version, reviewer, verdict, checks) select id, 1, 'プロジェクトオーナー（チャットで承認）', 'approved', '{"content_hash":"9b889ecc126fd85ef4978f4a93295bd6caca0ee59be39847d5e504d5b4b61be5","findings":[]}'::jsonb from articles where slug = 'souki-rishoku-tenshoku';
+update articles set status = 'published' where slug = 'souki-rishoku-tenshoku';
+
 -- article: taishoku-juminzei (published)
 insert into articles (slug, kind, title, summary, body_md, status, featured, published_at, updated_at, reviewed_at, reviewed_by, information_checked_at, seo_title, seo_description, related_slugs, roles, concerns, situations, eyecatch, illustration, recommended, faq, news_meta, research_notes) values ('taishoku-juminzei', 'article', '退職したあとの住民税はどう払う？辞める時期による違いと、転職先で続ける方法', '給料から引かれていた住民税は、会社を辞めると払い方が変わります。辞める時期が1〜5月か6〜12月かでの違い、自分で払う「普通徴収」への切り替え、次の会社で給料からの天引きを続ける方法を紹介します。', '会社員の住民税は、ふつう毎月の給料から引かれています。会社を辞めるとこの天引きができなくなるため、残りの住民税をどう払うかが変わります。
 
@@ -4069,6 +6197,128 @@ insert into article_sources (article_id, title, publisher, url, accessed_at, use
 insert into article_versions (article_id, version, title, summary, body_md, created_by) select id, 1, title, summary, body_md, 'seed' from articles where slug = 'taishoku-nenkin-tetsuzuki' on conflict do nothing;
 insert into article_reviews (article_id, version, reviewer, verdict, checks) select id, 1, 'プロジェクトオーナー（チャットで承認）', 'approved', '{"content_hash":"8f024b2cd2a02bbd1a1509c0667984f143fb97389b304cea0c9e5e18ba3d1936","findings":[]}'::jsonb from articles where slug = 'taishoku-nenkin-tetsuzuki';
 update articles set status = 'published' where slug = 'taishoku-nenkin-tetsuzuki';
+
+-- article: taishoku-riyuu-mensetsu (published)
+insert into articles (slug, kind, title, summary, body_md, status, featured, published_at, updated_at, reviewed_at, reviewed_by, information_checked_at, seo_title, seo_description, related_slugs, roles, concerns, situations, eyecatch, illustration, recommended, faq, news_meta, research_notes) values ('taishoku-riyuu-mensetsu', 'article', '面接で退職理由を聞かれたら？不満を前向きに言い換える答え方と例文', '面接で退職理由（転職理由）を聞かれたときは、不満を隠すのではなく、事実を短く伝えて「次にしたいこと」につなげます。面接官が確かめたいこと、答え方の型、人間関係・残業・ノルマなど本音別の言い換え例、言い換えと嘘の違いを紹介します。', '面接で「前の会社を辞めた理由を教えてください」と聞かれたとき、本当の理由が「人間関係がつらかった」「残業が多すぎた」だと、どこまで話していいのか迷いますよね。
+
+先に結論を言うと、退職理由は**不満を隠すことより、事実を短く伝えて「次にしたいこと」につなげる**ことが大事です。言い方を前向きにすることと、嘘をつくことは違います。**事実は変えずに、話す順番と言葉を整える**と考えましょう。
+
+この記事で分かること：
+
+- 面接官が退職理由で**確かめたいこと**
+- 退職理由の**答え方の型**
+- 人間関係・残業・ノルマなど**本音別の言い換え例**（仮の例）
+- **言い換えと嘘**の違い
+
+## 面接官は何を確かめたい？
+
+退職理由を聞かれると、責められているように感じるかもしれません。でも、面接官が知りたいのは、おもに次のようなことです。
+
+- 同じ理由で、うちの会社もすぐに辞めてしまわないか
+- 前の職場のせいにするだけでなく、自分で考えて動いているか
+- 次にやりたいことが、うちの会社でかなうことか
+
+大阪のハローワーク布施の面接対策セミナーの資料では、前の職場の批判や不満を全面に出して話すのはすすめず、人間関係や労働条件が理由の場合は客観的に短く伝えるとしています。不満があったこと自体が悪いのではなく、**不満だけで話が終わる**と、面接官の心配に答えられないのです。
+
+## 答え方の型
+
+退職理由は、次の順番で組み立てると、短く、前向きにまとまります。
+
+```figure
+type: steps
+title: 退職理由の答え方の型
+items:
+  - label: きっかけ
+    text: 何があったかを、事実だけ短く
+  - label: 考えたこと
+    text: その中で気づいたこと、自分に足りなかったこと
+  - label: 次にしたいこと
+    text: どんな仕事・環境で働きたいか
+  - label: 応募先とのつながり
+    text: それが応募先でかなうと考えた理由
+```
+
+ポイントは、**「きっかけ」を短く、「次にしたいこと」を厚めに**話すことです。退職理由の質問ですが、話の後半は志望動機につながっていきます。
+
+## 本音別の言い換え例（仮の例）
+
+ここからは、よくある本音ごとの言い換え例です。どれも仮の例なので、自分の事実に合わせて言葉を変えてください。
+
+| 本音 | そのまま話すと | 言い換えると |
+| --- | --- | --- |
+| 上司と合わなかった | 上司が厳しくて、話を聞いてくれなかった | 相談しながら仕事を進められる環境で働きたい |
+| 残業が多すぎた | 毎日遅くまで帰れず、もう限界だった | 時間を区切って集中し、長く働き続けられる働き方をしたい |
+| ノルマがきつかった | 売上の目標に追われるのがつらかった | 一人ひとりのお客様に時間をかけて対応する仕事がしたい |
+| 頑張っても評価されなかった | 何をしても給料が変わらなかった | 取り組んだことが目に見える形で評価される仕事に挑戦したい |
+| 仕事が合わなかった | やりたい仕事ではなかった | 働く中で、〇〇の作業にやりがいを感じると分かった |
+
+言い換えた部分だけを話すと、ふわっとした印象になります。**型にそって、事実と一緒に**話します。
+
+> 「前の職場では、店舗の売上目標を追いかける販売の仕事をしていました。その中で、目標の数字よりも、一人のお客様の相談にじっくり乗れたときにやりがいを感じることに気づきました。御社のカスタマーサポートは、お問い合わせに一件ずつ丁寧に対応する仕事だと伺い、自分の気づいたことを活かせると考えて応募しました。」
+
+> 「前の職場では、少人数の店舗で、仕事のほとんどを一人で判断して進めていました。うまくいかないときに相談できる人がいなかったことから、チームで声をかけ合いながら進める働き方をしたいと考えるようになりました。」
+
+人間関係が理由でも、特定の人の名前や悪口は出しません。**「どんな環境で働きたいか」**だけを取り出して話します。
+
+## 応募先にも当てはまる理由は避ける
+
+大阪のハローワークの資料では、退職理由も、応募中の会社に当てはまる理由は避けなければいけないとしています。
+
+たとえば「残業が多かったので辞めました」と話した応募先が、繁忙期に残業がある会社だったら、面接官は「うちでも同じ理由で辞めるのでは」と考えます。答えを準備したら、**応募先の求人票と見比べて**、同じことが起きそうなら言い方を変えましょう。
+
+- 求人票の残業時間・休日・仕事内容を読み直す
+- 言い換えた理由が、応募先の働き方と合っているか確かめる
+- 合わないなら、別の事実（やってみたいこと）を中心に話す
+
+そもそも次の職場で何を変えたいのかが整理できていないときは、[今の仕事を辞めたいとき、先に確認しておきたいこと](/articles/yametai-mae-kakunin)で、辞める前に考えておきたいことを紹介しています。
+
+## 言い換えと嘘はちがう
+
+前向きに言い換えることと、事実と違うことを言うことは、まったく別のものです。
+
+```figure
+type: compare
+title: 言い換えと嘘のちがい
+columns:
+  - label: 言い換え（OK）
+    tone: mint
+    items:
+      - 事実は変えずに、話す順番と言葉を選ぶ
+      - 悪口を省き、次にしたいことを話す
+      - 深く聞かれても、同じ話ができる
+  - label: 嘘（NG）
+    tone: coral
+    items:
+      - 辞めていないのに辞めたことにする
+      - 会社の都合だったことを自分の希望にする
+      - 深く聞かれると、話が合わなくなる
+```
+
+山形のハローワークの面接対策の資料でも、退職理由をあいまいにごまかすことや、話が長くてポイントがぼやけることは避けるようにとしています。面接では「具体的にはどんなことがあったのですか」と深く聞かれることがあります。作った理由は、ここで答えに詰まりやすくなります。
+
+## 自分で決めたのではない退職のとき
+
+会社の業績が悪くなった、契約期間が終わったなど、自分で決めたのではない退職もあります。その場合は、**事実をそのまま短く**伝えて構いません。
+
+> 「契約期間の満了で退職しました。次は、長く同じ職場で経験を積みたいと考え、正社員の求人に応募しています。」
+
+ハローワーク布施の資料では、介護・育児・病気など個人的な事情で辞めた場合は、今は働ける環境になったことをしっかり伝えるようにとしています。辞めてから働いていない期間がある場合の説明は、[職歴に空白期間があるとき、面接でどう説明する？](/articles/kuhaku-kikan-setsumei)を参考にしてください。
+
+## 短い期間で辞めたとき
+
+入社してすぐ辞めた場合は、「また辞めるのでは」と心配されやすいものです。ここで大事なのは、**次の会社をどう選んだか**を話すことです。
+
+> 「前の会社は、仕事内容をよく確かめないまま入社してしまい、思っていた仕事と違うと感じて退職しました。今回は求人票だけでなく、職場の見学や面接で、一日の仕事の流れを確かめたうえで応募しています。」
+
+自分の選び方に足りなかったことを認め、それを今回どう変えたかを話すと、同じことを繰り返さないと伝わります。何度か転職している場合の説明のしかたは、[転職回数が気になるときに整理したいこと](/articles/tenshoku-kaisu-kininaru)で紹介しています。', 'review', false, '2026-10-09'::timestamptz, '2026-10-09'::timestamptz, '2026-10-09'::timestamptz, 'プロジェクトオーナー（チャットで承認）', '2026-10-09'::timestamptz, '面接の退職理由、どう答える？不満の言い換え例と答え方の型', '面接で退職理由を聞かれたときの答え方を紹介します。面接官が確かめたいこと、事実→考えたこと→次にしたいことの型、人間関係・残業・ノルマなど本音別の言い換え例、応募先に当てはまる理由を避けるコツ、嘘との線引きが分かります。', array['tenshoku-kaisu-kininaru', 'yametai-mae-kakunin', 'kuhaku-kikan-setsumei', 'mensetsu-yokukiku-shitsumon', 'souki-rishoku-tenshoku']::text[], '{}'::text[], array['mensetsu', 'yametai']::text[], array['hajimete', 'dainishinsotsu']::text[], array['辞めた理由、', '正直に言っていい？']::text[], null, false, '[{"q":"本当の退職理由が人間関係です。正直に言わないとだめですか？","a":"嘘をつく必要はありませんが、人の悪口として話す必要もありません。「一人で作業する時間が長く、相談しながら進められる環境で働きたいと考えました」のように、事実の中から「次にどんな環境で働きたいか」を取り出して短く話しましょう。"},{"q":"入社してすぐに辞めてしまいました。どう説明すればいいですか？","a":"短い期間で辞めたことは、ごまかさずに認めます。そのうえで、仕事選びで足りなかったこと（調べ方や確かめ方）と、今回はそれをどう確かめて応募したかを話すと、同じ理由でまた辞めるのではという心配に答えられます。"},{"q":"会社の都合で辞めた場合も、前向きな理由を言う必要がありますか？","a":"会社の都合や契約期間の満了など、自分で決めたのではない退職は、事実をそのまま短く伝えて構いません。そのうえで「この機会に〇〇の仕事に挑戦したいと考えました」と、これからのことを話しましょう。"}]'::jsonb, null, '{"schema_version":2,"writer_agent":"career-writer","angle":"退職理由は「不満を隠す」のではなく「事実を短く→考えたこと→次にしたいこと」に組み立て直す。既存記事（mensetsu-junbi-mikeiken）の言い換え表（シフト・給料・立ち仕事）と重ならないよう、人間関係・残業・ノルマ・評価・仕事が合わないなどの本音別に例を出し、「応募先にも当てはまる理由」の落とし穴と、言い換えと嘘の線引きを中心にする","quotes":[{"source_url":"https://jsite.mhlw.go.jp/osaka-hellowork/content/contents/002184437.pdf","text":"基本的に前職の批判・不満を全面に出して話すのはお勧めしない。人間関係や労働条件を理由にする場合は客観的に短く。待遇への不満、会社の経営悪化、介護・育児・病気などの個人的事情に分けて伝え方の例を示し、個人的事情の場合は現在は働ける環境になったことをしっかりと伝える（この環境から jsite.mhlw.go.jp に直接接続できなかったため、検索結果に表示された資料の抜粋で確認）","used_in":"面接官は何を確かめたい？／本音別の言い換え例／自分で決めたのではない退職のとき"},{"source_url":"https://jsite.mhlw.go.jp/osaka-hellowork/var/rev0/0058/1693/fusaiyou.pdf","text":"退職理由も、応募中の会社に当てはまる理由は避けなければいけない（直接開けなかったため、検索結果の抜粋で確認）","used_in":"応募先にも当てはまる理由は避ける"},{"source_url":"https://jsite.mhlw.go.jp/yamagata-hellowork/content/contents/002350381.pdf","text":"退職理由をあいまいにごまかすこと、話が長くポイントがぼやけることは避ける（直接開けなかったため、検索結果の抜粋で確認）","used_in":"言い換えと嘘はちがう"}],"not_used":["山形の資料の「面接時間は15〜30分程度が半数を超える」という調査の数字は、この記事の論点と離れるため使わない","「退職理由は30秒程度で」などの時間の目安は公的な根拠を確認できなかったので書かない","経歴を偽った場合の内定取り消しなど法的な扱いは、事情によって判断が分かれるため断定しない"]}'::jsonb) on conflict (slug) do nothing;
+insert into article_categories (article_id, category_id, is_primary) select a.id, c.id, true from articles a, categories c where a.slug = 'taishoku-riyuu-mensetsu' and c.slug = 'shorui-mensetsu' on conflict do nothing;
+insert into article_categories (article_id, category_id, is_primary) select a.id, c.id, false from articles a, categories c where a.slug = 'taishoku-riyuu-mensetsu' and c.slug = 'junbi' on conflict do nothing;
+insert into article_sources (article_id, title, publisher, url, accessed_at, used_for, sort_order) select id, 'ハローワーク布施 面接対策セミナー', '大阪労働局（ハローワーク布施）', 'https://jsite.mhlw.go.jp/osaka-hellowork/content/contents/002184437.pdf', '2026-10-09'::date, '前職の批判・不満を全面に出して話すのはすすめないこと。人間関係や労働条件を理由にする場合は客観的に短く伝えること。待遇・経営悪化・個人的な事情など理由の種類ごとの伝え方（個人的な事情の場合は、今は働ける環境になったことを伝える）', 0 from articles where slug = 'taishoku-riyuu-mensetsu';
+insert into article_sources (article_id, title, publisher, url, accessed_at, used_for, sort_order) select id, '採否通知のコメント欄に書かれた採用・不採用の理由（ハローワーク資料）', '大阪労働局（ハローワーク）', 'https://jsite.mhlw.go.jp/osaka-hellowork/var/rev0/0058/1693/fusaiyou.pdf', '2026-10-09'::date, '退職理由も、応募中の会社に当てはまる理由は避けなければいけないこと', 1 from articles where slug = 'taishoku-riyuu-mensetsu';
+insert into article_sources (article_id, title, publisher, url, accessed_at, used_for, sort_order) select id, '面接対策', '山形労働局（ハローワーク）', 'https://jsite.mhlw.go.jp/yamagata-hellowork/content/contents/002350381.pdf', '2026-10-09'::date, '退職理由をあいまいにごまかすことや、話が長くてポイントがぼやけることを避けること', 2 from articles where slug = 'taishoku-riyuu-mensetsu';
+insert into article_versions (article_id, version, title, summary, body_md, created_by) select id, 1, title, summary, body_md, 'seed' from articles where slug = 'taishoku-riyuu-mensetsu' on conflict do nothing;
+insert into article_reviews (article_id, version, reviewer, verdict, checks) select id, 1, 'プロジェクトオーナー（チャットで承認）', 'approved', '{"content_hash":"a87606c98fc86425689792a5fd99bb2df16235177e1aa35504b8219a7ad4e2e3","findings":[]}'::jsonb from articles where slug = 'taishoku-riyuu-mensetsu';
+update articles set status = 'published' where slug = 'taishoku-riyuu-mensetsu';
 
 -- article: taishoku-shorui (published)
 insert into articles (slug, kind, title, summary, body_md, status, featured, published_at, updated_at, reviewed_at, reviewed_by, information_checked_at, seo_title, seo_description, related_slugs, roles, concerns, situations, eyecatch, illustration, recommended, faq, news_meta, research_notes) values ('taishoku-shorui', 'article', '退職するときに受け取る書類・返す書類｜離職票や源泉徴収票は何に使う？', '会社を辞めるときは、離職票・源泉徴収票・雇用保険被保険者証・基礎年金番号が分かる書類・健康保険の資格喪失証明書などを受け取ります。それぞれ何に使うのか、いつごろ届くのか、会社に返すものは何かを一覧で整理します。', '会社を辞めるときは、いくつもの書類を受け取ったり返したりします。どれも次の会社に入るときや、健康保険・年金・税金の手続きで使うものです。名前が似ていて分かりにくいので、何に使うのかを先に整理しておきましょう。
@@ -4508,6 +6758,139 @@ insert into article_versions (article_id, version, title, summary, body_md, crea
 insert into article_reviews (article_id, version, reviewer, verdict, checks) select id, 1, 'seed', 'approved', '{"content_hash":"a748c34d897ba3f5dae2c0798f1e435d4dd4e8841c532d7170edc20b231a7cf7","findings":[]}'::jsonb from articles where slug = 'tenshoku-kaisu-kininaru';
 update articles set status = 'published' where slug = 'tenshoku-kaisu-kininaru';
 
+-- article: tenshoku-koukai-shinai (published)
+insert into articles (slug, kind, title, summary, body_md, status, featured, published_at, updated_at, reviewed_at, reviewed_by, information_checked_at, seo_title, seo_description, related_slugs, roles, concerns, situations, eyecatch, illustration, recommended, faq, news_meta, research_notes) values ('tenshoku-koukai-shinai', 'article', '転職で後悔しないために、入社前に確認したいこと｜労働条件通知書・求人票との違い・休日・残業・試用期間・配属', '入社してから「聞いていた話と違う」とならないためには、内定の承諾前に、労働条件を書面で受け取り、求人票や面接で聞いた内容と照らし合わせることが大切です。労働基準法第15条の労働条件の明示のしくみ、休日・残業・試用期間・配属で見るところ、違いがあったときの聞き方を紹介します。', '「休みは土日と聞いていたのに、月に何回か出勤がある」「事務で応募したのに、配属は営業だった」。転職したあとの「こんなはずじゃなかった」は、入社前に確かめられたことが少なくありません。
+
+先に結論を言うと、後悔を減らすいちばんの方法は、**内定を承諾する前に、労働条件を書面で受け取り、求人票と面接で聞いた内容と照らし合わせること**です。
+
+この記事で分かること：
+
+- 会社に**労働条件を示す決まり**があること（労働基準法第15条）
+- 求人票・面接・労働条件通知書の**照らし合わせ方**
+- **休日・残業・試用期間・配属**で見るところ
+- 違いがあったときの**聞き方と相談先**
+
+## 会社には、労働条件を示す決まりがある
+
+労働基準法第15条では、会社は労働契約を結ぶときに、働く人に**賃金、労働時間その他の労働条件を示さなければならない**とされています。そのうち、賃金や労働時間など法律で決められた事項は、原則として**書面で**示すことになっています。この書面は「労働条件通知書」などの名前で渡されることが多いです。
+
+書面で示す主な項目は次のとおりです。
+
+- 契約の期間（期間の定めがあるかどうか）
+- 働く場所と、する仕事
+- 始業・終業の時刻、残業の有無、休憩、休日、休暇
+- 賃金の決め方、計算と支払いの方法、締め日と支払日
+- 退職に関すること（解雇の理由を含む）
+
+また、同じ第15条では、示された労働条件が**事実と違う場合、働く人はすぐに労働契約を解除できる**とされています。それだけ、入社前に示される条件は大事なものだということです。
+
+まだ書面を受け取っていないなら、承諾の前にお願いしましょう。
+
+> 「内定のご連絡をいただき、ありがとうございます。お返事の前に、労働条件を書面で確認させていただけますでしょうか。」
+
+条件を確かめたいと言うのは、失礼なことではありません。受け取ったあとの全体の見方は[内定をもらったら、承諾の前に確認すること](/articles/naitei-shodaku-mae)にまとめています。
+
+## 求人票・面接・書面の3つを照らし合わせる
+
+条件は、応募から内定までに3回、形を変えて出てきます。それぞれの内容を並べて、違うところがないかを見ます。
+
+```figure
+type: steps
+title: 条件は3か所で照らし合わせる
+items:
+  - label: 求人票
+    text: 応募のときに見た条件。保存しておく
+  - label: 面接
+    text: 説明されたことや聞いた答えをメモする
+  - label: 労働条件通知書
+    text: 承諾の前に受け取り、前の2つと比べる
+```
+
+- **求人票は保存しておく**：求人サイトの掲載は終わると見られなくなることがあります。応募した時点で画面を保存したり、印刷したりしておきましょう
+- **面接の内容はメモする**：面接のあとに、説明された仕事の内容、休日、残業などを書き留めておきます
+- **書面で最終確認**：労働条件通知書が、求人票や面接の内容と合っているかを確かめます
+
+## 休日：「週休2日制」と「完全週休2日制」は違う
+
+休日は、曜日だけでなく言葉の違いに注意します。
+
+- **完全週休2日制**：毎週2日の休みがある
+- **週休2日制**：週2日の休みがある週がある、という意味で使われ、毎週2日休みとは限らない
+
+あわせて、**年間の休日の日数**、祝日や年末年始・夏季の休みの扱い、シフト制かどうかも見ましょう。
+
+> 「求人票に週休2日制とありましたが、月に何回くらい土曜日の出勤がありますか。」
+
+休日と給料をあわせて比べたいときは、[「土日休み」と「年収」をどう比較する？](/articles/donichi-yasumi-nenshu-hikaku)が参考になります。
+
+## 残業：時間の実績と、残業代の払われ方
+
+残業は、求人票の「残業あり」だけでは実際の様子が分かりません。
+
+- **平均の残業時間の実績**：求人票や会社の情報に、月の平均が書かれていないか
+- **繁忙期の働き方**：忙しい時期はいつで、どのくらい残業が増えるか
+- **固定残業代**：月給に一定時間分の残業代が含まれていないか。含まれている場合は、何時間分でいくらか、超えた分は別に払われるか
+
+> 「1日の流れを教えていただけますか。忙しい時期は、何時ごろまで働くことが多いでしょうか。」
+
+新卒などを対象にした求人では、残業時間の実績などの「職場の情報」を確認できることがあります。見方は[求人で「職場の情報」を確かめるには？](/articles/shokuba-jouhou-wakamono)で紹介しています。
+
+## 試用期間：期間と、そのあいだの条件
+
+試用期間がある会社では、次の点を確かめます。
+
+- **期間の長さ**と、延長されることがあるか
+- 試用期間中と本採用後で、**給料や手当などの条件が変わるか**
+- 試用期間中も、**社会保険に入るか**
+
+試用期間中だけ給料が低い、契約社員として始まる、といった場合は、求人票と労働条件通知書の両方に書かれているかを見ます。法律上の扱いや確認の言い方は[試用期間って何？](/articles/shiyou-kikan)にまとめています。
+
+## 配属：最初の仕事と「変更の範囲」
+
+「事務で応募したのに別の仕事に」という行き違いを防ぐには、**入社直後の仕事と働く場所**に加えて、**将来どこまで変わる可能性があるか**を見ます。
+
+2024年4月1日から、労働契約を結ぶときに、入社直後の働く場所と仕事に加えて、**その変更の範囲**も示すことになりました。対象は、正社員だけでなく、パート・アルバイトや契約社員なども含むすべての働く人です。2024年4月からは、求人の段階でも、仕事と働く場所の変更の範囲が示されるようになっています。
+
+たとえば、仕事の内容が「（雇入れ直後）一般事務　（変更の範囲）会社の定める業務」となっていれば、事務以外の仕事に変わる可能性があると読めます。働く場所の変更の範囲が広ければ、転勤の可能性もあります。
+
+> 「入社後は、どちらの部署に配属される予定でしょうか。配属はいつごろ、どのように決まりますか。」
+
+配属が入社後の研修のあとに決まる会社もあります。その場合は、これまでどんな部署に配属された人が多いかを聞いてみましょう。
+
+## 求人票と違うところがあったら
+
+照らし合わせて違うところが見つかったら、承諾の前に**理由を確かめる**のが先です。厚生労働省の「確かめよう労働条件」でも、まず違いが生じた理由を確かめることが第一とされています。書きまちがいのこともあれば、条件が変わっていることもあります。
+
+> 「求人票では完全週休2日制と拝見していましたが、通知書では週休2日制となっていました。休日の決まり方を教えていただけますか。」
+
+```figure
+type: checklist
+title: 承諾の前に見直すこと
+items:
+  - 労働条件通知書を書面で受け取ったか
+  - 仕事の内容と働く場所、その変更の範囲
+  - 休日の言葉（完全週休2日制か）と年間の日数
+  - 残業時間の実績と、固定残業代の有無
+  - 試用期間の長さと、そのあいだの条件
+  - 求人票・面接と違うところの理由を聞いたか
+```
+
+説明に納得できないときは、返事を急がずに考えましょう。返事の期限を延ばしてほしいときは、早めに相談します。
+
+- **ハローワークの求人**の場合は、求人票と説明が違うことをハローワークの窓口に申し出られます
+- 入社前後の条件のことで困ったら、都道府県労働局や労働基準監督署などにある**総合労働相談コーナー**でも相談できます
+
+入社前に少し手間をかけて確かめておけば、入社してからの「こんなはずじゃなかった」を減らせます。', 'review', false, '2026-10-09'::timestamptz, '2026-10-09'::timestamptz, '2026-10-09'::timestamptz, 'プロジェクトオーナー（チャットで承認）', '2026-10-09'::timestamptz, '転職で後悔しないために入社前に確認したいこと｜労働条件', '入社後に「聞いていた話と違う」とならないための確認ポイントを紹介します。労働基準法第15条の労働条件の明示、労働条件通知書と求人票の照らし合わせ方、休日・残業・試用期間・配属で見るところ、違いがあったときの聞き方と相談先が分かります。', array['naitei-shodaku-mae', 'shiyou-kikan', 'nenshu-dake-erabanai', 'koteizangyo-kyujin', 'naitei-jitai-tsutaekata']::text[], '{}'::text[], array['donichi', 'kyuryo', 'seishain']::text[], array['hajimete', 'dainishinsotsu']::text[], array['入社してから', '「話が違う」を防ぐ']::text[], null, false, '[{"q":"労働条件通知書をもらえないまま入社日が近づいています。どうすればいいですか？","a":"労働基準法第15条では、会社は労働契約を結ぶときに、賃金や労働時間などの労働条件を示さなければならないとされています。「入社前に、労働条件を書面で確認させていただけますか」と採用担当者にお願いしてみましょう。それでも示されないときは、総合労働相談コーナーやハローワークに相談できます。"},{"q":"求人票と労働条件通知書の内容が違います。どちらが正しいのですか？","a":"厚生労働省の「確かめよう労働条件」では、求人票と説明が違う場合は、まずその違いが生じた理由を確かめることが第一とされています。書きまちがいのこともあれば、条件が変わっていることもあります。承諾の前に理由を聞き、納得できる説明がなければ返事を急がないようにしましょう。ハローワークの求人なら、ハローワークの窓口に申し出られます。"},{"q":"入社してから、条件が説明と違うと分かったらどうなりますか？","a":"労働基準法第15条では、示された労働条件が事実と違う場合、働く人はすぐに労働契約を解除できるとされています。ただ、辞める前に、まず会社に確認し、話し合いで解決できないかを考えましょう。どう動けばいいか迷ったら、総合労働相談コーナーで相談できます。"}]'::jsonb, null, '{"schema_version":2,"writer_agent":"career-writer","angle":"「後悔しない」を気持ちの問題ではなく、入社前に書面で何を確かめるかに落とし込む。労働基準法第15条を軸に、求人票→面接→労働条件通知書の順に照らし合わせる方法と、休日・残業・試用期間・配属の見るところを示す","quotes":[{"source_url":"https://laws.e-gov.go.jp/law/322AC0000000049","text":"第十五条第一項「使用者は、労働契約の締結に際し、労働者に対して賃金、労働時間その他の労働条件を明示しなければならない。この場合において、賃金及び労働時間に関する事項その他の厚生労働省令で定める事項については、厚生労働省令で定める方法により明示しなければならない。」第二項「前項の規定によつて明示された労働条件が事実と相違する場合においては、労働者は、即時に労働契約を解除することができる。」（e-Gov に直接接続できなかったため、WebSearch の検索結果に表示された条文の記述で確認。書面で明示する事項の内容は、検索結果に表示された労働基準法施行規則第5条の記述で確認）","used_in":"会社には、労働条件を示す決まりがある"},{"source_url":"https://www.mhlw.go.jp/content/001114167.pdf","text":"2024年4月から、募集広告や職業紹介を受ける際に、求人企業などから明示される労働条件が追加される（従事すべき業務の変更の範囲、就業場所の変更の範囲など）（直接接続できなかったため、検索結果に表示された資料の題名と記述で確認）","used_in":"配属：最初の仕事と「変更の範囲」"},{"source_url":"https://muki.mhlw.go.jp/rule.html","text":"労働契約の締結時と有期労働契約の更新時に、雇入れ直後の就業場所・業務に加えて、変更の範囲を明示。対象はパート・アルバイト、契約社員、派遣労働者なども含むすべての労働者。臨時の応援業務や出張、研修など一時的な変更先は含まれない（直接接続できなかったため、検索結果に表示された記述で確認）","used_in":"配属：最初の仕事と「変更の範囲」"},{"source_url":"https://www.check-roudou.mhlw.go.jp/qa/roudousya/koyou/q5.html","text":"求人票と面接時の説明が違う場合、まずその違いが生じた理由を確かめることが第一。ハローワークの求人の場合は、ハローワークの窓口に申し出ることができ、ハローワークが事実確認と必要な指導を行う。募集時に示した条件を変更する場合は、変更内容を明示する（直接接続できなかったため、検索結果に表示された記述で確認）","used_in":"求人票と違うところがあったら"}],"not_used":["労働条件の明示義務違反の罰則（罰金の額）は、読者がとる行動に直接関わらないため書かない","求人票の記載が契約内容になるとした裁判例は、個別の事情で判断が分かれるため紹介せず、「まず理由を確かめる」「相談する」にとどめた","「入社後に条件が違ったら即日辞められる」と受け取られないよう、労働基準法第15条第2項はFAQで触れ、まず会社に確認・相談することを先に書いた"]}'::jsonb) on conflict (slug) do nothing;
+insert into article_categories (article_id, category_id, is_primary) select a.id, c.id, true from articles a, categories c where a.slug = 'tenshoku-koukai-shinai' and c.slug = 'junbi' on conflict do nothing;
+insert into article_categories (article_id, category_id, is_primary) select a.id, c.id, false from articles a, categories c where a.slug = 'tenshoku-koukai-shinai' and c.slug = 'hatarakikata' on conflict do nothing;
+insert into article_sources (article_id, title, publisher, url, accessed_at, used_for, sort_order) select id, '労働基準法（昭和二十二年法律第四十九号）第十五条', 'e-Gov法令検索（デジタル庁）', 'https://laws.e-gov.go.jp/law/322AC0000000049', '2026-10-09'::date, '使用者は労働契約の締結に際し、賃金・労働時間その他の労働条件を明示しなければならないこと。厚生労働省令で定める事項は省令で定める方法（書面の交付が原則）で明示すること。明示された労働条件が事実と相違する場合、労働者は即時に労働契約を解除できること', 0 from articles where slug = 'tenshoku-koukai-shinai';
+insert into article_sources (article_id, title, publisher, url, accessed_at, used_for, sort_order) select id, '2024年4月から、募集広告や職業紹介を受ける際に、求人企業などから明示される労働条件が追加されます。（リーフレット）', '厚生労働省', 'https://www.mhlw.go.jp/content/001114167.pdf', '2026-10-09'::date, '2024年4月から、求人の段階で示される労働条件に、業務の変更の範囲と就業場所の変更の範囲などが加わったこと', 1 from articles where slug = 'tenshoku-koukai-shinai';
+insert into article_sources (article_id, title, publisher, url, accessed_at, used_for, sort_order) select id, '2024年4月から労働条件明示のルールが変わります（有期契約労働者の無期転換ポータルサイト）', '厚生労働省', 'https://muki.mhlw.go.jp/rule.html', '2026-10-09'::date, '2024年4月1日から、労働契約の締結時に、雇入れ直後の就業場所・業務に加えて、その変更の範囲も明示することになったこと。対象は雇用形態を問わずすべての労働者であること', 2 from articles where slug = 'tenshoku-koukai-shinai';
+insert into article_sources (article_id, title, publisher, url, accessed_at, used_for, sort_order) select id, '求人票や求人広告に記載された条件が、実際の条件と違った場合の対処法（確かめよう労働条件）', '厚生労働省', 'https://www.check-roudou.mhlw.go.jp/qa/roudousya/koyou/q5.html', '2026-10-09'::date, '求人票と説明された条件が違う場合は、まず違いが生じた理由を確かめることが第一であること。ハローワークの求人の場合はハローワークの窓口などに申し出られること。募集時の条件を変える場合は、変更の内容を示すことになっていること', 3 from articles where slug = 'tenshoku-koukai-shinai';
+insert into article_versions (article_id, version, title, summary, body_md, created_by) select id, 1, title, summary, body_md, 'seed' from articles where slug = 'tenshoku-koukai-shinai' on conflict do nothing;
+insert into article_reviews (article_id, version, reviewer, verdict, checks) select id, 1, 'プロジェクトオーナー（チャットで承認）', 'approved', '{"content_hash":"89824c686dabed409b2c371c21ff5cb8bddc53e2fad3624845b9e34c457c8bd2","findings":[]}'::jsonb from articles where slug = 'tenshoku-koukai-shinai';
+update articles set status = 'published' where slug = 'tenshoku-koukai-shinai';
+
 -- article: tenshoku-nenmatsu-chosei (published)
 insert into articles (slug, kind, title, summary, body_md, status, featured, published_at, updated_at, reviewed_at, reviewed_by, information_checked_at, seo_title, seo_description, related_slugs, roles, concerns, situations, eyecatch, illustration, recommended, faq, news_meta, research_notes) values ('tenshoku-nenmatsu-chosei', 'article', '転職した年の年末調整と確定申告｜前の会社の源泉徴収票はどうする？', '年の途中で転職した年は、前の会社の源泉徴収票を新しい会社に出して、前の会社の給料も含めて年末調整をしてもらいます。年内に再就職しなかったときの確定申告（還付申告）のしかたと、源泉徴収票が届かないときの対処もまとめます。', '年の途中で会社を辞めて転職した年は、所得税の精算のしかたがいつもと少し違います。ポイントは、**前の会社からもらう「源泉徴収票」**です。
 
@@ -4611,6 +6994,313 @@ insert into article_sources (article_id, title, publisher, url, accessed_at, use
 insert into article_versions (article_id, version, title, summary, body_md, created_by) select id, 1, title, summary, body_md, 'seed' from articles where slug = 'tenshoku-nenmatsu-chosei' on conflict do nothing;
 insert into article_reviews (article_id, version, reviewer, verdict, checks) select id, 1, 'プロジェクトオーナー（チャットで承認）', 'approved', '{"content_hash":"f7e8dda73b111c8af7cfcd522a54364dad544eb6e4e524cf5469da880b81f445","findings":[]}'::jsonb from articles where slug = 'tenshoku-nenmatsu-chosei';
 update articles set status = 'published' where slug = 'tenshoku-nenmatsu-chosei';
+
+-- article: tenshoku-okane-junbi (published)
+insert into articles (slug, kind, title, summary, body_md, status, featured, published_at, updated_at, reviewed_at, reviewed_by, information_checked_at, seo_title, seo_description, related_slugs, roles, concerns, situations, eyecatch, illustration, recommended, faq, news_meta, research_notes) values ('tenshoku-okane-junbi', 'article', '転職活動にかかるお金と、退職後の生活費の準備｜住民税・保険・年金と失業給付の待期・給付制限', '転職活動では、面接の交通費や身だしなみなどの出費に加えて、仕事をしない期間ができると、住民税・健康保険・年金を自分で払う場面が出てきます。退職後に失業給付を受ける場合も、待期と給付制限があり、すぐには受け取れません。かかるお金の種類と、準備しておきたい生活費の考え方を紹介します。', '「転職したいけど、お金がもつか心配」。転職活動そのものの出費に加えて、仕事を辞めてから次の会社に入るまでのあいだは、給料が入らないのに、税金や保険料の支払いは続きます。
+
+先に結論を言うと、お金の準備は**「転職活動の出費」と「仕事をしない期間の生活費・税金・保険料」に分けて**考えると見通しが立ちます。とくに退職してから活動する人は、失業給付がすぐには受け取れないことを前提にしておきましょう。
+
+この記事で分かること：
+
+- **転職活動**でかかるお金
+- 退職後に**自分で払うことになる**住民税・健康保険・年金
+- 失業給付の**待期と給付制限**
+- 準備したいお金の**見積もり方**
+
+## 転職活動でかかるお金
+
+働きながら活動する人も、辞めてから活動する人も、次のような出費があります。金額は住んでいる場所や応募する会社によって大きく変わるので、自分の場合に当てはめて書き出してみましょう。
+
+| 出費 | 内容と確かめたいこと |
+| --- | --- |
+| 面接の交通費 | 会社までの往復。遠方の面接では交通費を会社が負担することもあるので、案内を確かめる |
+| 身だしなみ | スーツ・かばん・靴など。服装の指定がないかを案内で確かめる |
+| 書類 | 証明写真、履歴書の用紙、印刷や郵送の費用 |
+| オンライン面接 | カメラ付きのパソコンやスマートフォン、安定した通信環境 |
+| 勉強・資格 | 応募する仕事に関係する本や講座、試験の受験料 |
+
+### 出費をおさえるには
+
+- **オンライン面接を使う**：会社が対応していれば、交通費と移動の時間がかかりません
+- **持っているものを確かめる**：スーツなどは、まず手持ちで足りるかを見てから買うかを決めます
+- **公的な支援を調べる**：講座の費用は、教育訓練給付などの制度が使えることもあります
+
+働きながらの活動なら、給料が入り続けるので、出費の心配は小さくなります。
+
+## 退職後に自分で払うお金
+
+会社員のあいだは、住民税・健康保険料・厚生年金保険料は給料から引かれています。退職して次の会社に入るまでに期間があくと、これらを**自分で払う**ことになります。
+
+```figure
+type: compare
+title: 会社員のときと退職後の違い
+style: before-after
+columns:
+  - label: 会社員のとき
+    tone: sky
+    items:
+      - 住民税は給料から引かれる
+      - 健康保険は会社の保険
+      - 年金は厚生年金
+  - label: 次の会社に入るまで
+    tone: sand
+    items:
+      - 住民税は納付書で払うことがある
+      - 任意継続・国保・家族の扶養から選ぶ
+      - 国民年金に切り替えて払う
+```
+
+### 住民税：辞めても、前の年の分を払う
+
+個人住民税は、**前年の所得**をもとに課税されます。そのため、退職して収入がなくなっても、前の年に働いていた分の住民税は払うことになります。
+
+会社が給料から引いていた住民税（特別徴収）は、退職すると、残りの払い方が変わります。東京都主税局の案内では、次のように説明されています。
+
+- **6月1日〜12月31日に退職**：残りは自分で納付書で払う方法（普通徴収）に切り替わります。本人が申し出れば、最後の給与などからまとめて引いてもらうこともできます
+- **1月1日〜4月30日に退職**：5月31日までに支払われる給与や退職金が残りの税額を超える場合は、申し出がなくても、まとめて引かれます
+
+まとめて引かれると、最後の給料の手取りが少なくなります。普通徴収になると、あとから納付書が届きます。どちらの場合も、退職後のお金の計画に入れておきましょう。くわしくは[退職したあとの住民税はどう払う？](/articles/taishoku-juminzei)で紹介しています。
+
+### 健康保険：保険料は、選び方で変わる
+
+退職後は、前の会社の健康保険を続ける（任意継続）、国民健康保険に入る、家族の健康保険の扶養に入る、のどれかを選びます。保険料は、選ぶものや住んでいる地域、収入によって変わるので、**市区町村の窓口や加入していた健康保険に見積もりを聞いて**比べましょう。選び方は[退職後の健康保険はどうする？](/articles/taishoku-kenko-hoken)にまとめています。
+
+### 年金：国民年金に切り替えて払う
+
+退職してすぐに次の会社の厚生年金に入らない期間は、国民年金に切り替えて保険料を払います。日本年金機構によると、**2026年度（令和8年度）の国民年金保険料は月額17,920円**で、納付期限は納付する月の翌月末日です。
+
+払うのがむずかしいときは、失業を理由にした免除や納付猶予の制度があります。手続きは[転職で働かない期間ができたら、年金はどうする？](/articles/taishoku-nenkin-tetsuzuki)で紹介しています。
+
+## 失業給付は、すぐには受け取れない
+
+雇用保険の失業給付（基本手当）を受けられる場合でも、退職した次の日から受け取れるわけではありません。
+
+```figure
+type: steps
+title: 自己都合で辞めたときの流れ
+items:
+  - label: ハローワークで手続き
+    text: 求職の申し込みをし、受給資格が決まる
+  - label: 待期
+    text: 受給資格が決まった日から7日間は支給されない
+  - label: 給付制限
+    text: 2025年4月1日以降の離職は原則1か月
+  - label: 支給の対象に
+    text: 失業の認定を受けたあとに振り込まれる
+```
+
+- **待期**：受給資格が決まった日から**7日間**は、どの理由で辞めた人も支給されません
+- **給付制限**：正当な理由のない自己都合で辞めた場合は、待期のあとに給付制限の期間があります。**2025年4月1日以降**に離職した場合は、原則**1か月**です
+- **給付制限の解除**：2025年4月以降に、対象の教育訓練などを受けた（受けている）場合は、給付制限が解除されるしくみがあります
+
+そのうえ、実際に振り込まれるのは、失業の認定を受けたあとです。給付を受けられる条件や、もらえる日数は人によって違います。くわしくは[退職後の失業手当はもらえる？](/articles/shitsugyo-teate-kihon)を読んでみてください。
+
+## 準備したいお金の見積もり方
+
+「何か月分あれば安心」という決まった目安はありません。自分の数字で、次の式に当てはめて見積もります。
+
+```figure
+type: equation
+title: 準備したいお金の考え方
+terms:
+  - 毎月の生活費
+  - "×"
+  - 収入がない月数
+  - "+"
+  - 退職後に払う税金・保険料
+  - "+"
+  - 転職活動の出費
+```
+
+1. **毎月の生活費**：家賃、食費、通信費、光熱費など、ここ数か月の実際の出費を書き出す
+2. **収入がない月数**：辞めてから次の会社の最初の給料日までを見込む。失業給付を受ける場合も、待期と給付制限のあいだは収入がない前提で
+3. **退職後に払う税金・保険料**：住民税の残り、健康保険料、国民年金保険料
+4. **転職活動の出費**：交通費や身だしなみなど
+
+次の会社の最初の給料は、入社した月の末ではなく、翌月の支払日になることもあります。締め日と支払日は、内定のときに労働条件通知書で確かめましょう。
+
+### お金に不安があるなら、辞める前に確かめる
+
+```figure
+type: checklist
+title: 辞める前に確かめるお金のこと
+items:
+  - 毎月の生活費をいくらと見込んでいるか
+  - 住民税の残りは、どう払うことになるか
+  - 健康保険はどれを選び、保険料はいくらか
+  - 失業給付を受けられそうか、いつごろか
+  - 次の会社の最初の給料日はいつか
+```
+
+見積もってみて足りなさそうなら、**働きながら転職活動をして、次が決まってから辞める**順番にすると、収入がない期間を短くできます。', 'review', false, '2026-10-09'::timestamptz, '2026-10-09'::timestamptz, '2026-10-09'::timestamptz, 'プロジェクトオーナー（チャットで承認）', '2026-10-09'::timestamptz, '転職活動にかかるお金と退職後の生活費｜住民税・保険・年金', '転職活動にかかるお金と、退職後に必要になる生活費の準備を紹介します。面接の交通費や身だしなみの出費、退職後の住民税・健康保険・国民年金の支払い、失業給付の待期7日間と給付制限、準備したいお金の見積もり方が分かります。', array['shitsugyo-teate-kihon', 'taishoku-juminzei', 'zaishoku-tenshoku-susumekata', 'tenshoku-schedule', 'tenshoku-koukai-shinai']::text[], '{}'::text[], array['yametai', 'kyuryo']::text[], array['hajimete']::text[], array['転職と退職後、', 'お金はいくら必要？']::text[], null, false, '[{"q":"自己都合で辞めたら、失業給付はいつからもらえますか？","a":"受給資格が決まった日から7日間の待期があり、正当な理由のない自己都合退職の場合は、そのあとさらに給付制限の期間があります。2025年4月1日以降に離職した場合の給付制限は原則1か月です。振り込まれるまでの生活費は、手元のお金でまかなう前提で準備しておきましょう。"},{"q":"退職したら、住民税は払わなくてよくなりますか？","a":"払わなくてよくなるわけではありません。個人住民税は前年の所得に応じて課税されるので、退職したあとも、前の年に働いていた分の住民税を払います。退職した時期によって、最後の給与からまとめて引かれるか、自分で納付書で払うかが変わります。"},{"q":"退職後の国民年金の保険料はいくらですか？","a":"日本年金機構によると、2026年度（令和8年度）の国民年金保険料は月額17,920円です。退職してすぐに次の会社の厚生年金に入らない期間は、国民年金に切り替えて保険料を払います。払うのがむずかしいときは、免除や納付猶予の制度を相談できます。"}]'::jsonb, null, '{"schema_version":2,"writer_agent":"career-writer","angle":"「転職活動の出費」と「仕事をしない期間の生活費・社会保険料・税金」を分けて、何にお金がかかるかを先に見せる。金額は出典がある国民年金保険料と、待期・給付制限の期間だけを書き、ほかは自分で見積もる方法を示す","quotes":[{"source_url":"https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/0000160564_00045.html","text":"雇用保険の被保険者が正当な理由がなく自己の都合によって退職した場合には、基本手当の受給資格決定日から7日間の待期期間満了後1〜3か月間は基本手当を支給されない。令和7年4月1日以降の離職は原則1か月。令和7年4月以降に教育訓練等を受けた（受けている）場合、給付制限が解除される（www.mhlw.go.jp に直接接続できなかったため、WebSearch の検索結果に表示された記述で確認）","used_in":"失業給付は、すぐには受け取れない"},{"source_url":"https://www.nenkin.go.jp/service/kokunen/hokenryo/hokenryo.html","text":"国民年金保険料は1か月あたり17,920円（令和8年度）。納付期限は法令で納付対象月の翌月末日と定められている（直接接続できなかったため、検索結果に表示された記述で確認）","used_in":"退職後に自分で払うお金"},{"source_url":"https://www.tax.metro.tokyo.lg.jp/kazei/life/kojin_ju/tokubetsu/tetsuzuki","text":"6月1日から12月31日までに退職した場合、残りの税額は普通徴収に切り替わる（本人の申出があれば一括徴収）。翌年1月1日から4月30日までに退職した場合は、5月31日までに支給される給与・退職金等が残りの税額を超える場合、申出がなくても一括して特別徴収する（直接接続できなかったため、検索結果に表示された記述で確認）","used_in":"退職後に自分で払うお金"},{"source_url":"https://www.tax.metro.tokyo.lg.jp/kazei/life/kojin_ju","text":"個人住民税は前年の所得に応じて課税される（検索結果に表示されたページと、既存記事 taishoku-juminzei の確認記録で照合）","used_in":"退職後に自分で払うお金"}],"not_used":["面接の交通費・スーツ・証明写真などの金額の相場は公的な根拠を確認できなかったので、金額は書かず、項目と確かめ方だけを書く","国民健康保険料・任意継続の保険料の金額は、住んでいる地域や前年の収入、退職時の給与で変わるため書かず、見積もりの取り方と既存記事へのリンクにとどめた","「生活費の3か月分を準備」などの目安は公的な根拠を確認できなかったので書かず、自分の数字で計算する式を示した","給付制限が3か月になる場合（5年間に2回以上の自己都合退職など）は、検索結果で触れられていたが本記事では深追いせず、既存記事 shitsugyo-teate-kihon へのリンクにとどめた"]}'::jsonb) on conflict (slug) do nothing;
+insert into article_categories (article_id, category_id, is_primary) select a.id, c.id, true from articles a, categories c where a.slug = 'tenshoku-okane-junbi' and c.slug = 'junbi' on conflict do nothing;
+insert into article_categories (article_id, category_id, is_primary) select a.id, c.id, false from articles a, categories c where a.slug = 'tenshoku-okane-junbi' and c.slug = 'hatarakikata' on conflict do nothing;
+insert into article_sources (article_id, title, publisher, url, accessed_at, used_for, sort_order) select id, '令和７年４月以降に教育訓練等を受ける場合、給付制限が解除され、基本手当を受給できます', '厚生労働省', 'https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/0000160564_00045.html', '2026-10-09'::date, '正当な理由のない自己都合退職の場合、受給資格決定日から7日間の待期期間満了後、給付制限の期間は基本手当が支給されないこと。2025年4月1日以降の離職は給付制限が原則1か月であること。2025年4月以降に教育訓練等を受けた場合に給付制限が解除されること', 0 from articles where slug = 'tenshoku-okane-junbi';
+insert into article_sources (article_id, title, publisher, url, accessed_at, used_for, sort_order) select id, '国民年金保険料', '日本年金機構', 'https://www.nenkin.go.jp/service/kokunen/hokenryo/hokenryo.html', '2026-10-09'::date, '2026年度（令和8年度）の国民年金保険料が月額17,920円であること、納付期限が納付対象月の翌月末日であること', 1 from articles where slug = 'tenshoku-okane-junbi';
+insert into article_sources (article_id, title, publisher, url, accessed_at, used_for, sort_order) select id, '特別徴収にかかる手続きについて（個人住民税の特別徴収推進ステーション）', '東京都主税局', 'https://www.tax.metro.tokyo.lg.jp/kazei/life/kojin_ju/tokubetsu/tetsuzuki', '2026-10-09'::date, '6月1日から12月31日に退職した場合は残りの税額が普通徴収に切り替わり、本人の申出があれば一括徴収できること。1月1日から4月30日に退職した場合は、5月31日までに支払われる給与・退職金等が残りの税額を超えれば、申出がなくても一括徴収されること', 2 from articles where slug = 'tenshoku-okane-junbi';
+insert into article_sources (article_id, title, publisher, url, accessed_at, used_for, sort_order) select id, '個人住民税（暮らしと税金）', '東京都主税局', 'https://www.tax.metro.tokyo.lg.jp/kazei/life/kojin_ju', '2026-10-09'::date, '個人住民税は前年の所得をもとに課税されること', 3 from articles where slug = 'tenshoku-okane-junbi';
+insert into article_versions (article_id, version, title, summary, body_md, created_by) select id, 1, title, summary, body_md, 'seed' from articles where slug = 'tenshoku-okane-junbi' on conflict do nothing;
+insert into article_reviews (article_id, version, reviewer, verdict, checks) select id, 1, 'プロジェクトオーナー（チャットで承認）', 'approved', '{"content_hash":"0d1e8304c19575778354aa21e26af29a8c1af41f9e256d94c991e1d38246cb8c","findings":[]}'::jsonb from articles where slug = 'tenshoku-okane-junbi';
+update articles set status = 'published' where slug = 'tenshoku-okane-junbi';
+
+-- article: tenshoku-schedule (published)
+insert into articles (slug, kind, title, summary, body_md, status, featured, published_at, updated_at, reviewed_at, reviewed_by, information_checked_at, seo_title, seo_description, related_slugs, roles, concerns, situations, eyecatch, illustration, recommended, faq, news_meta, research_notes) values ('tenshoku-schedule', 'article', '転職活動の流れとスケジュールの立て方｜自己分析から入社まで、各ステップでやること', '転職活動は「自己分析→情報集め→応募→面接→内定→退職手続き→入社」の順に進みます。働きながら進める場合と辞めてから進める場合の違い、各ステップでやること、入社日から逆算するスケジュールの立て方、退職後に期限がある手続きを紹介します。', '「転職したい」と思っても、何から手をつけて、どの順番で進めればいいのかが分からないと、なかなか動き出せません。
+
+先に結論を言うと、転職活動は次の順番で進みます。
+
+1. 自己分析（経験と希望の整理）
+2. 情報集め（職種・求人を調べる）
+3. 応募（書類を作って出す）
+4. 面接
+5. 内定（条件を確かめて承諾する）
+6. 退職手続き
+7. 入社
+
+この記事で分かること：
+
+- 働きながら進める場合と、辞めてから進める場合の**違い**
+- 各ステップで**やること**と、次に進む目安
+- 入社日から逆算する**スケジュールの立て方**
+- 辞めてから進める場合に**期限がある手続き**
+
+## まず決めること：働きながら進める？辞めてから進める？
+
+最初に考えたいのは、今の仕事を続けながら進めるか、辞めてから進めるかです。どちらが正解というより、自分の状況に合うほうを選びます。
+
+| | 働きながら進める | 辞めてから進める |
+| --- | --- | --- |
+| 収入 | 途切れない | 収入がない期間ができる |
+| 時間 | 平日の夜や休日を使う | 面接の日程を合わせやすい |
+| 気持ち | 内定を見てから辞めるか決められる | 早く決めたいと焦りやすい |
+| 手続き | 会社を移るときの手続きが中心 | 健康保険・年金の切り替えを自分で行う |
+
+はじめての転職で迷ったら、**収入が途切れない「働きながら」を基本に考え、体調や職場の状況で続けるのが難しいときは「辞めてから」も選ぶ**、と考えると決めやすくなります。辞めてから進める場合は、生活費が何か月分あるかを先に計算しておきましょう。
+
+働きながら進めるときの時間の作り方は、[働きながらの転職活動、何から？](/articles/zaishoku-tenshoku-susumekata)で詳しく紹介しています。
+
+## 転職活動の流れと、各ステップでやること
+
+```figure
+type: steps
+title: 転職活動の流れ
+items:
+  - label: 自己分析
+    text: 経験・ゆずれない条件・避けたいことを書き出す
+  - label: 情報集め
+    text: 職種を2〜3つにしぼり、求人を見て比べる
+  - label: 応募
+    text: 履歴書・職務経歴書を作り、面接に行ける数だけ出す
+  - label: 面接
+    text: よく聞かれる質問の答えと、逆質問を準備する
+  - label: 内定
+    text: 労働条件を書面で確かめてから承諾する
+  - label: 退職・入社
+    text: 退職を伝え、引き継ぎと手続きをして入社する
+```
+
+### ステップ1：自己分析
+
+求人を見る前に、自分のことを書き出します。ここを飛ばすと、求人を見るたびに気持ちが揺れて、選べなくなりがちです。
+
+- これまでの仕事やアルバイトで**やってきたこと**（作業・工夫・ほめられたこと）
+- **ゆずれない条件**（給料の下限、休み、勤務地など）
+- **避けたいこと**（今の仕事で特につらいこと）
+
+次へ進む目安：「どんな仕事なら続けられそうか」を一言で言えるようになったら、情報集めに進みます。
+
+### ステップ2：情報集め
+
+興味のある職種を2〜3つにしぼり、仕事内容と求人を調べます。求人を見るときは、仕事内容・給料の内訳・休日・残業・研修の有無をそろえて比べると、違いが分かりやすくなります。
+
+次へ進む目安：「応募してみたい求人」がいくつか見つかったら、書類づくりに進みます。
+
+### ステップ3：応募
+
+履歴書と職務経歴書を作り、応募します。働きながら進める場合は、**面接に行ける数だけ応募する**のがポイントです。一度にたくさん出すと、面接の日程が重なって調整が大変になります。
+
+次へ進む目安：書類は一度作ったら、応募する求人に合わせて志望動機などを少しずつ書き換えます。
+
+### ステップ4：面接
+
+面接では、自己紹介・転職理由・志望動機などがよく聞かれます。答えを丸暗記するより、話す順番だけ決めておくと落ち着いて話せます。
+
+面接のあとは、聞かれたことと答えにくかったことをメモしておくと、次の面接の準備になります。
+
+### ステップ5：内定
+
+内定が出たら、すぐに返事をする前に、**労働条件を書面で確かめます**。給料の内訳、勤務地、休日、試用期間、入社日などが、求人や面接で聞いた内容と合っているかを見ましょう。条件を確かめてから承諾し、そのあとで今の職場に退職を伝えます。
+
+### ステップ6：退職手続き
+
+退職を伝える時期は、まず**就業規則**で「何日前までに申し出るか」を確かめます。伝える相手は直属の上司が基本です。退職日が決まったら、引き継ぎ、有給休暇の使い方、返すもの・受け取る書類を確認します。
+
+伝え方の例は[退職の伝え方は？誰に・いつ・どう言うか](/articles/taishoku-tsutaekata)で紹介しています。
+
+### ステップ7：入社
+
+入社日までに、転職先から求められる書類（年金や雇用保険の番号が分かるもの、源泉徴収票など）をそろえます。何が必要かは会社によって違うので、内定後の案内で確認しましょう。
+
+## スケジュールは「入社日」から逆算する
+
+転職活動にかかる期間は、応募する数や選考の回数、引き継ぎに必要な日数などで変わるため、一律には言えません。そこでおすすめなのが、**入社したい時期を先に決めて、逆算する**立て方です。
+
+```figure
+type: checklist
+title: 逆算するときに確かめること
+items:
+  - 入社したい時期はいつか
+  - 就業規則で、退職は何日前までに申し出るか
+  - 引き継ぎにどのくらいかかりそうか
+  - 残っている有給休暇を使うか
+  - 平日の夜・休日に使える時間はどのくらいか
+  - 辞めてから進めるなら、生活費は何か月分あるか
+```
+
+書き出し方の例（日付は仮の例です）：
+
+> 入社したい時期：20XX年7月1日
+> 就業規則：退職は〇か月前までに申し出る → 〇月中には内定を承諾しておきたい
+> 引き継ぎ：担当の仕事の整理に時間がかかりそう → 退職の申し出は早めにしたい
+> 応募：〇月から始めて、週に〇社のペースで面接を受ける
+
+予定どおりに進まないことも多いので、**最初から余裕をもって組んでおき、月に一度は見直す**くらいがちょうどよいです。応募したい求人が見つからない月があっても、自己分析や書類の見直しに時間を使えば、遅れを取り戻しやすくなります。
+
+## 辞めてから進める場合に、期限がある手続き
+
+仕事を辞めてから転職活動をする場合や、退職日から入社日まで間が空く場合は、自分で行う手続きがあります。期限があるものは先に確認しておきましょう。
+
+| 手続き | 期限・ポイント | 窓口 |
+| --- | --- | --- |
+| 国民年金への切り替え | 退職日の翌日から14日以内 | 住所地の市区町村 |
+| 国民健康保険への加入 | 14日以内に届け出る | 住所地の市町村 |
+| 失業手当（基本手当）の手続き | 求職の申込みをした日から通算7日間は待期期間 | 住所を管轄するハローワーク |
+
+- 国民年金の手続きでは、資格喪失日を証明できるもの（離職票など）が必要になる場合があります
+- 健康保険は、国民健康保険のほかに、前の会社の健康保険を続ける「任意継続」や、家族の扶養に入る方法もあります
+- 失業手当は、2025年4月1日以降に正当な理由のない自己都合で辞めた場合、待期期間のあとに**原則1か月の給付制限**があります
+
+退職日の翌日に次の会社に入る場合は、国民年金や国民健康保険への切り替えは原則として必要ありません。間が空くかどうかで手続きが変わるので、退職日と入社日が決まった時点で確認しましょう。
+
+健康保険の選び方や失業手当の条件と流れは、[退職後の失業手当はもらえる？](/articles/shitsugyo-teate-kihon)などで詳しく紹介しています。
+
+## 進め方に迷ったら
+
+流れが分かっていても、「自己分析がまとまらない」「応募しても先に進まない」と止まってしまうことはあります。そんなときは、ひとつ前のステップに戻ってみましょう。
+
+- 応募する求人が決められない → 自己分析の「ゆずれない条件」を見直す
+- 書類で先に進まない → 職務経歴書に、やってきたことを具体的に書けているか見直す
+- 面接で話がまとまらない → 転職理由と志望動機がつながっているか見直す
+
+転職活動の最初に整理しておきたいことは、[未経験転職は何から始める？](/articles/mikeiken-tenshoku-hajimekata)にもまとめています。', 'review', false, '2026-10-09'::timestamptz, '2026-10-09'::timestamptz, '2026-10-09'::timestamptz, 'プロジェクトオーナー（チャットで承認）', '2026-10-09'::timestamptz, '転職活動の流れとスケジュール｜何から順番に進める？', '転職活動の流れを、自己分析・応募・面接・内定・退職手続き・入社の順に紹介します。在職中と退職後の進め方の違い、入社日から逆算するスケジュールの立て方、退職後14日以内の健康保険・年金の手続きも分かります。', array['zaishoku-tenshoku-susumekata', 'mikeiken-tenshoku-hajimekata', 'taishoku-tsutaekata', 'jiko-bunseki-yarikata', 'tenshoku-okane-junbi']::text[], '{}'::text[], array['yametai']::text[], array['hajimete', 'dainishinsotsu']::text[], array['転職活動、', 'どんな順番で進める？']::text[], null, false, '[{"q":"転職活動は、仕事を辞める前と辞めた後、どちらに始めるのがいいですか？","a":"どちらにもよい点と気をつける点があります。働きながら進めると収入が途切れず、内定を見てから辞めるかどうかを決められます。辞めてから進めると時間は作りやすい一方で、収入がない期間ができ、健康保険や年金の切り替えなどの手続きも自分で行います。貯金と、今の仕事を続けられる体調かどうかを見て決めましょう。"},{"q":"転職活動にはどのくらいの期間がかかりますか？","a":"応募する数、選考の回数、退職までに必要な引き継ぎの期間などで変わるため、一律には言えません。入社したい時期を決めて、そこから「退職の申し出の時期（就業規則で確認）」「内定の時期」「応募を始める時期」と逆算して、自分の予定を立てるのがおすすめです。"},{"q":"退職してから次の会社に入るまで間が空くとき、何の手続きが必要ですか？","a":"次の会社にすぐ入らない場合は、会社の健康保険から国民健康保険などへの切り替えと、厚生年金から国民年金への切り替えが必要です。国民健康保険は14日以内に住所地の市町村の窓口へ届け出ることになっていて、国民年金も退職日の翌日から14日以内に市区町村で手続きします。失業手当を受ける場合は、住所を管轄するハローワークで手続きします。"}]'::jsonb, null, '{"schema_version":2,"writer_agent":"career-writer","angle":"転職活動を「自己分析→情報集め→応募→面接→内定→退職手続き→入社」の順に並べ、各ステップの「やること」と「次へ進む目安」を示す。期間の目安は根拠のある公的情報がないので書かず、入社日から逆算する立て方を示す。辞めてから進める場合に期限がある手続き（国保・国民年金の14日以内、失業手当の待期・給付制限）だけを数字で書く","quotes":[{"source_url":"https://www.nenkin.go.jp/service/kokunen/kanyu/20140710-03.html","text":"退職して第1号被保険者になる場合、提出期限は退職日の翌日から14日以内、提出先は住所地の市区町村役場。資格喪失日を証明できるもの（離職票等）が必要になる場合がある（サイトへ直接接続できなかったため、日本年金機構サイト内の検索結果に表示された内容で確認）","used_in":"辞めてから進める場合に、期限がある手続き"},{"source_url":"https://www.mhlw.go.jp/stf/newpage_21539.html","text":"国民健康保険の被保険者になったときなどは、14日以内に住所地の市町村の国民健康保険の窓口へ届け出る（サイトへ直接接続できなかったため、検索結果に表示された内容で確認）","used_in":"辞めてから進める場合に、期限がある手続き"},{"source_url":"https://www.hellowork.mhlw.go.jp/help/question05.html","text":"雇用保険の基本手当は、離職票の提出と求職の申込みを行った日（受給資格決定日）から通算して7日間を待期期間といい、その期間が満了するまでは支給されない（検索結果に表示された内容で確認）","used_in":"辞めてから進める場合に、期限がある手続き"},{"source_url":"https://jsite.mhlw.go.jp/gunma-roudoukyoku/content/contents/002182062.pdf","text":"令和7年4月1日以降に離職された方は、正当な理由がない自己都合により退職した場合、給付制限期間が原則1か月となる（資料のタイトルと検索結果で確認）","used_in":"辞めてから進める場合に、期限がある手続き"}],"not_used":["「転職活動の期間は3か月が目安」などの一般的な期間は、公的な調査・出典を確認できなかったため書かない。入社日から逆算する方法だけを示した","応募数・書類選考の通過率・面接回数の目安も、出典がないため書かない","民法第627条の「2週間」のルールは、退職の伝え方の記事（taishoku-tsutaekata）にまとめているため、本文では就業規則の確認と内部リンクにとどめた"]}'::jsonb) on conflict (slug) do nothing;
+insert into article_categories (article_id, category_id, is_primary) select a.id, c.id, true from articles a, categories c where a.slug = 'tenshoku-schedule' and c.slug = 'junbi' on conflict do nothing;
+insert into article_categories (article_id, category_id, is_primary) select a.id, c.id, false from articles a, categories c where a.slug = 'tenshoku-schedule' and c.slug = 'mikeiken' on conflict do nothing;
+insert into article_sources (article_id, title, publisher, url, accessed_at, used_for, sort_order) select id, '会社を退職したときの国民年金の手続き', '日本年金機構', 'https://www.nenkin.go.jp/service/kokunen/kanyu/20140710-03.html', '2026-10-09'::date, '退職して次の会社の厚生年金に入らない場合、退職日の翌日から14日以内に住所地の市区町村で国民年金の手続きをすること', 0 from articles where slug = 'tenshoku-schedule';
+insert into article_sources (article_id, title, publisher, url, accessed_at, used_for, sort_order) select id, '国民健康保険の加入・脱退について', '厚生労働省', 'https://www.mhlw.go.jp/stf/newpage_21539.html', '2026-10-09'::date, '国民健康保険に加入するときは、14日以内に住所地の市町村の窓口へ届け出ること', 1 from articles where slug = 'tenshoku-schedule';
+insert into article_sources (article_id, title, publisher, url, accessed_at, used_for, sort_order) select id, 'よくあるご質問（雇用保険について）', 'ハローワークインターネットサービス（厚生労働省）', 'https://www.hellowork.mhlw.go.jp/help/question05.html', '2026-10-09'::date, '離職票の提出と求職の申込みを行った日から通算して7日間は待期期間で、基本手当が支給されないこと', 2 from articles where slug = 'tenshoku-schedule';
+insert into article_sources (article_id, title, publisher, url, accessed_at, used_for, sort_order) select id, '令和７年４月１日以降に離職された方は、正当な理由がない自己都合により退職した場合、給付制限期間が原則１か月となります。', '群馬労働局・ハローワーク', 'https://jsite.mhlw.go.jp/gunma-roudoukyoku/content/contents/002182062.pdf', '2026-10-09'::date, '2025年4月1日以降に正当な理由のない自己都合で離職した場合、給付制限期間が原則1か月であること', 3 from articles where slug = 'tenshoku-schedule';
+insert into article_versions (article_id, version, title, summary, body_md, created_by) select id, 1, title, summary, body_md, 'seed' from articles where slug = 'tenshoku-schedule' on conflict do nothing;
+insert into article_reviews (article_id, version, reviewer, verdict, checks) select id, 1, 'プロジェクトオーナー（チャットで承認）', 'approved', '{"content_hash":"8d4fd84d91be34e07bf3c7268e2a214e0feb55941d8a09874ed6738b9aaf6e3b","findings":[]}'::jsonb from articles where slug = 'tenshoku-schedule';
+update articles set status = 'published' where slug = 'tenshoku-schedule';
 
 -- article: tenshoku-service-chigai (published)
 insert into articles (slug, kind, title, summary, body_md, status, featured, published_at, updated_at, reviewed_at, reviewed_by, information_checked_at, seo_title, seo_description, related_slugs, roles, concerns, situations, eyecatch, illustration, recommended, faq, news_meta, research_notes) values ('tenshoku-service-chigai', 'article', '転職サイト・転職エージェント・ハローワークの違いは？しくみと使い分け', '転職サイト、転職エージェント（人材紹介）、ハローワークは、だれが運営し、どこからお金が出て、どこまで手伝ってくれるかが違います。それぞれのしくみと向いている使い方、人材紹介が求職者から原則として手数料を取らないという職業安定法のルール、許可を受けた事業者かの確かめ方を紹介します。', '転職活動を始めようとすると、「転職サイト」「転職エージェント」「ハローワーク」と、いくつもの入口があって迷います。どれも「仕事を探すためのもの」ですが、**だれが運営していて、どこからお金が出ていて、どこまで手伝ってくれるか**が違います。
@@ -4865,6 +7555,125 @@ insert into article_versions (article_id, version, title, summary, body_md, crea
 insert into article_reviews (article_id, version, reviewer, verdict, checks) select id, 1, 'プロジェクトオーナー（チャットで承認）', 'approved', '{"content_hash":"ee016f046a2f2ed0a8a9fe1ff9f74c1e0f2c6ad4663db3cd7a9801bc9c10dd5a","findings":[]}'::jsonb from articles where slug = 'trial-koyou';
 update articles set status = 'published' where slug = 'trial-koyou';
 
+-- article: web-mensetsu-junbi (published)
+insert into articles (slug, kind, title, summary, body_md, status, featured, published_at, updated_at, reviewed_at, reviewed_by, information_checked_at, seo_title, seo_description, related_slugs, roles, concerns, situations, eyecatch, illustration, recommended, faq, news_meta, research_notes) values ('web-mensetsu-junbi', 'article', 'Web面接（オンライン面接）の準備は？通信・カメラ位置・背景・服装と、つながらないときの連絡', 'Web面接は、会場を自分で用意する面接です。前日までに通信・アプリ・カメラを本番と同じ条件で試し、当日は早めにログインして、つながらないときの連絡先を手元に置いておきます。カメラの高さや明るさ、背景、服装、当日の流れ、トラブル時の連絡の例文を紹介します。', '「Web面接で」と案内が来たけれど、家のどこで受ければいいのか、何を用意すればいいのか分からない。はじめてだと不安になりますよね。
+
+先に結論を言うと、Web面接は**会場を自分で用意する面接**です。準備は次の3つに分けると迷いません。
+
+1. **前日まで**に、通信・アプリ・カメラを本番と同じ条件で試す
+2. **当日**は、早めにログインして待つ
+3. **つながらないときの連絡先**を、すぐ見られる場所に置いておく
+
+この記事で分かること：
+
+- 前日までに**試しておくこと**
+- **カメラの高さと明るさ**、**背景**、**服装**の整え方
+- 当日の**流れ**と、話すときのコツ
+- **つながらないとき**の連絡のしかたと例文（仮の例）
+
+## 対面の面接と何が違う？
+
+対面の面接では、会社が部屋や机を用意してくれます。Web面接では、**通信、機材、明るさ、静かさ**を自分で用意しなければなりません。逆に言えば、ここを前日までに整えておけば、当日は話すことに集中できます。
+
+面接で話す内容の準備は、対面と変わりません。聞かれやすい質問の準備は[未経験職種の面接、何を準備する？](/articles/mensetsu-junbi-mikeiken)で紹介しています。
+
+## 前日までに試しておくこと
+
+兵庫労働局が公開しているオンライン面接のチェックポイントでは、実際に使うアプリの確認や、接続試験があるかの確認、パソコンを電源コードにつなぐことなどを挙げています。前日までに、**本番と同じ場所・同じ機材**で一度通して試しておきましょう。
+
+```figure
+type: checklist
+title: 前日までに試しておくこと
+items:
+  - 案内のURLとアプリで、実際に入れるか試した
+  - 会社の接続テストがあれば受けた
+  - 受ける場所で、通信が途切れないか確かめた
+  - カメラとマイクが映る・聞こえるか確かめた
+  - パソコンを電源コードにつないだ
+  - 通知が鳴らないよう、ほかのアプリを閉じた
+  - つながらないときの連絡先を控えた
+```
+
+試すときは、家族や友人とビデオ通話をしてみると、**自分の声が相手にどう聞こえるか**、映り方がどうかを教えてもらえます。カメラやマイクの調子が悪い場合は、兵庫労働局のチェックポイントでも、外付けの機器を検討するようにとしています。
+
+パソコンの操作に自信がないときは、アプリの入り方やマイクの切り替えだけでも前日に何度か練習しておくと安心です。パソコンの基本操作の練習のしかたは[PCが得意じゃなくても、事務職は目指せる？](/articles/pc-nigate-jimu)でも紹介しています。
+
+## カメラの高さと明るさ
+
+神奈川のハローワーク川崎の面接対策の資料では、光は顔の前から受け、パソコンのカメラを目線の高さに合わせるようにとしています。
+
+- **カメラの高さ**：ノートパソコンを机に置いたままだと、カメラが目より下になり、見下ろすような映り方になりがちです。本や箱を下に置いて、カメラを目の高さまで上げます
+- **映る範囲**：顔だけでなく、上半身が映るくらいの距離に座ります
+- **明るさ**：窓や照明を背にすると、顔が暗く映ります。光が顔の前から当たる向きに座り、顔に影ができていないか、明るすぎて白く飛んでいないかを確かめます
+
+自然光を使う場合は、面接と同じ時間帯に試しておくと、当日の明るさに近い状態で確かめられます。
+
+## 背景
+
+ハローワーク川崎の資料では、背景は無地が好ましく、難しい場合は背後にできるだけものが映らないようにするとしています。兵庫労働局のチェックポイントでは、バーチャル背景を使わないことも確認項目に入っています。
+
+- 無地の壁やカーテンの前に座る
+- 洗濯物、ポスター、散らかった棚などが映らない向きにする
+- 家族の声や生活音が入らない部屋を選び、受ける時間を家族に伝えておく
+
+## 服装
+
+ハローワーク川崎の資料では、オンライン面接の服装も通常の面接と同じにするとしています。画面に映るのは上半身だけでも、**上下とも対面の面接と同じ服装**にしておきましょう。途中で立ち上がることになっても慌てずにすみますし、気持ちも切り替わります。
+
+会社から「私服で」「服装自由」などの指定がある場合は、それに従います。
+
+## 当日の流れ
+
+```figure
+type: steps
+title: Web面接の当日の流れ
+items:
+  - label: 準備
+    text: 機材を立ち上げ、カメラとマイクを確かめる
+  - label: ログイン
+    text: 開始5〜10分前までに入って待つ
+  - label: 面接
+    text: カメラを見て、少しゆっくり話す
+  - label: 退出
+    text: お礼を言い、相手が退出してから切る
+```
+
+兵庫労働局のチェックポイントでは、開始5〜10分前までにログインを終えることを確認項目にしています。早すぎて相手の準備中に入ってしまわないよう、案内に入室の時刻が書かれていればそれに合わせましょう。
+
+### 話すときのコツ
+
+- **カメラを見て話す**：画面の相手の顔を見ると、相手からは目線が下がって見えます。ハローワーク川崎の資料でも、面接中はカメラを見て話すようにとしています
+- **少しゆっくり、はっきり**：音声が少し遅れて届くことがあるので、相手の話が終わってから一呼吸おいて答えます
+- **うなずきを大きめに**：小さな相づちは画面では伝わりにくいので、うなずきで聞いていることを示します
+- **メモは紙に**：キーボードを打つ音はマイクに入りやすいので、メモを取るときは手元の紙に書きます
+
+働きながら転職活動をしていて、平日の面接の時間をどう作るか迷うときは、[働きながらの転職活動、何から？](/articles/zaishoku-tenshoku-susumekata)も参考にしてください。
+
+## つながらないときの連絡
+
+兵庫労働局のチェックポイントには、通信が途絶えたときの連絡手段を確認しておくことも入っています。面接の案内メールに書かれている**電話番号とメールアドレス**を、紙に書くかスマホにメモして、パソコンとは別に見られるようにしておきましょう。
+
+開始時刻になっても入れないときや、途中で切れて戻れないときは、まず入り直しを試し、それでもだめなら**すぐに連絡**します。黙って待つより、早めに伝えるほうが、会社も次の対応を決めやすくなります。
+
+電話で伝える場合（仮の例）：
+
+> 「本日〇時からWeb面接のお約束をいただいている〇〇と申します。先ほどから案内のURLに接続できず、ご連絡いたしました。入り直しを試しておりますが、どのようにすればよろしいでしょうか。」
+
+メールで伝える場合（仮の例）：
+
+> 件名：Web面接への接続について（〇〇 〇〇）
+>
+> 本日〇時からWeb面接のお約束をいただいている〇〇です。開始時刻に案内のURLから接続を試みましたが、つながらない状態です。引き続き接続を試しております。お手数をおかけしますが、ご指示をいただけますと幸いです。
+
+途中で音声だけが聞こえなくなったときは、画面のチャット欄に「音声が聞こえなくなりました。入り直します」と書いてから入り直すと、相手にも状況が伝わります。トラブルがあっても、落ち着いて状況を伝えられれば、そのあとの面接に気持ちを切り替えやすくなります。', 'review', false, '2026-10-09'::timestamptz, '2026-10-09'::timestamptz, '2026-10-09'::timestamptz, 'プロジェクトオーナー（チャットで承認）', '2026-10-09'::timestamptz, 'Web面接の準備と注意点｜カメラ位置・背景・つながらないとき', 'Web面接（オンライン面接）の準備を紹介します。前日までに試す通信・アプリ・電源、カメラの高さと明るさ、背景と服装、当日のログインの目安、話し方のコツ、つながらないときの連絡のしかたと例文が分かります。', array['mensetsu-junbi-mikeiken', 'zaishoku-tenshoku-susumekata', 'pc-nigate-jimu', 'mensetsu-fukusou', 'oubo-mail-kakikata']::text[], '{}'::text[], array['mensetsu']::text[], array['hajimete', 'pc-mikeiken']::text[], array['Web面接、', '何を準備すればいい？']::text[], null, false, '[{"q":"Web面接はスマホで受けても大丈夫ですか？","a":"会社から指定がなければ、スマホで受けられる場合もあります。その場合は、手に持たずにスタンドなどで固定し、充電しながら、通知を切って受けましょう。パソコンかスマホか迷うときは、面接の案内に書かれていないかを確認し、分からなければ事前に問い合わせると安心です。"},{"q":"バーチャル背景を使ってもいいですか？","a":"兵庫労働局のオンライン面接のチェックポイントでは、バーチャル背景を使わないことが確認項目に入っています。会社から指定がなければ、無地の壁やカーテンの前など、実際の背景を整えて受けるのが無難です。"},{"q":"面接の途中で通信が切れてしまったら、不合格になりますか？","a":"通信の不具合だけで結果が決まるとは限りません。慌てずに入り直し、入れないときは事前に控えておいた連絡先に、すぐ電話かメールで状況を伝えましょう。再開のしかたは会社の指示に従います。"}]'::jsonb, null, '{"schema_version":2,"writer_agent":"career-writer","angle":"Web面接は「会場を自分で用意する面接」。既存記事（mensetsu-junbi-mikeiken）の5項目のチェックを深掘りし、前日までの試し方、カメラ・明るさ・背景・服装、当日の流れ、つながらないときの連絡の例文まで、手順として示す","quotes":[{"source_url":"https://jsite.mhlw.go.jp/hyogo-roudoukyoku/content/contents/000946458.pdf","text":"ライトの角度が悪く顔に影ができていないか、光量が強く白飛びしていないか。実際に使うアプリケーションを確認し、接続試験があるか確認すること（あれば対応すること）。パソコンはバッテリー駆動させていないか（電源コード接続が望ましい）。カメラやマイクの調子が悪い場合は外付け機器の導入を検討すること。上半身が映るカメラ位置、バーチャル背景を使用しないこと、開始5〜10分前までのログイン、通信が途絶えた際の連絡手段の確認などをチェック項目にしている（この環境から jsite.mhlw.go.jp に直接接続できなかったため、検索結果に表示された資料の抜粋で確認）","used_in":"前日までに試しておくこと／カメラの高さと明るさ／背景／当日の流れ／つながらないときの連絡"},{"source_url":"https://jsite.mhlw.go.jp/kanagawa-hellowork/content/contents/002604524.pdf","text":"オンライン面接の注意点として、背景は無地が好ましく、難しい場合は背後に極力ものが写らないようにする。光は顔の前から受ける、PCのカメラを目線の高さに合わせる、面接中はカメラを見て話す。服装は通常の面接と同じ（直接開けなかったため、検索結果の抜粋で確認）","used_in":"カメラの高さと明るさ／背景／服装／話し方"}],"not_used":["兵庫労働局のチェックポイントにある通信速度の目安の数値は、抜粋だけでは正確な値と条件を確認できなかったため書かない","背景ぼかし機能の可否は、ハローワークの資料によって扱いが分かれていた（使ってよいとする資料と、使わないことをすすめる資料がある）ため断定せず、「実際の背景を整えるのが無難」にとどめた","使うアプリ（Zoom・Teams など）は会社によって違うため、特定のサービスの操作方法は書かない"]}'::jsonb) on conflict (slug) do nothing;
+insert into article_categories (article_id, category_id, is_primary) select a.id, c.id, true from articles a, categories c where a.slug = 'web-mensetsu-junbi' and c.slug = 'shorui-mensetsu' on conflict do nothing;
+insert into article_categories (article_id, category_id, is_primary) select a.id, c.id, false from articles a, categories c where a.slug = 'web-mensetsu-junbi' and c.slug = 'junbi' on conflict do nothing;
+insert into article_sources (article_id, title, publisher, url, accessed_at, used_for, sort_order) select id, 'オンライン面接（WEB面接）チェックポイント', '兵庫労働局', 'https://jsite.mhlw.go.jp/hyogo-roudoukyoku/content/contents/000946458.pdf', '2026-10-09'::date, '実際に使うアプリの確認と接続試験の有無の確認、パソコンは電源コードに接続すること、カメラやマイクの調子が悪いときは外付け機器を検討すること、顔に影ができていないか・白飛びしていないかの確認、上半身が映るカメラ位置、バーチャル背景を使わないこと、開始5〜10分前までのログイン、通信が途絶えたときの連絡手段の確認', 0 from articles where slug = 'web-mensetsu-junbi';
+insert into article_sources (article_id, title, publisher, url, accessed_at, used_for, sort_order) select id, '面接対策 面接のマナーとよく聞かれる質問', '神奈川労働局（ハローワーク川崎）', 'https://jsite.mhlw.go.jp/kanagawa-hellowork/content/contents/002604524.pdf', '2026-10-09'::date, 'オンライン面接の背景は無地が好ましく、難しい場合は背後にものが映らないようにすること。光は顔の前から受け、カメラを目線の高さに合わせ、カメラを見て話すこと。服装は通常の面接と同じにすること', 1 from articles where slug = 'web-mensetsu-junbi';
+insert into article_versions (article_id, version, title, summary, body_md, created_by) select id, 1, title, summary, body_md, 'seed' from articles where slug = 'web-mensetsu-junbi' on conflict do nothing;
+insert into article_reviews (article_id, version, reviewer, verdict, checks) select id, 1, 'プロジェクトオーナー（チャットで承認）', 'approved', '{"content_hash":"203896cf118e3ac2db6c0fbc862b5d20f095091409bdecbb9a82a89fe4608797","findings":[]}'::jsonb from articles where slug = 'web-mensetsu-junbi';
+update articles set status = 'published' where slug = 'web-mensetsu-junbi';
+
 -- article: yametai-mae-kakunin (published)
 insert into articles (slug, kind, title, summary, body_md, status, featured, published_at, updated_at, reviewed_at, reviewed_by, information_checked_at, seo_title, seo_description, related_slugs, roles, concerns, situations, eyecatch, illustration, recommended, faq, news_meta, research_notes) values ('yametai-mae-kakunin', 'article', '今の仕事を辞めたいとき、先に確認しておきたいこと', '今の仕事を辞めたいと思ったら、辞める前に、つらい理由の整理、働きながら探すかどうか、退職を伝える時期、有給休暇の残りを確認しておくと、あとで困りにくくなります。心や体がつらいときの相談先もあわせて紹介します。', '「もう今の仕事を辞めたい」。そう思うのは、おかしなことではありません。ただ、勢いで辞めてしまうと、次の仕事が決まるまでの生活費や手続きで困ることがあります。辞めるかどうかを決める前に、確認しておきたいことを順番に整理します。
 
@@ -4941,7 +7750,7 @@ items:
 - **総合労働相談コーナー**: 都道府県の労働局や労働基準監督署の中にあり、解雇やいじめ・嫌がらせ、退職をめぐるトラブルなど、職場の問題の相談を面談か電話で受け付けています。予約は不要です
 - **こころの耳**: 厚生労働省の、働く人の心の健康のためのサイトです。電話・SNS・メールで相談できます
 
-辞めると決めたあとの進め方は[未経験転職は何から始める？](/articles/mikeiken-tenshoku-hajimekata)を、転職が何回目かが気になる人は[転職回数が気になるときに整理したいこと](/articles/tenshoku-kaisu-kininaru)を参考にしてください。', 'review', false, '2026-10-06'::timestamptz, '2026-10-06'::timestamptz, '2026-10-06'::timestamptz, null, '2026-10-06'::timestamptz, null, null, array['news-koyou-hoken-kyufu-seigen', 'tenshoku-kaisu-kininaru', 'mikeiken-tenshoku-hajimekata']::text[], '{}'::text[], array['yametai']::text[], array['hajimete']::text[], array['辞めたい。', 'その前に確認すること']::text[], null, false, '[{"q":"会社が退職を認めてくれないと、辞められないのですか？","a":"期間の定めのない雇用（正社員など）の場合、民法では、退職を申し出てから2週間がたつと雇用が終わるとされていて、会社の同意がないと辞められないわけではありません。ただし、就業規則に退職の申し出についての決まりがあれば原則としてそれが適用されるので、まず就業規則を確認しましょう。"},{"q":"有給休暇が何日あるか、どう確かめればいいですか？","a":"給与明細や勤怠のシステムに残りの日数が書かれていることがあります。分からなければ、人事の担当者や上司に確認しましょう。法律では、6か月続けて勤務し、出勤すべき日の8割以上出勤した人に、10日の年次有給休暇が与えられます（週5日勤務などの場合）。"},{"q":"辞めてから転職活動をしても大丈夫ですか？","a":"時間を確保しやすい一方で、収入が途切れる期間が出ます。雇用保険の基本手当には受け取るための条件があるので、自分が当てはまるかを確認し、生活費の見通しを立ててから決めましょう。"}]'::jsonb, null, '{"schema_version":2,"writer_agent":"career-writer","angle":"辞めるかどうかを決める前に、理由の整理・活動の進め方・退職の手続き・有給・相談先の順に確認する。心身の不調がある場合は転職より休養と相談を先にする","quotes":[{"source_url":"https://jsite.mhlw.go.jp/kagoshima-roudoukyoku/yokuaru_goshitsumon/qa07/0701.html","text":"民法では期間の定めのない雇用契約は解約の申し入れ後2週間で終了することとなっており、会社の同意がなければ退職できないというものではない（民法第627条）。就業規則に退職の規定がある場合は原則として就業規則が適用されるが、極端に長い申し入れ期間などは無効とされる場合もある","used_in":"退職はいつまでに伝える？"},{"source_url":"https://www.check-roudou.mhlw.go.jp/qa/roudousya/yukyu/q1.html","text":"雇い入れから6か月継続勤務し、全労働日の8割以上出勤した労働者に10日の年次有給休暇。その後は勤続年数に応じて増え、最高20日（週5日以上または週30時間以上の場合）","used_in":"有給休暇は残っている？"},{"source_url":"https://www.mhlw.go.jp/general/seido/chihou/kaiketu/soudan.html","text":"総合労働相談コーナーは各都道府県労働局と全国の労働基準監督署内などに設置。解雇、雇止め、いじめなどあらゆる分野の労働問題を対象に、専門の相談員が面談または電話で対応。予約不要・無料","used_in":"つらさが強いときの相談先"},{"source_url":"https://kokoro.mhlw.go.jp/","text":"働く人とその家族などが、電話・SNS・メールで匿名・無料で相談できる窓口がある","used_in":"つらさが強いときの相談先"},{"source_url":"https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/0000160564.html","text":"令和7年4月1日以降に正当な理由なく自己都合で離職した場合、給付制限期間が原則2か月から1か月に短縮","used_in":"働きながら探す？辞めてから探す？"}],"not_used":["退職理由の割合や転職者数などの統計は使っていない","有期雇用の途中退職のルールは、契約書の確認をすすめるにとどめた"]}'::jsonb) on conflict (slug) do nothing;
+辞めると決めたあとの進め方は[未経験転職は何から始める？](/articles/mikeiken-tenshoku-hajimekata)を、転職が何回目かが気になる人は[転職回数が気になるときに整理したいこと](/articles/tenshoku-kaisu-kininaru)を参考にしてください。', 'review', false, '2026-10-06'::timestamptz, '2026-10-06'::timestamptz, '2026-10-06'::timestamptz, null, '2026-10-06'::timestamptz, null, null, array['news-koyou-hoken-kyufu-seigen', 'tenshoku-kaisu-kininaru', 'mikeiken-tenshoku-hajimekata', 'tenshoku-okane-junbi']::text[], '{}'::text[], array['yametai']::text[], array['hajimete']::text[], array['辞めたい。', 'その前に確認すること']::text[], null, false, '[{"q":"会社が退職を認めてくれないと、辞められないのですか？","a":"期間の定めのない雇用（正社員など）の場合、民法では、退職を申し出てから2週間がたつと雇用が終わるとされていて、会社の同意がないと辞められないわけではありません。ただし、就業規則に退職の申し出についての決まりがあれば原則としてそれが適用されるので、まず就業規則を確認しましょう。"},{"q":"有給休暇が何日あるか、どう確かめればいいですか？","a":"給与明細や勤怠のシステムに残りの日数が書かれていることがあります。分からなければ、人事の担当者や上司に確認しましょう。法律では、6か月続けて勤務し、出勤すべき日の8割以上出勤した人に、10日の年次有給休暇が与えられます（週5日勤務などの場合）。"},{"q":"辞めてから転職活動をしても大丈夫ですか？","a":"時間を確保しやすい一方で、収入が途切れる期間が出ます。雇用保険の基本手当には受け取るための条件があるので、自分が当てはまるかを確認し、生活費の見通しを立ててから決めましょう。"}]'::jsonb, null, '{"schema_version":2,"writer_agent":"career-writer","angle":"辞めるかどうかを決める前に、理由の整理・活動の進め方・退職の手続き・有給・相談先の順に確認する。心身の不調がある場合は転職より休養と相談を先にする","quotes":[{"source_url":"https://jsite.mhlw.go.jp/kagoshima-roudoukyoku/yokuaru_goshitsumon/qa07/0701.html","text":"民法では期間の定めのない雇用契約は解約の申し入れ後2週間で終了することとなっており、会社の同意がなければ退職できないというものではない（民法第627条）。就業規則に退職の規定がある場合は原則として就業規則が適用されるが、極端に長い申し入れ期間などは無効とされる場合もある","used_in":"退職はいつまでに伝える？"},{"source_url":"https://www.check-roudou.mhlw.go.jp/qa/roudousya/yukyu/q1.html","text":"雇い入れから6か月継続勤務し、全労働日の8割以上出勤した労働者に10日の年次有給休暇。その後は勤続年数に応じて増え、最高20日（週5日以上または週30時間以上の場合）","used_in":"有給休暇は残っている？"},{"source_url":"https://www.mhlw.go.jp/general/seido/chihou/kaiketu/soudan.html","text":"総合労働相談コーナーは各都道府県労働局と全国の労働基準監督署内などに設置。解雇、雇止め、いじめなどあらゆる分野の労働問題を対象に、専門の相談員が面談または電話で対応。予約不要・無料","used_in":"つらさが強いときの相談先"},{"source_url":"https://kokoro.mhlw.go.jp/","text":"働く人とその家族などが、電話・SNS・メールで匿名・無料で相談できる窓口がある","used_in":"つらさが強いときの相談先"},{"source_url":"https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/0000160564.html","text":"令和7年4月1日以降に正当な理由なく自己都合で離職した場合、給付制限期間が原則2か月から1か月に短縮","used_in":"働きながら探す？辞めてから探す？"}],"not_used":["退職理由の割合や転職者数などの統計は使っていない","有期雇用の途中退職のルールは、契約書の確認をすすめるにとどめた"]}'::jsonb) on conflict (slug) do nothing;
 insert into article_categories (article_id, category_id, is_primary) select a.id, c.id, true from articles a, categories c where a.slug = 'yametai-mae-kakunin' and c.slug = 'junbi' on conflict do nothing;
 insert into article_sources (article_id, title, publisher, url, accessed_at, used_for, sort_order) select id, 'Q5 このたび、家庭の事情で10年間勤務していた会社を辞めたいと思い退職願を提出しましたが、上司が受け取ってくれません。会社が同意してくれないと私は退職できないのでしょうか。', '鹿児島労働局', 'https://jsite.mhlw.go.jp/kagoshima-roudoukyoku/yokuaru_goshitsumon/qa07/0701.html', '2026-10-06'::date, '期間の定めのない雇用は申し入れから2週間で終了し、会社の同意は必要ないこと（民法第627条）、就業規則に規定があれば原則としてそれが適用されること', 0 from articles where slug = 'yametai-mae-kakunin';
 insert into article_sources (article_id, title, publisher, url, accessed_at, used_for, sort_order) select id, '年次有給休暇はどのような場合に与えられるのですか（確かめよう労働条件）', '厚生労働省', 'https://www.check-roudou.mhlw.go.jp/qa/roudousya/yukyu/q1.html', '2026-10-06'::date, '6か月継続勤務・全労働日の8割以上出勤で10日の年次有給休暇が与えられ、勤続年数に応じて日数が増えること', 1 from articles where slug = 'yametai-mae-kakunin';

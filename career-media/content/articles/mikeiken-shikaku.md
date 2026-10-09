@@ -2,7 +2,7 @@
 slug: mikeiken-shikaku
 title: 未経験の転職に資格は必要？取る前に考えたいことと、職種別に検討されやすい資格の例
 summary: 未経験の転職では、資格があれば採用されるわけではありません。大事なのは、目指す仕事で「なくては働けない資格」か「あると役立つ資格」かを見分けることです。資格より先に考えたいこと、MOS・日商簿記・ITパスポート・介護職員初任者研修などの例、取る前に確認することを紹介します。
-status: review
+status: published
 categories: [mikeiken, junbi]
 featured: false
 recommended: false
@@ -14,7 +14,7 @@ roles: [jimu, it-support]
 concerns: [mikeiken-shokushu]
 situations: [hajimete, pc-mikeiken]
 eyecatch: ["未経験の転職、", "資格は取るべき？"]
-related: [pc-nigate-jimu, kyouiku-kunren-kyufu-tsukaikata, rirekisho-kakukoto-nai]
+related: [pc-nigate-jimu, kyouiku-kunren-kyufu-tsukaikata, rirekisho-kakukoto-nai, keiri-mikeiken, kaigo-mikeiken]
 faq:
   - q: 資格がないと、未経験の職種には応募できませんか？
     a: 職種によります。厚生労働省の職業情報提供サイト（job tag）では、一般事務は入職に学歴や資格は必要とされないと紹介されています。一方、訪問介護員（ホームヘルパー）のように、介護職員初任者研修の修了が必要な仕事もあります。応募したい求人の「応募資格」「必須」「歓迎」の欄を見て判断しましょう。
@@ -72,6 +72,9 @@ research_notes:
     - 各資格の合格率・学習時間の目安・受験料は、年度や回によって変わり、公式情報を今回すべて確認できなかったため書かない
     - 教育訓練給付金の支給率・上限額は、種類や受講開始日で変わるため本文では書かず、既存記事へのリンクにとどめた
     - 「資格があると年収が上がる」といった効果は公的な根拠を確認できなかったので書かない
+published_at: 2026-10-09
+reviewed_at: 2026-10-09
+reviewed_by: プロジェクトオーナー（チャットで承認）
 ---
 
 「未経験の仕事に応募するなら、何か資格を取っておいたほうがいい？」。転職を考え始めると、まず資格の勉強から始めようとする人は多いです。

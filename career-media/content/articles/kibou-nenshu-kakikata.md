@@ -2,7 +2,7 @@
 slug: kibou-nenshu-kakikata
 title: 希望年収・希望給与の書き方と面接での答え方｜「貴社規定に従います」の使いどころと例文
 summary: 希望年収は、書類では「貴社規定に従います」を基本にしつつ、ゆずれない金額があるときは根拠をそえて書きます。面接では、額面の年額で、今の年収と希望をセットで伝えると話がずれません。手取りと額面の違い、今の年収の確かめ方、場面別の答え方の例を紹介します。
-status: review
+status: published
 categories: [hatarakikata, shorui-mensetsu]
 featured: false
 recommended: false
@@ -14,7 +14,7 @@ roles: []
 concerns: [kyuryo, mensetsu]
 situations: [hajimete, seishain-keiken-sukunai]
 eyecatch: ["希望年収、", "なんて答えればいい？"]
-related: [nenshu-300man-tenshoku, tedori-20man-hikaku, mensetsu-junbi-mikeiken]
+related: [nenshu-300man-tenshoku, tedori-20man-hikaku, mensetsu-junbi-mikeiken, koteizangyo-kyujin, mensetsu-yokukiku-shitsumon]
 faq:
   - q: 履歴書の希望給与の欄は、空欄でもいいですか？
     a: 厚生労働省の履歴書様式例では、給料などの希望を書く欄は「本人希望記入欄」で、希望があれば記入する欄です。特に希望がなければ「貴社の規定に従います」と書くのが一般的です。空欄よりも、ひとこと書いておくほうが、書き忘れではないことが伝わります。
@@ -57,6 +57,9 @@ research_notes:
     - 手取りの割合（額面の〇割前後）は、扶養や住民税、保険の種類で変わり、公的な目安を確認できなかったため書かない
     - 厚生年金の保険料率や標準報酬月額の等級などの具体的な数字は、この記事の主題から外れるため書かない
     - 年収の交渉を代行するサービスなど、特定のサービスには触れない
+published_at: 2026-10-09
+reviewed_at: 2026-10-09
+reviewed_by: プロジェクトオーナー（チャットで承認）
 ---
 
 応募書類の「希望給与」の欄や、面接での「希望年収はいくらですか？」という質問。高く言うと落とされそうで、低く言うと損をしそうで、どう答えればいいか迷う人は多いです。

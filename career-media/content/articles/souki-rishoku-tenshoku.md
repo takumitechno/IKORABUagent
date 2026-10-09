@@ -3,7 +3,7 @@ slug: souki-rishoku-tenshoku
 kind: article
 title: 入社1年以内に辞めた・辞めたいときの転職｜面接での説明のしかたと、次に同じことを繰り返さない確認
 summary: 入社して早く辞めた経験は、隠すより「何が合わなかったか」と「次は何を確かめて選んだか」をセットで話すほうが伝わりやすくなります。面接での説明の型と例文、次の会社で同じことを繰り返さないための確認ポイント、第二新卒としての応募の考え方と相談先を紹介します。
-status: review
+status: published
 categories: [junbi, mikeiken]
 featured: false
 recommended: false
@@ -15,7 +15,7 @@ roles: []
 concerns: [mensetsu, yametai]
 situations: [dainishinsotsu, seishain-keiken-sukunai]
 eyecatch: ["早く辞めた経験、", "面接でどう話す？"]
-related: [dainishinsotsu-nansai, tenshoku-kaisu-kininaru, shokuba-jouhou-wakamono]
+related: [dainishinsotsu-nansai, tenshoku-kaisu-kininaru, shokuba-jouhou-wakamono, taishoku-riyuu-mensetsu, tenshoku-koukai-shinai]
 faq:
   - q: 入社して数か月で辞めた職歴は、履歴書に書かなくてもいいですか？
     a: 短い期間でも、正社員などとして雇われていた職歴は書くのが基本です。書かずにいて、あとで分かると、説明が食い違って信用を失うおそれがあります。期間が短いことは面接で聞かれやすいので、話す内容を準備しておきましょう。
@@ -57,6 +57,9 @@ research_notes:
     - 新規学卒者の3年以内離職率などの統計は、年度で数字が変わり、本記事の主題（説明と選び方）に直接必要ないため使わない
     - 「1年未満の職歴は書類選考で不利」などの評価に関する一般論は公的な根拠を確認できなかったので書かない
     - 第二新卒の年齢・卒業後年数の定義は法律で決まっていないため断定せず、既存記事 dainishinsotsu-nansai へのリンクにとどめた
+published_at: 2026-10-09
+reviewed_at: 2026-10-09
+reviewed_by: プロジェクトオーナー（チャットで承認）
 ---
 
 「入社して半年で辞めてしまった」「1年もたたずに、もう辞めたいと思っている」。早く辞めた経験があると、次の面接で何を言われるか不安になり、転職活動そのものに踏み出しにくくなるかもしれません。
@@ -155,7 +158,7 @@ items:
   - 迷ったら：承諾の前に返事の期限を相談する
 ```
 
-新卒などを対象にした求人では、採用者数と離職者数、研修の有無、残業の実績といった「職場の情報」を確認できることがあります。見方は[求人で「職場の情報」を確かめるには？](/articles/shokuba-jouhou-wakamono)で紹介しています。面接での逆質問の例は[未経験職種の面接、何を準備する？](/articles/mensetsu-junbi-mikeiken)が参考になります。
+新卒などを対象にした求人では、採用者数と離職者数、研修の有無、残業の実績といった「職場の情報」を確認できることがあります。見方は[求人で「職場の情報」を確かめるには？](/articles/shokuba-jouhou-wakamono)で紹介しています。
 
 ### 3. まだ在職中なら、辞める前にもう一度考える
 

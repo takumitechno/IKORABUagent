@@ -14,7 +14,7 @@ roles: []
 concerns: [yametai]
 situations: [hajimete]
 eyecatch: ["辞めたい。", "その前に確認すること"]
-related: [news-koyou-hoken-kyufu-seigen, tenshoku-kaisu-kininaru, mikeiken-tenshoku-hajimekata]
+related: [news-koyou-hoken-kyufu-seigen, tenshoku-kaisu-kininaru, mikeiken-tenshoku-hajimekata, tenshoku-okane-junbi]
 faq:
   - q: 会社が退職を認めてくれないと、辞められないのですか？
     a: 期間の定めのない雇用（正社員など）の場合、民法では、退職を申し出てから2週間がたつと雇用が終わるとされていて、会社の同意がないと辞められないわけではありません。ただし、就業規則に退職の申し出についての決まりがあれば原則としてそれが適用されるので、まず就業規則を確認しましょう。

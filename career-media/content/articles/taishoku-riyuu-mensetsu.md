@@ -3,7 +3,7 @@ slug: taishoku-riyuu-mensetsu
 kind: article
 title: 面接で退職理由を聞かれたら？不満を前向きに言い換える答え方と例文
 summary: 面接で退職理由（転職理由）を聞かれたときは、不満を隠すのではなく、事実を短く伝えて「次にしたいこと」につなげます。面接官が確かめたいこと、答え方の型、人間関係・残業・ノルマなど本音別の言い換え例、言い換えと嘘の違いを紹介します。
-status: review
+status: published
 categories: [shorui-mensetsu, junbi]
 featured: false
 recommended: false
@@ -15,7 +15,7 @@ roles: []
 concerns: [mensetsu, yametai]
 situations: [hajimete, dainishinsotsu]
 eyecatch: ["辞めた理由、", "正直に言っていい？"]
-related: [tenshoku-kaisu-kininaru, yametai-mae-kakunin, kuhaku-kikan-setsumei]
+related: [tenshoku-kaisu-kininaru, yametai-mae-kakunin, kuhaku-kikan-setsumei, mensetsu-yokukiku-shitsumon, souki-rishoku-tenshoku]
 faq:
   - q: 本当の退職理由が人間関係です。正直に言わないとだめですか？
     a: 嘘をつく必要はありませんが、人の悪口として話す必要もありません。「一人で作業する時間が長く、相談しながら進められる環境で働きたいと考えました」のように、事実の中から「次にどんな環境で働きたいか」を取り出して短く話しましょう。
@@ -57,6 +57,9 @@ research_notes:
     - 山形の資料の「面接時間は15〜30分程度が半数を超える」という調査の数字は、この記事の論点と離れるため使わない
     - 「退職理由は30秒程度で」などの時間の目安は公的な根拠を確認できなかったので書かない
     - 経歴を偽った場合の内定取り消しなど法的な扱いは、事情によって判断が分かれるため断定しない
+published_at: 2026-10-09
+reviewed_at: 2026-10-09
+reviewed_by: プロジェクトオーナー（チャットで承認）
 ---
 
 面接で「前の会社を辞めた理由を教えてください」と聞かれたとき、本当の理由が「人間関係がつらかった」「残業が多すぎた」だと、どこまで話していいのか迷いますよね。

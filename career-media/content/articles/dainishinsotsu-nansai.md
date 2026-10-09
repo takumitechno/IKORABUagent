@@ -14,7 +14,7 @@ roles: []
 concerns: [mikeiken-shokushu]
 situations: [dainishinsotsu, hajimete]
 eyecatch: ["第二新卒って", "何歳まで？"]
-related: [26sai-mikeiken, agent-mendan-mae, tenshoku-kaisu-kininaru]
+related: [26sai-mikeiken, agent-mendan-mae, tenshoku-kaisu-kininaru, souki-rishoku-tenshoku]
 faq:
   - q: 第二新卒は何歳までですか？
     a: 何歳までと一律には決まっていません。学校を卒業しておおむね3年以内の人を指すことが多く、年齢より卒業からの年数で考えると分かりやすくなります。たとえば22歳で大学を卒業した場合、25歳前後までが目安です。応募できるかどうかは、求人ごとの応募条件で確認しましょう。

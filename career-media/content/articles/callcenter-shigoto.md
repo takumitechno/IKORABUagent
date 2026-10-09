@@ -2,7 +2,7 @@
 slug: callcenter-shigoto
 title: コールセンターの仕事内容は？受信と発信の違い・向き不向きと、接客経験の活かし方
 summary: コールセンターの仕事は、電話やメールでお客さまに応対し、聞き取った内容をパソコンに入力する仕事です。受信（インバウンド）と発信（アウトバウンド）の違い、向き不向き、接客経験の活かし方、応募前に求人で確認することを紹介します。
-status: review
+status: published
 categories: [shokushu, keiken]
 featured: false
 recommended: false
@@ -14,7 +14,7 @@ roles: [customer-support]
 concerns: [mikeiken-shokushu]
 situations: [sekkyaku, hajimete]
 eyecatch: ["コールセンターって、", "接客経験が活きる？"]
-related: [eigyo-cs-it-support-chigai, sekkyaku-keiken-ikasu, mikeiken-kenshu-kakunin]
+related: [eigyo-cs-it-support-chigai, sekkyaku-keiken-ikasu, mikeiken-kenshu-kakunin, jiko-pr-mikeiken, eigyo-jimu-shigoto]
 faq:
   - q: コールセンターの仕事に、資格や経験は必要ですか？
     a: 厚生労働省の職業情報提供サイト（job tag）では、コールセンターオペレーターになるのに学歴や資格は特に必要ないとされています。入社後に商品やサービスの知識を学び、ロールプレイ（練習の応対）や上の立場の人の指導を受けてから、ひとりで応対するのが一般的な流れです。研修の期間や内容は会社によって違うので、求人や面接で確認しましょう。
@@ -59,6 +59,9 @@ research_notes:
     - コールセンターの賃金・労働時間の数字は、地域や雇用形態で大きく変わるため書かない
     - 「テレコミュニケーター検定」などの民間検定は、job tag の関連資格欄で確認できなかったため扱わない
     - 受信と発信のどちらが離職しやすいか等の評価は、公的な根拠を確認できなかったので書かない
+published_at: 2026-10-09
+reviewed_at: 2026-10-09
+reviewed_by: プロジェクトオーナー（チャットで承認）
 ---
 
 「接客の仕事から離れたいけど、人と話すことはきらいじゃない」。そんなときに候補に挙がりやすいのが、コールセンターの仕事です。求人もよく見かけますが、実際に何をするのか、電話ばかりでつらくないのか、イメージしにくい人も多いはずです。

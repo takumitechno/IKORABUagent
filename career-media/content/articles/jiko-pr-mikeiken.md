@@ -3,7 +3,7 @@ slug: jiko-pr-mikeiken
 kind: article
 title: 未経験の仕事の自己PR、何を書く？アルバイト・接客の経験から強みを見つける方法と例文
 summary: 未経験の仕事に応募するときの自己PRは、同じ仕事の経験がなくても、アルバイトや接客で「やってきたこと」から作れます。強みの見つけ方、接客の経験を強みの言葉にする言い換え、自己PRの型、職種別の例文、面接で話すときのコツを紹介します。
-status: review
+status: published
 categories: [shorui-mensetsu, keiken]
 featured: false
 recommended: false
@@ -15,7 +15,7 @@ roles: []
 concerns: [mensetsu, mikeiken-shokushu]
 situations: [sekkyaku, freeter, seishain-keiken-sukunai]
 eyecatch: ["接客の経験、", "自己PRにできる？"]
-related: [sekkyaku-keiken-ikasu, shokumu-keirekisho-arubaito, shiboudouki-mikeiken]
+related: [sekkyaku-keiken-ikasu, shokumu-keirekisho-arubaito, shiboudouki-mikeiken, mensetsu-yokukiku-shitsumon, jiko-bunseki-yarikata]
 faq:
   - q: アルバイトの経験だけでも、自己PRに書いていいですか？
     a: 書いて構いません。自己PRで伝えるのは、経験の長さや肩書きよりも、仕事の中で自分がどう考えて動いたかです。アルバイトで工夫したことや任されたことを、応募する仕事でどう活かすかまでつなげて書きましょう。
@@ -56,6 +56,9 @@ research_notes:
   not_used:
     - 「自己PRは〇〇文字が目安」「面接での自己PRは〇分」などの分量・時間は、公的な根拠を確認できなかったので書かない
     - 例文には年数・件数などの数字を入れず「〇年」とした。架空の数字を実績のように見せないため
+published_at: 2026-10-09
+reviewed_at: 2026-10-09
+reviewed_by: プロジェクトオーナー（チャットで承認）
 ---
 
 「接客のアルバイトしかしていないのに、自己PRに何を書けばいいの？」。未経験の仕事に応募しようとして、ここで手が止まる人は多いと思います。

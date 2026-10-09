@@ -2,7 +2,7 @@
 slug: tenshoku-schedule
 title: 転職活動の流れとスケジュールの立て方｜自己分析から入社まで、各ステップでやること
 summary: 転職活動は「自己分析→情報集め→応募→面接→内定→退職手続き→入社」の順に進みます。働きながら進める場合と辞めてから進める場合の違い、各ステップでやること、入社日から逆算するスケジュールの立て方、退職後に期限がある手続きを紹介します。
-status: review
+status: published
 categories: [junbi, mikeiken]
 featured: false
 recommended: false
@@ -14,7 +14,7 @@ roles: []
 concerns: [yametai]
 situations: [hajimete, dainishinsotsu]
 eyecatch: ["転職活動、", "どんな順番で進める？"]
-related: [zaishoku-tenshoku-susumekata, mikeiken-tenshoku-hajimekata, taishoku-tsutaekata]
+related: [zaishoku-tenshoku-susumekata, mikeiken-tenshoku-hajimekata, taishoku-tsutaekata, jiko-bunseki-yarikata, tenshoku-okane-junbi]
 faq:
   - q: 転職活動は、仕事を辞める前と辞めた後、どちらに始めるのがいいですか？
     a: どちらにもよい点と気をつける点があります。働きながら進めると収入が途切れず、内定を見てから辞めるかどうかを決められます。辞めてから進めると時間は作りやすい一方で、収入がない期間ができ、健康保険や年金の切り替えなどの手続きも自分で行います。貯金と、今の仕事を続けられる体調かどうかを見て決めましょう。
@@ -64,6 +64,9 @@ research_notes:
     - 「転職活動の期間は3か月が目安」などの一般的な期間は、公的な調査・出典を確認できなかったため書かない。入社日から逆算する方法だけを示した
     - 応募数・書類選考の通過率・面接回数の目安も、出典がないため書かない
     - 民法第627条の「2週間」のルールは、退職の伝え方の記事（taishoku-tsutaekata）にまとめているため、本文では就業規則の確認と内部リンクにとどめた
+published_at: 2026-10-09
+reviewed_at: 2026-10-09
+reviewed_by: プロジェクトオーナー（チャットで承認）
 ---
 
 「転職したい」と思っても、何から手をつけて、どの順番で進めればいいのかが分からないと、なかなか動き出せません。

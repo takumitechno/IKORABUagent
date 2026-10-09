@@ -2,7 +2,7 @@
 slug: koteizangyo-kyujin
 title: 固定残業代（みなし残業）がある求人の見方｜求人に書かれるべき3つの項目と確認のしかた
 summary: 固定残業代がある求人では、月給の合計だけでなく「固定残業代を除いた基本給」「何時間分でいくらか」「超えた分を追加で払うか」の3つを確かめます。若者雇用促進法に基づく指針と厚生労働省のリーフレットをもとに、求人の読み方、書いていないときの聞き方を紹介します。
-status: review
+status: published
 categories: [hatarakikata, seido]
 featured: false
 recommended: false
@@ -14,7 +14,7 @@ roles: []
 concerns: [kyuryo]
 situations: [hajimete, seishain-keiken-sukunai]
 eyecatch: ["「みなし残業」って", "どこを見ればいい？"]
-related: [donichi-yasumi-nenshu-hikaku, naitei-shodaku-mae, tedori-20man-hikaku]
+related: [donichi-yasumi-nenshu-hikaku, naitei-shodaku-mae, tedori-20man-hikaku, tenshoku-koukai-shinai, kibou-nenshu-kakikata]
 faq:
   - q: 固定残業代がある会社は、避けたほうがいいですか？
     a: 固定残業代があること自体が、すぐに悪いというわけではありません。大事なのは、固定残業代を除いた基本給がいくらか、何時間分の残業代でいくらか、その時間を超えた分は追加で支払われるかが、はっきり示されているかどうかです。この3つが書かれていない場合は、応募前や面接で確かめましょう。
@@ -65,6 +65,9 @@ research_notes:
     - 割増率（25%など）の具体的な数字は、この記事の主題から外れるため書かない
     - 固定残業代と「みなし労働時間制（裁量労働制・事業場外みなし）」の違いは、今回の出典で確認しきれなかったため扱わない
     - 求人の金額例は、架空の数字を作らないよう「〇〇円」で示した
+published_at: 2026-10-09
+reviewed_at: 2026-10-09
+reviewed_by: プロジェクトオーナー（チャットで承認）
 ---
 
 求人を見ていると、「月給〇〇万円（固定残業代含む）」「みなし残業〇時間分を含む」といった書き方を見かけることがあります。月給が高く見えても、その中身が分からないと、ほかの求人と正しく比べられません。

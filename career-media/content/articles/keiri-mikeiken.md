@@ -3,7 +3,7 @@ slug: keiri-mikeiken
 kind: article
 title: 経理の仕事内容は？日次・月次・年次の流れと、未経験から目指すときの準備
 summary: 経理は、会社のお金の出入りを記録し、月ごと・年ごとに集計して、経営の状態を数字でまとめる仕事です。日次・月次・年次の仕事の流れ、日商簿記の位置づけ、求人の「経理補助」「経理アシスタント」の読み方、未経験から目指すときの準備を紹介します。
-status: review
+status: published
 categories: [shokushu, mikeiken]
 featured: false
 recommended: false
@@ -15,7 +15,7 @@ roles: [jimu]
 concerns: [mikeiken-shokushu, office]
 situations: [pc-mikeiken, seishain-keiken-sukunai]
 eyecatch: ["経理って、", "未経験からどう目指す？"]
-related: [jimu-mikeiken-mae, pc-nigate-jimu, kyouiku-kunren-kyufu-tsukaikata]
+related: [jimu-mikeiken-mae, pc-nigate-jimu, kyouiku-kunren-kyufu-tsukaikata, eigyo-jimu-shigoto, mikeiken-shikaku]
 faq:
   - q: 経理の仕事は、簿記の資格がないとできませんか？
     a: job tag（厚生労働省の職業情報提供サイト）では、経理事務になるのに学歴や資格は特に必要とされていません。ただし、日商簿記検定などの関連資格があると仕事に役立つとされています。求人によっては応募条件に「簿記3級以上」などと書かれていることもあるので、応募条件の欄を確認しましょう。
@@ -76,6 +76,9 @@ research_notes:
     - 民間サイトにある「経理事務の平均時給」「簿記2級以上が目安」などの数字・基準は、公的な根拠を確認できなかったので書かない
     - 簿記の合格率や受験料は回ごとに変わるため書かない
     - 給与計算や年末調整を経理・総務・人事のどこが担当するかは会社によって違うため、断定せず「担当することがある」にとどめた
+published_at: 2026-10-09
+reviewed_at: 2026-10-09
+reviewed_by: プロジェクトオーナー（チャットで承認）
 ---
 
 「数字を扱う仕事に興味がある」「事務の中でも、専門性のある仕事がしたい」。そんな理由で経理を考える人もいると思います。一方で、「簿記の資格がないと無理？」「未経験で応募していいの？」と迷う人も多い職種です。
