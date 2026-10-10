@@ -160,13 +160,9 @@ describe("site", () => {
     expect(findSelectedImage("missing", [e])).toBeNull();
   });
 
-  it("the image index matches its records and active image slots remain wired", () => {
+  it("the image index matches its records", () => {
     const index = JSON.parse(fs.readFileSync(path.join(REPO, "content/images/index.json"), "utf8"));
     const metas = fs.readdirSync(path.join(REPO, "content/images/meta")).filter((f) => f.endsWith(".json"));
     expect(index.images.map((i: { slug: string }) => i.slug).sort()).toEqual(metas.map((f) => f.replace(/\.json$/, "")).sort());
-    const page = fs.readFileSync(path.join(REPO, "src/app/page.tsx"), "utf8");
-    expect(page).toContain("<ResultPreview />");
-    expect(page).not.toContain("<HeroMockup");
-    expect(page).toContain('slug="check-support"');
   });
 });

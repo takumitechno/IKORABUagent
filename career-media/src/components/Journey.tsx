@@ -158,12 +158,16 @@ export function JourneyNav({ journey, index, articles }: { journey: Journey; ind
   );
 }
 
-const CASE_COLORS = ["var(--color-brand-press)", "var(--color-sub)", "var(--color-accent)"];
+const CASE_COPY = [
+  { lead: "接客の経験を活かして", title: "デスクワークへ。", tone: "bg-sky text-sky-ink", scene: "desk" as const },
+  { lead: "給料は下げたくない。", title: "休みも増やしたい。", tone: "bg-sand text-sand-ink", scene: "calendar" as const },
+  { lead: "バイトの経験から", title: "正社員を目指す。", tone: "bg-mint text-mint-ink", scene: "flag" as const },
+];
 
 /** トップに出す3つのガイドの入口（写真の代わりに、色の帯と最初のステップを見せる） */
 export function JourneyCards() {
   return (
-    <ul className="swipe md-grid reveal [--swipe-w:82%]" style={{ ["--cols" as string]: 3 }}>
+    <ul className="grid gap-3 md:grid-cols-3 md:gap-5">
       {JOURNEYS.map((j, i) => (
         <li key={j.id}>
           <Link
@@ -171,21 +175,14 @@ export function JourneyCards() {
             data-cta-placement="home-journeys"
             data-cta-kind="journey-start"
             data-pattern-id={j.patternId}
-            className="tap lift group flex h-full flex-col overflow-hidden rounded-2xl border border-line bg-surface hover:border-brand/40"
+            className={`tap group relative flex min-h-[132px] items-center overflow-hidden rounded-2xl p-5 transition-shadow hover:shadow-[var(--shadow-raised)] md:min-h-[240px] md:items-start md:p-6 ${CASE_COPY[i].tone}`}
           >
-            <span className="relative block overflow-hidden px-4 pb-4 pt-4 text-white" style={{ background: CASE_COLORS[i % CASE_COLORS.length] }}>
-              <span aria-hidden="true" className="absolute -right-10 -top-12 h-36 w-36 rounded-full bg-white/[0.08]" />
-              <span className="relative block text-[11px] font-bold tracking-[0.2em] text-white/75">CASE {String(i + 1).padStart(2, "0")}</span>
-              <span className="relative mt-1.5 block text-[17px] font-bold leading-snug">{j.title}</span>
+            <span className="relative z-10 block w-[70%] md:w-full">
+              <span className="block text-xs font-medium md:text-sm">{CASE_COPY[i].lead}</span>
+              <span className="mt-1 block text-[19px] font-bold leading-relaxed min-[360px]:text-[21px] md:text-[23px]">{CASE_COPY[i].title}</span>
+              <span className="mt-2 inline-flex items-center gap-1 text-xs font-bold">読んでみる<ArrowRight className="h-3.5 w-3.5" aria-hidden="true" /></span>
             </span>
-            <span className="flex flex-1 flex-col px-4 pb-4 pt-3">
-              <span className="text-[11.5px] font-bold text-muted">こんな人に</span>
-              <span className="mt-0.5 line-clamp-2 text-[13px] leading-6 text-body">{j.who}</span>
-              <span className="mt-auto inline-flex items-center gap-1 pt-4 text-[13.5px] font-bold text-brand-strong">
-                順番に読む（全{j.steps.length}ステップ）
-                <ArrowRight className="h-4 w-4 transition group-hover:translate-x-0.5" aria-hidden="true" />
-              </span>
-            </span>
+            <Motif name={CASE_COPY[i].scene} className="absolute bottom-2 right-1 h-24 w-24 md:bottom-1 md:right-3 md:h-32 md:w-32" />
           </Link>
         </li>
       ))}

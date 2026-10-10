@@ -98,8 +98,8 @@ import { GeneratedImage } from "@/components/GeneratedImage";
 
 | slug | type | 使う場所 | 状態 |
 | --- | --- | --- | --- |
-| [hero-home](hero-home.md) | hero | 差し込み口なし。現在は条件整理ノートの見本を使用 | 保留・生成不要 |
-| [check-support](check-support.md) | section | トップの「条件整理チェック」（`src/app/page.tsx`） | 未生成 |
+| [hero-home](hero-home.md) | hero | 差し込み口なし。現在は既存SVGと短いコピーを使用 | 保留・生成不要 |
+| [check-support](check-support.md) | section | 現在のトップには差し込み口なし | 保留・生成不要 |
 | [sns-theme-a-cover](sns-theme-a-cover.md) | sns-carousel | `/sales/sns/a` の表紙用ビジュアル | 未生成 |
 | [journey-sekkyaku-office](journey-sekkyaku-office.md) | section | （今は差し込み口なし。ケースカードは色帯のデザインに変更） | 未生成 |
 | [journey-kyuryo-donichi](journey-kyuryo-donichi.md) | section | （同上） | 未生成 |

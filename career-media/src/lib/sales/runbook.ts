@@ -10,7 +10,7 @@ export const DEMO_PREPARATION = [
   "5分版では読む順番ガイドを省略し、他2テーマと技術詳細は質問が出たときだけ開く。",
 ];
 export const RUNBOOK: RunbookStep[] = [
-  { title: "Home", href: "/", show: "見出しと条件整理ノートの見本", say: "Instagramの投稿に興味を持った人が、記事を読み、条件を整理し、相談するところまで試作しました。正式提携前の非公開デモです。", next: "投稿の見本をご覧ください。", minutes: 0.3 },
+  { title: "Home", href: "/", show: "短い見出しと、絵で選べる3つの入口", say: "SNSをよく見る20〜30代が、まず自分に近い悩みを選び、記事・条件整理・相談へ進める試作です。正式提携前の非公開デモです。", next: "投稿の見本をご覧ください。", minutes: 0.3 },
   { title: "SNS見本（接客経験）", href: "/sales/sns/b#carousel", show: "表紙・経験の分け方・記事への接続。7枚を読み上げない", say: "接客の経験しかないと感じる人に、経験の伝え方を届ける投稿です。詳しく知りたい人は記事へ進みます。リールは台本・絵コンテの見本です。", next: "記事へのリンクを新規タブで開きます。", minutes: 1 },
   { title: "代表記事", href: `/articles/sekkyaku-keiken-ikasu?${utm("b", "carousel")}`, show: "経験の表と職務経歴書の例（新規タブ）", say: "自分で書類を書き始められるところまで説明しています。検索から来た人にも使える記事です。", next: "迷わず次を読める順番も用意しています。", minutes: 1 },
   { title: "読む順番ガイド", href: "/situations/sekkyaku#guide", show: "経験→働き方→比較→PC/電話→条件整理→相談の6段階", say: "接客からオフィスワークを考える人に、比べる材料と読む順番を用意しています。", next: "自分の希望はチェックで整理できます。", minutes: 0.5 },

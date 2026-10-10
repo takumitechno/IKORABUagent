@@ -1,319 +1,99 @@
 import Link from "next/link";
-import { ArrowRight, Building2, ClipboardList, FileText, ListChecks, MessagesSquare, Search, ShieldCheck } from "lucide-react";
+import { ArrowRight, ClipboardList, Search } from "lucide-react";
 import { JourneyCards } from "@/components/Journey";
-import { ArticleList, ArticleRow, LeadCard } from "@/components/ArticleCards";
-import { ConsultButton, ConsultationCta } from "@/components/ConsultationCta";
-import { ExploreTabs } from "@/components/EntryGrid";
-import { GeneratedImage } from "@/components/GeneratedImage";
-import { ResultPreview } from "@/components/ResultPreview";
-import { JobPostingDiagram, ProcessFlow } from "@/components/HomeDiagrams";
-import { ProValueSection } from "@/components/ProValue";
-import { LevelMeter } from "@/components/LevelMeter";
 import { JsonLd } from "@/components/JsonLd";
-import { Roadmap, type RoadmapStep } from "@/components/Roadmap";
-import { SectionHeading } from "@/components/SectionHeading";
+import { Motif } from "@/components/illustrations/Motif";
 import { partner } from "@/config/partner";
 import { site } from "@/config/site";
 import { getRepository } from "@/lib/content";
-import { ALL_QUESTIONS } from "@/lib/condition-check/questions";
-import { JOB_ROLES, LEVEL_LABELS, type JobRole } from "@/lib/jobs";
 import { organizationJsonLd, pageMetadata, websiteJsonLd } from "@/lib/seo";
-import { HERO_SHORTCUTS, ROLE_TO_COMPARISON, TAXONOMY, type TaxonomyGroup } from "@/lib/taxonomy";
 
 export const revalidate = 600;
+export const metadata = pageMetadata({ title: site.fullName + "｜はじめて・未経験の転職", description: site.description, path: "/" });
 
-export const metadata = pageMetadata({
-  title: `${site.fullName}｜はじめての転職・未経験転職の仕事選びメディア`,
-  description: site.description,
-  path: "/",
-});
-
-/** ヒーローのメイン導線（自分に合う仕事の探し方） */
-const GUIDE_SLUG = "shigoto-sagashikata";
-/** 進め方の「比べる」で読んでほしい記事 */
-const COMPARE_SLUG = "donichi-yasumi-nenshu-hikaku";
-
-const roleHub = (r: JobRole) => {
-  const hub = Object.entries(ROLE_TO_COMPARISON).find(([, v]) => v === r.slug)?.[0];
-  return hub ? `/jobs/${hub}` : `/jobs#${r.slug}`;
-};
+const READS = [
+  { slug: "shigoto-sagashikata", title: "やりたい仕事が分からないときは？", label: "仕事選び" },
+  { slug: "sekkyaku-keiken-ikasu", title: "「接客しかしてない」も、経験になる。", label: "経験の伝え方" },
+  { slug: "donichi-yasumi-nenshu-hikaku", title: "給料と休み、どっちも大事。", label: "条件の比べ方" },
+];
 
 export default async function HomePage() {
-  const repo = getRepository();
-  const [categories, all] = await Promise.all([repo.listCategories(), repo.listArticles()]);
-  const articles = all.filter((a) => a.kind === "article");
-  // 制度の変更は、施行・発表日の新しい順に並べる（解説を書いた日ではなく、制度の日付で見せる）
-  const news = all
-    .filter((a) => a.kind === "news")
-    .sort((a, b) => (b.news?.announcedAt ?? "").localeCompare(a.news?.announcedAt ?? ""))
-    .slice(0, 5);
-  // 「最初に読みたい記事」: 編集部が選んだ記事（featured → recommended の順）。ランキングではない
-  const featuredAll = articles.filter((a) => a.featured);
-  const lead = featuredAll.find((a) => a.slug === GUIDE_SLUG) ?? featuredAll[0];
-  const picks = [...featuredAll, ...articles.filter((a) => a.recommended)].filter((a, i, arr) => a !== lead && arr.indexOf(a) === i).slice(0, 6);
-  const shown = new Set([lead, ...picks].filter(Boolean).map((a) => a!.slug));
-  // 新着は、上で出した記事と重ならないように
-  const latest = articles.filter((a) => !shown.has(a.slug)).slice(0, 5);
-  const has = (slug: string) => articles.some((a) => a.slug === slug);
-  const guideHref = has(GUIDE_SLUG) ? `/articles/${GUIDE_SLUG}` : "/jobs";
-  const counts = (group: TaxonomyGroup) => Object.fromEntries(TAXONOMY[group].map((t) => [t.slug, all.filter((a) => a[group].includes(t.slug)).length]));
-
-  const roadmap: RoadmapStep[] = [
-    { scene: "checklist", title: "整理する", text: "条件と経験を書き出す", href: "/check", cta: "条件整理チェック", tone: "bg-mint" },
-    { scene: "search", title: "知る", text: "仕事の中身を知る", href: "/jobs", cta: "職種を比べる", tone: "bg-sky" },
-    { scene: "scale", title: "比べる", text: "給料と休みを比べる", href: has(COMPARE_SLUG) ? `/articles/${COMPARE_SLUG}` : "/concerns/kyuryo", cta: "比べ方を読む", tone: "bg-sand" },
-    { scene: "chat", title: "相談する", text: "迷ったら人に話す", href: "/consultation", cta: "相談について", tone: "bg-coral" },
-  ];
-
+  const articles = await getRepository().listArticles();
+  const reads = READS.filter((read) => articles.some((article) => article.slug === read.slug));
   return (
     <>
       <JsonLd data={organizationJsonLd()} />
       <JsonLd data={websiteJsonLd()} />
-
-      {/* Hero: ブランドの色の面に、見出し・検索・人気のキーワード・2つの入口（転職メディアでよくある構成） */}
-      <section className="relative overflow-hidden bg-hero text-white">
-        <div aria-hidden="true" className="pointer-events-none absolute inset-0">
-          <span className="drift absolute -right-40 -top-56 h-[560px] w-[560px] rounded-full bg-[radial-gradient(circle,rgb(255_255_255/0.14),transparent_62%)]" />
-          <span className="drift-2 absolute -bottom-64 -left-32 h-[480px] w-[480px] rounded-full bg-black/[0.12]" />
-          <span className="sparkle absolute left-[46%] top-[14%] h-2 w-2 rotate-45 rounded-[2px] bg-highlight" />
-          <span className="sparkle sparkle-d1 absolute left-[8%] top-[62%] h-1.5 w-1.5 rotate-45 rounded-[2px] bg-white/80" />
-          <span className="sparkle sparkle-d2 absolute right-[6%] top-[22%] h-2.5 w-2.5 rotate-45 rounded-[2px] bg-accent-bright" />
-          <span className="absolute inset-0 bg-[radial-gradient(rgb(255_255_255/0.07)_1px,transparent_1.4px)] [background-size:22px_22px]" />
-        </div>
-        <div className="relative mx-auto grid max-w-6xl gap-10 px-4 pb-10 pt-8 sm:px-6 md:grid-cols-[minmax(0,1.08fr)_minmax(0,0.92fr)] md:items-center md:pb-16 md:pt-14">
-          <div>
-            <p className="enter inline-flex items-center gap-1.5 rounded-full bg-white/12 px-3 py-1 text-[12px] font-bold tracking-wide ring-1 ring-white/20">
-              <span className="h-1.5 w-1.5 rounded-full bg-accent-bright" aria-hidden="true" />
-              {partner.heroBadge}
-            </p>
-            <h1 className="enter enter-d1 mt-4 text-[30px] font-bold leading-[1.4] min-[400px]:text-[32px] sm:text-[46px]">
-              転職したい。
-              <br />
-              でも、
-              <br className="sm:hidden" />
-              <span className="text-highlight">何から決めればいい？</span>
+      <section className="overflow-hidden bg-hero text-white">
+        <div className="mx-auto grid max-w-6xl gap-8 px-5 py-10 sm:px-6 sm:py-16 md:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)] md:items-center">
+          <div className="min-w-0">
+            <p className="text-[12px] font-bold tracking-widest text-white/75">はじめて・未経験の転職</p>
+            <h1 className="mt-5 text-[clamp(1.75rem,7vw,3.5rem)] font-bold leading-[1.45] tracking-tight">
+              仕事、そろそろ<br /><span className="text-highlight">変えてみたい。</span>
             </h1>
-            <p className="enter enter-d2 mt-3 text-[15px] leading-7 text-white/85 sm:text-base">会社選びから面接の練習まで、{partner.proLabel}と一緒に。</p>
-
-            <form action="/articles" method="get" role="search" className="enter enter-d3 relative mt-6 rounded-2xl bg-surface p-3 text-ink shadow-[0_18px_40px_-18px_rgb(0_0_0/0.45)] sm:p-4">
-              <label htmlFor="hero-search" className="px-1 text-[12px] font-bold text-muted">
-                キーワードで記事を探す
-              </label>
-              <div className="mt-1.5 flex overflow-hidden rounded-xl border border-line-strong focus-within:border-brand focus-within:ring-2 focus-within:ring-brand/20">
-                <Search className="ml-3 h-4 w-4 shrink-0 self-center text-muted" aria-hidden="true" />
-                <input id="hero-search" name="q" type="search" placeholder="例: 事務、土日休み、履歴書" className="min-w-0 flex-1 bg-transparent px-2.5 py-3 text-[15px] outline-none placeholder:text-muted/70" />
-                <button type="submit" className="m-1 rounded-lg bg-accent px-4 text-[14px] font-bold text-white hover:bg-accent-press">
-                  検索
-                </button>
-              </div>
-              <p className="mt-3 px-1 text-[11.5px] font-bold text-muted">人気のキーワード</p>
-              <ul className="mt-1.5 flex flex-wrap gap-1.5">
-                {HERO_SHORTCUTS.map((k) => (
-                  <li key={k.href}>
-                    <Link href={k.href} className="inline-flex rounded-full bg-canvas px-2.5 py-1 text-[12.5px] font-medium text-ink ring-1 ring-line hover:text-brand-strong hover:ring-brand/40">
-                      {k.label}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </form>
-
-            <div className="mt-5 grid grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)] gap-2.5 sm:flex sm:flex-wrap">
-              <ConsultButton placement="home-hero" label={partner.consultCta} />
-              <Link href="/check" className="tap inline-flex items-center justify-center gap-1.5 rounded-full bg-surface px-4 py-3 text-[14px] font-bold text-brand-strong hover:bg-brand-tint sm:px-5">
-                <ClipboardList className="h-4 w-4" aria-hidden="true" />
-                条件整理チェック
+            <p className="mt-4 text-sm leading-7 text-white/85 sm:text-base">次は、どんな働き方がいい？</p>
+            <div className="mt-7 flex flex-col items-start gap-4 sm:flex-row sm:flex-wrap sm:items-center">
+              <Link href="/check" data-cta-placement="home-hero" data-cta-kind="check" className="tap inline-flex w-full items-center justify-center gap-2 rounded-full bg-accent px-6 py-4 text-base font-bold text-white hover:bg-accent-press sm:w-auto">
+                希望を整理する<ArrowRight className="h-5 w-5 shrink-0" aria-hidden="true" />
+              </Link>
+              <Link href="/consultation" data-cta-placement="home-hero" data-cta-kind="consultation-info" className="inline-flex items-center gap-2 text-sm font-bold text-white underline underline-offset-4">
+                まずは相談したい<ArrowRight className="h-4 w-4" aria-hidden="true" />
               </Link>
             </div>
-            <Link href={guideHref} className="mt-3 inline-flex items-center gap-1 text-[13px] font-bold text-white/85 hover:text-white">
-              まずは仕事の探し方を読む
-              <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
-            </Link>
+            <p className="mt-4 flex items-center gap-1.5 text-xs text-white/70"><ClipboardList className="h-3.5 w-3.5" aria-hidden="true" />条件整理は約3分・登録不要</p>
           </div>
-
-          {/* 実際の条件整理で持ち帰れるノートの見本 */}
-          <div className="hidden md:block">
-            <ResultPreview />
+          <div aria-hidden="true" className="relative hidden aspect-square max-h-[340px] md:block">
+            <div className="absolute inset-[8%] rounded-full bg-white/10" />
+            <Motif name="desk" className="absolute inset-[8%] -rotate-6" />
+            <span className="absolute left-0 top-[8%] -rotate-6 rounded-full bg-sand px-5 py-2.5 text-lg font-bold text-sand-ink">休みも。</span>
+            <span className="absolute right-0 top-[30%] rotate-6 rounded-full bg-sky px-5 py-2.5 text-lg font-bold text-sky-ink">給料も。</span>
+            <span className="absolute bottom-[8%] left-[8%] -rotate-3 rounded-full bg-coral px-5 py-2.5 text-xl font-bold text-coral-ink">自分の時間も。</span>
           </div>
         </div>
       </section>
-
-      <div className="mx-auto max-w-6xl space-y-16 px-4 pt-10 sm:px-6 sm:pt-14">
-        {/* プロに頼むよさ（このサイトの目的: 整理したことをもとにキャリア相談 → 自分に合う会社へ）。ヒーローのすぐ下に置く */}
-        <section aria-labelledby="home-consult" className="reveal">
-          <ProValueSection has={has} />
-        </section>
-
-        {/* 入口: 今の状況 / 悩み / 職種 */}
-        <section aria-labelledby="home-explore" className="reveal">
-          <SectionHeading eyebrow="FIND" title="自分に近いところから探す" id="home-explore" />
-          <ExploreTabs counts={{ situations: counts("situations"), concerns: counts("concerns"), roles: counts("roles") }} />
-        </section>
-
-        {/* はじめての転職ガイド: 進め方 + よくある3つのケース */}
-        <section aria-labelledby="home-howto" className="reveal">
-          <SectionHeading eyebrow="GUIDE" title="はじめての転職ガイド" id="home-howto" />
-          <Roadmap steps={roadmap} />
-          <h3 className="mt-9 text-[16px] font-bold text-ink">よくある3つのケースを、順番に読む</h3>
-          <div className="mt-3">
-            <JourneyCards />
+      <div className="mx-auto max-w-6xl space-y-14 px-5 pt-9 sm:space-y-20 sm:px-6 sm:pt-14">
+        <section aria-labelledby="home-journeys">
+          <h2 id="home-journeys" className="mb-5 text-xl font-bold text-ink sm:text-2xl">今の気持ちに、近いのは？</h2>
+          <JourneyCards />
+          <div className="mt-5 flex flex-wrap gap-x-6 gap-y-3 text-sm font-bold text-brand-strong">
+            <Link href="/concerns" className="hover:underline">ほかの悩みから探す →</Link>
+            <Link href="/jobs" className="hover:underline">職種から探す →</Link>
           </div>
         </section>
-
-        {/* 図: 転職活動の流れ（7ステップ。各ステップから記事へ） */}
-        <section aria-labelledby="home-flow" className="reveal">
-          <SectionHeading eyebrow="FLOW" title="転職活動の流れを図で見る" id="home-flow" href={has("tenshoku-schedule") ? "/articles/tenshoku-schedule" : undefined} hrefLabel="スケジュールの立て方" />
-          <ProcessFlow has={has} />
-        </section>
-
-        {/* 最初に読みたい記事（編集部が選んだもの。ランキングではない） */}
-        {lead && (
-          <section aria-labelledby="home-featured" className="reveal">
-            <SectionHeading eyebrow="EDITOR'S PICK" title="最初に読みたい記事" id="home-featured" href="/articles" hrefLabel="記事一覧" />
-            <div className="grid grid-cols-[minmax(0,1fr)] gap-5 lg:grid-cols-[minmax(0,1.25fr)_minmax(0,1fr)]">
-              <div className="reveal">
-                <LeadCard article={lead} categories={categories} />
-              </div>
-              <ArticleList articles={picks.slice(0, 4)} categories={categories} showSummary={false} className="-mt-4 lg:mt-0" />
-            </div>
-          </section>
-        )}
-
-        {/* 新着 */}
-        {latest.length > 0 && (
-          <section aria-labelledby="home-latest" className="reveal">
-            <SectionHeading eyebrow="LATEST" title="新着記事" id="home-latest" href="/articles" hrefLabel="すべて見る" />
-            <ArticleList articles={latest} categories={categories} showSummary={false} className="-mt-3 md:grid md:grid-cols-2 md:gap-x-8" />
-          </section>
-        )}
-
-        {/* 制度の変更 */}
-        <section aria-labelledby="home-news" className="reveal">
-          <SectionHeading eyebrow="NEWS" title="知っておきたい制度の変更" id="home-news" href="/news" hrefLabel="一覧" />
-          <ul className="-mt-3 divide-y divide-line md:grid md:grid-cols-2 md:gap-x-8">
-            {news.slice(0, 4).map((n) => (
-              <ArticleRow key={n.slug} article={n} categories={categories} showSummary={false} />
-            ))}
-          </ul>
-        </section>
-
-        {/* 職種の比較表（転職サイトの職種比較のように、同じものさしで並べる） */}
-        <section aria-labelledby="home-jobs" className="reveal">
-          <SectionHeading eyebrow="JOB GUIDE" title="職種を比べる" id="home-jobs" href="/jobs" hrefLabel="くわしく比べる" />
-          {/* スマホ: 1職種1カード（表は横にはみ出すため） */}
-          <ul className="grid gap-2.5 sm:hidden">
-            {JOB_ROLES.map((r) => (
-              <li key={r.slug}>
-                <Link href={roleHub(r)} className="block rounded-xl border border-line bg-surface p-4 active:bg-brand-tint/60">
-                  <span className="flex items-center justify-between gap-2">
-                    <span className="text-[15px] font-bold text-ink">{r.name}</span>
-                    <ArrowRight className="h-4 w-4 shrink-0 text-brand-strong" aria-hidden="true" />
-                  </span>
-                  <span className="mt-1 line-clamp-2 block text-[12.5px] leading-5 text-muted">{r.oneLiner}</span>
-                  <span className="mt-3 grid grid-cols-3 gap-2 border-t border-line pt-3 text-[11px] text-muted">
-                    {(
-                      [
-                        ["人と話す", r.talkLevel, LEVEL_LABELS.talk[r.talkLevel]],
-                        ["パソコン", r.pcLevel, LEVEL_LABELS.pc[r.pcLevel]],
-                        ["数字の目標", r.targetLevel, LEVEL_LABELS.target[r.targetLevel]],
-                      ] as const
-                    ).map(([name, level, label]) => (
-                      <span key={name} className="min-w-0">
-                        <span className="block font-bold">{name}</span>
-                        <span className="mt-1 block">
-                          <LevelMeter level={level} label={label} srLabel={name} className="flex-col !items-start !gap-1 [&>span:last-child]:text-[12px]" />
-                        </span>
-                      </span>
-                    ))}
-                  </span>
+        <section aria-labelledby="home-reads">
+          <div className="flex flex-wrap items-end justify-between gap-3">
+            <h2 id="home-reads" className="text-xl font-bold text-ink sm:text-2xl">気になることから、読んでみる。</h2>
+            <Link href="/articles" className="text-sm font-bold text-brand-strong hover:underline">記事一覧 →</Link>
+          </div>
+          <ul className="mt-5 divide-y divide-line border-y border-line">
+            {reads.map((read) => (
+              <li key={read.slug}>
+                <Link href={"/articles/" + read.slug} className="group flex items-center justify-between gap-4 py-5">
+                  <span className="min-w-0"><span className="text-xs font-medium text-muted">{read.label}</span><span className="mt-1 block text-base font-bold leading-7 text-ink group-hover:text-brand-strong">{read.title}</span></span>
+                  <ArrowRight className="h-5 w-5 shrink-0 text-brand-strong" aria-hidden="true" />
                 </Link>
               </li>
             ))}
           </ul>
-          <div className="hidden overflow-x-auto rounded-xl border border-line bg-surface sm:block">
-            <table className="w-full min-w-[560px] text-[13px]">
-              <thead className="bg-canvas text-left text-[12px] text-muted">
-                <tr>
-                  <th className="px-4 py-3 font-bold">職種</th>
-                  <th className="px-3 py-3 font-bold">人と話す量</th>
-                  <th className="px-3 py-3 font-bold">パソコン作業</th>
-                  <th className="px-3 py-3 font-bold">数字の目標</th>
-                  <th className="px-3 py-3" />
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-line">
-                {JOB_ROLES.map((r) => (
-                  <tr key={r.slug} className="hover:bg-brand-tint/60">
-                    <td className="px-4 py-3">
-                      <Link href={roleHub(r)} className="font-bold text-ink hover:text-brand-strong hover:underline">
-                        {r.name}
-                      </Link>
-                      <span className="mt-0.5 block max-w-[300px] truncate text-[12px] text-muted">{r.oneLiner}</span>
-                    </td>
-                    <td className="px-3 py-3"><LevelMeter level={r.talkLevel} label={LEVEL_LABELS.talk[r.talkLevel]} srLabel="人と話す量" /></td>
-                    <td className="px-3 py-3"><LevelMeter level={r.pcLevel} label={LEVEL_LABELS.pc[r.pcLevel]} srLabel="パソコン作業" /></td>
-                    <td className="px-3 py-3"><LevelMeter level={r.targetLevel} label={LEVEL_LABELS.target[r.targetLevel]} srLabel="数字の目標" /></td>
-                    <td className="px-3 py-3 text-right">
-                      <Link href={roleHub(r)} className="inline-flex items-center gap-0.5 whitespace-nowrap text-[12.5px] font-bold text-brand-strong hover:underline">
-                        記事を見る
-                        <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
-                      </Link>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+          <form action="/articles" method="get" role="search" className="mt-5 flex min-w-0 items-center gap-2 rounded-full border border-line-strong bg-surface px-3 py-2 focus-within:ring-2 focus-within:ring-brand">
+            <Search className="h-4 w-4 shrink-0 text-muted" aria-hidden="true" />
+            <label htmlFor="home-search" className="sr-only">キーワードで記事を探す</label>
+            <input id="home-search" name="q" type="search" placeholder="事務、土日休み、履歴書…" className="min-w-0 flex-1 bg-transparent py-2 text-sm text-ink outline-none" />
+            <button className="shrink-0 rounded-full bg-brand px-4 py-2 text-sm font-bold text-white hover:bg-brand-press">検索</button>
+          </form>
+        </section>
+        <section aria-labelledby="home-consult" className="rounded-3xl bg-brand-tint p-6 sm:p-10">
+          <div className="flex items-center gap-4">
+            <Motif name="chat" className="h-16 w-16 shrink-0 sm:h-24 sm:w-24" />
+            <h2 id="home-consult" className="text-xl font-bold leading-relaxed text-ink sm:text-3xl">まだ決まってなくても、<br />話していい。</h2>
           </div>
-          <p className="mt-2 text-[12px] text-muted">一般的な傾向です。会社や配属先によって大きく異なります。</p>
+          <p className="mt-4 text-sm leading-7 text-body">会社選び・書類・面接。プロと一緒に準備できます。</p>
+          <Link href="/consultation" data-cta-placement="home-band" data-cta-kind="consultation-info" className="tap mt-5 inline-flex max-w-full items-center gap-2 rounded-full bg-accent px-5 py-3 text-sm font-bold text-white hover:bg-accent-press">
+            {partner.consultCta}<ArrowRight className="h-4 w-4 shrink-0" aria-hidden="true" />
+          </Link>
+          <p className="mt-3 text-xs leading-5 text-muted">応募するかは、自分で決められます。</p>
         </section>
-
-        {/* 図: 求人票の見るところ（見本に番号を振る） */}
-        <section aria-labelledby="home-posting" className="reveal">
-          <SectionHeading eyebrow="CHECK" title="求人票は、ここを見る" id="home-posting" href={has("kyujin-hyo-yomikata") ? "/articles/kyujin-hyo-yomikata" : undefined} hrefLabel="求人票の見方" />
-          <JobPostingDiagram has={has} />
-        </section>
-
-        {/* 条件整理チェック（転職サイトの「診断」のような入口。ただし判定はしない） */}
-        <section aria-labelledby="home-check" className="reveal overflow-hidden rounded-2xl border-2 border-brand/20 bg-surface">
-          <div className="grid gap-6 p-5 sm:p-9 md:grid-cols-[minmax(0,1fr)_minmax(0,0.9fr)] md:items-center">
-            <div>
-              <p className="inline-flex items-center gap-1.5 rounded-full bg-brand-tint px-3 py-1 text-[12px] font-bold text-brand-strong">
-                <ClipboardList className="h-3.5 w-3.5" aria-hidden="true" />
-                無料・登録不要
-              </p>
-              <h2 id="home-check" className="mt-3 text-[22px] font-bold leading-snug text-ink sm:text-[28px]">
-                3分でできる、条件整理チェック
-              </h2>
-              <ul className="mt-5 grid gap-2.5">
-                {[
-                  { icon: ListChecks, t: `${ALL_QUESTIONS.length}の質問に答えるだけ`, d: "選ぶだけ。答えたくない質問は飛ばせます" },
-                  { icon: FileText, t: "条件・経験・比べたい職種が一覧に", d: "面談で使えるメモとしてコピーできます" },
-                  { icon: ShieldCheck, t: "回答はどこにも送信されません", d: "このブラウザの中だけで整理します" },
-                ].map((x) => (
-                  <li key={x.t} className="flex items-center gap-3">
-                    <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-brand text-white">
-                      <x.icon className="h-4.5 w-4.5" aria-hidden="true" />
-                    </span>
-                    <span>
-                      <span className="block text-[14.5px] font-bold text-ink">{x.t}</span>
-                    </span>
-                  </li>
-                ))}
-              </ul>
-              <Link href="/check" className="tap mt-6 flex items-center justify-center gap-2 rounded-xl bg-accent py-3.5 text-[15px] font-bold text-white hover:bg-accent-press md:inline-flex md:px-10">
-                チェックをはじめる
-                <ArrowRight className="h-4 w-4" aria-hidden="true" />
-              </Link>
-            </div>
-            <div className="hidden md:block">
-              <GeneratedImage slug="check-support" sizes="440px" className="w-full rounded-2xl" fallback={<ResultPreview />} />
-            </div>
-          </div>
-        </section>
-
-        <ConsultationCta placement="home-band" heading="整理したことをもとに、自分の場合を相談する" />
       </div>
     </>
   );
 }
-

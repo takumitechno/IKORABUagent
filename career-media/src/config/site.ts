@@ -14,7 +14,7 @@ export const site = {
   fullName: sameBrand ? partner.mediaName : `${partner.mediaName} by ${partner.brandName}`,
   tagline: partner.mediaTagline,
   description:
-    "はじめての転職・未経験転職で迷っている20代のための仕事選びメディア。仕事の種類、給料や休みの見方、経験の活かし方を、むずかしい言葉なしで一つずつ整理できます。",
+    "はじめて・未経験の転職を考える20〜30代のための仕事選びメディア。休み・給料・経験から、次の働き方を探せます。",
   url: (process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000").replace(/\/$/, ""),
   locale: "ja_JP",
   /**

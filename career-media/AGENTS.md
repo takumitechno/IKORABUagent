@@ -4,7 +4,7 @@ Codex などのコーディングエージェント向けの作業ガイド。�
 
 ## これは何か
 
-- 20代の「はじめての転職・未経験転職」向けオウンドメディアの MVP（Next.js 16 / React 19 / Tailwind CSS 4）。
+- 20〜30代の「はじめての転職・未経験転職」向けオウンドメディアの MVP（Next.js 16 / React 19 / Tailwind CSS 4）。SNSから来た人が短いコピーと絵で選べるUIを優先する。
   記事・ニュース解説・職種比較・条件整理チェックで考えを整理してもらい、人材紹介会社のキャリア相談（面談）へつなぐ。
 - **サイトの目的（プロジェクトオーナーの方針、2026-10-10）:** 読者に提携先のキャリア相談（面談）を使ってもらい、自分に合う会社への就職につなげる。
   「はじめて・未経験の転職は、ひとりで悩むより転職のプロ（キャリアアドバイザー／転職エージェント）に相談しながら進めたほうがいい」という方向でサイト全体を作る。
@@ -71,7 +71,7 @@ Node.js 20.9 以上。依存は `npm ci`。環境変数なしで動く（記事�
 
 | URL | ページ | 主な部品・データ |
 |---|---|---|
-| `/` | `src/app/page.tsx` | `ResultPreview`（条件整理ノートの見本）、`ProValue`（プロに頼むよさ）、`EntryGrid`（入口タブ）、`HomeDiagrams`（転職の流れ・求人票の見方）、`ArticleCards`、職種の比較表（`LevelMeter`）、`ConsultationCta` |
+| `/` | `src/app/page.tsx` | 短いヒーロー、`JourneyCards`（絵で選ぶ3経路）、代表記事3件と検索、相談への入口。詳しい比較・手順はリンク先 |
 | `/articles`、`/articles/[slug]` | `src/app/articles/` | `ArticleCards`、`ArticleParts`、`lib/markdown.ts`、`lib/figures.ts`、`content/articles/*.md` |
 | `/news`、`/news/[slug]` | `src/app/news/` | `NewsTimeline`、`content/news/*.md` |
 | `/categories/[slug]` | `src/app/categories/[slug]/page.tsx` | `content/categories.json` |
@@ -99,8 +99,8 @@ Node.js 20.9 以上。依存は `npm ci`。環境変数なしで動く（記事�
 ## 画像（生成画像）
 
 - 方針は `docs/ART_DIRECTION.md`、手順は `docs/image-briefs/README.md`。まず画像なしで成り立たせ、必要な場所だけに使う。文字は画像に入れない
-- 画像は `src/components/GeneratedImage.tsx` で出す（`content/images/index.json` で status が selected のものだけ。なければ fallback の SVG）。今の差し込み口: トップのチェック `check-support`（なければ結果の見本、デスクトップのみ）、`/sales/sns/*` の表紙 `sns-theme-*-cover`。`journey-*` の brief はあるが、今のケースカードには差し込み口がない
-- トップのヒーローは `ResultPreview`。架空のチャット・予約UIは使わない。スマホでは装飾を省き、検索・チェック・相談の入口を優先する。
+- 生成画像は `src/components/GeneratedImage.tsx` で出す（`content/images/index.json` で status が selected のものだけ）。現在の差し込み口は `/sales/sns/*` の表紙 `sns-theme-*-cover`。トップでは既存のSVGモチーフを使用。
+- トップは短いコピーと選べる入口を優先。長い比較表・手順・相談説明を重複させない。架空のチャット・予約UIは使わない。
 - 生成した画像は draft のまま。実際のページで確認してから `image:status` で selected にする。気に入らなければ brief を直して `--force` で作り直す（前の画像は `.image-history/`）
 - API キー（`OPENAI_API_KEY`）は `.env.local` か環境変数にだけ置く。ロゴ・実在の企業やキャラクターは生成しない（`BLOCKED_TERMS`）
 

@@ -6,7 +6,7 @@ import { CategoryIcon } from "./CategoryIcon";
 export function CategoryBar() {
   const items = [...categories].sort((a, b) => a.sort_order - b.sort_order);
   return (
-    <nav aria-label="カテゴリ" className="no-print border-b border-line bg-surface">
+    <nav aria-label="カテゴリ" className="no-print hidden border-b border-line bg-surface sm:block">
       <ul className="mx-auto flex max-w-6xl gap-1 overflow-x-auto px-3 py-2 [scrollbar-width:none] sm:px-5 [&::-webkit-scrollbar]:hidden">
         {items.map((c) => (
           <li key={c.slug} className="shrink-0">

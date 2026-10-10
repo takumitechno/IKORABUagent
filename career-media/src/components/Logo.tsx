@@ -31,7 +31,7 @@ export function Logo({ compact = false }: { compact?: boolean }) {
         <span className={`font-bold tracking-wide text-ink ${compact ? "text-[16px]" : "text-[17px] sm:text-lg"}`}>
           {partner.brandName}
           {compact && site.name.startsWith(partner.brandName) && site.name !== partner.brandName && (
-            <span className="ml-1.5 whitespace-nowrap rounded-md bg-brand px-1.5 py-0.5 align-[2px] text-[11px] font-bold tracking-normal text-white">{subName()}</span>
+            <span className="ml-1.5 hidden whitespace-nowrap rounded-md bg-brand px-1.5 py-0.5 align-[2px] text-[11px] font-bold tracking-normal text-white min-[400px]:inline">{subName()}</span>
           )}
         </span>
         {!compact && <span className="mt-1 text-[10.5px] font-medium tracking-[0.06em] text-brand-strong">{subName()}</span>}
