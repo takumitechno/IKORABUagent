@@ -133,7 +133,7 @@ export default async function JobsPage() {
         {AXES.map((axis) => (
           <div key={axis.key} className="rounded-[var(--radius-card)] border border-line bg-white p-4">
             <p className="text-sm font-bold text-ink">{axis.label}</p>
-            <ul className="mt-3 space-y-3">
+            <ul className="anim-list mt-3 space-y-3">
               {JOB_ROLES.map((r) => {
                 const level = r[axis.key];
                 return (

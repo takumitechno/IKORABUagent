@@ -94,7 +94,7 @@ export default function ConsultationPage() {
           <h2 id="audience" className="text-[22px] font-bold text-ink">
             こんな方の相談を想定しています
           </h2>
-          <ul className="mt-5 grid gap-3 sm:grid-cols-2">
+          <ul className="anim-list mt-5 grid gap-3 sm:grid-cols-2">
             {partner.serviceAudience.map((a) => (
               <li key={a} className="rounded-xl bg-white p-4 text-[14.5px] leading-7 ring-1 ring-line">
                 {a}
@@ -108,7 +108,7 @@ export default function ConsultationPage() {
             相談の流れ
           </h2>
           <p className="mt-2 text-[13px] leading-6 text-muted">{partner.consultationStepsNote}</p>
-          <ol className="relative mt-5 grid gap-3 md:grid-cols-5">
+          <ol className="anim-list relative mt-5 grid gap-3 md:grid-cols-5">
             <span aria-hidden="true" className="reveal-grow-y absolute bottom-8 left-[35px] top-8 border-l-[3px] border-dashed border-brand/30 md:hidden" />
             <span aria-hidden="true" className="reveal-grow-x absolute left-[10%] right-[10%] top-[44px] hidden border-t-[3px] border-dashed border-brand/30 md:block" />
             {partner.consultationSteps.map((s, i) => (

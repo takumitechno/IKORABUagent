@@ -784,6 +784,10 @@ body {
   50% { transform: translateX(4px); }
 }
 
+@keyframes slide-in-left {
+  from { opacity: 0; transform: translateX(-18px); }
+  to { opacity: 1; transform: none; }
+}
 @keyframes shine {
   0% { transform: translateX(-130%) skewX(-20deg); }
   55%, 100% { transform: translateX(330%) skewX(-20deg); }
@@ -823,6 +827,10 @@ body {
   .sparkle-d2 { animation-delay: -1.8s; }
   /* チャットの吹き出しが順にポンと出る */
   .chat-pop { animation: pop-in 0.5s cubic-bezier(0.2, 0.8, 0.25, 1.2) both; }
+  /* FAQ・目次・出典を開いたとき、中身がふわっと出る */
+  details[open] > :not(summary) { animation: rise-in 0.35s cubic-bezier(0.2, 0.7, 0.2, 1) both; }
+  /* 図解の矢印が小さく動く */
+  .fig-arrow { animation: nudge-x 1.8s ease-in-out infinite; }
   /* ポップアップ */
   .popup-in { animation: popup-in 0.5s cubic-bezier(0.2, 0.8, 0.25, 1.1) both; }
   .flash-in { animation: flash-in 0.6s cubic-bezier(0.2, 0.8, 0.25, 1.2) both; }
@@ -880,6 +888,12 @@ body {
   /* スクロールで現れる */
   @supports (animation-timeline: view()) {
     .reveal { animation: rise-in linear both; animation-timeline: view(); animation-range: entry 0% entry 70%; }
+    /* 一覧・カード・タイル: 画面に入ったものから順にふわっと現れる */
+    .anim-list > * { animation: rise-in linear both; animation-timeline: view(); animation-range: entry 0% entry 55%; }
+    /* 記事本文: 見出しは左からすべり込み、表・引用・図解の中の項目は順に現れる */
+    .article-body h2 { animation: slide-in-left linear both; animation-timeline: view(); animation-range: entry 0% entry 60%; }
+    .article-body .table-wrap, .article-body blockquote, .article-body .lead-box { animation: rise-in linear both; animation-timeline: view(); animation-range: entry 0% entry 60%; }
+    .fig-step, .fig-col, .fig-stat, .fig-check-list > li, .fig-term { animation: rise-in linear both; animation-timeline: view(); animation-range: entry 5% entry 65%; }
     /* 記事の上部の読み進めバー（ページのスクロールに合わせて伸びる） */
     .read-progress { display: block; transform-origin: left center; animation: grow-x linear both; animation-timeline: scroll(root); }
     .reveal-pop { animation: pop-in linear both; animation-timeline: view(); animation-range: entry 5% entry 80%; }

@@ -200,11 +200,11 @@ export function ConditionCheck({ consultationHref, consultationLabel, allowPrint
             </div>
           </div>
           <div className="mt-6 space-y-8">
-            {step.questions.map((q) => {
+            {step.questions.map((q, qi) => {
               const selected = answers[q.id] ?? [];
               const missing = triedNext && selected.length === 0;
               return (
-                <fieldset key={q.id} className="rounded-[var(--radius-card)] border border-line bg-white p-5 sm:p-6" aria-describedby={missing ? `${q.id}-error` : undefined}>
+                <fieldset key={q.id} className="enter rounded-[var(--radius-card)] border border-line bg-white p-5 sm:p-6" style={{ animationDelay: `${0.08 + qi * 0.1}s` }} aria-describedby={missing ? `${q.id}-error` : undefined}>
                   <legend className="sr-only">{q.title}</legend>
                   <p className="text-[16px] font-bold leading-7 text-ink" aria-hidden="true">
                     {q.title}

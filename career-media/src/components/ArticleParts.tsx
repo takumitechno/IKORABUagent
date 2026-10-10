@@ -109,7 +109,7 @@ export function FaqSection({ article }: { article: Pick<Article, "faq"> }) {
 /** 出典の一覧（折りたたみの中で使う） */
 export function SourcesSection({ article }: { article: Pick<Article, "sources"> }) {
   return (
-    <ol className="space-y-3">
+    <ol className="anim-list space-y-3">
       {article.sources.map((s, i) => (
         <li key={s.url + i} className="text-[13px] leading-6">
           <a href={s.url} target="_blank" rel="noopener noreferrer" className="inline-flex items-start gap-1 font-bold text-brand-strong hover:underline">

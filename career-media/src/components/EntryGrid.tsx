@@ -27,7 +27,7 @@ export function EntryGrid({ group, counts, variant = "tile" }: { group: Taxonomy
     );
   }
   return (
-    <ul className="grid grid-cols-3 gap-2 sm:grid-cols-4 sm:gap-3 lg:grid-cols-8">
+    <ul className="anim-list grid grid-cols-3 gap-2 sm:grid-cols-4 sm:gap-3 lg:grid-cols-8">
       {items.map((item, i) => {
         const tone = TONE_CLASSES[GROUP_TONE[group][i % 4]];
         const count = counts?.[item.slug];

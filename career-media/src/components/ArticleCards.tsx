@@ -90,7 +90,7 @@ export function ArticleRow({ article, categories, showSummary = true }: { articl
 
 export function ArticleList({ articles, categories, showSummary = true, className = "" }: { articles: ArticleSummary[]; categories: Category[]; showSummary?: boolean; className?: string }) {
   return (
-    <ul className={`divide-y divide-line ${className}`}>
+    <ul className={`anim-list divide-y divide-line ${className}`}>
       {articles.map((a) => (
         <ArticleRow key={a.slug} article={a} categories={categories} showSummary={showSummary} />
       ))}

@@ -20,7 +20,7 @@ export function NewsTimeline({ news, today = new Date() }: { news: ArticleSummar
         <span className="rounded-full bg-ink px-2.5 py-0.5 text-[11px] tracking-[0.08em] text-white">図解</span>
         制度が変わる時期
       </figcaption>
-      <ol className="relative mt-4 space-y-3 before:absolute before:bottom-3 before:left-[23px] before:top-3 before:border-l-[3px] before:border-dotted before:border-brand/30 md:grid md:grid-cols-[repeat(auto-fit,minmax(0,1fr))] md:gap-3 md:space-y-0 md:before:left-6 md:before:right-6 md:before:top-[23px] md:before:bottom-auto md:before:border-l-0 md:before:border-t-[3px]">
+      <ol className="anim-list relative mt-4 space-y-3 before:absolute before:bottom-3 before:left-[23px] before:top-3 before:border-l-[3px] before:border-dotted before:border-brand/30 md:grid md:grid-cols-[repeat(auto-fit,minmax(0,1fr))] md:gap-3 md:space-y-0 md:before:left-6 md:before:right-6 md:before:top-[23px] md:before:bottom-auto md:before:border-l-0 md:before:border-t-[3px]">
         {items.map((n) => {
           const date = n.news!.announcedAt;
           const future = date > todayIso;

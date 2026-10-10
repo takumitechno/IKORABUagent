@@ -60,7 +60,7 @@ export function SoloVsPro({ dark = false }: { dark?: boolean }) {
 /** 相談でできること（アイコン付きのタイル） */
 export function ServiceHighlights({ dark = false, compact = false, brief = false }: { dark?: boolean; compact?: boolean; brief?: boolean }) {
   return (
-    <ul className={`grid gap-2.5 ${compact ? "grid-cols-1 sm:grid-cols-2" : "grid-cols-2 lg:grid-cols-5"}`}>
+    <ul className={`anim-list grid gap-2.5 ${compact ? "grid-cols-1 sm:grid-cols-2" : "grid-cols-2 lg:grid-cols-5"}`}>
       {partner.serviceHighlights.map((h, i) => {
         const Icon = ICONS[h.icon];
         const last = !compact && i === partner.serviceHighlights.length - 1 ? "col-span-2 lg:col-span-1" : "";
@@ -123,7 +123,7 @@ export function ProValueSection({ placement = "home-consult", has = () => false 
         {reads.length > 0 && (
           <div className="mt-8 border-t border-white/10 pt-6">
             <p className="text-[13px] font-bold text-white/70">プロに頼むよさを、記事で読む</p>
-            <ul className="mt-3 grid gap-2.5 md:grid-cols-3">
+            <ul className="anim-list mt-3 grid gap-2.5 md:grid-cols-3">
               {reads.map((r) => (
                 <li key={r.slug}>
                   <Link href={`/articles/${r.slug}`} className="flex h-full items-center gap-3 rounded-xl bg-white p-3.5 text-[13.5px] font-bold leading-6 text-ink hover:bg-pro-tint">
