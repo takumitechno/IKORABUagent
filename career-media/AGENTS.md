@@ -21,7 +21,10 @@ Codex などのコーディングエージェント向けの作業ガイド。�
   メディア名「MakeCareer転職ガイド」（仮）、相談ボタン「MakeCareerに相談する」、配色は `src/app/globals.css` の
   `html[data-brand="makecareer"]`（仮のネイビー×オレンジ。ブランドガイド受領後に差し替え）。ブランドで変わる文言は `partner.ts` の
   `adviserLabel` / `consultCta` / `proLabel` / `heroBadge` / `theme`。ロゴは許諾があるまで汎用のマーク＋文字。
-  ローカル・非公開のまま（アーティファクトや静的書き出しは中立版だけ。スクリプトが実在企業名義を拒否する）。
+  ローカル・非公開のまま（claude.ai のアーティファクトや静的書き出しは中立版だけ。スクリプトが実在企業名義を拒否する）。
+  商談で手元に渡す1ファイル版だけは、`PARTNER_PROFILE=makecareer SALES_DEMO=1` で起動したサーバーに対して
+  `npx tsx scripts/artifact/build-artifact.ts --base <URL> --out <file.html> --private-brand` で作れる
+  （商談用プレビューの表示があること・本番の申込ページへのリンクがないことを確かめてから書き出す。公開しない）。
 - **本番送客（実際の申込ページへのリンク）を有効にしない。** 有効になるのは `brandUsageApproved: true`・人が書いた
   `liveOutboundApproval`・`PARTNER_LIVE_OUTBOUND=on` の3つがそろったときだけ。エージェントはこのどれも書き換えない。
   相談の申込ボタンは `buildConsultationUrl()` だけで作る（無効の間はサイト内の `/consultation/apply` を指す）。

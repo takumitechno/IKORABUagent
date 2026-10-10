@@ -105,7 +105,7 @@ export function ProValueSection({ placement = "home-consult", has = () => false 
             </p>
             <div className="mt-6 flex flex-col gap-2.5 sm:flex-row sm:items-center">
               <ConsultButton placement={placement} label="キャリア相談を申し込む" size="lg" />
-              <Link href="/consultation" data-cta-placement={placement} data-cta-kind="consultation-info" className="inline-flex items-center justify-center gap-1 px-2 py-2 text-[14px] font-bold text-white/90 hover:text-white">
+              <Link href="/consultation" data-cta-placement={placement} data-cta-kind="consultation-info" className="inline-flex items-center justify-center gap-1 whitespace-nowrap px-2 py-2 text-[14px] font-bold text-white/90 hover:text-white">
                 相談でできることを見る
                 <ArrowRight className="h-4 w-4" aria-hidden="true" />
               </Link>

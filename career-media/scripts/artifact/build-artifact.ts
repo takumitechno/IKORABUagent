@@ -6,7 +6,9 @@
  *   NEXT_DIST_DIR=.next-demo npx next start -p 3200 -H 127.0.0.1
  *   npx tsx scripts/artifact/build-artifact.ts --base http://127.0.0.1:3200 --out <file.html>
  *
- * 実在企業の名義（PARTNER_PROFILE=makecareer）では作らない。
+ * 実在企業の名義（PARTNER_PROFILE=makecareer）では、通常は作らない。
+ * 商談で手元に渡すファイルとしてだけ、--private-brand を付けたときに作る（claude.ai などには公開しない。
+ * 画面上部の「商談用プレビュー（非公開・正式提携前）」の表示と、本番送客が無効であることはそのまま）。
  */
 import fs from "node:fs";
 import path from "node:path";
@@ -54,25 +56,38 @@ function inlineGeneratedImages(html: string): string {
 }
 
 async function main() {
-  if (partner.profile !== "neutral") throw new Error("中立ブランド（既定の partner profile）で実行してください（実在企業の名義ではアーティファクトを作りません）");
+  const privateBrand = process.argv.includes("--private-brand");
+  if (partner.profile !== "neutral" && !privateBrand) throw new Error("中立ブランド（既定の partner profile）で実行してください（実在企業の名義では、商談用の非公開ファイルとして --private-brand を付けたときだけ作ります）");
   const base = arg("base", "http://127.0.0.1:3200");
   const out = path.resolve(arg("out"));
+  const realCompany = /MakeCareer|make-career\.co\.jp|13-ユ-313746/;
 
-  // 実在企業の名義のまま作らないためのガード
+  // 実在企業の名義のまま作らないためのガード（--private-brand のときは、商談用プレビューの表示があることを確かめる）
   const home = await get(base, "/");
-  if (!home.html.includes(partner.mediaName)) throw new Error("中立ブランドで起動したサーバーを指定してください");
-  if (/MakeCareer|make-career\.co\.jp|13-ユ-313746/.test(home.html)) throw new Error("実在企業の表記が含まれています");
+  if (!home.html.includes(partner.mediaName)) throw new Error(`${partner.mediaName} で起動したサーバーを指定してください`);
+  if (!privateBrand && realCompany.test(home.html)) throw new Error("実在企業の表記が含まれています");
+  if (privateBrand && !/商談用プレビュー（非公開/.test(home.html)) throw new Error("商談用プレビューの表示がありません");
+  if (privateBrand && /href="https?:\/\/[^"]*make-career/.test(home.html)) throw new Error("本番の申込ページへのリンクがあります");
 
   const repo = new LocalContentRepository(path.join(ROOT, "content"));
   const articles = await repo.listArticles();
   const routes = await listSiteRoutes(repo);
+  // 商談用ファイル（--private-brand）では、SALES_DEMO=1 で起動したサーバーの商談メニュー（/sales 以下）も入れる
+  if (privateBrand) {
+    const sales = await get(base, "/sales");
+    if (sales.status === 200) {
+      const found = new Set(["/sales", ...[...sales.html.matchAll(/href="(\/sales[^"#?]*)"/g)].map((m) => m[1])]);
+      routes.push(...[...found].filter((r) => !routes.includes(r)));
+    }
+  }
 
   const templates: string[] = [];
   for (const route of [...routes, "/404"]) {
     const page = await get(base, route === "/404" ? "/__artifact_not_found__" : route);
     if (route !== "/404" && page.status !== 200) throw new Error(`${route}: HTTP ${page.status}`);
     const main = inlineGeneratedImages(stripScripts(pick(page.html, /<main id="main">([\s\S]*?)<\/main>/, `${route} の main`)));
-    if (/MakeCareer|make-career\.co\.jp|13-ユ-313746/.test(main)) throw new Error(`${route} に実在企業の表記が含まれています`);
+    if (!privateBrand && realCompany.test(main)) throw new Error(`${route} に実在企業の表記が含まれています`);
+    if (/href="https?:\/\/[^"]*make-career/.test(main)) throw new Error(`${route} に本番の申込ページへのリンクがあります`);
     const title = decodeTitle(pick(page.html, /<title>([\s\S]*?)<\/title>/, `${route} の title`));
     templates.push(`<template data-route="${route}" data-title="${escAttr(title)}">${main}</template>`);
   }
@@ -199,8 +214,19 @@ ${templates.join("\n")}
 <script>${runtimeJs}</script>
 `;
 
+  // 商談用ファイルは、そのままブラウザで開けるように文書の頭を付け、ブランドの配色（html[data-brand]）を当てる
+  const doc = privateBrand
+    ? `<!doctype html>
+<html lang="ja" data-brand="${partner.theme}">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+${html}</html>
+`
+    : html;
+
   fs.mkdirSync(path.dirname(out), { recursive: true });
-  fs.writeFileSync(out, html);
+  fs.writeFileSync(out, doc);
   console.log(`wrote ${out} (${(Buffer.byteLength(html) / 1024).toFixed(0)} KB, ${templates.length} pages)`);
 }
 
