@@ -18,7 +18,7 @@ Codex などのコーディングエージェント向けの作業ガイド。�
   TODO コメントにだけ置く。画面・記事・他のファイルへ直書きしない（`tests/consultation.test.ts` が検出する）。
   LP や企業サイトの文章・画像・ロゴ・実績を写さない。一次情報で確認していない許可番号は画面に出さない。
 - **MakeCareer 版（`PARTNER_PROFILE=makecareer`、`npm run demo:makecareer`）は、MakeCareer 帰属の商品として作る。**
-  メディア名「MakeCareer転職ガイド」（仮）、相談ボタン「MakeCareerに相談する」、配色は `src/app/globals.css` の
+  メディア名「MakeCareer転職エージェント（仮）」、相談ボタン「MakeCareerに相談する」、配色は `src/app/globals.css` の
   `html[data-brand="makecareer"]`（仮のネイビー×オレンジ。ブランドガイド受領後に差し替え）。ブランドで変わる文言は `partner.ts` の
   `adviserLabel` / `consultCta` / `proLabel` / `heroBadge` / `theme`。ロゴは許諾があるまで汎用のマーク＋文字。
   ローカル・非公開のまま（claude.ai のアーティファクトや静的書き出しは中立版だけ。スクリプトが実在企業名義を拒否する）。
@@ -71,7 +71,7 @@ Node.js 20.9 以上。依存は `npm ci`。環境変数なしで動く（記事�
 
 | URL | ページ | 主な部品・データ |
 |---|---|---|
-| `/` | `src/app/page.tsx` | `components/illustrations/*`、`Roadmap`、`EntryGrid`（入口タブ）、`ArticleCards`、職種の比較表（`LevelMeter`）、`ConsultationCta` |
+| `/` | `src/app/page.tsx` | `HeroMockup`（チャット画面のイメージ）、`ProValue`（プロに頼むよさ）、`EntryGrid`（入口タブ）、`HomeDiagrams`（転職の流れ・求人票の見方）、`ArticleCards`、職種の比較表（`LevelMeter`）、`ConsultationCta` |
 | `/articles`、`/articles/[slug]` | `src/app/articles/` | `ArticleCards`、`ArticleParts`、`lib/markdown.ts`、`lib/figures.ts`、`content/articles/*.md` |
 | `/news`、`/news/[slug]` | `src/app/news/` | `NewsTimeline`、`content/news/*.md` |
 | `/categories/[slug]` | `src/app/categories/[slug]/page.tsx` | `content/categories.json` |
@@ -80,7 +80,8 @@ Node.js 20.9 以上。依存は `npm ci`。環境変数なしで動く（記事�
 | `/check` | `src/app/check/page.tsx` | `ConditionCheck`（クライアント）、`lib/condition-check/`（設問とルール） |
 | `/consultation` | `src/app/consultation/page.tsx` | `lib/consultation.ts`（相談ボタンの URL はすべて `buildConsultationUrl`） |
 | `/about`、`/editorial-policy`、`/disclosure`、`/privacy`、`/disclaimer` | 各 `page.tsx` | `InfoPage` |
-| 全ページ共通 | `src/app/layout.tsx` | `Header`、`MobileNav`、`Footer`、`PreviewBanner`、`MobileStickyCta`、`NavTracker`、`src/app/globals.css` |
+| 全ページ共通 | `src/app/layout.tsx` | `Header`（`ThemeToggle`）、`MobileNav`、`CategoryBar`、`Footer`、`PreviewBanner`、`ConsultPopup`（相談のポップアップ）、`MobileStickyCta`、`NavTracker`、`src/app/globals.css` |
+| ページ上部の帯 | `src/components/PageHero.tsx` | 記事一覧・カテゴリ・ニュース・職種・チェック・相談・入口ページ・案内ページで共通 |
 | パンくずと「戻る」 | `src/components/Breadcrumbs.tsx` | `BackButton`（サイト内で移動してきたときは履歴で戻る。直接開いたときはひとつ上の階層へ）。アーティファクト版は `scripts/artifact/runtime.js` がページ内の履歴で処理する |
 
 | `/consultation/apply` | `src/app/consultation/apply/page.tsx` | 本番送客が無効な間の、相談の申込ボタンの行き先（noindex） |
