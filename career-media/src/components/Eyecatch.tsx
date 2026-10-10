@@ -43,7 +43,7 @@ export function Eyecatch({ article, category, size = "md", className = "" }: { a
         <span className={`absolute inset-y-0 right-0 w-1/2 ${DOTS}`} />
         <span className="absolute -left-4 -top-6 aspect-square w-[70%] rounded-full border-[6px] border-white/10" />
         <span className="absolute bottom-2 right-2.5 h-2 w-2 rounded-full" style={{ background: HIGHLIGHT }} />
-        <span className="relative flex aspect-square w-[42%] items-center justify-center rounded-full bg-white shadow-[0_6px_14px_-6px_rgb(0_0_0/0.5)]">
+        <span className="eyecatch-badge relative flex aspect-square w-[42%] items-center justify-center rounded-full bg-white shadow-[0_6px_14px_-6px_rgb(0_0_0/0.5)]">
           <CategoryIcon name={icon} className="h-1/2 w-1/2" style={{ color }} />
         </span>
       </div>
@@ -58,7 +58,7 @@ export function Eyecatch({ article, category, size = "md", className = "" }: { a
       {/* 背景: 右側のドット、大きな輪、右下の白い丸にカテゴリのアイコン */}
       <span className={`absolute inset-y-0 right-0 w-[45%] ${DOTS}`} />
       <span className="absolute -left-[12%] -top-[40%] aspect-square w-[55%] rounded-full border-[10px] border-white/[0.08]" />
-      <span className={`absolute -bottom-[16%] -right-[6%] flex aspect-square items-center justify-center rounded-full bg-white shadow-[0_18px_40px_-16px_rgb(0_0_0/0.6)] ${s.badge}`}>
+      <span className={`eyecatch-badge absolute -bottom-[16%] -right-[6%] flex aspect-square items-center justify-center rounded-full bg-white shadow-[0_18px_40px_-16px_rgb(0_0_0/0.6)] ${s.badge}`}>
         <CategoryIcon name={icon} className={s.icon} style={{ color }} />
       </span>
       <span className={`absolute right-[30%] top-[14%] h-2.5 w-2.5 rounded-full`} style={{ background: HIGHLIGHT }} />

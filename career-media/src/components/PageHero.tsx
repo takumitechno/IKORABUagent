@@ -31,9 +31,11 @@ export function PageHero({
   return (
     <section className="relative overflow-hidden bg-hero text-white">
       <div aria-hidden="true" className="pointer-events-none absolute inset-0">
-        <span className="absolute -right-24 -top-40 h-[460px] w-[460px] rounded-full bg-[radial-gradient(circle,rgb(255_255_255/0.16),transparent_65%)]" />
+        <span className="drift absolute -right-24 -top-40 h-[460px] w-[460px] rounded-full bg-[radial-gradient(circle,rgb(255_255_255/0.16),transparent_65%)]" />
+        <span className="sparkle absolute left-[52%] top-[22%] h-2 w-2 rotate-45 rounded-[2px] bg-highlight" />
+        <span className="sparkle sparkle-d2 absolute left-[30%] bottom-[18%] h-1.5 w-1.5 rotate-45 rounded-[2px] bg-white/70" />
         <span className="absolute -right-10 top-1/2 h-[380px] w-[380px] -translate-y-1/2 rounded-full border border-white/10" />
-        <span className="absolute -bottom-40 -left-24 h-[360px] w-[360px] rounded-full bg-black/[0.12]" />
+        <span className="drift-2 absolute -bottom-40 -left-24 h-[360px] w-[360px] rounded-full bg-black/[0.12]" />
         <span className="absolute inset-0 bg-[radial-gradient(rgb(255_255_255/0.07)_1px,transparent_1.4px)] [background-size:22px_22px]" />
       </div>
       <div className={`relative mx-auto max-w-6xl px-4 sm:px-6 ${compact ? "pb-8 pt-5 sm:pb-10" : "pb-10 pt-5 sm:pb-14"}`}>

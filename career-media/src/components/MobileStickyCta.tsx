@@ -26,7 +26,7 @@ export function MobileStickyCta({ contentSlug, consultHref = "/consultation", co
       aria-hidden={!visible}
     >
       <div className="grid grid-cols-[minmax(0,1.25fr)_minmax(0,1fr)] gap-2">
-        <a href={consultHref} tabIndex={tab} data-cta-placement="article-sticky" data-cta-kind="consultation-apply" data-content-slug={contentSlug} className="flex items-center justify-center gap-1.5 rounded-full bg-accent py-2.5 text-[13.5px] font-bold text-white">
+        <a href={consultHref} tabIndex={tab} data-cta-placement="article-sticky" data-cta-kind="consultation-apply" data-content-slug={contentSlug} className="btn-shine flex items-center justify-center gap-1.5 rounded-full bg-accent py-2.5 text-[13.5px] font-bold text-white">
           <MessageCircle className="h-4 w-4" aria-hidden="true" />
           {consultLabel}
         </a>

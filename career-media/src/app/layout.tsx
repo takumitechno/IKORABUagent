@@ -1,6 +1,8 @@
 import type { Metadata, Viewport } from "next";
 import { Noto_Sans_JP } from "next/font/google";
 import { NavTracker } from "@/components/BackButton";
+import { ConsultPopup } from "@/components/ConsultPopup";
+import { buildConsultationUrl } from "@/lib/consultation";
 import { CategoryBar } from "@/components/CategoryBar";
 import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
@@ -48,6 +50,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <Footer />
         <MeasurementTracker mode={consultationMode} />
         <NavTracker />
+        <ConsultPopup href={buildConsultationUrl("popup")} title={`${partner.proLabel}に相談してみませんか？`} label={partner.consultCta} points={partner.serviceHighlights.slice(0, 3).map((h) => h.title)} />
         <SalesMenuButton />
       </body>
     </html>

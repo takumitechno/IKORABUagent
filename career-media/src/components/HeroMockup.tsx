@@ -39,7 +39,7 @@ function Phone({ peek = false }: { peek?: boolean }) {
         <div className={`space-y-2.5 px-3 py-3.5 ${peek ? "h-[250px]" : "h-[392px]"}`}>
           <p className="text-center text-[9.5px] font-bold text-muted">画面はイメージです</p>
           {CHAT.map((m, i) => (
-            <div key={i} className={`flex ${m.from === "me" ? "justify-end" : "justify-start"}`}>
+            <div key={i} className={`chat-pop flex ${m.from === "me" ? "justify-end" : "justify-start"}`} style={{ animationDelay: `${0.5 + i * 0.45}s` }}>
               <p
                 className={`max-w-[82%] rounded-2xl px-3 py-2 text-[11.5px] leading-[1.55] ${
                   m.from === "me" ? "rounded-br-md bg-brand text-white" : "rounded-bl-md bg-white text-ink shadow-[0_1px_2px_rgb(20_43_62/0.08)]"
@@ -49,8 +49,17 @@ function Phone({ peek = false }: { peek?: boolean }) {
               </p>
             </div>
           ))}
+          {peek && (
+            <div className="chat-pop flex justify-start" style={{ animationDelay: "2.4s" }}>
+              <span className="inline-flex gap-1 rounded-2xl rounded-bl-md bg-white px-3 py-2.5 shadow-[0_1px_2px_rgb(20_43_62/0.08)]">
+                {[0, 1, 2].map((d) => (
+                  <span key={d} className="typing-dot h-1.5 w-1.5 rounded-full bg-muted" />
+                ))}
+              </span>
+            </div>
+          )}
           {!peek && (
-            <div className="flex justify-start">
+            <div className="chat-pop flex justify-start" style={{ animationDelay: "2.4s" }}>
               <div className="w-[82%] rounded-2xl rounded-bl-md bg-white p-2.5 shadow-[0_1px_2px_rgb(20_43_62/0.08)]">
                 <p className="flex items-center gap-1.5 text-[10.5px] font-bold text-ink">
                   <CalendarCheck className="h-3.5 w-3.5 text-accent" aria-hidden="true" />

@@ -73,8 +73,11 @@ export default async function HomePage() {
       {/* Hero: ブランドの色の面に、見出し・検索・人気のキーワード・2つの入口（転職メディアでよくある構成） */}
       <section className="relative overflow-hidden bg-hero text-white">
         <div aria-hidden="true" className="pointer-events-none absolute inset-0">
-          <span className="absolute -right-40 -top-56 h-[560px] w-[560px] rounded-full bg-white/[0.06]" />
-          <span className="absolute -bottom-64 -left-32 h-[480px] w-[480px] rounded-full bg-black/[0.12]" />
+          <span className="drift absolute -right-40 -top-56 h-[560px] w-[560px] rounded-full bg-[radial-gradient(circle,rgb(255_255_255/0.14),transparent_62%)]" />
+          <span className="drift-2 absolute -bottom-64 -left-32 h-[480px] w-[480px] rounded-full bg-black/[0.12]" />
+          <span className="sparkle absolute left-[46%] top-[14%] h-2 w-2 rotate-45 rounded-[2px] bg-highlight" />
+          <span className="sparkle sparkle-d1 absolute left-[8%] top-[62%] h-1.5 w-1.5 rotate-45 rounded-[2px] bg-white/80" />
+          <span className="sparkle sparkle-d2 absolute right-[6%] top-[22%] h-2.5 w-2.5 rotate-45 rounded-[2px] bg-accent-bright" />
           <span className="absolute inset-0 bg-[radial-gradient(rgb(255_255_255/0.07)_1px,transparent_1.4px)] [background-size:22px_22px]" />
         </div>
         <div className="relative mx-auto grid max-w-6xl gap-10 px-4 pb-10 pt-8 sm:px-6 md:grid-cols-[minmax(0,1.08fr)_minmax(0,0.92fr)] md:items-center md:pb-16 md:pt-14">

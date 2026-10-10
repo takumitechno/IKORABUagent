@@ -784,7 +784,53 @@ body {
   50% { transform: translateX(4px); }
 }
 
+@keyframes shine {
+  0% { transform: translateX(-130%) skewX(-20deg); }
+  55%, 100% { transform: translateX(330%) skewX(-20deg); }
+}
+@keyframes pulse-ring {
+  0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--color-accent) 55%, transparent); }
+  100% { box-shadow: 0 0 0 14px transparent; }
+}
+@keyframes drift {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(-36px, 28px) scale(1.08); }
+}
+@keyframes popup-in {
+  from { opacity: 0; transform: translateY(28px) scale(0.94); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes flash-in {
+  0% { opacity: 0; transform: scale(0.6); }
+  60% { opacity: 1; transform: scale(1.15); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
 @media (prefers-reduced-motion: no-preference) {
+  /* ボタンの光が流れる（フラッシュ）・相談ボタンの波紋 */
+  .btn-shine { position: relative; overflow: hidden; isolation: isolate; }
+  .btn-shine::after {
+    content: ""; position: absolute; inset: 0 auto 0 0; width: 38%; pointer-events: none; z-index: -1;
+    background: linear-gradient(90deg, transparent, rgb(255 255 255 / 0.5), transparent);
+    animation: shine 3.8s ease-in-out infinite;
+  }
+  .pulse-ring { animation: pulse-ring 2.4s ease-out infinite; }
+  /* ヒーローの光がゆっくり動く・星がまたたく */
+  .drift { animation: drift 16s ease-in-out infinite; }
+  .drift-2 { animation: drift 21s ease-in-out infinite reverse; }
+  .sparkle { animation: twinkle 2.8s ease-in-out infinite; }
+  .sparkle-d1 { animation-delay: -0.9s; }
+  .sparkle-d2 { animation-delay: -1.8s; }
+  /* チャットの吹き出しが順にポンと出る */
+  .chat-pop { animation: pop-in 0.5s cubic-bezier(0.2, 0.8, 0.25, 1.2) both; }
+  /* ポップアップ */
+  .popup-in { animation: popup-in 0.5s cubic-bezier(0.2, 0.8, 0.25, 1.1) both; }
+  .flash-in { animation: flash-in 0.6s cubic-bezier(0.2, 0.8, 0.25, 1.2) both; }
+  /* カードにマウスを乗せたとき: サムネイルのアイコンが少し動く */
+  .eyecatch-badge { transition: transform 0.35s cubic-bezier(0.2, 0.8, 0.3, 1.3); }
+  .group:hover .eyecatch-badge { transform: scale(1.08) rotate(-6deg); }
+  .tile-icon { transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.3, 1.4); }
+  .group:hover .tile-icon { transform: translateY(-3px) scale(1.08); }
   /* トップのイラスト */
   .hero-person { animation: breathe 4.5s ease-in-out infinite; }
   .hero-head { transform-box: view-box; transform-origin: 155px 134px; animation: head-tilt 7s ease-in-out infinite; }

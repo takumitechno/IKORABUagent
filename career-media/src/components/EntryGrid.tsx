@@ -37,7 +37,7 @@ export function EntryGrid({ group, counts, variant = "tile" }: { group: Taxonomy
               href={taxonomyPath(group, item.slug)}
               className="tap group flex h-full flex-col items-center rounded-xl border border-line bg-white px-1.5 pb-3 pt-4 text-center transition-colors hover:border-brand hover:bg-brand-tint sm:px-2"
             >
-              <span className={`relative mb-2.5 flex h-12 w-12 items-center justify-center rounded-xl ${tone.bg} ${tone.fg}`}>
+              <span className={`tile-icon relative mb-2.5 flex h-12 w-12 items-center justify-center rounded-xl ${tone.bg} ${tone.fg}`}>
                 <CategoryIcon name={item.icon} className="h-6 w-6" />
                 {count !== undefined && (
                   <span className="absolute -right-2.5 -top-2 flex h-5 min-w-5 items-center justify-center rounded-full bg-accent px-1 text-[10.5px] font-bold tabular-nums text-white ring-2 ring-white" aria-label={`記事${count}件`}>

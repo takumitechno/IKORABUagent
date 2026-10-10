@@ -41,7 +41,7 @@ export function ConsultButton({ placement, contentSlug, label, size = "md" }: { 
       data-cta-placement={placement}
       data-cta-kind="consultation-apply"
       data-content-slug={contentSlug}
-      className={`inline-flex items-center justify-center gap-1.5 whitespace-nowrap rounded-full bg-accent font-bold text-white transition-colors hover:bg-accent-strong ${
+      className={`btn-shine inline-flex items-center justify-center gap-1.5 whitespace-nowrap rounded-full bg-accent font-bold text-white transition-colors hover:bg-accent-strong ${
         size === "lg" ? "px-7 py-4 text-base" : "px-5 py-3 text-[15px]"
       }`}
     >

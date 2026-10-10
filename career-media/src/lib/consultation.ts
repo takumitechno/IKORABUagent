@@ -6,6 +6,7 @@ export type CtaPlacement =
   | "home-hero"
   | "home-band"
   | "home-consult"
+  | "popup"
   | "article-inline"
   | "article-bottom"
   | "article-sidebar"
