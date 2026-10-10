@@ -14,7 +14,7 @@ roles: []
 concerns: [yaritai]
 situations: [hajimete]
 eyecatch: ["転職サイト？エージェント？", "ハローワーク？"]
-related: [agent-soudan-nani, agent-mendan-mae, freeter-seishain-hajimeni, hellowork-tsukaikata]
+related: [agent-soudan-nani, agent-mendan-mae, freeter-seishain-hajimeni, hellowork-tsukaikata, tenshoku-agent-merit]
 faq:
   - q: 転職エージェントは無料と聞きますが、なぜ無料なのですか？
     a: 人材紹介会社（有料職業紹介事業者）は、主に求人を出している企業から手数料を受け取っているからです。職業安定法では、有料職業紹介事業者は求職者から原則として手数料を受け取ってはいけないとされています。例外は、芸能家・モデルや、年収700万円を超える経営管理者・科学技術者・熟練技能者などに限られています。

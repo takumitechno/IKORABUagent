@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { BookOpen, ClipboardList, MessagesSquare } from "lucide-react";
+import { BookOpen, ClipboardList } from "lucide-react";
+import { ServiceHighlights, SoloVsPro } from "@/components/ProValue";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { ConsultButton, ConsultationCta, PartnerNote } from "@/components/ConsultationCta";
 import { JsonLd } from "@/components/JsonLd";
@@ -7,8 +8,8 @@ import { partner } from "@/config/partner";
 import { faqJsonLd, pageMetadata } from "@/lib/seo";
 
 export const metadata = pageMetadata({
-  title: "キャリア相談について",
-  description: `未経験からの転職を、人材紹介会社のキャリアアドバイザーに相談するときにできること・相談の流れ・相談前に準備しておくこと・よくある質問をまとめています。`,
+  title: "キャリア相談について｜転職はプロに相談しながら進めよう",
+  description: `はじめての転職・未経験の転職を、人材紹介会社のキャリアアドバイザー（転職エージェント）に相談するとできること（企業選び・面接の練習・書類の添削・日程調整）、相談の流れ、相談前に準備しておくこと、よくある質問をまとめています。`,
   path: "/consultation",
 });
 
@@ -18,6 +19,8 @@ const FAQ = [
     answer:
       "人材紹介会社（有料職業紹介事業者）は、職業安定法により、原則として求職者から手数料を受け取ることができません（一部の職業を除く）。紹介手数料は、採用した企業が支払うしくみです。実際の条件は、申し込みページで相談先の案内を確認してください。",
   },
+  { question: "面接の練習もしてもらえますか？", answer: "人材紹介会社のキャリア相談では、応募先に合わせた面接の準備（模擬面接など）のサポートを受けられることが一般的です。具体的な内容は、相談のときに確認してください。" },
+  { question: "どの会社を選べばいいか分からなくても相談できますか？", answer: "はい。求人票だけでは分からない職場のことを聞きながら、条件の優先順位や自分に合う会社を一緒に考えられます。" },
   { question: "相談したら、必ず応募しないといけませんか？", answer: "いいえ。紹介された求人に応募するかどうかは、ご自身で決められます。情報収集のための相談でも構いません。" },
   { question: "まだ転職するか決めていなくても相談できますか？", answer: "はい。転職するかどうか迷っている段階でも、今の状況や選択肢を整理するために相談できます。" },
   { question: "相談すれば転職できますか？", answer: "相談は、内定や年収アップなどの結果を保証するものではありません。経験や希望をもとに、選択肢や進め方を一緒に考えるためのものです。" },
@@ -36,44 +39,53 @@ export default function ConsultationPage() {
         <header className="mt-6 grid gap-8 rounded-[20px] bg-white p-6 ring-1 ring-line sm:p-10 md:grid-cols-[1.4fr_1fr] md:items-center">
           <div>
             <p className="text-[11px] font-bold tracking-[0.2em] text-brand">CAREER CONSULTATION</p>
-            <h1 className="mt-1 text-[26px] font-bold leading-snug text-ink sm:text-[32px]">キャリア相談について</h1>
+            <h1 className="mt-1 text-[26px] font-bold leading-snug text-ink sm:text-[32px]">
+              転職は、プロに相談しながら
+              <br className="hidden sm:block" />
+              進めよう
+            </h1>
             <p className="mt-4 text-[15px] leading-8 text-body">
-              このメディアは、仕事や条件について自分で調べて整理するための場所です。自分の場合どんな求人や進め方があるかを具体的に考えたいときは、{partner.partnerName}のキャリアアドバイザーに相談できます。相談しなくても、記事とチェックだけで使えるように作っています。
+              はじめての転職や未経験の仕事への転職は、分からないことが多いものです。{partner.partnerName}のキャリアアドバイザーに相談すると、企業選びから面接の練習、書類の添削、日程の調整まで、一緒に進められます。応募するかどうかは、ご自身で決められます。
             </p>
           </div>
           <div className="rounded-2xl bg-brand-tint p-5 ring-1 ring-brand/15">
             <span aria-hidden="true" className="motif motif-chat mx-auto mb-3 block h-24 w-24 rounded-full bg-white" />
-            <ConsultButton placement="consultation-page" label="相談を申し込む" />
+            <ConsultButton placement="consultation-page" label="キャリア相談を申し込む" />
             <p className="mt-3 text-xs leading-5 text-muted">先に条件を整理したい方は、下の「相談の前に準備しておくと話しやすいこと」から。</p>
             <PartnerNote className="mt-2 text-xs leading-5 text-muted" />
           </div>
         </header>
 
-        <section aria-labelledby="roles" className="mt-12">
-          <h2 id="roles" className="text-[22px] font-bold text-ink">
-            メディアとキャリア相談でできること
+        <section aria-labelledby="services" className="mt-12">
+          <h2 id="services" className="text-[22px] font-bold text-ink">
+            キャリア相談でできること
           </h2>
-          <div className="mt-5 grid gap-5 md:grid-cols-2">
-            <div className="rounded-[var(--radius-card)] border border-line bg-white p-6">
-              <p className="flex items-center gap-2 font-bold text-ink">
-                <BookOpen className="h-5 w-5 text-brand" aria-hidden="true" />
-                このメディアでできること（自分で）
-              </p>
-              <ul className="mt-4 space-y-2.5 text-[14.5px] leading-7">
-                <li>・仕事内容や働き方、給料・休日の見方を知る</li>
-                <li>・職種ごとの違いを比べる</li>
-                <li>・条件整理チェックで、希望や経験・聞きたいことを整理する</li>
-              </ul>
-              <p className="mt-3 text-[12.5px] leading-6 text-muted">求人の紹介や、個別の応募先の判断はしていません。</p>
-            </div>
-            <div className="rounded-[var(--radius-card)] border-2 border-accent/30 bg-white p-6">
-              <p className="flex items-center gap-2 font-bold text-ink">
-                <MessagesSquare className="h-5 w-5 text-accent" aria-hidden="true" />
-                キャリア相談でできること（{partner.partnerName}）
-              </p>
-              <p className="mt-3 text-[14.5px] leading-7 text-body">{partner.serviceDescription}</p>
-              <p className="mt-3 text-[12.5px] leading-6 text-muted">内定や年収アップなどの結果を保証するものではありません。</p>
-            </div>
+          <div className="mt-5">
+            <ServiceHighlights compact />
+          </div>
+          <p className="mt-3 text-[12.5px] leading-6 text-muted">{partner.serviceHighlightsNote} 内定や年収アップなどの結果を保証するものではありません。</p>
+        </section>
+
+        <section aria-labelledby="solo-vs-pro" className="mt-12">
+          <h2 id="solo-vs-pro" className="text-[22px] font-bold text-ink">
+            ひとりで進める場合との違い
+          </h2>
+          <div className="mt-5">
+            <SoloVsPro />
+          </div>
+          <div className="mt-5 rounded-[var(--radius-card)] border border-line bg-white p-5">
+            <p className="flex items-center gap-2 font-bold text-ink">
+              <BookOpen className="h-5 w-5 text-brand" aria-hidden="true" />
+              このメディアの使い方
+            </p>
+            <p className="mt-2 text-[14px] leading-7 text-body">
+              記事で仕事や条件の見方を知り、条件整理チェックで希望や経験を書き出しておくと、相談のときに話が進みやすくなります。このメディア自体は、求人の紹介や応募先の判断はしていません。
+            </p>
+            <p className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-[13.5px] font-bold">
+              <Link href="/articles/tenshoku-agent-merit" className="text-brand-strong underline underline-offset-2">エージェントに相談したほうがいい理由</Link>
+              <Link href="/articles/mensetsu-renshu-pro" className="text-brand-strong underline underline-offset-2">面接の練習をプロに頼む</Link>
+              <Link href="/articles/kigyou-erabi-soudan" className="text-brand-strong underline underline-offset-2">会社選びをプロに相談する</Link>
+            </p>
           </div>
         </section>
 

@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { ArrowRight, ArrowUpRight, CheckCircle2, ClipboardList, MessageCircle } from "lucide-react";
+import { ArrowRight, ArrowUpRight, CheckCircle2, ClipboardList, MessageCircle, MessagesSquare } from "lucide-react";
+import { ctaCopy } from "@/lib/cta-copy";
 import { licenseLabel, partner } from "@/config/partner";
 import { buildConsultationUrl, isExternalConsultationUrl, type CtaPlacement } from "@/lib/consultation";
 import { ChatMock } from "./illustrations/ChatMock";
@@ -10,10 +11,12 @@ type Props = {
   variant?: "band" | "inline" | "compact";
   heading?: string;
   lead?: string;
+  /** 記事のカテゴリ。文言をカテゴリに合わせる */
+  category?: string;
 };
 
-/** キャリア相談（人材紹介サービス）で一般的にできること。提携先の固有のサービス内容は書かない */
-const POINTS = ["これまでの経験と希望条件の整理", "条件に合いそうな求人の紹介", "応募書類・面接の準備のサポート"];
+/** キャリア相談でできること（partner config の serviceHighlights から先頭の3つ） */
+const POINTS = partner.serviceHighlights.slice(0, 3).map((h) => `${h.title}（${h.body.replace(/。$/, "")}）`);
 
 /** 相談先の表記（運営者とは分けて書く） */
 export function PartnerNote({ className = "" }: { className?: string }) {
@@ -38,7 +41,7 @@ export function ConsultButton({ placement, contentSlug, label, size = "md" }: { 
       data-cta-placement={placement}
       data-cta-kind="consultation-apply"
       data-content-slug={contentSlug}
-      className={`inline-flex items-center justify-center gap-1.5 rounded-full bg-accent font-bold text-white transition-colors hover:bg-accent-strong ${
+      className={`inline-flex items-center justify-center gap-1.5 whitespace-nowrap rounded-full bg-accent font-bold text-white transition-colors hover:bg-accent-strong ${
         size === "lg" ? "px-7 py-4 text-base" : "px-5 py-3 text-[15px]"
       }`}
     >
@@ -58,46 +61,63 @@ function AboutConsultationLink({ placement, contentSlug, className }: { placemen
   );
 }
 
-export function ConsultationCta({ placement, contentSlug, variant = "band", heading, lead }: Props) {
+export function ConsultationCta({ placement, contentSlug, variant = "band", heading, lead, category }: Props) {
+  const copy = ctaCopy(category);
   if (variant === "compact") {
     return (
       <div className="rounded-[var(--radius-card)] border border-accent/25 bg-accent-soft p-5">
         <p className="flex items-center gap-2 text-sm font-bold text-ink">
           <MessageCircle className="h-4 w-4 text-accent" aria-hidden="true" />
-          {heading ?? "自分の場合はどうなる？"}
+          {heading ?? copy.heading}
         </p>
-        <p className="mt-2 text-[13px] leading-6 text-body">{lead ?? "記事で整理したことをもとに、具体的な求人や進め方を人材紹介会社のキャリアアドバイザーに相談することもできます。"}</p>
+        <p className="mt-2 text-[13px] leading-6 text-body">{lead ?? copy.lead}</p>
+        <div className="mt-4">
+          <ConsultButton placement={placement} contentSlug={contentSlug} label={copy.label} />
+        </div>
         <AboutConsultationLink
           placement={placement}
           contentSlug={contentSlug}
-          className="mt-4 inline-flex items-center gap-1.5 rounded-full border border-accent/40 bg-white px-4 py-2.5 text-sm font-bold text-ink hover:border-accent hover:text-accent-strong"
+          className="mt-3 inline-flex items-center gap-1.5 text-[13px] font-bold text-ink underline-offset-4 hover:text-accent-strong hover:underline"
         />
       </div>
     );
   }
 
   if (variant === "inline") {
-    // 記事の途中では相談をすすめず、まず自分の条件を整理する道具を案内する
+    // 記事の途中: 記事のテーマに合わせて、プロに相談するとできることを短く案内する（整理のためのチェックも添える）
     return (
-      <aside aria-label="条件整理チェックのご案内" className="no-print my-10 overflow-hidden rounded-[var(--radius-card)] border border-line bg-brand-tint">
-        <div className="flex flex-col gap-4 p-5 sm:flex-row sm:items-center sm:justify-between sm:p-6">
+      <aside aria-label="キャリア相談のご案内" className="no-print my-10 overflow-hidden rounded-[var(--radius-card)] border-2 border-accent/30 bg-[#fff8ef]">
+        <div className="p-5 sm:p-6">
           <div className="flex items-start gap-3">
-            <span aria-hidden="true" className="motif motif-checklist block h-14 w-14 shrink-0 rounded-full bg-white" />
-            <div>
-              <p className="text-[16px] font-bold leading-7 text-ink">{heading ?? "読みながら、自分の条件も整理してみる"}</p>
-              <p className="mt-1 text-sm leading-6 text-muted">{lead ?? "約3分・登録不要。回答はどこにも送信されません。"}</p>
+            <span aria-hidden="true" className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-accent text-white">
+              <MessagesSquare className="h-5 w-5" />
+            </span>
+            <div className="min-w-0">
+              <p className="text-[16.5px] font-bold leading-7 text-ink">{heading ?? copy.heading}</p>
+              <p className="mt-1 text-[13.5px] leading-6 text-body">{lead ?? copy.lead}</p>
             </div>
           </div>
-          <Link
-            href="/check"
-            data-cta-placement={placement}
-            data-cta-kind="check"
-            data-content-slug={contentSlug}
-            className="inline-flex shrink-0 items-center justify-center gap-1.5 rounded-full bg-brand px-5 py-3 text-sm font-bold text-white hover:bg-brand-strong"
-          >
-            <ClipboardList className="h-4 w-4" aria-hidden="true" />
-            条件整理チェック
-          </Link>
+          <ul className="mt-4 flex flex-wrap gap-1.5">
+            {partner.serviceHighlights.slice(0, 3).map((h) => (
+              <li key={h.title} className="inline-flex items-center gap-1 rounded-full bg-white px-2.5 py-1 text-[12px] font-bold text-accent-strong ring-1 ring-accent/25">
+                <CheckCircle2 className="h-3.5 w-3.5" aria-hidden="true" />
+                {h.title}
+              </li>
+            ))}
+          </ul>
+          <div className="mt-5 flex flex-col gap-2.5 sm:flex-row sm:items-center">
+            <ConsultButton placement={placement} contentSlug={contentSlug} label={copy.label} />
+            <Link
+              href="/check"
+              data-cta-placement={placement}
+              data-cta-kind="check"
+              data-content-slug={contentSlug}
+              className="inline-flex items-center justify-center gap-1.5 px-2 py-2 text-[13.5px] font-bold text-brand-strong hover:underline"
+            >
+              <ClipboardList className="h-4 w-4" aria-hidden="true" />
+              先に条件を整理する（3分・登録不要）
+            </Link>
+          </div>
         </div>
       </aside>
     );
@@ -108,10 +128,10 @@ export function ConsultationCta({ placement, contentSlug, variant = "band", head
       <div className="grid gap-8 p-6 sm:p-10 md:grid-cols-[1.3fr_1fr] md:items-center">
         <div>
           <h2 id={`cta-${placement}`} className="text-[21px] font-bold leading-snug sm:text-[26px]">
-            {heading ?? "自分の場合を、一緒に整理してもらう"}
+            {heading ?? copy.heading}
           </h2>
           <p className="mt-3 text-[15px] leading-7 text-white/80">
-            {lead ?? "人材紹介会社のアドバイザーと、求人や進め方を話せます。応募するかどうかは、ご自身で決められます。"}
+            {lead ?? copy.lead}
           </p>
           <ul className="mt-5 hidden space-y-2.5 md:block">
             {POINTS.map((p) => (
@@ -122,7 +142,7 @@ export function ConsultationCta({ placement, contentSlug, variant = "band", head
             ))}
           </ul>
           <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
-            <ConsultButton placement={placement} contentSlug={contentSlug} size="lg" />
+            <ConsultButton placement={placement} contentSlug={contentSlug} size="lg" label={category ? copy.label : undefined} />
             <AboutConsultationLink
               placement={placement}
               contentSlug={contentSlug}

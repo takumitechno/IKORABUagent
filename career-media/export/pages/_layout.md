@@ -14,7 +14,7 @@
 - [条件整理チェック](/check)
 - [転職ニュース](/news)
 
-[キャリア相談について](/consultation)
+[プロに相談する](/consultation)
 
 ---
 

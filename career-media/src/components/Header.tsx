@@ -25,10 +25,10 @@ export function Header() {
             href="/consultation"
             data-cta-placement="header"
             data-cta-kind="consultation-info"
-            className="hidden items-center gap-1.5 rounded-full bg-ink px-4 py-2 text-[13px] font-bold text-white transition-colors hover:bg-brand-strong sm:inline-flex"
+            className="hidden items-center gap-1.5 rounded-full bg-accent px-4 py-2 text-[13px] font-bold text-white transition-colors hover:bg-accent-strong sm:inline-flex"
           >
             <MessageCircle className="h-4 w-4" aria-hidden="true" />
-            キャリア相談について
+            プロに相談する
           </Link>
           <MobileNav />
         </div>

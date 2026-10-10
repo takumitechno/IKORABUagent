@@ -55,6 +55,16 @@ export function ProcessFlow({ has }: { has: Has }) {
           );
         })}
       </ol>
+      <Link href="/consultation" data-cta-placement="home-consult" data-cta-kind="consultation-info" className="mt-4 flex items-center gap-3 rounded-xl bg-[#fff8ef] p-3.5 ring-1 ring-accent/25 hover:ring-accent/50">
+        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-accent text-white">
+          <MessagesSquare className="h-4.5 w-4.5" aria-hidden="true" />
+        </span>
+        <span className="min-w-0 flex-1 text-[13px] leading-6 text-ink">
+          <b>STEP 2〜7 は、転職のプロと一緒に進められます。</b>
+          <span className="text-muted">求人の紹介、書類の添削、面接の練習、日程や条件の調整まで。</span>
+        </span>
+        <ArrowRight className="h-4 w-4 shrink-0 text-accent-strong" aria-hidden="true" />
+      </Link>
     </div>
   );
 }
@@ -117,7 +127,15 @@ export function JobPostingDiagram({ has }: { has: Has }) {
             </li>
           );
         })}
+        <li className="rounded-xl bg-[#fff8ef] p-3.5 text-[12.5px] leading-6 text-ink ring-1 ring-accent/25">
+          求人票に書かれていないこと（職場の雰囲気・残業の実態・配属）は、
+          <Link href="/consultation" data-cta-placement="home-consult" data-cta-kind="consultation-info" className="font-bold text-accent-strong underline underline-offset-2">
+            キャリア相談
+          </Link>
+          のときにアドバイザーに聞けます。
+        </li>
       </ol>
     </div>
   );
 }
+

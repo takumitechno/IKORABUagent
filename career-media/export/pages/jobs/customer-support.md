@@ -75,8 +75,10 @@ source:
 - [転職回数が多い](/situations/kaisu)
 - [PC仕事が未経験](/situations/pc-mikeiken)
 
-自分の場合はどうなる？
+ひとりで悩むより、転職のプロと進める
 
-記事で整理したことをもとに、具体的な求人や進め方を人材紹介会社のキャリアアドバイザーに相談することもできます。
+会社選びから面接の練習まで、キャリアアドバイザーに相談しながら準備できます。応募するかどうかは、ご自身で決められます。
+
+[キャリア相談を申し込む](/consultation/apply?placement=article-sidebar__roles-customer-support)
 
 [相談でできることを見る](/consultation)

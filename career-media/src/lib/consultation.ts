@@ -5,6 +5,7 @@ export type CtaPlacement =
   | "header"
   | "home-hero"
   | "home-band"
+  | "home-consult"
   | "article-inline"
   | "article-bottom"
   | "article-sidebar"

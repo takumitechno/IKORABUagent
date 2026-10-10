@@ -14,7 +14,7 @@ roles: []
 concerns: [yaritai]
 situations: [hajimete]
 eyecatch: ["エージェント面談の前、", "何を決めておく？"]
-related: [mikeiken-tenshoku-hajimekata, donichi-yasumi-nenshu-hikaku, mikeiken-kenshu-kakunin]
+related: [mikeiken-tenshoku-hajimekata, donichi-yasumi-nenshu-hikaku, mikeiken-kenshu-kakunin, tenshoku-agent-merit, mensetsu-renshu-pro]
 faq:
   - q: 人材紹介会社に相談すると、お金はかかりますか？
     a: 職業安定法にもとづく有料職業紹介事業では、原則として求職者から手数料を受け取ることはできず、紹介手数料は採用した企業が支払うしくみです。一部の職業では例外もあるため、気になる場合は相談先に確認しましょう。

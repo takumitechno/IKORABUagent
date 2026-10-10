@@ -15,7 +15,7 @@ roles: []
 concerns: [mensetsu, mikeiken-shokushu]
 situations: [hajimete]
 eyecatch: ["企業研究って、", "どこで何を見る？"]
-related: [shokuba-jouhou-wakamono, shiboudouki-mikeiken, gyaku-shitsumon, shorui-senkou-tooranai, fukuri-kousei-mikata]
+related: [shokuba-jouhou-wakamono, shiboudouki-mikeiken, gyaku-shitsumon, shorui-senkou-tooranai, fukuri-kousei-mikata, kigyou-erabi-soudan]
 faq:
   - q: 企業研究は、1社にどのくらい時間をかければいいですか？
     a: 決まった時間はありません。目安は「志望動機に会社ならではの理由を1つ入れられる」「逆質問をいくつか用意できる」「働き方の条件で気になることが分かっている」の3つがそろうところまでです。書類を出す前は求人票と公式サイトを中心に、面接が決まったら職場情報や仕事内容まで調べる、と段階を分けると続けやすくなります。

@@ -15,7 +15,7 @@ roles: []
 concerns: [donichi, kyuryo, seishain]
 situations: [hajimete, dainishinsotsu]
 eyecatch: ["入社してから", "「話が違う」を防ぐ"]
-related: [naitei-shodaku-mae, shiyou-kikan, nenshu-dake-erabanai, koteizangyo-kyujin, naitei-jitai-tsutaekata, naitei-go-junbi, tenkin-kinmuchi-kakunin]
+related: [naitei-shodaku-mae, shiyou-kikan, nenshu-dake-erabanai, koteizangyo-kyujin, naitei-jitai-tsutaekata, naitei-go-junbi, tenkin-kinmuchi-kakunin, kigyou-erabi-soudan]
 faq:
   - q: 労働条件通知書をもらえないまま入社日が近づいています。どうすればいいですか？
     a: 労働基準法第15条では、会社は労働契約を結ぶときに、賃金や労働時間などの労働条件を示さなければならないとされています。「入社前に、労働条件を書面で確認させていただけますか」と採用担当者にお願いしてみましょう。それでも示されないときは、総合労働相談コーナーやハローワークに相談できます。

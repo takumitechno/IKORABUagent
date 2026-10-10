@@ -15,7 +15,7 @@ roles: []
 concerns: [mensetsu]
 situations: [hajimete, seishain-keiken-sukunai]
 eyecatch: ["面接に落ちた…", "次は何を直せばいい？"]
-related: [mensetsu-yokukiku-shitsumon, mensetsu-junbi-mikeiken, gyaku-shitsumon, mensetsu-kinchou, hellowork-tsukaikata]
+related: [mensetsu-yokukiku-shitsumon, mensetsu-junbi-mikeiken, gyaku-shitsumon, mensetsu-kinchou, hellowork-tsukaikata, mensetsu-renshu-pro]
 faq:
   - q: 面接に落ちた理由を、会社に聞いてもいいですか？
     a: 聞くこと自体はかまいませんが、不採用の理由は詳しく教えてもらえないことが多いと考えておきましょう。答えが返ってこなくても失礼にあたるわけではありません。理由が分からないときは、面接直後のメモをもとに自分で振り返るか、ハローワークなどの窓口で面接の受け答えを一緒に見直してもらう方法があります。

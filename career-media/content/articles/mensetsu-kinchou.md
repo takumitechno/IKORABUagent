@@ -14,7 +14,7 @@ roles: []
 concerns: [mensetsu]
 situations: [hajimete, seishain-keiken-sukunai]
 eyecatch: ["面接で緊張して", "頭が真っ白になる"]
-related: [mensetsu-yokukiku-shitsumon, web-mensetsu-junbi, mensetsu-fukusou, mensetsu-ochita-furikaeri, tekisei-kensa-tenshoku]
+related: [mensetsu-yokukiku-shitsumon, web-mensetsu-junbi, mensetsu-fukusou, mensetsu-ochita-furikaeri, tekisei-kensa-tenshoku, mensetsu-renshu-pro]
 faq:
   - q: 面接で緊張していることは、伝えてもいいですか？
     a: 伝えてかまいません。言葉に詰まったときに「緊張していて、うまくまとまらず失礼しました。改めてお話しします」と一言添えてから話し直すと、黙ってしまうより落ち着いて続けやすくなります。ただし何度もくり返すより、話す中身に戻ることを大事にしましょう。

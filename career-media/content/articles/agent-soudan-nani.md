@@ -14,7 +14,7 @@ roles: []
 concerns: [yaritai, seishain]
 situations: [hajimete, freeter]
 eyecatch: ["エージェントに", "何を相談する？"]
-related: [agent-mendan-mae, shigoto-sagashikata, mensetsu-junbi-mikeiken]
+related: [agent-mendan-mae, shigoto-sagashikata, mensetsu-junbi-mikeiken, tenshoku-agent-merit, kigyou-erabi-soudan]
 faq:
   - q: やりたい仕事が決まっていなくても、相談していいですか？
     a: 大丈夫です。これまでの経験と、今の働き方で変えたいことを伝えると、考えられる職種や求人を一緒に整理しやすくなります。

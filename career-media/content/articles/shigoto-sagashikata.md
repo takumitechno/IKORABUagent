@@ -14,7 +14,7 @@ roles: [sonota]
 concerns: [yaritai, mikeiken-shokushu]
 situations: [hajimete, seishain-keiken-sukunai]
 eyecatch: ["やりたい仕事が", "分からないときは。"]
-related: [mikeiken-tenshoku-hajimekata, eigyo-cs-it-support-chigai, sekkyaku-keiken-ikasu, jiko-bunseki-yarikata]
+related: [mikeiken-tenshoku-hajimekata, eigyo-cs-it-support-chigai, sekkyaku-keiken-ikasu, jiko-bunseki-yarikata, tenshoku-agent-merit]
 faq:
   - q: やりたいことが決まっていないまま、転職活動を始めてもいいですか？
     a: 始めて大丈夫です。やりたいことがはっきりしていなくても、避けたいこと・続けられた作業・ゆずれない条件の3つを書き出せば、候補をしぼって比べることはできます。働きながら、やりたいことが見えてくる人もいます。

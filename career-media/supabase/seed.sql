@@ -192,7 +192,7 @@ items:
 
 厚生労働省の「人材サービス総合サイト」では、許可番号や事業者名から職業紹介事業者を検索できます。初めて利用する相談先なら、一度確認しておくと安心です。
 
-面談の前に、自分の希望や経験をざっくり整理しておきたい場合は、[条件整理チェック](/check)を使ってみてください。整理した結果は、そのまま面談で話す材料になります。', 'review', false, '2026-10-06'::timestamptz, '2026-10-06'::timestamptz, '2026-10-06'::timestamptz, null, '2026-10-06'::timestamptz, null, null, array['mikeiken-tenshoku-hajimekata', 'donichi-yasumi-nenshu-hikaku', 'mikeiken-kenshu-kakunin']::text[], '{}'::text[], array['yaritai']::text[], array['hajimete']::text[], array['エージェント面談の前、', '何を決めておく？']::text[], null, true, '[{"q":"人材紹介会社に相談すると、お金はかかりますか？","a":"職業安定法にもとづく有料職業紹介事業では、原則として求職者から手数料を受け取ることはできず、紹介手数料は採用した企業が支払うしくみです。一部の職業では例外もあるため、気になる場合は相談先に確認しましょう。"},{"q":"面談を受けたら、必ず応募しないといけませんか？","a":"面談を受けることと応募することは別です。紹介された求人に応募するかどうかは自分で決められます。合わないと感じた求人は、理由を添えて断って構いません。"},{"q":"相談先が許可を受けた事業者かどうかは、どうやって確かめられますか？","a":"厚生労働省の「人材サービス総合サイト」で、職業紹介事業の許可番号や事業者名から検索できます。"}]'::jsonb, null, null) on conflict (slug) do nothing;
+面談の前に、自分の希望や経験をざっくり整理しておきたい場合は、[条件整理チェック](/check)を使ってみてください。整理した結果は、そのまま面談で話す材料になります。', 'review', false, '2026-10-06'::timestamptz, '2026-10-06'::timestamptz, '2026-10-06'::timestamptz, null, '2026-10-06'::timestamptz, null, null, array['mikeiken-tenshoku-hajimekata', 'donichi-yasumi-nenshu-hikaku', 'mikeiken-kenshu-kakunin', 'tenshoku-agent-merit', 'mensetsu-renshu-pro']::text[], '{}'::text[], array['yaritai']::text[], array['hajimete']::text[], array['エージェント面談の前、', '何を決めておく？']::text[], null, true, '[{"q":"人材紹介会社に相談すると、お金はかかりますか？","a":"職業安定法にもとづく有料職業紹介事業では、原則として求職者から手数料を受け取ることはできず、紹介手数料は採用した企業が支払うしくみです。一部の職業では例外もあるため、気になる場合は相談先に確認しましょう。"},{"q":"面談を受けたら、必ず応募しないといけませんか？","a":"面談を受けることと応募することは別です。紹介された求人に応募するかどうかは自分で決められます。合わないと感じた求人は、理由を添えて断って構いません。"},{"q":"相談先が許可を受けた事業者かどうかは、どうやって確かめられますか？","a":"厚生労働省の「人材サービス総合サイト」で、職業紹介事業の許可番号や事業者名から検索できます。"}]'::jsonb, null, null) on conflict (slug) do nothing;
 insert into article_categories (article_id, category_id, is_primary) select a.id, c.id, true from articles a, categories c where a.slug = 'agent-mendan-mae' and c.slug = 'junbi' on conflict do nothing;
 insert into article_categories (article_id, category_id, is_primary) select a.id, c.id, false from articles a, categories c where a.slug = 'agent-mendan-mae' and c.slug = 'mikeiken' on conflict do nothing;
 insert into article_sources (article_id, title, publisher, url, accessed_at, used_for, sort_order) select id, '職業安定法', 'e-Gov法令検索（デジタル庁）', 'https://laws.e-gov.go.jp/law/322AC0000000141', '2026-10-06'::date, '有料職業紹介事業の手数料に関する規定', 0 from articles where slug = 'agent-mendan-mae';
@@ -291,7 +291,7 @@ items:
 
 有料で職業紹介を行う事業者は、厚生労働大臣の許可を受ける必要があります。また、有料職業紹介事業者は原則として求職者から手数料を受け取ってはいけないとされています（芸能家やモデルなど、一部の職業には例外があります）。
 
-利用規約の確認は、厚生労働省の求職者向けリーフレットでもすすめられています。分からない言葉があれば、登録前にそのまま質問して大丈夫です。', 'review', false, '2026-10-06'::timestamptz, '2026-10-06'::timestamptz, '2026-10-06'::timestamptz, null, '2026-10-06'::timestamptz, null, null, array['agent-mendan-mae', 'shigoto-sagashikata', 'mensetsu-junbi-mikeiken']::text[], '{}'::text[], array['yaritai', 'seishain']::text[], array['hajimete', 'freeter']::text[], array['エージェントに', '何を相談する？']::text[], null, false, '[{"q":"やりたい仕事が決まっていなくても、相談していいですか？","a":"大丈夫です。これまでの経験と、今の働き方で変えたいことを伝えると、考えられる職種や求人を一緒に整理しやすくなります。"},{"q":"紹介された求人を断るときは、どう伝えればいいですか？","a":"「通勤に1時間半かかるので見送ります。片道1時間以内だとありがたいです」のように、断る理由と、次に希望する条件をセットで伝えると、次に紹介される求人が希望に近づきやすくなります。"},{"q":"登録する前に、確認しておくことはありますか？","a":"厚生労働省のリーフレットでは、登録するときに利用規約をよく読み、違約金の有無や、自分の個人情報が誰に・いつまで提供されるかを確認するよう案内されています。許可を受けた事業者かどうかは、厚生労働省の「人材サービス総合サイト」で調べられます。"}]'::jsonb, null, '{"schema_version":2,"writer_agent":"career-writer","angle":"既存の agent-mendan-mae（面談前に決めること）と重ならないよう、面談の場で「何を・どう頼むか」に絞り、場面ごとの相談内容と、そのまま使える相談の言い方の例を中心にする。実在の事業者名は出さない","quotes":[{"source_url":"https://jsite.mhlw.go.jp/ishikawa-roudoukyoku/hourei_seido_tetsuzuki/roudousha_haken/syoukai_gaiyou.html","text":"有料職業紹介事業は手数料または報酬を受けて行う職業紹介事業で、厚生労働大臣の許可が必要。求職者からの手数料徴収は原則禁止で、芸能家・モデル、年収700万円超の経営管理者・科学技術者・熟練技能者などに例外がある","used_in":"登録・相談の前に、ここだけ確認"},{"source_url":"https://www.mhlw.go.jp/content/000851397.pdf","text":"求職者向けリーフレット。人材サービス総合サイト（厚生労働省運営）で、許可を受けた職業紹介事業者かどうか、手数料や就職実績などの情報を確認できると案内。求職登録時には利用規約をよく確認し、特に違約金や自分の個人情報の取り扱い（誰に提供されるか、いつまで提供されるかなど）を確認する","used_in":"登録・相談の前に、ここだけ確認／FAQ"},{"source_url":"https://jinzai.hellowork.mhlw.go.jp/JinzaiWeb","text":"労働者派遣事業・職業紹介事業の許可・届出事業所を検索できる厚生労働省のサイト","used_in":"登録・相談の前に、ここだけ確認"},{"source_url":"https://www.mhlw.go.jp/content/001114167.pdf","text":"2024年4月から、募集広告や職業紹介を受ける際に明示される労働条件に、従事すべき業務の変更の範囲、就業場所の変更の範囲、有期労働契約を更新する場合の基準が追加","used_in":"聞きにくい条件ほど、先に聞く"}],"not_used":["転職エージェントの利用者数や、利用した場合の内定率などの統計は使っていない","サポートの範囲は事業者によって違うため、一般的な例として書き、最初に確認するようすすめた"]}'::jsonb) on conflict (slug) do nothing;
+利用規約の確認は、厚生労働省の求職者向けリーフレットでもすすめられています。分からない言葉があれば、登録前にそのまま質問して大丈夫です。', 'review', false, '2026-10-06'::timestamptz, '2026-10-06'::timestamptz, '2026-10-06'::timestamptz, null, '2026-10-06'::timestamptz, null, null, array['agent-mendan-mae', 'shigoto-sagashikata', 'mensetsu-junbi-mikeiken', 'tenshoku-agent-merit', 'kigyou-erabi-soudan']::text[], '{}'::text[], array['yaritai', 'seishain']::text[], array['hajimete', 'freeter']::text[], array['エージェントに', '何を相談する？']::text[], null, false, '[{"q":"やりたい仕事が決まっていなくても、相談していいですか？","a":"大丈夫です。これまでの経験と、今の働き方で変えたいことを伝えると、考えられる職種や求人を一緒に整理しやすくなります。"},{"q":"紹介された求人を断るときは、どう伝えればいいですか？","a":"「通勤に1時間半かかるので見送ります。片道1時間以内だとありがたいです」のように、断る理由と、次に希望する条件をセットで伝えると、次に紹介される求人が希望に近づきやすくなります。"},{"q":"登録する前に、確認しておくことはありますか？","a":"厚生労働省のリーフレットでは、登録するときに利用規約をよく読み、違約金の有無や、自分の個人情報が誰に・いつまで提供されるかを確認するよう案内されています。許可を受けた事業者かどうかは、厚生労働省の「人材サービス総合サイト」で調べられます。"}]'::jsonb, null, '{"schema_version":2,"writer_agent":"career-writer","angle":"既存の agent-mendan-mae（面談前に決めること）と重ならないよう、面談の場で「何を・どう頼むか」に絞り、場面ごとの相談内容と、そのまま使える相談の言い方の例を中心にする。実在の事業者名は出さない","quotes":[{"source_url":"https://jsite.mhlw.go.jp/ishikawa-roudoukyoku/hourei_seido_tetsuzuki/roudousha_haken/syoukai_gaiyou.html","text":"有料職業紹介事業は手数料または報酬を受けて行う職業紹介事業で、厚生労働大臣の許可が必要。求職者からの手数料徴収は原則禁止で、芸能家・モデル、年収700万円超の経営管理者・科学技術者・熟練技能者などに例外がある","used_in":"登録・相談の前に、ここだけ確認"},{"source_url":"https://www.mhlw.go.jp/content/000851397.pdf","text":"求職者向けリーフレット。人材サービス総合サイト（厚生労働省運営）で、許可を受けた職業紹介事業者かどうか、手数料や就職実績などの情報を確認できると案内。求職登録時には利用規約をよく確認し、特に違約金や自分の個人情報の取り扱い（誰に提供されるか、いつまで提供されるかなど）を確認する","used_in":"登録・相談の前に、ここだけ確認／FAQ"},{"source_url":"https://jinzai.hellowork.mhlw.go.jp/JinzaiWeb","text":"労働者派遣事業・職業紹介事業の許可・届出事業所を検索できる厚生労働省のサイト","used_in":"登録・相談の前に、ここだけ確認"},{"source_url":"https://www.mhlw.go.jp/content/001114167.pdf","text":"2024年4月から、募集広告や職業紹介を受ける際に明示される労働条件に、従事すべき業務の変更の範囲、就業場所の変更の範囲、有期労働契約を更新する場合の基準が追加","used_in":"聞きにくい条件ほど、先に聞く"}],"not_used":["転職エージェントの利用者数や、利用した場合の内定率などの統計は使っていない","サポートの範囲は事業者によって違うため、一般的な例として書き、最初に確認するようすすめた"]}'::jsonb) on conflict (slug) do nothing;
 insert into article_categories (article_id, category_id, is_primary) select a.id, c.id, true from articles a, categories c where a.slug = 'agent-soudan-nani' and c.slug = 'junbi' on conflict do nothing;
 insert into article_sources (article_id, title, publisher, url, accessed_at, used_for, sort_order) select id, '職業紹介事業とは', '石川労働局', 'https://jsite.mhlw.go.jp/ishikawa-roudoukyoku/hourei_seido_tetsuzuki/roudousha_haken/syoukai_gaiyou.html', '2026-10-06'::date, '有料職業紹介事業には厚生労働大臣の許可が必要なこと、求職者からの手数料の徴収は原則禁止で、芸能家・モデルなど一部の職業に例外があること', 0 from articles where slug = 'agent-soudan-nani';
 insert into article_sources (article_id, title, publisher, url, accessed_at, used_for, sort_order) select id, '職業紹介事業者を利用するときに知っておきたいこと（求職者の皆さまへ）', '厚生労働省・都道府県労働局', 'https://www.mhlw.go.jp/content/000851397.pdf', '2026-10-06'::date, '人材サービス総合サイトで許可を受けた職業紹介事業者かどうかや、手数料・就職実績などの情報を確認できること、登録時に利用規約で違約金や個人情報の取り扱いを確認すること', 1 from articles where slug = 'agent-soudan-nani';
@@ -1534,7 +1534,7 @@ terms:
 
 正社員を目指すと決めたら、まずは自分の希望条件と経験を整理するところから始めましょう。[未経験転職は何から始める？](/articles/mikeiken-tenshoku-hajimekata)では、最初に整理したい5つのことを紹介しています。
 
-整理したことをもとに、自分の場合はどんな選択肢がありそうかを人に相談してみるのも、遠回りに見えて近道になることがあります。', 'review', true, '2026-10-06'::timestamptz, '2026-10-06'::timestamptz, '2026-10-06'::timestamptz, null, '2026-10-06'::timestamptz, null, null, array['mikeiken-tenshoku-hajimekata', 'sekkyaku-keiken-ikasu', 'agent-mendan-mae', 'hellowork-tsukaikata']::text[], '{}'::text[], array['seishain', 'mensetsu']::text[], array['freeter', 'seishain-keiken-sukunai']::text[], array['フリーターから正社員、', '最初に何を確認する？']::text[], null, false, '[{"q":"アルバイト経験しかないと、正社員の書類選考に通らないのでしょうか？","a":"アルバイト経験しかないことだけで判断されるわけではありません。未経験者を対象にした求人では、これまでの経験の中身や、働くことへの姿勢、入社後に学ぶ意欲などもあわせて見られます。担当していた業務を具体的に書くことが大切です。"},{"q":"空白期間があるのですが、どう説明すればいいですか？","a":"空白期間に何をしていたのかを、事実として簡潔に伝えましょう。資格の勉強や家庭の事情など理由はさまざまです。そのうえで「今は働く準備ができていること」「これから何をしたいか」を添えると、前向きに伝わりやすくなります。"}]'::jsonb, null, null) on conflict (slug) do nothing;
+整理したことをもとに、自分の場合はどんな選択肢がありそうかを人に相談してみるのも、遠回りに見えて近道になることがあります。', 'review', true, '2026-10-06'::timestamptz, '2026-10-06'::timestamptz, '2026-10-06'::timestamptz, null, '2026-10-06'::timestamptz, null, null, array['mikeiken-tenshoku-hajimekata', 'sekkyaku-keiken-ikasu', 'agent-mendan-mae', 'hellowork-tsukaikata', 'tenshoku-agent-merit']::text[], '{}'::text[], array['seishain', 'mensetsu']::text[], array['freeter', 'seishain-keiken-sukunai']::text[], array['フリーターから正社員、', '最初に何を確認する？']::text[], null, false, '[{"q":"アルバイト経験しかないと、正社員の書類選考に通らないのでしょうか？","a":"アルバイト経験しかないことだけで判断されるわけではありません。未経験者を対象にした求人では、これまでの経験の中身や、働くことへの姿勢、入社後に学ぶ意欲などもあわせて見られます。担当していた業務を具体的に書くことが大切です。"},{"q":"空白期間があるのですが、どう説明すればいいですか？","a":"空白期間に何をしていたのかを、事実として簡潔に伝えましょう。資格の勉強や家庭の事情など理由はさまざまです。そのうえで「今は働く準備ができていること」「これから何をしたいか」を添えると、前向きに伝わりやすくなります。"}]'::jsonb, null, null) on conflict (slug) do nothing;
 insert into article_categories (article_id, category_id, is_primary) select a.id, c.id, true from articles a, categories c where a.slug = 'freeter-seishain-hajimeni' and c.slug = 'mikeiken' on conflict do nothing;
 insert into article_categories (article_id, category_id, is_primary) select a.id, c.id, false from articles a, categories c where a.slug = 'freeter-seishain-hajimeni' and c.slug = 'keiken' on conflict do nothing;
 insert into article_sources (article_id, title, publisher, url, accessed_at, used_for, sort_order) select id, '2024年4月から労働条件明示のルールが変わります', '厚生労働省', 'https://www.mhlw.go.jp/stf/newpage_32105.html', '2026-10-06'::date, '契約期間・更新上限など、雇用形態にかかわる労働条件の明示', 0 from articles where slug = 'freeter-seishain-hajimeni';
@@ -3523,6 +3523,138 @@ insert into article_versions (article_id, version, title, summary, body_md, crea
 insert into article_reviews (article_id, version, reviewer, verdict, checks) select id, 1, 'プロジェクトオーナー（チャットで承認）', 'approved', '{"content_hash":"10c976138de21b306a1412c37a3177e426bfa2b008df7d26da7ce6fc05bc2eac","findings":[]}'::jsonb from articles where slug = 'kibou-nenshu-kakikata';
 update articles set status = 'published' where slug = 'kibou-nenshu-kakikata';
 
+-- article: kigyou-erabi-soudan (published)
+insert into articles (slug, kind, title, summary, body_md, status, featured, published_at, updated_at, reviewed_at, reviewed_by, information_checked_at, seo_title, seo_description, related_slugs, roles, concerns, situations, eyecatch, illustration, recommended, faq, news_meta, research_notes) values ('kigyou-erabi-soudan', 'article', '自分に合う会社選びを、プロに相談するとよい理由｜求人票で分からないことの聞き方と確かめ方', '求人票には、職場の雰囲気や配属、残業の実態、研修の中身までは書かれていないことがよくあります。人材紹介会社のキャリアアドバイザーに相談すると、こうした求人票の外側のことを聞けて、条件の優先順位も一緒に整理できます。聞けることと質問の例、優先順位のつけ方、すすめられた会社を自分で確かめる方法を紹介します。', '求人をいくつも見ていると、どの会社も同じように見えてきて、「結局どこが自分に合うのか分からない」と感じることがあります。給料や休日は求人票で比べられても、**入ってから毎日過ごす職場の様子**は、求人票だけではなかなか見えません。
+
+先に結論を言うと、**自分に合う会社を選ぶには、求人票の外側の情報を集めることと、自分の条件に優先順位をつけることが大切**です。どちらも、人材紹介会社のキャリアアドバイザー（転職エージェント）に相談すると進めやすくなります。
+
+この記事で分かること：
+
+- **求人票だけでは分からない**こと
+- キャリアアドバイザーに**聞けること**と、質問の例
+- 条件の**優先順位のつけ方**
+- すすめられた会社を**自分で確かめる方法**
+
+## 求人票だけでは分からないこと
+
+求人票には、給料・休日・勤務地などの条件が書かれています。でも、次のようなことは書かれていないか、書かれていても一部だけのことが多いです。
+
+| 分かりにくいこと | 求人票だけでは見えないところの例 |
+| --- | --- |
+| 職場の雰囲気 | 年齢層、チームの人数、質問しやすい空気か |
+| 配属 | 最初にどの部署で何をするか、その後に変わることはあるか |
+| 残業の実態 | 月によって忙しさがどう違うか、部署による差はあるか |
+| 研修 | 誰が、どのくらいの期間、どんな形で教えてくれるか |
+
+配属については、2024年4月から、求人の募集や職業紹介のときに明示される労働条件に「業務の変更の範囲」「就業場所の変更の範囲」が加わりました。求人票に書かれている「変更の範囲」も見ておくと、入社後にどんな仕事や勤務地に変わる可能性があるかの手がかりになります。
+
+それでも、「実際に入った人は最初の1年で何をしているか」「忙しい時期はいつか」といった実態は、求人票からは読み取りにくいところです。
+
+## キャリアアドバイザーに聞けること
+
+人材紹介会社のキャリアアドバイザーは、求人を出している企業とやりとりをしています。そのため、求人票に書かれていない職場の様子を、知っている範囲で教えてもらえることがあります。どこまで分かるかは求人によって違うので、「分かる範囲で教えてください」と聞いてみましょう。
+
+**職場の雰囲気**
+
+- 「配属される部署は何人くらいで、どんな年代の人が多いですか？」
+- 「未経験で入った人は、職場にどのくらいいますか？」
+
+**配属**
+
+- 「最初に配属される部署と、そこで任される仕事を教えてください」
+- 「何年か働いたあとに、部署や勤務地が変わることはありますか？」
+
+**残業の実態**
+
+- 「残業が多くなりやすい時期はありますか？」
+- 「求人票の残業時間は、配属される部署でも同じくらいですか？」
+
+**研修**
+
+- 「入社後の研修は、どのくらいの期間、どんな形で行われますか？」
+- 「研修のあと、仕事を教えてくれる先輩はついてもらえますか？」
+
+面接では聞きにくい質問も、応募の前にキャリアアドバイザーに聞いておけると、応募するかどうかを落ち着いて判断できます。
+
+## 条件の優先順位は、一緒に整理できる
+
+自分に合う会社を選ぶときに、もうひとつ大事なのが**条件の優先順位**です。給料も休みも仕事内容も、全部を満たす求人はなかなかありません。何を優先するかが決まっていないと、求人を見るたびに迷ってしまいます。
+
+優先順位は、次の順番で整理すると決めやすくなります。
+
+```figure
+type: steps
+title: 条件の優先順位のつけ方
+items:
+  - label: 書き出す
+    text: 給料・休日・勤務地・仕事内容など、気になる条件を全部書く
+  - label: ゆずれない条件
+    text: 満たされないなら応募しない条件を1〜2個選ぶ
+  - label: できれば
+    text: あるとうれしいが、ほかと比べて考えられる条件
+  - label: 気にしない
+    text: 今回はこだわらなくていい条件
+```
+
+たとえば、次のように整理します（仮の例）。
+
+- **ゆずれない**：土日休み、通勤は片道1時間以内
+- **できれば**：今と同じくらいの給料、研修がある
+- **気にしない**：会社の規模、制服の有無
+
+迷うときは、**今の仕事でいちばんつらいこと**を思い出してみてください。「土日に休めない」がつらいなら、それがゆずれない条件の候補です。
+
+この整理は、キャリアアドバイザーと話しながら進めるとまとまりやすくなります。「土日休みと給料、どちらを優先するか迷っています」と伝えれば、それぞれを優先した場合の求人の違いを一緒に考えてもらえます。
+
+## すすめられた会社を、自分で確かめる方法
+
+キャリアアドバイザーの話は参考になりますが、応募するかどうかを決めるのは自分です。すすめられた会社は、次の方法で自分でも確かめておきましょう。
+
+```figure
+type: checklist
+title: すすめられた会社を確かめる
+items:
+  - すすめられた理由を聞いたか
+  - 求人票の条件と、聞いた話が合っているか
+  - 公式サイトで、仕事内容や会社の様子を見たか
+  - しょくばらぼで、職場情報が公開されていないか
+  - 分からないことを、面接の逆質問で聞けるか
+  - 内定後に、条件を書面で確かめるつもりか
+```
+
+- **すすめられた理由を聞く**：「この会社をすすめてくださった理由を教えてください」と聞くと、自分の希望のどこに合っているのかが分かります
+- **公的な職場情報を見る**：厚生労働省の職場情報総合サイト「しょくばらぼ」では、企業の残業時間や有給休暇の取得状況、平均年齢などの職場情報を検索・比較できます（すべての会社が載っているわけではありません）
+- **面接で確かめる**：キャリアアドバイザーから聞いた話で気になることは、面接の逆質問で「入社後はどのような研修がありますか？」のように、自分でも確かめましょう
+
+自分で調べる方法は[転職の企業研究、何を見ればいい？](/articles/kigyou-kenkyu-yarikata)、新卒者などの募集で職場情報を求める方法は[求人で「職場の情報」を確かめるには？](/articles/shokuba-jouhou-wakamono)で紹介しています。内定をもらったら、聞いていた条件を労働条件通知書などの書面で照らし合わせることも大切です。見るところは[転職で後悔しないために、入社前に確認したいこと](/articles/tenshoku-koukai-shinai)にまとめています。
+
+## 相談するときに気をつけたいこと
+
+- **聞いた話は、最後は書面で確かめる**：キャリアアドバイザーが知っている職場の様子も、時期や部署によって変わることがあります。大事な条件は、内定後に書面で確かめましょう
+- **すすめられた会社を、そのまま受けない**：紹介される求人は、その人材紹介会社が扱っている求人の中からになります。自分の優先順位と合っているかを、自分で判断しましょう
+- **合わない担当者もいる**：希望を伝えてもかみ合わないときは、担当を変えてもらえるか問い合わせても構いません
+
+キャリアアドバイザーを「会社を決めてくれる人」ではなく、**求人票の外側の情報を集め、優先順位を一緒に整理してくれる相談相手**として使うと、自分で納得して会社を選びやすくなります。
+
+## まとめ：相談の前に整理しておくこと
+
+自分に合う会社を選ぶには、求人票の条件だけでなく、職場の雰囲気・配属・残業の実態・研修といった求人票の外側の情報と、自分の条件の優先順位が欠かせません。どちらも、人材紹介会社のキャリアアドバイザーに相談すると整理しやすくなります。
+
+相談を考えているなら、面談の前に次のことを整理しておくと、自分に合う会社の話に早く進めます。
+
+- **気になる条件の書き出し**と、そのうち**ゆずれない条件1〜2個**
+- **今の仕事でつらいこと・変えたいこと**
+- **求人票を見て気になったこと**（あれば、その求人票も持っていく）
+
+面談の前に決めておくこと・決めなくていいことは、[エージェント面談の前に決めておくこと・決めなくていいこと](/articles/agent-mendan-mae)にまとめています。', 'review', false, '2026-10-10'::timestamptz, '2026-10-10'::timestamptz, '2026-10-10'::timestamptz, 'プロジェクトオーナー（チャットで承認）', '2026-10-10'::timestamptz, '自分に合う会社選びをプロに相談するとよい理由と確かめ方', '自分に合う会社はどう選ぶ？求人票だけでは分からない職場の雰囲気・配属・残業の実態・研修を、人材紹介会社のキャリアアドバイザーに聞くときの質問例と、条件の優先順位のつけ方、すすめられた会社を自分で確かめる方法を紹介します。', array['kigyou-kenkyu-yarikata', 'tenshoku-koukai-shinai', 'shokuba-jouhou-wakamono', 'tenshoku-agent-merit', 'mensetsu-renshu-pro']::text[], '{}'::text[], array['yaritai']::text[], array['hajimete']::text[], array['自分に合う会社、', 'どう選べばいい？']::text[], null, false, '[{"q":"求人票に書いていないことは、どうやって調べればいいですか？","a":"会社の公式サイトや、厚生労働省の職場情報総合サイト「しょくばらぼ」で、残業時間や有給休暇の取得状況などが公開されていないか確かめましょう。それでも分からないことは、人材紹介会社のキャリアアドバイザーに聞いたり、面接の逆質問で確かめたりする方法があります。"},{"q":"キャリアアドバイザーにすすめられた会社は、信用していいですか？","a":"すすめられた理由を聞き、自分の希望と合っているかを自分でも確かめてから決めましょう。キャリアアドバイザーが知っている職場の様子は参考になりますが、大事な条件は、内定のあとに労働条件通知書などの書面で確認することが大切です。"},{"q":"条件の優先順位は、どうやって決めればいいですか？","a":"気になる条件をすべて書き出してから、「これが満たされないなら応募しない」というゆずれない条件を1〜2個選びます。残りは「できれば」の条件にします。迷うときは、今の仕事でいちばんつらいことを思い出すと、ゆずれない条件が見つかりやすくなります。"}]'::jsonb, null, '{"schema_version":2,"writer_agent":"career-writer","angle":"既存の kigyou-kenkyu-yarikata（自分で調べる企業研究）と tenshoku-koukai-shinai（内定後に書面で確かめること）と役割を分け、「求人票の外側の情報を、人材紹介会社のキャリアアドバイザーに聞く」ことと「条件の優先順位を一緒に整理する」ことに絞る。アドバイザーの話も最後は自分で確かめる、という注意を短く入れたうえで、前向きな使い方で結ぶ。特定の会社名・サービス名は書かない","quotes":[{"source_url":"https://www.mhlw.go.jp/content/001114167.pdf","text":"2024年4月1日から、募集広告や職業紹介の際に明示される労働条件に、従事すべき業務の変更の範囲、就業場所の変更の範囲、有期労働契約を更新する場合の基準が追加された（mhlw.go.jp に直接接続できなかったため、各労働局が掲載している同じ求職者向けリーフレットの内容を検索結果で確認。URL は既存の公開記事 agent-soudan-nani・tenshoku-koukai-shinai で使っているもの）","used_in":"求人票だけでは分からないこと（配属）"},{"source_url":"https://shokuba.mhlw.go.jp/010/20180302201542.html","text":"しょくばらぼは厚生労働省の職場情報総合サイトで、企業の残業時間（時間外労働時間）、有給休暇取得率、平均年齢などの職場情報を検索・比較できる（サイトに直接接続できなかったため、検索結果の記載で確認）","used_in":"すすめられた会社を、自分で確かめる方法"}],"not_used":["求人票の「未経験歓迎」「学歴不問」などの言葉の読み方は、執筆中の kyujin-hyo-yomikata（draft）の役割なので扱わず、リンクもしていない（未公開のため）","キャリアアドバイザーが職場の内情をどこまで知っているかについての公的な根拠はないため、「知っている範囲で教えてもらえることがある」にとどめた","残業時間や離職率の「この数字なら安心」といった基準は、公的な根拠を確認できなかったので書かない","口コミサイトの情報は扱わない"]}'::jsonb) on conflict (slug) do nothing;
+insert into article_categories (article_id, category_id, is_primary) select a.id, c.id, true from articles a, categories c where a.slug = 'kigyou-erabi-soudan' and c.slug = 'junbi' on conflict do nothing;
+insert into article_categories (article_id, category_id, is_primary) select a.id, c.id, false from articles a, categories c where a.slug = 'kigyou-erabi-soudan' and c.slug = 'hatarakikata' on conflict do nothing;
+insert into article_sources (article_id, title, publisher, url, accessed_at, used_for, sort_order) select id, '企業から受ける労働条件明示のルールが変わります！（求職者の皆さまへ）', '厚生労働省', 'https://www.mhlw.go.jp/content/001114167.pdf', '2026-10-10'::date, '2024年4月から、求人の募集や職業紹介のときに明示される労働条件に、業務の変更の範囲・就業場所の変更の範囲などが加わったこと', 0 from articles where slug = 'kigyou-erabi-soudan';
+insert into article_sources (article_id, title, publisher, url, accessed_at, used_for, sort_order) select id, '職場情報総合サイト しょくばらぼ', '厚生労働省', 'https://shokuba.mhlw.go.jp/010/20180302201542.html', '2026-10-10'::date, '企業の残業時間や有給休暇の取得状況、平均年齢などの職場情報を検索・比較できること', 1 from articles where slug = 'kigyou-erabi-soudan';
+insert into article_versions (article_id, version, title, summary, body_md, created_by) select id, 1, title, summary, body_md, 'seed' from articles where slug = 'kigyou-erabi-soudan' on conflict do nothing;
+insert into article_reviews (article_id, version, reviewer, verdict, checks) select id, 1, 'プロジェクトオーナー（チャットで承認）', 'approved', '{"content_hash":"aff29acfe6b84bd130639abb28e08bcf20795b63ef25151cd8b9fd278a8b242f","findings":[]}'::jsonb from articles where slug = 'kigyou-erabi-soudan';
+update articles set status = 'published' where slug = 'kigyou-erabi-soudan';
+
 -- article: kigyou-kenkyu-yarikata (published)
 insert into articles (slug, kind, title, summary, body_md, status, featured, published_at, updated_at, reviewed_at, reviewed_by, information_checked_at, seo_title, seo_description, related_slugs, roles, concerns, situations, eyecatch, illustration, recommended, faq, news_meta, research_notes) values ('kigyou-kenkyu-yarikata', 'article', '転職の企業研究、何を見ればいい？公式サイト・求人票・職場情報の調べ方と面接での使い方', '転職の企業研究は、「面接で聞かれることに答える材料を集める」ことと「入社後のギャップを減らす」ことの2つのためにします。求人票・会社の公式サイト・しょくばらぼなどの公的な職場情報・job tag でそれぞれ何を見るか、調べた内容のまとめ方、志望動機や逆質問への使い方を紹介します。', '応募したい会社が見つかった。でも「企業研究をしよう」と言われても、何をどこまで調べればいいのか分からない。そんな人は多いはずです。
 
@@ -3638,7 +3770,7 @@ items:
 
 ### 働き方の条件は、内定のあとに書面で確かめる
 
-休日や残業、試用期間など、働き方の条件で気になることは、面接で聞きにくければ、内定が出たあとに労働条件通知書などの書面で確かめる方法もあります。企業研究メモに書いた「分からないこと」は、内定のあとまで残しておきましょう。', 'review', false, '2026-10-10'::timestamptz, '2026-10-10'::timestamptz, '2026-10-10'::timestamptz, 'プロジェクトオーナー（チャットで承認）', '2026-10-09'::timestamptz, '転職の企業研究のやり方｜どこで何を見て面接に使う？', '転職の企業研究は何を見ればいい？求人票・会社の公式サイト・しょくばらぼや若者雇用促進法の職場情報・中途採用比率・job tag で確かめることと、調べたことのまとめ方、志望動機や逆質問への使い方を紹介します。', array['shokuba-jouhou-wakamono', 'shiboudouki-mikeiken', 'gyaku-shitsumon', 'shorui-senkou-tooranai', 'fukuri-kousei-mikata']::text[], '{}'::text[], array['mensetsu', 'mikeiken-shokushu']::text[], array['hajimete']::text[], array['企業研究って、', 'どこで何を見る？']::text[], null, false, '[{"q":"企業研究は、1社にどのくらい時間をかければいいですか？","a":"決まった時間はありません。目安は「志望動機に会社ならではの理由を1つ入れられる」「逆質問をいくつか用意できる」「働き方の条件で気になることが分かっている」の3つがそろうところまでです。書類を出す前は求人票と公式サイトを中心に、面接が決まったら職場情報や仕事内容まで調べる、と段階を分けると続けやすくなります。"},{"q":"小さな会社で、公式サイトにほとんど情報がありません。どう調べればいいですか？","a":"求人票を細かく読み、しょくばらぼで職場情報が登録されていないかを確認しましょう。仕事内容は job tag（職業情報提供サイト）で職種ごとの一般的な内容を調べられます。それでも分からないことは、面接の逆質問や、内定後に労働条件を確認する場で聞くことにして、メモに残しておきます。"},{"q":"口コミサイトの情報は、企業研究に使ってもいいですか？","a":"参考にするのはかまいませんが、書いた人の立場や時期が分からず、事実かどうか確かめられないこともあります。気になることがあれば、求人票や会社が公表している情報と照らし合わせ、それでも分からないことは面接で質問する形で確かめましょう。面接で口コミの内容をそのまま持ち出すのは避けたほうが無難です。"}]'::jsonb, null, '{"schema_version":2,"writer_agent":"career-writer","angle":"企業研究を「大きな会社の分析」ではなく、①面接で答える材料、②入社後のギャップを減らす確認、の2つに絞る。見る場所を4つ（求人票・公式サイト・公的な職場情報・job tag）に分け、何を見るかとメモの型、面接での使い方まで具体的に示す。若者雇用促進法の詳しい説明は既存記事 shokuba-jouhou-wakamono に任せる","quotes":[{"source_url":"https://shokuba.mhlw.go.jp","text":"しょくばらぼは厚生労働省の職場情報総合サイトで、勤務実態などの働き方や採用状況について企業の職場情報を検索・比較できる。若者雇用促進総合サイト、女性の活躍推進企業データベース、両立支援のひろばの情報が集められている（サイトに直接接続できなかったため、検索結果の記載で確認）","used_in":"公的な職場情報で見ること"},{"source_url":"https://shigoto.mhlw.go.jp/User/about","text":"job tag は職業の仕事内容、タスク、スキル・知識を見える化したサイトで、仕事の概要、入職経路、労働条件などを確認できる（検索結果の記載で確認）","used_in":"仕事内容は job tag で確かめる"},{"source_url":"https://jsite.mhlw.go.jp/oita-roudoukyoku/hourei_seido_tetsuzuki/kyujin_kyushoku/2021.02.15.html","text":"令和3年4月1日から、常時雇用する労働者が301人以上の企業は、自社のホームページなどで「直近の3事業年度の各年度について、採用した正規雇用労働者の中途採用比率」を公表することが必要となる（検索結果の記載で確認。ページ題名は直接読めなかったため、内容に沿った題名で記録した）","used_in":"公的な職場情報で見ること"},{"source_url":"https://jsite.mhlw.go.jp/kochi-roudoukyoku/var/rev0/0109/7901/2016216181336.pdf","text":"新卒者等であることを条件とした募集・求人申込みを行う場合に情報提供が必要。応募者等からの求めがあった場合は、募集・採用に関する状況、労働時間などに関する状況、職業能力の開発・向上に関する状況の3類型ごとに1つ以上の情報提供が義務（検索結果の記載で確認。資料の正式な題名は直接読めなかったため、内容に沿った題名で記録した）","used_in":"公的な職場情報で見ること"}],"not_used":["しょくばらぼの掲載企業数は時点で変わるため書かない","中途採用比率の公表に違反したときの罰則の有無は、民間の解説でしか確認できなかったので書かない","口コミサイトの信頼性についての公的な調査は確認できなかったので、「事実か確かめられないこともある」という一般的な注意にとどめた"]}'::jsonb) on conflict (slug) do nothing;
+休日や残業、試用期間など、働き方の条件で気になることは、面接で聞きにくければ、内定が出たあとに労働条件通知書などの書面で確かめる方法もあります。企業研究メモに書いた「分からないこと」は、内定のあとまで残しておきましょう。', 'review', false, '2026-10-10'::timestamptz, '2026-10-10'::timestamptz, '2026-10-10'::timestamptz, 'プロジェクトオーナー（チャットで承認）', '2026-10-09'::timestamptz, '転職の企業研究のやり方｜どこで何を見て面接に使う？', '転職の企業研究は何を見ればいい？求人票・会社の公式サイト・しょくばらぼや若者雇用促進法の職場情報・中途採用比率・job tag で確かめることと、調べたことのまとめ方、志望動機や逆質問への使い方を紹介します。', array['shokuba-jouhou-wakamono', 'shiboudouki-mikeiken', 'gyaku-shitsumon', 'shorui-senkou-tooranai', 'fukuri-kousei-mikata', 'kigyou-erabi-soudan']::text[], '{}'::text[], array['mensetsu', 'mikeiken-shokushu']::text[], array['hajimete']::text[], array['企業研究って、', 'どこで何を見る？']::text[], null, false, '[{"q":"企業研究は、1社にどのくらい時間をかければいいですか？","a":"決まった時間はありません。目安は「志望動機に会社ならではの理由を1つ入れられる」「逆質問をいくつか用意できる」「働き方の条件で気になることが分かっている」の3つがそろうところまでです。書類を出す前は求人票と公式サイトを中心に、面接が決まったら職場情報や仕事内容まで調べる、と段階を分けると続けやすくなります。"},{"q":"小さな会社で、公式サイトにほとんど情報がありません。どう調べればいいですか？","a":"求人票を細かく読み、しょくばらぼで職場情報が登録されていないかを確認しましょう。仕事内容は job tag（職業情報提供サイト）で職種ごとの一般的な内容を調べられます。それでも分からないことは、面接の逆質問や、内定後に労働条件を確認する場で聞くことにして、メモに残しておきます。"},{"q":"口コミサイトの情報は、企業研究に使ってもいいですか？","a":"参考にするのはかまいませんが、書いた人の立場や時期が分からず、事実かどうか確かめられないこともあります。気になることがあれば、求人票や会社が公表している情報と照らし合わせ、それでも分からないことは面接で質問する形で確かめましょう。面接で口コミの内容をそのまま持ち出すのは避けたほうが無難です。"}]'::jsonb, null, '{"schema_version":2,"writer_agent":"career-writer","angle":"企業研究を「大きな会社の分析」ではなく、①面接で答える材料、②入社後のギャップを減らす確認、の2つに絞る。見る場所を4つ（求人票・公式サイト・公的な職場情報・job tag）に分け、何を見るかとメモの型、面接での使い方まで具体的に示す。若者雇用促進法の詳しい説明は既存記事 shokuba-jouhou-wakamono に任せる","quotes":[{"source_url":"https://shokuba.mhlw.go.jp","text":"しょくばらぼは厚生労働省の職場情報総合サイトで、勤務実態などの働き方や採用状況について企業の職場情報を検索・比較できる。若者雇用促進総合サイト、女性の活躍推進企業データベース、両立支援のひろばの情報が集められている（サイトに直接接続できなかったため、検索結果の記載で確認）","used_in":"公的な職場情報で見ること"},{"source_url":"https://shigoto.mhlw.go.jp/User/about","text":"job tag は職業の仕事内容、タスク、スキル・知識を見える化したサイトで、仕事の概要、入職経路、労働条件などを確認できる（検索結果の記載で確認）","used_in":"仕事内容は job tag で確かめる"},{"source_url":"https://jsite.mhlw.go.jp/oita-roudoukyoku/hourei_seido_tetsuzuki/kyujin_kyushoku/2021.02.15.html","text":"令和3年4月1日から、常時雇用する労働者が301人以上の企業は、自社のホームページなどで「直近の3事業年度の各年度について、採用した正規雇用労働者の中途採用比率」を公表することが必要となる（検索結果の記載で確認。ページ題名は直接読めなかったため、内容に沿った題名で記録した）","used_in":"公的な職場情報で見ること"},{"source_url":"https://jsite.mhlw.go.jp/kochi-roudoukyoku/var/rev0/0109/7901/2016216181336.pdf","text":"新卒者等であることを条件とした募集・求人申込みを行う場合に情報提供が必要。応募者等からの求めがあった場合は、募集・採用に関する状況、労働時間などに関する状況、職業能力の開発・向上に関する状況の3類型ごとに1つ以上の情報提供が義務（検索結果の記載で確認。資料の正式な題名は直接読めなかったため、内容に沿った題名で記録した）","used_in":"公的な職場情報で見ること"}],"not_used":["しょくばらぼの掲載企業数は時点で変わるため書かない","中途採用比率の公表に違反したときの罰則の有無は、民間の解説でしか確認できなかったので書かない","口コミサイトの信頼性についての公的な調査は確認できなかったので、「事実か確かめられないこともある」という一般的な注意にとどめた"]}'::jsonb) on conflict (slug) do nothing;
 insert into article_categories (article_id, category_id, is_primary) select a.id, c.id, true from articles a, categories c where a.slug = 'kigyou-kenkyu-yarikata' and c.slug = 'junbi' on conflict do nothing;
 insert into article_categories (article_id, category_id, is_primary) select a.id, c.id, false from articles a, categories c where a.slug = 'kigyou-kenkyu-yarikata' and c.slug = 'mikeiken' on conflict do nothing;
 insert into article_sources (article_id, title, publisher, url, accessed_at, used_for, sort_order) select id, '職場情報総合サイト しょくばらぼ', '厚生労働省', 'https://shokuba.mhlw.go.jp', '2026-10-09'::date, '企業の残業時間・有休の取得状況・平均年齢・採用の状況などの職場情報を検索・比較できるサイトであること。若者雇用促進総合サイトや女性の活躍推進企業データベースなどの情報が集められていること', 0 from articles where slug = 'kigyou-kenkyu-yarikata';
@@ -4799,7 +4931,7 @@ items:
   - 次に準備しておきたいこと
 ```
 
-詰まった質問は、要点のメモに書き足して、もう一度声に出して練習しておきましょう。回数を重ねるうちに「この質問はもう答えたことがある」と思えるものが増え、落ち着いて話せる場面が増えていきます。', 'review', false, '2026-10-10'::timestamptz, '2026-10-10'::timestamptz, '2026-10-10'::timestamptz, 'プロジェクトオーナー（チャットで承認）', '2026-10-09'::timestamptz, '面接で緊張するときの準備と対処｜詰まったときの言い方', '面接で緊張して頭が真っ白になりそう…。話す内容を要点で準備する方法、声に出す練習、当日の流れ、ゆっくり話すコツ、言葉に詰まったとき・質問が分からないときの言い方の例と、前日に確認したいことを紹介します。', array['mensetsu-yokukiku-shitsumon', 'web-mensetsu-junbi', 'mensetsu-fukusou', 'mensetsu-ochita-furikaeri', 'tekisei-kensa-tenshoku']::text[], '{}'::text[], array['mensetsu']::text[], array['hajimete', 'seishain-keiken-sukunai']::text[], array['面接で緊張して', '頭が真っ白になる']::text[], null, false, '[{"q":"面接で緊張していることは、伝えてもいいですか？","a":"伝えてかまいません。言葉に詰まったときに「緊張していて、うまくまとまらず失礼しました。改めてお話しします」と一言添えてから話し直すと、黙ってしまうより落ち着いて続けやすくなります。ただし何度もくり返すより、話す中身に戻ることを大事にしましょう。"},{"q":"答えを丸暗記していったほうが安心ですか？","a":"丸暗記は、一言忘れると続きが出てこなくなりやすいので、話す要点をいくつかのキーワードで覚えておく方法がおすすめです。順番と言いたいことが決まっていれば、言い回しが毎回少し変わってもかまいません。"},{"q":"面接の練習は、どこでできますか？","a":"家族や友人に面接官役を頼むほか、ハローワークでは面接の受け方についての個別相談やセミナーを無料で行っています。窓口で面接の練習ができるところもあるので、利用したいハローワークに予約や方法を問い合わせてみてください。"}]'::jsonb, null, '{"schema_version":2,"writer_agent":"career-writer","angle":"緊張を「なくす」方法ではなく、緊張しても話せる状態を作る準備（要点の準備・声に出す練習・流れを知る）と、当日に言葉に詰まったときに使える一言を具体的に示す。よく聞かれる質問の答え方は既存記事 mensetsu-yokukiku-shitsumon に任せてリンクする","quotes":[{"source_url":"https://jsite.mhlw.go.jp/hokkaido-hellowork/list/sapporo/shisetsu/shinsotsu-column3.html","text":"緊張するといつもよりも早口になってしまうことがある。聞き取りやすい大きさの声で、いつも以上にゆっくり丁寧に話す。面接官の話を最後まで聞いたうえで、一呼吸おいてから話し始めると、話を聞ける人だという印象を与えられる（官公庁サイトは直接開けなかったため、検索結果の抜粋で確認）","used_in":"当日、話すときに意識したいこと"},{"source_url":"https://jsite.mhlw.go.jp/yamagata-hellowork/content/contents/002350381.pdf","text":"面接官の質問には語尾をはっきりと、張りのある声で短く簡潔に答える。緊張から早口になりがちなので、声の大きさ・スピードに注意する（直接開けなかったため検索結果の抜粋で確認）","used_in":"当日、話すときに意識したいこと"},{"source_url":"https://www.mhlw.go.jp/stf/newpage_27742.html","text":"ハローワークでは、応募書類の作り方、面接の受け方などの個別相談やセミナーを無料で行っている（直接開けなかったため、既存記事での確認内容と検索結果で確認）","used_in":"声に出して練習する"}],"not_used":["緊張を和らげる呼吸法や医学的な効果についての説明は、公的な根拠を確認できなかったので書かない","「受付の何分前に着く」といった時間の目安は資料によって違い、出典を特定しきれなかったので数字を書かず「余裕を持って」にとどめた","模擬面接の所要時間や予約方法はハローワークごとに違うため書かない"]}'::jsonb) on conflict (slug) do nothing;
+詰まった質問は、要点のメモに書き足して、もう一度声に出して練習しておきましょう。回数を重ねるうちに「この質問はもう答えたことがある」と思えるものが増え、落ち着いて話せる場面が増えていきます。', 'review', false, '2026-10-10'::timestamptz, '2026-10-10'::timestamptz, '2026-10-10'::timestamptz, 'プロジェクトオーナー（チャットで承認）', '2026-10-09'::timestamptz, '面接で緊張するときの準備と対処｜詰まったときの言い方', '面接で緊張して頭が真っ白になりそう…。話す内容を要点で準備する方法、声に出す練習、当日の流れ、ゆっくり話すコツ、言葉に詰まったとき・質問が分からないときの言い方の例と、前日に確認したいことを紹介します。', array['mensetsu-yokukiku-shitsumon', 'web-mensetsu-junbi', 'mensetsu-fukusou', 'mensetsu-ochita-furikaeri', 'tekisei-kensa-tenshoku', 'mensetsu-renshu-pro']::text[], '{}'::text[], array['mensetsu']::text[], array['hajimete', 'seishain-keiken-sukunai']::text[], array['面接で緊張して', '頭が真っ白になる']::text[], null, false, '[{"q":"面接で緊張していることは、伝えてもいいですか？","a":"伝えてかまいません。言葉に詰まったときに「緊張していて、うまくまとまらず失礼しました。改めてお話しします」と一言添えてから話し直すと、黙ってしまうより落ち着いて続けやすくなります。ただし何度もくり返すより、話す中身に戻ることを大事にしましょう。"},{"q":"答えを丸暗記していったほうが安心ですか？","a":"丸暗記は、一言忘れると続きが出てこなくなりやすいので、話す要点をいくつかのキーワードで覚えておく方法がおすすめです。順番と言いたいことが決まっていれば、言い回しが毎回少し変わってもかまいません。"},{"q":"面接の練習は、どこでできますか？","a":"家族や友人に面接官役を頼むほか、ハローワークでは面接の受け方についての個別相談やセミナーを無料で行っています。窓口で面接の練習ができるところもあるので、利用したいハローワークに予約や方法を問い合わせてみてください。"}]'::jsonb, null, '{"schema_version":2,"writer_agent":"career-writer","angle":"緊張を「なくす」方法ではなく、緊張しても話せる状態を作る準備（要点の準備・声に出す練習・流れを知る）と、当日に言葉に詰まったときに使える一言を具体的に示す。よく聞かれる質問の答え方は既存記事 mensetsu-yokukiku-shitsumon に任せてリンクする","quotes":[{"source_url":"https://jsite.mhlw.go.jp/hokkaido-hellowork/list/sapporo/shisetsu/shinsotsu-column3.html","text":"緊張するといつもよりも早口になってしまうことがある。聞き取りやすい大きさの声で、いつも以上にゆっくり丁寧に話す。面接官の話を最後まで聞いたうえで、一呼吸おいてから話し始めると、話を聞ける人だという印象を与えられる（官公庁サイトは直接開けなかったため、検索結果の抜粋で確認）","used_in":"当日、話すときに意識したいこと"},{"source_url":"https://jsite.mhlw.go.jp/yamagata-hellowork/content/contents/002350381.pdf","text":"面接官の質問には語尾をはっきりと、張りのある声で短く簡潔に答える。緊張から早口になりがちなので、声の大きさ・スピードに注意する（直接開けなかったため検索結果の抜粋で確認）","used_in":"当日、話すときに意識したいこと"},{"source_url":"https://www.mhlw.go.jp/stf/newpage_27742.html","text":"ハローワークでは、応募書類の作り方、面接の受け方などの個別相談やセミナーを無料で行っている（直接開けなかったため、既存記事での確認内容と検索結果で確認）","used_in":"声に出して練習する"}],"not_used":["緊張を和らげる呼吸法や医学的な効果についての説明は、公的な根拠を確認できなかったので書かない","「受付の何分前に着く」といった時間の目安は資料によって違い、出典を特定しきれなかったので数字を書かず「余裕を持って」にとどめた","模擬面接の所要時間や予約方法はハローワークごとに違うため書かない"]}'::jsonb) on conflict (slug) do nothing;
 insert into article_categories (article_id, category_id, is_primary) select a.id, c.id, true from articles a, categories c where a.slug = 'mensetsu-kinchou' and c.slug = 'shorui-mensetsu' on conflict do nothing;
 insert into article_categories (article_id, category_id, is_primary) select a.id, c.id, false from articles a, categories c where a.slug = 'mensetsu-kinchou' and c.slug = 'junbi' on conflict do nothing;
 insert into article_sources (article_id, title, publisher, url, accessed_at, used_for, sort_order) select id, 'おさえておきたい面接マナー', '札幌新卒応援ハローワーク（北海道労働局）', 'https://jsite.mhlw.go.jp/hokkaido-hellowork/list/sapporo/shisetsu/shinsotsu-column3.html', '2026-10-09'::date, '緊張するといつもより早口になりやすいので、聞き取りやすい大きさの声でいつも以上にゆっくり話すこと、面接官の話を最後まで聞いてから一呼吸おいて話し始めること', 0 from articles where slug = 'mensetsu-kinchou';
@@ -4935,7 +5067,7 @@ items:
 
 > 「事務職の面接で2社続けて不採用になりました。志望動機を聞かれたときに、うまく答えられなかった気がします。メモを持ってきたので、答え方を一緒に見ていただけますか。」
 
-面接練習の進め方や予約のしかたは窓口によって違うので、利用するハローワークで確認してください。面接の最後の逆質問を見直したいときは[面接の逆質問、何を聞けばいい？](/articles/gyaku-shitsumon)も参考にしてください。', 'review', false, '2026-10-10'::timestamptz, '2026-10-10'::timestamptz, '2026-10-10'::timestamptz, 'プロジェクトオーナー（チャットで承認）', '2026-10-09'::timestamptz, '面接に落ちたときの振り返り方｜次の面接に向けた直し方', '面接に落ちたとき、何をどう振り返ればいい？気持ちの整理のしかた、面接直後にメモしておく項目、直せることと直せないことの分け方、答えの直し方の例、ハローワークで面接練習や相談を受けるときの使い方を紹介します。', array['mensetsu-yokukiku-shitsumon', 'mensetsu-junbi-mikeiken', 'gyaku-shitsumon', 'mensetsu-kinchou', 'hellowork-tsukaikata']::text[], '{}'::text[], array['mensetsu']::text[], array['hajimete', 'seishain-keiken-sukunai']::text[], array['面接に落ちた…', '次は何を直せばいい？']::text[], null, false, '[{"q":"面接に落ちた理由を、会社に聞いてもいいですか？","a":"聞くこと自体はかまいませんが、不採用の理由は詳しく教えてもらえないことが多いと考えておきましょう。答えが返ってこなくても失礼にあたるわけではありません。理由が分からないときは、面接直後のメモをもとに自分で振り返るか、ハローワークなどの窓口で面接の受け答えを一緒に見直してもらう方法があります。"},{"q":"面接に何回も落ちています。自分に問題があるのでしょうか？","a":"不採用には、応募者の受け答えだけでなく、ほかの応募者との比較や募集人数、会社の事情なども関わります。回数だけで自分を否定せず、「どの質問でつまずいたか」「同じところで落ちていないか」を並べてみましょう。書類で落ちることが多いのか、面接で落ちることが多いのかでも、直すところが変わります。"},{"q":"振り返りや面接練習は、どこで手伝ってもらえますか？","a":"ハローワークでは、応募書類の作り方や面接の受け方について、無料で個別相談やセミナーを行っています。正社員を目指すおおむね35歳未満の人は、わかものハローワークなどで担当者制の相談も受けられます。面接練習の実施方法や予約のしかたは窓口によって違うので、利用するハローワークで確認しましょう。"}]'::jsonb, null, '{"schema_version":2,"writer_agent":"career-writer","angle":"面接に落ちたとき、読者は「自分がだめだった」と一括りにしがち。直せること（準備・答え方）と直せないこと（比較・枠・相性）を分け、面接直後のメモ→1つずつ直す→人に聞いてもらう、の順で次につなげる。面接の答え方そのものは既存記事（mensetsu-yokukiku-shitsumon など）に任せ、この記事は「振り返りの手順」に絞る","quotes":[{"source_url":"https://www.mhlw.go.jp/stf/newpage_27742.html","text":"ハローワークでは、履歴書をはじめとした応募書類の作り方、面接の受け方などの個別相談やセミナーを実施しており、応募する求人に合わせた面接での受け答えなどについて助言している（官公庁サイトに直接接続できなかったため、検索結果の記載で確認）","used_in":"ひとりで振り返るのがつらいときは"},{"source_url":"https://www.mhlw.go.jp/content/11600000/001441500.pdf","text":"ご希望等に応じて応募書類（履歴書・職務経歴書など）の添削や面接に向けた相談も行っております。ご利用は無料（検索結果の記載で確認）","used_in":"ひとりで振り返るのがつらいときは"},{"source_url":"https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/0000181329.html","text":"正社員を目指す若者（おおむね35歳未満）を対象に、担当者制による職業相談から応募準備のサポート、就職後の職場定着支援まで一貫した支援を無料で実施（検索結果の記載で確認）","used_in":"ひとりで振り返るのがつらいときは"}],"not_used":["「面接の通過率」「平均で何社受けるか」などの数字は、公的な根拠を確認できなかったので書かない","不採用理由の開示について、会社に説明する義務があるかどうかの公的な説明は確認できなかったので、「教えてもらえないことが多いと考えておく」にとどめた","面接練習（模擬面接）の予約方法・時間は窓口ごとに違うため、具体的な時間は書かない"]}'::jsonb) on conflict (slug) do nothing;
+面接練習の進め方や予約のしかたは窓口によって違うので、利用するハローワークで確認してください。面接の最後の逆質問を見直したいときは[面接の逆質問、何を聞けばいい？](/articles/gyaku-shitsumon)も参考にしてください。', 'review', false, '2026-10-10'::timestamptz, '2026-10-10'::timestamptz, '2026-10-10'::timestamptz, 'プロジェクトオーナー（チャットで承認）', '2026-10-09'::timestamptz, '面接に落ちたときの振り返り方｜次の面接に向けた直し方', '面接に落ちたとき、何をどう振り返ればいい？気持ちの整理のしかた、面接直後にメモしておく項目、直せることと直せないことの分け方、答えの直し方の例、ハローワークで面接練習や相談を受けるときの使い方を紹介します。', array['mensetsu-yokukiku-shitsumon', 'mensetsu-junbi-mikeiken', 'gyaku-shitsumon', 'mensetsu-kinchou', 'hellowork-tsukaikata', 'mensetsu-renshu-pro']::text[], '{}'::text[], array['mensetsu']::text[], array['hajimete', 'seishain-keiken-sukunai']::text[], array['面接に落ちた…', '次は何を直せばいい？']::text[], null, false, '[{"q":"面接に落ちた理由を、会社に聞いてもいいですか？","a":"聞くこと自体はかまいませんが、不採用の理由は詳しく教えてもらえないことが多いと考えておきましょう。答えが返ってこなくても失礼にあたるわけではありません。理由が分からないときは、面接直後のメモをもとに自分で振り返るか、ハローワークなどの窓口で面接の受け答えを一緒に見直してもらう方法があります。"},{"q":"面接に何回も落ちています。自分に問題があるのでしょうか？","a":"不採用には、応募者の受け答えだけでなく、ほかの応募者との比較や募集人数、会社の事情なども関わります。回数だけで自分を否定せず、「どの質問でつまずいたか」「同じところで落ちていないか」を並べてみましょう。書類で落ちることが多いのか、面接で落ちることが多いのかでも、直すところが変わります。"},{"q":"振り返りや面接練習は、どこで手伝ってもらえますか？","a":"ハローワークでは、応募書類の作り方や面接の受け方について、無料で個別相談やセミナーを行っています。正社員を目指すおおむね35歳未満の人は、わかものハローワークなどで担当者制の相談も受けられます。面接練習の実施方法や予約のしかたは窓口によって違うので、利用するハローワークで確認しましょう。"}]'::jsonb, null, '{"schema_version":2,"writer_agent":"career-writer","angle":"面接に落ちたとき、読者は「自分がだめだった」と一括りにしがち。直せること（準備・答え方）と直せないこと（比較・枠・相性）を分け、面接直後のメモ→1つずつ直す→人に聞いてもらう、の順で次につなげる。面接の答え方そのものは既存記事（mensetsu-yokukiku-shitsumon など）に任せ、この記事は「振り返りの手順」に絞る","quotes":[{"source_url":"https://www.mhlw.go.jp/stf/newpage_27742.html","text":"ハローワークでは、履歴書をはじめとした応募書類の作り方、面接の受け方などの個別相談やセミナーを実施しており、応募する求人に合わせた面接での受け答えなどについて助言している（官公庁サイトに直接接続できなかったため、検索結果の記載で確認）","used_in":"ひとりで振り返るのがつらいときは"},{"source_url":"https://www.mhlw.go.jp/content/11600000/001441500.pdf","text":"ご希望等に応じて応募書類（履歴書・職務経歴書など）の添削や面接に向けた相談も行っております。ご利用は無料（検索結果の記載で確認）","used_in":"ひとりで振り返るのがつらいときは"},{"source_url":"https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/0000181329.html","text":"正社員を目指す若者（おおむね35歳未満）を対象に、担当者制による職業相談から応募準備のサポート、就職後の職場定着支援まで一貫した支援を無料で実施（検索結果の記載で確認）","used_in":"ひとりで振り返るのがつらいときは"}],"not_used":["「面接の通過率」「平均で何社受けるか」などの数字は、公的な根拠を確認できなかったので書かない","不採用理由の開示について、会社に説明する義務があるかどうかの公的な説明は確認できなかったので、「教えてもらえないことが多いと考えておく」にとどめた","面接練習（模擬面接）の予約方法・時間は窓口ごとに違うため、具体的な時間は書かない"]}'::jsonb) on conflict (slug) do nothing;
 insert into article_categories (article_id, category_id, is_primary) select a.id, c.id, true from articles a, categories c where a.slug = 'mensetsu-ochita-furikaeri' and c.slug = 'shorui-mensetsu' on conflict do nothing;
 insert into article_categories (article_id, category_id, is_primary) select a.id, c.id, false from articles a, categories c where a.slug = 'mensetsu-ochita-furikaeri' and c.slug = 'junbi' on conflict do nothing;
 insert into article_sources (article_id, title, publisher, url, accessed_at, used_for, sort_order) select id, 'ハローワークの相談支援', '厚生労働省', 'https://www.mhlw.go.jp/stf/newpage_27742.html', '2026-10-09'::date, 'ハローワークで、応募書類の作り方や面接の受け方について個別相談やセミナーを無料で行い、求人に合わせた面接での受け答えについて助言していること', 0 from articles where slug = 'mensetsu-ochita-furikaeri';
@@ -4944,6 +5076,150 @@ insert into article_sources (article_id, title, publisher, url, accessed_at, use
 insert into article_versions (article_id, version, title, summary, body_md, created_by) select id, 1, title, summary, body_md, 'seed' from articles where slug = 'mensetsu-ochita-furikaeri' on conflict do nothing;
 insert into article_reviews (article_id, version, reviewer, verdict, checks) select id, 1, 'プロジェクトオーナー（チャットで承認）', 'approved', '{"content_hash":"ec4b9f97fe899c7307af4f3bdc692d8bbf695773404c6dc3407062b2ef0fe084","findings":[]}'::jsonb from articles where slug = 'mensetsu-ochita-furikaeri';
 update articles set status = 'published' where slug = 'mensetsu-ochita-furikaeri';
+
+-- article: mensetsu-renshu-pro (published)
+insert into articles (slug, kind, title, summary, body_md, status, featured, published_at, updated_at, reviewed_at, reviewed_by, information_checked_at, seo_title, seo_description, related_slugs, roles, concerns, situations, eyecatch, illustration, recommended, faq, news_meta, research_notes) values ('mensetsu-renshu-pro', 'article', '面接の練習は、プロに頼むと何が変わる？模擬面接で分かることと、頼む前の準備', '面接の練習は、ひとりでも声に出してできますが、話の長さや伝わり方は、人に聞いてもらわないと分かりにくいものです。ひとりで練習する限界、模擬面接で分かること、人材紹介会社のキャリアアドバイザーやハローワークでの面接練習、頼む前に準備することを紹介します。', '面接の準備で、想定される質問への答えを考えて、声に出して練習してみた。でも、「これで本当に伝わっているのかな」と不安が残る。そんな人は多いはずです。
+
+先に結論を言うと、**面接の練習は、ひとりでやるより、人に聞いてもらうほうが直すところが見つかりやすくなります**。特に、転職のプロ（人材紹介会社のキャリアアドバイザーや、ハローワークの職員）に模擬面接をしてもらうと、自分では気づきにくい**話の長さ・伝わり方・応募先に合わせた答え方**が分かります。
+
+この記事で分かること：
+
+- ひとりで練習するときの**限界**
+- 模擬面接で**分かること**
+- **どこで**面接の練習を頼めるか
+- 頼む**前に準備すること**と、頼み方の例
+
+よく聞かれる質問と答え方の型は[転職の面接でよく聞かれる質問と答え方](/articles/mensetsu-yokukiku-shitsumon)、緊張したときの対処は[面接で緊張してしまうときの準備と当日の対処](/articles/mensetsu-kinchou)で紹介しています。この記事では、「人に練習を頼むと何が変わるか」に絞ります。
+
+## ひとりで練習するときの限界
+
+ひとりでも、答えを書き出したり、声に出したり、スマホで録音して聞き返したりする練習はできます。それだけでも、何も準備しないよりずっと落ち着いて話せます。
+
+ただ、ひとりの練習では、次のようなことが分かりにくいままです。
+
+- **長さがちょうどいいか**：自分では短くまとめたつもりでも、聞く側には長く感じることがある
+- **相手に伝わっているか**：自分は話の流れを知っているので、説明が抜けていても気づきにくい
+- **聞き返しや深掘りにどう答えるか**：「それはなぜですか？」と追加で聞かれる練習ができない
+- **応募先に合った答えになっているか**：その会社や職種で何が重視されやすいかは、ひとりでは判断がつきにくい
+
+面接は「相手に伝わるか」がすべてです。伝わり方は、実際に誰かに聞いてもらわないと確かめられません。
+
+## 模擬面接で分かること
+
+模擬面接は、本番と同じように質問してもらい、答えたあとに感想や直すところを教えてもらう練習です。プロに頼むと、主に次の3つが分かります。
+
+### 1. 話の長さ
+
+「答えが長くて、途中で何の話か分からなくなった」「短すぎて、もう少し聞きたかった」といった、聞く側の感じ方を教えてもらえます。
+
+### 2. 伝わり方
+
+結論が先に来ているか、言葉づかいは自然か、声の大きさや表情はどうか。自分では見えない部分を、聞いた人の目で指摘してもらえます。
+
+たとえば、転職理由を聞かれて、こう答えたとします（仮の例）。
+
+> 「今の職場は飲食店で、シフトが毎月変わるのですが、人が足りないときは休みの日に呼ばれることもあって、店長に相談したこともあったのですが、なかなか変わらず、それで、もう少し決まった時間で働ける仕事がいいなと思うようになって……」
+
+模擬面接では、「不満の説明が長く、何をしたいのかが最後まで出てこない」と指摘されることがあります。直すと、次のようになります。
+
+> 「決まった時間で働きながら、事務の仕事を長く続けたいと考えて転職を決めました。飲食店で4年接客をする中で、予約の管理や発注など、裏方の仕事にやりがいを感じたのがきっかけです。」
+
+```figure
+type: compare
+style: before-after
+title: 転職理由の答え方の直し方
+columns:
+  - label: 直す前
+    tone: sand
+    items:
+      - 今の職場への不満から話し始める
+      - 何をしたいかが最後まで出てこない
+      - 一文が長く、話の区切りがない
+  - label: 直したあと
+    tone: mint
+    items:
+      - 最初に「何をしたいか」を言う
+      - 今の経験とのつながりを短く添える
+      - 一文を短く区切って話す
+```
+
+### 3. 応募先に合わせた答え方
+
+同じ志望動機でも、応募先によって伝えたほうがいいことは変わります。たとえば、事務職なら「正確さ」や「段取り」、営業職なら「人と話すこと」や「目標に向けて動くこと」が話題になりやすいなど、職種や会社に合わせてどこを厚くするかを一緒に考えてもらえます。
+
+人材紹介会社のキャリアアドバイザーは、応募先の求人を扱っているため、その会社の面接で聞かれやすいことを知っている場合もあります。「この会社の面接では、どんなことを聞かれやすいですか？」と聞いてみましょう。
+
+## どこで頼める？
+
+面接の練習を頼める主な相談先は、次の2つです。
+
+**人材紹介会社のキャリアアドバイザー（転職エージェント）**
+
+紹介を受けた求人に応募するときに、面接の準備を手伝ってもらえる場合があります。応募先に合わせた練習をしたいときに向いています。面接練習の有無や形は会社によって違うので、面談のときに「面接の練習もお願いできますか？」と確認しておきましょう。
+
+**ハローワーク**
+
+ハローワークでは、応募書類の作り方や面接の受け方について、無料で相談できます。担当の職員が、応募する求人に合わせた面接の受け答えについてアドバイスしてくれます。正社員を目指すおおむね35歳未満の人なら、わかものハローワークなどの若者向けの窓口で、担当者制で相談に乗ってもらえます。
+
+模擬面接の実施の形（対面・オンラインなど）や予約の方法は、窓口ごとに違います。利用したいときは、最寄りのハローワークに問い合わせてみてください。ハローワークの使い方の全体は[ハローワークの使い方は？](/articles/hellowork-tsukaikata)にまとめています。
+
+## 頼む前に準備すること
+
+模擬面接は、準備してから受けるほど、もらえるアドバイスが具体的になります。
+
+```figure
+type: checklist
+title: 模擬面接の前に用意するもの
+items:
+  - 応募先の求人票（決まっていれば）
+  - 自分の履歴書・職務経歴書
+  - 自己紹介・転職理由・志望動機の要点メモ
+  - 特に見てほしいところ
+  - 本番に近い服装や、Web面接の環境
+```
+
+答えは文章で丸暗記するより、**要点を箇条書きにしたメモ**で準備しておくのがおすすめです。模擬面接で直すところが見つかったときにも、組み立て直しやすくなります。
+
+頼むときは、**特に見てほしいところ**を伝えると、練習の中身が濃くなります。
+
+- 「志望動機が長くなりがちなので、短くまとまっているか見てもらえますか？」
+- 「未経験の仕事を選んだ理由が、納得できる答えになっているか聞いてほしいです」
+- 「緊張すると早口になるので、話すスピードも見てもらえますか？」
+- 「Web面接なので、画面の映り方や声の聞こえ方も確認してもらえますか？」
+
+## 練習のあとにやること
+
+模擬面接が終わったら、言われたことを忘れないうちにメモしておきましょう。
+
+1. 指摘されたことを書き出す
+2. 直すところを1〜2個に絞る
+3. 要点メモを書き直して、声に出してもう一度話す
+4. できれば、もう一度聞いてもらう
+
+一度に全部を直そうとすると、かえって話しにくくなります。いちばん大事なところから少しずつ直していきましょう。
+
+### 気をつけたいこと
+
+アドバイスは参考にしつつ、**答えは自分の言葉で話せる形にしておく**ことが大切です。言われた言い回しをそのまま覚えると、本番で少し違う聞き方をされたときに詰まりやすくなります。また、アドバイスが自分の考えと合わないと感じたら、「どうしてそのほうがいいのですか？」と理由を聞いてみましょう。納得したうえで直したほうが、本番でも自然に話せます。
+
+## まとめ：相談の前に整理しておくこと
+
+面接の練習は、ひとりでもできます。でも、話の長さや伝わり方、応募先に合わせた答え方は、人に聞いてもらって初めて分かることが多いものです。人材紹介会社のキャリアアドバイザーやハローワークを頼って、本番の前に一度、模擬面接を受けてみましょう。
+
+キャリアアドバイザーへの相談を考えているなら、面談の前に次のことを整理しておくと、面接の練習まで話がつながりやすくなります。
+
+- **これまでの経歴の事実**（いつからいつまで、どんな仕事をしていたか）
+- **転職したい理由**を、ひと言で言うと何か
+- **面接で不安なこと**（話が長くなる、緊張する、未経験の理由をうまく言えないなど）
+
+面談の前に決めておくこと・決めなくていいことは、[エージェント面談の前に決めておくこと・決めなくていいこと](/articles/agent-mendan-mae)にまとめています。', 'review', false, '2026-10-10'::timestamptz, '2026-10-10'::timestamptz, '2026-10-10'::timestamptz, 'プロジェクトオーナー（チャットで承認）', '2026-10-10'::timestamptz, '面接の練習はプロに頼むと何が変わる？模擬面接で分かること', '面接の練習をプロに頼むと何が変わる？ひとりで練習する限界、模擬面接で分かる話の長さ・伝わり方・応募先に合わせた答え方、キャリアアドバイザーやハローワークでの面接練習の受け方、頼む前に準備することを紹介します。', array['mensetsu-yokukiku-shitsumon', 'mensetsu-kinchou', 'hellowork-tsukaikata', 'tenshoku-agent-merit', 'kigyou-erabi-soudan']::text[], '{}'::text[], array['mensetsu']::text[], '{}'::text[], array['面接の練習、', 'プロに頼むと？']::text[], null, false, '[{"q":"模擬面接は、どこで受けられますか？","a":"人材紹介会社のキャリアアドバイザー（転職エージェント）に頼める場合があるほか、ハローワークでも面接の受け答えについて無料で相談できます。正社員を目指すおおむね35歳未満の人なら、わかものハローワークなどの若者向けの窓口もあります。実施の形や予約の方法は窓口ごとに違うので、事前に問い合わせましょう。"},{"q":"応募先が決まっていなくても、面接の練習を頼めますか？","a":"頼めます。自己紹介や転職理由など、どの会社でも聞かれやすい質問の練習から始められます。応募先が決まったら、その求人票を持っていき、応募先に合わせた志望動機の練習をもう一度してもらうと、本番に近い練習になります。"},{"q":"模擬面接で言われたとおりに答えを直せば大丈夫ですか？","a":"指摘は参考にしつつ、答えは自分の言葉で話せる形にしておきましょう。言われた言い回しをそのまま覚えると、本番で少し違う聞き方をされたときに詰まりやすくなります。直すところを1〜2個に絞り、要点だけ覚えて話す練習をするのがおすすめです。"}]'::jsonb, null, '{"schema_version":2,"writer_agent":"career-writer","angle":"既存の mensetsu-yokukiku-shitsumon（質問と答え方の型）と mensetsu-kinchou（緊張への準備）と役割を分け、「人に練習を頼むと何が分かるか」と「頼み方・準備」に絞る。人材紹介会社のキャリアアドバイザーとハローワークの両方を紹介し、プロに頼む練習の価値を前向きに伝える。特定の会社名・サービス名は書かない","quotes":[{"source_url":"https://www.mhlw.go.jp/stf/newpage_27742.html","text":"ハローワークでは、応募書類の作り方、面接の受け方などの個別相談やセミナーを無料で行い、担当職員が求人に合わせた書類の書き方や面接の受け答えについて助言している（mhlw.go.jp に直接接続できなかったため、検索結果に表示された同ページの内容で確認）","used_in":"どこで頼める？"},{"source_url":"https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/0000181329.html","text":"わかものハローワークなどで、正社員を目指すおおむね35歳未満の若者を対象に、担当者制による職業相談などを無料で行っている（検索結果に表示された同ページの内容で確認。各地のわかものハローワークの案内では、本番を想定した模擬面接を行っている例も検索結果で確認した）","used_in":"どこで頼める？"}],"not_used":["模擬面接の回数の目安や、模擬面接を受けた人の通過率などの数字は、公的な根拠がないため書かない","自己紹介や回答の長さの「〇分が目安」は、公的な根拠を確認できなかったので書かず、「短くまとまっているか見てもらう」にとどめた","各地のハローワークの模擬面接の予約方法・回数制限・オンライン対応は施設ごとに違い、検索で見つかった案内も時期がまちまちだったため、具体的には書かず「問い合わせる」とした","人材紹介会社の面接練習は事業者によって有無や形が違うため、一般的な例として書き、最初に確認するようすすめた"]}'::jsonb) on conflict (slug) do nothing;
+insert into article_categories (article_id, category_id, is_primary) select a.id, c.id, true from articles a, categories c where a.slug = 'mensetsu-renshu-pro' and c.slug = 'shorui-mensetsu' on conflict do nothing;
+insert into article_categories (article_id, category_id, is_primary) select a.id, c.id, false from articles a, categories c where a.slug = 'mensetsu-renshu-pro' and c.slug = 'junbi' on conflict do nothing;
+insert into article_sources (article_id, title, publisher, url, accessed_at, used_for, sort_order) select id, 'ハローワークの相談支援', '厚生労働省', 'https://www.mhlw.go.jp/stf/newpage_27742.html', '2026-10-10'::date, 'ハローワークで、応募書類の作り方や面接の受け方について個別相談やセミナーを無料で行い、応募する求人に合わせた面接の受け答えなどについて助言していること', 0 from articles where slug = 'mensetsu-renshu-pro';
+insert into article_sources (article_id, title, publisher, url, accessed_at, used_for, sort_order) select id, 'わかものハローワーク', '厚生労働省', 'https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/0000181329.html', '2026-10-10'::date, '正社員を目指すおおむね35歳未満の若者を対象に、担当者制による職業相談などを無料で行っていること', 1 from articles where slug = 'mensetsu-renshu-pro';
+insert into article_versions (article_id, version, title, summary, body_md, created_by) select id, 1, title, summary, body_md, 'seed' from articles where slug = 'mensetsu-renshu-pro' on conflict do nothing;
+insert into article_reviews (article_id, version, reviewer, verdict, checks) select id, 1, 'プロジェクトオーナー（チャットで承認）', 'approved', '{"content_hash":"4e3d207095706a69aaa28d752a8d956c753beeb71451cc7d9b5daf80327d9fbd","findings":[]}'::jsonb from articles where slug = 'mensetsu-renshu-pro';
+update articles set status = 'published' where slug = 'mensetsu-renshu-pro';
 
 -- article: mensetsu-yokukiku-shitsumon (published)
 insert into articles (slug, kind, title, summary, body_md, status, featured, published_at, updated_at, reviewed_at, reviewed_by, information_checked_at, seo_title, seo_description, related_slugs, roles, concerns, situations, eyecatch, illustration, recommended, faq, news_meta, research_notes) values ('mensetsu-yokukiku-shitsumon', 'article', '転職の面接でよく聞かれる質問と答え方｜自己紹介・転職理由・志望動機の型と回答例', '転職の面接で聞かれることの多くは、「何ができるか」「どのくらい入りたいか」「どんな人か」を確かめる質問です。自己紹介・転職理由・志望動機・強み弱み・未経験の仕事を選んだ理由について、答え方の型と回答例を紹介します。応募者に聞いてはいけないとされている質問の考え方も紹介します。', 'はじめての転職の面接は、「何を聞かれるんだろう」「うまく答えられなかったらどうしよう」と不安になりやすいものです。
@@ -5086,7 +5362,7 @@ items:
 
 声に出して話してみると、書いたときには気づかなかった言いにくさが分かります。ひとりで練習するのが不安なら、ハローワークでは応募書類の添削や面接に向けた相談を無料で受けられます。
 
-面接の準備全体（逆質問やオンライン面接の確認を含む）は[未経験職種の面接、何を準備する？](/articles/mensetsu-junbi-mikeiken)、働いていない期間の説明は[職歴に空白期間があるとき、面接でどう説明する？](/articles/kuhaku-kikan-setsumei)で紹介しています。', 'review', false, '2026-10-09'::timestamptz, '2026-10-09'::timestamptz, '2026-10-09'::timestamptz, 'プロジェクトオーナー（チャットで承認）', '2026-10-09'::timestamptz, '転職の面接でよく聞かれる質問｜答え方の型と回答例', '転職の面接でよく聞かれる自己紹介・転職理由・志望動機・強みと弱み・未経験の仕事を選んだ理由の答え方を、型と回答例で紹介します。答えに詰まったときの言い方や、応募者に聞いてはいけない質問の考え方も分かります。', array['mensetsu-junbi-mikeiken', 'shiboudouki-mikeiken', 'kuhaku-kikan-setsumei', 'gyaku-shitsumon', 'taishoku-riyuu-mensetsu', 'jiko-pr-mikeiken', 'mensetsu-kinchou']::text[], '{}'::text[], array['mensetsu', 'mikeiken-shokushu']::text[], array['hajimete', 'sekkyaku']::text[], array['面接の質問、', 'どう答えればいい？']::text[], null, false, '[{"q":"面接の回答は、丸暗記して臨んだほうがいいですか？","a":"文章をまるごと覚えると、少し違う聞き方をされたときに言葉が出なくなりがちです。質問ごとに「結論」と「話したいエピソード」だけを決めておき、あとは自分の言葉で話す練習をしておくほうが、落ち着いて答えやすくなります。"},{"q":"弱み（短所）を聞かれたら、何と答えればいいですか？","a":"仕事に大きく差し支えるものを避け、ひとつに絞って正直に伝えます。そのうえで「気をつけていること」をセットで話すと、自分を客観的に見られていることが伝わります。たとえば「心配性なところがあり、確認に時間をかけすぎることがあります。今は確認する項目を先に決めてから作業するようにしています」のような形です。"},{"q":"面接で家族のことや住まいのことを聞かれたら、答えないといけませんか？","a":"厚生労働省は、家族の職業や収入、住宅の状況など、本人の適性・能力に関係のないことを応募書類や面接で把握することは、就職差別につながるおそれがあるとしています。無理に答える必要はありません。気になる質問をされたときは、最寄りのハローワークや都道府県労働局に相談できます。"}]'::jsonb, null, '{"schema_version":2,"writer_agent":"career-writer","angle":"「よく聞かれる質問」を一覧で並べるだけでなく、面接官が確かめたいこと（できること・意欲・人柄）から逆算して、全質問に使える「結論→具体例→これから」の型を示す。未経験の仕事を選んだ理由を独立した質問として扱い、聞いてはいけない質問の考え方（公正な採用選考）で締める","quotes":[{"source_url":"https://jsite.mhlw.go.jp/osaka-hellowork/content/contents/002184437.pdf","text":"面接にマニュアルは無く、答える内容も1人ひとり異なる。企業側は「能力、適性、経験」を見ており、何ができるのか（どのような経験をし、どんな能力があるのか）、意欲（その会社にどのように貢献するのか、どのような存在になりたいのか）を伝える。自己PRには具体的な根拠やエピソード（上司や顧客からの評価など）を入れる（この環境から jsite.mhlw.go.jp に直接接続できなかったため、検索結果に表示された資料の抜粋で確認）","used_in":"面接官は、何を知りたい？／質問別の答え方と回答例"},{"source_url":"https://www.hellowork.mhlw.go.jp/doc/oubosyorui_pamphlet_202406.pdf","text":"面接では提出した履歴書・職務経歴書の内容に基づいて質問されることが多いので、完成した書類はコピーしておき、面接前に確認する（直接開けなかったため、検索結果と既存記事 mensetsu-junbi-mikeiken の記録で確認）","used_in":"練習は「書類を見返す」ところから"},{"source_url":"https://kouseisaiyou.mhlw.go.jp/consider.html","text":"就職差別につながるおそれがある14事項。本人に責任のない事項（本籍・出生地、家族、住宅状況、生活環境・家庭環境）、本来自由であるべき事項（宗教、支持政党、人生観・生活信条、尊敬する人物、思想など）を、応募用紙や面接で把握しない（直接開けなかったため、各労働局が公開している同内容の資料の検索結果で確認）","used_in":"応募者に聞いてはいけない質問もある"},{"source_url":"https://kouseisaiyou.mhlw.go.jp/jobseekers.html","text":"面接で適性・能力に関係のない質問をされ、就職差別につながると感じた場合は、最寄りのハローワークや都道府県労働局に相談できる（直接開けなかったため、愛媛労働局など各労働局の案内ページの検索結果で確認）","used_in":"応募者に聞いてはいけない質問もある／FAQ"},{"source_url":"https://www.mhlw.go.jp/content/11600000/001441500.pdf","text":"ハローワークでは応募書類の作成方法などのセミナーを実施し、希望に応じて応募書類の添削や面接に向けた相談も行っている。利用は無料（直接開けなかったため、検索結果の抜粋で確認）","used_in":"練習は「書類を見返す」ところから"}],"not_used":["「自己紹介は1分程度」「転職理由を重視する企業は約85%」などの時間・割合は、公的な根拠を確認できなかったので書かない","よく聞かれる質問のランキングは、調査の出どころが確認できないので使わない","「その質問は違法です」と面接官に指摘するような対応は、法的な線引きを断定できないため書かず、相談先の案内にとどめた"]}'::jsonb) on conflict (slug) do nothing;
+面接の準備全体（逆質問やオンライン面接の確認を含む）は[未経験職種の面接、何を準備する？](/articles/mensetsu-junbi-mikeiken)、働いていない期間の説明は[職歴に空白期間があるとき、面接でどう説明する？](/articles/kuhaku-kikan-setsumei)で紹介しています。', 'review', false, '2026-10-09'::timestamptz, '2026-10-09'::timestamptz, '2026-10-09'::timestamptz, 'プロジェクトオーナー（チャットで承認）', '2026-10-09'::timestamptz, '転職の面接でよく聞かれる質問｜答え方の型と回答例', '転職の面接でよく聞かれる自己紹介・転職理由・志望動機・強みと弱み・未経験の仕事を選んだ理由の答え方を、型と回答例で紹介します。答えに詰まったときの言い方や、応募者に聞いてはいけない質問の考え方も分かります。', array['mensetsu-junbi-mikeiken', 'shiboudouki-mikeiken', 'kuhaku-kikan-setsumei', 'gyaku-shitsumon', 'taishoku-riyuu-mensetsu', 'jiko-pr-mikeiken', 'mensetsu-kinchou', 'mensetsu-renshu-pro']::text[], '{}'::text[], array['mensetsu', 'mikeiken-shokushu']::text[], array['hajimete', 'sekkyaku']::text[], array['面接の質問、', 'どう答えればいい？']::text[], null, false, '[{"q":"面接の回答は、丸暗記して臨んだほうがいいですか？","a":"文章をまるごと覚えると、少し違う聞き方をされたときに言葉が出なくなりがちです。質問ごとに「結論」と「話したいエピソード」だけを決めておき、あとは自分の言葉で話す練習をしておくほうが、落ち着いて答えやすくなります。"},{"q":"弱み（短所）を聞かれたら、何と答えればいいですか？","a":"仕事に大きく差し支えるものを避け、ひとつに絞って正直に伝えます。そのうえで「気をつけていること」をセットで話すと、自分を客観的に見られていることが伝わります。たとえば「心配性なところがあり、確認に時間をかけすぎることがあります。今は確認する項目を先に決めてから作業するようにしています」のような形です。"},{"q":"面接で家族のことや住まいのことを聞かれたら、答えないといけませんか？","a":"厚生労働省は、家族の職業や収入、住宅の状況など、本人の適性・能力に関係のないことを応募書類や面接で把握することは、就職差別につながるおそれがあるとしています。無理に答える必要はありません。気になる質問をされたときは、最寄りのハローワークや都道府県労働局に相談できます。"}]'::jsonb, null, '{"schema_version":2,"writer_agent":"career-writer","angle":"「よく聞かれる質問」を一覧で並べるだけでなく、面接官が確かめたいこと（できること・意欲・人柄）から逆算して、全質問に使える「結論→具体例→これから」の型を示す。未経験の仕事を選んだ理由を独立した質問として扱い、聞いてはいけない質問の考え方（公正な採用選考）で締める","quotes":[{"source_url":"https://jsite.mhlw.go.jp/osaka-hellowork/content/contents/002184437.pdf","text":"面接にマニュアルは無く、答える内容も1人ひとり異なる。企業側は「能力、適性、経験」を見ており、何ができるのか（どのような経験をし、どんな能力があるのか）、意欲（その会社にどのように貢献するのか、どのような存在になりたいのか）を伝える。自己PRには具体的な根拠やエピソード（上司や顧客からの評価など）を入れる（この環境から jsite.mhlw.go.jp に直接接続できなかったため、検索結果に表示された資料の抜粋で確認）","used_in":"面接官は、何を知りたい？／質問別の答え方と回答例"},{"source_url":"https://www.hellowork.mhlw.go.jp/doc/oubosyorui_pamphlet_202406.pdf","text":"面接では提出した履歴書・職務経歴書の内容に基づいて質問されることが多いので、完成した書類はコピーしておき、面接前に確認する（直接開けなかったため、検索結果と既存記事 mensetsu-junbi-mikeiken の記録で確認）","used_in":"練習は「書類を見返す」ところから"},{"source_url":"https://kouseisaiyou.mhlw.go.jp/consider.html","text":"就職差別につながるおそれがある14事項。本人に責任のない事項（本籍・出生地、家族、住宅状況、生活環境・家庭環境）、本来自由であるべき事項（宗教、支持政党、人生観・生活信条、尊敬する人物、思想など）を、応募用紙や面接で把握しない（直接開けなかったため、各労働局が公開している同内容の資料の検索結果で確認）","used_in":"応募者に聞いてはいけない質問もある"},{"source_url":"https://kouseisaiyou.mhlw.go.jp/jobseekers.html","text":"面接で適性・能力に関係のない質問をされ、就職差別につながると感じた場合は、最寄りのハローワークや都道府県労働局に相談できる（直接開けなかったため、愛媛労働局など各労働局の案内ページの検索結果で確認）","used_in":"応募者に聞いてはいけない質問もある／FAQ"},{"source_url":"https://www.mhlw.go.jp/content/11600000/001441500.pdf","text":"ハローワークでは応募書類の作成方法などのセミナーを実施し、希望に応じて応募書類の添削や面接に向けた相談も行っている。利用は無料（直接開けなかったため、検索結果の抜粋で確認）","used_in":"練習は「書類を見返す」ところから"}],"not_used":["「自己紹介は1分程度」「転職理由を重視する企業は約85%」などの時間・割合は、公的な根拠を確認できなかったので書かない","よく聞かれる質問のランキングは、調査の出どころが確認できないので使わない","「その質問は違法です」と面接官に指摘するような対応は、法的な線引きを断定できないため書かず、相談先の案内にとどめた"]}'::jsonb) on conflict (slug) do nothing;
 insert into article_categories (article_id, category_id, is_primary) select a.id, c.id, true from articles a, categories c where a.slug = 'mensetsu-yokukiku-shitsumon' and c.slug = 'shorui-mensetsu' on conflict do nothing;
 insert into article_categories (article_id, category_id, is_primary) select a.id, c.id, false from articles a, categories c where a.slug = 'mensetsu-yokukiku-shitsumon' and c.slug = 'mikeiken' on conflict do nothing;
 insert into article_sources (article_id, title, publisher, url, accessed_at, used_for, sort_order) select id, 'ハローワーク布施 面接対策セミナー', '大阪労働局 ハローワーク布施', 'https://jsite.mhlw.go.jp/osaka-hellowork/content/contents/002184437.pdf', '2026-10-09'::date, '面接に決まったマニュアルはなく、答える内容は一人ひとり違うこと。企業は能力・適性・経験や意欲を見ていること。自己PRには具体的な根拠やエピソードを入れること', 0 from articles where slug = 'mensetsu-yokukiku-shitsumon';
@@ -5498,7 +5774,7 @@ columns:
 2. [条件整理チェック](/check)で、希望条件と経験をもう一度まとめてみる
 3. 整理したメモを持って、キャリアアドバイザーに相談する
 
-整理したメモは完成品である必要はありません。調べたり人と話したりする中で、何度書き直しても大丈夫です。大切なのは、求人を見る前に「自分にとって何が大事か」の手がかりを持っておくことです。', 'review', true, '2026-10-06'::timestamptz, '2026-10-07'::timestamptz, '2026-10-07'::timestamptz, null, '2026-10-06'::timestamptz, '未経験転職は何から始める？最初に整理したい5つのこと', '未経験転職の最初の一歩は、求人探しより「整理」です。転職理由・経験・希望条件・比べる職種・スケジュールの5つを、書き出し例つきで解説します。', array['agent-mendan-mae', 'donichi-yasumi-nenshu-hikaku', 'eigyo-cs-it-support-chigai', 'tenshoku-schedule']::text[], '{}'::text[], array['mikeiken-shokushu', 'yaritai']::text[], array['hajimete']::text[], array['未経験の転職、', '何から始める？']::text[], null, false, '[{"q":"自分には強みと言えるような経験がありません。それでも整理する意味はありますか？","a":"あります。整理の目的は「すごい経験」を探すことではなく、どんな作業をどのくらい続けてきたかを事実として並べることです。アルバイトのシフト管理や新人への説明なども、書き出してみると仕事選びの材料になります。"},{"q":"転職したい理由が不満ばかりです。ネガティブでも大丈夫でしょうか？","a":"最初は不満のままで構いません。そのうえで「その不満がなくなったら、次はどうなっていたいか」に言い換えると、求人を比べるときの基準として使えるようになります。"},{"q":"整理にはどれくらい時間をかければいいですか？","a":"目安は1〜2週間です。完璧に仕上げる必要はなく、5つの項目に一度メモを書けたら、職種を調べたり相談したりしながら書き直していくほうが進めやすくなります。"}]'::jsonb, null, '{"schema_version":2,"writer_agent":"career-writer","angle":"求人探しの前に、比較の基準を作る"}'::jsonb) on conflict (slug) do nothing;
+整理したメモは完成品である必要はありません。調べたり人と話したりする中で、何度書き直しても大丈夫です。大切なのは、求人を見る前に「自分にとって何が大事か」の手がかりを持っておくことです。', 'review', true, '2026-10-06'::timestamptz, '2026-10-07'::timestamptz, '2026-10-07'::timestamptz, null, '2026-10-06'::timestamptz, '未経験転職は何から始める？最初に整理したい5つのこと', '未経験転職の最初の一歩は、求人探しより「整理」です。転職理由・経験・希望条件・比べる職種・スケジュールの5つを、書き出し例つきで解説します。', array['agent-mendan-mae', 'donichi-yasumi-nenshu-hikaku', 'eigyo-cs-it-support-chigai', 'tenshoku-schedule', 'tenshoku-agent-merit']::text[], '{}'::text[], array['mikeiken-shokushu', 'yaritai']::text[], array['hajimete']::text[], array['未経験の転職、', '何から始める？']::text[], null, false, '[{"q":"自分には強みと言えるような経験がありません。それでも整理する意味はありますか？","a":"あります。整理の目的は「すごい経験」を探すことではなく、どんな作業をどのくらい続けてきたかを事実として並べることです。アルバイトのシフト管理や新人への説明なども、書き出してみると仕事選びの材料になります。"},{"q":"転職したい理由が不満ばかりです。ネガティブでも大丈夫でしょうか？","a":"最初は不満のままで構いません。そのうえで「その不満がなくなったら、次はどうなっていたいか」に言い換えると、求人を比べるときの基準として使えるようになります。"},{"q":"整理にはどれくらい時間をかければいいですか？","a":"目安は1〜2週間です。完璧に仕上げる必要はなく、5つの項目に一度メモを書けたら、職種を調べたり相談したりしながら書き直していくほうが進めやすくなります。"}]'::jsonb, null, '{"schema_version":2,"writer_agent":"career-writer","angle":"求人探しの前に、比較の基準を作る"}'::jsonb) on conflict (slug) do nothing;
 insert into article_categories (article_id, category_id, is_primary) select a.id, c.id, true from articles a, categories c where a.slug = 'mikeiken-tenshoku-hajimekata' and c.slug = 'mikeiken' on conflict do nothing;
 insert into article_categories (article_id, category_id, is_primary) select a.id, c.id, false from articles a, categories c where a.slug = 'mikeiken-tenshoku-hajimekata' and c.slug = 'junbi' on conflict do nothing;
 insert into article_sources (article_id, title, publisher, url, accessed_at, used_for, sort_order) select id, '職業情報提供サイト（job tag）', '厚生労働省', 'https://shigoto.mhlw.go.jp/User/', '2026-10-06'::date, '職種ごとの仕事内容を調べる方法の紹介', 0 from articles where slug = 'mikeiken-tenshoku-hajimekata';
@@ -8241,7 +8517,7 @@ job tag には、職業興味検査や仕事価値観検査など、興味や大
 
 ひとりで決めきれないときは、書き出したメモを持って相談するのも一つの方法です。正社員を目指すおおむね35歳未満の人は、わかものハローワークで担当者に無料で相談できます。キャリアアドバイザーへの相談については[キャリア相談について](/consultation)で紹介しています。
 
-候補が決まったあとの準備の流れは、[未経験転職は何から始める？](/articles/mikeiken-tenshoku-hajimekata)にまとめています。', 'review', true, '2026-10-06'::timestamptz, '2026-10-06'::timestamptz, '2026-10-06'::timestamptz, null, '2026-10-06'::timestamptz, null, null, array['mikeiken-tenshoku-hajimekata', 'eigyo-cs-it-support-chigai', 'sekkyaku-keiken-ikasu', 'jiko-bunseki-yarikata']::text[], array['sonota']::text[], array['yaritai', 'mikeiken-shokushu']::text[], array['hajimete', 'seishain-keiken-sukunai']::text[], array['やりたい仕事が', '分からないときは。']::text[], null, false, '[{"q":"やりたいことが決まっていないまま、転職活動を始めてもいいですか？","a":"始めて大丈夫です。やりたいことがはっきりしていなくても、避けたいこと・続けられた作業・ゆずれない条件の3つを書き出せば、候補をしぼって比べることはできます。働きながら、やりたいことが見えてくる人もいます。"},{"q":"適職診断の結果は、どこまで参考にしていいですか？","a":"結果は候補を広げるヒントとして使うのがおすすめです。job tag のよくある質問でも、職業興味検査や仕事価値観検査で出てくる職業は、学歴・職務経験・資格などを考えずに挙げたものなので、参考として使うよう案内されています。出てきた職業は、この記事の3ステップで確かめてみてください。"},{"q":"候補の職種はいくつくらいにしぼればいいですか？","a":"2〜3職種がおすすめです。1つだけだと比べる相手がなく、多すぎると一つひとつを調べきれなくなります。比べてみて合わないと分かった職種は、外して入れ替えて構いません。"}]'::jsonb, null, '{"schema_version":2,"writer_agent":"career-writer","angle":"ホームのメイン導線の着地先。「やりたいこと」から探さず、避けたいこと・続けられた作業・ゆずれない条件の3ステップで候補を2〜3職種にしぼり、比べて確かめる。mikeiken-tenshoku-hajimekata（転職準備の5項目）とは重ならないよう、職種の候補を見つける手順に絞る","quotes":[{"source_url":"https://shigoto.mhlw.go.jp/Search/WorkActivity","text":"job tag では、仕事の内容（具体的な作業）から職業を検索できる。","used_in":"ステップ2：続けられた作業は？"},{"source_url":"https://shigoto.mhlw.go.jp/User/faq","text":"職業興味検査や仕事価値観検査で表示される職業リストは、回答者の学歴・職務経験・取得資格・専門性などを考慮しておらず、興味や価値観の特徴と職業との類似度から作成されているので、参考として利用すること。","used_in":"調べてもしぼれないときは？"},{"source_url":"https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/0000181329.html","text":"わかものハローワークは、正社員を目指す若者（おおむね35歳未満）を対象に、担当者制による職業相談や自己理解・職務理解のサポートなどを無料で行っている。","used_in":"調べてもしぼれないときは？"}]}'::jsonb) on conflict (slug) do nothing;
+候補が決まったあとの準備の流れは、[未経験転職は何から始める？](/articles/mikeiken-tenshoku-hajimekata)にまとめています。', 'review', true, '2026-10-06'::timestamptz, '2026-10-06'::timestamptz, '2026-10-06'::timestamptz, null, '2026-10-06'::timestamptz, null, null, array['mikeiken-tenshoku-hajimekata', 'eigyo-cs-it-support-chigai', 'sekkyaku-keiken-ikasu', 'jiko-bunseki-yarikata', 'tenshoku-agent-merit']::text[], array['sonota']::text[], array['yaritai', 'mikeiken-shokushu']::text[], array['hajimete', 'seishain-keiken-sukunai']::text[], array['やりたい仕事が', '分からないときは。']::text[], null, false, '[{"q":"やりたいことが決まっていないまま、転職活動を始めてもいいですか？","a":"始めて大丈夫です。やりたいことがはっきりしていなくても、避けたいこと・続けられた作業・ゆずれない条件の3つを書き出せば、候補をしぼって比べることはできます。働きながら、やりたいことが見えてくる人もいます。"},{"q":"適職診断の結果は、どこまで参考にしていいですか？","a":"結果は候補を広げるヒントとして使うのがおすすめです。job tag のよくある質問でも、職業興味検査や仕事価値観検査で出てくる職業は、学歴・職務経験・資格などを考えずに挙げたものなので、参考として使うよう案内されています。出てきた職業は、この記事の3ステップで確かめてみてください。"},{"q":"候補の職種はいくつくらいにしぼればいいですか？","a":"2〜3職種がおすすめです。1つだけだと比べる相手がなく、多すぎると一つひとつを調べきれなくなります。比べてみて合わないと分かった職種は、外して入れ替えて構いません。"}]'::jsonb, null, '{"schema_version":2,"writer_agent":"career-writer","angle":"ホームのメイン導線の着地先。「やりたいこと」から探さず、避けたいこと・続けられた作業・ゆずれない条件の3ステップで候補を2〜3職種にしぼり、比べて確かめる。mikeiken-tenshoku-hajimekata（転職準備の5項目）とは重ならないよう、職種の候補を見つける手順に絞る","quotes":[{"source_url":"https://shigoto.mhlw.go.jp/Search/WorkActivity","text":"job tag では、仕事の内容（具体的な作業）から職業を検索できる。","used_in":"ステップ2：続けられた作業は？"},{"source_url":"https://shigoto.mhlw.go.jp/User/faq","text":"職業興味検査や仕事価値観検査で表示される職業リストは、回答者の学歴・職務経験・取得資格・専門性などを考慮しておらず、興味や価値観の特徴と職業との類似度から作成されているので、参考として利用すること。","used_in":"調べてもしぼれないときは？"},{"source_url":"https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/0000181329.html","text":"わかものハローワークは、正社員を目指す若者（おおむね35歳未満）を対象に、担当者制による職業相談や自己理解・職務理解のサポートなどを無料で行っている。","used_in":"調べてもしぼれないときは？"}]}'::jsonb) on conflict (slug) do nothing;
 insert into article_categories (article_id, category_id, is_primary) select a.id, c.id, true from articles a, categories c where a.slug = 'shigoto-sagashikata' and c.slug = 'mikeiken' on conflict do nothing;
 insert into article_categories (article_id, category_id, is_primary) select a.id, c.id, false from articles a, categories c where a.slug = 'shigoto-sagashikata' and c.slug = 'shokushu' on conflict do nothing;
 insert into article_sources (article_id, title, publisher, url, accessed_at, used_for, sort_order) select id, '仕事の内容で検索（job tag）', '厚生労働省 職業情報提供サイト（job tag）', 'https://shigoto.mhlw.go.jp/Search/WorkActivity', '2026-10-06'::date, '仕事の内容から職業を探せる検索があること', 0 from articles where slug = 'shigoto-sagashikata';
@@ -10714,6 +10990,153 @@ insert into article_versions (article_id, version, title, summary, body_md, crea
 insert into article_reviews (article_id, version, reviewer, verdict, checks) select id, 1, 'プロジェクトオーナー（チャットで承認）', 'approved', '{"content_hash":"f98f9086922c0436fff95e2c917620e546d16988b6929936ddb24c9d81f7082f","findings":[]}'::jsonb from articles where slug = 'tenkin-kinmuchi-kakunin';
 update articles set status = 'published' where slug = 'tenkin-kinmuchi-kakunin';
 
+-- article: tenshoku-agent-merit (published)
+insert into articles (slug, kind, title, summary, body_md, status, featured, published_at, updated_at, reviewed_at, reviewed_by, information_checked_at, seo_title, seo_description, related_slugs, roles, concerns, situations, eyecatch, illustration, recommended, faq, news_meta, research_notes) values ('tenshoku-agent-merit', 'article', 'はじめて・未経験の転職こそ、転職エージェントに相談したほうがいい理由｜頼めることと注意点', 'はじめての転職や未経験の仕事への転職は、迷うところが多いぶん、人材紹介会社のキャリアアドバイザー（転職エージェント）に相談しながら進めると、ひとりで抱える負担を減らせます。頼めること、求職者が原則無料のしくみ、ひとりで進める場合との違い、使うときの注意点を紹介します。', 'はじめての転職や、やったことのない仕事への転職は、「何から始めればいいか」「自分の経歴で応募できる仕事はあるのか」と、迷うところがたくさんあります。
+
+先に結論を言うと、**はじめて・未経験の転職ほど、ひとりで進めるより、転職のプロに相談しながら進めたほうが進めやすくなります**。ここでいう転職のプロは、人材紹介会社のキャリアアドバイザー（転職エージェント）のことです。
+
+この記事で分かること：
+
+- はじめて・未経験の転職で、**ひとりだと迷いやすいところ**
+- 転職エージェントに**頼めること**
+- 求職者は**原則無料**で使えるしくみ
+- 使うときの**注意点**と、上手な使い方
+
+転職サイト・転職エージェント・ハローワークのしくみの違いは[転職サイト・転職エージェント・ハローワークの違いは？](/articles/tenshoku-service-chigai)、面談でそのまま使える相談の言い方は[転職エージェントに、何を相談すればいい？](/articles/agent-soudan-nani)にまとめています。この記事では、「なぜ相談したほうがいいのか」に絞って紹介します。
+
+## はじめて・未経験の転職で、ひとりだと迷いやすいところ
+
+転職がはじめてだったり、経験のない仕事を目指していたりすると、次のようなところで手が止まりがちです。
+
+- **どの仕事なら応募できるのか分からない**：求人をいくつ見ても、自分の経験で応募していいのか判断がつかない
+- **求人票だけでは会社の様子が分からない**：「未経験歓迎」「研修あり」と書いてあっても、実際にどこまで教えてもらえるのか分からない
+- **書類に何を書けばいいか分からない**：接客やアルバイトの経験を、どう書けば伝わるのか迷う
+- **面接で何を聞かれるか分からない**：「なぜ未経験の仕事を選んだのか」にうまく答えられるか不安
+- **連絡や調整に手が回らない**：働きながらだと、面接の日程調整や条件の確認に時間を取られる
+
+どれも、転職に慣れている人なら経験で乗り越えられることです。でも、はじめての人にとっては、ひとつずつ調べて判断するだけで時間と気力を使います。ここを一緒に考えてくれる相手がいるかどうかで、進めやすさは大きく変わります。
+
+## 転職エージェントに頼めること
+
+人材紹介会社のキャリアアドバイザーには、一般的に次のようなことを頼めます。サポートの範囲は会社によって違うので、最初の面談で「どこまで手伝ってもらえますか？」と聞いておくと安心です。
+
+### 1. 求人の紹介
+
+これまでの経験と希望を伝えると、それに合いそうな求人を紹介してもらえます。「この経歴で応募できる仕事はあるのか」を、ひとりで求人を見比べるより早くつかみやすくなります。
+
+### 2. 企業選びの相談
+
+「事務と営業のどちらが向いているか」「この会社とあの会社、どちらが自分の希望に近いか」といった迷いを相談できます。求人票に書かれていない職場の雰囲気や、未経験で入った人がどんな研修を受けているかなどを、知っている範囲で教えてもらえることもあります。
+
+### 3. 応募書類の添削
+
+履歴書や職務経歴書を見てもらい、伝わりにくいところを指摘してもらえます。たとえば「レジ・接客を担当」とだけ書いていたところを、「1日〇人ほどのお客様の問い合わせに対応」のように、何をどのくらいしていたかが分かる書き方に直す、といった相談ができます。
+
+### 4. 面接の練習
+
+応募先でよく聞かれる質問や、答え方の練習に付き合ってもらえます。自分では気づきにくい「話が長い」「結論が後ろにある」といったクセも、人に聞いてもらうと分かります。
+
+### 5. 日程や条件の調整
+
+面接の日程調整や、給与・入社日などの条件の確認を、間に入って進めてもらえます。給料や残業のことなど、自分からは聞きにくいことを確認してもらえるのも助かるところです。
+
+## ひとりで進める場合と、何が違う？
+
+ひとりで進める場合と、キャリアアドバイザーに相談しながら進める場合を比べると、次のようになります。
+
+```figure
+type: compare
+title: ひとりで進める・相談しながら進める
+columns:
+  - label: ひとりで進める
+    tone: sand
+    items:
+      - 求人探しも応募も、すべて自分で判断する
+      - 書類や面接の準備は、自分で調べて進める
+      - 日程調整や条件の確認も自分で連絡する
+      - 自分のペースで進めやすい
+  - label: 相談しながら進める
+    tone: mint
+    items:
+      - 経験と希望に合いそうな求人を紹介してもらう
+      - 書類の添削や面接の練習を頼める
+      - 日程や条件の調整を間に入って進めてもらう
+      - 迷ったときに相談できる相手がいる
+```
+
+ひとりで進めるほうが合う人もいます。応募したい会社がはっきり決まっている人や、自分のペースで進めたい人です。一方で、**何が自分に合うか分からない、書類や面接に自信がない、働きながらで時間がない**という人は、相談しながら進めたほうが、迷う時間を減らしやすくなります。
+
+## 求職者は原則無料。お金はどこから出ている？
+
+「プロに相談するなら、お金がかかるのでは？」と心配になるかもしれません。
+
+職業安定法では、人材紹介会社（有料職業紹介事業者）は、**求職者から原則として手数料を受け取ってはいけない**とされています。人材紹介会社は、主に、紹介した人を採用した企業から手数料を受け取って運営しています。
+
+例外として、芸能家やモデルなど、法令で決められた一部の職業では求職者から手数料を受け取れることがあります。はじめての転職や未経験の仕事への転職で、こうした例外に当てはまることはあまりありません。登録や相談に料金がかかると言われたら、理由を確認し、納得できなければ利用を見送りましょう。
+
+相談先が、国の許可を受けた職業紹介事業者かどうかは、厚生労働省の「人材サービス総合サイト」で、事業者名や許可番号から調べられます。厚生労働省のリーフレットでは、このサイトで手数料や就職実績などの情報が公開されているかも確認するよう案内されています。
+
+## 未経験の転職で、相談が特に役に立つ場面
+
+未経験の仕事を目指すときは、次のような場面で相談の効果を感じやすいはずです。相談するときの言い方の例もあわせて紹介します。
+
+**接客の経験を、どう伝えればいいか分からないとき**
+
+> 「飲食店で4年接客をしてきました。事務の仕事に応募したいのですが、接客の経験は書類でどう書けば伝わりますか？」
+
+**研修がどのくらいあるか知りたいとき**
+
+> 「未経験で入った人は、入社してからどんな研修を受けていますか？最初の1か月はどんな仕事をすることが多いですか？」
+
+研修のある求人で確認したいことは[未経験求人の「研修あり」で確認すべきこと](/articles/mikeiken-kenshu-kakunin)も参考にしてください。
+
+**聞きにくい条件を確かめたいとき**
+
+> 「この求人の月給には、固定残業代が含まれていますか？残業は月にどのくらいありますか？」
+
+こうしたことを、応募の前に聞いておけると、入社してから「思っていたのと違う」と感じることを減らしやすくなります。
+
+## 使うときに気をつけたいこと
+
+相談しながら進めるのはおすすめですが、気をつけたいこともあります。
+
+- **担当者と合わないことがある**：話がかみ合わない、希望と違う求人ばかり紹介される、と感じることもあります。まずは希望を具体的に伝え直し、それでも合わなければ、担当を変えてもらえるか問い合わせて構いません
+- **すすめられた求人を、そのまま受けない**：紹介される求人は、その会社が扱っている求人の中からになります。すすめられた理由を聞き、自分の希望と合っているかを自分の目で確かめましょう
+- **応募するかどうかは、自分で決める**：面談を受けたからといって、応募しなければいけないわけではありません。迷うときは「一度考えてから返事をします」と伝えて大丈夫です
+
+だからこそ、転職エージェントは「全部おまかせする相手」ではなく、**迷ったときに一緒に考えてくれる相談相手**として使うのがおすすめです。
+
+```figure
+type: checklist
+title: 相談相手として上手に使うコツ
+items:
+  - 希望の条件と、ゆずれない理由を伝える
+  - すすめられた理由を聞いてから決める
+  - 合わない求人は、理由を添えて断る
+  - 気になることは、応募の前に聞いておく
+  - 最後に決めるのは自分、と考えておく
+```
+
+## まとめ：相談の前に整理しておくこと
+
+はじめて・未経験の転職は、迷うところが多いぶん、ひとりで抱え込むより、人材紹介会社のキャリアアドバイザー（転職エージェント）に相談しながら進めたほうが進めやすくなります。求職者は原則無料で、求人の紹介から書類・面接の準備、日程や条件の調整まで頼めます。
+
+相談を考えているなら、面談の前に次の3つを軽く整理しておくと、話がスムーズに進みます。
+
+- **転職したい時期の目安**（例：「3か月以内に働き始めたい」）
+- **ゆずれない条件を1〜2個**（例：「土日休み」「通勤は片道1時間以内」）
+- **これまでの経歴の事実**（いつからいつまで、どんな仕事をしていたか）
+
+すべてを決めてから行く必要はありません。面談の前に決めておくこと・決めなくていいことは、[エージェント面談の前に決めておくこと・決めなくていいこと](/articles/agent-mendan-mae)にまとめています。', 'review', true, '2026-10-10'::timestamptz, '2026-10-10'::timestamptz, '2026-10-10'::timestamptz, 'プロジェクトオーナー（チャットで承認）', '2026-10-10'::timestamptz, '未経験の転職こそ転職エージェントに相談したほうがいい理由', 'はじめて・未経験の転職は、転職エージェントに相談しながら進めると迷う時間を減らせます。求人紹介・企業選び・書類添削・面接練習・日程や条件の調整など頼めること、求職者が原則無料のしくみ、使うときの注意点を紹介します。', array['tenshoku-service-chigai', 'agent-soudan-nani', 'agent-mendan-mae', 'mensetsu-renshu-pro', 'kigyou-erabi-soudan']::text[], '{}'::text[], array['mikeiken-shokushu']::text[], array['hajimete', 'seishain-keiken-sukunai']::text[], array['はじめての転職、', 'ひとりで進める？']::text[], null, false, '[{"q":"転職エージェントは、本当に無料で使えるのですか？","a":"人材紹介会社（有料職業紹介事業者）は、職業安定法で、求職者から原則として手数料を受け取ってはいけないとされています。主に、人を採用した企業から手数料を受け取るしくみです。芸能家やモデルなど一部の職業には例外がありますが、はじめての転職や未経験の仕事への転職で当てはまることはあまりありません。料金がかかると言われたら、理由を確認しましょう。"},{"q":"紹介された求人には、全部応募しないといけませんか？","a":"応募するかどうかは自分で決めます。紹介された求人でも、条件や仕事内容が希望と合わなければ、理由を添えて断って構いません。「通勤が片道1時間を超えるので見送ります」のように理由を伝えると、次に紹介される求人が希望に近づきやすくなります。"},{"q":"担当のキャリアアドバイザーと合わないと感じたら、どうすればいいですか？","a":"まずは「土日休みを最優先にしたい」など、希望をあらためて具体的に伝えてみましょう。それでも話がかみ合わないときは、担当者を変えてもらえるか問い合わせる方法もあります。ひとつの相談先にこだわらず、ハローワークなど別の窓口とあわせて使うのもひとつの方法です。"}]'::jsonb, null, '{"schema_version":2,"writer_agent":"career-writer","angle":"既存の tenshoku-service-chigai（3つのサービスのしくみの違い）と agent-soudan-nani（相談の言い方）と役割を分け、「はじめて・未経験の転職で、なぜ相談しながら進めたほうがいいか」に絞る。ひとりで進める場合との違いを図解で見せ、注意点（合わない担当者・すすめられた求人をそのまま受けない・応募は自分で決める）も短く正直に書いたうえで、前向きな使い方で結ぶ。特定の会社名・サービス名は書かない","quotes":[{"source_url":"https://laws.e-gov.go.jp/law/322AC0000000141","text":"第三十二条の三で、有料職業紹介事業者は求職者から原則として手数料を徴収してはならず、求職者の利益のために必要と認められるときとして厚生労働省令で定めるときに限り例外があるとされている（要約）。e-Gov と mhlw.go.jp に直接接続できなかったため、厚生労働省の資料が「有料職業紹介事業者は、求職者から原則として手数料を徴収してはならない（第32条の3）」と説明している検索結果と、施行規則第20条で芸能家・モデルなどが例外とされているとの検索結果で確認した","used_in":"求職者は原則無料。お金はどこから出ている？"},{"source_url":"https://www.mhlw.go.jp/content/000851397.pdf","text":"求職者向けリーフレット。人材サービス総合サイトに許可事業者として記載があるか、手数料や就職実績が公開されているかを確認するよう案内している（PDF に直接接続できなかったため、検索結果に表示された内容で確認）","used_in":"求職者は原則無料。お金はどこから出ている？"},{"source_url":"https://jinzai.hellowork.mhlw.go.jp/JinzaiWeb/","text":"厚生労働省の人材サービス総合サイト。職業紹介事業・労働者派遣事業などを行う事業者を検索できる（既存の公開記事で使っている URL。今回は検索結果に表示された同サイトの手数料表ページで、許可番号ごとに事業者情報が掲載されていることを確認）","used_in":"求職者は原則無料。お金はどこから出ている？"}],"not_used":["転職エージェントを使った人の内定率・満足度・年収の変化などの数字は、公的な根拠がなく、成果を約束する表現にもなるため書かない","求職者から手数料を受け取れる例外のうち、年収要件のある職業（経営管理者など）の金額は、今回の読者にほぼ関係がなく、施行規則の原文を直接確認できなかったため書かない","紹介手数料の相場（理論年収の〇％など）は事業者ごとに違い、公的な一般値を確認できなかったので書かない","サポートの範囲（面接練習の有無など）は事業者によって違うため、一般的な例として書き、最初に確認するようすすめた","利用者の体験談・口コミは使っていない"]}'::jsonb) on conflict (slug) do nothing;
+insert into article_categories (article_id, category_id, is_primary) select a.id, c.id, true from articles a, categories c where a.slug = 'tenshoku-agent-merit' and c.slug = 'junbi' on conflict do nothing;
+insert into article_categories (article_id, category_id, is_primary) select a.id, c.id, false from articles a, categories c where a.slug = 'tenshoku-agent-merit' and c.slug = 'mikeiken' on conflict do nothing;
+insert into article_sources (article_id, title, publisher, url, accessed_at, used_for, sort_order) select id, '職業安定法（昭和二十二年法律第百四十一号）', 'e-Gov法令検索（デジタル庁）', 'https://laws.e-gov.go.jp/law/322AC0000000141', '2026-10-10'::date, '有料職業紹介事業者は、求職者から原則として手数料を徴収してはならないこと（第32条の3）。例外は厚生労働省令で定める場合に限られること', 0 from articles where slug = 'tenshoku-agent-merit';
+insert into article_sources (article_id, title, publisher, url, accessed_at, used_for, sort_order) select id, '職業紹介事業者を利用するときに知っておきたいこと（求職者の皆さまへ）', '厚生労働省・都道府県労働局', 'https://www.mhlw.go.jp/content/000851397.pdf', '2026-10-10'::date, '人材サービス総合サイトで、許可を受けた事業者として載っているか、手数料や就職実績の情報が公開されているかを確認できること', 1 from articles where slug = 'tenshoku-agent-merit';
+insert into article_sources (article_id, title, publisher, url, accessed_at, used_for, sort_order) select id, '人材サービス総合サイト', '厚生労働省', 'https://jinzai.hellowork.mhlw.go.jp/JinzaiWeb/', '2026-10-10'::date, '職業紹介事業を行う事業者を、事業者名や許可番号から検索できること', 2 from articles where slug = 'tenshoku-agent-merit';
+insert into article_versions (article_id, version, title, summary, body_md, created_by) select id, 1, title, summary, body_md, 'seed' from articles where slug = 'tenshoku-agent-merit' on conflict do nothing;
+insert into article_reviews (article_id, version, reviewer, verdict, checks) select id, 1, 'プロジェクトオーナー（チャットで承認）', 'approved', '{"content_hash":"bf744f90e0e8224db4dda13c84b55dd337a74928ddb4e9da051f34c164626d95","findings":[]}'::jsonb from articles where slug = 'tenshoku-agent-merit';
+update articles set status = 'published' where slug = 'tenshoku-agent-merit';
+
 -- article: tenshoku-kaisu-kininaru (published)
 insert into articles (slug, kind, title, summary, body_md, status, featured, published_at, updated_at, reviewed_at, reviewed_by, information_checked_at, seo_title, seo_description, related_slugs, roles, concerns, situations, eyecatch, illustration, recommended, faq, news_meta, research_notes) values ('tenshoku-kaisu-kininaru', 'article', '転職回数が気になるときに整理したいこと｜説明のしかたと次の選び方', '短期間での離職や転職回数の多さが気になるときは、隠すよりも事実を整理し、次の職場で何を変えたいのかを説明できるようにしておくことが大切です。経歴の整理のしかたと、伝え方の型を紹介します。', '「転職回数が多いと、書類で落とされるのでは」「短期間で辞めた経歴をどう説明すればいいか分からない」。こうした不安から、転職活動そのものに踏み出せなくなる人は少なくありません。
 
@@ -10924,7 +11347,7 @@ items:
 - **ハローワークの求人**の場合は、求人票と説明が違うことをハローワークの窓口に申し出られます
 - 入社前後の条件のことで困ったら、都道府県労働局や労働基準監督署などにある**総合労働相談コーナー**でも相談できます
 
-入社前に少し手間をかけて確かめておけば、入社してからの「こんなはずじゃなかった」を減らせます。', 'review', false, '2026-10-09'::timestamptz, '2026-10-09'::timestamptz, '2026-10-09'::timestamptz, 'プロジェクトオーナー（チャットで承認）', '2026-10-09'::timestamptz, '転職で後悔しないために入社前に確認したいこと｜労働条件', '入社後に「聞いていた話と違う」とならないための確認ポイントを紹介します。労働基準法第15条の労働条件の明示、労働条件通知書と求人票の照らし合わせ方、休日・残業・試用期間・配属で見るところ、違いがあったときの聞き方と相談先が分かります。', array['naitei-shodaku-mae', 'shiyou-kikan', 'nenshu-dake-erabanai', 'koteizangyo-kyujin', 'naitei-jitai-tsutaekata', 'naitei-go-junbi', 'tenkin-kinmuchi-kakunin']::text[], '{}'::text[], array['donichi', 'kyuryo', 'seishain']::text[], array['hajimete', 'dainishinsotsu']::text[], array['入社してから', '「話が違う」を防ぐ']::text[], null, false, '[{"q":"労働条件通知書をもらえないまま入社日が近づいています。どうすればいいですか？","a":"労働基準法第15条では、会社は労働契約を結ぶときに、賃金や労働時間などの労働条件を示さなければならないとされています。「入社前に、労働条件を書面で確認させていただけますか」と採用担当者にお願いしてみましょう。それでも示されないときは、総合労働相談コーナーやハローワークに相談できます。"},{"q":"求人票と労働条件通知書の内容が違います。どちらが正しいのですか？","a":"厚生労働省の「確かめよう労働条件」では、求人票と説明が違う場合は、まずその違いが生じた理由を確かめることが第一とされています。書きまちがいのこともあれば、条件が変わっていることもあります。承諾の前に理由を聞き、納得できる説明がなければ返事を急がないようにしましょう。ハローワークの求人なら、ハローワークの窓口に申し出られます。"},{"q":"入社してから、条件が説明と違うと分かったらどうなりますか？","a":"労働基準法第15条では、示された労働条件が事実と違う場合、働く人はすぐに労働契約を解除できるとされています。ただ、辞める前に、まず会社に確認し、話し合いで解決できないかを考えましょう。どう動けばいいか迷ったら、総合労働相談コーナーで相談できます。"}]'::jsonb, null, '{"schema_version":2,"writer_agent":"career-writer","angle":"「後悔しない」を気持ちの問題ではなく、入社前に書面で何を確かめるかに落とし込む。労働基準法第15条を軸に、求人票→面接→労働条件通知書の順に照らし合わせる方法と、休日・残業・試用期間・配属の見るところを示す","quotes":[{"source_url":"https://laws.e-gov.go.jp/law/322AC0000000049","text":"第十五条第一項「使用者は、労働契約の締結に際し、労働者に対して賃金、労働時間その他の労働条件を明示しなければならない。この場合において、賃金及び労働時間に関する事項その他の厚生労働省令で定める事項については、厚生労働省令で定める方法により明示しなければならない。」第二項「前項の規定によつて明示された労働条件が事実と相違する場合においては、労働者は、即時に労働契約を解除することができる。」（e-Gov に直接接続できなかったため、WebSearch の検索結果に表示された条文の記述で確認。書面で明示する事項の内容は、検索結果に表示された労働基準法施行規則第5条の記述で確認）","used_in":"会社には、労働条件を示す決まりがある"},{"source_url":"https://www.mhlw.go.jp/content/001114167.pdf","text":"2024年4月から、募集広告や職業紹介を受ける際に、求人企業などから明示される労働条件が追加される（従事すべき業務の変更の範囲、就業場所の変更の範囲など）（直接接続できなかったため、検索結果に表示された資料の題名と記述で確認）","used_in":"配属：最初の仕事と「変更の範囲」"},{"source_url":"https://muki.mhlw.go.jp/rule.html","text":"労働契約の締結時と有期労働契約の更新時に、雇入れ直後の就業場所・業務に加えて、変更の範囲を明示。対象はパート・アルバイト、契約社員、派遣労働者なども含むすべての労働者。臨時の応援業務や出張、研修など一時的な変更先は含まれない（直接接続できなかったため、検索結果に表示された記述で確認）","used_in":"配属：最初の仕事と「変更の範囲」"},{"source_url":"https://www.check-roudou.mhlw.go.jp/qa/roudousya/koyou/q5.html","text":"求人票と面接時の説明が違う場合、まずその違いが生じた理由を確かめることが第一。ハローワークの求人の場合は、ハローワークの窓口に申し出ることができ、ハローワークが事実確認と必要な指導を行う。募集時に示した条件を変更する場合は、変更内容を明示する（直接接続できなかったため、検索結果に表示された記述で確認）","used_in":"求人票と違うところがあったら"}],"not_used":["労働条件の明示義務違反の罰則（罰金の額）は、読者がとる行動に直接関わらないため書かない","求人票の記載が契約内容になるとした裁判例は、個別の事情で判断が分かれるため紹介せず、「まず理由を確かめる」「相談する」にとどめた","「入社後に条件が違ったら即日辞められる」と受け取られないよう、労働基準法第15条第2項はFAQで触れ、まず会社に確認・相談することを先に書いた"]}'::jsonb) on conflict (slug) do nothing;
+入社前に少し手間をかけて確かめておけば、入社してからの「こんなはずじゃなかった」を減らせます。', 'review', false, '2026-10-09'::timestamptz, '2026-10-09'::timestamptz, '2026-10-09'::timestamptz, 'プロジェクトオーナー（チャットで承認）', '2026-10-09'::timestamptz, '転職で後悔しないために入社前に確認したいこと｜労働条件', '入社後に「聞いていた話と違う」とならないための確認ポイントを紹介します。労働基準法第15条の労働条件の明示、労働条件通知書と求人票の照らし合わせ方、休日・残業・試用期間・配属で見るところ、違いがあったときの聞き方と相談先が分かります。', array['naitei-shodaku-mae', 'shiyou-kikan', 'nenshu-dake-erabanai', 'koteizangyo-kyujin', 'naitei-jitai-tsutaekata', 'naitei-go-junbi', 'tenkin-kinmuchi-kakunin', 'kigyou-erabi-soudan']::text[], '{}'::text[], array['donichi', 'kyuryo', 'seishain']::text[], array['hajimete', 'dainishinsotsu']::text[], array['入社してから', '「話が違う」を防ぐ']::text[], null, false, '[{"q":"労働条件通知書をもらえないまま入社日が近づいています。どうすればいいですか？","a":"労働基準法第15条では、会社は労働契約を結ぶときに、賃金や労働時間などの労働条件を示さなければならないとされています。「入社前に、労働条件を書面で確認させていただけますか」と採用担当者にお願いしてみましょう。それでも示されないときは、総合労働相談コーナーやハローワークに相談できます。"},{"q":"求人票と労働条件通知書の内容が違います。どちらが正しいのですか？","a":"厚生労働省の「確かめよう労働条件」では、求人票と説明が違う場合は、まずその違いが生じた理由を確かめることが第一とされています。書きまちがいのこともあれば、条件が変わっていることもあります。承諾の前に理由を聞き、納得できる説明がなければ返事を急がないようにしましょう。ハローワークの求人なら、ハローワークの窓口に申し出られます。"},{"q":"入社してから、条件が説明と違うと分かったらどうなりますか？","a":"労働基準法第15条では、示された労働条件が事実と違う場合、働く人はすぐに労働契約を解除できるとされています。ただ、辞める前に、まず会社に確認し、話し合いで解決できないかを考えましょう。どう動けばいいか迷ったら、総合労働相談コーナーで相談できます。"}]'::jsonb, null, '{"schema_version":2,"writer_agent":"career-writer","angle":"「後悔しない」を気持ちの問題ではなく、入社前に書面で何を確かめるかに落とし込む。労働基準法第15条を軸に、求人票→面接→労働条件通知書の順に照らし合わせる方法と、休日・残業・試用期間・配属の見るところを示す","quotes":[{"source_url":"https://laws.e-gov.go.jp/law/322AC0000000049","text":"第十五条第一項「使用者は、労働契約の締結に際し、労働者に対して賃金、労働時間その他の労働条件を明示しなければならない。この場合において、賃金及び労働時間に関する事項その他の厚生労働省令で定める事項については、厚生労働省令で定める方法により明示しなければならない。」第二項「前項の規定によつて明示された労働条件が事実と相違する場合においては、労働者は、即時に労働契約を解除することができる。」（e-Gov に直接接続できなかったため、WebSearch の検索結果に表示された条文の記述で確認。書面で明示する事項の内容は、検索結果に表示された労働基準法施行規則第5条の記述で確認）","used_in":"会社には、労働条件を示す決まりがある"},{"source_url":"https://www.mhlw.go.jp/content/001114167.pdf","text":"2024年4月から、募集広告や職業紹介を受ける際に、求人企業などから明示される労働条件が追加される（従事すべき業務の変更の範囲、就業場所の変更の範囲など）（直接接続できなかったため、検索結果に表示された資料の題名と記述で確認）","used_in":"配属：最初の仕事と「変更の範囲」"},{"source_url":"https://muki.mhlw.go.jp/rule.html","text":"労働契約の締結時と有期労働契約の更新時に、雇入れ直後の就業場所・業務に加えて、変更の範囲を明示。対象はパート・アルバイト、契約社員、派遣労働者なども含むすべての労働者。臨時の応援業務や出張、研修など一時的な変更先は含まれない（直接接続できなかったため、検索結果に表示された記述で確認）","used_in":"配属：最初の仕事と「変更の範囲」"},{"source_url":"https://www.check-roudou.mhlw.go.jp/qa/roudousya/koyou/q5.html","text":"求人票と面接時の説明が違う場合、まずその違いが生じた理由を確かめることが第一。ハローワークの求人の場合は、ハローワークの窓口に申し出ることができ、ハローワークが事実確認と必要な指導を行う。募集時に示した条件を変更する場合は、変更内容を明示する（直接接続できなかったため、検索結果に表示された記述で確認）","used_in":"求人票と違うところがあったら"}],"not_used":["労働条件の明示義務違反の罰則（罰金の額）は、読者がとる行動に直接関わらないため書かない","求人票の記載が契約内容になるとした裁判例は、個別の事情で判断が分かれるため紹介せず、「まず理由を確かめる」「相談する」にとどめた","「入社後に条件が違ったら即日辞められる」と受け取られないよう、労働基準法第15条第2項はFAQで触れ、まず会社に確認・相談することを先に書いた"]}'::jsonb) on conflict (slug) do nothing;
 insert into article_categories (article_id, category_id, is_primary) select a.id, c.id, true from articles a, categories c where a.slug = 'tenshoku-koukai-shinai' and c.slug = 'junbi' on conflict do nothing;
 insert into article_categories (article_id, category_id, is_primary) select a.id, c.id, false from articles a, categories c where a.slug = 'tenshoku-koukai-shinai' and c.slug = 'hatarakikata' on conflict do nothing;
 insert into article_sources (article_id, title, publisher, url, accessed_at, used_for, sort_order) select id, '労働基準法（昭和二十二年法律第四十九号）第十五条', 'e-Gov法令検索（デジタル庁）', 'https://laws.e-gov.go.jp/law/322AC0000000049', '2026-10-09'::date, '使用者は労働契約の締結に際し、賃金・労働時間その他の労働条件を明示しなければならないこと。厚生労働省令で定める事項は省令で定める方法（書面の交付が原則）で明示すること。明示された労働条件が事実と相違する場合、労働者は即時に労働契約を解除できること', 0 from articles where slug = 'tenshoku-koukai-shinai';
@@ -11478,7 +11901,7 @@ items:
 
 複数のサービスを使うときは、**どの求人に、どこから応募したか**を一覧にしておきましょう。同じ求人に別のルートから重ねて応募すると、企業側が混乱することがあります。
 
-面談の前に何を決めておけばいいかは[エージェント面談の前に決めておくこと・決めなくていいこと](/articles/agent-mendan-mae)にまとめています。相談の前に希望条件を整理したいときは、[条件整理チェック](/check)も使ってみてください。', 'review', false, '2026-10-09'::timestamptz, '2026-10-09'::timestamptz, '2026-10-09'::timestamptz, 'プロジェクトオーナー（チャットで承認）', '2026-10-07'::timestamptz, '転職サイト・転職エージェント・ハローワークの違いと使い分け', '転職サイト、転職エージェント、ハローワークは何が違う？それぞれのしくみと向いている使い方、人材紹介は求職者から原則手数料を取らないという職業安定法のルール、人材サービス総合サイトで許可番号を確かめる方法を紹介します。', array['agent-soudan-nani', 'agent-mendan-mae', 'freeter-seishain-hajimeni', 'hellowork-tsukaikata']::text[], '{}'::text[], array['yaritai']::text[], array['hajimete']::text[], array['転職サイト？エージェント？', 'ハローワーク？']::text[], null, false, '[{"q":"転職エージェントは無料と聞きますが、なぜ無料なのですか？","a":"人材紹介会社（有料職業紹介事業者）は、主に求人を出している企業から手数料を受け取っているからです。職業安定法では、有料職業紹介事業者は求職者から原則として手数料を受け取ってはいけないとされています。例外は、芸能家・モデルや、年収700万円を超える経営管理者・科学技術者・熟練技能者などに限られています。"},{"q":"転職サイトと転職エージェントは、両方使ってもいいですか？","a":"使って構いません。ハローワークもあわせて、どれか一つに絞る必要はありません。ただし、同じ求人に別のルートから重ねて応募すると、企業側が混乱することがあります。どの求人に、どこから応募したかを一覧にして管理しましょう。"},{"q":"登録した転職エージェントが、本当に許可を受けているか心配です。","a":"厚生労働省の「人材サービス総合サイト」で、事業者の名前や許可番号を入れて検索できます。許可を受けた職業紹介事業者であれば、許可番号や事業所の情報が表示されます。登録する前に確かめておくと安心です。"}]'::jsonb, null, '{"schema_version":2,"writer_agent":"career-writer","angle":"3つのサービスを「だれが運営し、どこからお金が出て、どこまで手伝ってくれるか」で比べる。人材紹介の手数料ルールと許可の確かめ方を、公的な資料にもとづいて書く。特定の企業・サービスはすすめない","quotes":[{"source_url":"https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/koyou_roudou/koyou/hellowork.html","text":"ハローワーク（公共職業安定所）は、仕事を探す人や求人事業主に対して、さまざまなサービスを無償で提供する、国（厚生労働省）が運営する総合的雇用サービス機関。職業紹介のほか、雇用保険、雇用対策などの国の制度を組み合わせた支援を行う","used_in":"ハローワーク：国が運営する、無料の窓口"},{"source_url":"https://www.hellowork.mhlw.go.jp/member/mem_possible.html","text":"求職者マイページを開設すると、自宅のパソコン等から求人情報検索、オンライン自主応募、求職活動状況の確認などができる","used_in":"ハローワーク：国が運営する、無料の窓口"},{"source_url":"https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/boshuujouhouteikyou.html","text":"募集情報等提供事業には求人サイト・求人情報誌などが該当する。労働者になろうとする者に関する情報を収集する特定募集情報等提供事業者は、厚生労働大臣への届出が必要（2022年10月1日施行の改正職業安定法）","used_in":"転職サイト：自分で探して、自分で応募する"},{"source_url":"https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/0000172497_00003.html","text":"令和4年10月1日施行の改正により、特定募集情報等提供事業を行う者は、職業安定法第43条の2第1項に基づき厚生労働大臣への届出が必要","used_in":"転職サイト：自分で探して、自分で応募する"},{"source_url":"https://jsite.mhlw.go.jp/ishikawa-roudoukyoku/hourei_seido_tetsuzuki/roudousha_haken/syoukai_gaiyou.html","text":"職業紹介とは、求人及び求職の申込みを受け、求人者と求職者との間における雇用関係の成立をあっせんすること（職業安定法第4条第1項）。有料職業紹介事業は、職業安定法第30条第1項の厚生労働大臣の許可を受けて行うことができる","used_in":"転職エージェント：担当者が間に入る「人材紹介」"},{"source_url":"https://jsite.mhlw.go.jp/osaka-roudoukyoku/hourei_seido_tetsuzuki/yuryou_muryou_shokugyou/hourei_seido/gaiyou.html","text":"有料職業紹介事業者が徴収できる手数料は限られている。求職者手数料は「芸能家」「モデル」「経営管理者」「科学技術者」「熟練技能者」の職業に限られ、後の3つは紹介により就職した職業の賃金が年収700万円またはこれに相当する額を超える場合に限る","used_in":"人材紹介は、求職者から原則として手数料を取らない"},{"source_url":"https://jinzai.hellowork.mhlw.go.jp/JinzaiWeb/","text":"厚生労働省の人材サービス総合サイト。労働者派遣事業、職業紹介事業、特定募集情報等提供事業を行う事業者を検索できる。職業紹介事業の詳細ページは「13-ユ-」で始まるような許可番号ごとに表示される","used_in":"許可を受けているかの確かめ方"},{"source_url":"https://www.mhlw.go.jp/file/06-Seisakujouhou-11600000-Shokugyouanteikyoku/0000171018_2.pdf","text":"職業紹介事業者は、人材サービス総合サイトで、就職者数、無期雇用就職者数、そのうち6か月以内に解雇以外の理由で離職した者の数、手数料に関する事項、返戻金制度の有無などの情報提供が義務付けられる","used_in":"許可を受けているかの確かめ方"},{"source_url":"https://jsite.mhlw.go.jp/tokyo-roudoukyoku/news_topics/jyukyuuchousei_030303.html","text":"職業安定法に基づく指針の改正により、2021年4月1日から、「就職お祝い金」などの名目で求職者に金銭等を提供して求職の申込みの勧奨を行うことが禁止された","used_in":"許可を受けているかの確かめ方"}],"not_used":["サービスごとの求人数、利用者数、内定率などの数字は公的な根拠がなく、比較にもなりやすいため書かない","特定の転職サイト・転職エージェントの名前や評判は書かない","紹介手数料の相場（理論年収の〇％など）は、事業者ごとに違い、公的な一般値を確認できなかったので書かない","求職受付手数料の具体的な金額（1件あたりの上限額）は、税率等で変わり、読者に関係が薄いため書かない"]}'::jsonb) on conflict (slug) do nothing;
+面談の前に何を決めておけばいいかは[エージェント面談の前に決めておくこと・決めなくていいこと](/articles/agent-mendan-mae)にまとめています。相談の前に希望条件を整理したいときは、[条件整理チェック](/check)も使ってみてください。', 'review', false, '2026-10-09'::timestamptz, '2026-10-09'::timestamptz, '2026-10-09'::timestamptz, 'プロジェクトオーナー（チャットで承認）', '2026-10-07'::timestamptz, '転職サイト・転職エージェント・ハローワークの違いと使い分け', '転職サイト、転職エージェント、ハローワークは何が違う？それぞれのしくみと向いている使い方、人材紹介は求職者から原則手数料を取らないという職業安定法のルール、人材サービス総合サイトで許可番号を確かめる方法を紹介します。', array['agent-soudan-nani', 'agent-mendan-mae', 'freeter-seishain-hajimeni', 'hellowork-tsukaikata', 'tenshoku-agent-merit']::text[], '{}'::text[], array['yaritai']::text[], array['hajimete']::text[], array['転職サイト？エージェント？', 'ハローワーク？']::text[], null, false, '[{"q":"転職エージェントは無料と聞きますが、なぜ無料なのですか？","a":"人材紹介会社（有料職業紹介事業者）は、主に求人を出している企業から手数料を受け取っているからです。職業安定法では、有料職業紹介事業者は求職者から原則として手数料を受け取ってはいけないとされています。例外は、芸能家・モデルや、年収700万円を超える経営管理者・科学技術者・熟練技能者などに限られています。"},{"q":"転職サイトと転職エージェントは、両方使ってもいいですか？","a":"使って構いません。ハローワークもあわせて、どれか一つに絞る必要はありません。ただし、同じ求人に別のルートから重ねて応募すると、企業側が混乱することがあります。どの求人に、どこから応募したかを一覧にして管理しましょう。"},{"q":"登録した転職エージェントが、本当に許可を受けているか心配です。","a":"厚生労働省の「人材サービス総合サイト」で、事業者の名前や許可番号を入れて検索できます。許可を受けた職業紹介事業者であれば、許可番号や事業所の情報が表示されます。登録する前に確かめておくと安心です。"}]'::jsonb, null, '{"schema_version":2,"writer_agent":"career-writer","angle":"3つのサービスを「だれが運営し、どこからお金が出て、どこまで手伝ってくれるか」で比べる。人材紹介の手数料ルールと許可の確かめ方を、公的な資料にもとづいて書く。特定の企業・サービスはすすめない","quotes":[{"source_url":"https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/koyou_roudou/koyou/hellowork.html","text":"ハローワーク（公共職業安定所）は、仕事を探す人や求人事業主に対して、さまざまなサービスを無償で提供する、国（厚生労働省）が運営する総合的雇用サービス機関。職業紹介のほか、雇用保険、雇用対策などの国の制度を組み合わせた支援を行う","used_in":"ハローワーク：国が運営する、無料の窓口"},{"source_url":"https://www.hellowork.mhlw.go.jp/member/mem_possible.html","text":"求職者マイページを開設すると、自宅のパソコン等から求人情報検索、オンライン自主応募、求職活動状況の確認などができる","used_in":"ハローワーク：国が運営する、無料の窓口"},{"source_url":"https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/boshuujouhouteikyou.html","text":"募集情報等提供事業には求人サイト・求人情報誌などが該当する。労働者になろうとする者に関する情報を収集する特定募集情報等提供事業者は、厚生労働大臣への届出が必要（2022年10月1日施行の改正職業安定法）","used_in":"転職サイト：自分で探して、自分で応募する"},{"source_url":"https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/0000172497_00003.html","text":"令和4年10月1日施行の改正により、特定募集情報等提供事業を行う者は、職業安定法第43条の2第1項に基づき厚生労働大臣への届出が必要","used_in":"転職サイト：自分で探して、自分で応募する"},{"source_url":"https://jsite.mhlw.go.jp/ishikawa-roudoukyoku/hourei_seido_tetsuzuki/roudousha_haken/syoukai_gaiyou.html","text":"職業紹介とは、求人及び求職の申込みを受け、求人者と求職者との間における雇用関係の成立をあっせんすること（職業安定法第4条第1項）。有料職業紹介事業は、職業安定法第30条第1項の厚生労働大臣の許可を受けて行うことができる","used_in":"転職エージェント：担当者が間に入る「人材紹介」"},{"source_url":"https://jsite.mhlw.go.jp/osaka-roudoukyoku/hourei_seido_tetsuzuki/yuryou_muryou_shokugyou/hourei_seido/gaiyou.html","text":"有料職業紹介事業者が徴収できる手数料は限られている。求職者手数料は「芸能家」「モデル」「経営管理者」「科学技術者」「熟練技能者」の職業に限られ、後の3つは紹介により就職した職業の賃金が年収700万円またはこれに相当する額を超える場合に限る","used_in":"人材紹介は、求職者から原則として手数料を取らない"},{"source_url":"https://jinzai.hellowork.mhlw.go.jp/JinzaiWeb/","text":"厚生労働省の人材サービス総合サイト。労働者派遣事業、職業紹介事業、特定募集情報等提供事業を行う事業者を検索できる。職業紹介事業の詳細ページは「13-ユ-」で始まるような許可番号ごとに表示される","used_in":"許可を受けているかの確かめ方"},{"source_url":"https://www.mhlw.go.jp/file/06-Seisakujouhou-11600000-Shokugyouanteikyoku/0000171018_2.pdf","text":"職業紹介事業者は、人材サービス総合サイトで、就職者数、無期雇用就職者数、そのうち6か月以内に解雇以外の理由で離職した者の数、手数料に関する事項、返戻金制度の有無などの情報提供が義務付けられる","used_in":"許可を受けているかの確かめ方"},{"source_url":"https://jsite.mhlw.go.jp/tokyo-roudoukyoku/news_topics/jyukyuuchousei_030303.html","text":"職業安定法に基づく指針の改正により、2021年4月1日から、「就職お祝い金」などの名目で求職者に金銭等を提供して求職の申込みの勧奨を行うことが禁止された","used_in":"許可を受けているかの確かめ方"}],"not_used":["サービスごとの求人数、利用者数、内定率などの数字は公的な根拠がなく、比較にもなりやすいため書かない","特定の転職サイト・転職エージェントの名前や評判は書かない","紹介手数料の相場（理論年収の〇％など）は、事業者ごとに違い、公的な一般値を確認できなかったので書かない","求職受付手数料の具体的な金額（1件あたりの上限額）は、税率等で変わり、読者に関係が薄いため書かない"]}'::jsonb) on conflict (slug) do nothing;
 insert into article_categories (article_id, category_id, is_primary) select a.id, c.id, true from articles a, categories c where a.slug = 'tenshoku-service-chigai' and c.slug = 'junbi' on conflict do nothing;
 insert into article_categories (article_id, category_id, is_primary) select a.id, c.id, false from articles a, categories c where a.slug = 'tenshoku-service-chigai' and c.slug = 'mikeiken' on conflict do nothing;
 insert into article_sources (article_id, title, publisher, url, accessed_at, used_for, sort_order) select id, 'ハローワーク', '厚生労働省', 'https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/koyou_roudou/koyou/hellowork.html', '2026-10-07'::date, 'ハローワークは国（厚生労働省）が運営し、職業紹介・雇用保険・雇用対策などのサービスを無償で提供していること', 0 from articles where slug = 'tenshoku-service-chigai';

@@ -6,9 +6,10 @@ import { ClipboardList, MessageCircle } from "lucide-react";
 
 /**
  * スマホで記事を読み進めたときだけ下部に出る「次の一歩」。
- * いきなり申し込みをすすめず、まず自分で整理する道（条件整理チェック）と、相談の説明を並べる。
+ * プロへの相談（申し込み）と、自分で整理する道（条件整理チェック）を並べる。
+ * 申し込みのリンク先はサーバー側で作って渡す（本番送客が無効な間はサイト内の説明ページ）。
  */
-export function MobileStickyCta({ contentSlug }: { contentSlug?: string }) {
+export function MobileStickyCta({ contentSlug, consultHref = "/consultation" }: { contentSlug?: string; consultHref?: string }) {
   const [visible, setVisible] = useState(false);
   useEffect(() => {
     const onScroll = () => setVisible(window.scrollY > 900);
@@ -24,14 +25,14 @@ export function MobileStickyCta({ contentSlug }: { contentSlug?: string }) {
       }`}
       aria-hidden={!visible}
     >
-      <div className="grid grid-cols-2 gap-2">
-        <Link href="/check" tabIndex={tab} data-cta-placement="article-sticky" data-cta-kind="check" data-content-slug={contentSlug} className="flex items-center justify-center gap-1.5 rounded-full bg-brand py-2.5 text-[13.5px] font-bold text-white">
-          <ClipboardList className="h-4 w-4" aria-hidden="true" />
-          条件を整理する
-        </Link>
-        <Link href="/consultation" tabIndex={tab} data-cta-placement="article-sticky" data-cta-kind="consultation-info" data-content-slug={contentSlug} className="flex items-center justify-center gap-1.5 rounded-full border border-line-strong bg-white py-2.5 text-[13.5px] font-bold text-ink">
+      <div className="grid grid-cols-[minmax(0,1.25fr)_minmax(0,1fr)] gap-2">
+        <a href={consultHref} tabIndex={tab} data-cta-placement="article-sticky" data-cta-kind="consultation-apply" data-content-slug={contentSlug} className="flex items-center justify-center gap-1.5 rounded-full bg-accent py-2.5 text-[13.5px] font-bold text-white">
           <MessageCircle className="h-4 w-4" aria-hidden="true" />
-          相談について
+          プロに相談する
+        </a>
+        <Link href="/check" tabIndex={tab} data-cta-placement="article-sticky" data-cta-kind="check" data-content-slug={contentSlug} className="flex items-center justify-center gap-1.5 rounded-full border border-line-strong bg-white py-2.5 text-[13.5px] font-bold text-ink">
+          <ClipboardList className="h-4 w-4" aria-hidden="true" />
+          条件を整理
         </Link>
       </div>
     </div>

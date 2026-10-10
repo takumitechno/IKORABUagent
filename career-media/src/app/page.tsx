@@ -1,12 +1,13 @@
 import Link from "next/link";
-import { ArrowRight, ClipboardList, FileText, ListChecks, Search, ShieldCheck } from "lucide-react";
+import { ArrowRight, Building2, ClipboardList, FileText, ListChecks, MessagesSquare, Search, ShieldCheck } from "lucide-react";
 import { JourneyCards } from "@/components/Journey";
 import { ArticleList, ArticleRow, LeadCard } from "@/components/ArticleCards";
-import { ConsultationCta } from "@/components/ConsultationCta";
+import { ConsultButton, ConsultationCta } from "@/components/ConsultationCta";
 import { ExploreTabs } from "@/components/EntryGrid";
 import { GeneratedImage } from "@/components/GeneratedImage";
 import { Illustration } from "@/components/Illustration";
 import { JobPostingDiagram, ProcessFlow } from "@/components/HomeDiagrams";
+import { ProValueSection } from "@/components/ProValue";
 import { LevelMeter } from "@/components/LevelMeter";
 import { JsonLd } from "@/components/JsonLd";
 import { Roadmap, type RoadmapStep } from "@/components/Roadmap";
@@ -88,7 +89,7 @@ export default async function HomePage() {
               <br className="sm:hidden" />
               <span className="text-[#ffe08a]">何から決めればいい？</span>
             </h1>
-            <p className="mt-3 text-[15px] leading-7 text-white/85 sm:text-base">仕事・給料・休みのことを、一つずつ整理できるガイドです。</p>
+            <p className="mt-3 text-[15px] leading-7 text-white/85 sm:text-base">会社選びから面接の練習まで、転職のプロに相談しながら進められます。まずは記事とチェックで、自分の条件を整理しましょう。</p>
 
             {/* スマホ: 人物のイラストの下半分に検索ボックスを重ねる */}
             <div className="relative mx-auto -mb-16 -mt-2 w-[280px] md:hidden">
@@ -118,16 +119,17 @@ export default async function HomePage() {
               </ul>
             </form>
 
-            <div className="mt-5 grid grid-cols-2 gap-2.5 sm:flex sm:flex-wrap">
-              <Link href={guideHref} className="tap inline-flex items-center justify-center gap-1.5 rounded-xl bg-white px-4 py-3 text-[14px] font-bold text-brand-strong hover:bg-brand-tint sm:px-5">
-                仕事の探し方
-                <ArrowRight className="h-4 w-4" aria-hidden="true" />
-              </Link>
-              <Link href="/check" className="tap inline-flex items-center justify-center gap-1.5 rounded-xl px-4 py-3 text-[14px] font-bold text-white ring-1 ring-white/50 hover:bg-white/10 sm:px-5">
+            <div className="mt-5 grid grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)] gap-2.5 sm:flex sm:flex-wrap">
+              <ConsultButton placement="home-hero" label="プロに相談する" />
+              <Link href="/check" className="tap inline-flex items-center justify-center gap-1.5 rounded-full bg-white px-4 py-3 text-[14px] font-bold text-brand-strong hover:bg-brand-tint sm:px-5">
                 <ClipboardList className="h-4 w-4" aria-hidden="true" />
                 条件整理チェック
               </Link>
             </div>
+            <Link href={guideHref} className="mt-3 inline-flex items-center gap-1 text-[13px] font-bold text-white/85 hover:text-white">
+              まずは仕事の探し方を読む
+              <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
+            </Link>
           </div>
 
           {/* 右側: 人物（写真を採用したら写真）と、このサイトでできることの小さなカード */}
@@ -138,6 +140,11 @@ export default async function HomePage() {
       </section>
 
       <div className="mx-auto max-w-6xl space-y-16 px-4 pt-10 sm:px-6 sm:pt-14">
+        {/* プロに頼むよさ（このサイトの目的: 整理したことをもとにキャリア相談 → 自分に合う会社へ）。ヒーローのすぐ下に置く */}
+        <section aria-labelledby="home-consult">
+          <ProValueSection has={has} />
+        </section>
+
         {/* 入口: 今の状況 / 悩み / 職種 */}
         <section aria-labelledby="home-explore">
           <SectionHeading eyebrow="FIND" title="自分に近いところから探す" id="home-explore" />
@@ -352,43 +359,33 @@ function HeroVisual() {
     <div className="relative mx-auto w-full max-w-[540px]">
       <GeneratedImage slug="hero-home" priority sizes="540px" className="h-auto w-full" fallback={<Illustration name="hero-people" priority className="h-auto w-full" />} />
       <div aria-hidden="true">
-        <div className={`${card} -left-[8%] top-[46%] w-[188px] p-3`}>
-          <p className="flex items-center gap-1.5 text-[11.5px] font-bold text-muted">
-            <span className="flex h-6 w-6 items-center justify-center rounded-lg bg-brand text-white">
-              <ListChecks className="h-3.5 w-3.5" />
+        <div className={`${card} -left-[8%] top-[44%] w-[196px] p-3`}>
+          <p className="flex items-center gap-1.5 text-[12.5px] font-bold text-ink">
+            <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-accent text-white">
+              <MessagesSquare className="h-4 w-4" />
             </span>
-            ゆずれない条件
+            面接の練習
+          </p>
+          <p className="mt-1.5 text-[11.5px] leading-5 text-muted">応募先に合わせた模擬面接で、本番の前に確かめる</p>
+        </div>
+        <div className={`${card} -right-[4%] top-[38%] w-[186px] p-3`}>
+          <p className="flex items-center gap-1.5 text-[12.5px] font-bold text-ink">
+            <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-brand text-white">
+              <Building2 className="h-4 w-4" />
+            </span>
+            企業選びの相談
           </p>
           <p className="mt-2 flex flex-wrap gap-1">
-            {["土日休み", "月給22万円以上", "残業少なめ"].map((c) => (
+            {["職場の雰囲気", "残業の実態", "研修"].map((c) => (
               <span key={c} className="rounded-md bg-brand-tint px-1.5 py-0.5 text-[11px] font-bold text-brand-strong">
                 {c}
               </span>
             ))}
           </p>
         </div>
-        <div className={`${card} -right-[4%] top-[42%] w-[176px] p-3`}>
-          <p className="text-[11.5px] font-bold text-muted">職種を比べる</p>
-          {(
-            [
-              ["事務", 2],
-              ["カスタマーサポート", 4],
-            ] as const
-          ).map(([name, n]) => (
-            <p key={name} className="mt-1.5 flex items-center justify-between gap-2 text-[11.5px] font-bold">
-              {name}
-              <span className="flex gap-0.5">
-                {[1, 2, 3, 4, 5].map((i) => (
-                  <span key={i} className={`h-1.5 w-1.5 rounded-full ${i <= n ? "bg-accent" : "bg-line-strong"}`} />
-                ))}
-              </span>
-            </p>
-          ))}
-          <p className="mt-1 text-right text-[10px] text-muted">人と話す量</p>
-        </div>
         <p className="absolute bottom-[9%] left-[4%] inline-flex items-center gap-1.5 rounded-full bg-accent px-3.5 py-2 text-[12.5px] font-bold text-white shadow-[0_12px_28px_-10px_rgb(0_0_0/0.5)]">
           <ShieldCheck className="h-4 w-4" />
-          無料・登録不要で使える
+          転職のプロに相談できる
         </p>
       </div>
     </div>

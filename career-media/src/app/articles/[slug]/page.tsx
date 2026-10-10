@@ -4,6 +4,7 @@ import { ClipboardList, Scale } from "lucide-react";
 import { ArticleHeader, EditorialNote, FaqSection, pickRelated, RelatedArticles, TocList } from "@/components/ArticleParts";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { ConsultationCta } from "@/components/ConsultationCta";
+import { buildConsultationUrl } from "@/lib/consultation";
 import { JsonLd } from "@/components/JsonLd";
 import { JourneyNav } from "@/components/Journey";
 import { TrackArticleView } from "@/components/MeasurementTracker";
@@ -62,7 +63,7 @@ export default async function ArticlePage({ params }: Props) {
             <div className="article-body mt-8" dangerouslySetInnerHTML={{ __html: sections[0] }} />
             {sections[1] && (
               <>
-                <ConsultationCta placement="article-inline" contentSlug={article.slug} variant="inline" />
+                <ConsultationCta placement="article-inline" contentSlug={article.slug} variant="inline" category={article.categories[0]} />
                 <div className="article-body" dangerouslySetInnerHTML={{ __html: sections[1] }} />
               </>
             )}
@@ -81,7 +82,7 @@ export default async function ArticlePage({ params }: Props) {
                   </div>
                 </nav>
               )}
-              <ConsultationCta placement="article-sidebar" contentSlug={article.slug} variant="compact" />
+              <ConsultationCta placement="article-sidebar" contentSlug={article.slug} variant="compact" category={article.categories[0]} />
               <div className="grid gap-2">
                 <Link href="/check" className="flex items-center gap-2 rounded-xl border border-line bg-white px-4 py-3 text-sm font-bold text-ink hover:border-brand/40 hover:text-brand-strong">
                   <ClipboardList className="h-4 w-4 text-brand" aria-hidden="true" />
@@ -97,11 +98,11 @@ export default async function ArticlePage({ params }: Props) {
         </div>
 
         <div className="mt-12">
-          <ConsultationCta placement="article-bottom" contentSlug={article.slug} />
+          <ConsultationCta placement="article-bottom" contentSlug={article.slug} category={article.categories[0]} />
         </div>
         <RelatedArticles articles={related} categories={categories} />
       </div>
-      <MobileStickyCta contentSlug={article.slug} />
+      <MobileStickyCta contentSlug={article.slug} consultHref={buildConsultationUrl("article-sticky", article.slug)} />
     </>
   );
 }
