@@ -5,7 +5,7 @@ import { ArticleList, ArticleRow, LeadCard } from "@/components/ArticleCards";
 import { ConsultButton, ConsultationCta } from "@/components/ConsultationCta";
 import { ExploreTabs } from "@/components/EntryGrid";
 import { GeneratedImage } from "@/components/GeneratedImage";
-import { Illustration } from "@/components/Illustration";
+import { HeroMockup, HeroMockupPeek } from "@/components/HeroMockup";
 import { JobPostingDiagram, ProcessFlow } from "@/components/HomeDiagrams";
 import { ProValueSection } from "@/components/ProValue";
 import { LevelMeter } from "@/components/LevelMeter";
@@ -27,9 +27,6 @@ export const metadata = pageMetadata({
   description: site.description,
   path: "/",
 });
-
-/** ヒーローの人物のイラスト（ブランドの色に合わせた版） */
-const HERO_ILLUSTRATION = partner.theme === "makecareer" ? "hero-people-mc" : "hero-people";
 
 /** ヒーローのメイン導線（自分に合う仕事の探し方） */
 const GUIDE_SLUG = "shigoto-sagashikata";
@@ -96,8 +93,8 @@ export default async function HomePage() {
             <p className="mt-3 text-[15px] leading-7 text-white/85 sm:text-base">会社選びから面接の練習まで、{partner.proLabel}に相談しながら進められます。まずは記事とチェックで、自分の条件を整理しましょう。</p>
 
             {/* スマホ: 人物のイラストの下半分に検索ボックスを重ねる */}
-            <div className="relative mx-auto -mb-16 -mt-2 w-[280px] md:hidden">
-              <GeneratedImage slug="hero-home" priority sizes="290px" className="h-auto w-full" fallback={<Illustration name={HERO_ILLUSTRATION} priority className="h-auto w-full" />} />
+            <div className="relative -mb-24 mt-4 h-[330px] overflow-hidden md:hidden">
+              <GeneratedImage slug="hero-home" priority sizes="290px" className="mx-auto h-auto w-[290px]" fallback={<HeroMockupPeek />} />
             </div>
 
             <form action="/articles" method="get" role="search" className="relative rounded-2xl md:mt-6 bg-white p-3 text-ink shadow-[0_18px_40px_-18px_rgb(0_0_0/0.45)] sm:p-4">
@@ -137,8 +134,8 @@ export default async function HomePage() {
           </div>
 
           {/* 右側: 人物（写真を採用したら写真）と、このサイトでできることの小さなカード */}
-          <div className="hidden md:-mb-16 md:block md:self-end">
-            <HeroVisual />
+          <div className="hidden md:block">
+            <GeneratedImage slug="hero-home" priority sizes="540px" className="h-auto w-full rounded-2xl" fallback={<HeroMockup />} />
           </div>
         </div>
       </section>
@@ -356,42 +353,3 @@ function ResultPreview() {
   );
 }
 
-/** ヒーロー右側: 人物のイラスト（写真を採用したら写真）に、このサイトでできることを小さなカードで重ねる */
-function HeroVisual() {
-  const card = "absolute rounded-2xl bg-white text-ink shadow-[0_18px_40px_-16px_rgb(0_0_0/0.45)]";
-  return (
-    <div className="relative mx-auto w-full max-w-[540px]">
-      <GeneratedImage slug="hero-home" priority sizes="540px" className="h-auto w-full" fallback={<Illustration name={HERO_ILLUSTRATION} priority className="h-auto w-full" />} />
-      <div aria-hidden="true">
-        <div className={`${card} -left-[8%] top-[44%] w-[196px] p-3`}>
-          <p className="flex items-center gap-1.5 text-[12.5px] font-bold text-ink">
-            <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-accent text-white">
-              <MessagesSquare className="h-4 w-4" />
-            </span>
-            面接の練習
-          </p>
-          <p className="mt-1.5 text-[11.5px] leading-5 text-muted">応募先に合わせた模擬面接で、本番の前に確かめる</p>
-        </div>
-        <div className={`${card} -right-[4%] top-[38%] w-[186px] p-3`}>
-          <p className="flex items-center gap-1.5 text-[12.5px] font-bold text-ink">
-            <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-brand text-white">
-              <Building2 className="h-4 w-4" />
-            </span>
-            企業選びの相談
-          </p>
-          <p className="mt-2 flex flex-wrap gap-1">
-            {["職場の雰囲気", "残業の実態", "研修"].map((c) => (
-              <span key={c} className="rounded-md bg-brand-tint px-1.5 py-0.5 text-[11px] font-bold text-brand-strong">
-                {c}
-              </span>
-            ))}
-          </p>
-        </div>
-        <p className="absolute bottom-[9%] left-[4%] inline-flex items-center gap-1.5 rounded-full bg-accent px-3.5 py-2 text-[12.5px] font-bold text-white shadow-[0_12px_28px_-10px_rgb(0_0_0/0.5)]">
-          <ShieldCheck className="h-4 w-4" />
-          {partner.proLabel}に相談できる
-        </p>
-      </div>
-    </div>
-  );
-}

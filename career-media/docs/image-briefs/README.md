@@ -89,7 +89,7 @@ npm run image:index      # content/images/index.json を作り直す
 ```tsx
 import { GeneratedImage } from "@/components/GeneratedImage";
 
-<GeneratedImage slug="hero-home" sizes="(min-width: 768px) 560px, 270px" className="..." fallback={<Illustration name="hero-people" priority className="h-auto w-full" />} />
+<GeneratedImage slug="hero-home" sizes="(min-width: 768px) 560px, 270px" className="..." fallback={<HeroMockup />} />
 ```
 
 採用済み（`selected`）の画像がなければ `fallback` を出す。縦横・alt は記録から入る。
