@@ -17,7 +17,7 @@ const FLOW: { icon: LucideIcon; title: string; text: string; slug: string }[] = 
   { icon: Flag, title: "入社", text: "入社前に条件の最終確認", slug: "tenshoku-koukai-shinai" },
 ];
 
-const STEP_COLORS = ["#0f7b6c", "#1f5f99", "#a8432a", "#b85a12", "#3f6f1f", "#3a5068", "#3c4f8f"];
+const STEP_COLORS = ["var(--color-brand)", "#1f5f99", "#a8432a", "#b85a12", "#3f6f1f", "#3a5068", "#3c4f8f"];
 
 export function ProcessFlow({ has }: { has: Has }) {
   return (
@@ -55,7 +55,7 @@ export function ProcessFlow({ has }: { has: Has }) {
           );
         })}
       </ol>
-      <Link href="/consultation" data-cta-placement="home-consult" data-cta-kind="consultation-info" className="mt-4 flex items-center gap-3 rounded-xl bg-[#fff8ef] p-3.5 ring-1 ring-accent/25 hover:ring-accent/50">
+      <Link href="/consultation" data-cta-placement="home-consult" data-cta-kind="consultation-info" className="mt-4 flex items-center gap-3 rounded-xl bg-cta-tint p-3.5 ring-1 ring-accent/25 hover:ring-accent/50">
         <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-accent text-white">
           <MessagesSquare className="h-4.5 w-4.5" aria-hidden="true" />
         </span>
@@ -127,7 +127,7 @@ export function JobPostingDiagram({ has }: { has: Has }) {
             </li>
           );
         })}
-        <li className="rounded-xl bg-[#fff8ef] p-3.5 text-[12.5px] leading-6 text-ink ring-1 ring-accent/25">
+        <li className="rounded-xl bg-cta-tint p-3.5 text-[12.5px] leading-6 text-ink ring-1 ring-accent/25">
           求人票に書かれていないこと（職場の雰囲気・残業の実態・配属）は、
           <Link href="/consultation" data-cta-placement="home-consult" data-cta-kind="consultation-info" className="font-bold text-accent-strong underline underline-offset-2">
             キャリア相談

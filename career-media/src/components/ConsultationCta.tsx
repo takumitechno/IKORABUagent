@@ -86,7 +86,7 @@ export function ConsultationCta({ placement, contentSlug, variant = "band", head
   if (variant === "inline") {
     // 記事の途中: 記事のテーマに合わせて、プロに相談するとできることを短く案内する（整理のためのチェックも添える）
     return (
-      <aside aria-label="キャリア相談のご案内" className="no-print my-10 overflow-hidden rounded-[var(--radius-card)] border-2 border-accent/30 bg-[#fff8ef]">
+      <aside aria-label="キャリア相談のご案内" className="no-print my-10 overflow-hidden rounded-[var(--radius-card)] border-2 border-accent/30 bg-cta-tint">
         <div className="p-5 sm:p-6">
           <div className="flex items-start gap-3">
             <span aria-hidden="true" className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-accent text-white">

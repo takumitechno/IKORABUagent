@@ -158,7 +158,7 @@ export function JourneyNav({ journey, index, articles }: { journey: Journey; ind
   );
 }
 
-const CASE_COLORS = ["#0b5f54", "#1f5f99", "#b85a12"];
+const CASE_COLORS = ["var(--color-brand-strong)", "#1f5f99", "#b85a12"];
 
 /** トップに出す3つのガイドの入口（写真の代わりに、色の帯と最初のステップを見せる） */
 export function JourneyCards() {

@@ -16,13 +16,25 @@ export function BrandMark({ className = "h-8 w-8" }: { className?: string }) {
   );
 }
 
+/** ロゴの2行目: メディア名がブランド名で始まるとき（MakeCareer転職ガイド）は残りの部分、同じときはタグライン */
+function subName() {
+  if (partner.brandName === site.name) return site.tagline;
+  if (site.name.startsWith(partner.brandName)) return site.name.slice(partner.brandName.length).trim();
+  return site.name;
+}
+
 export function Logo({ compact = false }: { compact?: boolean }) {
   return (
     <Link href="/" className="group flex items-center gap-2.5" aria-label={`${site.fullName} ホーム`}>
       <BrandMark className={`shrink-0 ${compact ? "h-7 w-7" : "h-8 w-8 sm:h-9 sm:w-9"}`} />
       <span className="flex flex-col leading-none">
-        <span className={`font-bold tracking-wide text-ink ${compact ? "text-[16px]" : "text-[17px] sm:text-lg"}`}>{partner.brandName}</span>
-        {!compact && <span className="mt-1 text-[10.5px] font-medium tracking-[0.06em] text-brand-strong">{partner.brandName === site.name ? site.tagline : site.name}</span>}
+        <span className={`font-bold tracking-wide text-ink ${compact ? "text-[16px]" : "text-[17px] sm:text-lg"}`}>
+          {partner.brandName}
+          {compact && site.name.startsWith(partner.brandName) && site.name !== partner.brandName && (
+            <span className="ml-1.5 rounded-md bg-brand px-1.5 py-0.5 align-[2px] text-[11px] font-bold tracking-normal text-white">{subName()}</span>
+          )}
+        </span>
+        {!compact && <span className="mt-1 text-[10.5px] font-medium tracking-[0.06em] text-brand-strong">{subName()}</span>}
       </span>
     </Link>
   );

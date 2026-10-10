@@ -70,6 +70,16 @@ export type PartnerConfig = {
   serviceHighlights: { icon: "building" | "messages" | "file" | "search" | "calendar"; title: string; body: string }[];
   /** 相談でできることについての注記 */
   serviceHighlightsNote: string;
+  /** 相談相手の呼び方（例: 人材紹介会社のキャリアアドバイザー） */
+  adviserLabel: string;
+  /** ヘッダー・ヒーロー・スマホの追従ボタンなど、短い相談ボタンの文言 */
+  consultCta: string;
+  /** トップの「プロに頼むよさ」の見出しで強調する言葉 */
+  proLabel: string;
+  /** トップのヒーローの小さなバッジの文言 */
+  heroBadge: string;
+  /** 画面のテーマ（色）。globals.css の html[data-brand] で切り替える */
+  theme: "neutral" | "makecareer";
   /** 正式な提携・ブランド利用許諾が済んでいるか。false の間は公開しない */
   brandUsageApproved: boolean;
   /** 運営者情報のうち、正式公開前に確定が必要な項目 */
@@ -127,16 +137,22 @@ const neutral: PartnerConfig = {
   consultationStepsNote: "人材紹介サービスの一般的な流れです。実際の流れは、正式公開時に相談先の案内を掲載します。",
   serviceHighlightsNote: "人材紹介会社のキャリア相談で一般的に受けられるサポートの例です。求職者の利用は原則無料です（職業安定法により、求職者から手数料を取ることは原則禁止されています）。",
   previewNotice: "提案用デモ（非公開）｜相談ボタンは申し込みページに移動しません",
+  adviserLabel: "人材紹介会社のキャリアアドバイザー（転職エージェント）",
+  consultCta: "プロに相談する",
+  proLabel: "転職のプロ",
+  heroBadge: "20代のはじめての転職・未経験転職ガイド",
+  theme: "neutral",
 };
 
 /** B. 提携候補企業との商談でだけ見せる完成イメージ（PARTNER_PROFILE=makecareer。ローカル・非公開・noindex） */
 const makecareer: PartnerConfig = {
   ...common,
   profile: "makecareer",
-  mediaName: "未経験転職ノート",
-  mediaTagline: "20代・未経験転職のための仕事選びメディア",
-  operatorDisplay: "MakeCareer株式会社（運営想定・正式提携前）",
-  operatorShort: "MakeCareer（想定）",
+  // TODO(正式公開前にMakeCareer確認が必要): メディア名は仮。MakeCareer 帰属の商品として「MakeCareer転職ガイド」にしている
+  mediaName: "MakeCareer転職ガイド",
+  mediaTagline: "20代・未経験の転職を、プロと一緒に。",
+  operatorDisplay: "MakeCareer株式会社",
+  operatorShort: "MakeCareer",
   producerDisplay: "匠Technologies（企画・制作・運用の提案）",
   partnerName: "MakeCareer株式会社",
   brandName: "MakeCareer",
@@ -150,6 +166,11 @@ const makecareer: PartnerConfig = {
   // TODO(正式公開前にMakeCareer確認が必要): 面接の練習・企業選びの相談は PO（プロジェクトオーナー）から共有された内容。表現と範囲を確認する
   serviceHighlightsNote: "MakeCareer株式会社のキャリア相談では、面接の練習や企業選びの相談も受けられます（正式公開前に内容を確認して掲載します）。求職者の利用は原則無料です（職業安定法により、求職者から手数料を取ることは原則禁止されています）。",
   previewNotice: "MakeCareer様 商談用プレビュー（非公開・正式提携前）｜相談ボタンは申し込みページに移動しません",
+  adviserLabel: "MakeCareerのキャリアアドバイザー",
+  consultCta: "MakeCareerに相談する",
+  proLabel: "MakeCareerのプロ",
+  heroBadge: "MakeCareerの転職ガイド｜20代・未経験の転職を、プロと一緒に",
+  theme: "makecareer",
 };
 
 const selected = process.env.PARTNER_PROFILE === "makecareer" ? makecareer : neutral;

@@ -5,6 +5,7 @@ import { ArticleHeader, EditorialNote, FaqSection, pickRelated, RelatedArticles,
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { ConsultationCta } from "@/components/ConsultationCta";
 import { buildConsultationUrl } from "@/lib/consultation";
+import { partner } from "@/config/partner";
 import { JsonLd } from "@/components/JsonLd";
 import { JourneyNav } from "@/components/Journey";
 import { TrackArticleView } from "@/components/MeasurementTracker";
@@ -102,7 +103,7 @@ export default async function ArticlePage({ params }: Props) {
         </div>
         <RelatedArticles articles={related} categories={categories} />
       </div>
-      <MobileStickyCta contentSlug={article.slug} consultHref={buildConsultationUrl("article-sticky", article.slug)} />
+      <MobileStickyCta contentSlug={article.slug} consultHref={buildConsultationUrl("article-sticky", article.slug)} consultLabel={partner.consultCta} />
     </>
   );
 }

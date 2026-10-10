@@ -5,7 +5,8 @@ import { partner } from "./partner";
  * ブランド色は src/app/globals.css の :root トークンが正本。
  * TODO(正式公開前にMakeCareer確認が必要): メディア名・ロゴ・ブランドカラーの確定
  */
-const sameBrand = partner.brandName === partner.mediaName;
+/** メディア名にブランド名が入っているとき（例: MakeCareer転職ガイド）は、"by ブランド" を付けない */
+const sameBrand = partner.brandName === partner.mediaName || partner.mediaName.startsWith(partner.brandName);
 
 export const site = {
   name: partner.mediaName,

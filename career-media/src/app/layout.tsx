@@ -7,7 +7,7 @@ import { Header } from "@/components/Header";
 import { MeasurementTracker } from "@/components/MeasurementTracker";
 import { PreviewBanner } from "@/components/PreviewBanner";
 import { SalesMenuButton } from "@/components/sales/SalesMenuButton";
-import { consultationMode } from "@/config/partner";
+import { consultationMode, partner } from "@/config/partner";
 import { site } from "@/config/site";
 import "./globals.css";
 
@@ -29,14 +29,14 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#0f7b6c",
+  themeColor: partner.theme === "makecareer" ? "#1e4fb8" : "#0f7b6c",
   width: "device-width",
   initialScale: 1,
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="ja" className={notoSansJp.variable}>
+    <html lang="ja" data-brand={partner.theme} className={notoSansJp.variable}>
       <body className="min-h-screen antialiased">
         <a href="#main" className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded focus:bg-white focus:px-4 focus:py-2">
           本文へスキップ

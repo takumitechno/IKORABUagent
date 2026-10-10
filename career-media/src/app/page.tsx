@@ -12,6 +12,7 @@ import { LevelMeter } from "@/components/LevelMeter";
 import { JsonLd } from "@/components/JsonLd";
 import { Roadmap, type RoadmapStep } from "@/components/Roadmap";
 import { SectionHeading } from "@/components/SectionHeading";
+import { partner } from "@/config/partner";
 import { site } from "@/config/site";
 import { getRepository } from "@/lib/content";
 import { ALL_QUESTIONS } from "@/lib/condition-check/questions";
@@ -26,6 +27,9 @@ export const metadata = pageMetadata({
   description: site.description,
   path: "/",
 });
+
+/** ヒーローの人物のイラスト（ブランドの色に合わせた版） */
+const HERO_ILLUSTRATION = partner.theme === "makecareer" ? "hero-people-mc" : "hero-people";
 
 /** ヒーローのメイン導線（自分に合う仕事の探し方） */
 const GUIDE_SLUG = "shigoto-sagashikata";
@@ -70,7 +74,7 @@ export default async function HomePage() {
       <JsonLd data={websiteJsonLd()} />
 
       {/* Hero: ブランドの色の面に、見出し・検索・人気のキーワード・2つの入口（転職メディアでよくある構成） */}
-      <section className="relative overflow-hidden bg-[#0b5f54] text-white">
+      <section className="relative overflow-hidden bg-hero text-white">
         <div aria-hidden="true" className="pointer-events-none absolute inset-0">
           <span className="absolute -right-40 -top-56 h-[560px] w-[560px] rounded-full bg-white/[0.06]" />
           <span className="absolute -bottom-64 -left-32 h-[480px] w-[480px] rounded-full bg-black/[0.12]" />
@@ -80,20 +84,20 @@ export default async function HomePage() {
           <div>
             <p className="inline-flex items-center gap-1.5 rounded-full bg-white/12 px-3 py-1 text-[12px] font-bold tracking-wide ring-1 ring-white/20">
               <span className="h-1.5 w-1.5 rounded-full bg-accent-bright" aria-hidden="true" />
-              20代のはじめての転職・未経験転職ガイド
+              {partner.heroBadge}
             </p>
             <h1 className="mt-4 text-[30px] font-bold leading-[1.4] min-[400px]:text-[32px] sm:text-[46px]">
               転職したい。
               <br />
               でも、
               <br className="sm:hidden" />
-              <span className="text-[#ffe08a]">何から決めればいい？</span>
+              <span className="text-highlight">何から決めればいい？</span>
             </h1>
-            <p className="mt-3 text-[15px] leading-7 text-white/85 sm:text-base">会社選びから面接の練習まで、転職のプロに相談しながら進められます。まずは記事とチェックで、自分の条件を整理しましょう。</p>
+            <p className="mt-3 text-[15px] leading-7 text-white/85 sm:text-base">会社選びから面接の練習まで、{partner.proLabel}に相談しながら進められます。まずは記事とチェックで、自分の条件を整理しましょう。</p>
 
             {/* スマホ: 人物のイラストの下半分に検索ボックスを重ねる */}
             <div className="relative mx-auto -mb-16 -mt-2 w-[280px] md:hidden">
-              <GeneratedImage slug="hero-home" priority sizes="290px" className="h-auto w-full" fallback={<Illustration name="hero-people" priority className="h-auto w-full" />} />
+              <GeneratedImage slug="hero-home" priority sizes="290px" className="h-auto w-full" fallback={<Illustration name={HERO_ILLUSTRATION} priority className="h-auto w-full" />} />
             </div>
 
             <form action="/articles" method="get" role="search" className="relative rounded-2xl md:mt-6 bg-white p-3 text-ink shadow-[0_18px_40px_-18px_rgb(0_0_0/0.45)] sm:p-4">
@@ -120,7 +124,7 @@ export default async function HomePage() {
             </form>
 
             <div className="mt-5 grid grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)] gap-2.5 sm:flex sm:flex-wrap">
-              <ConsultButton placement="home-hero" label="プロに相談する" />
+              <ConsultButton placement="home-hero" label={partner.consultCta} />
               <Link href="/check" className="tap inline-flex items-center justify-center gap-1.5 rounded-full bg-white px-4 py-3 text-[14px] font-bold text-brand-strong hover:bg-brand-tint sm:px-5">
                 <ClipboardList className="h-4 w-4" aria-hidden="true" />
                 条件整理チェック
@@ -357,7 +361,7 @@ function HeroVisual() {
   const card = "absolute rounded-2xl bg-white text-ink shadow-[0_18px_40px_-16px_rgb(0_0_0/0.45)]";
   return (
     <div className="relative mx-auto w-full max-w-[540px]">
-      <GeneratedImage slug="hero-home" priority sizes="540px" className="h-auto w-full" fallback={<Illustration name="hero-people" priority className="h-auto w-full" />} />
+      <GeneratedImage slug="hero-home" priority sizes="540px" className="h-auto w-full" fallback={<Illustration name={HERO_ILLUSTRATION} priority className="h-auto w-full" />} />
       <div aria-hidden="true">
         <div className={`${card} -left-[8%] top-[44%] w-[196px] p-3`}>
           <p className="flex items-center gap-1.5 text-[12.5px] font-bold text-ink">
@@ -385,7 +389,7 @@ function HeroVisual() {
         </div>
         <p className="absolute bottom-[9%] left-[4%] inline-flex items-center gap-1.5 rounded-full bg-accent px-3.5 py-2 text-[12.5px] font-bold text-white shadow-[0_12px_28px_-10px_rgb(0_0_0/0.5)]">
           <ShieldCheck className="h-4 w-4" />
-          転職のプロに相談できる
+          {partner.proLabel}に相談できる
         </p>
       </div>
     </div>

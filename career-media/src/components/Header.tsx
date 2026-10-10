@@ -3,6 +3,7 @@ import { MessageCircle } from "lucide-react";
 import { Logo } from "./Logo";
 import { MobileNav } from "./MobileNav";
 import { NAV_ITEMS } from "./nav";
+import { partner } from "@/config/partner";
 
 export function Header() {
   return (
@@ -28,7 +29,7 @@ export function Header() {
             className="hidden items-center gap-1.5 rounded-full bg-accent px-4 py-2 text-[13px] font-bold text-white transition-colors hover:bg-accent-strong sm:inline-flex"
           >
             <MessageCircle className="h-4 w-4" aria-hidden="true" />
-            プロに相談する
+            {partner.consultCta}
           </Link>
           <MobileNav />
         </div>

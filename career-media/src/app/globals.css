@@ -23,6 +23,12 @@
   --color-canvas: #faf8f4;
   --color-surface: #ffffff;
   --color-marker: #ffe7a0;
+  /* ヒーローの面・強調の黄色・相談まわりの淡い面（ブランドごとに上書きする） */
+  --color-hero: #0b5f54;
+  --color-highlight: #ffe08a;
+  --color-cta-tint: #fff8ef;
+  --color-pro-tint: #fff7e0;
+  --color-pro-ring: #ffd25e;
   /* アイキャッチ・入口タイルの柔らかい面（各トーンの文字色は WCAG AA を満たすものだけ） */
   --color-mint: #e3f3ec;
   --color-mint-ink: #0b5f54;
@@ -46,6 +52,30 @@
 
 :root {
   color-scheme: light;
+}
+
+/*
+ * MakeCareer 版（PARTNER_PROFILE=makecareer。商談用・非公開）のブランド色。
+ * TODO(正式公開前にMakeCareer確認が必要): 仮の配色（ネイビー×オレンジ）。ブランドガイドを受領したら差し替える。
+ * 文字とボタンは WCAG AA（4.5:1）以上で選んでいる。
+ */
+html[data-brand="makecareer"] {
+  --color-brand: #1e4fb8;
+  --color-brand-strong: #173c8f;
+  --color-brand-soft: #e3ebfb;
+  --color-brand-tint: #f1f5fd;
+  --color-accent: #c2410c;
+  --color-accent-strong: #9a3412;
+  --color-accent-soft: #fff1e6;
+  --color-accent-bright: #fb923c;
+  --color-mint: #e3ebfb;
+  --color-mint-ink: #173c8f;
+  --color-hero: #132c66;
+  --color-highlight: #ffd84d;
+  --color-cta-tint: #fff4ea;
+  --color-pro-tint: #fff8db;
+  --color-pro-ring: #ffd84d;
+  --color-canvas: #f7f8fb;
 }
 
 html {

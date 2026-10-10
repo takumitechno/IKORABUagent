@@ -39,7 +39,7 @@ export function SoloVsPro({ dark = false }: { dark?: boolean }) {
           ))}
         </ul>
       </div>
-      <div className="rounded-2xl bg-[#fff7e0] p-3.5 text-ink ring-2 ring-[#ffd25e] sm:p-5">
+      <div className="rounded-2xl bg-pro-tint p-3.5 text-ink ring-2 ring-pro-ring sm:p-5">
         <p className="flex items-center gap-1.5 text-[13px] font-bold text-accent-strong sm:text-[14px]">
           <Users className="h-4 w-4" aria-hidden="true" />
           プロに相談しながら
@@ -94,14 +94,14 @@ export function ProValueSection({ placement = "home-consult", has = () => false 
       <div className="p-5 sm:p-8 lg:p-10">
         <div className="grid gap-6 lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] lg:items-center">
           <div>
-            <p className="inline-flex rounded-full bg-white/10 px-3 py-1 text-[12px] font-bold text-[#ffe08a] ring-1 ring-white/15">はじめての転職・未経験の転職なら</p>
+            <p className="inline-flex rounded-full bg-white/10 px-3 py-1 text-[12px] font-bold text-highlight ring-1 ring-white/15">はじめての転職・未経験の転職なら</p>
             <h2 id="home-consult" className="mt-3 text-[24px] font-bold leading-snug sm:text-[32px]">
               ひとりで悩むより、
               <br />
-              <span className="text-[#ffe08a]">転職のプロ</span>と進めよう
+              <span className="text-highlight">{partner.proLabel}</span>と進めよう
             </h2>
             <p className="mt-3 text-[14px] leading-7 text-white/80 sm:text-[15px]">
-              人材紹介会社のキャリアアドバイザー（転職エージェント）に相談すると、会社選びから面接の練習まで、一緒に準備できます。応募するかどうかは、ご自身で決められます。
+              {partner.adviserLabel}に相談すると、会社選びから面接の練習まで、一緒に準備できます。応募するかどうかは、ご自身で決められます。
             </p>
             <div className="mt-6 flex flex-col gap-2.5 sm:flex-row sm:items-center">
               <ConsultButton placement={placement} label="キャリア相談を申し込む" size="lg" />
@@ -126,7 +126,7 @@ export function ProValueSection({ placement = "home-consult", has = () => false 
             <ul className="mt-3 grid gap-2.5 md:grid-cols-3">
               {reads.map((r) => (
                 <li key={r.slug}>
-                  <Link href={`/articles/${r.slug}`} className="flex h-full items-center gap-3 rounded-xl bg-white p-3.5 text-[13.5px] font-bold leading-6 text-ink hover:bg-[#fff7e0]">
+                  <Link href={`/articles/${r.slug}`} className="flex h-full items-center gap-3 rounded-xl bg-white p-3.5 text-[13.5px] font-bold leading-6 text-ink hover:bg-pro-tint">
                     <span className="min-w-0 flex-1">{r.title}</span>
                     <ArrowRight className="h-4 w-4 shrink-0 text-accent-strong" aria-hidden="true" />
                   </Link>

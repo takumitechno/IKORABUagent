@@ -11,7 +11,7 @@ type Size = "banner" | "lg" | "md" | "sm";
 
 /** カテゴリごとの面の色（白い文字が読めるコントラストにしている） */
 export const CATEGORY_COLOR: Record<string, string> = {
-  mikeiken: "#0f7b6c",
+  mikeiken: "var(--color-brand)",
   shokushu: "#1f5f99",
   keiken: "#b85a12",
   "shorui-mensetsu": "#a8432a",
@@ -20,9 +20,9 @@ export const CATEGORY_COLOR: Record<string, string> = {
   seido: "#3c4f8f",
   news: "#142b3e",
 };
-export const categoryColor = (slug?: string) => CATEGORY_COLOR[slug ?? ""] ?? "#0f7b6c";
+export const categoryColor = (slug?: string) => CATEGORY_COLOR[slug ?? ""] ?? "var(--color-brand)";
 
-const HIGHLIGHT = "#ffe08a";
+const HIGHLIGHT = "var(--color-highlight)";
 const surface = (color: string) => ({ background: `linear-gradient(135deg, ${color} 0%, color-mix(in srgb, ${color} 72%, #000) 100%)` });
 const DOTS = "bg-[radial-gradient(rgb(255_255_255/0.16)_1.2px,transparent_1.6px)] [background-size:14px_14px]";
 

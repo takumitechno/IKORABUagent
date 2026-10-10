@@ -17,6 +17,11 @@ Codex などのコーディングエージェント向けの作業ガイド。�
   提携候補の実在企業の社名・LP の URL は `src/config/partner.ts`（`makecareer` プロファイル＝商談用の非公開プレビュー）と
   TODO コメントにだけ置く。画面・記事・他のファイルへ直書きしない（`tests/consultation.test.ts` が検出する）。
   LP や企業サイトの文章・画像・ロゴ・実績を写さない。一次情報で確認していない許可番号は画面に出さない。
+- **MakeCareer 版（`PARTNER_PROFILE=makecareer`、`npm run demo:makecareer`）は、MakeCareer 帰属の商品として作る。**
+  メディア名「MakeCareer転職ガイド」（仮）、相談ボタン「MakeCareerに相談する」、配色は `src/app/globals.css` の
+  `html[data-brand="makecareer"]`（仮のネイビー×オレンジ。ブランドガイド受領後に差し替え）。ブランドで変わる文言は `partner.ts` の
+  `adviserLabel` / `consultCta` / `proLabel` / `heroBadge` / `theme`。ロゴは許諾があるまで汎用のマーク＋文字。
+  ローカル・非公開のまま（アーティファクトや静的書き出しは中立版だけ。スクリプトが実在企業名義を拒否する）。
 - **本番送客（実際の申込ページへのリンク）を有効にしない。** 有効になるのは `brandUsageApproved: true`・人が書いた
   `liveOutboundApproval`・`PARTNER_LIVE_OUTBOUND=on` の3つがそろったときだけ。エージェントはこのどれも書き換えない。
   相談の申込ボタンは `buildConsultationUrl()` だけで作る（無効の間はサイト内の `/consultation/apply` を指す）。

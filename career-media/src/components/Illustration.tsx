@@ -4,6 +4,7 @@
  */
 export const ILLUSTRATIONS = {
   "hero-people": { width: 500, height: 490 },
+  "hero-people-mc": { width: 500, height: 490 },
   "hero-home": { width: 1200, height: 800 },
   "check-support": { width: 600, height: 600 },
   "journey-sekkyaku-office": { width: 1280, height: 720 },
