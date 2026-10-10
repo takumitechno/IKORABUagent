@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "slug": "editorial-weekend",
+  "type": "section",
+  "status": "selected",
+  "purpose": "人物中心の入口と生活の希望を伝える装飾画像。実在の利用者・社員・職場ではない。",
+  "used_in": [
+    "/"
+  ],
+  "alt": "",
+  "decorative": true,
+  "brief_file": null,
+  "model": "OpenAI built-in image_gen (model not exposed)",
+  "size": "1536x1024",
+  "quality": "auto",
+  "output_format": "webp",
+  "background": "opaque",
+  "prompt_brief": "Use case: photorealistic-natural. Asset type: editorial website story card for Japanese adults changing careers, matching a calm magazine art direction. Premium still-life lifestyle photograph, landscape 3:2. A quiet weekend morning in Japan: a natural canvas tote bag, unbranded cobalt-blue reusable bottle and plain burnt-orange paperback placed on a light wood park bench; soft green trees, sunlit grass and gently blurred blue sky behind. Attainable everyday freedom, contemporary Kinfolk-like editorial composition but distinct original work. Tactile linen and paper, warm natural sunlight, realistic restrained color, authentic surface imperfections, tasteful photographic grain. The bag and bottle grouped toward center, orange book in foreground. No humans, no hands, no faces, no logos, no text, no lettering or numbers, no watermark, no food, no corporate stock-photo gloss, no fake UI. Strong simple silhouette legible at small thumbnail size. Decorative aspirational scene, not evidence of a real workplace or promised benefit.",
+  "prompt_final": "Use case: photorealistic-natural. Asset type: editorial website story card for Japanese adults changing careers, matching a calm magazine art direction. Premium still-life lifestyle photograph, landscape 3:2. A quiet weekend morning in Japan: a natural canvas tote bag, unbranded cobalt-blue reusable bottle and plain burnt-orange paperback placed on a light wood park bench; soft green trees, sunlit grass and gently blurred blue sky behind. Attainable everyday freedom, contemporary Kinfolk-like editorial composition but distinct original work. Tactile linen and paper, warm natural sunlight, realistic restrained color, authentic surface imperfections, tasteful photographic grain. The bag and bottle grouped toward center, orange book in foreground. No humans, no hands, no faces, no logos, no text, no lettering or numbers, no watermark, no food, no corporate stock-photo gloss, no fake UI. Strong simple silhouette legible at small thumbnail size. Decorative aspirational scene, not evidence of a real workplace or promised benefit.",
+  "revised_prompt": null,
+  "generated_at": "2026-10-10T14:42:56.135Z",
+  "src": "/images/generated/sections/editorial-weekend.webp",
+  "file": "public/images/generated/sections/editorial-weekend.webp",
+  "width": 1536,
+  "height": 1024,
+  "bytes": 192404,
+  "sha256": "7a67d14d4a9f385706d4a65664b4e490c2b483d86b01f1a1b286f1947e0e7f3a",
+  "usage": null,
+  "regenerated_from": null,
+  "notes": "Generated with built-in image_gen. Reviewed visually. Lossy WebP compression only using existing sharp; original retained. No third-party photograph reused."
+}

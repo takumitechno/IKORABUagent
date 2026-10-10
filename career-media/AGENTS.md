@@ -71,7 +71,7 @@ Node.js 20.9 以上。依存は `npm ci`。環境変数なしで動く（記事�
 
 | URL | ページ | 主な部品・データ |
 |---|---|---|
-| `/` | `src/app/page.tsx` | 短いヒーロー、`JourneyCards`（絵で選ぶ3経路）、代表記事3件と検索、相談への入口。詳しい比較・手順はリンク先 |
+| `/` | `src/app/page.tsx` | 人物写真のヒーロー、`JourneyCards`（3経路）、条件整理メモ、相談CTA、代表記事6件と検索。SEO記事本文を保持 |
 | `/articles`、`/articles/[slug]` | `src/app/articles/` | `ArticleCards`、`ArticleParts`、`lib/markdown.ts`、`lib/figures.ts`、`content/articles/*.md` |
 | `/news`、`/news/[slug]` | `src/app/news/` | `NewsTimeline`、`content/news/*.md` |
 | `/categories/[slug]` | `src/app/categories/[slug]/page.tsx` | `content/categories.json` |
@@ -99,7 +99,7 @@ Node.js 20.9 以上。依存は `npm ci`。環境変数なしで動く（記事�
 ## 画像（生成画像）
 
 - 方針は `docs/ART_DIRECTION.md`、手順は `docs/image-briefs/README.md`。まず画像なしで成り立たせ、必要な場所だけに使う。文字は画像に入れない
-- 生成画像は `src/components/GeneratedImage.tsx` で出す（`content/images/index.json` で status が selected のものだけ）。現在の差し込み口は `/sales/sns/*` の表紙 `sns-theme-*-cover`。トップでは既存のSVGモチーフを使用。
+- 生成画像は `src/components/GeneratedImage.tsx` で出す（`content/images/index.json` で status が selected のものだけ）。差し込み口は `/sales/sns/*` の表紙 `sns-theme-*-cover` とトップ・相談ページ。トップ・相談では生成した架空人物の写真イメージ、3経路には生活写真を使用。実在の利用者・相談員の証明には使わない。
 - トップは短いコピーと選べる入口を優先。長い比較表・手順・相談説明を重複させない。架空のチャット・予約UIは使わない。
 - 生成した画像は draft のまま。実際のページで確認してから `image:status` で selected にする。気に入らなければ brief を直して `--force` で作り直す（前の画像は `.image-history/`）
 - API キー（`OPENAI_API_KEY`）は `.env.local` か環境変数にだけ置く。ロゴ・実在の企業やキャラクターは生成しない（`BLOCKED_TERMS`）

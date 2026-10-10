@@ -4,6 +4,7 @@ import type { ArticleSummary } from "@/lib/content/types";
 import { JOURNEY_ANCHOR, JOURNEYS, stepHref, type Journey, type JourneyStep } from "@/lib/journeys";
 import { ConsultButton } from "./ConsultationCta";
 import { Motif } from "./illustrations/Motif";
+import { GeneratedImage } from "./GeneratedImage";
 
 const stepTitle = (step: JourneyStep, articles: ArticleSummary[]) =>
   step.kind === "article" ? (articles.find((a) => a.slug === step.slug)?.title ?? null) : null;
@@ -159,30 +160,19 @@ export function JourneyNav({ journey, index, articles }: { journey: Journey; ind
 }
 
 const CASE_COPY = [
-  { lead: "接客の経験を活かして", title: "デスクワークへ。", tone: "bg-sky text-sky-ink", scene: "desk" as const },
-  { lead: "給料は下げたくない。", title: "休みも増やしたい。", tone: "bg-sand text-sand-ink", scene: "calendar" as const },
-  { lead: "バイトの経験から", title: "正社員を目指す。", tone: "bg-mint text-mint-ink", scene: "flag" as const },
+  { lead: "接客の経験を活かして", title: "デスクワークへ。", image: "editorial-workday", scene: "desk" as const },
+  { lead: "給料は下げたくない。", title: "休みも増やしたい。", image: "editorial-weekend", scene: "calendar" as const },
+  { lead: "バイトの経験から", title: "正社員を目指す。", image: "editorial-fresh-start", scene: "flag" as const },
 ];
 
-/** トップに出す3つのガイドの入口（写真の代わりに、色の帯と最初のステップを見せる） */
 export function JourneyCards() {
   return (
-    <ul className="grid gap-3 md:grid-cols-3 md:gap-5">
+    <ul className="editorial-journeys">
       {JOURNEYS.map((j, i) => (
         <li key={j.id}>
-          <Link
-            href={`${j.hubs[0]}#${JOURNEY_ANCHOR}`}
-            data-cta-placement="home-journeys"
-            data-cta-kind="journey-start"
-            data-pattern-id={j.patternId}
-            className={`tap group relative flex min-h-[132px] items-center overflow-hidden rounded-2xl p-5 transition-shadow hover:shadow-[var(--shadow-raised)] md:min-h-[240px] md:items-start md:p-6 ${CASE_COPY[i].tone}`}
-          >
-            <span className="relative z-10 block w-[70%] md:w-full">
-              <span className="block text-xs font-medium md:text-sm">{CASE_COPY[i].lead}</span>
-              <span className="mt-1 block text-[19px] font-bold leading-relaxed min-[360px]:text-[21px] md:text-[23px]">{CASE_COPY[i].title}</span>
-              <span className="mt-2 inline-flex items-center gap-1 text-xs font-bold">読んでみる<ArrowRight className="h-3.5 w-3.5" aria-hidden="true" /></span>
-            </span>
-            <Motif name={CASE_COPY[i].scene} className="absolute bottom-2 right-1 h-24 w-24 md:bottom-1 md:right-3 md:h-32 md:w-32" />
+          <Link href={`${j.hubs[0]}#${JOURNEY_ANCHOR}`} data-cta-placement="home-journeys" data-cta-kind="journey-start" data-pattern-id={j.patternId} className="editorial-story">
+            <div className="editorial-story-photo"><GeneratedImage slug={CASE_COPY[i].image} sizes="(min-width: 768px) 33vw, 100vw" fallback={<Motif name={CASE_COPY[i].scene} className="h-full w-full" />} className="h-full w-full !object-cover" /><span aria-hidden="true">0{i + 1}</span></div>
+            <div className="editorial-story-copy"><span>{CASE_COPY[i].lead}</span><h3>{CASE_COPY[i].title}</h3><span className="editorial-story-arrow" aria-label="読む順番ガイドへ"><ArrowRight aria-hidden="true" /></span></div>
           </Link>
         </li>
       ))}

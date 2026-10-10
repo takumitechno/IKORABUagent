@@ -1,8 +1,9 @@
 import Link from "next/link";
 import { BookOpen, ClipboardList } from "lucide-react";
-import { ServiceHighlights, SoloVsPro } from "@/components/ProValue";
-import { PageHero } from "@/components/PageHero";
-import { ConsultButton, ConsultationCta, PartnerNote } from "@/components/ConsultationCta";
+import { SoloVsPro } from "@/components/ProValue";
+import { GeneratedImage } from "@/components/GeneratedImage";
+import { Breadcrumbs } from "@/components/Breadcrumbs";
+import { ConsultButton, PartnerNote } from "@/components/ConsultationCta";
 import { JsonLd } from "@/components/JsonLd";
 import { partner } from "@/config/partner";
 import { faqJsonLd, pageMetadata } from "@/lib/seo";
@@ -26,46 +27,34 @@ const FAQ = [
   { question: "相談すれば転職できますか？", answer: "相談は、内定や年収アップなどの結果を保証するものではありません。経験や希望をもとに、選択肢や進め方を一緒に考えるためのものです。" },
 ];
 
-/** 相談の流れの各ステップのイラスト（申し込み → 面談 → 求人の紹介 → 応募・面接 → 入社） */
-const FLOW_SCENES = ["laptop", "chat", "search", "interview", "flag"];
+
 
 export default function ConsultationPage() {
   return (
-    <>
+    <div className="editorial-consultation">
       <JsonLd data={faqJsonLd({ faq: FAQ })} />
-      <PageHero
-        crumbs={[{ name: "ホーム", path: "/" }, { name: "キャリア相談について", path: "/consultation" }]}
-        eyebrow="CAREER CONSULTATION"
-        title={
-          <>
-            転職は、<span className="text-highlight">プロに相談</span>しながら
-            <br className="hidden sm:block" />
-            進めよう
-          </>
-        }
-        lead={`${partner.adviserLabel}に、企業選びから面接の練習・書類の添削・日程の調整まで相談できます。応募するかどうかは、ご自身で決められます。`}
-
-      >
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+      <div className="editorial-shell pt-5"><Breadcrumbs items={[{ name: "ホーム", path: "/" }, { name: "キャリア相談について", path: "/consultation" }]} /></div>
+      <section className="editorial-hero editorial-consult-hero">
+        <div className="editorial-hero-copy">
+          <p className="editorial-kicker">CAREER CONSULTATION / キャリア相談</p>
+          <h1>次の一歩は、<br /><span>話すことから。</span></h1>
+          <p className="editorial-lead">「自分に何ができるか、分からない」<br />その気持ちごと、相談して大丈夫。</p>
           <ConsultButton placement="consultation-page" label="キャリア相談を申し込む" size="lg" />
+          <p className="editorial-fine">応募するかどうかは、自分で決められます。</p>
+          <PartnerNote className="mt-4 text-xs leading-6 text-muted" />
         </div>
-        <PartnerNote className="mt-4 text-[11.5px] leading-5 text-white/60" />
-      </PageHero>
+        <figure className="editorial-hero-photo"><GeneratedImage slug="editorial-conversation" priority fallback={<div className="h-full bg-sand" />} className="h-full w-full !object-cover" /><figcaption><span>ONE STEP AT A TIME</span><span>自分のペースで、進もう。</span></figcaption><span className="editorial-photo-note">生成イメージ・人物は架空です</span></figure>
+      </section>
       <div className="mx-auto max-w-5xl px-4 pt-2 sm:px-6">
         <section aria-labelledby="services" className="mt-12">
           <h2 id="services" className="text-[22px] font-bold text-ink">
             キャリア相談でできること
           </h2>
-          <div className="mt-5">
-            <ServiceHighlights compact />
-          </div>
+          <ul className="editorial-services mt-5 grid gap-x-8 sm:grid-cols-2">{partner.serviceHighlights.map((item, i) => <li key={item.title} className="flex gap-4"><span className="editorial-service-number">0{i + 1}</span><div><h3 className="text-sm font-bold">{item.title}</h3><p className="mt-2 text-xs leading-6 text-muted">{item.body}</p></div></li>)}</ul>
           <p className="mt-3 text-[12.5px] leading-6 text-muted">{partner.serviceHighlightsNote} 内定や年収アップなどの結果を保証するものではありません。</p>
         </section>
 
-        <section aria-labelledby="solo-vs-pro" className="mt-12">
-          <h2 id="solo-vs-pro" className="text-[22px] font-bold text-ink">
-            ひとりで進める場合との違い
-          </h2>
+        <section aria-labelledby="solo-vs-pro" className="mt-12"><details className="editorial-details"><summary id="solo-vs-pro">ひとりで進める場合との違い</summary>
           <div className="mt-5">
             <SoloVsPro />
           </div>
@@ -83,7 +72,7 @@ export default function ConsultationPage() {
               <Link href="/articles/kigyou-erabi-soudan" className="text-brand-strong underline underline-offset-2">会社選びをプロに相談する</Link>
             </p>
           </div>
-        </section>
+        </details></section>
 
         <section aria-labelledby="audience" className="mt-12">
           <h2 id="audience" className="text-[22px] font-bold text-ink">
@@ -103,21 +92,8 @@ export default function ConsultationPage() {
             相談の流れ
           </h2>
           <p className="mt-2 text-[13px] leading-6 text-muted">{partner.consultationStepsNote}</p>
-          <ol className="anim-list relative mt-5 grid gap-3 md:grid-cols-5">
-            <span aria-hidden="true" className="reveal-grow-y absolute bottom-8 left-[35px] top-8 border-l-[3px] border-dashed border-brand/30 md:hidden" />
-            <span aria-hidden="true" className="reveal-grow-x absolute left-[10%] right-[10%] top-[44px] hidden border-t-[3px] border-dashed border-brand/30 md:block" />
-            {partner.consultationSteps.map((s, i) => (
-              <li key={s.title} className="reveal relative grid grid-cols-[72px_minmax(0,1fr)] items-start gap-3 rounded-xl bg-surface p-3 ring-1 ring-line md:flex md:flex-col md:items-center md:p-4 md:text-center">
-                <span className="relative block aspect-square w-[72px] rounded-full bg-mint md:w-[76px]">
-                  <span aria-hidden="true" className={`motif motif-${FLOW_SCENES[i] ?? "chat"} absolute inset-[6%] block`} />
-                  <span className="absolute -left-1 -top-1 flex h-6 w-6 items-center justify-center rounded-full bg-night text-[11px] font-bold text-white ring-2 ring-surface">{i + 1}</span>
-                </span>
-                <span className="min-w-0 md:mt-2">
-                  <span className="block font-bold leading-6 text-ink">{s.title}</span>
-                  <span className="mt-1 block text-[13px] leading-6 text-muted">{s.body}</span>
-                </span>
-              </li>
-            ))}
+          <ol className="editorial-flow">
+            {partner.consultationSteps.map((s, i) => <li key={s.title}><span className="editorial-flow-number">0{i + 1}</span><div><h3>{s.title}</h3><p>{s.body}</p></div></li>)}
           </ol>
         </section>
 
@@ -141,20 +117,11 @@ export default function ConsultationPage() {
           <h2 id="consult-faq" className="text-[22px] font-bold text-ink">
             よくある質問
           </h2>
-          <dl className="mt-5 space-y-3">
-            {FAQ.map((f) => (
-              <div key={f.question} className="rounded-xl bg-surface p-5 ring-1 ring-line">
-                <dt className="font-bold text-ink">Q. {f.question}</dt>
-                <dd className="mt-2 text-[14.5px] leading-7 text-body">{f.answer}</dd>
-              </div>
-            ))}
-          </dl>
+          <div className="mt-5">{FAQ.map((f) => <details key={f.question} className="editorial-details"><summary>{f.question}</summary><p className="py-4 text-sm leading-7 text-body">{f.answer}</p></details>)}</div>
         </section>
 
-        <div className="mt-14">
-          <ConsultationCta placement="consultation-page" />
-        </div>
+        <section className="editorial-consult mt-14"><div><p className="editorial-kicker">LET’S TALK</p><h2>まだ決まっていなくても。<br />まずは、今の話を。</h2><p>希望や経験を整理しながら、次の選択肢を考えましょう。</p><ConsultButton placement="consultation-page" label="キャリア相談を申し込む" size="lg" /><p className="editorial-fine">内定・年収アップを保証するサービスではありません。</p></div></section>
       </div>
-    </>
+    </div>
   );
 }

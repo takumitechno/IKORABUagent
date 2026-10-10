@@ -98,7 +98,7 @@ import { GeneratedImage } from "@/components/GeneratedImage";
 
 | slug | type | 使う場所 | 状態 |
 | --- | --- | --- | --- |
-| [hero-home](hero-home.md) | hero | 差し込み口なし。現在は既存SVGと短いコピーを使用 | 保留・生成不要 |
+| [hero-home](hero-home.md) | hero | 旧SVG向けbrief。現在はeditorial-peopleを使用 | 保留・生成不要 |
 | [check-support](check-support.md) | section | 現在のトップには差し込み口なし | 保留・生成不要 |
 | [sns-theme-a-cover](sns-theme-a-cover.md) | sns-carousel | `/sales/sns/a` の表紙用ビジュアル | 未生成 |
 | [journey-sekkyaku-office](journey-sekkyaku-office.md) | section | （今は差し込み口なし。ケースカードは色帯のデザインに変更） | 未生成 |
@@ -113,3 +113,5 @@ done
 ```
 
 状態の正本は `content/images/meta/*.json`（`npm run image:index` で一覧を表示）。
+
+2026-10-10: ユーザー依頼により、トップ・相談を人物中心へ更新。OpenAI内蔵image_genを使用し、APIキー不要。採用5画像の完全なprompt・寸法・SHA-256は `content/images/meta/editorial-*.json`。旧CLIのフラットイラスト用HOUSE_STYLEは流用しない。詳細は `docs/REDESIGN.md`。

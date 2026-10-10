@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "slug": "editorial-workday",
+  "type": "section",
+  "status": "selected",
+  "purpose": "人物中心の入口と生活の希望を伝える装飾画像。実在の利用者・社員・職場ではない。",
+  "used_in": [
+    "/"
+  ],
+  "alt": "",
+  "decorative": true,
+  "brief_file": null,
+  "model": "OpenAI built-in image_gen (model not exposed)",
+  "size": "1536x1024",
+  "quality": "auto",
+  "output_format": "webp",
+  "background": "opaque",
+  "prompt_brief": "Use case: photorealistic-natural. Asset type: bespoke editorial hero photograph for a Japanese career guidance website aimed at adults in their twenties and thirties who browse Instagram. Create a premium architectural lifestyle still life, landscape 3:2 composition. A beautifully sunlit, attainable small Japanese apartment workspace, one sculptural burnt-orange chair at a pale warm oak desk, a closed cobalt blue notebook and a simple unbranded silver laptop on the desk, small leafy plant, generous warm off-white plaster wall, soft daylight through a large window, blue sky glimpsed outside. The chair is angled toward the window suggesting a fresh start. Strong art direction and asymmetrical composition, close editorial framing, natural tactile materials, realistic shadows, subtle analogue film grain, crisp objects, calm but optimistic. Main objects occupy center-right and center, with uncluttered cream space at upper left. Sophisticated magazine photography rather than a corporate stock image, no people, no faces, no hands, no slogans, no typography, no letters, no numbers, no logo, no watermark, no UI mockups, no floating objects, no cartoon, no glossy plastic. Palette warm ivory, deep cobalt, burnt orange, restrained green. This is an aspirational decorative illustration of everyday work, not a real office or employer photograph. Generate a polished high-resolution image for an edge-to-edge website image panel.",
+  "prompt_final": "Use case: photorealistic-natural. Asset type: bespoke editorial hero photograph for a Japanese career guidance website aimed at adults in their twenties and thirties who browse Instagram. Create a premium architectural lifestyle still life, landscape 3:2 composition. A beautifully sunlit, attainable small Japanese apartment workspace, one sculptural burnt-orange chair at a pale warm oak desk, a closed cobalt blue notebook and a simple unbranded silver laptop on the desk, small leafy plant, generous warm off-white plaster wall, soft daylight through a large window, blue sky glimpsed outside. The chair is angled toward the window suggesting a fresh start. Strong art direction and asymmetrical composition, close editorial framing, natural tactile materials, realistic shadows, subtle analogue film grain, crisp objects, calm but optimistic. Main objects occupy center-right and center, with uncluttered cream space at upper left. Sophisticated magazine photography rather than a corporate stock image, no people, no faces, no hands, no slogans, no typography, no letters, no numbers, no logo, no watermark, no UI mockups, no floating objects, no cartoon, no glossy plastic. Palette warm ivory, deep cobalt, burnt orange, restrained green. This is an aspirational decorative illustration of everyday work, not a real office or employer photograph. Generate a polished high-resolution image for an edge-to-edge website image panel.",
+  "revised_prompt": null,
+  "generated_at": "2026-10-10T14:42:14.167Z",
+  "src": "/images/generated/sections/editorial-workday.webp",
+  "file": "public/images/generated/sections/editorial-workday.webp",
+  "width": 1536,
+  "height": 1024,
+  "bytes": 135452,
+  "sha256": "dfc02a11df90a307629cafd823fed788c7ea60b221056bb2cd99cd8db7870f75",
+  "usage": null,
+  "regenerated_from": null,
+  "notes": "Generated with built-in image_gen. Reviewed visually. Lossy WebP compression only using existing sharp; original retained. No third-party photograph reused."
+}

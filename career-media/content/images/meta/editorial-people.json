@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "slug": "editorial-people",
+  "type": "hero",
+  "status": "selected",
+  "purpose": "人物中心の入口と生活の希望を伝える装飾画像。実在の利用者・社員・職場ではない。",
+  "used_in": [
+    "/"
+  ],
+  "alt": "",
+  "decorative": true,
+  "brief_file": null,
+  "model": "OpenAI built-in image_gen (model not exposed)",
+  "size": "1536x1024",
+  "quality": "auto",
+  "output_format": "webp",
+  "background": "opaque",
+  "prompt_brief": "Use case: photorealistic-natural. Create an original premium photographic hero for a Japanese career-change guidance website, aimed at ordinary adults in their twenties and thirties browsing social media. Landscape 3:2, realistic editorial campaign photograph. Two fictional Japanese adults, a woman around 28 and a man around 29, standing relaxed together outside a modest contemporary Japanese building on a sunny spring morning, casually speaking and looking a little toward the camera with subtle, natural optimistic smiles. Woman in soft off-white cotton blouse and light blue overshirt, man in muted navy casual overshirt over white T-shirt, everyday approachable clothes, not business suits, no luxury styling. Medium framing waist up, both faces fully in frame grouped in the central 60 percent with generous headroom so image can crop on mobile. Warm ivory architectural background, leafy plant at edge, restrained cobalt and terracotta accents. Natural sunlight, true skin texture and pores, believable hair strands, slight asymmetry, gentle candid energy, beautifully composed magazine editorial, 50mm lens, realistic soft shadow, quiet aspirational mood. High-quality photography, not glossy AI plastic beauty, not two identical models. No exaggerated laughter, no thumbs up, no handshake, no crossed arms, no pointing, no laptops, no prominent hands in foreground. No text, lettering, logos, watermark, signage, UI, charts, employment claims. These are fictional decorative characters, not testimonials, employees or actual service users. Do not imitate any known person. The final must feel warm, young, human and credible, visually simple and recognizable at thumbnail size.",
+  "prompt_final": "Use case: photorealistic-natural. Create an original premium photographic hero for a Japanese career-change guidance website, aimed at ordinary adults in their twenties and thirties browsing social media. Landscape 3:2, realistic editorial campaign photograph. Two fictional Japanese adults, a woman around 28 and a man around 29, standing relaxed together outside a modest contemporary Japanese building on a sunny spring morning, casually speaking and looking a little toward the camera with subtle, natural optimistic smiles. Woman in soft off-white cotton blouse and light blue overshirt, man in muted navy casual overshirt over white T-shirt, everyday approachable clothes, not business suits, no luxury styling. Medium framing waist up, both faces fully in frame grouped in the central 60 percent with generous headroom so image can crop on mobile. Warm ivory architectural background, leafy plant at edge, restrained cobalt and terracotta accents. Natural sunlight, true skin texture and pores, believable hair strands, slight asymmetry, gentle candid energy, beautifully composed magazine editorial, 50mm lens, realistic soft shadow, quiet aspirational mood. High-quality photography, not glossy AI plastic beauty, not two identical models. No exaggerated laughter, no thumbs up, no handshake, no crossed arms, no pointing, no laptops, no prominent hands in foreground. No text, lettering, logos, watermark, signage, UI, charts, employment claims. These are fictional decorative characters, not testimonials, employees or actual service users. Do not imitate any known person. The final must feel warm, young, human and credible, visually simple and recognizable at thumbnail size.",
+  "revised_prompt": null,
+  "generated_at": "2026-10-10T14:53:38.573Z",
+  "src": "/images/generated/hero/editorial-people.webp",
+  "file": "public/images/generated/hero/editorial-people.webp",
+  "width": 1536,
+  "height": 1024,
+  "bytes": 121498,
+  "sha256": "fb1276f419921f6c04a6ce7be59a15034bf9909c999c60c84bf67db6e52e3b0c",
+  "usage": null,
+  "regenerated_from": null,
+  "notes": "Generated with built-in image_gen. Reviewed visually. Lossy WebP compression only using existing sharp; original retained. No third-party photograph reused."
+}

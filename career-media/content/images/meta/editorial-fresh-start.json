@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "slug": "editorial-fresh-start",
+  "type": "section",
+  "status": "selected",
+  "purpose": "人物中心の入口と生活の希望を伝える装飾画像。実在の利用者・社員・職場ではない。",
+  "used_in": [
+    "/"
+  ],
+  "alt": "",
+  "decorative": true,
+  "brief_file": null,
+  "model": "OpenAI built-in image_gen (model not exposed)",
+  "size": "1536x1024",
+  "quality": "auto",
+  "output_format": "webp",
+  "background": "opaque",
+  "prompt_brief": "Use case: photorealistic-natural. Asset type: original editorial story-card photograph for a Japanese career-guidance website for adults in their twenties and thirties. Landscape 3:2. A fresh-start still life in a modest beautiful Japanese apartment entryway: a clean navy canvas work tote leaning beside a pair of simple unbranded off-white sneakers, folded light beige overshirt hanging above on a peg, small burnt-orange key tray, soft sunlight entering an open doorway. Rich natural linen texture, warm oak flooring, ivory plaster wall, quiet cobalt-blue accent from a notebook peeking from bag. Premium authentic lifestyle magazine photography, realistic shadows, subtle film grain, asymmetrical crop, warmly optimistic and attainable. No person or body parts, no faces, no logos, no letters, no text, no numbers, no watermark, no UI, no suits, no corporate office cliches, no glossy 3D. Make one cohesive, clean and highly art-directed photographic image. Keep important objects centered so the image can crop as a thumbnail. This is a decorative aspirational image, not a real employer testimonial or job guarantee.",
+  "prompt_final": "Use case: photorealistic-natural. Asset type: original editorial story-card photograph for a Japanese career-guidance website for adults in their twenties and thirties. Landscape 3:2. A fresh-start still life in a modest beautiful Japanese apartment entryway: a clean navy canvas work tote leaning beside a pair of simple unbranded off-white sneakers, folded light beige overshirt hanging above on a peg, small burnt-orange key tray, soft sunlight entering an open doorway. Rich natural linen texture, warm oak flooring, ivory plaster wall, quiet cobalt-blue accent from a notebook peeking from bag. Premium authentic lifestyle magazine photography, realistic shadows, subtle film grain, asymmetrical crop, warmly optimistic and attainable. No person or body parts, no faces, no logos, no letters, no text, no numbers, no watermark, no UI, no suits, no corporate office cliches, no glossy 3D. Make one cohesive, clean and highly art-directed photographic image. Keep important objects centered so the image can crop as a thumbnail. This is a decorative aspirational image, not a real employer testimonial or job guarantee.",
+  "revised_prompt": null,
+  "generated_at": "2026-10-10T14:43:24.757Z",
+  "src": "/images/generated/sections/editorial-fresh-start.webp",
+  "file": "public/images/generated/sections/editorial-fresh-start.webp",
+  "width": 1536,
+  "height": 1024,
+  "bytes": 173978,
+  "sha256": "92fdc4cb6dd7a552c4ebde55095d8479451f37c3a0f41bb14d184c0560649fdf",
+  "usage": null,
+  "regenerated_from": null,
+  "notes": "Generated with built-in image_gen. Reviewed visually. Lossy WebP compression only using existing sharp; original retained. No third-party photograph reused."
+}

@@ -1,3 +1,69 @@
 {
-  "images": []
+  "images": [
+    {
+      "slug": "editorial-conversation",
+      "type": "hero",
+      "status": "selected",
+      "src": "/images/generated/hero/editorial-conversation.webp",
+      "width": 1536,
+      "height": 1024,
+      "alt": "",
+      "decorative": true,
+      "used_in": [
+        "/consultation"
+      ]
+    },
+    {
+      "slug": "editorial-fresh-start",
+      "type": "section",
+      "status": "selected",
+      "src": "/images/generated/sections/editorial-fresh-start.webp",
+      "width": 1536,
+      "height": 1024,
+      "alt": "",
+      "decorative": true,
+      "used_in": [
+        "/"
+      ]
+    },
+    {
+      "slug": "editorial-people",
+      "type": "hero",
+      "status": "selected",
+      "src": "/images/generated/hero/editorial-people.webp",
+      "width": 1536,
+      "height": 1024,
+      "alt": "",
+      "decorative": true,
+      "used_in": [
+        "/"
+      ]
+    },
+    {
+      "slug": "editorial-weekend",
+      "type": "section",
+      "status": "selected",
+      "src": "/images/generated/sections/editorial-weekend.webp",
+      "width": 1536,
+      "height": 1024,
+      "alt": "",
+      "decorative": true,
+      "used_in": [
+        "/"
+      ]
+    },
+    {
+      "slug": "editorial-workday",
+      "type": "section",
+      "status": "selected",
+      "src": "/images/generated/sections/editorial-workday.webp",
+      "width": 1536,
+      "height": 1024,
+      "alt": "",
+      "decorative": true,
+      "used_in": [
+        "/"
+      ]
+    }
+  ]
 }

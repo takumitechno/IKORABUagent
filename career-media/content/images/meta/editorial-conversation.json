@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "slug": "editorial-conversation",
+  "type": "hero",
+  "status": "selected",
+  "purpose": "人物中心の入口と生活の希望を伝える装飾画像。実在の利用者・社員・職場ではない。",
+  "used_in": [
+    "/consultation"
+  ],
+  "alt": "",
+  "decorative": true,
+  "brief_file": null,
+  "model": "OpenAI built-in image_gen (model not exposed)",
+  "size": "1536x1024",
+  "quality": "auto",
+  "output_format": "webp",
+  "background": "opaque",
+  "prompt_brief": "Use case: photorealistic-natural. Create an original premium editorial photograph for a Japanese career guidance consultation page. Landscape 3:2. A fictional Japanese woman about 30 in an unstructured muted navy jacket and cream top listens warmly to a fictional Japanese man about 27 wearing a casual light grey-blue overshirt, across a small warm oak table beside a bright window. Frame from a slightly side-on eye-level angle: both people shown in three-quarter profile with both faces clear and equally important, in central 65 percent, generous room above heads. Man is speaking comfortably, woman attentive with a small natural smile, relaxed equals, not a lecture or formal job interview. A simple plain cobalt notebook and pencil on the table, a small green plant in soft background. Modest welcoming room, soft ivory walls, warm daylight, understated cobalt and terracotta accents. Natural skin texture, authentic diverse facial features, believable relaxed posture and anatomically correct hands resting simply, editorial photographic realism, subtle grain, no airbrushing, no plastic AI faces, no exaggerated grin, no handshake, no pointing at camera, no corporate stock cliche, no cinematic drama. No text, writing, lettering, logos, watermarks, branding, signage, name badges, certificates, charts or UI. The scene depicts a fictional illustration of a conversation; neither character represents an actual employee, client, adviser, testimonial or employment outcome. Do not imitate any known person. Cohesive high-quality website campaign photograph, approachable and grounded.",
+  "prompt_final": "Use case: photorealistic-natural. Create an original premium editorial photograph for a Japanese career guidance consultation page. Landscape 3:2. A fictional Japanese woman about 30 in an unstructured muted navy jacket and cream top listens warmly to a fictional Japanese man about 27 wearing a casual light grey-blue overshirt, across a small warm oak table beside a bright window. Frame from a slightly side-on eye-level angle: both people shown in three-quarter profile with both faces clear and equally important, in central 65 percent, generous room above heads. Man is speaking comfortably, woman attentive with a small natural smile, relaxed equals, not a lecture or formal job interview. A simple plain cobalt notebook and pencil on the table, a small green plant in soft background. Modest welcoming room, soft ivory walls, warm daylight, understated cobalt and terracotta accents. Natural skin texture, authentic diverse facial features, believable relaxed posture and anatomically correct hands resting simply, editorial photographic realism, subtle grain, no airbrushing, no plastic AI faces, no exaggerated grin, no handshake, no pointing at camera, no corporate stock cliche, no cinematic drama. No text, writing, lettering, logos, watermarks, branding, signage, name badges, certificates, charts or UI. The scene depicts a fictional illustration of a conversation; neither character represents an actual employee, client, adviser, testimonial or employment outcome. Do not imitate any known person. Cohesive high-quality website campaign photograph, approachable and grounded.",
+  "revised_prompt": null,
+  "generated_at": "2026-10-10T14:54:22.621Z",
+  "src": "/images/generated/hero/editorial-conversation.webp",
+  "file": "public/images/generated/hero/editorial-conversation.webp",
+  "width": 1536,
+  "height": 1024,
+  "bytes": 109636,
+  "sha256": "98146cddcf31a118cb161416ac60198fb1623e49f2c92d6730c896afd3479e1b",
+  "usage": null,
+  "regenerated_from": null,
+  "notes": "Generated with built-in image_gen. Reviewed visually. Lossy WebP compression only using existing sharp; original retained. No third-party photograph reused."
+}
