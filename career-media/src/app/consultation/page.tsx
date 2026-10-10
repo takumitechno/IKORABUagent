@@ -37,10 +37,13 @@ export default function ConsultationPage() {
       <section className="editorial-hero editorial-consult-hero">
         <div className="editorial-hero-copy">
           <p className="editorial-kicker">CAREER CONSULTATION / キャリア相談</p>
-          <h1>次の一歩は、<br /><span>話すことから。</span></h1>
-          <p className="editorial-lead">「自分に何ができるか、分からない」<br />その気持ちごと、相談して大丈夫。</p>
+          <h1>会社選びも、<br /><span>面接の不安も。</span></h1>
+          <p className="editorial-lead">今までの経験を、どう伝えるか。<br />次の仕事で、何を大切にするか。<br />一緒に整理するところから始められます。</p>
+          <ul className="consult-assurance" aria-label="相談の前に知っておきたいこと">
+            <li>{partner.consultationFeeNote}</li><li>応募するかどうかは、自分で決められます。</li>
+          </ul>
           <ConsultButton placement="consultation-page" label="キャリア相談を申し込む" size="lg" />
-          <p className="editorial-fine">応募するかどうかは、自分で決められます。</p>
+          <p className="editorial-fine">{partner.consultationEligibilityNote}</p>
           <PartnerNote className="mt-4 text-xs leading-6 text-muted" />
         </div>
         <figure className="editorial-hero-photo"><GeneratedImage slug="editorial-conversation" priority fallback={<div className="h-full bg-sand" />} className="h-full w-full !object-cover" /><figcaption><span>ONE STEP AT A TIME</span><span>自分のペースで、進もう。</span></figcaption><span className="editorial-photo-note">生成イメージ・人物は架空です</span></figure>
@@ -74,10 +77,8 @@ export default function ConsultationPage() {
           </div>
         </details></section>
 
-        <section aria-labelledby="audience" className="mt-12">
-          <h2 id="audience" className="text-[22px] font-bold text-ink">
-            こんな方の相談を想定しています
-          </h2>
+        <section aria-labelledby="audience" className="mt-6"><details className="editorial-details">
+          <summary id="audience">相談を想定している方・対象について</summary>
           <ul className="anim-list mt-5 grid gap-3 sm:grid-cols-2">
             {partner.serviceAudience.map((a) => (
               <li key={a} className="rounded-xl bg-surface p-4 text-[14.5px] leading-7 ring-1 ring-line">
@@ -85,17 +86,17 @@ export default function ConsultationPage() {
               </li>
             ))}
           </ul>
-        </section>
+          <p className="my-4 text-sm leading-7 text-muted">{partner.consultationEligibilityNote}</p>
+        </details></section>
 
-        <section aria-labelledby="flow" className="mt-12">
-          <h2 id="flow" className="text-[22px] font-bold text-ink">
-            相談の流れ
-          </h2>
+        <section aria-labelledby="flow" className="mt-6"><details className="editorial-details">
+          <summary id="flow">申し込みから入社までの流れ</summary>
           <p className="mt-2 text-[13px] leading-6 text-muted">{partner.consultationStepsNote}</p>
           <ol className="editorial-flow">
             {partner.consultationSteps.map((s, i) => <li key={s.title}><span className="editorial-flow-number">0{i + 1}</span><div><h3>{s.title}</h3><p>{s.body}</p></div></li>)}
           </ol>
-        </section>
+          <p className="my-4 text-sm leading-7 text-muted">相談方法・所要時間・申し込み後の連絡方法は、正式公開前に相談先へ確認して案内します。</p>
+        </details></section>
 
         <section aria-labelledby="prepare" className="mt-12 rounded-[var(--radius-card)] bg-brand-tint p-6 ring-1 ring-brand/15">
           <h2 id="prepare" className="text-[20px] font-bold text-ink">

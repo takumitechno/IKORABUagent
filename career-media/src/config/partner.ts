@@ -52,6 +52,8 @@ export type PartnerConfig = {
   serviceDescription: string;
   /** 相談サービスの対象として想定している人（相談ページで使用） */
   serviceAudience: string[];
+  consultationFeeNote: string;
+  consultationEligibilityNote: string;
   /** 本番の申込先（本番送客が有効なときだけ使う）。未確定なら null */
   liveConsultationUrl: string | null;
   /** 本番送客の承認記録。null の間は本番の申込先へ送らない */
@@ -91,6 +93,8 @@ export type PartnerConfig = {
 const common = {
   serviceDescription:
     "キャリアアドバイザーが、これまでの経験や希望条件を一緒に整理し、条件に合いそうな求人の紹介、応募書類や面接の準備、選考の日程や条件の調整などをサポートする人材紹介サービスです。",
+  consultationFeeNote: "求職者の利用は原則無料。実際の条件は相談先の案内をご確認ください。",
+  consultationEligibilityNote: "相談先の対象年齢・地域・希望職種は、正式公開前に確認して掲載します。",
   serviceAudience: [
     "はじめての転職で、何から始めればいいか迷っている方",
     "フリーター・派遣から正社員を目指したい方",
@@ -148,6 +152,8 @@ const neutral: PartnerConfig = {
 const makecareer: PartnerConfig = {
   ...common,
   profile: "makecareer",
+  consultationFeeNote: "求職者の方は無料で利用できます。",
+  consultationEligibilityNote: "相談先は主に20代の転職を支援しています。30代の方や地域・希望職種ごとの対応可否は、事前確認が必要です。",
   // メディア名は未定。PO の指示（2026-10-10）で「転職エージェント（仮）」にしている
   mediaName: "MakeCareer転職エージェント（仮）",
   mediaTagline: "20代・第二新卒・既卒・フリーターの転職を、プロと一緒に。",

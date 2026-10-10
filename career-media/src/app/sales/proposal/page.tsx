@@ -1,5 +1,5 @@
 import { salesAddressee } from "@/config/sales";
-import { ACCEPTANCE_NOTE, INITIAL_SCOPE, PRODUCTION_ROLES, ASSETS_PARTNER, ASSETS_TAKUMI, EXIT_PRINCIPLE, fixedTotal, MONTHLY_SCOPE, OUT_OF_SCOPE, PARTNER_COOPERATION, paymentScenario, PILOT, PLAN, SCENARIO_COUNTS, yen } from "@/lib/sales/proposal";
+import { THEME_DELIVERY, PILOT_VALIDATION, ACCEPTANCE_NOTE, INITIAL_SCOPE, PRODUCTION_ROLES, ASSETS_PARTNER, ASSETS_TAKUMI, EXIT_PRINCIPLE, fixedTotal, MONTHLY_SCOPE, OUT_OF_SCOPE, PARTNER_COOPERATION, paymentScenario, PILOT, PLAN, SCENARIO_COUNTS, yen } from "@/lib/sales/proposal";
 import { pageMetadata } from "@/lib/seo";
 import { PrintButton } from "./PrintButton";
 
@@ -63,6 +63,12 @@ export default function ProposalPage() {
       </div>
 
       <div className="mt-4">
+        <Block id="delivery" title="買うものは、投稿から相談までの導線と、その改善です">
+          <p className="text-xs text-muted">例:「接客経験をどう伝える？」の1テーマ。形式は月の制作枠内で選びます。</p>
+          <div className="mt-3 divide-y divide-line">{THEME_DELIVERY.map((row, i) => <div key={row.step} className="py-3 sm:grid sm:grid-cols-[120px_1fr] sm:gap-4"><h3 className="font-bold text-ink"><span className="mr-2 text-brand">0{i + 1}</span>{row.step}</h3><div><p className="font-bold text-ink">{row.output}</p><p className="mt-1 text-xs leading-6"><strong>匠:</strong> {row.takumi}<br /><strong>先方:</strong> {row.partner}</p></div></div>)}</div>
+        </Block>
+      </div>
+      <div className="mt-4">
         <Block id="initial" title="初期10万円で納品するもの・完了の確認（案）">
           <dl className="divide-y divide-line">
             {INITIAL_SCOPE.map((s) => <div key={s.deliverable} className="py-3 sm:grid sm:grid-cols-[200px_1fr] sm:gap-4">
@@ -115,6 +121,7 @@ export default function ProposalPage() {
           </ul>
         </Block>
       </div>
+      <div className="mt-4"><Block id="validation" title="新規ドメインで、3か月に何を確かめるか"><ul className="list-disc space-y-2 pl-5">{PILOT_VALIDATION.map((item) => <li key={item}>{item}</li>)}</ul></Block></div>
       <p className="mt-4 text-[11.5px] leading-6 text-muted">この提案は商談用の仮条件です。契約内容・成果条件・個人情報の扱い・ブランドの利用範囲は、正式な契約と法務確認で決めます。</p>
     </article>
   );

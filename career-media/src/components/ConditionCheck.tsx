@@ -77,7 +77,7 @@ export function ConditionCheck({ consultationHref, consultationLabel, allowPrint
   const stepComplete = isStepComplete(step, answers);
   const result: CheckResult | null = useMemo(() => (showResult ? buildResult(answers) : null), [showResult, answers]);
 
-  const scrollTop = () => topRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+  const scrollTop = () => topRef.current?.scrollIntoView({ behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "instant" : "smooth", block: "start" });
 
   const toggle = (question: Question, optionId: string) => {
     setAnswers((prev) => {
@@ -266,17 +266,18 @@ const RESULT_SCENES: MotifName[] = ["calendar", "star", "scale", "checklist", "c
 
 function ResultSection({ title, children, number, note }: { title: string; number: number; note?: string; children: React.ReactNode }) {
   return (
-    <section className="reveal break-inside-avoid rounded-[var(--radius-card)] border border-line bg-surface p-5 sm:p-6">
-      <h3 className="flex items-center gap-3 text-[17px] font-bold text-ink">
+    <details className="result-detail break-inside-avoid border-b border-line bg-surface">
+      <summary className="flex cursor-pointer items-center gap-3 py-4 text-[15px] font-bold text-ink sm:text-[17px]">
         <span className="relative block aspect-square w-11 shrink-0 rounded-full bg-mint">{motif(RESULT_SCENES[number - 1] ?? "checklist", "absolute inset-[6%]")}</span>
         <span>
           <span className="mr-1.5 text-xs font-bold text-brand">{number}</span>
           {title}
         </span>
-      </h3>
+        <span className="result-detail-toggle ml-auto shrink-0" aria-hidden="true">＋</span>
+      </summary>
       {note && <p className="mt-2 text-[12.5px] leading-6 text-muted">{note}</p>}
-      <div className="mt-4">{children}</div>
-    </section>
+      <div className="pb-6 pt-4">{children}</div>
+    </details>
   );
 }
 
@@ -301,19 +302,42 @@ function Result({
   copied: "" | "all" | "memo" | "failed";
   fallbackText: string | null;
 }) {
+  const resultRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    let closed: HTMLDetailsElement[] = [];
+    const expand = () => {
+      closed = Array.from(resultRef.current?.querySelectorAll<HTMLDetailsElement>("details:not([open])") ?? []);
+      closed.forEach((detail) => { detail.open = true; });
+    };
+    const restore = () => {
+      closed.forEach((detail) => { detail.open = false; });
+      closed = [];
+    };
+    window.addEventListener("beforeprint", expand);
+    window.addEventListener("afterprint", restore);
+    return () => {
+      window.removeEventListener("beforeprint", expand);
+      window.removeEventListener("afterprint", restore);
+    };
+  }, []);
   const top = result.candidates.slice(0, 3);
   const [s1, s2, s3, s4, s5, s6, s7] = RESULT_SECTIONS;
   const button = "inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-[13px] font-bold ring-1";
   return (
-    <div className="mt-8" aria-live="polite">
+    <div ref={resultRef} className="check-result mt-8" aria-live="polite">
       <div className="enter relative overflow-hidden rounded-[20px] bg-night p-6 text-white sm:p-8">
         <span aria-hidden="true" className="pointer-events-none absolute -right-6 -top-6 block h-28 w-28 rounded-full bg-white/[0.06] sm:h-40 sm:w-40" />
         {motif("checklist", "anim-float-slow absolute right-4 top-4 h-16 w-16 rounded-full bg-white/90 sm:right-8 sm:top-8 sm:h-24 sm:w-24")}
         <p className="text-[11px] font-bold tracking-[0.2em] text-accent-bright">YOUR NOTE</p>
         <h2 className="mt-2 pr-20 text-[22px] font-bold leading-snug sm:pr-28 sm:text-[26px]">あなたの条件整理ノート</h2>
         <p className="mt-3 text-sm leading-7 text-white/80">
-          回答をもとに、求人を比べるときと相談するときに使える形で整理しました。向き不向きや選考の結果を判定するものではありません。このノートは自分で持ち帰るためのもので、どこにも送信されていません。
+          希望と経験を、話せるメモにしました。適職の判定ではありません。回答は相談先に送信されません。
         </p>
+        <dl className="result-summary">
+          <div><dt>ゆずれない条件</dt><dd>{result.priorityConditions.map((c) => c.label).join("・") || "まだ決めていなくて大丈夫"}</dd></div>
+          <div><dt>活かせそうな経験</dt><dd>{result.skills[0]?.skill ?? "学校や日常で続けてきたことから整理しよう"}</dd></div>
+          <div><dt>まず、ここから</dt><dd>{result.selfActions[0]?.title ?? "気になる条件をひとつ書き出す"}</dd></div>
+        </dl>
         <div className="no-print mt-5 flex flex-wrap gap-2">
           <button type="button" onClick={() => onCopy("memo")} className={`${button} bg-accent-bright text-night ring-accent-bright hover:bg-white`}>
             <NotebookPen className="h-4 w-4" aria-hidden="true" />
@@ -341,7 +365,12 @@ function Result({
         </div>
       )}
 
-      <div className="mt-6 space-y-5">
+      <div className="result-next no-print">
+        <div><p className="font-bold text-ink">このメモを持って、次の一歩へ。</p><p className="mt-1 text-xs leading-6 text-muted">相談は任意です。伝えたい内容だけ選んで話せます。</p></div>
+        <Link href="/consultation" data-cta-placement="check-result" data-cta-kind="consultation-info" className="editorial-button">相談でできることを見る<ArrowRight className="h-4 w-4" aria-hidden="true" /></Link>
+      </div>
+      <p className="mt-8 text-xs font-bold text-muted">詳しい内容は、項目を開いて確認できます。</p>
+      <div className="mt-3">
         <ResultSection title={s1} number={1}>
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="rounded-xl bg-accent-soft p-4">
@@ -490,7 +519,7 @@ function Result({
             </button>
             <Link href="/consultation" data-cta-placement="check-result" data-cta-kind="consultation-info" className="inline-flex items-center justify-center gap-1.5 rounded-full border border-accent/50 bg-surface px-5 py-3 text-sm font-bold text-accent-strong hover:border-accent">
               <MessageCircle className="h-4 w-4" aria-hidden="true" />
-              相談でできることを見る
+              相談の内容をもう一度確認する
             </Link>
             <a href={consultationHref} data-cta-placement="check-result" data-cta-kind="consultation-apply" className="inline-flex items-center justify-center gap-1.5 rounded-full bg-accent px-6 py-3 text-sm font-bold text-white shadow-[0_6px_16px_-6px_rgb(191_82_8/0.6)] hover:bg-accent-press">
               {consultationLabel}

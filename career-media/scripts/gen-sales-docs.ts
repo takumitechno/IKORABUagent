@@ -6,7 +6,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { EVENT_DICTIONARY, PARTNER_RETURN_EVENTS, SCHEMA_VERSION } from "../src/lib/measurement/schema";
-import { ACCEPTANCE_NOTE, INITIAL_SCOPE, PRODUCTION_ROLES, ASSETS_PARTNER, ASSETS_TAKUMI, EXIT_PRINCIPLE, fixedTotal, MONTHLY_SCOPE, OBJECTIONS, OUT_OF_SCOPE, PARTNER_COOPERATION, paymentScenario, PILOT, PLAN, SCENARIO_COUNTS, WORKLOAD, workloadTotal, yen } from "../src/lib/sales/proposal";
+import { THEME_DELIVERY, PILOT_VALIDATION, ACCEPTANCE_NOTE, INITIAL_SCOPE, PRODUCTION_ROLES, ASSETS_PARTNER, ASSETS_TAKUMI, EXIT_PRINCIPLE, fixedTotal, MONTHLY_SCOPE, OBJECTIONS, OUT_OF_SCOPE, PARTNER_COOPERATION, paymentScenario, PILOT, PLAN, SCENARIO_COUNTS, WORKLOAD, workloadTotal, yen } from "../src/lib/sales/proposal";
 import { DEMO_PREPARATION, RUNBOOK, runbookMinutes } from "../src/lib/sales/runbook";
 import { SNS_THEMES, utm, type Slide } from "../src/lib/sales/sns";
 
@@ -149,6 +149,18 @@ ${scenarioTable}
 固定費込みの1件あたり ＝ ${yen(PILOT.performanceFeePerMeeting)} ＋ ${yen(fixedTotal)} ÷ 件数。「面談単価 ${yen(PILOT.performanceFeePerMeeting)}」だけで説明しない（固定費がある）。
 匠の売上と、人材紹介会社が採用企業から受け取る紹介手数料を混同しない。提携先の紹介料・入社率・利益率は推測しない。
 
+## 1テーマの制作と役割分担（例: 接客経験をどう伝える？）
+
+形式は月の制作枠内で選ぶ。すべてのテーマで全形式を作る契約ではない。
+
+| 段階 | 制作・改善するもの | 匠 | 先方 |
+| --- | --- | --- | --- |
+${THEME_DELIVERY.map((r) => `| ${r.step} | ${r.output} | ${r.takumi} | ${r.partner} |`).join("\n")}
+
+## 新規ドメインの検証と公開前の確認
+
+${PILOT_VALIDATION.map((s) => `- ${s}`).join("\n")}
+
 ## 初期費用の納品物・完了条件（案）
 
 | 納品物 | 完了の確認 |
@@ -209,6 +221,8 @@ write(
 | 価格（税別・提案仮条件） | 初期 ${yen(PILOT.initialFee)}＋月額 ${yen(PILOT.monthlyFee)}×${PILOT.months}か月＝固定 ${yen(fixedTotal)}。成果報酬（案）: 承認面談1件 ${yen(PILOT.performanceFeePerMeeting)} |
 | 初期納品・完了条件 | ${INITIAL_SCOPE.map((s) => `${s.deliverable}: ${s.acceptance}`).join("／")} |
 | 制作と投稿の分担 | ${PRODUCTION_ROLES} |
+| 新規ドメインでの検証 | ${PILOT_VALIDATION[0]} ${PILOT_VALIDATION[1]} |
+| 公開前の相談条件確認 | ${PILOT_VALIDATION[4]} |
 | 先方に残る資産 | ${ASSETS_PARTNER.slice(0, 4).join("／")} |
 | 必要な協力 | ${PARTNER_COOPERATION.slice(0, 4).join("／")} |
 `,

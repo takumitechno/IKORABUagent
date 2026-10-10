@@ -27,17 +27,17 @@ export default async function HomePage() {
         <div className="campaign-orbit" aria-hidden="true"><span /><span /></div>
         <div className="campaign-copy">
           <p className="campaign-eyebrow"><span />はじめて・未経験の転職ガイド</p>
-          <h1 id="home-title"><span>「変わりたい」を、</span><br /><strong>次の仕事へ。</strong></h1>
-          <p className="campaign-lead">経験に、自信がなくても。<br />次の一歩は、ここから。</p>
+          <h1 id="home-title"><span>その経験から、</span><br /><strong>次の仕事へ。</strong></h1>
+          <p className="campaign-lead">接客の経験も、バイトの日々も。<br />活かせる経験と、ゆずれない条件を整理しよう。</p>
         </div>
         <figure className="campaign-people">
-          <GeneratedImage slug="campaign-people" priority sizes="(min-width: 768px) 60vw, 100vw" fallback={<div />} className="h-full w-full" />
+          <GeneratedImage slug="campaign-people" priority sizes="(min-width: 768px) 60vw, 100vw" fallback={<div />} className="h-full w-full max-md:!object-cover" />
           <figcaption>生成イメージ・人物は架空です</figcaption>
         </figure>
         <a href="#home-journeys" className="campaign-stamp" aria-label="今の気持ちから探す"><ArrowDown aria-hidden="true" /><span>その気持ちから<br />はじめよう。</span></a>
         <div className="campaign-actions">
-          <Link href="/consultation" data-cta-placement="home-hero" data-cta-kind="consultation-info" className="campaign-cta"><span><small>ひとりで悩む、その前に。</small>自分に合う働き方を相談する</span><span className="campaign-arrow"><ArrowRight aria-hidden="true" /></span></Link>
-          <Link href="/check" data-cta-placement="home-hero" data-cta-kind="check" className="campaign-secondary">まずは希望を整理する<small>約3分・登録不要</small><ArrowRight aria-hidden="true" /></Link>
+          <Link href="/consultation" data-cta-placement="home-hero" data-cta-kind="consultation-info" className="campaign-cta"><span><small>会社選び・書類・面接の準備まで</small>相談でできることを見る</span><span className="campaign-arrow"><ArrowRight aria-hidden="true" /></span></Link>
+          <Link href="/check" data-cta-placement="home-hero" data-cta-kind="check" className="campaign-secondary">相談前にメモをつくる<small>約3分・登録不要</small><ArrowRight aria-hidden="true" /></Link>
         </div>
       </section>
       <div className="editorial-shell">
