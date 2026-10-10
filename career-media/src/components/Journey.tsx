@@ -171,7 +171,7 @@ export function JourneyCards() {
       {JOURNEYS.map((j, i) => (
         <li key={j.id}>
           <Link href={`${j.hubs[0]}#${JOURNEY_ANCHOR}`} data-cta-placement="home-journeys" data-cta-kind="journey-start" data-pattern-id={j.patternId} className="editorial-story">
-            <div className="editorial-story-photo"><GeneratedImage slug={CASE_COPY[i].image} sizes="(min-width: 768px) 33vw, 100vw" fallback={<Motif name={CASE_COPY[i].scene} className="h-full w-full" />} className="h-full w-full !object-cover" /><span aria-hidden="true">0{i + 1}</span></div>
+            <span className="editorial-story-number" aria-hidden="true">0{i + 1}</span><div className="editorial-story-photo"><GeneratedImage slug={CASE_COPY[i].image} sizes="(min-width: 768px) 33vw, 100vw" fallback={<Motif name={CASE_COPY[i].scene} className="h-full w-full" />} className="h-full w-full !object-cover" /></div>
             <div className="editorial-story-copy"><span>{CASE_COPY[i].lead}</span><h3>{CASE_COPY[i].title}</h3><span className="editorial-story-arrow" aria-label="読む順番ガイドへ"><ArrowRight aria-hidden="true" /></span></div>
           </Link>
         </li>

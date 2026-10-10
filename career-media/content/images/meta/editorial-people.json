@@ -2,11 +2,9 @@
   "schema_version": 1,
   "slug": "editorial-people",
   "type": "hero",
-  "status": "selected",
+  "status": "draft",
   "purpose": "人物中心の入口と生活の希望を伝える装飾画像。実在の利用者・社員・職場ではない。",
-  "used_in": [
-    "/"
-  ],
+  "used_in": [],
   "alt": "",
   "decorative": true,
   "brief_file": null,
@@ -27,5 +25,5 @@
   "sha256": "fb1276f419921f6c04a6ce7be59a15034bf9909c999c60c84bf67db6e52e3b0c",
   "usage": null,
   "regenerated_from": null,
-  "notes": "Generated with built-in image_gen. Reviewed visually. Lossy WebP compression only using existing sharp; original retained. No third-party photograph reused."
+  "notes": "Generated with built-in image_gen. Reviewed visually. Lossy WebP compression only using existing sharp; original retained. No third-party photograph reused. Superseded on Home by campaign-people; retained as source."
 }

@@ -23,36 +23,40 @@ export default async function HomePage() {
   return (
     <div className="editorial-home">
       <JsonLd data={organizationJsonLd()} /><JsonLd data={websiteJsonLd()} />
-      <section className="editorial-hero" aria-labelledby="home-title">
-        <div className="editorial-hero-copy">
-          <p className="editorial-kicker">はじめての転職、未経験からの転職。</p>
-          <h1 id="home-title">仕事を変える。<br />毎日が、<br /><span>ちょっと楽しみに。</span></h1>
-          <p className="editorial-lead">休みも、給料も、自分の時間も。<br />次の働き方を、一緒に見つけよう。</p>
-          <Link href="/consultation" data-cta-placement="home-hero" data-cta-kind="consultation-info" className="editorial-button">自分に合う働き方を相談する<ArrowRight aria-hidden="true" /></Link>
-          <Link href="/check" data-cta-placement="home-hero" data-cta-kind="check" className="editorial-text-link">まずは希望を整理する<span>約3分・登録不要</span><ArrowRight aria-hidden="true" /></Link>
+      <section className="campaign-hero" aria-labelledby="home-title">
+        <div className="campaign-orbit" aria-hidden="true"><span /><span /></div>
+        <div className="campaign-copy">
+          <p className="campaign-eyebrow"><span />はじめて・未経験の転職ガイド</p>
+          <h1 id="home-title"><span>「変わりたい」を、</span><br /><strong>次の仕事へ。</strong></h1>
+          <p className="campaign-lead">経験に、自信がなくても。<br />次の一歩は、ここから。</p>
         </div>
-        <figure className="editorial-hero-photo">
-          <GeneratedImage slug="editorial-people" priority sizes="(min-width: 768px) 55vw, 100vw" fallback={<div className="h-full bg-sand" />} className="h-full w-full !object-cover" />
-          <figcaption><span>YOUR NEXT CHAPTER</span><span>次の毎日を、ここから。</span></figcaption><span className="editorial-photo-note">生成イメージ・人物は架空です</span>
+        <figure className="campaign-people">
+          <GeneratedImage slug="campaign-people" priority sizes="(min-width: 768px) 60vw, 100vw" fallback={<div />} className="h-full w-full" />
+          <figcaption>生成イメージ・人物は架空です</figcaption>
         </figure>
+        <a href="#home-journeys" className="campaign-stamp" aria-label="今の気持ちから探す"><ArrowDown aria-hidden="true" /><span>その気持ちから<br />はじめよう。</span></a>
+        <div className="campaign-actions">
+          <Link href="/consultation" data-cta-placement="home-hero" data-cta-kind="consultation-info" className="campaign-cta"><span><small>ひとりで悩む、その前に。</small>自分に合う働き方を相談する</span><span className="campaign-arrow"><ArrowRight aria-hidden="true" /></span></Link>
+          <Link href="/check" data-cta-placement="home-hero" data-cta-kind="check" className="campaign-secondary">まずは希望を整理する<small>約3分・登録不要</small><ArrowRight aria-hidden="true" /></Link>
+        </div>
       </section>
       <div className="editorial-shell">
-        <a href="#home-journeys" className="editorial-scroll">今の気持ちから、探してみる<ArrowDown aria-hidden="true" /></a>
+
         <section className="editorial-section" aria-labelledby="home-journeys">
-          <div className="editorial-section-head"><div><p className="editorial-kicker">01 / FIND YOUR WAY</p><h2 id="home-journeys">次は、どんな毎日にする？</h2></div><p>ひとつ気になったら、そこからで大丈夫。</p></div>
+          <div className="editorial-section-head"><div><p className="editorial-kicker">あなたの「変わりたい」は？</p><h2 id="home-journeys">今の気持ちで、選んでいい。</h2></div><p>ひとつ気になったら、そこからで大丈夫。</p></div>
           <JourneyCards />
           <div className="editorial-browse"><Link href="/concerns">ほかの悩みから探す<ArrowRight aria-hidden="true" /></Link><Link href="/jobs">職種を見比べる<ArrowRight aria-hidden="true" /></Link></div>
         </section>
         <section className="editorial-check" aria-labelledby="home-check">
-          <div><p className="editorial-kicker">02 / MAKE IT CLEAR</p><h2 id="home-check">「なんとなく」を、<br />話せる希望に。</h2><p>ゆずれない条件、今までの経験。<br />選ぶだけで、相談に持っていけるメモに。</p><Link href="/check" data-cta-placement="home-hero" data-cta-kind="check" className="editorial-button">希望を整理してみる<ArrowRight aria-hidden="true" /></Link><p className="editorial-fine">約3分・登録不要。適職を判定する診断ではありません。</p></div>
-          <div className="editorial-note" aria-label="相談メモのイメージ"><p className="editorial-note-label">MY NEXT WORK / 相談メモの例</p><dl><div><dt>大切にしたいこと</dt><dd>土日休み、自分の時間</dd></div><div><dt>活かせそうな経験</dt><dd>接客で、相手の話を聞いてきた</dd></div><div><dt>相談で聞きたいこと</dt><dd>未経験から始められる仕事は？</dd></div></dl><span className="editorial-note-foot">答えが全部そろわなくても、OK。</span></div>
+          <div><p className="editorial-kicker">選ぶだけで、相談の準備。</p><h2 id="home-check">「なんとなく」を、<br />話せる希望に。</h2><p>ゆずれない条件、今までの経験。<br />選ぶだけで、相談に持っていけるメモに。</p><Link href="/check" data-cta-placement="home-hero" data-cta-kind="check" className="editorial-button">希望を整理してみる<ArrowRight aria-hidden="true" /></Link><p className="editorial-fine">約3分・登録不要。適職を判定する診断ではありません。</p></div>
+          <div className="editorial-note" aria-label="相談メモのイメージ"><p className="editorial-note-label">相談メモの例</p><dl><div><dt>大切にしたいこと</dt><dd>土日休み、自分の時間</dd></div><div><dt>活かせそうな経験</dt><dd>接客で、相手の話を聞いてきた</dd></div><div><dt>相談で聞きたいこと</dt><dd>未経験から始められる仕事は？</dd></div></dl><span className="editorial-note-foot">答えが全部そろわなくても、OK。</span></div>
         </section>
         <section className="editorial-consult" aria-labelledby="home-consult">
-          <div><p className="editorial-kicker">03 / LET’S TALK</p><h2 id="home-consult">ひとりで決めなくていい。<br />まずは、話そう。</h2><p>会社選びも、書類も、面接も。<br />転職のプロと、一つずつ準備できます。</p><Link href="/consultation" data-cta-placement="home-band" data-cta-kind="consultation-info" className="editorial-button">相談でできることを見る<ArrowRight aria-hidden="true" /></Link><p className="editorial-fine">まだ転職を決めていなくても。応募するかは、自分で決められます。</p></div>
+          <div><p className="editorial-kicker">次の一歩は、話すことから。</p><h2 id="home-consult">ひとりで決めなくていい。<br />まずは、話そう。</h2><p>会社選びも、書類も、面接も。<br />転職のプロと、一つずつ準備できます。</p><Link href="/consultation" data-cta-placement="home-band" data-cta-kind="consultation-info" className="editorial-button">相談でできることを見る<ArrowRight aria-hidden="true" /></Link><p className="editorial-fine">まだ転職を決めていなくても。応募するかは、自分で決められます。</p></div>
           <div className="editorial-consult-words" aria-hidden="true"><span>会社選び</span><span>書類の準備</span><span>面接の練習</span><ArrowRight /></div>
         </section>
         <section className="editorial-section" aria-labelledby="home-reads">
-          <div className="editorial-section-head"><div><p className="editorial-kicker">JOURNAL / 転職の読みもの</p><h2 id="home-reads">気になることから、ひとつ。</h2></div><Link href="/articles" className="editorial-text-link">記事をすべて見る<ArrowRight aria-hidden="true" /></Link></div>
+          <div className="editorial-section-head"><div><p className="editorial-kicker">転職の読みもの</p><h2 id="home-reads">気になることから、ひとつ。</h2></div><Link href="/articles" className="editorial-text-link">記事をすべて見る<ArrowRight aria-hidden="true" /></Link></div>
           <ul className="editorial-reads">{reads.map((read, i) => <li key={read.slug}><Link href={"/articles/" + read.slug}><span className="editorial-read-number">0{i + 1}</span><span><small>{read.label}</small><strong>{read.title}</strong></span><ArrowRight aria-hidden="true" /></Link></li>)}</ul>
           <form action="/articles" method="get" role="search" className="editorial-search"><Search aria-hidden="true" /><label htmlFor="home-search" className="sr-only">キーワードで記事を探す</label><input id="home-search" name="q" type="search" placeholder="事務、土日休み、履歴書…" /><button>検索</button></form>
           <p className="editorial-fine">未経験の仕事選びから、職種比較、履歴書・面接、働く条件まで。記事で知り、希望を整理して、キャリア相談につなげられる転職ガイドです。</p>

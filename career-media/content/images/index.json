@@ -1,6 +1,19 @@
 {
   "images": [
     {
+      "slug": "campaign-people",
+      "type": "hero",
+      "status": "selected",
+      "src": "/images/generated/hero/campaign-people.webp",
+      "width": 1536,
+      "height": 1024,
+      "alt": "",
+      "decorative": true,
+      "used_in": [
+        "/"
+      ]
+    },
+    {
       "slug": "editorial-conversation",
       "type": "hero",
       "status": "selected",
@@ -29,15 +42,13 @@
     {
       "slug": "editorial-people",
       "type": "hero",
-      "status": "selected",
+      "status": "draft",
       "src": "/images/generated/hero/editorial-people.webp",
       "width": 1536,
       "height": 1024,
       "alt": "",
       "decorative": true,
-      "used_in": [
-        "/"
-      ]
+      "used_in": []
     },
     {
       "slug": "editorial-weekend",

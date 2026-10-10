@@ -44,6 +44,9 @@
   --color-mist-ink: #33475a;
   /* 白い文字を載せる面（ダークモードでも変えない）。ボタンの押下色・帯・カテゴリ色に使う */
   --color-night: #142b3e;
+  --color-campaign-paper: #fff7e9;
+  --color-campaign-ink: #172b40;
+  --color-campaign-pop: #ffd65a;
   --color-brand-press: #0b5f54;
   --color-accent-press: #a24506;
   --color-sub: #1f5f99;
@@ -1340,3 +1343,109 @@ body {
 }
 @keyframes editorial-arrive { from { transform: translateY(16px); } to { transform: translateY(0); } }
 @keyframes editorial-photo-in { from { transform: scale(1.055); } to { transform: scale(1); } }
+
+/* One campaign canvas: live type, transparent subjects and a clear next action. */
+@layer components {
+  .campaign-hero { position: relative; isolation: isolate; overflow: clip; background: var(--color-hero); color: var(--color-campaign-paper); min-height: 690px; padding: 72px max(40px, calc((100vw - 1200px) / 2)); }
+  .campaign-copy { position: relative; z-index: 3; pointer-events: none; }
+  .campaign-eyebrow { display: flex; align-items: center; gap: 10px; font-size: 12px; font-weight: 600; letter-spacing: .1em; }
+  .campaign-eyebrow > span { width: 8px; height: 8px; border-radius: 50%; background: var(--color-campaign-pop); }
+  .campaign-copy h1 { margin-top: 36px; font-weight: 800; letter-spacing: -.065em; line-height: 1.32; }
+  .campaign-copy h1 > span { display: inline-block; font-size: clamp(35px, 4.8vw, 66px); }
+  .campaign-copy h1 > strong { display: inline-block; font-size: clamp(50px, 6.5vw, 92px); color: var(--color-campaign-pop); font-weight: 900; }
+  .campaign-lead { margin-top: 23px; font-size: 15px; line-height: 1.9; letter-spacing: .06em; }
+  .campaign-people { position: absolute; z-index: 2; bottom: 0; right: max(-35px, calc((100vw - 1500px) / 2)); width: min(66vw, 870px); height: 94%; pointer-events: none; }
+  .campaign-people > img { object-fit: contain; object-position: bottom; }
+  .campaign-people figcaption { position: absolute; right: 28px; bottom: 14px; padding: 3px 7px; background: var(--color-hero); font-size: 9px; letter-spacing: .02em; }
+  .campaign-orbit { position: absolute; z-index: -1; width: 700px; height: 700px; right: -80px; top: 15px; border-radius: 50%; background: var(--color-brand); }
+  .campaign-orbit > span { position: absolute; inset: -48px; border: 1px solid rgb(255 255 255 / .22); border-radius: 50%; }
+  .campaign-orbit > span:last-child { inset: -105px; }
+  .campaign-stamp { position: absolute; z-index: 4; right: 5%; top: 28px; width: 126px; height: 126px; border-radius: 50%; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 5px; background: var(--color-campaign-pop); color: var(--color-campaign-ink); transform: rotate(9deg); font-size: 12px; font-weight: 700; line-height: 1.6; }
+  .campaign-stamp svg { width: 25px; height: 25px; }
+  .campaign-actions { position: relative; z-index: 4; margin-top: 37px; width: 385px; max-width: 100%; }
+  .campaign-cta { display: flex; align-items: center; justify-content: space-between; gap: 18px; padding: 17px 17px 17px 23px; border-radius: 60px; background: var(--color-campaign-pop); color: var(--color-campaign-ink); font-size: 15px; font-weight: 700; }
+  .campaign-cta small { display: block; font-size: 10px; font-weight: 500; margin-bottom: 5px; }
+  .campaign-arrow { width: 43px; height: 43px; border-radius: 50%; display: grid; place-items: center; background: var(--color-campaign-ink); color: var(--color-campaign-paper); flex-shrink: 0; }
+  .campaign-arrow svg { width: 21px; }
+  .campaign-secondary { display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 18px; font-size: 12px; }
+  .campaign-secondary small { font-size: 10px; opacity: .8; }
+  .campaign-secondary svg { width: 17px; }
+  .campaign-secondary:hover { text-decoration: underline; text-underline-offset: 4px; }
+  .editorial-home [id] { scroll-margin-top: 100px; }
+  .campaign-hero a:focus-visible { outline: 3px solid var(--color-campaign-paper); outline-offset: 6px; }
+  .editorial-home .editorial-section { padding-block: 88px; }
+  .editorial-home .editorial-section h2 { font-size: clamp(26px, 3vw, 42px); letter-spacing: -.05em; }
+  .editorial-home .editorial-journeys { display: block; border-top: 1px solid var(--color-line-strong); }
+  .editorial-home .editorial-journeys li { border-bottom: 1px solid var(--color-line-strong); }
+  .editorial-home .editorial-story { display: grid; grid-template-columns: 76px minmax(0,1fr) 215px; gap: 30px; align-items: center; min-height: 160px; padding: 20px 18px 20px 0; }
+  .editorial-story-number { font: 300 44px/1 Arial, sans-serif; color: var(--color-accent-strong); letter-spacing: -.06em; }
+  .editorial-home .editorial-story-photo { grid-column: 3; grid-row: 1; aspect-ratio: 2; border-radius: 80px; }
+  .editorial-home .editorial-story-copy { grid-column: 2; grid-row: 1; border: 0; padding: 0 44px 0 0; }
+  .editorial-home .editorial-story-copy h3 { font-size: clamp(22px, 2.5vw, 32px); line-height: 1.45; }
+  .editorial-home .editorial-story-arrow { top: 50%; bottom: auto; margin-top: -16px; border: 0; background: var(--color-ink); color: var(--color-surface); }
+  .editorial-home .editorial-story:hover, .editorial-home .editorial-story:focus-visible { background: var(--color-brand-tint); }
+  .editorial-home .editorial-check { border-radius: 28px; }
+  .editorial-home .editorial-consult { border-radius: 28px; }
+  .editorial-home .editorial-button { border-radius: 50px; }
+  @media (max-width: 1000px) and (min-width: 768px) {
+    .campaign-hero { padding: 55px 32px; min-height: 640px; }
+    .campaign-people { width: 72vw; right: -130px; height: 88%; }
+    .campaign-stamp { width: 98px; height: 98px; font-size: 10px; right: 4%; }
+    .campaign-orbit { right: -320px; }
+  }
+  @media (max-width: 767px) {
+    .campaign-hero { min-height: 685px; padding: 30px 23px 24px; display: flex; flex-direction: column; }
+    .campaign-eyebrow { font-size: 10px; gap: 7px; }
+    .campaign-copy h1 { margin-top: 23px; line-height: 1.34; }
+    .campaign-copy h1 > span { font-size: clamp(27px, 8.4vw, 54px); }
+    .campaign-copy h1 > strong { font-size: clamp(43px, 13vw, 78px); }
+    .campaign-lead { margin-top: 15px; font-size: 12px; line-height: 1.8; }
+    .campaign-people { top: 235px; bottom: auto; right: -6%; width: 112%; height: 346px; }
+    .campaign-people figcaption { bottom: 0; right: 10%; font-size: 8px; }
+    .campaign-orbit { width: 390px; height: 390px; top: 220px; right: -100px; }
+    .campaign-orbit > span { inset: -28px; }
+    .campaign-orbit > span:last-child { inset: -58px; }
+    .campaign-people > img { object-fit: cover; }
+    .campaign-stamp { display: none; width: 81px; height: 81px; top: 242px; right: 22px; font-size: 9px; gap: 1px; }
+    .campaign-stamp svg { width: 19px; height: 19px; }
+    .campaign-actions { width: 100%; margin-top: auto; padding-top: 338px; }
+    .campaign-cta { padding: 13px 13px 13px 20px; font-size: 13px; gap: 8px; }
+    .campaign-cta small { font-size: 9px; }
+    .campaign-arrow { width: 38px; height: 38px; }
+    .campaign-secondary { margin-top: 15px; font-size: 11px; }
+    .editorial-home .editorial-section { padding-block: 54px; }
+    .editorial-home .editorial-story { grid-template-columns: 25px minmax(0,1fr) 78px; gap: 12px; min-height: 128px; padding: 15px 0; }
+    .editorial-story-number { font-size: 21px; align-self: start; padding-top: 21px; }
+    .editorial-home .editorial-story-photo { aspect-ratio: .8; border-radius: 60px; }
+    .editorial-home .editorial-story-copy { padding: 0 0 24px; }
+    .editorial-home .editorial-story-copy h3 { font-size: 18px; letter-spacing: -.04em; }
+    .editorial-home .editorial-story-copy > span:first-child { font-size: 10px; }
+    .editorial-home .editorial-story-arrow { top: auto; bottom: -7px; right: auto; left: 0; width: 24px; height: 24px; }
+    .editorial-home .editorial-check, .editorial-home .editorial-consult { border-radius: 20px; }
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .campaign-copy h1 > span { animation: campaign-type .85s cubic-bezier(.16,1,.3,1) both; }
+    .campaign-copy h1 > strong { animation: campaign-type 1s .12s cubic-bezier(.16,1,.3,1) both; }
+    .campaign-people { animation: campaign-people-in 1.3s cubic-bezier(.16,1,.3,1) both; }
+    .campaign-orbit { animation: campaign-orbit-in 1.8s cubic-bezier(.16,1,.3,1) both; }
+    .campaign-stamp { animation: campaign-stamp-in 1.2s .2s cubic-bezier(.16,1,.3,1) both; }
+    .campaign-actions { animation: editorial-arrive 1s .3s both; }
+    .campaign-cta, .campaign-arrow, .campaign-stamp, .editorial-home .editorial-story, .editorial-home .editorial-story-photo { transition: transform .45s cubic-bezier(.16,1,.3,1), background .3s; }
+    .campaign-cta:hover { transform: translateY(-4px); }
+    .campaign-cta:hover .campaign-arrow { transform: rotate(-35deg); }
+    .campaign-stamp:hover { transform: rotate(0); }
+    .editorial-home .editorial-story:is(:hover,:focus-visible) { transform: translateX(5px); }
+    .editorial-home .editorial-story:is(:hover,:focus-visible) .editorial-story-photo { transform: rotate(-4deg) scale(1.04); }
+    @supports (animation-timeline: view()) {
+      .campaign-people > img { animation: campaign-parallax linear both; animation-timeline: view(); animation-range: exit 0% exit 100%; }
+      .editorial-home .editorial-journeys li { animation: editorial-arrive linear both; animation-timeline: view(); animation-range: entry 0% entry 75%; }
+      .editorial-home .editorial-note { animation: campaign-note linear both; animation-timeline: view(); animation-range: entry 0% entry 100%; }
+    }
+  }
+}
+@keyframes campaign-type { from { transform: translateY(-18px) rotate(1deg); } to { transform: translateY(0) rotate(0); } }
+@keyframes campaign-people-in { from { transform: translateY(75px) scale(1.035); } to { transform: translateY(0) scale(1); } }
+@keyframes campaign-orbit-in { from { transform: scale(.6) translateX(130px); } to { transform: scale(1) translateX(0); } }
+@keyframes campaign-stamp-in { from { transform: rotate(-35deg) scale(.7); } to { transform: rotate(9deg) scale(1); } }
+@keyframes campaign-parallax { from { transform: translateY(0); } to { transform: translateY(70px); } }
+@keyframes campaign-note { from { transform: rotate(-5deg) translateY(25px); } to { transform: rotate(2deg) translateY(0); } }

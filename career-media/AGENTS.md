@@ -71,7 +71,7 @@ Node.js 20.9 以上。依存は `npm ci`。環境変数なしで動く（記事�
 
 | URL | ページ | 主な部品・データ |
 |---|---|---|
-| `/` | `src/app/page.tsx` | 人物写真のヒーロー、`JourneyCards`（3経路）、条件整理メモ、相談CTA、代表記事6件と検索。SEO記事本文を保持 |
+| `/` | `src/app/page.tsx` | 透過人物・大見出し・CSSモーションのヒーロー、`JourneyCards`（3経路）、条件整理メモ、相談CTA、代表記事6件と検索。SEO記事本文を保持 |
 | `/articles`、`/articles/[slug]` | `src/app/articles/` | `ArticleCards`、`ArticleParts`、`lib/markdown.ts`、`lib/figures.ts`、`content/articles/*.md` |
 | `/news`、`/news/[slug]` | `src/app/news/` | `NewsTimeline`、`content/news/*.md` |
 | `/categories/[slug]` | `src/app/categories/[slug]/page.tsx` | `content/categories.json` |

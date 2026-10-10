@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "slug": "campaign-people",
+  "type": "hero",
+  "status": "selected",
+  "purpose": "人物中心の入口と生活の希望を伝える装飾画像。実在の利用者・社員・職場ではない。",
+  "used_in": [
+    "/"
+  ],
+  "alt": "",
+  "decorative": true,
+  "brief_file": null,
+  "model": "OpenAI built-in image_gen (model not exposed)",
+  "size": "1536x1024",
+  "quality": "auto",
+  "output_format": "webp",
+  "background": "transparent",
+  "prompt_brief": "Use case: background-extraction. Edit the supplied image. Remove all architecture, trees and background entirely, leaving the two fictional Japanese adults as one clean photographic cutout on true alpha transparency. Preserve their exact identities, natural faces, clothing, body proportions and relative positions. Keep all hair detail and both shoulders intact; extend crop slightly to include lower torso naturally if needed. No white matte, no colored background, no outline, no sticker border, no text, no shadow outside subjects. This is a transparent web campaign compositing asset. Preserve photo realism.\n",
+  "prompt_final": "Use case: background-extraction. Edit the supplied image. Remove all architecture, trees and background entirely, leaving the two fictional Japanese adults as one clean photographic cutout on true alpha transparency. Preserve their exact identities, natural faces, clothing, body proportions and relative positions. Keep all hair detail and both shoulders intact; extend crop slightly to include lower torso naturally if needed. No white matte, no colored background, no outline, no sticker border, no text, no shadow outside subjects. This is a transparent web campaign compositing asset. Preserve photo realism.\n",
+  "revised_prompt": null,
+  "generated_at": "2026-10-10T15:20:09.136Z",
+  "src": "/images/generated/hero/campaign-people.webp",
+  "file": "public/images/generated/hero/campaign-people.webp",
+  "width": 1536,
+  "height": 1024,
+  "bytes": 209284,
+  "sha256": "93e8d312633eb776c6949eb53f826164b3b16606ac6496725cc198e5c71991e7",
+  "usage": null,
+  "regenerated_from": "editorial-people",
+  "notes": "Built-in image_gen background extraction; original retained. WebP compression preserves alpha. Fictional people, not testimonials."
+}
