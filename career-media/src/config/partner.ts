@@ -148,28 +148,38 @@ const neutral: PartnerConfig = {
 const makecareer: PartnerConfig = {
   ...common,
   profile: "makecareer",
-  // TODO(正式公開前にMakeCareer確認が必要): メディア名は仮。MakeCareer 帰属の商品として「MakeCareer転職ガイド」にしている
-  mediaName: "MakeCareer転職ガイド",
-  mediaTagline: "20代・未経験の転職を、プロと一緒に。",
+  // メディア名は未定。PO の指示（2026-10-10）で「転職エージェント（仮）」にしている
+  mediaName: "MakeCareer転職エージェント（仮）",
+  mediaTagline: "20代・第二新卒・既卒・フリーターの転職を、プロと一緒に。",
   operatorDisplay: "MakeCareer株式会社",
   operatorShort: "MakeCareer",
   producerDisplay: "匠Technologies（企画・制作・運用の提案）",
   partnerName: "MakeCareer株式会社",
   brandName: "MakeCareer",
-  licenseNumber: null,
+  // 会社概要ページ（https://make-career.co.jp/company/）の記載を Web 検索の結果で確認（2026-10-10）。PO から共有された番号とも一致
+  licenseNumber: "13-ユ-313746",
   liveConsultationUrl: "https://lp.make-career.co.jp/tenshoku-01/",
   campaignId: "owned-media-pilot",
   corporateUrl: null,
   disclosure:
     "このサイトは、MakeCareer株式会社が運営するオウンドメディアの完成イメージとして、匠Technologiesが商談用に試作したものです（正式提携・ブランド利用許諾前、非公開）。正式に公開する場合は、記事や条件整理チェックの中で MakeCareer株式会社のキャリア相談をご案内する想定です。商談用プレビューのため、相談ボタンを押しても申し込みページには移動しません。記事は、特定の求人や企業への応募をすすめるものではありません。",
-  consultationStepsNote: "人材紹介サービスの一般的な流れの例です。MakeCareer株式会社の実際の流れ・対応範囲は、正式公開前に確認して掲載します。",
-  // TODO(正式公開前にMakeCareer確認が必要): 面接の練習・企業選びの相談は PO（プロジェクトオーナー）から共有された内容。表現と範囲を確認する
-  serviceHighlightsNote: "MakeCareer株式会社のキャリア相談では、面接の練習や企業選びの相談も受けられます（正式公開前に内容を確認して掲載します）。求職者の利用は原則無料です（職業安定法により、求職者から手数料を取ることは原則禁止されています）。",
+  consultationStepsNote: "人材紹介サービスの一般的な流れの例です。MakeCareer株式会社の実際の流れは、相談の申し込み後にご案内します。",
+  // 面接の練習・企業選びの相談は PO から共有され、サイトへの掲載も PO が了承（2026-10-10）。
+  // 20代・第二新卒・既卒・フリーター向け、国家資格のキャリアコンサルタント在籍、求職者は無料、は会社サイトの記載を Web 検索の結果で確認
+  serviceHighlightsNote: "MakeCareer株式会社のキャリア相談では、面接の練習や企業選びの相談も受けられます。求職者の方は無料で利用できます（紹介手数料は採用した企業が支払うしくみです）。",
+  serviceDescription:
+    "MakeCareer株式会社は、20代・第二新卒・既卒・フリーターの方の転職を支援する人材紹介会社です。国家資格を持つキャリアコンサルタントが、これまでの経験や希望条件の整理、企業選びの相談、応募書類の添削や面接の練習、選考の日程や条件の調整まで、転職を一緒に進めます。",
+  serviceAudience: [
+    "第二新卒・既卒・フリーターで、正社員を目指したい方",
+    "はじめての転職で、何から始めればいいか迷っている方",
+    "接客・販売などから、別の職種を考えている方",
+    "未経験の仕事に挑戦したい20代の方",
+  ],
   previewNotice: "MakeCareer様 商談用プレビュー（非公開・正式提携前）｜相談ボタンは申し込みページに移動しません",
   adviserLabel: "MakeCareerのキャリアアドバイザー",
   consultCta: "MakeCareerに相談する",
   proLabel: "MakeCareerのプロ",
-  heroBadge: "MakeCareerの転職ガイド｜20代・未経験の転職を、プロと一緒に",
+  heroBadge: "20代・第二新卒・既卒・フリーターの転職を、プロと一緒に",
   theme: "makecareer",
 };
 

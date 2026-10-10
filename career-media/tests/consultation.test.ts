@@ -97,9 +97,9 @@ describe("consultation flow (partner config)", () => {
     expect(partner.operatorDisplay).toMatch(/デモ/);
   });
 
-  it("does not show an unverified license number in the MakeCareer private demo", async () => {
+  it("shows only the license number confirmed on the company profile in the MakeCareer private demo", async () => {
     const mc = await loadProfile({ PARTNER_PROFILE: "makecareer" });
-    expect(mc.partner.licenseNumber).toBeNull();
+    expect(mc.partner.licenseNumber).toBe("13-ユ-313746");
     expect(mc.partner.previewNotice).toMatch(/非公開/);
     expect(mc.partner.disclosure).toMatch(/正式提携.*前|非公開/);
   });
