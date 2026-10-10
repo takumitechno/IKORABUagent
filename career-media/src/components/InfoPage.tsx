@@ -1,17 +1,16 @@
-import { Breadcrumbs } from "./Breadcrumbs";
+import { PageHero } from "./PageHero";
 
 export function InfoPage({ title, path, eyebrow, lead, children }: { title: string; path: string; eyebrow?: string; lead?: string; children: React.ReactNode }) {
   return (
-    <div className="mx-auto max-w-3xl px-4 pt-6 sm:px-6">
-      <Breadcrumbs items={[{ name: "ホーム", path: "/" }, { name: title, path }]} />
-      <article className="mt-6 rounded-[20px] bg-white px-5 py-8 ring-1 ring-line sm:px-10 sm:py-10">
-        <header>
-          <h1 className="text-[26px] font-bold leading-snug text-ink sm:text-[30px]">{title}</h1>
-          {lead && <p className="mt-4 text-[15px] leading-8 text-body">{lead}</p>}
-        </header>
-        <div className="article-body mt-8">{children}</div>
-      </article>
-    </div>
+    <>
+      <PageHero crumbs={[{ name: "ホーム", path: "/" }, { name: title, path }]} eyebrow={eyebrow} title={title} compact />
+      <div className="mx-auto max-w-3xl px-4 pt-8 sm:px-6">
+        <article className="rounded-[20px] bg-white px-5 py-8 ring-1 ring-line sm:px-10 sm:py-10">
+          {lead && <p className="text-[15px] leading-8 text-body">{lead}</p>}
+          <div className={`article-body ${lead ? "mt-8" : ""}`}>{children}</div>
+        </article>
+      </div>
+    </>
   );
 }
 

@@ -1,6 +1,6 @@
-import { ClipboardList, Clock, Lock, ShieldCheck } from "lucide-react";
-import { Breadcrumbs } from "@/components/Breadcrumbs";
+import { Clock, Lock, ShieldCheck } from "lucide-react";
 import { ConditionCheck } from "@/components/ConditionCheck";
+import { PageHero } from "@/components/PageHero";
 import { buildConsultationUrl } from "@/lib/consultation";
 import { ALL_QUESTIONS } from "@/lib/condition-check/questions";
 import { pageMetadata } from "@/lib/seo";
@@ -13,37 +13,32 @@ export const metadata = pageMetadata({
 
 export default function CheckPage() {
   return (
-    <div className="mx-auto max-w-4xl px-4 pt-6 sm:px-6">
-      <Breadcrumbs items={[{ name: "ホーム", path: "/" }, { name: "条件整理チェック", path: "/check" }]} />
-      <header className="mt-4 grid items-center gap-2 overflow-hidden rounded-[22px] bg-brand-tint p-5 ring-1 ring-brand/15 sm:mt-6 sm:grid-cols-[minmax(0,1fr)_220px] sm:p-8">
-        <div className="order-2 sm:order-1">
-          <p className="text-[11px] font-bold tracking-[0.2em] text-brand">SELF CHECK</p>
-          <h1 className="mt-1 text-[24px] font-bold leading-snug text-ink sm:text-[30px]">未経験転職 条件整理チェック</h1>
-          <p className="mt-2 text-[15px] leading-7 text-body">
-            {ALL_QUESTIONS.length}の質問に答えると、ゆずれない条件・活かせそうな経験・比べてみたい職種・面談で聞きたいことが一覧になります。合否や向き不向きを判定するものではありません。
-          </p>
-          <ul className="mt-4 flex flex-wrap gap-2 text-[12.5px] font-medium text-ink">
-            <li className="inline-flex items-center gap-1.5 rounded-full bg-white px-3 py-1 ring-1 ring-line">
-              <Clock className="h-3.5 w-3.5 text-brand" aria-hidden="true" />
-              約3分
+    <>
+      <PageHero
+        crumbs={[{ name: "ホーム", path: "/" }, { name: "条件整理チェック", path: "/check" }]}
+        eyebrow="SELF CHECK"
+        title="未経験転職 条件整理チェック"
+        lead={`${ALL_QUESTIONS.length}の質問に答えると、ゆずれない条件や面談で聞きたいことが一覧になります。合否や向き不向きの判定はしません。`}
+        icon="clipboard-list"
+      >
+        <ul className="flex flex-wrap gap-2 text-[12.5px] font-bold">
+          {[
+            { icon: Clock, text: "約3分" },
+            { icon: Lock, text: "登録不要・回答は送信されません" },
+            { icon: ShieldCheck, text: "氏名や連絡先の入力なし" },
+          ].map(({ icon: Icon, text }) => (
+            <li key={text} className="inline-flex items-center gap-1.5 rounded-full bg-white/10 px-3 py-1.5 ring-1 ring-white/20">
+              <Icon className="h-3.5 w-3.5 text-highlight" aria-hidden="true" />
+              {text}
             </li>
-            <li className="inline-flex items-center gap-1.5 rounded-full bg-white px-3 py-1 ring-1 ring-line">
-              <Lock className="h-3.5 w-3.5 text-brand" aria-hidden="true" />
-              登録不要・回答は送信されません
-            </li>
-            <li className="inline-flex items-center gap-1.5 rounded-full bg-white px-3 py-1 ring-1 ring-line">
-              <ShieldCheck className="h-3.5 w-3.5 text-brand" aria-hidden="true" />
-              氏名や連絡先の入力なし
-            </li>
-          </ul>
+          ))}
+        </ul>
+      </PageHero>
+      <div className="mx-auto max-w-4xl px-4 sm:px-6">
+        <div id="condition-check-root" className="mt-8 rounded-[20px] bg-canvas">
+          <ConditionCheck consultationHref={buildConsultationUrl("check-result")} consultationLabel="整理した内容をもとに相談する" />
         </div>
-        <span aria-hidden="true" className="order-1 mx-auto hidden h-28 w-28 items-center justify-center rounded-3xl bg-brand text-white shadow-[0_18px_40px_-18px_rgb(15_123_108/0.8)] sm:order-2 sm:flex">
-          <ClipboardList className="h-14 w-14" />
-        </span>
-      </header>
-      <div id="condition-check-root" className="mt-8 rounded-[20px] bg-canvas">
-        <ConditionCheck consultationHref={buildConsultationUrl("check-result")} consultationLabel="整理した内容をもとに相談する" />
       </div>
-    </div>
+    </>
   );
 }

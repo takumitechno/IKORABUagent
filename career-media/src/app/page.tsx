@@ -79,25 +79,25 @@ export default async function HomePage() {
         </div>
         <div className="relative mx-auto grid max-w-6xl gap-10 px-4 pb-10 pt-8 sm:px-6 md:grid-cols-[minmax(0,1.08fr)_minmax(0,0.92fr)] md:items-center md:pb-16 md:pt-14">
           <div>
-            <p className="inline-flex items-center gap-1.5 rounded-full bg-white/12 px-3 py-1 text-[12px] font-bold tracking-wide ring-1 ring-white/20">
+            <p className="enter inline-flex items-center gap-1.5 rounded-full bg-white/12 px-3 py-1 text-[12px] font-bold tracking-wide ring-1 ring-white/20">
               <span className="h-1.5 w-1.5 rounded-full bg-accent-bright" aria-hidden="true" />
               {partner.heroBadge}
             </p>
-            <h1 className="mt-4 text-[30px] font-bold leading-[1.4] min-[400px]:text-[32px] sm:text-[46px]">
+            <h1 className="enter enter-d1 mt-4 text-[30px] font-bold leading-[1.4] min-[400px]:text-[32px] sm:text-[46px]">
               転職したい。
               <br />
               でも、
               <br className="sm:hidden" />
               <span className="text-highlight">何から決めればいい？</span>
             </h1>
-            <p className="mt-3 text-[15px] leading-7 text-white/85 sm:text-base">会社選びから面接の練習まで、{partner.proLabel}に相談しながら進められます。まずは記事とチェックで、自分の条件を整理しましょう。</p>
+            <p className="enter enter-d2 mt-3 text-[15px] leading-7 text-white/85 sm:text-base">会社選びから面接の練習まで、{partner.proLabel}と一緒に。</p>
 
             {/* スマホ: 人物のイラストの下半分に検索ボックスを重ねる */}
             <div className="relative -mb-24 mt-4 h-[330px] overflow-hidden md:hidden">
               <GeneratedImage slug="hero-home" priority sizes="290px" className="mx-auto h-auto w-[290px]" fallback={<HeroMockupPeek />} />
             </div>
 
-            <form action="/articles" method="get" role="search" className="relative rounded-2xl md:mt-6 bg-white p-3 text-ink shadow-[0_18px_40px_-18px_rgb(0_0_0/0.45)] sm:p-4">
+            <form action="/articles" method="get" role="search" className="enter enter-d3 relative rounded-2xl md:mt-6 bg-white p-3 text-ink shadow-[0_18px_40px_-18px_rgb(0_0_0/0.45)] sm:p-4">
               <label htmlFor="hero-search" className="px-1 text-[12px] font-bold text-muted">
                 キーワードで記事を探す
               </label>
@@ -142,18 +142,18 @@ export default async function HomePage() {
 
       <div className="mx-auto max-w-6xl space-y-16 px-4 pt-10 sm:px-6 sm:pt-14">
         {/* プロに頼むよさ（このサイトの目的: 整理したことをもとにキャリア相談 → 自分に合う会社へ）。ヒーローのすぐ下に置く */}
-        <section aria-labelledby="home-consult">
+        <section aria-labelledby="home-consult" className="reveal">
           <ProValueSection has={has} />
         </section>
 
         {/* 入口: 今の状況 / 悩み / 職種 */}
-        <section aria-labelledby="home-explore">
+        <section aria-labelledby="home-explore" className="reveal">
           <SectionHeading eyebrow="FIND" title="自分に近いところから探す" id="home-explore" />
           <ExploreTabs counts={{ situations: counts("situations"), concerns: counts("concerns"), roles: counts("roles") }} />
         </section>
 
         {/* はじめての転職ガイド: 進め方 + よくある3つのケース */}
-        <section aria-labelledby="home-howto">
+        <section aria-labelledby="home-howto" className="reveal">
           <SectionHeading eyebrow="GUIDE" title="はじめての転職ガイド" id="home-howto" />
           <Roadmap steps={roadmap} />
           <h3 className="mt-9 text-[16px] font-bold text-ink">よくある3つのケースを、順番に読む</h3>
@@ -163,14 +163,14 @@ export default async function HomePage() {
         </section>
 
         {/* 図: 転職活動の流れ（7ステップ。各ステップから記事へ） */}
-        <section aria-labelledby="home-flow">
+        <section aria-labelledby="home-flow" className="reveal">
           <SectionHeading eyebrow="FLOW" title="転職活動の流れを図で見る" id="home-flow" href={has("tenshoku-schedule") ? "/articles/tenshoku-schedule" : undefined} hrefLabel="スケジュールの立て方" />
           <ProcessFlow has={has} />
         </section>
 
         {/* 最初に読みたい記事（編集部が選んだもの。ランキングではない） */}
         {lead && (
-          <section aria-labelledby="home-featured">
+          <section aria-labelledby="home-featured" className="reveal">
             <SectionHeading eyebrow="EDITOR'S PICK" title="最初に読みたい記事" id="home-featured" href="/articles" hrefLabel="記事一覧" />
             <div className="grid grid-cols-[minmax(0,1fr)] gap-5 lg:grid-cols-[minmax(0,1.25fr)_minmax(0,1fr)]">
               <div className="reveal">
@@ -183,14 +183,14 @@ export default async function HomePage() {
 
         {/* 新着 */}
         {latest.length > 0 && (
-          <section aria-labelledby="home-latest">
+          <section aria-labelledby="home-latest" className="reveal">
             <SectionHeading eyebrow="LATEST" title="新着記事" id="home-latest" href="/articles" hrefLabel="すべて見る" />
             <ArticleList articles={latest} categories={categories} showSummary={false} className="-mt-3 md:grid md:grid-cols-2 md:gap-x-8" />
           </section>
         )}
 
         {/* 制度の変更 */}
-        <section aria-labelledby="home-news">
+        <section aria-labelledby="home-news" className="reveal">
           <SectionHeading eyebrow="NEWS" title="知っておきたい制度の変更" id="home-news" href="/news" hrefLabel="一覧" />
           <ul className="-mt-3 divide-y divide-line md:grid md:grid-cols-2 md:gap-x-8">
             {news.slice(0, 4).map((n) => (
@@ -200,7 +200,7 @@ export default async function HomePage() {
         </section>
 
         {/* 職種の比較表（転職サイトの職種比較のように、同じものさしで並べる） */}
-        <section aria-labelledby="home-jobs">
+        <section aria-labelledby="home-jobs" className="reveal">
           <SectionHeading eyebrow="JOB GUIDE" title="職種を比べる" id="home-jobs" href="/jobs" hrefLabel="くわしく比べる" />
           {/* スマホ: 1職種1カード（表は横にはみ出すため） */}
           <ul className="grid gap-2.5 sm:hidden">
@@ -270,13 +270,13 @@ export default async function HomePage() {
         </section>
 
         {/* 図: 求人票の見るところ（見本に番号を振る） */}
-        <section aria-labelledby="home-posting">
+        <section aria-labelledby="home-posting" className="reveal">
           <SectionHeading eyebrow="CHECK" title="求人票は、ここを見る" id="home-posting" href={has("kyujin-hyo-yomikata") ? "/articles/kyujin-hyo-yomikata" : undefined} hrefLabel="求人票の見方" />
           <JobPostingDiagram has={has} />
         </section>
 
         {/* 条件整理チェック（転職サイトの「診断」のような入口。ただし判定はしない） */}
-        <section aria-labelledby="home-check" className="overflow-hidden rounded-2xl border-2 border-brand/20 bg-white">
+        <section aria-labelledby="home-check" className="reveal overflow-hidden rounded-2xl border-2 border-brand/20 bg-white">
           <div className="grid gap-6 p-5 sm:p-9 md:grid-cols-[minmax(0,1fr)_minmax(0,0.9fr)] md:items-center">
             <div>
               <p className="inline-flex items-center gap-1.5 rounded-full bg-brand-tint px-3 py-1 text-[12px] font-bold text-brand-strong">
@@ -286,20 +286,18 @@ export default async function HomePage() {
               <h2 id="home-check" className="mt-3 text-[22px] font-bold leading-snug text-ink sm:text-[28px]">
                 3分でできる、条件整理チェック
               </h2>
-              <p className="mt-2 text-[14.5px] leading-7 text-muted">向いている仕事を判定するものではありません。迷っていることを、自分の言葉で整理するための道具です。</p>
               <ul className="mt-5 grid gap-2.5">
                 {[
                   { icon: ListChecks, t: `${ALL_QUESTIONS.length}の質問に答えるだけ`, d: "選ぶだけ。答えたくない質問は飛ばせます" },
                   { icon: FileText, t: "条件・経験・比べたい職種が一覧に", d: "面談で使えるメモとしてコピーできます" },
                   { icon: ShieldCheck, t: "回答はどこにも送信されません", d: "このブラウザの中だけで整理します" },
                 ].map((x) => (
-                  <li key={x.t} className="flex items-start gap-3">
+                  <li key={x.t} className="flex items-center gap-3">
                     <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-brand text-white">
                       <x.icon className="h-4.5 w-4.5" aria-hidden="true" />
                     </span>
                     <span>
                       <span className="block text-[14.5px] font-bold text-ink">{x.t}</span>
-                      <span className="block text-[12.5px] leading-5 text-muted">{x.d}</span>
                     </span>
                   </li>
                 ))}

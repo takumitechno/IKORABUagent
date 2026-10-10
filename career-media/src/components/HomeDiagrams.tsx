@@ -38,7 +38,7 @@ export function ProcessFlow({ has }: { has: Has }) {
                   STEP {i + 1}
                 </span>
                 <span className="block text-[14.5px] font-bold text-ink">{step.title}</span>
-                <span className="mt-0.5 block text-[12px] leading-5 text-muted">{step.text}</span>
+                <span className="mt-0.5 hidden text-[12px] leading-5 text-muted md:block">{step.text}</span>
               </span>
             </>
           );
@@ -60,8 +60,7 @@ export function ProcessFlow({ has }: { has: Has }) {
           <MessagesSquare className="h-4.5 w-4.5" aria-hidden="true" />
         </span>
         <span className="min-w-0 flex-1 text-[13px] leading-6 text-ink">
-          <b>STEP 2〜7 は、転職のプロと一緒に進められます。</b>
-          <span className="text-muted">求人の紹介、書類の添削、面接の練習、日程や条件の調整まで。</span>
+          <b>STEP 2〜7 は、プロと一緒に進められます</b>
         </span>
         <ArrowRight className="h-4 w-4 shrink-0 text-accent-strong" aria-hidden="true" />
       </Link>

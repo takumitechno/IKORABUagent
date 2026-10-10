@@ -1,7 +1,8 @@
 import Link from "next/link";
 import { BookOpen, ClipboardList } from "lucide-react";
 import { ServiceHighlights, SoloVsPro } from "@/components/ProValue";
-import { Breadcrumbs } from "@/components/Breadcrumbs";
+import { HeroMockupPeek } from "@/components/HeroMockup";
+import { PageHero } from "@/components/PageHero";
 import { ConsultButton, ConsultationCta, PartnerNote } from "@/components/ConsultationCta";
 import { JsonLd } from "@/components/JsonLd";
 import { partner } from "@/config/partner";
@@ -33,29 +34,29 @@ export default function ConsultationPage() {
   return (
     <>
       <JsonLd data={faqJsonLd({ faq: FAQ })} />
-      <div className="mx-auto max-w-5xl px-4 pt-6 sm:px-6">
-        <Breadcrumbs items={[{ name: "ホーム", path: "/" }, { name: "キャリア相談について", path: "/consultation" }]} />
-
-        <header className="mt-6 grid gap-8 rounded-[20px] bg-white p-6 ring-1 ring-line sm:p-10 md:grid-cols-[1.4fr_1fr] md:items-center">
-          <div>
-            <p className="text-[11px] font-bold tracking-[0.2em] text-brand">CAREER CONSULTATION</p>
-            <h1 className="mt-1 text-[26px] font-bold leading-snug text-ink sm:text-[32px]">
-              転職は、プロに相談しながら
-              <br className="hidden sm:block" />
-              進めよう
-            </h1>
-            <p className="mt-4 text-[15px] leading-8 text-body">
-              はじめての転職や未経験の仕事への転職は、分からないことが多いものです。{partner.partnerName}のキャリアアドバイザーに相談すると、企業選びから面接の練習、書類の添削、日程の調整まで、一緒に進められます。応募するかどうかは、ご自身で決められます。
-            </p>
+      <PageHero
+        crumbs={[{ name: "ホーム", path: "/" }, { name: "キャリア相談について", path: "/consultation" }]}
+        eyebrow="CAREER CONSULTATION"
+        title={
+          <>
+            転職は、<span className="text-highlight">プロに相談</span>しながら
+            <br className="hidden sm:block" />
+            進めよう
+          </>
+        }
+        lead={`${partner.adviserLabel}に、企業選びから面接の練習・書類の添削・日程の調整まで相談できます。応募するかどうかは、ご自身で決められます。`}
+        visual={
+          <div className="enter-pop enter-d2 mr-4 w-[290px]">
+            <HeroMockupPeek />
           </div>
-          <div className="rounded-2xl bg-brand-tint p-5 ring-1 ring-brand/15">
-            <span aria-hidden="true" className="motif motif-chat mx-auto mb-3 block h-24 w-24 rounded-full bg-white" />
-            <ConsultButton placement="consultation-page" label="キャリア相談を申し込む" />
-            <p className="mt-3 text-xs leading-5 text-muted">先に条件を整理したい方は、下の「相談の前に準備しておくと話しやすいこと」から。</p>
-            <PartnerNote className="mt-2 text-xs leading-5 text-muted" />
-          </div>
-        </header>
-
+        }
+      >
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+          <ConsultButton placement="consultation-page" label="キャリア相談を申し込む" size="lg" />
+        </div>
+        <PartnerNote className="mt-4 text-[11.5px] leading-5 text-white/60" />
+      </PageHero>
+      <div className="mx-auto max-w-5xl px-4 pt-2 sm:px-6">
         <section aria-labelledby="services" className="mt-12">
           <h2 id="services" className="text-[22px] font-bold text-ink">
             キャリア相談でできること

@@ -181,14 +181,6 @@ export function JourneyCards() {
             <span className="flex flex-1 flex-col px-4 pb-4 pt-3">
               <span className="text-[11.5px] font-bold text-muted">こんな人に</span>
               <span className="mt-0.5 line-clamp-2 text-[13px] leading-6 text-body">{j.who}</span>
-              <ol className="mt-3 space-y-1.5 border-t border-line pt-3">
-                {j.steps.slice(0, 3).map((st, n) => (
-                  <li key={n} className="flex items-start gap-2 text-[12.5px] leading-5 text-ink">
-                    <span className="mt-px flex h-4 w-4 shrink-0 items-center justify-center rounded bg-brand-tint text-[10px] font-bold text-brand-strong">{n + 1}</span>
-                    <span className="line-clamp-1">{st.label}</span>
-                  </li>
-                ))}
-              </ol>
               <span className="mt-auto inline-flex items-center gap-1 pt-4 text-[13.5px] font-bold text-brand-strong">
                 順番に読む（全{j.steps.length}ステップ）
                 <ArrowRight className="h-4 w-4 transition group-hover:translate-x-0.5" aria-hidden="true" />

@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { ArrowRight, Info } from "lucide-react";
-import { Breadcrumbs } from "@/components/Breadcrumbs";
+import { PageHero } from "@/components/PageHero";
 import { ConsultationCta } from "@/components/ConsultationCta";
 import { announcedLabel, formatDate, formatDateShort } from "@/components/DateMeta";
 import { Eyecatch } from "@/components/Eyecatch";
@@ -23,28 +23,22 @@ export default async function NewsIndexPage() {
   const newsCategory = categories.find((c) => c.slug === "news");
 
   return (
-    <div className="mx-auto max-w-6xl px-4 pt-6 sm:px-6">
-      <Breadcrumbs
-        items={[
+    <>
+      <PageHero
+        crumbs={[
           { name: "ホーム", path: "/" },
           { name: "転職ニュース・市場情報", path: "/news" },
         ]}
+        eyebrow="NEWS"
+        title="転職ニュース・市場情報"
+        lead="制度の変更や市場の動きを、「何が変わる？何を確かめる？」の視点で解説します。"
+        icon="newspaper"
       />
-      <header className="mt-6 flex items-start gap-4">
-        <div className="min-w-0 max-w-3xl flex-1">
-          <p className="text-[11px] font-bold tracking-[0.2em] text-brand">NEWS HUB</p>
-          <h1 className="mt-1 text-[26px] font-bold text-ink sm:text-[30px]">転職ニュース・市場情報</h1>
-          <p className="mt-3 text-[15px] leading-8 text-body">制度の変更や市場の動きを、未経験から転職を考える人にとって「何が変わるのか」「何を確認すればいいのか」という視点で解説します。</p>
-          <p className="mt-4 flex items-start gap-2 rounded-xl bg-white p-4 text-[13px] leading-6 text-muted ring-1 ring-line">
-            <Info className="mt-0.5 h-4 w-4 shrink-0 text-brand" aria-hidden="true" />
-            発表内容の全文転載は行わず、要点の解説と確認ポイントをまとめています。正確な内容は各記事の出典（発表元）でご確認ください。
-          </p>
-        </div>
-        <span className="enter-pop relative hidden aspect-square w-[132px] shrink-0 rounded-full bg-mist sm:block">
-          <Motif name="newspaper" className="anim-float-slow absolute inset-[4%]" />
-        </span>
-      </header>
-
+    <div className="mx-auto max-w-6xl px-4 pt-8 sm:px-6">
+      <p className="flex items-start gap-2 rounded-xl bg-white p-4 text-[13px] leading-6 text-muted ring-1 ring-line">
+        <Info className="mt-0.5 h-4 w-4 shrink-0 text-brand" aria-hidden="true" />
+        発表内容の全文転載は行わず、要点の解説と確認ポイントをまとめています。正確な内容は各記事の出典（発表元）でご確認ください。
+      </p>
       <div className="mt-6">
         <NewsTimeline news={news} />
       </div>
@@ -105,5 +99,6 @@ export default async function NewsIndexPage() {
         <ConsultationCta placement="news-bottom" />
       </div>
     </div>
+    </>
   );
 }

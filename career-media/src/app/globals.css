@@ -716,6 +716,9 @@ body {
   z-index: 1;
 }
 
+/* 読み進めバー: 対応ブラウザ・動きを減らす設定でない人だけに出す（ほかは非表示） */
+.read-progress { display: none; }
+
 /* ---------------------------------------------------------------------------
  * 動き
  * 「視差効果を減らす（prefers-reduced-motion: reduce）」を設定している人には一切動かさない。
@@ -831,6 +834,8 @@ body {
   /* スクロールで現れる */
   @supports (animation-timeline: view()) {
     .reveal { animation: rise-in linear both; animation-timeline: view(); animation-range: entry 0% entry 70%; }
+    /* 記事の上部の読み進めバー（ページのスクロールに合わせて伸びる） */
+    .read-progress { display: block; transform-origin: left center; animation: grow-x linear both; animation-timeline: scroll(root); }
     .reveal-pop { animation: pop-in linear both; animation-timeline: view(); animation-range: entry 5% entry 80%; }
     .reveal-grow-x { transform-origin: left center; animation: grow-x linear both; animation-timeline: view(); animation-range: entry 20% cover 40%; }
     .reveal-grow-y { transform-origin: center top; animation: grow-y linear both; animation-timeline: view(); animation-range: entry 10% cover 45%; }

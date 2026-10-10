@@ -58,20 +58,20 @@ export function SoloVsPro({ dark = false }: { dark?: boolean }) {
 }
 
 /** 相談でできること（アイコン付きのタイル） */
-export function ServiceHighlights({ dark = false, compact = false }: { dark?: boolean; compact?: boolean }) {
+export function ServiceHighlights({ dark = false, compact = false, brief = false }: { dark?: boolean; compact?: boolean; brief?: boolean }) {
   return (
     <ul className={`grid gap-2.5 ${compact ? "grid-cols-1 sm:grid-cols-2" : "grid-cols-2 lg:grid-cols-5"}`}>
       {partner.serviceHighlights.map((h, i) => {
         const Icon = ICONS[h.icon];
         const last = !compact && i === partner.serviceHighlights.length - 1 ? "col-span-2 lg:col-span-1" : "";
         return (
-          <li key={h.title} className={`flex gap-3 rounded-2xl p-3.5 sm:p-4 ${compact ? "" : "flex-col"} ${dark ? "bg-white/[0.06] ring-1 ring-white/10" : "bg-white ring-1 ring-line"} ${last}`}>
+          <li key={h.title} className={`flex gap-3 rounded-2xl p-3.5 sm:p-4 ${compact ? "" : brief ? "items-center lg:flex-col lg:items-start" : "flex-col"} ${dark ? "bg-white/[0.06] ring-1 ring-white/10" : "bg-white ring-1 ring-line"} ${last}`}>
             <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-accent text-white">
               <Icon className="h-5 w-5" aria-hidden="true" />
             </span>
             <span className="min-w-0">
               <span className={`block text-[14.5px] font-bold ${dark ? "text-white" : "text-ink"}`}>{h.title}</span>
-              <span className={`mt-0.5 block text-[12px] leading-5 sm:text-[12.5px] ${dark ? "text-white/70" : "text-muted"}`}>{h.body}</span>
+              {!brief && <span className={`mt-0.5 block text-[12px] leading-5 sm:text-[12.5px] ${dark ? "text-white/70" : "text-muted"}`}>{h.body}</span>}
             </span>
           </li>
         );
@@ -101,7 +101,7 @@ export function ProValueSection({ placement = "home-consult", has = () => false 
               <span className="text-highlight">{partner.proLabel}</span>と進めよう
             </h2>
             <p className="mt-3 text-[14px] leading-7 text-white/80 sm:text-[15px]">
-              {partner.adviserLabel}に相談すると、会社選びから面接の練習まで、一緒に準備できます。応募するかどうかは、ご自身で決められます。
+              {partner.adviserLabel}と、会社選びから面接の練習まで一緒に準備。応募するかは、ご自身で決められます。
             </p>
             <div className="mt-6 flex flex-col gap-2.5 sm:flex-row sm:items-center">
               <ConsultButton placement={placement} label="キャリア相談を申し込む" size="lg" />
@@ -116,7 +116,7 @@ export function ProValueSection({ placement = "home-consult", has = () => false 
         <div className="mt-8">
           <p className="text-[13px] font-bold text-white/70">相談でできること</p>
           <div className="mt-3">
-            <ServiceHighlights dark />
+            <ServiceHighlights dark brief />
           </div>
           <p className="mt-3 text-[11px] leading-5 text-white/50">{partner.serviceHighlightsNote}</p>
         </div>

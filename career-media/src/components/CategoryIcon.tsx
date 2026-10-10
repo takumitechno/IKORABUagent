@@ -1,4 +1,9 @@
 import {
+  BookOpen,
+  ClipboardList,
+  Info,
+  MessagesSquare,
+  Scale,
   BadgeCheck,
   Briefcase,
   Building,
@@ -58,6 +63,11 @@ const ICONS: Record<string, LucideIcon> = {
   flag: Flag,
   "list-ordered": ListOrdered,
   laptop: Laptop,
+  "book-open": BookOpen,
+  "clipboard-list": ClipboardList,
+  info: Info,
+  messages: MessagesSquare,
+  scale: Scale,
 };
 
 /** 面の色（トークン名）。カテゴリ・入口ごとに柔らかく色分けする */

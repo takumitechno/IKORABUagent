@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import { ArticleList } from "@/components/ArticleCards";
-import { Breadcrumbs } from "@/components/Breadcrumbs";
+import { PageHero } from "@/components/PageHero";
 import { categoryTone } from "@/components/CategoryIcon";
 import { Motif } from "@/components/illustrations/Motif";
 import { categoryScene } from "@/lib/illustrations/scenes";
@@ -37,24 +37,19 @@ export default async function CategoryPage({ params }: Props) {
   const tone = categoryTone(slug);
 
   return (
-    <div className="mx-auto max-w-6xl px-4 pt-6 sm:px-6">
-      <Breadcrumbs
-        items={[
+    <>
+      <PageHero
+        crumbs={[
           { name: "ホーム", path: "/" },
           { name: "記事一覧", path: "/articles" },
           { name: category.name, path: `/categories/${slug}` },
         ]}
+        eyebrow={`${articles.length}本の記事`}
+        title={category.name}
+        lead={category.description}
+        icon={category.icon}
       />
-      <header className="mt-6 flex items-center gap-4">
-        <span className={`enter-pop relative block aspect-square w-[72px] shrink-0 rounded-full sm:w-[104px] ${tone.bg}`}>
-          <Motif name={categoryScene(category.slug)} className="anim-float-slow absolute inset-[4%]" />
-        </span>
-        <div className="min-w-0">
-          <h1 className="text-[24px] font-bold text-ink sm:text-[30px]">{category.name}</h1>
-          <p className="mt-1 text-sm leading-7 text-muted">{category.description}</p>
-        </div>
-      </header>
-
+    <div className="mx-auto max-w-6xl px-4 pt-2 sm:px-6">
       <nav aria-label="ほかのテーマ" className="mt-6 flex gap-2 overflow-x-auto pb-2">
         {categories.map((c) => (
           <Link
@@ -77,5 +72,6 @@ export default async function CategoryPage({ params }: Props) {
         </aside>
       </div>
     </div>
+    </>
   );
 }

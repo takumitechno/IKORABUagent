@@ -90,12 +90,12 @@ export function HeroMockup() {
       <span className="absolute left-[62%] top-1/2 h-[520px] w-[520px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(circle,rgb(255_255_255/0.18),transparent_65%)]" />
       <span className="absolute left-[62%] top-1/2 h-[440px] w-[440px] -translate-x-1/2 -translate-y-1/2 rounded-full border border-white/15" />
       <span className="absolute left-[62%] top-1/2 h-[330px] w-[330px] -translate-x-1/2 -translate-y-1/2 rounded-full border border-dashed border-white/20" />
-      <div className="absolute right-0 top-6 w-[300px]">
+      <div className="enter-pop enter-d2 absolute right-0 top-6 w-[300px]">
         <Phone />
       </div>
 
       {/* 面接の練習 */}
-      <div className="absolute left-0 top-[70px] w-[200px] rounded-2xl bg-white/95 p-3.5 text-ink shadow-[0_24px_48px_-20px_rgb(0_0_0/0.55)] ring-1 ring-white/60 backdrop-blur">
+      <div className="anim-float absolute left-0 top-[70px] w-[200px] rounded-2xl bg-white/95 p-3.5 text-ink shadow-[0_24px_48px_-20px_rgb(0_0_0/0.55)] ring-1 ring-white/60 backdrop-blur">
         <p className="flex items-center gap-2 text-[12.5px] font-bold">
           <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-accent text-white">
             <Mic className="h-4 w-4" />
@@ -115,7 +115,7 @@ export function HeroMockup() {
       </div>
 
       {/* 企業選びの相談 */}
-      <div className="absolute left-2 top-[290px] w-[206px] rounded-2xl bg-white/95 p-3.5 text-ink shadow-[0_24px_48px_-20px_rgb(0_0_0/0.55)] ring-1 ring-white/60 backdrop-blur">
+      <div className="anim-float anim-delay-2 absolute left-2 top-[290px] w-[206px] rounded-2xl bg-white/95 p-3.5 text-ink shadow-[0_24px_48px_-20px_rgb(0_0_0/0.55)] ring-1 ring-white/60 backdrop-blur">
         <p className="flex items-center gap-2 text-[12.5px] font-bold">
           <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-brand text-white">
             <Sparkles className="h-4 w-4" />
@@ -133,7 +133,7 @@ export function HeroMockup() {
       </div>
 
       {/* バッジ */}
-      <p className="absolute bottom-[56px] right-[150px] inline-flex items-center gap-1.5 rounded-full bg-accent px-4 py-2 text-[12.5px] font-bold text-white shadow-[0_14px_30px_-12px_rgb(0_0_0/0.6)]">
+      <p className="anim-float anim-delay-1 absolute bottom-[56px] right-[150px] inline-flex items-center gap-1.5 rounded-full bg-accent px-4 py-2 text-[12.5px] font-bold text-white shadow-[0_14px_30px_-12px_rgb(0_0_0/0.6)]">
         <MessagesSquare className="h-4 w-4" />
         {partner.proLabel}に相談できる
       </p>

@@ -54,6 +54,7 @@ export default async function ArticlePage({ params }: Props) {
   return (
     <>
       <JsonLd data={articleJsonLd(article)} />
+      <span aria-hidden="true" className="read-progress no-print fixed inset-x-0 top-0 z-50 h-[3px] bg-accent" />
       <TrackArticleView context={{ content_id: `article:${article.slug}`, content_slug: article.slug, content_version: article.updatedAt, theme_cluster: article.categories[0] ?? "", pattern_id: inJourney?.journey.patternId ?? "" }} />
       <JsonLd data={faqJsonLd(article)} />
       <div className="mx-auto max-w-6xl px-4 pt-6 sm:px-6">

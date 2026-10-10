@@ -1,10 +1,9 @@
 import Link from "next/link";
 import { CheckCircle2, ClipboardList, HelpCircle, Info, MessageSquareText, Search } from "lucide-react";
-import { Breadcrumbs } from "@/components/Breadcrumbs";
+import { PageHero } from "@/components/PageHero";
 import { ConsultationCta } from "@/components/ConsultationCta";
 import { EntryGrid } from "@/components/EntryGrid";
 import { Motif } from "@/components/illustrations/Motif";
-import { JobMap } from "@/components/JobMap";
 import { JsonLd } from "@/components/JsonLd";
 import { LevelMeter } from "@/components/LevelMeter";
 import { getRepository } from "@/lib/content";
@@ -93,23 +92,20 @@ export default async function JobsPage() {
   };
 
   return (
-    <div className="mx-auto max-w-6xl px-4 pt-6 sm:px-6">
+    <>
+      <PageHero
+        crumbs={[{ name: "ホーム", path: "/" }, { name: "職種を比べる", path: "/jobs" }]}
+        eyebrow="JOB GUIDE"
+        title="職種から探す・比べる"
+        lead="未経験歓迎の求人でよく見る職種を、人と話す量・パソコン作業・数字の目標で比べられます。"
+        icon="scale"
+      />
+    <div className="mx-auto max-w-6xl px-4 pt-8 sm:px-6">
       <JsonLd data={itemList} />
-      <Breadcrumbs items={[{ name: "ホーム", path: "/" }, { name: "職種を比べる", path: "/jobs" }]} />
-      <header className="mt-6 grid gap-6 md:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)] md:items-center">
-        <div>
-          <p className="text-[11px] font-bold tracking-[0.2em] text-brand">JOB GUIDE</p>
-          <h1 className="mt-1 text-[26px] font-bold leading-snug text-ink sm:text-[30px]">職種から探す・比べる</h1>
-          <p className="mt-3 text-[15px] leading-8 text-body">
-            未経験歓迎の求人でよく見かける4つの職種を、仕事内容・人と話す量・パソコン作業・数字の目標で比べられます。求人の紹介ではなく、「何を確認すればいいか」を考えるための材料です。
-          </p>
-          <p className="mt-4 flex items-start gap-2 rounded-xl bg-white p-4 text-[13px] leading-6 text-muted ring-1 ring-line">
-            <Info className="mt-0.5 h-4 w-4 shrink-0 text-brand" aria-hidden="true" />
-            5段階の目安は一般的な傾向を示したもので、統計にもとづく数値ではありません。同じ職種名でも、会社や配属先によって仕事内容は大きく異なります。
-          </p>
-        </div>
-        <JobMap roles={JOB_ROLES} hrefFor={(r) => `#${r.slug}`} className="mx-auto w-full max-w-[400px]" />
-      </header>
+      <p className="flex items-start gap-2 rounded-xl bg-white p-4 text-[13px] leading-6 text-muted ring-1 ring-line">
+        <Info className="mt-0.5 h-4 w-4 shrink-0 text-brand" aria-hidden="true" />
+        5段階の目安は一般的な傾向を示したもので、統計にもとづく数値ではありません。同じ職種名でも、会社や配属先によって仕事内容は大きく異なります。
+      </p>
 
       <section aria-labelledby="jobs-by-role" className="mt-8">
         <h2 id="jobs-by-role" className="text-lg font-bold text-ink">
@@ -307,5 +303,6 @@ export default async function JobsPage() {
         <ConsultationCta placement="jobs" heading="気になる職種が見つかったら、具体的な求人や働き方を相談する" lead="同じ職種でも、会社によって働き方は大きく違います。キャリアアドバイザーに、求人票だけでは分からない点を聞いてみましょう。" />
       </div>
     </div>
+    </>
   );
 }

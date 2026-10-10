@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { Search } from "lucide-react";
 import { ArticleList } from "@/components/ArticleCards";
-import { Breadcrumbs } from "@/components/Breadcrumbs";
+import { PageHero } from "@/components/PageHero";
 import { CategoryIcon } from "@/components/CategoryIcon";
 import { ConsultationCta } from "@/components/ConsultationCta";
 import { EntryGrid } from "@/components/EntryGrid";
@@ -29,29 +29,31 @@ export default async function ArticlesPage({ searchParams }: Props) {
   const [categories, articles] = await Promise.all([repo.listCategories(), query ? repo.search(query) : repo.listArticles()]);
 
   return (
-    <div className="mx-auto max-w-6xl px-4 pt-6 sm:px-6">
-      <Breadcrumbs items={[{ name: "ホーム", path: "/" }, { name: "記事一覧", path: "/articles" }]} />
-      <div className="mt-6 grid gap-10 lg:grid-cols-[1fr_300px]">
+    <>
+      <PageHero
+        crumbs={[{ name: "ホーム", path: "/" }, { name: "記事一覧", path: "/articles" }]}
+        eyebrow={query ? "検索結果" : `${articles.length}本の記事`}
+        title={query ? `「${query}」の検索結果` : "記事一覧"}
+        lead={query ? `${articles.length}件の記事が見つかりました。` : "はじめての転職・未経験転職の疑問に、記事で答えます。"}
+        icon="book-open"
+      >
+        <form action="/articles" method="get" role="search" className="max-w-xl">
+          <label htmlFor="article-search" className="sr-only">
+            記事を検索
+          </label>
+          <div className="flex overflow-hidden rounded-2xl bg-white p-1.5 shadow-[0_18px_40px_-18px_rgb(0_0_0/0.5)] focus-within:ring-2 focus-within:ring-white/60">
+            <Search className="ml-3 h-5 w-5 self-center text-muted" aria-hidden="true" />
+            <input id="article-search" name="q" type="search" defaultValue={query} placeholder="キーワードで検索（例: 研修、年間休日）" className="min-w-0 flex-1 bg-transparent px-3 py-2.5 text-[15px] text-ink outline-none" />
+            <button type="submit" className="rounded-xl bg-accent px-5 text-sm font-bold text-white hover:bg-accent-strong">
+              検索
+            </button>
+          </div>
+        </form>
+      </PageHero>
+    <div className="mx-auto max-w-6xl px-4 pt-8 sm:px-6">
+      <div className="grid gap-10 lg:grid-cols-[1fr_300px]">
         <div>
-          <h1 className="text-[26px] font-bold text-ink sm:text-[30px]">{query ? `「${query}」の検索結果` : "記事一覧"}</h1>
-          <p className="mt-2 text-sm leading-7 text-muted">
-            {query ? `${articles.length}件の記事が見つかりました。` : `はじめての転職・未経験転職について、${articles.length}本の記事を公開しています。悩みや今の状況からも探せます。`}
-          </p>
-
-          <form action="/articles" method="get" role="search" className="mt-6">
-            <label htmlFor="article-search" className="sr-only">
-              記事を検索
-            </label>
-            <div className="flex overflow-hidden rounded-xl border border-line-strong bg-white focus-within:border-brand focus-within:ring-2 focus-within:ring-brand/20">
-              <Search className="ml-4 h-5 w-5 self-center text-muted" aria-hidden="true" />
-              <input id="article-search" name="q" type="search" defaultValue={query} placeholder="キーワードで検索（例: 研修、年間休日）" className="min-w-0 flex-1 px-3 py-3 text-[15px] outline-none" />
-              <button type="submit" className="bg-ink px-5 text-sm font-bold text-white hover:bg-brand-strong">
-                検索
-              </button>
-            </div>
-          </form>
-
-          <div className="mt-6 rounded-[var(--radius-card)] border border-line bg-white px-5" data-search-results={query ? "1" : undefined}>
+          <div className="rounded-[var(--radius-card)] border border-line bg-white px-5" data-search-results={query ? "1" : undefined}>
             {articles.length > 0 ? (
               <ArticleList articles={articles} categories={categories} />
             ) : (
@@ -106,5 +108,6 @@ export default async function ArticlesPage({ searchParams }: Props) {
         </aside>
       </div>
     </div>
+    </>
   );
 }

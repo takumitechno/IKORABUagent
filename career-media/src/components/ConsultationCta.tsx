@@ -16,7 +16,7 @@ type Props = {
 };
 
 /** キャリア相談でできること（partner config の serviceHighlights から先頭の3つ） */
-const POINTS = partner.serviceHighlights.slice(0, 3).map((h) => `${h.title}（${h.body.replace(/。$/, "")}）`);
+const POINTS = partner.serviceHighlights.slice(0, 3).map((h) => h.title);
 
 /** 相談先の表記（運営者とは分けて書く） */
 export function PartnerNote({ className = "" }: { className?: string }) {

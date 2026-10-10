@@ -2,7 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Scale } from "lucide-react";
 import { ArticleList, FeatureCard } from "@/components/ArticleCards";
-import { Breadcrumbs } from "@/components/Breadcrumbs";
+import { PageHero } from "@/components/PageHero";
 import { Motif } from "@/components/illustrations/Motif";
 import { ConsultationCta } from "@/components/ConsultationCta";
 import { EntryGrid } from "@/components/EntryGrid";
@@ -39,28 +39,22 @@ export async function TaxonomyHub({ group, slug }: { group: TaxonomyGroup; slug:
   const otherGroups = (["concerns", "situations", "roles"] as TaxonomyGroup[]).filter((x) => x !== group);
 
   return (
-    <div className="mx-auto max-w-6xl px-4 pt-6 sm:px-6">
-      <Breadcrumbs
-        items={[
+    <>
+      <PageHero
+        crumbs={[
           { name: "ホーム", path: "/" },
           { name: g.title, path: group === "roles" ? "/jobs" : g.basePath },
           { name: item.label, path: taxonomyPath(group, slug) },
         ]}
+        eyebrow={`${g.title.replace("から探す", "")}・${item.label}`}
+        title={item.heading}
+        lead={item.description}
+        icon={item.icon}
       />
-      <header className="relative mt-6 overflow-hidden rounded-[22px] bg-white p-5 ring-1 ring-line sm:p-8">
-        <span aria-hidden="true" className="pointer-events-none absolute -right-16 -top-20 h-56 w-56 rounded-full bg-brand-tint" />
-        <div className="relative flex items-start gap-4 sm:gap-6">
-          <div className="min-w-0 flex-1">
-            <p className="text-[13px] font-bold text-brand-strong">{g.title.replace("から探す", "")}・{item.label}</p>
-            <h1 className="mt-1 text-[22px] font-bold leading-snug text-ink sm:text-[30px]">{item.heading}</h1>
-            <p className="mt-2 text-[14.5px] leading-7 text-body">{item.description}</p>
-          </div>
-          <span className="enter-pop relative block aspect-square w-[84px] shrink-0 rounded-full bg-mint sm:w-[132px]">
-            <Motif name={taxonomyScene(group, slug)} className="anim-float-slow absolute inset-[4%]" />
-          </span>
-        </div>
+    <div className="mx-auto max-w-6xl px-4 pt-2 sm:px-6">
+      <header>
         {comparison && (
-          <div className="relative mt-5 flex flex-col gap-4 rounded-xl bg-canvas p-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="relative mt-6 flex flex-col gap-4 rounded-xl bg-white p-4 ring-1 ring-line sm:flex-row sm:items-center sm:justify-between">
             <div className="flex flex-wrap gap-x-6 gap-y-2">
               <div>
                 <p className="text-xs text-muted">人と話す量</p>
@@ -139,6 +133,7 @@ export async function TaxonomyHub({ group, slug }: { group: TaxonomyGroup; slug:
         </aside>
       </div>
     </div>
+    </>
   );
 }
 
@@ -148,19 +143,15 @@ export async function TaxonomyIndex({ group }: { group: TaxonomyGroup }) {
   const all = await getRepository().listArticles();
   const counts = Object.fromEntries(TAXONOMY[group].map((t) => [t.slug, all.filter((a) => a[group].includes(t.slug)).length]));
   return (
-    <div className="mx-auto max-w-6xl px-4 pt-6 sm:px-6">
-      <Breadcrumbs items={[{ name: "ホーム", path: "/" }, { name: g.title, path: g.basePath }]} />
-      <header className="mt-6 flex items-center gap-4">
-        <div className="min-w-0 flex-1">
-          <h1 className="text-[26px] font-bold text-ink sm:text-[30px]">{g.title}</h1>
-          <p className="mt-2 max-w-3xl text-[15px] leading-8 text-body">
-            {group === "concerns" ? "今いちばん気になっていることから、関係のある記事をまとめて読めます。" : "今の働き方や経歴に近いものを選ぶと、同じ状況の人に向けた記事をまとめて読めます。"}
-          </p>
-        </div>
-        <span className="enter-pop relative hidden aspect-square w-[120px] shrink-0 rounded-full bg-mint sm:block">
-          <Motif name={group === "concerns" ? "chat" : "flag"} className="anim-float-slow absolute inset-[4%]" />
-        </span>
-      </header>
+    <>
+      <PageHero
+        crumbs={[{ name: "ホーム", path: "/" }, { name: g.title, path: g.basePath }]}
+        eyebrow={`${TAXONOMY[group].length}つの入口`}
+        title={g.title}
+        lead={group === "concerns" ? "今いちばん気になっていることから、関係のある記事をまとめて読めます。" : "今の働き方や経歴に近いものを選ぶと、同じ状況の人に向けた記事をまとめて読めます。"}
+        icon={group === "concerns" ? "messages" : "flag"}
+      />
+    <div className="mx-auto max-w-6xl px-4 pt-2 sm:px-6">
       <div className="mt-6">
         <EntryGrid group={group} counts={counts} />
       </div>
@@ -168,5 +159,6 @@ export async function TaxonomyIndex({ group }: { group: TaxonomyGroup }) {
         <ConsultationCta placement="home-band" />
       </div>
     </div>
+    </>
   );
 }
