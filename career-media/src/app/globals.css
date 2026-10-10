@@ -1473,3 +1473,96 @@ body {
     .result-detail-toggle { display: none; }
   }
 }
+
+/* Reader intent: recognise a concern, see the help, choose a next step. */
+@layer components {
+  .consultation-first .campaign-copy h1 > strong { font-size: clamp(44px, 4.6vw, 66px); }
+  .confidence-strip { display:flex; justify-content:center; align-items:center; gap:28px; padding:24px; background:var(--color-surface); border-bottom:1px solid var(--color-line); color:var(--color-ink); font-size:13px; font-weight:700; }
+  .confidence-strip svg { width:16px; color:var(--color-brand-strong); }
+  .support-choices { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:8px; margin-bottom:20px; }
+  .support-choices button { display:flex; align-items:center; gap:12px; min-height:68px; padding:16px 18px; border-bottom:3px solid var(--color-line); text-align:left; font-size:16px; font-weight:700; cursor:pointer; }
+  .support-choices button > span { font:12px Arial,sans-serif; color:var(--color-muted); }
+  .support-choices button svg { width:18px; margin-left:auto; flex-shrink:0; }
+  .support-choices button[aria-pressed="true"] { border-color:var(--color-brand); color:var(--color-brand-strong); background:var(--color-brand-tint); border-radius:12px 12px 0 0; }
+  .support-choices button:focus-visible { outline:3px solid var(--color-brand); outline-offset:3px; }
+  .support-answer { overflow:hidden; border:1px solid var(--color-line); border-radius:24px; background:var(--color-surface); }
+  .support-answer-content { display:grid; grid-template-columns:1fr 1fr; min-height:365px; }
+  .support-example { display:flex; flex-direction:column; justify-content:center; padding:40px; background:var(--color-brand-tint); }
+  .support-label { font-size:11px; font-weight:700; letter-spacing:.08em; color:var(--color-muted); }
+  .support-before { margin-top:22px; font-size:20px; font-weight:600; line-height:1.65; color:var(--color-muted); }
+  .support-down { width:22px; margin-block:16px; color:var(--color-brand); }
+  .support-after { font-size:26px; font-weight:750; line-height:1.7; letter-spacing:-.035em; color:var(--color-ink); }
+  .support-note { margin-top:24px; font-size:11px; line-height:1.9; color:var(--color-muted); }
+  .support-explanation { padding:40px; align-self:center; }
+  .support-explanation h3 { margin-top:14px; font-size:25px; font-weight:750; line-height:1.55; letter-spacing:-.04em; }
+  .support-explanation > p:not(.editorial-kicker) { font-size:14px; line-height:1.95; margin-top:18px; color:var(--color-body); }
+  .consultation-first .editorial-button { background:var(--color-brand); border-radius:40px; }
+  .consultation-first .editorial-button:hover { background:var(--color-brand-press); }
+  .support-reassurance { display:flex; gap:8px; align-items:start; margin-top:18px; font-size:12px; line-height:1.8; color:var(--color-muted); }
+  .support-reassurance svg { width:17px; flex-shrink:0; color:var(--color-brand-strong); }
+  .talk-path { display:grid; grid-template-columns:1fr 1fr; gap:38px 65px; border-top:1px solid var(--color-line-strong); padding-block:60px; }
+  .talk-path h2 { font-size:clamp(27px,3vw,38px); font-weight:750; letter-spacing:-.05em; line-height:1.55; margin-top:15px; }
+  .talk-path-heading > p:not(.editorial-kicker) { margin-top:20px; font-size:13px; line-height:1.9; color:var(--color-muted); }
+  .talk-path-steps { position:relative; display:grid; gap:34px; }
+  .talk-path-steps::before { content:""; position:absolute; left:21px; top:24px; bottom:48px; width:1px; background:var(--color-brand); transform-origin:top; }
+  .talk-path-steps li { position:relative; display:flex; gap:24px; }
+  .talk-path-steps li > span { display:grid; place-items:center; flex-shrink:0; width:44px; height:44px; border-radius:50%; background:var(--color-brand); color:var(--color-campaign-paper); font:14px Arial,sans-serif; border:5px solid var(--color-canvas); }
+  .talk-path-steps h3 { font-size:19px; font-weight:700; padding-top:8px; }
+  .talk-path-steps p { font-size:13px; line-height:1.9; color:var(--color-muted); margin-top:7px; }
+  .talk-path-note { grid-column:1/-1; font-size:11px; line-height:1.9; color:var(--color-muted); }
+  .quiet-check { display:flex; gap:28px; align-items:center; justify-content:space-between; border-block:1px solid var(--color-line-strong); padding-block:32px; }
+  .quiet-check h2 { font-size:20px; font-weight:700; margin-top:8px; line-height:1.6; }
+  .quiet-check p:not(.editorial-kicker) { font-size:12px; line-height:1.9; color:var(--color-muted); margin-top:8px; }
+  .quiet-check .editorial-text-link { flex-shrink:0; }
+  .first-talk { scroll-margin-top:100px; border-block:1px solid var(--color-line); padding-block:36px; margin-top:45px; }
+  .first-talk h2 { font-size:clamp(25px,3vw,36px); letter-spacing:-.045em; line-height:1.6; font-weight:750; margin-top:12px; }
+  .first-talk-topics { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:24px; margin-block:30px; }
+  .first-talk-topics li { border-top:2px solid var(--color-brand); padding-top:16px; }
+  .first-talk-topics span { font:12px Arial,sans-serif; color:var(--color-brand-strong); }
+  .first-talk-topics h3 { font-size:17px; font-weight:700; margin-top:10px; }
+  .first-talk-topics p { font-size:12px; line-height:1.9; margin-top:6px; color:var(--color-muted); }
+  .first-talk-action { display:flex; gap:24px; align-items:center; justify-content:space-between; padding:22px 0; }
+  .first-talk-action > div > p:first-child { font-size:13px; font-weight:600; line-height:1.9; }
+  .first-talk-action > a { flex-shrink:0; }
+  @media(max-width:767px) {
+    .consultation-first .campaign-copy h1 > strong { font-size:clamp(29px,9.9vw,66px); }
+    .confidence-strip { padding:18px 12px; gap:10px; font-size:10px; }
+    .confidence-strip svg { width:12px; }
+    .support-choices { gap:4px; margin-bottom:14px; }
+    .support-choices button { flex-direction:column; align-items:flex-start; gap:8px; padding:12px 9px; min-height:84px; font-size:12px; line-height:1.6; }
+    .support-choices button svg { display:none; }
+    .support-answer-content { grid-template-columns:1fr; }
+    .support-example { padding:24px; }
+    .support-before { font-size:16px; margin-top:14px; }
+    .support-down { margin-block:10px; width:18px; }
+    .support-after { font-size:23px; }
+    .support-note { margin-top:16px; }
+    .support-explanation { padding:26px 24px; }
+    .support-explanation h3 { font-size:22px; }
+    .support-explanation .editorial-button { width:100%; font-size:12px; gap:10px; }
+    .support-explanation > p:not(.editorial-kicker) { font-size:13px; margin-top:12px; }
+    .talk-path { grid-template-columns:1fr; padding-block:40px; gap:30px; }
+    .talk-path-steps { gap:26px; }
+    .quiet-check { display:block; }
+    .quiet-check h2 { font-size:19px; }
+    .first-talk-topics { grid-template-columns:1fr; gap:16px; }
+    .first-talk-topics li { display:grid; grid-template-columns:28px 1fr; column-gap:12px; padding-top:14px; }
+    .first-talk-topics span { grid-row:1/3; padding-top:7px; }
+    .first-talk-topics h3 { margin:0; }
+    .first-talk-topics p { grid-column:2; }
+    .first-talk-action { flex-direction:column; align-items:stretch; }
+  }
+  @media(prefers-reduced-motion:no-preference) {
+    .support-choices button { transition:background .2s, border-color .2s, transform .2s; }
+    .support-choices button:hover { transform:translateY(-3px); }
+    .support-answer-content { animation:support-answer-in .4s ease-out both; }
+    .support-down { animation:support-direction .7s ease-out both; }
+    @supports(animation-timeline:view()) {
+      .talk-path-steps::before { animation:talk-line linear both; animation-timeline:view(); animation-range:entry 10% cover 45%; }
+      .talk-path-steps li, .first-talk-topics li { animation:editorial-arrive linear both; animation-timeline:view(); animation-range:entry 0% entry 70%; }
+    }
+  }
+}
+@keyframes support-answer-in { from { transform:translateX(12px); } to { transform:translateX(0); } }
+@keyframes support-direction { from { transform:translateY(-8px); } to { transform:translateY(0); } }
+@keyframes talk-line { from { transform:scaleY(.15); } to { transform:scaleY(1); } }

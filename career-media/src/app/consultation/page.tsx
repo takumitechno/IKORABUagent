@@ -37,8 +37,8 @@ export default function ConsultationPage() {
       <section className="editorial-hero editorial-consult-hero">
         <div className="editorial-hero-copy">
           <p className="editorial-kicker">CAREER CONSULTATION / キャリア相談</p>
-          <h1>会社選びも、<br /><span>面接の不安も。</span></h1>
-          <p className="editorial-lead">今までの経験を、どう伝えるか。<br />次の仕事で、何を大切にするか。<br />一緒に整理するところから始められます。</p>
+          <h1>次の仕事を、<br /><span>一緒に考える相談。</span></h1>
+          <p className="editorial-lead">経験の伝え方も、譲りたくない条件も。<br />まずは、今の状況を話すところから。</p>
           <ul className="consult-assurance" aria-label="相談の前に知っておきたいこと">
             <li>{partner.consultationFeeNote}</li><li>応募するかどうかは、自分で決められます。</li>
           </ul>
@@ -49,11 +49,17 @@ export default function ConsultationPage() {
         <figure className="editorial-hero-photo"><GeneratedImage slug="editorial-conversation" priority fallback={<div className="h-full bg-sand" />} className="h-full w-full !object-cover" /><figcaption><span>ONE STEP AT A TIME</span><span>自分のペースで、進もう。</span></figcaption><span className="editorial-photo-note">生成イメージ・人物は架空です</span></figure>
       </section>
       <div className="mx-auto max-w-5xl px-4 pt-2 sm:px-6">
+        <section id="first-talk" className="first-talk" aria-labelledby="first-talk-title">
+          <p className="editorial-kicker">最初の相談で話したいこと</p><h2 id="first-talk-title">立派な志望動機より、<br />今、気になっていることを。</h2>
+          <ol className="first-talk-topics"><li><span>01</span><h3>今までのこと</h3><p>どんな仕事や作業をしてきた？</p></li><li><span>02</span><h3>これからの希望</h3><p>給料・休み・仕事内容。何が大切？</p></li><li><span>03</span><h3>困っていること</h3><p>会社選び、書類、面接のどこが不安？</p></li></ol>
+          <div className="first-talk-action"><div><p>全部決まっていなくても、相談の出発点になります。</p><p className="editorial-fine">{partner.consultationFeeNote} {partner.consultationEligibilityNote}</p></div><ConsultButton placement="consultation-page" label="この内容で相談を申し込む" /></div>
+          <details className="editorial-details"><summary>申し込み後の連絡・相談方法について</summary><p className="py-4 text-sm leading-7 text-body">この画面は提案用デモです。相談方法・所要時間・初回連絡の手段と目安は、相談先への確認後に掲載します。現在のボタンはサイト内の案内に進み、登録や情報送信は行いません。</p></details>
+        </section>
         <section aria-labelledby="services" className="mt-12">
           <h2 id="services" className="text-[22px] font-bold text-ink">
             キャリア相談でできること
           </h2>
-          <ul className="editorial-services mt-5 grid gap-x-8 sm:grid-cols-2">{partner.serviceHighlights.map((item, i) => <li key={item.title} className="flex gap-4"><span className="editorial-service-number">0{i + 1}</span><div><h3 className="text-sm font-bold">{item.title}</h3><p className="mt-2 text-xs leading-6 text-muted">{item.body}</p></div></li>)}</ul>
+          <div className="mt-5">{partner.serviceHighlights.map((item, i) => <details key={item.title} className="editorial-details"><summary><span className="mr-4 text-xs text-muted">0{i + 1}</span>{item.title}</summary><p className="py-4 text-sm leading-7 text-body">{item.body}</p></details>)}</div>
           <p className="mt-3 text-[12.5px] leading-6 text-muted">{partner.serviceHighlightsNote} 内定や年収アップなどの結果を保証するものではありません。</p>
         </section>
 

@@ -21,6 +21,23 @@ async function complete(page,values){
  await page.getByRole('heading',{name:'あなたの条件整理ノート'}).waitFor();
 }
 try{
+ const intentContext=await browser.newContext({viewport:{width:390,height:844},reducedMotion:'reduce'});const intentPage=await intentContext.newPage();
+ for(const origin of [base,staticBase].filter(Boolean)){
+  await intentPage.goto(origin+'/');
+  const choices=intentPage.locator('.support-choices button');assert.equal(await choices.count(),3);
+  for(const [i,slug] of ['sekkyaku-keiken-ikasu','donichi-yasumi-nenshu-hikaku','agent-mendan-mae'].entries()){
+   await choices.nth(i).focus();await intentPage.keyboard.press('Enter');
+   assert.equal(await choices.nth(i).getAttribute('aria-pressed'),'true');assert.equal(await intentPage.locator('.support-choices [aria-pressed="true"]').count(),1);
+   assert(await intentPage.locator(`#support-answer a[href="/articles/${slug}"]`).isVisible());
+   assert.equal(await intentPage.locator('.support-answer-content').evaluate(el=>getComputedStyle(el).animationName),'none');
+   assert(await intentPage.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1));
+  }
+  await intentPage.locator('#support-answer [data-cta-kind="consultation-info"]').click();await intentPage.locator('#first-talk-title').waitFor();
+  assert.equal(new URL(intentPage.url()).hash,'#first-talk');
+  const firstTalk=await intentPage.locator('#first-talk').boundingBox();assert(firstTalk.y>=0&&firstTalk.y<250);
+  await intentPage.locator('#first-talk [data-cta-kind="consultation-apply"]').click();assert.equal(new URL(intentPage.url()).pathname.replace(/\/$/,''),'/consultation/apply');
+ }
+ await intentContext.close();evidence.intent={choices:3,keyboard:true,reducedMotion:true,consultationAnchor:true,static:!!staticBase};
  for(const [name,values] of Object.entries(cases)){
   const ctx=await browser.newContext({viewport:{width:390,height:844},reducedMotion:'reduce',permissions:['clipboard-read','clipboard-write']});const page=await ctx.newPage();
   page.on('pageerror',e=>evidence.errors.push(e.message));
