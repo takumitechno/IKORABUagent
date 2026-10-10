@@ -3,11 +3,11 @@ slug: tenkin-kinmuchi-kakunin
 kind: article
 title: 転勤あり・なしはどこで分かる？求人の「就業場所の変更の範囲」の読み方と確認のしかた
 summary: 2024年4月から、求人や労働契約で、入社直後の働く場所に加えて「就業場所の変更の範囲」が示されるようになりました。「転勤なし」の書き方だけで判断せず、変更の範囲の読み方、求人票と労働条件通知書で見るところ、面接での聞き方の例を紹介します。
-status: review
+status: published
 categories: [hatarakikata, seido]
 featured: false
 recommended: false
-updated_at: 2026-10-09
+updated_at: 2026-10-10
 information_checked_at: 2026-10-09
 seo_title: 転勤あり・なしの確認｜「就業場所の変更の範囲」の読み方
 seo_description: 転勤があるかどうかは、求人のどこを見れば分かる？2024年4月から示されるようになった「就業場所の変更の範囲」の読み方、求人票と労働条件通知書で見るところ、面接で転勤の頻度や範囲を聞くときの質問例を紹介します。
@@ -15,7 +15,7 @@ roles: []
 concerns: []
 situations: [hajimete, seishain-keiken-sukunai]
 eyecatch: ["転勤あり・なし、", "どこで分かる？"]
-related: [naitei-shodaku-mae, tenshoku-koukai-shinai, hanbai-seishain]
+related: [naitei-shodaku-mae, tenshoku-koukai-shinai, hanbai-seishain, gentei-seishain, remote-work-kyujin]
 faq:
   - q: 求人に「転勤なし」と書いてあれば、ずっと同じ場所で働けますか？
     a: 求人の「転勤なし」の一言だけでは分からないこともあります。2024年4月からは、求人や労働条件通知書に「就業場所の変更の範囲」が書かれるようになったので、そこが入社直後の勤務地と同じになっているかを確かめましょう。近くの店舗や事業所への異動があるかどうかも、面接で聞いておくと安心です。
@@ -64,6 +64,9 @@ research_notes:
   not_used:
     - 転勤命令の有効性に関する裁判例（権利の濫用にあたる場合など）は、民間の解説記事でしか確認できなかったため、法律の解釈としては書かない
     - 転勤の頻度や、転勤がある会社の割合などの統計は書かない
+published_at: 2026-10-10
+reviewed_at: 2026-10-10
+reviewed_by: プロジェクトオーナー（チャットで承認）
 ---
 
 「転勤がある会社だったらどうしよう」「求人に『転勤なし』とあったけど、本当に大丈夫？」。家族のことや今の暮らしを考えると、働く場所が変わるかどうかは大事な条件です。

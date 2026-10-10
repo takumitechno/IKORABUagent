@@ -2,11 +2,11 @@
 slug: seizou-koujou-shigoto
 title: 工場の仕事内容は？ライン作業・検査・機械オペレーターの違いと、交替制・雇用の形の確認
 summary: 製造業の工場の仕事には、ラインで部品を組み立てる仕事、製品を確かめる検査、機械や設備を動かして見守るオペレーターなどがあります。それぞれの仕事内容、交替制勤務と深夜の割増賃金、正社員・期間従業員・派遣の違いと、求人で確認することを紹介します。
-status: review
+status: published
 categories: [shokushu, mikeiken]
 featured: false
 recommended: false
-updated_at: 2026-10-09
+updated_at: 2026-10-10
 information_checked_at: 2026-10-09
 seo_title: 工場の仕事内容は？ライン・検査と交替制の確認点
 seo_description: 未経験から工場の仕事を考える人へ。ライン作業・検査・機械オペレーターの仕事の違い、2交替などの交替制勤務と深夜の割増賃金、正社員・期間従業員・派遣の雇い主と契約期間の違い、求人や面接で確認したいことを紹介します。
@@ -14,7 +14,7 @@ roles: [sonota]
 concerns: [mikeiken-shokushu, seishain]
 situations: [freeter, haken]
 eyecatch: ["工場の仕事、", "未経験でも大丈夫？"]
-related: [haken-seishain, muki-tenkan-keiyaku, mikeiken-kenshu-kakunin]
+related: [haken-seishain, muki-tenkan-keiyaku, mikeiken-kenshu-kakunin, butsuryu-soko-shigoto, gentei-seishain]
 faq:
   - q: 工場の仕事は、未経験でも始められますか？
     a: ラインでの組み立てなどは、作業を細かく分けて1人ひとりに割り当てる形が多く、未経験から始める人もいる仕事です。一方、検査の仕事は、製造の部署で経験を積んでから社内で移ることが多いと、職業情報提供サイト（job tag）で紹介されています。応募資格と、入社後に教えてもらう期間を求人で確認しましょう。
@@ -72,6 +72,9 @@ research_notes:
     - 工場の仕事の賃金や、期間従業員の満了金・手当の金額は、会社ごとに違い一次情報で確認できないため書かない
     - 交替制勤務の健康面の影響についての調査データは確認していないので書かない
     - 派遣の3年ルールや同一労働同一賃金の詳細は、別の記事（派遣から正社員）の役割なので、本文ではリンクにとどめた
+published_at: 2026-10-10
+reviewed_at: 2026-10-10
+reviewed_by: プロジェクトオーナー（チャットで承認）
 ---
 
 「黙々とできる仕事がいい」「未経験でも正社員の求人がある仕事を探したい」。そう考えたときに候補に入りやすいのが、製造業の工場の仕事です。

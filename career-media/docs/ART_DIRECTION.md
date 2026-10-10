@@ -45,7 +45,7 @@
 トップと記事一覧は、画像なしで転職サイトらしく見えるように作っている。
 
 - ヒーロー: 濃いティールの面＋検索ボックス＋人物のイラスト（`public/images/illustrations/hero-people.svg`。このリポジトリで手で描いた SVG。黒髪の20代の男女、ビジネスカジュアル）。デスクトップでは「ゆずれない条件」「職種を比べる」の小さなカード（HTML）を重ねる。`hero-home` を採用すると、イラストの代わりに写真が出る
-- 記事のサムネイル: カテゴリの色の面に、記事の問い（frontmatter の `eyecatch`）を白い文字で置く文字サムネイル（`src/components/Eyecatch.tsx`）
+- 記事のサムネイル: カテゴリの色のグラデーションに、記事の問い（frontmatter の `eyecatch`）を太い白い文字で置き、最後の行を黄色にする文字サムネイル。右下にカテゴリのアイコンを白い丸で置く（`src/components/Eyecatch.tsx`）。記事ページの上部にも大きく出す。一覧の行では文字なしのアイコンのタイル
 - 入口・ケース・ロードマップ: 色の四角＋アイコン、番号、色帯の見出し
 - `npm run illustrations` の Open Peeps 場面イラスト（CC0、`public/images/illustrations/`）は素材として残しているが、今のページでは使っていない
 

@@ -3,11 +3,11 @@ slug: web-marketing-mikeiken
 kind: article
 title: Webマーケティングの仕事内容は？種類と、未経験からの近づき方・求人の見方
 summary: Webマーケティングは、Webサイトや広告、SNSを使ってお客さまを集め、アクセスの数字を見ながら改善していく仕事です。仕事の種類、使う力、未経験から近づくときの準備、アシスタント求人で確かめたいことを紹介します。
-status: review
+status: published
 categories: [shokushu, mikeiken]
 featured: false
 recommended: false
-updated_at: 2026-10-09
+updated_at: 2026-10-10
 information_checked_at: 2026-10-09
 seo_title: Webマーケティングの仕事内容と未経験からの近づき方
 seo_description: Webマーケティングの仕事内容を、集客・広告・SNS・アクセス解析などの種類に分けて紹介します。使う力、未経験から近づくための準備、アシスタント求人で確かめたいこと、広告のルール（ステマ規制）の基本が分かります。
@@ -15,7 +15,7 @@ roles: [sonota]
 concerns: [mikeiken-shokushu, office]
 situations: [sekkyaku, hajimete]
 eyecatch: ["Webマーケティング、", "未経験から近づくには？"]
-related: [sekkyaku-keiken-ikasu, mikeiken-kenshu-kakunin, shigoto-sagashikata]
+related: [sekkyaku-keiken-ikasu, mikeiken-kenshu-kakunin, shigoto-sagashikata, programmer-mikeiken, remote-work-kyujin]
 faq:
   - q: Webマーケティングは未経験でも応募できますか？
     a: 「未経験可」や「アシスタント」の求人なら応募できます。入社後は、広告やSNSの投稿の作業、数字の集計などから任されることが多いので、どこまでを自分が担当するのか、誰が教えてくれるのかを求人や面接で確かめておきましょう。
@@ -57,6 +57,9 @@ research_notes:
     - job tag の賃金・就業者数などの数値は、検索結果では確認できなかったので書かない
     - Web広告の市場規模などの統計は、この記事の目的（仕事内容と近づき方）に必要ないので扱わない
     - Webマーケティング関連の民間資格や講座は、特定のサービスのすすめになるため扱わない
+published_at: 2026-10-10
+reviewed_at: 2026-10-10
+reviewed_by: プロジェクトオーナー（チャットで承認）
 ---
 
 「Webマーケティングに興味がある。でも、実際に毎日何をしている仕事なのか、よく分からない」。そう感じる人は多いと思います。

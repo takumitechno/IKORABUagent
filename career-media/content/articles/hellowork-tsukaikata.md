@@ -3,11 +3,11 @@ slug: hellowork-tsukaikata
 kind: article
 title: ハローワークの使い方は？求職申込みから紹介状・書類の添削・面接練習まで、在職中に使うときのことも
 summary: ハローワークは、求職申込みをすると、求人の検索だけでなく、職業相談、紹介状を使った応募、応募書類の添削や面接に向けた相談まで、無料で使えます。在職中でも相談できます。求職申込みのしかた、相談で聞けることと切り出し方の例、紹介状とオンライン自主応募の違いを紹介します。
-status: review
+status: published
 categories: [junbi, seido]
 featured: false
 recommended: false
-updated_at: 2026-10-09
+updated_at: 2026-10-10
 information_checked_at: 2026-10-09
 seo_title: ハローワークの使い方｜求職申込み・紹介状・面接練習
 seo_description: ハローワークは何ができて、どう使う？求職申込み（オンラインの事前登録）、求人の探し方、職業相談での切り出し方の例、紹介状とオンライン自主応募の違い、応募書類の添削や面接の相談、在職中でも使えるかを紹介します。
@@ -15,7 +15,7 @@ roles: []
 concerns: [seishain]
 situations: [hajimete, freeter]
 eyecatch: ["ハローワークって、", "何ができるの？"]
-related: [tenshoku-service-chigai, hello-training, saishushoku-teate]
+related: [tenshoku-service-chigai, hello-training, saishushoku-teate, mensetsu-ochita-furikaeri, shorui-senkou-tooranai]
 faq:
   - q: 働きながらでも、ハローワークを使えますか？
     a: 使えます。在職中でも職業相談を受けられると案内している労働局があります。相談を受けるには求職申込み（求職登録）が必要で、窓口のほか、ハローワークインターネットサービスから事前にオンラインで登録しておく方法もあります。夜間や土曜日に相談を受け付けている窓口もあるので、利用するハローワークで確認しましょう。
@@ -73,6 +73,9 @@ research_notes:
     - 拠点数や就職者数などの数字は年度で変わるため書かない
     - 求職申込みに必要な持ち物は窓口や手続き（雇用保険の手続きをするかどうか）で変わるため、具体的に並べず「窓口で確認」とした
     - 夜間・土曜の開庁は一部の窓口の例しか確認できなかったので、「受け付けている窓口もある」にとどめた
+published_at: 2026-10-10
+reviewed_at: 2026-10-10
+reviewed_by: プロジェクトオーナー（チャットで承認）
 ---
 
 ハローワークは名前を知っていても、「失業した人が行くところ」「何をしてくれるのかよく分からない」と感じている人は多いかもしれません。

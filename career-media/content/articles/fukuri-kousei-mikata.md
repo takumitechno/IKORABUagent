@@ -3,11 +3,11 @@ slug: fukuri-kousei-mikata
 kind: article
 title: 求人の「福利厚生」はどう見る？社会保険と会社独自の制度の違い、住宅手当・交通費・退職金の確かめ方
 summary: 求人の福利厚生は、法律で加入が決まっている社会保険（法定福利）と、会社が独自に用意する制度（法定外福利）に分けて読むと分かりやすくなります。「社会保険完備」の意味、住宅手当・交通費・退職金・研修で確かめること、面接での聞き方の例を紹介します。
-status: review
+status: published
 categories: [hatarakikata, junbi]
 featured: false
 recommended: false
-updated_at: 2026-10-09
+updated_at: 2026-10-10
 information_checked_at: 2026-10-09
 seo_title: 求人の福利厚生の見方｜社会保険と住宅手当・退職金
 seo_description: 求人の福利厚生欄はどこを見ればいい？法定福利（健康保険・厚生年金・雇用保険・労災保険）と会社独自の制度の違い、「社会保険完備」の意味、住宅手当・交通費・退職金・研修で確かめること、面接や書面での確認のしかたを紹介します。
@@ -15,7 +15,7 @@ roles: []
 concerns: [kyuryo]
 situations: [hajimete, freeter]
 eyecatch: ["福利厚生の欄、", "どこを見ればいい？"]
-related: [tedori-20man-hikaku, shiyou-kikan, mikeiken-kenshu-kakunin]
+related: [tedori-20man-hikaku, shiyou-kikan, mikeiken-kenshu-kakunin, shoyo-kyujin-mikata, taishokukin-kakunin]
 faq:
   - q: 求人に「社会保険完備」とあるのは、どういう意味ですか？
     a: 一般には、健康保険・厚生年金保険・雇用保険・労災保険に加入できることを指して使われています。求人では、これらの保険の適用に関することを示すことになっているので、求人票の「加入保険等」の欄も見ておきましょう。加入する時期（入社日からか、試用期間中も加入するか）も確かめておくと安心です。
@@ -65,6 +65,9 @@ research_notes:
     - 法定外福利費の平均額や、住宅手当・退職金がある会社の割合などの統計は、調査年で変わるため書かない
     - 短時間労働者の社会保険の適用拡大（企業規模要件の段階的な引き下げ）は、この記事の読者（正社員の求人を見る人）には細かすぎるため扱わない
     - 通勤手当の非課税限度額は、記事の目的（求人の読み方）から外れるため扱わない
+published_at: 2026-10-10
+reviewed_at: 2026-10-10
+reviewed_by: プロジェクトオーナー（チャットで承認）
 ---
 
 求人の「福利厚生」の欄には、「社会保険完備」「交通費支給」「住宅手当あり」「退職金制度あり」「研修制度充実」など、たくさんの言葉が並びます。項目が多いほど良い会社に見えますが、それだけで比べるのは難しいところです。

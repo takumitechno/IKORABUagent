@@ -14,7 +14,7 @@ roles: []
 concerns: [seishain, mensetsu]
 situations: [freeter, seishain-keiken-sukunai]
 eyecatch: ["フリーターから正社員、", "最初に何を確認する？"]
-related: [mikeiken-tenshoku-hajimekata, sekkyaku-keiken-ikasu, agent-mendan-mae]
+related: [mikeiken-tenshoku-hajimekata, sekkyaku-keiken-ikasu, agent-mendan-mae, hellowork-tsukaikata]
 faq:
   - q: アルバイト経験しかないと、正社員の書類選考に通らないのでしょうか？
     a: アルバイト経験しかないことだけで判断されるわけではありません。未経験者を対象にした求人では、これまでの経験の中身や、働くことへの姿勢、入社後に学ぶ意欲などもあわせて見られます。担当していた業務を具体的に書くことが大切です。

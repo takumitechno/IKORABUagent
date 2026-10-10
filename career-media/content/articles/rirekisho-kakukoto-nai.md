@@ -14,7 +14,7 @@ roles: []
 concerns: [mensetsu, seishain]
 situations: [seishain-keiken-sukunai, freeter]
 eyecatch: ["履歴書に", "書くことがない…？"]
-related: [shokumu-keirekisho-arubaito, shiboudouki-mikeiken, freeter-seishain-hajimeni]
+related: [shokumu-keirekisho-arubaito, shiboudouki-mikeiken, freeter-seishain-hajimeni, rirekisho-kakikata-kihon]
 faq:
   - q: アルバイトの経歴は、全部書かないといけませんか？
     a: ハローワークの資料では、学生時代のアルバイトは通常は書かず、卒業後のアルバイトや、応募する仕事に関係するアルバイトなどは「アルバイト」と明記して書くよう案内されています。履歴書に書ききれない仕事の中身は、職務経歴書でくわしく補いましょう。

@@ -14,7 +14,7 @@ roles: []
 concerns: [mensetsu]
 situations: [freeter, seishain-keiken-sukunai, sekkyaku]
 eyecatch: ["職務経歴書、", "アルバイトだけでも？"]
-related: [rirekisho-kakukoto-nai, sekkyaku-keiken-ikasu, shiboudouki-mikeiken]
+related: [rirekisho-kakukoto-nai, sekkyaku-keiken-ikasu, shiboudouki-mikeiken, shokumu-keirekisho-kakikata]
 faq:
   - q: アルバイトをいくつもしてきた場合、全部くわしく書くべきですか？
     a: 職務経歴書は自由な様式なので、期間が長いものや応募する仕事に近いものをくわしく書き、ほかは短くまとめる方法があります。履歴書の職歴欄と、勤務先や期間がずれないようにしておきましょう。

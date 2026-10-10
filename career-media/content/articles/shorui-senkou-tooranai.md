@@ -2,11 +2,11 @@
 slug: shorui-senkou-tooranai
 title: 書類選考が通らないときの見直しポイント｜応募先の選び方・求人票の条件・書類の書き方
 summary: 書類選考が続けて通らないときは、書類の文章だけでなく、応募先の選び方や求人票の条件との合い方から順に見直すと、原因をしぼりやすくなります。求人票の「必須」「あれば尚可」の読み方、書類の見直し項目、応募の記録のつけ方を紹介します。
-status: review
+status: published
 categories: [shorui-mensetsu, mikeiken]
 featured: false
 recommended: false
-updated_at: 2026-10-09
+updated_at: 2026-10-10
 information_checked_at: 2026-10-09
 seo_title: 書類選考が通らないときの見直しポイントと求人票の読み方
 seo_description: 書類選考が通らないときは何を見直せばいい？応募先の選び方、求人票の「必須」「あれば尚可」「不問」の読み方と条件との合い方、履歴書・職務経歴書の見直しのチェック項目、応募の記録のつけ方と相談先を紹介します。
@@ -14,7 +14,7 @@ roles: []
 concerns: [mensetsu, mikeiken-shokushu]
 situations: [seishain-keiken-sukunai, freeter]
 eyecatch: ["書類選考が", "なかなか通らない"]
-related: [shiboudouki-mikeiken, rirekisho-kakukoto-nai, tenshoku-service-chigai]
+related: [shiboudouki-mikeiken, rirekisho-kakukoto-nai, tenshoku-service-chigai, rirekisho-kakikata-kihon, kigyou-kenkyu-yarikata]
 faq:
   - q: 書類選考で落ちた理由を、会社に聞いてもいいですか？
     a: 聞くこと自体はできますが、選考の理由は答えてもらえないこともあります。理由を待つより、応募した求人の条件と自分の書類を並べて、合っていなかったところがないかを自分で見直すほうが次につながります。ハローワークや転職エージェントを使っているなら、担当者に書類を見てもらう方法もあります。
@@ -64,6 +64,9 @@ research_notes:
     - 書類選考の通過率、平均の応募社数、内定までの応募数などは公的な出典を確認できなかったので書かない
     - 企業が書類で重視する項目のランキング調査（大阪のハローワーク資料の求職者向け調査）は、書類選考の話とずれるため使わない
     - 年齢や学歴が書類選考にどう影響するかは、出典がなく会社によって違うため書かない
+published_at: 2026-10-10
+reviewed_at: 2026-10-10
+reviewed_by: プロジェクトオーナー（チャットで承認）
 ---
 
 何社に応募しても、書類選考で落ちてしまう。理由が分からないまま「お見送り」の連絡が続くと、自分の経歴に問題があるのではと落ち込んでしまいますよね。

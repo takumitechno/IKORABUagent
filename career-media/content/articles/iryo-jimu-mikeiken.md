@@ -3,11 +3,11 @@ slug: iryo-jimu-mikeiken
 kind: article
 title: 医療事務ってどんな仕事？受付・会計・レセプトの中身と、未経験から目指すときの確認
 summary: 医療事務は、病院やクリニックで受付・会計をし、医療費を請求するための書類（レセプト）を作る仕事です。それぞれの仕事の中身、資格が民間資格であることの意味、シフトや休日など働き方で確かめたいことを紹介します。
-status: review
+status: published
 categories: [shokushu, mikeiken]
 featured: false
 recommended: false
-updated_at: 2026-10-09
+updated_at: 2026-10-10
 information_checked_at: 2026-10-09
 seo_title: 医療事務の仕事内容｜受付・会計・レセプトと資格の考え方
 seo_description: 医療事務の仕事内容を、受付・会計・レセプト（診療報酬明細書）に分けて紹介します。医療事務の資格は民間資格で必須ではないこと、未経験から目指すときの準備、シフトや土曜の勤務など求人で確かめたい働き方が分かります。
@@ -15,7 +15,7 @@ roles: [jimu]
 concerns: [mikeiken-shokushu, office]
 situations: [sekkyaku, pc-mikeiken]
 eyecatch: ["医療事務、", "未経験から目指せる？"]
-related: [jimu-mikeiken-mae, mikeiken-shikaku, pc-nigate-jimu]
+related: [jimu-mikeiken-mae, mikeiken-shikaku, pc-nigate-jimu, uketsuke-shigoto]
 faq:
   - q: 医療事務の資格がないと働けませんか？
     a: 医療事務として働くのに、法律で決まった資格（国家資格）はありません。医療事務の資格は民間の団体が実施しているもので、必須ではありません。ただ、求人によっては資格を応募条件や歓迎条件にしていることがあるので、気になる求人の条件を確かめましょう。
@@ -49,6 +49,9 @@ research_notes:
     - job tag の求人賃金の数字は、検索結果の要約に出ていたが、ページを直接開いて時点と値を確かめられなかったので書かない
     - 個別の医療事務資格の名前・合格率・実施回数は、終了した試験があるとの情報もあり、公式で最新の状況を確かめられなかったので書かない（各団体の公式情報で確かめるよう書いた）
     - 「大きな病院ほど分業化している」という説明は民間サイトの情報のみだったので、断定せず「職場によって担当の分け方が違う」とした
+published_at: 2026-10-10
+reviewed_at: 2026-10-10
+reviewed_by: プロジェクトオーナー（チャットで承認）
 ---
 
 「医療事務なら、未経験からでも目指せそう」。そう考えて調べ始めると、「レセプト」「資格」など、よく分からない言葉がたくさん出てきます。

@@ -2,11 +2,11 @@
 slug: mensetsu-kinchou
 title: 面接で緊張してしまうときの準備と当日の対処｜言葉に詰まったときの言い方の例
 summary: 面接の緊張は、なくそうとするより「緊張しても話せる準備」をしておくほうが現実的です。話す内容の準備のしかた、声に出す練習、当日の流れの確認、ゆっくり話すコツ、言葉に詰まったときや質問が分からないときの言い方の例を、ハローワークの資料をもとに紹介します。
-status: review
+status: published
 categories: [shorui-mensetsu, junbi]
 featured: false
 recommended: false
-updated_at: 2026-10-09
+updated_at: 2026-10-10
 information_checked_at: 2026-10-09
 seo_title: 面接で緊張するときの準備と対処｜詰まったときの言い方
 seo_description: 面接で緊張して頭が真っ白になりそう…。話す内容を要点で準備する方法、声に出す練習、当日の流れ、ゆっくり話すコツ、言葉に詰まったとき・質問が分からないときの言い方の例と、前日に確認したいことを紹介します。
@@ -14,7 +14,7 @@ roles: []
 concerns: [mensetsu]
 situations: [hajimete, seishain-keiken-sukunai]
 eyecatch: ["面接で緊張して", "頭が真っ白になる"]
-related: [mensetsu-yokukiku-shitsumon, web-mensetsu-junbi, mensetsu-fukusou]
+related: [mensetsu-yokukiku-shitsumon, web-mensetsu-junbi, mensetsu-fukusou, mensetsu-ochita-furikaeri, tekisei-kensa-tenshoku]
 faq:
   - q: 面接で緊張していることは、伝えてもいいですか？
     a: 伝えてかまいません。言葉に詰まったときに「緊張していて、うまくまとまらず失礼しました。改めてお話しします」と一言添えてから話し直すと、黙ってしまうより落ち着いて続けやすくなります。ただし何度もくり返すより、話す中身に戻ることを大事にしましょう。
@@ -56,6 +56,9 @@ research_notes:
     - 緊張を和らげる呼吸法や医学的な効果についての説明は、公的な根拠を確認できなかったので書かない
     - 「受付の何分前に着く」といった時間の目安は資料によって違い、出典を特定しきれなかったので数字を書かず「余裕を持って」にとどめた
     - 模擬面接の所要時間や予約方法はハローワークごとに違うため書かない
+published_at: 2026-10-10
+reviewed_at: 2026-10-10
+reviewed_by: プロジェクトオーナー（チャットで承認）
 ---
 
 面接の前の日から落ち着かない。いざ質問されると頭が真っ白になって、準備したことが出てこない。そんな経験がある人は少なくありません。

@@ -14,7 +14,7 @@ roles: []
 concerns: [yametai]
 situations: [hajimete]
 eyecatch: ["辞めたあとの", "年金の手続きは？"]
-related: [yametai-mae-kakunin, tedori-20man-hikaku, news-koyou-hoken-kyufu-seigen]
+related: [yametai-mae-kakunin, tedori-20man-hikaku, news-koyou-hoken-kyufu-seigen, kokumin-nenkin-menjo]
 faq:
   - q: 次の会社が決まっていて、間が数日だけ空きます。それでも手続きは必要ですか？
     a: 退職日の翌日に次の会社に入る場合を除き、原則として国民年金に切り替える手続きが必要です。退職日の翌日と次の会社に入る日が同じ月の中なら、その月の国民年金の保険料は払わなくてよいとされています。迷ったら、住んでいる市区町村の国民年金の窓口に確認しましょう。

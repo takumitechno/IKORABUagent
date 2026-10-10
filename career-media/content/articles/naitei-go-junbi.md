@@ -3,11 +3,11 @@ slug: naitei-go-junbi
 kind: article
 title: 内定から入社までにやることは？退職手続きとの順番・入社日の調整・入社書類の準備
 summary: 内定から入社までは、「労働条件を書面で確認して承諾する」「入社日を決める」「今の会社に退職を伝える」「入社書類をそろえる」の順に進めると、行き違いが起きにくくなります。入社日の相談のしかたの例と、基礎年金番号が分かる書類・雇用保険被保険者証・源泉徴収票などの入社書類が何に使われるか、手元にないときの対処を紹介します。
-status: review
+status: published
 categories: [junbi, seido]
 featured: false
 recommended: false
-updated_at: 2026-10-09
+updated_at: 2026-10-10
 information_checked_at: 2026-10-09
 seo_title: 内定から入社までにやること｜退職との順番と入社書類
 seo_description: 内定から入社までに何をする？労働条件の確認と承諾、退職を伝える順番、入社日の相談のしかたの例、年金手帳・基礎年金番号通知書・雇用保険被保険者証・源泉徴収票などの入社書類の役割と、なくしたときの対処を紹介します。
@@ -15,7 +15,7 @@ roles: []
 concerns: [yametai]
 situations: [hajimete, dainishinsotsu]
 eyecatch: ["内定が出た！", "入社までに何をする？"]
-related: [naitei-shodaku-mae, taishoku-shorui, taishoku-tsutaekata]
+related: [naitei-shodaku-mae, taishoku-shorui, taishoku-tsutaekata, nyusha-go-hajime, tenkin-kinmuchi-kakunin]
 faq:
   - q: 内定をもらったら、すぐ今の会社に退職を伝えてもいいですか？
     a: 労働条件を書面で確認して内定を承諾し、入社日が決まってから伝えるのが安全です。承諾の前に退職を伝えてしまうと、条件が合わずに辞退したくなったとき、戻る場所がなくなってしまいます。退職の申し出の時期は就業規則に決まりがあることが多いので、あわせて確認しておきましょう。
@@ -65,6 +65,9 @@ research_notes:
     - 源泉徴収票の交付期限（退職後1か月以内）は taishoku-shorui で扱っているため、この記事ではリンクに任せた
     - 内定から入社までの平均的な期間や、入社日を延ばせる日数の目安は公的な根拠がなく、会社によって違うため書かない
     - 入社時に会社が求める書類（マイナンバー、口座、健康診断書など）は会社によって違うため、例として挙げるにとどめ「会社の案内で確認」とした
+published_at: 2026-10-10
+reviewed_at: 2026-10-10
+reviewed_by: プロジェクトオーナー（チャットで承認）
 ---
 
 内定の連絡が来てほっとしたのもつかの間、「今の会社にはいつ言えばいい？」「入社までに何を用意すればいい？」と、次の心配が出てくる人も多いはずです。

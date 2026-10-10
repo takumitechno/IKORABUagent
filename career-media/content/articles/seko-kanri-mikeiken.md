@@ -2,11 +2,11 @@
 slug: seko-kanri-mikeiken
 title: 施工管理の仕事内容は？4つの管理と資格の段階、未経験から目指す前に確認する働き方
 summary: 施工管理は、工事現場で工事が予定どおり・安全に進むよう、工程・品質・安全・原価を管理する仕事です。建築と土木の違い、施工管理技士の資格の段階（技士補・技士）と2024年度からの受検資格、2024年4月から建設業に適用された残業の上限、応募前に確認することを紹介します。
-status: review
+status: published
 categories: [shokushu, mikeiken]
 featured: false
 recommended: false
-updated_at: 2026-10-09
+updated_at: 2026-10-10
 information_checked_at: 2026-10-09
 seo_title: 施工管理の仕事内容は？未経験から目指す前の確認点
 seo_description: 未経験から施工管理を考える人へ。工程・品質・安全・原価の4つの管理の中身、建築と土木の違い、施工管理技士の技士補・技士の段階と受検資格、2024年4月から建設業に適用された時間外労働の上限、求人で確認することを紹介します。
@@ -14,7 +14,7 @@ roles: [sonota]
 concerns: [mikeiken-shokushu, kyuryo]
 situations: [hajimete, dainishinsotsu]
 eyecatch: ["施工管理って、", "未経験でもなれる？"]
-related: [koteizangyo-kyujin, mikeiken-shikaku, shokuba-jouhou-wakamono]
+related: [koteizangyo-kyujin, mikeiken-shikaku, shokuba-jouhou-wakamono, driver-shigoto, seizou-koujou-shigoto]
 faq:
   - q: 施工管理は、資格がなくても始められますか？
     a: 施工管理技士の資格は、実務の経験を積みながら段階を踏んで取っていくものです。2024年度から受検資格が見直され、1級の第一次検定は受検する年度の末に19歳以上、2級の第一次検定は17歳以上であれば受検できるようになりました。未経験の場合は、先輩の補佐から始めて、働きながら資格を目指す形が考えられます。応募資格は求人ごとに違うので、求人票で確認しましょう。
@@ -72,6 +72,9 @@ research_notes:
     - 施工管理技術者の平均年収・労働時間の数字は、job tag のページを直接開いて確認できず、二次情報サイトでしか見られなかったため書かない
     - 第二次検定に必要な実務経験の年数は、級や経路（特定実務経験・経過措置など）で細かく分かれるため、本文では「一定の実務経験」とし、受検の手引での確認をすすめた
     - 主任技術者・監理技術者の配置要件の詳細は、この記事の読者の最初の疑問から外れるため扱わない
+published_at: 2026-10-10
+reviewed_at: 2026-10-10
+reviewed_by: プロジェクトオーナー（チャットで承認）
 ---
 
 「ものづくりの現場に関わりたい」「資格を取って長く続けられる仕事に就きたい」。そう考えたときに候補に挙がりやすいのが、建設業の施工管理です。一方で、「未経験でも大丈夫？」「残業が多いって本当？」と不安に思う人も多い仕事です。

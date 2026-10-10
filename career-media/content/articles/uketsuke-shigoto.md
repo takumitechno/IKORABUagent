@@ -3,11 +3,11 @@ slug: uketsuke-shigoto
 kind: article
 title: 受付の仕事内容は？企業・ホテル・クリニックの違いと接客経験の活かし方
 summary: 受付の仕事は、来た人を迎えて用件を聞き、担当者や行き先につなぐことが中心です。企業受付・ホテルのフロント・クリニックの受付で何が違うか、接客経験をどう伝えるか、雇用形態や勤務時間など求人で確認したいことを紹介します。
-status: review
+status: published
 categories: [shokushu, keiken]
 featured: false
 recommended: false
-updated_at: 2026-10-09
+updated_at: 2026-10-10
 information_checked_at: 2026-10-09
 seo_title: 受付の仕事内容｜企業・ホテル・クリニックの違いと求人の見方
 seo_description: 受付の仕事内容を、企業受付・ホテルのフロント・クリニックの受付に分けて紹介します。それぞれの1日の動き方と勤務時間の違い、接客経験を書類や面接でどう伝えるかの例、雇用形態・シフト・受付以外の業務など求人で確認したいことが分かります。
@@ -15,7 +15,7 @@ roles: [jimu, hanbai]
 concerns: [office]
 situations: [sekkyaku, freeter]
 eyecatch: ["接客の経験、", "受付の仕事で活かせる？"]
-related: [sekkyaku-keiken-ikasu, sekkyaku-office, jimu-mikeiken-mae]
+related: [sekkyaku-keiken-ikasu, sekkyaku-office, jimu-mikeiken-mae, iryo-jimu-mikeiken]
 faq:
   - q: 受付の仕事は、未経験でも応募できますか？
     a: 「未経験可」の求人なら応募できます。来た人を迎えて案内する仕事なので、接客や販売の経験がある人は、あいさつや言葉づかい、待っている人への気配りを経験として伝えられます。電話の取り次ぎやパソコンでの予約管理もあることが多いので、求人の仕事内容の欄を確かめておきましょう。
@@ -57,6 +57,9 @@ research_notes:
     - job tag の受付事務のタスク実施率（電話対応などの割合）は検索結果の要約に出ていたが、ページを直接開いて確かめられなかったので書かない
     - 受付の賃金の数字は、時点と値を確かめられなかったので書かない
     - 「受付は派遣が多い」といった傾向は公的な根拠を確認できなかったので、断定せず雇用形態を確かめるよう書いた
+published_at: 2026-10-10
+reviewed_at: 2026-10-10
+reviewed_by: プロジェクトオーナー（チャットで承認）
 ---
 
 「接客の仕事はしてきたけど、次は受付の仕事をしてみたい」。受付は、接客の経験とつながりやすい仕事の一つです。ただ、**どこの受付かによって、することも勤務時間も大きく変わります**。

@@ -3,11 +3,11 @@ slug: mensetsu-ochita-furikaeri
 kind: article
 title: 面接に落ちたら、どう振り返る？気持ちの整理と、次の面接に向けた直し方
 summary: 面接に落ちたときは、自分を責めるより、「準備で直せること」と「相性やタイミングなど自分では変えられないこと」を分けて振り返ると、次の面接につなげやすくなります。気持ちの整理のしかた、振り返りの項目、答えの直し方の例、ハローワークで面接の相談をするときの使い方を紹介します。
-status: review
+status: published
 categories: [shorui-mensetsu, junbi]
 featured: false
 recommended: false
-updated_at: 2026-10-09
+updated_at: 2026-10-10
 information_checked_at: 2026-10-09
 seo_title: 面接に落ちたときの振り返り方｜次の面接に向けた直し方
 seo_description: 面接に落ちたとき、何をどう振り返ればいい？気持ちの整理のしかた、面接直後にメモしておく項目、直せることと直せないことの分け方、答えの直し方の例、ハローワークで面接練習や相談を受けるときの使い方を紹介します。
@@ -15,7 +15,7 @@ roles: []
 concerns: [mensetsu]
 situations: [hajimete, seishain-keiken-sukunai]
 eyecatch: ["面接に落ちた…", "次は何を直せばいい？"]
-related: [mensetsu-yokukiku-shitsumon, mensetsu-junbi-mikeiken, gyaku-shitsumon]
+related: [mensetsu-yokukiku-shitsumon, mensetsu-junbi-mikeiken, gyaku-shitsumon, mensetsu-kinchou, hellowork-tsukaikata]
 faq:
   - q: 面接に落ちた理由を、会社に聞いてもいいですか？
     a: 聞くこと自体はかまいませんが、不採用の理由は詳しく教えてもらえないことが多いと考えておきましょう。答えが返ってこなくても失礼にあたるわけではありません。理由が分からないときは、面接直後のメモをもとに自分で振り返るか、ハローワークなどの窓口で面接の受け答えを一緒に見直してもらう方法があります。
@@ -57,6 +57,9 @@ research_notes:
     - 「面接の通過率」「平均で何社受けるか」などの数字は、公的な根拠を確認できなかったので書かない
     - 不採用理由の開示について、会社に説明する義務があるかどうかの公的な説明は確認できなかったので、「教えてもらえないことが多いと考えておく」にとどめた
     - 面接練習（模擬面接）の予約方法・時間は窓口ごとに違うため、具体的な時間は書かない
+published_at: 2026-10-10
+reviewed_at: 2026-10-10
+reviewed_by: プロジェクトオーナー（チャットで承認）
 ---
 
 面接の結果が「今回はご縁がありませんでした」だった。準備したつもりだったのに、何がいけなかったのか分からない。そんなとき、落ち込むのは自然なことです。

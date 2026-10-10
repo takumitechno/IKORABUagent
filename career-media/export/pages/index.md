@@ -32,40 +32,40 @@ source:
 
 **［タブ: 今の状況から］**
 
-- 13
+- 21
   [フリーター](/situations/freeter)
-- 4
+- 8
   [派遣社員](/situations/haken)
-- 17
+- 25
   [正社員経験が少ない](/situations/seishain-keiken-sukunai)
-- 16
+- 21
   [接客・販売の経験](/situations/sekkyaku)
-- 12
+- 19
   [第二新卒](/situations/dainishinsotsu)
-- 50
+- 74
   [初めての転職](/situations/hajimete)
 - 3
   [転職回数が多い](/situations/kaisu)
-- 11
+- 13
   [PC仕事が未経験](/situations/pc-mikeiken)
 
 [状況の一覧](/situations)
 
 **［タブ: 悩みから］**
 
-- 15
+- 22
   [給料を上げたい](/concerns/kyuryo)
 - 5
   [土日休みにしたい](/concerns/donichi)
-- 7
+- 12
   [オフィスワークに行きたい](/concerns/office)
-- 13
-  [正社員になりたい](/concerns/seishain)
-- 32
-  [未経験の職種に挑戦したい](/concerns/mikeiken-shokushu)
-- 21
-  [今の仕事を辞めたい](/concerns/yametai)
 - 19
+  [正社員になりたい](/concerns/seishain)
+- 43
+  [未経験の職種に挑戦したい](/concerns/mikeiken-shokushu)
+- 26
+  [今の仕事を辞めたい](/concerns/yametai)
+- 26
   [面接・書類が不安](/concerns/mensetsu)
 - 10
   [やりたい仕事が分からない](/concerns/yaritai)
@@ -74,19 +74,19 @@ source:
 
 **［タブ: 職種から］**
 
-- 4
+- 5
   [営業](/jobs/eigyo)
-- 7
+- 9
   [事務](/jobs/jimu)
 - 5
   [カスタマーサポート](/jobs/customer-support)
-- 4
+- 5
   [ITサポート](/jobs/it-support)
 - 2
   [人事・採用](/jobs/jinji)
-- 2
-  [販売・接客](/jobs/hanbai)
 - 3
+  [販売・接客](/jobs/hanbai)
+- 9
   [その他の職種](/jobs/sonota)
 
 [職種を比べる](/jobs)
@@ -129,6 +129,32 @@ source:
   3. 未経験転職で、最初に整理する5つのこと
   順番に読む（全6ステップ）
 
+## 転職活動の流れを図で見る
+
+[スケジュールの立て方](/articles/tenshoku-schedule)
+
+1. [STEP 1](/articles/jiko-bunseki-yarikata)
+   自己分析
+   経験とゆずれない条件を書き出す
+2. STEP 2
+   求人を探す
+   求人票の見方を知って比べる
+3. [STEP 3](/articles/rirekisho-kakukoto-nai)
+   書類を書く
+   履歴書・職務経歴書をつくる
+4. [STEP 4](/articles/mensetsu-yokukiku-shitsumon)
+   面接
+   よく聞かれる質問を準備する
+5. [STEP 5](/articles/naitei-shodaku-mae)
+   内定
+   承諾の前に労働条件を確かめる
+6. [STEP 6](/articles/taishoku-tsutaekata)
+   退職の手続き
+   伝え方と、もらう書類を確認
+7. [STEP 7](/articles/tenshoku-koukai-shinai)
+   入社
+   入社前に条件の最終確認
+
 ## 最初に読みたい記事
 
 [記事一覧](/articles)
@@ -152,16 +178,16 @@ source:
 
 [すべて見る](/articles)
 
-- 職種を知る 2026.10.09
-  ### [コールセンターの仕事内容は？受信と発信の違い・向き不向きと、接客経験の活かし方](/articles/callcenter-shigoto)
-- 職種を知る 2026.10.09
-  ### [営業事務ってどんな仕事？一般事務との違い・1日の流れと、応募前に求人で確認すること](/articles/eigyo-jimu-shigoto)
-- 面接・書類 2026.10.09
-  ### [面接の逆質問、何を聞けばいい？聞くとよいこと・避けたいことと未経験向けの質問例](/articles/gyaku-shitsumon)
-- 制度・手続き 2026.10.09
-  ### [ハロートレーニング（公共職業訓練）とは？未経験の仕事のスキルを無料で学ぶ流れ](/articles/hello-training)
-- 転職準備 2026.10.09
-  ### [転職のための自己分析のやり方｜経験の棚卸し・ゆずれない条件・やりたくないことの書き出し例](/articles/jiko-bunseki-yarikata)
+- 職種を知る 2026.10.10
+  ### [物流・倉庫の仕事内容は？ピッキング・検品・在庫管理・フォークリフトの違いと未経験からの始め方](/articles/butsuryu-soko-shigoto)
+- 職種を知る 2026.10.10
+  ### [ドライバーの仕事内容と必要な免許は？準中型・中型・大型・二種の違いと、2024年4月からの働き方の確認](/articles/driver-shigoto)
+- 職種を知る 2026.10.10
+  ### [不動産営業の仕事内容は？賃貸仲介と売買仲介の違い・宅建士の役割・歩合の給与の確認と接客経験の活かし方](/articles/fudousan-eigyo)
+- 年収・働き方 2026.10.10
+  ### [求人の「福利厚生」はどう見る？社会保険と会社独自の制度の違い、住宅手当・交通費・退職金の確かめ方](/articles/fukuri-kousei-mikata)
+- 年収・働き方 2026.10.10
+  ### [限定正社員（勤務地・職務・短時間）とは？普通の正社員との違いと、応募前に確認すること](/articles/gentei-seishain)
 
 ## 知っておきたい制度の変更
 
@@ -188,6 +214,24 @@ source:
 | [一般事務・営業事務](/jobs/jimu) 書類やデータの作成・管理、電話や来客への対応で、社内の仕事が円滑に進むよう支える仕事。 | [図: 人と話す量: 5段階中2（やや少ない）] やや少ない | [図: パソコン作業: 5段階中4（やや多い）] やや多い | [図: 数字の目標: 5段階中1（ほぼない）] ほぼない | [記事を見る](/jobs/jimu) |
 
 一般的な傾向です。会社や配属先によって大きく異なります。
+
+## 求人票は、ここを見る
+
+> **一般事務（未経験歓迎） 見本（架空）**
+>
+> - **給与**
+>   月給 〇〇万円（固定残業代〇時間分を含む）
+> - **休日**
+>   週休2日制（土日）・年間休日 〇〇日
+> - **試用期間**
+>   〇か月（期間中の条件：〇〇）
+> - **勤務地**
+>   〇〇（変更の範囲：〇〇）
+
+1. [給与 固定残業代の時間数と金額、超えた分の支払い](/articles/koteizangyo-kyujin)
+2. [休日 「完全週休2日」との違いと年間休日の日数](/articles/donichi-yasumi-shigoto)
+3. [試用期間 期間の長さと、その間の給与や条件の違い](/articles/shiyou-kikan)
+4. [勤務地 転勤の有無と、勤務地が変わる範囲](/articles/tenkin-kinmuchi-kakunin)
 
 無料・登録不要
 

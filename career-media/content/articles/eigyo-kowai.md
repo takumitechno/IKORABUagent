@@ -14,7 +14,7 @@ roles: [eigyo]
 concerns: [mikeiken-shokushu, kyuryo]
 situations: [sekkyaku, hajimete]
 eyecatch: ["営業って怖い？", "中身を分けて考える。"]
-related: [eigyo-cs-it-support-chigai, sekkyaku-keiken-ikasu, mikeiken-kenshu-kakunin]
+related: [eigyo-cs-it-support-chigai, sekkyaku-keiken-ikasu, mikeiken-kenshu-kakunin, fudousan-eigyo]
 faq:
   - q: ノルマがない営業の仕事はありますか？
     a: 営業は、売上や契約件数などの目標が置かれていることが多い仕事です。目標があるかどうかより、個人の目標かチームの目標か、未経験で入った人の最初の目標はどう決めるか、届かなかったときにどんなフォローがあるかを確認しておくことが大切です。

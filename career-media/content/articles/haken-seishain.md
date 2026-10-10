@@ -14,7 +14,7 @@ roles: []
 concerns: [seishain, kyuryo]
 situations: [haken]
 eyecatch: ["派遣から正社員、", "何から考える？"]
-related: [freeter-seishain-hajimeni, donichi-yasumi-nenshu-hikaku, mikeiken-tenshoku-hajimekata]
+related: [freeter-seishain-hajimeni, donichi-yasumi-nenshu-hikaku, mikeiken-tenshoku-hajimekata, gentei-seishain]
 faq:
   - q: 紹介予定派遣とは何ですか？
     a: 派遣先の会社に直接雇われることを前提に、まず派遣社員として働く方法です。派遣で働く期間は6か月までで、その間に会社と本人の双方が、仕事や職場が合うかを確かめます。双方が合意すれば直接雇用になります。直接雇用後が正社員か契約社員かは求人によって違うので、始める前に確認しましょう。

@@ -2,11 +2,11 @@
 slug: tekisei-kensa-tenshoku
 title: 転職の適性検査とは？能力検査と性格検査の違い・受け方の種類と準備のしかた
 summary: 転職の選考で出てくる適性検査は、大きく分けると能力検査と性格検査があります。それぞれ何を聞かれるのか、テストセンター・自宅のWeb・会社でのペーパーといった受け方の違い、案内が届いたら確認すること、準備のしかたを、厚生労働省の資料をもとに紹介します。
-status: review
+status: published
 categories: [shorui-mensetsu, junbi]
 featured: false
 recommended: false
-updated_at: 2026-10-09
+updated_at: 2026-10-10
 information_checked_at: 2026-10-09
 seo_title: 転職の適性検査とは？能力検査・性格検査と準備のしかた
 seo_description: 転職の選考で「適性検査を受けてください」と言われたら？能力検査と性格検査の違い、テストセンター・自宅のWeb・ペーパーといった受け方、案内メールで確認すること、能力検査の練習のしかたと性格検査の答え方の考え方を紹介します。
@@ -14,7 +14,7 @@ roles: []
 concerns: [mensetsu]
 situations: [hajimete, dainishinsotsu]
 eyecatch: ["適性検査って", "何をすればいい？"]
-related: [tenshoku-schedule, mensetsu-yokukiku-shitsumon, jiko-bunseki-yarikata]
+related: [tenshoku-schedule, mensetsu-yokukiku-shitsumon, jiko-bunseki-yarikata, mensetsu-kinchou, kigyou-kenkyu-yarikata]
 faq:
   - q: 性格検査は、よく見えるように答えたほうがいいですか？
     a: 正直に答えるのがおすすめです。よく見せようとすると、似た内容の質問への答えがばらばらになったり、面接で話す内容と合わなくなったりしやすくなります。入社後に合わない仕事を選ばないためにも、ふだんの自分に近いほうを選びましょう。
@@ -64,6 +64,9 @@ research_notes:
     - 特定の検査会社・検査名、問題の例、出題数、合格ライン、受検料などは書かない（宣伝・転載を避け、会社ごとに違うため）
     - テストセンター・Web・ペーパーの受け方の違いについての公的な資料は見つからなかったため、一般的な違いの説明にとどめ、細かい決まりは「案内で確認する」と書いた
     - 適性検査を実施する企業の割合などの統計は、出典を確認できなかったので書かない
+published_at: 2026-10-10
+reviewed_at: 2026-10-10
+reviewed_by: プロジェクトオーナー（チャットで承認）
 ---
 
 書類選考のあとに「適性検査を受けてください」という案内が届いた。何が出るのか、どう準備すればいいのか分からず、不安になる人も多いと思います。

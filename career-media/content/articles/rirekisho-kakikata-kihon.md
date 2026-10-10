@@ -2,11 +2,11 @@
 slug: rirekisho-kakikata-kihon
 title: 転職の履歴書の書き方｜学歴・職歴・資格・志望動機・本人希望欄を欄ごとに確認
 summary: 転職の履歴書は、どの欄も「事実を正確に、応募先が読みやすく」が基本です。厚生労働省の履歴書様式例とハローワークの資料をもとに、日付・写真から学歴・職歴・免許資格・志望動機・本人希望記入欄まで、欄ごとの書き方と記入例、手書きとパソコンの考え方を紹介します。
-status: review
+status: published
 categories: [shorui-mensetsu, junbi]
 featured: false
 recommended: false
-updated_at: 2026-10-09
+updated_at: 2026-10-10
 information_checked_at: 2026-10-09
 seo_title: 転職の履歴書の書き方｜各欄の記入例と手書き・パソコン
 seo_description: 転職の履歴書はどう書く？厚生労働省の履歴書様式例とハローワークの資料をもとに、日付・写真、学歴・職歴・免許資格・志望動機・本人希望記入欄の書き方と記入例、手書きとパソコンの選び方、提出前のチェック項目を紹介します。
@@ -14,7 +14,7 @@ roles: []
 concerns: [mensetsu]
 situations: [hajimete, dainishinsotsu]
 eyecatch: ["はじめての履歴書、", "どの欄から書く？"]
-related: [rirekisho-kakukoto-nai, shiboudouki-mikeiken, kibou-nenshu-kakikata]
+related: [rirekisho-kakukoto-nai, shiboudouki-mikeiken, kibou-nenshu-kakikata, shokumu-keirekisho-kakikata, shorui-senkou-tooranai]
 faq:
   - q: 転職の履歴書は、手書きとパソコンのどちらがいいですか？
     a: 応募先から指定がなければ、どちらでもかまいません。ハローワークの資料でも、手書きでもパソコンでも構わないとする企業が多いため、書くのに使える時間などを考えて決めるよう案内されています。応募先の指定がある場合は、それに従いましょう。
@@ -56,6 +56,9 @@ research_notes:
     - 手書きとパソコンで選考の結果に差が出るかどうかの調査データは公的な根拠を確認できなかったので書かない
     - 写真のサイズ（縦横の寸法）は様式や地域の資料で書き方が異なり、今回確認しきれなかったので「様式の枠に合わせる」にとどめた
     - 学歴を「中学卒業から」「高校入学から」どちらで書くべきかは資料によって表現が違うため、断定せず「高校卒業から書く人が多いが決まりはない」程度にとどめた
+published_at: 2026-10-10
+reviewed_at: 2026-10-10
+reviewed_by: プロジェクトオーナー（チャットで承認）
 ---
 
 はじめて転職の履歴書を書くとき、「学歴はどこから書く？」「日付はいつにする？」と、細かいところで手が止まりがちです。

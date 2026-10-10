@@ -3,11 +3,11 @@ slug: kigyou-kenkyu-yarikata
 kind: article
 title: 転職の企業研究、何を見ればいい？公式サイト・求人票・職場情報の調べ方と面接での使い方
 summary: 転職の企業研究は、「面接で聞かれることに答える材料を集める」ことと「入社後のギャップを減らす」ことの2つのためにします。求人票・会社の公式サイト・しょくばらぼなどの公的な職場情報・job tag でそれぞれ何を見るか、調べた内容のまとめ方、志望動機や逆質問への使い方を紹介します。
-status: review
+status: published
 categories: [junbi, mikeiken]
 featured: false
 recommended: false
-updated_at: 2026-10-09
+updated_at: 2026-10-10
 information_checked_at: 2026-10-09
 seo_title: 転職の企業研究のやり方｜どこで何を見て面接に使う？
 seo_description: 転職の企業研究は何を見ればいい？求人票・会社の公式サイト・しょくばらぼや若者雇用促進法の職場情報・中途採用比率・job tag で確かめることと、調べたことのまとめ方、志望動機や逆質問への使い方を紹介します。
@@ -15,7 +15,7 @@ roles: []
 concerns: [mensetsu, mikeiken-shokushu]
 situations: [hajimete]
 eyecatch: ["企業研究って、", "どこで何を見る？"]
-related: [shokuba-jouhou-wakamono, shiboudouki-mikeiken, gyaku-shitsumon]
+related: [shokuba-jouhou-wakamono, shiboudouki-mikeiken, gyaku-shitsumon, shorui-senkou-tooranai, fukuri-kousei-mikata]
 faq:
   - q: 企業研究は、1社にどのくらい時間をかければいいですか？
     a: 決まった時間はありません。目安は「志望動機に会社ならではの理由を1つ入れられる」「逆質問をいくつか用意できる」「働き方の条件で気になることが分かっている」の3つがそろうところまでです。書類を出す前は求人票と公式サイトを中心に、面接が決まったら職場情報や仕事内容まで調べる、と段階を分けると続けやすくなります。
@@ -65,6 +65,9 @@ research_notes:
     - しょくばらぼの掲載企業数は時点で変わるため書かない
     - 中途採用比率の公表に違反したときの罰則の有無は、民間の解説でしか確認できなかったので書かない
     - 口コミサイトの信頼性についての公的な調査は確認できなかったので、「事実か確かめられないこともある」という一般的な注意にとどめた
+published_at: 2026-10-10
+reviewed_at: 2026-10-10
+reviewed_by: プロジェクトオーナー（チャットで承認）
 ---
 
 応募したい会社が見つかった。でも「企業研究をしよう」と言われても、何をどこまで調べればいいのか分からない。そんな人は多いはずです。

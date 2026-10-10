@@ -14,7 +14,7 @@ roles: [it-support]
 concerns: [mikeiken-shokushu]
 situations: [pc-mikeiken, hajimete]
 eyecatch: ["未経験のIT、", "最初はどんな仕事？"]
-related: [eigyo-cs-it-support-chigai, mikeiken-kenshu-kakunin, pc-nigate-jimu]
+related: [eigyo-cs-it-support-chigai, mikeiken-kenshu-kakunin, pc-nigate-jimu, programmer-mikeiken]
 faq:
   - q: ITパスポートを持っていないと、ITの仕事に応募できませんか？
     a: 応募条件に書かれていなければ、資格がなくても応募できます。ITパスポート試験は受験資格のない国家試験なので、ITの基礎を学ぶときの目標として使うのは一つの方法です。

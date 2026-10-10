@@ -3,11 +3,11 @@ slug: kokumin-nenkin-menjo
 kind: article
 title: 退職後に国民年金の保険料が払えないときは？免除・納付猶予と失業の特例、申請先と追納
 summary: 退職して国民年金の保険料を払うのが難しいときは、未納のままにせず、免除か納付猶予を申請しましょう。失業による特例で辞めた本人の所得がゼロとして審査されるしくみ、免除の4つの段階、申請先と必要な書類、さかのぼれる期間、あとから納める追納を紹介します。
-status: review
+status: published
 categories: [seido, junbi]
 featured: false
 recommended: false
-updated_at: 2026-10-09
+updated_at: 2026-10-10
 information_checked_at: 2026-10-09
 seo_title: 国民年金が払えない｜退職後の免除・納付猶予と失業の特例
 seo_description: 退職後、国民年金の保険料が払えないときの免除・納付猶予の申請方法を紹介します。失業による特例のしくみ、全額・一部免除の違いと2026年度の納める額、申請先と必要書類、2年1か月前までさかのぼれること、追納の期限が分かります。
@@ -15,7 +15,7 @@ roles: []
 concerns: [yametai]
 situations: [hajimete, seishain-keiken-sukunai]
 eyecatch: ["年金の保険料、", "払えないときは？"]
-related: [taishoku-nenkin-tetsuzuki, shitsugyo-teate-kihon, tenshoku-okane-junbi]
+related: [taishoku-nenkin-tetsuzuki, shitsugyo-teate-kihon, tenshoku-okane-junbi, taishoku-kakutei-shinkoku]
 faq:
   - q: 退職して収入がありません。国民年金の保険料は払わなくてもいいですか？
     a: 払えないときは、そのままにせず免除か納付猶予を申請しましょう。退職した人は「失業による特例」で、辞めた本人の前の年の所得をゼロとして審査してもらえます。申請しないで未納のままにすると、その期間は年金を受け取るために必要な期間に入らず、けがや病気で障害が残ったときの障害基礎年金を受けられないおそれがあります。
@@ -60,6 +60,9 @@ research_notes:
     - 一部免除（4分の3・半額・4分の1）の所得基準の細かい計算式は、控除の種類で変わり読者が自分で計算しにくいため、全額免除の目安だけを載せ、ほかは窓口で確認するよう書いた
     - 追納の加算額の具体的な金額は年度で変わるため書かない
     - 学生納付特例、法定免除、産前産後期間の免除は、この記事の読者（退職した人）から外れるため扱わない
+published_at: 2026-10-10
+reviewed_at: 2026-10-10
+reviewed_by: プロジェクトオーナー（チャットで承認）
 ---
 
 会社を辞めて、国民年金に切り替えた。でも収入がない中で、毎月の保険料を払うのは正直きつい。そんなときは、**払わずに放っておくのではなく、免除か納付猶予を申請**しましょう。

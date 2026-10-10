@@ -2,11 +2,11 @@
 slug: butsuryu-soko-shigoto
 title: 物流・倉庫の仕事内容は？ピッキング・検品・在庫管理・フォークリフトの違いと未経験からの始め方
 summary: 物流倉庫の仕事は、荷物を受け入れる・保管する・集める・確かめる・送り出す、の流れで分かれています。ピッキング・検品・在庫管理・フォークリフトの仕事の違い、フォークリフトに必要な資格、未経験から働くときに求人で確認することを紹介します。
-status: review
+status: published
 categories: [shokushu, mikeiken]
 featured: false
 recommended: false
-updated_at: 2026-10-09
+updated_at: 2026-10-10
 information_checked_at: 2026-10-09
 seo_title: 物流・倉庫の仕事内容は？ピッキング・検品と未経験の始め方
 seo_description: 物流・倉庫の仕事を未経験から考える人へ。入庫から出荷までの流れ、ピッキング・検品・在庫管理・フォークリフトの仕事の違い、フォークリフトに必要な技能講習と特別教育、求人や面接で確認したい勤務時間・雇用の形を紹介します。
@@ -14,7 +14,7 @@ roles: [sonota]
 concerns: [mikeiken-shokushu, seishain]
 situations: [freeter, haken]
 eyecatch: ["倉庫の仕事って、", "未経験でもできる？"]
-related: [haken-seishain, mikeiken-shikaku, mikeiken-kenshu-kakunin]
+related: [haken-seishain, mikeiken-shikaku, mikeiken-kenshu-kakunin, seizou-koujou-shigoto, driver-shigoto]
 faq:
   - q: 倉庫の仕事は、資格がなくても始められますか？
     a: ピッキングや検品、仕分けなどの倉庫内の作業は、資格がなくても応募できる求人が多い仕事です。ただし、フォークリフトの運転は資格が必要な仕事で、最大荷重1トン以上のものは技能講習、1トン未満のものは特別教育の修了が必要です。求人の応募資格の欄で、資格が必要かどうかを確認しましょう。
@@ -64,6 +64,9 @@ research_notes:
     - 倉庫作業員の賃金や求人倍率の数字は、job tag のページを直接開いて確認できなかったため書かない
     - 技能講習の時間数・費用は受講コース（持っている免許や経験）によって違い、一次情報で確認しきれなかったため書かない
     - 夜勤や交替制の有無は倉庫によって違うため断定せず、求人での確認のしかたを書くにとどめた
+published_at: 2026-10-10
+reviewed_at: 2026-10-10
+reviewed_by: プロジェクトオーナー（チャットで承認）
 ---
 
 「人と話すより、黙々と手を動かす仕事がしたい」「未経験でも始めやすい仕事を探している」。そんなときに候補に入りやすいのが、物流倉庫の仕事です。

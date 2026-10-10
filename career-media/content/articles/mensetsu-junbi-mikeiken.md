@@ -14,7 +14,7 @@ roles: []
 concerns: [mensetsu, mikeiken-shokushu]
 situations: [hajimete, seishain-keiken-sukunai]
 eyecatch: ["面接が不安。", "何を準備する？"]
-related: [shiboudouki-mikeiken, mikeiken-kenshu-kakunin, shokumu-keirekisho-arubaito, mensetsu-yokukiku-shitsumon, gyaku-shitsumon]
+related: [shiboudouki-mikeiken, mikeiken-kenshu-kakunin, shokumu-keirekisho-arubaito, mensetsu-yokukiku-shitsumon, gyaku-shitsumon, mensetsu-kinchou, tekisei-kensa-tenshoku]
 faq:
   - q: 面接で家族のことを聞かれたら、答えないといけませんか？
     a: 厚生労働省は、家族の職業や収入など、本人の適性・能力と関係のない事項を面接で尋ねることは就職差別につながるおそれがあるとして、企業に配慮を求めています。答えにくい質問に無理に答える必要はありません。気になる質問をされたときは、ハローワークや都道府県労働局に相談できます。

@@ -3,11 +3,11 @@ slug: taishoku-kakutei-shinkoku
 kind: article
 title: 年の途中で退職して年内に再就職しなかったら？確定申告（還付申告）の流れと必要な書類
 summary: 年の途中で辞めて、その年のうちに次の会社に入らなかった人は、年末調整を受けていないため、所得税を納めすぎている場合があります。翌年1月1日から5年間出せる還付申告のしくみ、源泉徴収票など必要な書類、失業手当や退職金の扱い、作成コーナーでの入力の流れを紹介します。
-status: review
+status: published
 categories: [seido, junbi]
 featured: false
 recommended: false
-updated_at: 2026-10-09
+updated_at: 2026-10-10
 information_checked_at: 2026-10-09
 seo_title: 退職後に再就職しなかった年の確定申告｜還付申告と必要書類
 seo_description: 年の途中で退職し、年内に再就職しなかったときの確定申告（還付申告）を紹介します。税金が戻る場合があるしくみ、翌年1月1日から5年間という申告できる期間、源泉徴収票や国民年金の控除証明書など必要な書類、失業手当や退職金の扱いが分かります。
@@ -15,7 +15,7 @@ roles: []
 concerns: [yametai]
 situations: [hajimete]
 eyecatch: ["辞めた年の税金、", "戻ってくるかも？"]
-related: [tenshoku-nenmatsu-chosei, taishoku-shorui, taishoku-juminzei]
+related: [tenshoku-nenmatsu-chosei, taishoku-shorui, taishoku-juminzei, kokumin-nenkin-menjo]
 faq:
   - q: 確定申告は3月15日までに出さないといけませんか？
     a: 納めすぎた税金を返してもらうための申告（還付申告）は、確定申告の期間とは関係なく、その年の翌年1月1日から5年間出せます。たとえば2026年に辞めて年内に再就職しなかった場合は、2027年1月1日から2031年12月31日まで出せます。ただし、書類がそろったら早めに出しておくと安心です。
@@ -77,6 +77,9 @@ research_notes:
     - 2025年分からの基礎控除・給与所得控除の見直しの具体的な金額は、年分によって変わり読者が自分で計算しにくいため書かず、作成コーナーで計算する流れを示した
     - 医療費控除やふるさと納税（寄附金控除）は、退職と直接関係しないため扱わない
     - 住民税は所得税と別のしくみのため、既存記事 taishoku-juminzei へのリンクにとどめた
+published_at: 2026-10-10
+reviewed_at: 2026-10-10
+reviewed_by: プロジェクトオーナー（チャットで承認）
 ---
 
 年の途中で会社を辞めて、その年のうちには次の会社に入らなかった。そんな年は、**翌年に確定申告をすると、納めすぎた所得税が戻ってくる場合があります**。

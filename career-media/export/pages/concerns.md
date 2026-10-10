@@ -14,19 +14,19 @@ source:
 
 今いちばん気になっていることから、関係のある記事をまとめて読めます。
 
-- 15
+- 22
   [給料を上げたい](/concerns/kyuryo)
 - 5
   [土日休みにしたい](/concerns/donichi)
-- 7
+- 12
   [オフィスワークに行きたい](/concerns/office)
-- 13
-  [正社員になりたい](/concerns/seishain)
-- 32
-  [未経験の職種に挑戦したい](/concerns/mikeiken-shokushu)
-- 21
-  [今の仕事を辞めたい](/concerns/yametai)
 - 19
+  [正社員になりたい](/concerns/seishain)
+- 43
+  [未経験の職種に挑戦したい](/concerns/mikeiken-shokushu)
+- 26
+  [今の仕事を辞めたい](/concerns/yametai)
+- 26
   [面接・書類が不安](/concerns/mensetsu)
 - 10
   [やりたい仕事が分からない](/concerns/yaritai)

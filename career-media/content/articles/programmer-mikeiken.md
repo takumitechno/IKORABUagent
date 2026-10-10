@@ -3,11 +3,11 @@ slug: programmer-mikeiken
 kind: article
 title: 未経験からプログラマーを目指すには？仕事内容・学び方と、研修のある求人の見方
 summary: プログラマーは、設計書をもとにプログラミング言語でプログラムを作り、正しく動くかを確かめる仕事です。未経験から目指すときの学び方の順番、「研修あり」の求人で確かめたいこと、ITサポートなど別の入口から近づく道との比べ方を紹介します。
-status: review
+status: published
 categories: [shokushu, mikeiken]
 featured: false
 recommended: false
-updated_at: 2026-10-09
+updated_at: 2026-10-10
 information_checked_at: 2026-10-09
 seo_title: 未経験からプログラマーへ｜仕事内容・学び方・求人の見方
 seo_description: 未経験からプログラマーを目指すときに知っておきたいことを紹介します。設計書をもとにプログラムを作りテストする仕事内容、独学・職業訓練など学び方の順番、研修のある求人で確かめたいこと、ITサポートから近づく道との比べ方が分かります。
@@ -15,7 +15,7 @@ roles: [it-support]
 concerns: [mikeiken-shokushu]
 situations: [pc-mikeiken, hajimete]
 eyecatch: ["プログラマー、", "未経験からどう目指す？"]
-related: [mikeiken-it-hajimari, mikeiken-kenshu-kakunin, hello-training]
+related: [mikeiken-it-hajimari, mikeiken-kenshu-kakunin, hello-training, web-marketing-mikeiken]
 faq:
   - q: 未経験でもプログラマーの求人に応募できますか？
     a: 応募条件に「未経験可」とある求人なら応募できます。ただ、入社後に覚えることは多いので、研修の期間と内容、配属後に誰が教えてくれるかを確かめておくことが大切です。独学で小さなものを作ってみておくと、面接で学んでいることを具体的に話しやすくなります。
@@ -57,6 +57,9 @@ research_notes:
     - job tag のプログラマーの賃金・就業者数・求人倍率などの数値は、検索結果だけでは最新の値を確認できなかったので書かない
     - プログラミングスクールの費用や期間は、特定のサービスに触れることになり、公的な根拠もないため扱わない
     - 「〇か月の勉強で就職できる」といった目安は根拠がなく、成果保証にもつながるため書かない
+published_at: 2026-10-10
+reviewed_at: 2026-10-10
+reviewed_by: プロジェクトオーナー（チャットで承認）
 ---
 
 「プログラマーになってみたい。でも、プログラミングはほとんどしたことがない」。そう思ったときに最初に知っておきたいのは、**プログラマーの仕事の中身と、入社前にどこまで準備しておくと話がしやすいか**です。

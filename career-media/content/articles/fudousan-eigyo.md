@@ -2,11 +2,11 @@
 slug: fudousan-eigyo
 title: 不動産営業の仕事内容は？賃貸仲介と売買仲介の違い・宅建士の役割・歩合の給与の確認と接客経験の活かし方
 summary: 不動産営業は、住まいや土地を借りたい・買いたい・売りたい人の相談に乗り、取引をまとめる仕事です。賃貸仲介と売買仲介の違い、宅地建物取引士（宅建士）の役割と試験、歩合がある給与の確認のしかた、接客経験の伝え方を紹介します。
-status: review
+status: published
 categories: [shokushu, keiken]
 featured: false
 recommended: false
-updated_at: 2026-10-09
+updated_at: 2026-10-10
 information_checked_at: 2026-10-09
 seo_title: 不動産営業の仕事内容は？宅建士と歩合の確認点
 seo_description: 不動産営業を考える人へ。賃貸仲介と売買仲介の仕事の違い、宅地建物取引士だけができる仕事と試験の受け方、歩合給がある求人で確かめたい固定給と保障給、休日の考え方、接客経験の活かし方と面接での伝え方の例を紹介します。
@@ -14,7 +14,7 @@ roles: [eigyo]
 concerns: [kyuryo, mikeiken-shokushu]
 situations: [sekkyaku, hajimete]
 eyecatch: ["不動産営業、", "歩合ってどうなの？"]
-related: [eigyo-kowai, sekkyaku-keiken-ikasu, donichi-yasumi-shigoto]
+related: [eigyo-kowai, sekkyaku-keiken-ikasu, donichi-yasumi-shigoto, shoyo-kyujin-mikata]
 faq:
   - q: 宅建士の資格がなくても、不動産営業はできますか？
     a: 職業情報提供サイト（job tag）では、住宅・不動産営業に入るときに特別な資格は必要ないとしたうえで、宅地建物取引士の資格を取ると仕事を進めるうえで有利だと紹介しています。契約の前の重要事項の説明は宅建士が行う仕事なので、資格がない間は、宅建士の先輩と組んで仕事を進める形になります。
@@ -57,6 +57,9 @@ research_notes:
     - 保障給の水準（平均賃金の6割程度など）は通達や解説による目安で、条文に数字の定めがないため書かない
     - 仲介手数料の上限など、お客さま側の制度は読者の最初の疑問から外れるため扱わない
     - 賃貸仲介と売買仲介の割合や、どちらが未経験者に多いかといった統計は確認できなかったので書かない
+published_at: 2026-10-10
+reviewed_at: 2026-10-10
+reviewed_by: プロジェクトオーナー（チャットで承認）
 ---
 
 「接客の経験を活かして、もっと給料を上げたい」。そう考えたときに候補に入りやすいのが、不動産営業です。一方で、「歩合って不安定じゃない？」「宅建がないと無理？」と迷う人も多い仕事です。

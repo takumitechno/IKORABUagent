@@ -3,11 +3,11 @@ slug: koumuin-shakaijin
 kind: article
 title: 社会人から公務員を目指すには？年齢要件の確かめ方と試験の流れ・準備
 summary: 社会人から公務員を目指す入口には、一般の採用試験と、民間などでの職務経験をいかす経験者採用があります。年齢や職務経験の要件は自治体・試験ごとに違うので、受験案内での確かめ方、試験の流れ、民間との違い、働きながらの準備を紹介します。
-status: review
+status: published
 categories: [shokushu, junbi]
 featured: false
 recommended: false
-updated_at: 2026-10-09
+updated_at: 2026-10-10
 information_checked_at: 2026-10-09
 seo_title: 社会人から公務員へ｜経験者採用と年齢要件の確かめ方
 seo_description: 社会人から公務員を目指すときの入口（一般の採用試験・経験者採用）、年齢や職務経験の要件を受験案内で確かめる方法、試験の流れ、仕事内容や兼業の決まりなど民間との違い、働きながらの準備と面接で聞かれやすいことが分かります。
@@ -15,7 +15,7 @@ roles: [sonota]
 concerns: [seishain]
 situations: [hajimete, dainishinsotsu]
 eyecatch: ["社会人から公務員、", "何を確かめる？"]
-related: [zaishoku-tenshoku-susumekata, jiko-bunseki-yarikata, shiboudouki-mikeiken]
+related: [zaishoku-tenshoku-susumekata, jiko-bunseki-yarikata, shiboudouki-mikeiken, tekisei-kensa-tenshoku]
 faq:
   - q: 公務員試験は何歳まで受けられますか？
     a: 自治体や試験の種類ごとに決まっていて、一律ではありません。同じ自治体でも、一般の採用試験と社会人経験者向けの試験で年齢の要件が違うことがあります。受けたい自治体の採用ページで、その年度の受験案内（募集要項）の「受験資格」の欄を確かめましょう。
@@ -66,6 +66,9 @@ research_notes:
     - 人事院の経験者採用試験の具体的な受験資格の年数や2026年度の日程は検索結果に出ていたが、区分や年度で変わり、読者の多くには直接当てはまらないため書かない
     - job tag の求人賃金や学歴別の割合は、時点と値を直接確かめられなかったので書かない
     - 公務員の給与や退職手当の制度は、自治体の条例などで決まり、この記事の目的から外れるため扱わない
+published_at: 2026-10-10
+reviewed_at: 2026-10-10
+reviewed_by: プロジェクトオーナー（チャットで承認）
 ---
 
 「今の仕事を続けるより、公務員として働いてみたい」。社会人になってからそう考える人もいます。ただ、調べ始めると「何歳まで受けられる？」「社会人枠って何？」と、分からないことが次々に出てきます。

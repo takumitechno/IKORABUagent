@@ -3,11 +3,11 @@ slug: remote-work-kyujin
 kind: article
 title: 「リモートワーク可」の求人、どこを見る？頻度・条件・費用と入社直後の出社を確かめる
 summary: 求人の「リモート可」「在宅勤務あり」は、会社によって意味が大きく違います。週に何日か、誰が対象か、入社直後は出社か、通信費や機器はどうなるかを確かめましょう。厚生労働省のテレワークガイドラインをもとに、求人の読み方と面接での聞き方の例を紹介します。
-status: review
+status: published
 categories: [hatarakikata, junbi]
 featured: false
 recommended: false
-updated_at: 2026-10-09
+updated_at: 2026-10-10
 information_checked_at: 2026-10-09
 seo_title: リモートワーク可の求人の見方｜頻度・費用・出社の確認
 seo_description: 「リモート可」「在宅勤務あり」の求人は何を確かめればいい？週の日数や対象者、入社直後は出社になるか、通信費やパソコンの扱い、労働条件通知書の就業場所の書き方を、厚生労働省のテレワークガイドラインをもとに紹介します。
@@ -15,7 +15,7 @@ roles: []
 concerns: [office]
 situations: [hajimete, sekkyaku]
 eyecatch: ["「リモート可」って", "毎日家で働ける？"]
-related: [sekkyaku-office, naitei-shodaku-mae, tenshoku-koukai-shinai]
+related: [sekkyaku-office, naitei-shodaku-mae, tenshoku-koukai-shinai, tenkin-kinmuchi-kakunin, fukuri-kousei-mikata]
 faq:
   - q: 求人に「リモート可」とあれば、入社してすぐ在宅で働けますか？
     a: 会社によって違います。入社後しばらくは出社して仕事を覚え、慣れてから在宅勤務を始める決まりにしている会社もあります。厚生労働省のテレワークガイドラインでも、中途採用の社員などは、出社と組み合わせるなどコミュニケーションに特に配慮することが望ましいとされています。入社直後の働き方は、面接で確かめておきましょう。
@@ -60,6 +60,9 @@ research_notes:
     - テレワークを導入している企業の割合などの統計は、調査によって数字が違い、年で変わるため書かない
     - 在宅勤務手当の相場の金額は公的な根拠がないため書かない
     - 在宅勤務手当の税金・社会保険の扱いは、記事の目的（求人の読み方）から外れるため扱わない
+published_at: 2026-10-10
+reviewed_at: 2026-10-10
+reviewed_by: プロジェクトオーナー（チャットで承認）
 ---
 
 「リモートワーク可」「在宅勤務あり」と書かれた求人を見ると、通勤がなくなる、家で落ち着いて働ける、と期待がふくらみます。でも、入社してみたら「在宅は週1日だけだった」「最初の半年は毎日出社だった」ということもあります。

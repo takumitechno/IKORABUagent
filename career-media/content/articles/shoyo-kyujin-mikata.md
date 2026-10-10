@@ -3,11 +3,11 @@ slug: shoyo-kyujin-mikata
 kind: article
 title: 求人の「賞与年2回」「昨年実績」はどう読む？ボーナスの見方と面接での聞き方
 summary: 求人票の賞与（ボーナス）欄は、過去の実績を示していることが多く、次の支給額を約束するものではありません。「賞与年2回」「昨年実績〇か月分」の読み方、業績や評価で変わるしくみ、試用期間中や入社1年目の支給、面接での聞き方の例を紹介します。
-status: review
+status: published
 categories: [hatarakikata, junbi]
 featured: false
 recommended: false
-updated_at: 2026-10-09
+updated_at: 2026-10-10
 information_checked_at: 2026-10-09
 seo_title: 求人の賞与（ボーナス）の見方｜「昨年実績」の読み方
 seo_description: 求人票の「賞与年2回」「昨年実績〇か月分」は何を表している？実績は次回の約束ではない理由、「〇か月分」の元になる金額、入社1年目や試用期間中の支給、面接やオファー面談での聞き方の例を紹介します。
@@ -15,7 +15,7 @@ roles: []
 concerns: [kyuryo]
 situations: [hajimete, seishain-keiken-sukunai]
 eyecatch: ["ボーナス「昨年実績」", "そのままもらえる？"]
-related: [koteizangyo-kyujin, naitei-shodaku-mae, nenshu-dake-erabanai]
+related: [koteizangyo-kyujin, naitei-shodaku-mae, nenshu-dake-erabanai, fukuri-kousei-mikata, taishokukin-kakunin]
 faq:
   - q: 求人票に「賞与 昨年実績〇か月分」とあれば、入社後も同じだけもらえますか？
     a: 同じ額になるとは限りません。労働局の資料でも、賞与は会社の業績や個人の評価で大きく変わる項目のため、求人票にはすでに確定した前年の実績を載せていて、次回も同じ月数がもらえるという意味ではないと説明されています。実績は「この会社ではこれくらい出たことがある」という参考として読みましょう。
@@ -57,6 +57,9 @@ research_notes:
     - 賞与の平均支給額や支給月数の統計は、業種・規模・年で大きく変わるため書かない
     - 賞与の定義に関する昭和22年の通達は、民間の解説サイト経由でしか確認できなかったので出典にしない
     - 賞与にかかる社会保険料の計算は、記事の目的（求人の読み方）から外れるため扱わない
+published_at: 2026-10-10
+reviewed_at: 2026-10-10
+reviewed_by: プロジェクトオーナー（チャットで承認）
 ---
 
 求人票の「賞与年2回」「昨年実績〇か月分」を見て、「入社したらこのくらいもらえるのかな」と考える人は多いと思います。

@@ -3,11 +3,11 @@ slug: pawahara-soudan
 kind: article
 title: これってパワハラ？3つの要素と6つの類型で確かめる｜記録の残し方と相談先
 summary: パワハラかどうかは、厚生労働省が示す3つの要素と6つの類型で整理すると考えやすくなります。指導との違い、会社に義務づけられている相談窓口、相談の前に残しておきたい記録の書き方の例、会社の外の無料の相談先を紹介します。
-status: review
+status: published
 categories: [seido, hatarakikata]
 featured: false
 recommended: false
-updated_at: 2026-10-09
+updated_at: 2026-10-10
 information_checked_at: 2026-10-09
 seo_title: これってパワハラ？3つの要素と6類型・記録の残し方と相談先
 seo_description: 上司の言動がパワハラにあたるか迷ったときに。厚生労働省が示すパワハラの3つの要素と6つの類型、指導との違い、会社の相談窓口の義務、記録の残し方の例、総合労働相談コーナーなど会社の外の無料の相談先を紹介します。
@@ -15,7 +15,7 @@ roles: []
 concerns: [yametai]
 situations: [hajimete, dainishinsotsu]
 eyecatch: ["これってパワハラ？", "迷ったときの確かめ方"]
-related: [yametai-mae-kakunin, taishoku-riyuu-mensetsu, souki-rishoku-tenshoku]
+related: [yametai-mae-kakunin, taishoku-riyuu-mensetsu, souki-rishoku-tenshoku, roudou-soudan-saki]
 faq:
   - q: 厳しく注意されるのは、全部パワハラですか？
     a: いいえ。仕事のうえで必要で、やり方も相当な範囲で行われる指示や指導は、パワハラにはあたらないとされています。ただし、人格を否定するような言動や、必要以上に長い時間の叱責をくり返すことは、パワハラの例として挙げられています。迷ったら、何を言われたかを記録して、相談窓口で一緒に整理してもらいましょう。
@@ -74,6 +74,9 @@ research_notes:
     - パワハラの相談件数などの統計は、読者の判断に直結しないため使わない
     - 2026年10月1日からのカスタマーハラスメント対策の義務化は、資料の見出しまでしか確認できず、この記事のテーマ（上司・同僚からのパワハラ）からも外れるため扱わない
     - 録音の可否や、損害賠償請求の見込みなど法的な判断は個別の事情によるため、断定せず相談をすすめるにとどめた
+published_at: 2026-10-10
+reviewed_at: 2026-10-10
+reviewed_by: プロジェクトオーナー（チャットで承認）
 ---
 
 上司から毎日のように強い口調で責められる。自分だけ仕事を回してもらえない。でも「自分が仕事できないせいかも」「これくらいでパワハラと言うのは大げさかも」と迷って、誰にも言えずにいる。そんな人は少なくありません。

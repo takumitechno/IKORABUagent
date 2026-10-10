@@ -14,7 +14,7 @@ roles: []
 concerns: [yametai]
 situations: [hajimete]
 eyecatch: ["転職した年の", "年末調整どうする？"]
-related: [tedori-20man-hikaku, yametai-mae-kakunin, nenshu-300man-tenshoku]
+related: [tedori-20man-hikaku, yametai-mae-kakunin, nenshu-300man-tenshoku, taishoku-kakutei-shinkoku]
 faq:
   - q: 前の会社の源泉徴収票をなくしてしまいました。どうすればいいですか？
     a: 前の会社に連絡して、もう一度発行してもらえないか相談しましょう。新しい会社の年末調整に間に合わない場合は、年末調整を受けずに、翌年に自分で確定申告をして精算することになります。

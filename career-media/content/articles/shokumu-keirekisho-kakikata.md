@@ -2,11 +2,11 @@
 slug: shokumu-keirekisho-kakikata
 title: 職務経歴書の書き方｜編年体と逆編年体の選び方と、職務要約・職務内容・自己PRの例
 summary: 職務経歴書は、決まった様式がない分、「何を、どの順で書くか」で読みやすさが変わります。正社員や契約社員として働いた経験がある人向けに、編年体と逆編年体の選び方、職務要約・職務内容・活かせる経験・自己PRの書き方と例を、ハローワークや厚生労働省の資料をもとに紹介します。
-status: review
+status: published
 categories: [shorui-mensetsu, keiken]
 featured: false
 recommended: false
-updated_at: 2026-10-09
+updated_at: 2026-10-10
 information_checked_at: 2026-10-09
 seo_title: 職務経歴書の書き方｜編年体・逆編年体と職務要約の例
 seo_description: 職務経歴書は何をどの順で書けばいい？正社員・契約社員の経験がある人向けに、編年体と逆編年体の選び方、職務要約・職務内容・活かせる経験・自己PRの書き方と例、A4で1〜2枚にまとめるコツと見直しのチェック項目を紹介します。
@@ -14,7 +14,7 @@ roles: []
 concerns: [mensetsu]
 situations: [dainishinsotsu, haken, hajimete]
 eyecatch: ["職務経歴書、", "何から書けばいい？"]
-related: [shokumu-keirekisho-arubaito, jiko-pr-mikeiken, jiko-bunseki-yarikata]
+related: [shokumu-keirekisho-arubaito, jiko-pr-mikeiken, jiko-bunseki-yarikata, rirekisho-kakikata-kihon, shorui-senkou-tooranai]
 faq:
   - q: 職務経歴書は、編年体と逆編年体のどちらで書けばいいですか？
     a: 応募先から指定がなければ、どちらでもかまいません。ハローワークの資料では、迷ったときは古い順に書く編年体にするよう案内されています。今の仕事が応募する仕事に近く、まず今の経験を見てほしいときは、新しい順に書く逆編年体も選べます。
@@ -64,6 +64,9 @@ research_notes:
     - 文字の大きさ（ポイント数）や余白の目安は資料によって違うため書かない
     - 採用担当者が職務経歴書を読む時間など、出典を確認できない数字は書かない
     - キャリア式は転職回数が多い人などに向くとされるが、この記事の対象（はじめて書く人）では使う場面が少ないので、紹介を短くした
+published_at: 2026-10-10
+reviewed_at: 2026-10-10
+reviewed_by: プロジェクトオーナー（チャットで承認）
 ---
 
 正社員や契約社員として働いてきたけれど、職務経歴書を書くのははじめて。「履歴書と何が違う？」「どこまでくわしく書けばいい？」と迷う人は多いです。

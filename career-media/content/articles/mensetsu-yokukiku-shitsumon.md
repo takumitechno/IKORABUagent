@@ -14,7 +14,7 @@ roles: []
 concerns: [mensetsu, mikeiken-shokushu]
 situations: [hajimete, sekkyaku]
 eyecatch: ["面接の質問、", "どう答えればいい？"]
-related: [mensetsu-junbi-mikeiken, shiboudouki-mikeiken, kuhaku-kikan-setsumei, gyaku-shitsumon, taishoku-riyuu-mensetsu, jiko-pr-mikeiken]
+related: [mensetsu-junbi-mikeiken, shiboudouki-mikeiken, kuhaku-kikan-setsumei, gyaku-shitsumon, taishoku-riyuu-mensetsu, jiko-pr-mikeiken, mensetsu-kinchou]
 faq:
   - q: 面接の回答は、丸暗記して臨んだほうがいいですか？
     a: 文章をまるごと覚えると、少し違う聞き方をされたときに言葉が出なくなりがちです。質問ごとに「結論」と「話したいエピソード」だけを決めておき、あとは自分の言葉で話す練習をしておくほうが、落ち着いて答えやすくなります。

@@ -14,7 +14,7 @@ roles: []
 concerns: [kyuryo]
 situations: [hajimete]
 eyecatch: ["内定が出た！", "承諾の前に見ること"]
-related: [nenshu-dake-erabanai, donichi-yasumi-nenshu-hikaku, tedori-20man-hikaku, naitei-jitai-tsutaekata]
+related: [nenshu-dake-erabanai, donichi-yasumi-nenshu-hikaku, tedori-20man-hikaku, naitei-jitai-tsutaekata, naitei-go-junbi]
 faq:
   - q: 労働条件通知書をもらえないまま、承諾を求められています。どうすればいいですか？
     a: 労働契約を結ぶときには、会社は契約期間、就業の場所と業務、労働時間、賃金、退職に関することなどを、原則として書面で明示しなければならないとされています。「承諾の前に、労働条件を書面で確認させてください」とお願いしてみましょう。ハローワークの求人で応募した場合は、ハローワークの窓口にも相談できます。
