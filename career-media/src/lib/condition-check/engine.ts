@@ -21,13 +21,13 @@ export type NextAction = { title: string; description: string; href: string };
 
 /**
  * 結果は「相談準備ノート」として7つに分ける。
- * 1 ゆずれない条件 / 2 今までの経験から使えそうなこと / 3 比べてみたい職種 / 4 求人で確認すること /
+ * 1 最優先の条件 / 2 今までの経験から使えそうなこと / 3 比べてみたい職種 / 4 求人で確認すること /
  * 5 面談で聞く質問 / 6 自分でできる次の一歩 / 7 相談する場合の次の一歩
  * 判定（合否・適性・推定年収・確率）は出さない。
  */
 export type CheckResult = {
-  mustHave: ConditionItem[];
-  niceToHave: ConditionItem[];
+  priorityConditions: ConditionItem[];
+  otherConditions: ConditionItem[];
   conditionNote: string | null;
   skills: TransferableSkill[];
   candidates: RoleCandidate[];
@@ -40,7 +40,7 @@ export type CheckResult = {
 };
 
 export const RESULT_SECTIONS = [
-  "ゆずれない条件",
+  "最優先の条件",
   "今までの経験から使えそうなこと",
   "比べてみたい職種",
   "求人で確認すること",
@@ -99,36 +99,28 @@ const PRIORITY_ONLY: Record<string, ConditionItem> = {
   location: { label: "通いやすさ・勤務地", detail: "通勤時間の上限と、転勤の有無を確認する" },
 };
 
-/** 「強い」条件（選べる求人の幅を狭めやすいもの） */
-const STRICT_OPTIONS = new Set(["keep_current", "up_priority", "weekends", "no_overtime", "commute_home", "remote"]);
-
 function organizeConditions(answers: Answers) {
   const priority = one(answers, "priority");
   const priorityKey = priority ? PRIORITY_TO_CONDITION[priority] : undefined;
-  const mustHave: ConditionItem[] = [];
-  const niceToHave: ConditionItem[] = [];
+  const priorityConditions: ConditionItem[] = [];
+  const otherConditions: ConditionItem[] = [];
 
   if (priority) {
     const linked = priorityKey ? CONDITION_TEXT[priorityKey][one(answers, priorityKey) ?? ""] : null;
-    mustHave.push(linked ?? PRIORITY_ONLY[priority]);
+    priorityConditions.push(linked ?? PRIORITY_ONLY[priority]);
   }
 
-  let strictCount = 0;
   for (const key of ["income", "holidays", "hours", "location"] as ConditionKey[]) {
     const value = one(answers, key);
     if (!value) continue;
-    if (STRICT_OPTIONS.has(value)) strictCount += 1;
     if (key === priorityKey) continue;
     const item = CONDITION_TEXT[key][value];
-    if (item) niceToHave.push(item);
+    if (item) otherConditions.push(item);
   }
 
-  const conditionNote =
-    strictCount >= 3
-      ? "条件をすべて満たす求人は限られることがあります。「ゆずれない条件」は1〜2個に絞り、ほかは「できれば」として比べると選択肢が広がります。"
-      : null;
+  const conditionNote = "最優先以外の希望も大切な条件です。ゆずれるかどうかは、まだ決めていません。必要な条件の数を無理に減らさず、相談のときに一つずつ確認しましょう。";
 
-  return { mustHave, niceToHave, conditionNote };
+  return { priorityConditions, otherConditions, conditionNote };
 }
 
 // ---------------------------------------------------------------------------
@@ -346,7 +338,7 @@ function consultSteps(answers: Answers): string[] {
     "下の「面談で使うメモとしてコピー」で、このノートの要点を手元に残す（回答は相談先に自動では送られません）",
     "相談でできること・できないことを確認する",
     soon
-      ? "働き始めたい時期が近いので、申し込みのときに時期と、ゆずれない条件を最初に伝える"
+      ? "働き始めたい時期が近いので、申し込みのときに時期と、最優先の条件を最初に伝える"
       : "時期が決まっていなくても相談できます。「まだ情報収集中」と最初に伝えると、話を合わせてもらいやすくなります",
     "面談では、5 の質問から聞きたいものを選んで使う",
   ];
@@ -355,11 +347,11 @@ function consultSteps(answers: Answers): string[] {
 // ---------------------------------------------------------------------------
 
 export function buildResult(answers: Answers): CheckResult {
-  const { mustHave, niceToHave, conditionNote } = organizeConditions(answers);
+  const { priorityConditions, otherConditions, conditionNote } = organizeConditions(answers);
   const candidates = rankRoles(answers);
   return {
-    mustHave,
-    niceToHave,
+    priorityConditions,
+    otherConditions,
     conditionNote,
     skills: transferableSkills(answers),
     candidates,
@@ -375,11 +367,11 @@ export function resultToText(result: CheckResult): string {
   const [s1, s2, s3, s4, s5, s6, s7] = RESULT_SECTIONS;
   const lines: string[] = ["【未経験転職 条件整理ノート】", ""];
   lines.push(`■ 1. ${s1}`);
-  if (result.mustHave.length) result.mustHave.forEach((c) => lines.push(`・${c.label}（${c.detail}）`));
+  if (result.priorityConditions.length) result.priorityConditions.forEach((c) => lines.push(`・${c.label}（${c.detail}）`));
   else lines.push("・まだ決めていない");
-  if (result.niceToHave.length) {
-    lines.push("（できれば）");
-    result.niceToHave.forEach((c) => lines.push(`・${c.label}`));
+  if (result.otherConditions.length) {
+    lines.push("（その他の希望条件）");
+    result.otherConditions.forEach((c) => lines.push(`・${c.label}`));
   }
   lines.push("", `■ 2. ${s2}`);
   if (result.skills.length) result.skills.forEach((s) => lines.push(`・${s.from} → ${s.skill}`));
@@ -404,8 +396,8 @@ export function memoText(result: CheckResult, answers: Answers): string {
   const lines: string[] = ["【相談メモ】（条件整理チェックで自分で整理した内容）"];
   if (status && status !== "skip") lines.push(`・今の働き方: ${optionLabel("status", status)}`);
   if (timing) lines.push(`・働き始めたい時期: ${optionLabel("timing", timing)}`);
-  if (result.mustHave.length) lines.push(`・ゆずれない条件: ${result.mustHave.map((c) => c.label).join("、")}`);
-  if (result.niceToHave.length) lines.push(`・できれば: ${result.niceToHave.map((c) => c.label).join("、")}`);
+  if (result.priorityConditions.length) lines.push(`・最優先の条件: ${result.priorityConditions.map((c) => c.label).join("、")}`);
+  if (result.otherConditions.length) lines.push(`・その他の希望条件: ${result.otherConditions.map((c) => c.label).join("、")}`);
   const exps = many(answers, "experiences").map((x) => optionLabel("experiences", x));
   lines.push(`・これまでの経験: ${exps.length ? exps.join("、") : "仕事の経験はほとんどない"}`);
   lines.push(`・比べてみたい職種: ${result.candidates.slice(0, 3).map((c) => c.role.shortName).join("、")}`);

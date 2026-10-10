@@ -61,7 +61,7 @@ const VIEWPORTS = process.env.VIEWPORTS ? Object.fromEntries(Object.entries(ALL_
 const only = process.argv.slice(2);
 const problems = [];
 
-const browser = await chromium.launch();
+const browser = await chromium.launch(process.env.PLAYWRIGHT_CHANNEL ? { channel: process.env.PLAYWRIGHT_CHANNEL } : {});
 for (const [vpName, viewport] of Object.entries(VIEWPORTS)) {
   // 全体のスクリーンショットは「動きを減らす」設定で撮る（スクロールで現れる表現が途中の状態で写らないように）。
   // MOTION=1 で動きありのまま撮る。

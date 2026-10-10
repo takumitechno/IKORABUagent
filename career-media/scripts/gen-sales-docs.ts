@@ -6,8 +6,8 @@
 import fs from "node:fs";
 import path from "node:path";
 import { EVENT_DICTIONARY, PARTNER_RETURN_EVENTS, SCHEMA_VERSION } from "../src/lib/measurement/schema";
-import { ASSETS_PARTNER, ASSETS_TAKUMI, EXIT_PRINCIPLE, fixedTotal, MONTHLY_SCOPE, OBJECTIONS, OUT_OF_SCOPE, PARTNER_COOPERATION, paymentScenario, PILOT, PLAN, SCENARIO_COUNTS, WORKLOAD, workloadTotal, yen } from "../src/lib/sales/proposal";
-import { RUNBOOK, runbookMinutes } from "../src/lib/sales/runbook";
+import { ACCEPTANCE_NOTE, INITIAL_SCOPE, PRODUCTION_ROLES, ASSETS_PARTNER, ASSETS_TAKUMI, EXIT_PRINCIPLE, fixedTotal, MONTHLY_SCOPE, OBJECTIONS, OUT_OF_SCOPE, PARTNER_COOPERATION, paymentScenario, PILOT, PLAN, SCENARIO_COUNTS, WORKLOAD, workloadTotal, yen } from "../src/lib/sales/proposal";
+import { DEMO_PREPARATION, RUNBOOK, runbookMinutes } from "../src/lib/sales/runbook";
 import { SNS_THEMES, utm, type Slide } from "../src/lib/sales/sns";
 
 const OUT = path.resolve(__dirname, "../docs/sales");
@@ -24,8 +24,12 @@ write(
   "MEETING_DEMO_RUNBOOK.md",
   `${HEADER("商談デモの順番（MEETING_DEMO_RUNBOOK）")}
 - 起動: \`npm run demo:makecareer\` → http://localhost:3100（商談メニュー: http://localhost:3100/sales）
-- 合計 約${Math.round(runbookMinutes())}分。技術・ページ数・AI の話から始めない。実物を開いて見せる。
+- 合計 約${runbookMinutes().toFixed(1)}分（切替を含め8分を目安）。技術・ページ数・AI の話から始めない。実物を開いて見せる。
 - 相談ボタンは本番の申し込みページへ移動しない（本番送客 OFF）。押すと /consultation/apply（説明ページ）に留まる。
+
+## 事前準備
+
+${DEMO_PREPARATION.map((s) => `- ${s}`).join("\n")}
 
 ${RUNBOOK.map(
   (s, i) => `## ${i + 1}. ${s.title}（約${s.minutes}分）
@@ -145,11 +149,19 @@ ${scenarioTable}
 固定費込みの1件あたり ＝ ${yen(PILOT.performanceFeePerMeeting)} ＋ ${yen(fixedTotal)} ÷ 件数。「面談単価 ${yen(PILOT.performanceFeePerMeeting)}」だけで説明しない（固定費がある）。
 匠の売上と、人材紹介会社が採用企業から受け取る紹介手数料を混同しない。提携先の紹介料・入社率・利益率は推測しない。
 
+## 初期費用の納品物・完了条件（案）
+
+| 納品物 | 完了の確認 |
+| --- | --- |
+${INITIAL_SCOPE.map((s) => `| ${s.deliverable} | ${s.acceptance} |`).join("\n")}
+
+${ACCEPTANCE_NOTE}
+
 ## 月額の標準範囲（月4 Research Theme の一案）
 
 ${MONTHLY_SCOPE.map((s) => `- **${s.area}**: ${s.items.join("／")}`).join("\n")}
 
-標準に含めないもの: ${OUT_OF_SCOPE.join("、")}。素材・撮影は先方提供が前提。投稿・公開の権限と承認責任は正式契約後に決める。最終的な範囲は、既存 TikTok の素材・撮影体制・出演者・Instagram の目的・社内承認フローを確認して調整する。
+標準に含めないもの: ${OUT_OF_SCOPE.join("、")}。${PRODUCTION_ROLES} 投稿・公開の権限と承認責任は正式契約後に決める。最終的な範囲は、既存 TikTok の素材・撮影体制・出演者・Instagram の目的・社内承認フローを確認して調整する。
 
 ## 作業時間の仮説（1か月）
 
@@ -183,7 +195,7 @@ ${PARTNER_COOPERATION.map((c) => `- ${c}`).join("\n")}
 
 write(
   "ONE_PAGE_PROPOSAL.md",
-  `${HEADER("1枚の提案（ONE-PAGE PROPOSAL）")}
+  `${HEADER("提案概要（ONE-PAGE PROPOSAL）")}
 画面版（印刷できる）: http://localhost:3100/sales/proposal
 
 **${PILOT.name}** — ${PILOT.oneLiner}
@@ -195,6 +207,8 @@ write(
 | Web を付ける理由 | SNS は知るきっかけ、Web は自分の場合を考える場所。迷う人は記事・比較・条件整理へ、すぐ相談したい人は相談の説明へ |
 | 3か月 Pilot | 面談数は保証しない。資産・SNS 制作物・運用体制・計測・改善データを残しながら勝ち筋を検証。3か月目に条件を見直す |
 | 価格（税別・提案仮条件） | 初期 ${yen(PILOT.initialFee)}＋月額 ${yen(PILOT.monthlyFee)}×${PILOT.months}か月＝固定 ${yen(fixedTotal)}。成果報酬（案）: 承認面談1件 ${yen(PILOT.performanceFeePerMeeting)} |
+| 初期納品・完了条件 | ${INITIAL_SCOPE.map((s) => `${s.deliverable}: ${s.acceptance}`).join("／")} |
+| 制作と投稿の分担 | ${PRODUCTION_ROLES} |
 | 先方に残る資産 | ${ASSETS_PARTNER.slice(0, 4).join("／")} |
 | 必要な協力 | ${PARTNER_COOPERATION.slice(0, 4).join("／")} |
 `,

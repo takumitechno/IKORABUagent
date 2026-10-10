@@ -11,7 +11,7 @@ let dir: string;
 
 function run(...args: string[]): { code: number; out: string } {
   try {
-    const out = execFileSync(path.join(ROOT, "node_modules/.bin/tsx"), [path.join(ROOT, "pipeline/src/cli.ts"), ...args], {
+    const out = execFileSync(process.execPath, ["--import", "tsx", path.join(ROOT, "pipeline/src/cli.ts"), ...args], {
       env: { ...process.env, PIPELINE_CONTENT_DIR: dir, PIPELINE_LOG_FILE: path.join(dir, "runs.jsonl"), PIPELINE_TODAY: "2026-10-06" },
       encoding: "utf8",
       stdio: ["ignore", "pipe", "pipe"],

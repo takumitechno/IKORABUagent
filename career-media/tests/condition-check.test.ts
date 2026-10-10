@@ -43,12 +43,29 @@ describe("condition check questions", () => {
 });
 
 describe("condition check engine", () => {
-  it("organizes must-have vs nice-to-have from the priority", () => {
+  it("keeps the top priority separate without discarding other wishes", () => {
     const r = buildResult(base);
-    expect(r.mustHave.map((c) => c.label)).toEqual(["土日祝休み"]);
-    expect(r.niceToHave.map((c) => c.label)).toEqual(expect.arrayContaining(["今の収入を下げない", "残業は少なめ", "自宅から通える勤務地"]));
-    // 強い条件が多いときは絞り込みを促す
+    expect(r.priorityConditions.map((c) => c.label)).toEqual(["土日祝休み"]);
+    expect(r.otherConditions.map((c) => c.label)).toEqual(expect.arrayContaining(["今の収入を下げない", "残業は少なめ", "自宅から通える勤務地"]));
+    // 希望の許容度は本人が答えていないため推測しない
     expect(r.conditionNote).not.toBeNull();
+  });
+
+  it.each(["income", "holidays"])("preserves both income and holidays when %s is prioritized", (priority) => {
+    const answers = { ...base, priority: [priority] };
+    const result = buildResult(answers);
+    const memo = memoText(result, answers);
+    expect(memo).toContain("今の収入を下げない");
+    expect(memo).toContain("土日祝休み");
+    expect(memo).toContain("その他の希望条件:");
+    expect(`${memo}\n${resultToText(result)}`).not.toMatch(/できれば|1〜2個|絞り/);
+  });
+
+  it("allows uncertain strengths without inventing skills, and restores exclusive choices", () => {
+    const answers = sanitizeAnswers({ ...base, experiences: ["none"], strengths: ["none", "routine"] });
+    expect(answers.strengths).toEqual(["none"]);
+    expect(isStepComplete(STEPS[1], answers)).toBe(true);
+    expect(buildResult(answers).skills).toEqual([]);
   });
 
   it("maps experiences to transferable skills", () => {
@@ -83,7 +100,7 @@ describe("condition check engine", () => {
   });
 
   it("lays the result out as the 7-part consultation prep note", () => {
-    expect(RESULT_SECTIONS).toEqual(["ゆずれない条件", "今までの経験から使えそうなこと", "比べてみたい職種", "求人で確認すること", "面談で聞く質問", "自分でできる次の一歩", "相談する場合の次の一歩"]);
+    expect(RESULT_SECTIONS).toEqual(["最優先の条件", "今までの経験から使えそうなこと", "比べてみたい職種", "求人で確認すること", "面談で聞く質問", "自分でできる次の一歩", "相談する場合の次の一歩"]);
     const text = resultToText(buildResult(base));
     RESULT_SECTIONS.forEach((title, i) => expect(text).toContain(`■ ${i + 1}. ${title}`));
   });
@@ -99,7 +116,7 @@ describe("condition check engine", () => {
     const memo = memoText(buildResult(base), base);
     expect(memo).toContain("今の働き方: アルバイト・パートで働いている");
     expect(memo).toContain("働き始めたい時期: 3か月以内");
-    expect(memo).toContain("ゆずれない条件: 土日祝休み");
+    expect(memo).toContain("最優先の条件: 土日祝休み");
     expect(memo).toContain("送信されていません");
     // 「答えたくない」を選んだ項目はメモに出さない
     const skipped = memoText(buildResult({ ...base, status: ["skip"] }), { ...base, status: ["skip"] });

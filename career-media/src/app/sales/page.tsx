@@ -1,7 +1,6 @@
-import Link from "next/link";
 import { ArrowRight, Clock } from "lucide-react";
 import { salesAddressee } from "@/config/sales";
-import { RUNBOOK, runbookMinutes } from "@/lib/sales/runbook";
+import { DEMO_PREPARATION, RUNBOOK, runbookMinutes } from "@/lib/sales/runbook";
 import { pageMetadata } from "@/lib/seo";
 
 export const metadata = pageMetadata({ title: "商談メニュー", description: "商談用（非公開）", path: "/sales", noindex: true });
@@ -14,6 +13,7 @@ export default function SalesMenuPage() {
       <p className="mt-3 max-w-3xl text-[15px] leading-8 text-body">
         Instagram の投稿から、記事・比較・条件整理・相談まで、実物を順番に開いてご覧いただくための順番です。上から開いていくと、約{Math.round(runbookMinutes())}分で全体をご覧いただけます。
       </p>
+      <details className="mt-5 rounded-xl border border-line p-4"><summary className="cursor-pointer font-bold text-ink">当日の事前準備</summary><ul className="mt-3 space-y-2 text-sm leading-7 text-body">{DEMO_PREPARATION.map((s) => <li key={s}>・{s}</li>)}</ul></details>
       <ol className="mt-8 space-y-3">
         {RUNBOOK.map((step, i) => (
           <li key={step.title} className="grid gap-3 rounded-[var(--radius-card)] border border-line bg-surface p-4 sm:grid-cols-[48px_minmax(0,1fr)_auto] sm:items-start sm:p-5">
@@ -29,10 +29,10 @@ export default function SalesMenuPage() {
               <p className="mt-2 rounded-lg bg-canvas px-3 py-2 text-[14px] leading-7 text-body">話すこと: {step.say}</p>
               <p className="mt-1.5 text-[12.5px] text-brand-strong">次へ: {step.next}</p>
             </div>
-            <Link href={step.href} className="inline-flex shrink-0 items-center justify-center gap-1.5 rounded-full bg-brand px-4 py-2.5 text-sm font-bold text-white hover:bg-brand-press">
-              開く
+            <a href={step.href} target={step.href.includes("utm_source=") ? "_blank" : undefined} rel={step.href.includes("utm_source=") ? "noopener noreferrer" : undefined} className="inline-flex shrink-0 items-center justify-center gap-1.5 rounded-full bg-brand px-4 py-2.5 text-sm font-bold text-white hover:bg-brand-press">
+              開く{step.href.includes("utm_source=") ? "（新規タブ）" : ""}
               <ArrowRight className="h-4 w-4" aria-hidden="true" />
-            </Link>
+            </a>
           </li>
         ))}
       </ol>

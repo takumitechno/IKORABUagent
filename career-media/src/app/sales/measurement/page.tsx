@@ -27,10 +27,19 @@ export default function MeasurementPage() {
   return (
     <div>
       <p className="text-[11px] font-bold tracking-[0.2em] text-brand">MEASUREMENT</p>
-      <h1 className="mt-1 text-[24px] font-bold leading-snug text-ink sm:text-[30px]">計測の設計（本番の解析ツールは未接続）</h1>
+      <h1 className="mt-1 text-[24px] font-bold leading-snug text-ink sm:text-[30px]">どこで迷われたかを確認し、次の制作に活かす</h1>
       <p className="mt-3 max-w-3xl text-[15px] leading-8 text-body">
-        サイトで分かるのは「どの投稿・記事から、相談ボタンが押されたか」までです。登録・予約・面談・承認は、正式提携後に提携先から返していただくデータで見ます。フロントエンドが成果を自動で作ることはありません。数字はまだ1件もありません（架空の数字は載せていません）。
+        サイトで分かるのは「どの投稿・記事から、相談ボタンが押されたか」までです。登録・予約・面談・承認は、正式提携後に提携先から返していただくデータで見ます。本番の解析ツールは未接続です。下の記録は、このタブで行ったデモ操作だけです。実際の登録・面談実績はありません。
       </p>
+
+      <section className="mt-6 rounded-xl border border-line bg-surface p-5">
+        <h2 className="font-bold text-ink">何を見て、何を変えるか</h2>
+        <ul className="mt-3 space-y-2 text-sm leading-7 text-body">
+          <li>記事まで進まれない → 投稿の伝え方と記事への案内を見直す</li>
+          <li>チェックが途中で止まる → 質問や選択肢を見直す</li>
+          <li>相談につながる → 先方から返る面談・承認データと合わせて、続けるテーマを判断する</li>
+        </ul>
+      </section>
 
       <div className="mt-8 grid gap-8 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]">
         <ol className="space-y-1.5">
@@ -43,7 +52,7 @@ export default function MeasurementPage() {
                     {f.label}
                     <span className={`rounded-full px-2 py-0.5 text-[10.5px] font-bold ${OWNER[f.owner].cls}`}>{OWNER[f.owner].label}</span>
                   </p>
-                  <p className="mt-0.5 font-mono text-[11.5px] leading-5 text-muted">{f.note}</p>
+                  <details className="mt-1 text-[11.5px] leading-5 text-muted"><summary className="cursor-pointer">記録する内容</summary><p className="mt-1 font-mono">{f.note}</p></details>
                 </div>
               </div>
               {i < FUNNEL.length - 1 && <ArrowDown className="mx-auto my-0.5 h-4 w-4 text-line-strong" aria-hidden="true" />}

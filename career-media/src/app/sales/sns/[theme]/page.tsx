@@ -31,7 +31,7 @@ export default async function SnsThemePage({ params }: Props) {
   const slides = theme.carousel.slides;
   const route = [
     { icon: Images, label: "Instagram の投稿", sub: "カルーセル・リール・Stories", href: "#carousel" },
-    { icon: FileText, label: "記事", sub: theme.web.articleTitle, href: `/articles/${theme.web.articleSlug}` },
+    { icon: FileText, label: "記事", sub: theme.web.articleTitle, href: `/articles/${theme.web.articleSlug}?${utm(theme.id, "carousel")}` },
     ...(theme.web.journeyHub ? [{ icon: Compass, label: "読む順番ガイド", sub: theme.web.journeyTitle ?? "", href: `${theme.web.journeyHub}#guide` }] : []),
     { icon: ClipboardList, label: "条件整理チェック", sub: "13問・相談準備ノート", href: "/check" },
     { icon: MessageCircle, label: "相談について", sub: "相談したい人はここから", href: "/consultation" },
@@ -44,28 +44,6 @@ export default async function SnsThemePage({ params }: Props) {
       </div>
       <h1 className="mt-1 text-[24px] font-bold leading-snug text-ink sm:text-[30px]">{theme.title}</h1>
       <p className="mt-2 max-w-3xl text-[15px] leading-8 text-body">対象: {theme.audience}</p>
-
-      {/* 投稿から先の流れ */}
-      <section aria-labelledby="route" className="mt-6 rounded-[var(--radius-card)] bg-surface p-4 ring-1 ring-line sm:p-5">
-        <h2 id="route" className="text-[15px] font-bold text-ink">この投稿から先の流れ（すべて実際に開けます）</h2>
-        <ol className="mt-3 grid gap-2 sm:grid-cols-5">
-          {route.map((r, i) => (
-            <li key={r.label}>
-              <Link href={r.href} className="flex h-full items-start gap-2 rounded-xl bg-canvas p-3 ring-1 ring-line hover:ring-brand/40">
-                <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-night text-[11px] font-bold text-white">{i + 1}</span>
-                <span className="min-w-0">
-                  <span className="flex items-center gap-1 text-[13px] font-bold text-ink">
-                    <r.icon className="h-3.5 w-3.5 text-brand" aria-hidden="true" />
-                    {r.label}
-                  </span>
-                  <span className="mt-0.5 block text-[11.5px] leading-5 text-muted">{r.sub}</span>
-                </span>
-              </Link>
-            </li>
-          ))}
-        </ol>
-        {!article && <p className="mt-2 text-xs text-accent-strong">対応する記事が見つかりません（公開状態を確認）</p>}
-      </section>
 
       {/* 表紙用ビジュアル（OpenAI で生成し、採用済みのものがあるときだけ出す） */}
       {findSelectedImage(`sns-theme-${theme.id}-cover`) && (
@@ -82,7 +60,7 @@ export default async function SnsThemePage({ params }: Props) {
       )}
 
       {/* カルーセル */}
-      <section id="carousel" aria-labelledby="carousel-title" className="mt-10 scroll-mt-24">
+      <section id="carousel" aria-labelledby="carousel-title" className="mt-6 scroll-mt-24">
         <h2 id="carousel-title" className="flex flex-wrap items-center gap-2 text-[20px] font-bold text-ink">
           <Images className="h-5 w-5 text-brand" aria-hidden="true" />
           カルーセル（{slides.length}枚・4:5）
@@ -116,6 +94,28 @@ export default async function SnsThemePage({ params }: Props) {
             <p className="mt-2 text-[11.5px] leading-5 text-muted">UTM はセッションの流入元として1回だけ記録する（ページを見るたびに SNS 訪問として数えない）。</p>
           </div>
         </div>
+      </section>
+
+      {/* 投稿から先の流れ */}
+      <section aria-labelledby="route" className="mt-6 rounded-[var(--radius-card)] bg-surface p-4 ring-1 ring-line sm:p-5">
+        <h2 id="route" className="text-[15px] font-bold text-ink">この投稿から先の流れ（すべて実際に開けます）</h2>
+        <ol className="mt-3 grid gap-2 sm:grid-cols-5">
+          {route.map((r, i) => (
+            <li key={r.label}>
+              <a href={r.href} target={r.href.includes("utm_source=") ? "_blank" : undefined} rel={r.href.includes("utm_source=") ? "noopener noreferrer" : undefined} className="flex h-full items-start gap-2 rounded-xl bg-canvas p-3 ring-1 ring-line hover:ring-brand/40">
+                <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-night text-[11px] font-bold text-white">{i + 1}</span>
+                <span className="min-w-0">
+                  <span className="flex items-center gap-1 text-[13px] font-bold text-ink">
+                    <r.icon className="h-3.5 w-3.5 text-brand" aria-hidden="true" />
+                    {r.label}{r.href.includes("utm_source=") ? "（新規タブ）" : ""}
+                  </span>
+                  <span className="mt-0.5 block text-[11.5px] leading-5 text-muted">{r.sub}</span>
+                </span>
+              </a>
+            </li>
+          ))}
+        </ol>
+        {!article && <p className="mt-2 text-xs text-accent-strong">対応する記事が見つかりません（公開状態を確認）</p>}
       </section>
 
       {/* リール */}

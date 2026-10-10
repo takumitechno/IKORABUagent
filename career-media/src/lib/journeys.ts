@@ -90,7 +90,7 @@ export const JOURNEYS: Journey[] = [
         side: { slug: "donichi-yasumi-shigoto", label: "土日休みになりやすい仕事は" },
       },
       { kind: "article", slug: "nenshu-dake-erabanai", label: "ゆずれない順番を決める", why: "年収だけで選ばず、休み・時間・仕事内容のどれを優先するかを決めます。", scene: "list" },
-      { kind: "check", label: "自分の条件を整理する", why: "収入・休日・残業・勤務地の条件を「ゆずれない」と「できれば」に分けます（約3分・登録不要）。", scene: "checklist" },
+      { kind: "check", label: "自分の条件を整理する", why: "収入・休日・残業・勤務地について、最優先とその他の希望条件を整理します（約3分・登録不要）。", scene: "checklist" },
       { kind: "consult", label: "求人を見るとき・相談するときに確認すること", why: "求人票だけで分からないことは、下の質問で確認できます。", scene: "chat" },
     ],
     questions: [

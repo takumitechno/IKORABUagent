@@ -345,10 +345,10 @@ function Result({
         <ResultSection title={s1} number={1}>
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="rounded-xl bg-accent-soft p-4">
-              <p className="text-xs font-bold text-accent">ゆずれない条件</p>
-              {result.mustHave.length > 0 ? (
+              <p className="text-xs font-bold text-accent">最優先の条件</p>
+              {result.priorityConditions.length > 0 ? (
                 <ul className="mt-2 space-y-2">
-                  {result.mustHave.map((c) => (
+                  {result.priorityConditions.map((c) => (
                     <li key={c.label}>
                       <p className="font-bold text-ink">{c.label}</p>
                       <p className="text-[13px] leading-6 text-body">{c.detail}</p>
@@ -360,10 +360,10 @@ function Result({
               )}
             </div>
             <div className="rounded-xl bg-canvas p-4">
-              <p className="text-xs font-bold text-muted">できれば叶えたい条件</p>
-              {result.niceToHave.length > 0 ? (
+              <p className="text-xs font-bold text-muted">その他の希望条件</p>
+              {result.otherConditions.length > 0 ? (
                 <ul className="mt-2 space-y-2">
-                  {result.niceToHave.map((c) => (
+                  {result.otherConditions.map((c) => (
                     <li key={c.label}>
                       <p className="font-bold text-ink">{c.label}</p>
                       <p className="text-[13px] leading-6 text-body">{c.detail}</p>
@@ -371,7 +371,7 @@ function Result({
                   ))}
                 </ul>
               ) : (
-                <p className="mt-2 text-sm text-muted">ほかの条件にはこだわりが少なく、選べる求人の幅を広く取れる状態です。</p>
+                <p className="mt-2 text-sm text-muted">このほかの希望条件は、まだ具体的に選ばれていません。相談しながら整理しても大丈夫です。</p>
               )}
             </div>
           </div>

@@ -26,6 +26,16 @@ sources:
     url: https://shigoto.mhlw.go.jp/User/
     accessed_at: 2026-10-06
     used_for: 各職種の仕事内容・求められるスキルの確認
+  - title: 一般事務 - 職業詳細（job tag）
+    publisher: 厚生労働省
+    url: https://shigoto.mhlw.go.jp/User/Occupation/Detail/428
+    accessed_at: 2026-10-10
+    used_for: 書類・データ管理、電話取次ぎ、来客対応等の業務内容。経験の言い換えは編集上の例で、採用可能性の判定ではない
+  - title: コールセンターオペレーター - 職業詳細（job tag）
+    publisher: 厚生労働省
+    url: https://shigoto.mhlw.go.jp/User/Occupation/Detail?occupationId=64
+    accessed_at: 2026-10-10
+    used_for: 顧客の問い合わせに対応する業務内容の参照。企業・担当業務で必要な経験は異なる
 ---
 
 「接客しかしてこなかったから、アピールできることがない」。転職を考え始めたとき、そう感じて手が止まっていませんか。

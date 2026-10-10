@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { BookOpen, ClipboardList } from "lucide-react";
 import { ServiceHighlights, SoloVsPro } from "@/components/ProValue";
-import { HeroMockupPeek } from "@/components/HeroMockup";
 import { PageHero } from "@/components/PageHero";
 import { ConsultButton, ConsultationCta, PartnerNote } from "@/components/ConsultationCta";
 import { JsonLd } from "@/components/JsonLd";
@@ -45,11 +44,7 @@ export default function ConsultationPage() {
           </>
         }
         lead={`${partner.adviserLabel}に、企業選びから面接の練習・書類の添削・日程の調整まで相談できます。応募するかどうかは、ご自身で決められます。`}
-        visual={
-          <div className="enter-pop enter-d2 mr-4 w-[290px]">
-            <HeroMockupPeek />
-          </div>
-        }
+
       >
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
           <ConsultButton placement="consultation-page" label="キャリア相談を申し込む" size="lg" />
@@ -130,7 +125,7 @@ export default function ConsultationPage() {
           <h2 id="prepare" className="text-[20px] font-bold text-ink">
             相談の前に準備しておくと話しやすいこと
           </h2>
-          <p className="mt-2 text-[14.5px] leading-7 text-body">すべてを決めておく必要はありません。転職したい時期の目安と、ゆずれない条件が1〜2個あれば十分です。</p>
+          <p className="mt-2 text-[14.5px] leading-7 text-body">すべてを決めておく必要はありません。転職したい時期の目安と、気になる条件を伝えられれば十分です。まだ決められないことも、そのまま相談できます。</p>
           <div className="mt-4 flex flex-col gap-3 sm:flex-row">
             <Link href="/check" className="inline-flex items-center justify-center gap-2 rounded-full bg-brand px-5 py-3 text-sm font-bold text-white hover:bg-brand-press">
               <ClipboardList className="h-4 w-4" aria-hidden="true" />

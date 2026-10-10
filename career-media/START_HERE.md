@@ -2,6 +2,8 @@
 
 未経験転職メディアの MVP と、MakeCareer 様との商談で見せる資料一式。**すべてローカル・非公開。** 本番公開・本番送客・実 SNS 投稿・本番解析はしていない。
 
+2026-10-10の独立監査後の修正と確認結果: [商談前の受入確認](docs/sales/DELIVERY_CHECK.md)。
+
 ## 1. 中立デモを起動する（実在企業名なし）
 
 ```bash
@@ -29,9 +31,11 @@ npm run demo:makecareer # → http://localhost:3100 （商談メニュー: http:
   ```
 - 仕組み: 本番送客は「ブランド利用の許諾」「人が書いた承認記録」「`PARTNER_LIVE_OUTBOUND=on`」の3つがそろったときだけ有効（`src/config/partner.ts`）。`PARTNER_PROFILE=makecareer` だけでは有効にならない。テスト: `tests/consultation.test.ts`
 
-## 4. 5分デモ
+## 4. 標準8分・短縮5分デモ
 
 - 順番と話す内容: [docs/sales/MEETING_DEMO_RUNBOOK.md](docs/sales/MEETING_DEMO_RUNBOOK.md)（画面版: http://localhost:3100/sales）
+- SNSから記事へは「新規タブ」のリンクで開く（UTM付き）。そのタブでチェック・相談・計測へ進む。流入元は途中で上書きしない。
+- 結果は事前に実入力して別タブに用意し「事前入力した例」と説明する。13問を本番で全入力すると約3分を使う。
 - トークスクリプト: [docs/sales/TALK_TRACK_5MIN.md](docs/sales/TALK_TRACK_5MIN.md)
 
 ## 5. 3つの読者導線
@@ -52,7 +56,7 @@ npm run demo:makecareer # → http://localhost:3100 （商談メニュー: http:
 
 ## 7. Pilot の提案
 
-- 1枚の提案（印刷できる）: http://localhost:3100/sales/proposal ／ [docs/sales/ONE_PAGE_PROPOSAL.md](docs/sales/ONE_PAGE_PROPOSAL.md)
+- 提案概要（印刷できる）: http://localhost:3100/sales/proposal ／ [docs/sales/ONE_PAGE_PROPOSAL.md](docs/sales/ONE_PAGE_PROPOSAL.md)
 - 詳細（価格・範囲・作業時間の仮説・3か月の進め方）: [docs/sales/PILOT_PROPOSAL.md](docs/sales/PILOT_PROPOSAL.md)、[docs/sales/OPERATING_PLAN_3M.md](docs/sales/OPERATING_PLAN_3M.md)
 - 反論への回答: [docs/sales/OBJECTIONS.md](docs/sales/OBJECTIONS.md)
 - 商談で聞くこと: [docs/sales/PARTNER_DISCOVERY_QUESTIONS.md](docs/sales/PARTNER_DISCOVERY_QUESTIONS.md)
@@ -70,7 +74,7 @@ npm run demo:makecareer # → http://localhost:3100 （商談メニュー: http:
 
 | もの | 作り方 | 場所 |
 | --- | --- | --- |
-| 全ページの Markdown（中立デモ） | `npm run export:static` | `export/pages/`（リポジトリに含む） |
+| 全ページの Markdown（中立デモ） | `npm run export:static` | `export/pages/PAGES.md` が一覧（リポジトリに含む） |
 | 全ページの静的 HTML（中立デモ） | 同上 | `export/site/`（git 管理外） |
 | スクリーンショット（360 / 390 / デスクトップ） | `npm run screenshots`（`BASE_URL`・`SALES=1` で切り替え） | `screenshots/`（git 管理外） |
 
@@ -91,3 +95,11 @@ npm run lint && npm test && npm run content:check && npm run build
 - 現状の棚卸し: [docs/sales/CONTENT_AUDIT.md](docs/sales/CONTENT_AUDIT.md)
 - MakeCareer の Research 記録（確認できたこと／仮説）: [docs/sales/MAKECAREER_RESEARCH.md](docs/sales/MAKECAREER_RESEARCH.md)
 - エージェント向けの作業ルール: [AGENTS.md](AGENTS.md)
+
+## Windowsでの確認
+
+Playwright付属Chromiumが未導入でEdgeが使える場合、PowerShellで `$env:PLAYWRIGHT_CHANNEL="msedge"` を設定して screenshots / export:static / sns:images を実行できる。通常はPlaywrightのChromiumを使う。
+
+## 商談導線の回帰確認
+
+デモ起動後に `npm run test:meeting -- --base http://127.0.0.1:3100`。3経路の全回答・コピー・新規タブのSNS流入・相談先の安全性を確認する。静的サイトを別ポートでHTTP配信した場合は `--static-base http://127.0.0.1:3301` も指定する。

@@ -8,9 +8,9 @@ export function CarouselSlide({ slide, index, total, mediaName, tone }: { slide:
   const l = slide.layout;
   const cover = l.kind === "cover";
   return (
-    <figure data-slide className={`@container relative aspect-[4/5] w-full overflow-hidden [overflow-wrap:anywhere] rounded-[3cqw] ring-1 ring-line ${cover ? tone : "bg-surface"}`} aria-label={slide.alt}>
+    <figure data-slide className={`@container relative aspect-[4/5] w-full overflow-hidden [overflow-wrap:anywhere] rounded-[2cqw] ring-1 ring-line ${cover ? tone : "bg-surface"}`} aria-label={slide.alt}>
       <span className="absolute left-[5cqw] top-[4.5cqw] z-10 rounded-full bg-surface/90 px-[2.4cqw] py-[0.8cqw] text-[2.6cqw] font-bold text-accent-strong ring-1 ring-accent/30">投稿案・未公開</span>
-      <span aria-hidden="true" className={`motif motif-${slide.motif} absolute block ${cover ? "bottom-[10cqw] right-[5cqw] h-[40cqw] w-[40cqw] rounded-full bg-white/85" : "right-[5cqw] top-[12cqw] h-[16cqw] w-[16cqw] rounded-full bg-mint"}`} />
+      <span aria-hidden="true" className={`motif motif-${slide.motif} absolute block ${cover ? "bottom-[10cqw] right-[5cqw] h-[40cqw] w-[40cqw] rounded-full bg-surface/90" : "right-[5cqw] top-[12cqw] h-[16cqw] w-[16cqw] rounded-full bg-brand-tint"}`} />
       <div className="relative flex h-full flex-col px-[7cqw] pb-[12cqw] pt-[14cqw]">
         {l.kind === "cover" && (
           <>

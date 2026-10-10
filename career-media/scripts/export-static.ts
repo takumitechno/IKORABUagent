@@ -8,7 +8,7 @@
  * - site/: 各ページの HTML と、使っている JS・CSS・フォント。サーバーのルートに置いて開く
  *   （例: python3 -m http.server 8080 -d export/site）。file:// で開くと JS が読み込めない。
  *   記事検索（/articles?q=）はサーバー側の処理なので、書き出した HTML では絞り込まれない。
- * - pages/: 各ページの本文（main）を Markdown にしたもの。INDEX.md が一覧、_layout.md が全ページ共通の部分。
+ * - pages/: 各ページの本文（main）を Markdown にしたもの。PAGES.md が一覧、_layout.md が全ページ共通の部分。
  *   Playwright の Chromium が必要（--no-md で省略）。export/pages/ はリポジトリに置き、ビルドしなくても読めるようにしている。
  *
  * 実在企業の名義（PARTNER_PROFILE=makecareer）のサーバーからは書き出さない。どちらも公開サーバーには置かない。
@@ -87,7 +87,7 @@ async function exportMarkdown(base: string, routes: string[], pagesDir: string):
   let browser;
   try {
     const { chromium } = await import("playwright");
-    browser = await chromium.launch();
+    browser = await chromium.launch(process.env.PLAYWRIGHT_CHANNEL ? { channel: process.env.PLAYWRIGHT_CHANNEL } : {});
   } catch (e) {
     console.warn(`Chromium を起動できないため Markdown を省略します（npx playwright install chromium で入れられます）: ${(e as Error).message.split("\n")[0]}`);
     return null;
@@ -223,8 +223,8 @@ async function main() {
   if (process.argv.includes("--no-md")) return;
   const pages = await exportMarkdown(base, routes, pagesDir);
   if (!pages) return;
-  write(path.join(pagesDir, "INDEX.md"), indexMarkdown(pages, base));
-  console.log(`pages/: ${pages.length}ページの Markdown と INDEX.md・_layout.md → ${path.relative(process.cwd(), pagesDir) || pagesDir}`);
+  write(path.join(pagesDir, "PAGES.md"), indexMarkdown(pages, base));
+  console.log(`pages/: ${pages.length}ページの Markdown と PAGES.md・_layout.md → ${path.relative(process.cwd(), pagesDir) || pagesDir}`);
 }
 
 main().catch((e) => {

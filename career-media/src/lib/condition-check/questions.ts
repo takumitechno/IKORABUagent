@@ -103,6 +103,7 @@ export const STEPS: Step[] = [
           { id: "research", label: "分からないことを調べて解決すること" },
           { id: "targets", label: "目標に向けて工夫すること" },
           { id: "routine", label: "決まった作業をコツコツ続けること" },
+          { id: "none", label: "まだ分からない・これから整理したい" },
         ],
       },
     ],
@@ -249,7 +250,7 @@ export function sanitizeAnswers(input: unknown): Answers {
     const raw = (input as Record<string, unknown>)[q.id];
     if (!Array.isArray(raw)) continue;
     const valid = raw.filter((v): v is string => typeof v === "string" && q.options.some((o) => o.id === v));
-    const unique = [...new Set(valid)];
+    const unique = q.type === "multi" && valid.includes("none") ? ["none"] : [...new Set(valid)];
     const limited = q.type === "single" ? unique.slice(0, 1) : unique.slice(0, q.max ?? q.options.length);
     if (limited.length > 0) result[q.id] = limited;
   }

@@ -15,7 +15,7 @@ const BASE = arg("base", "http://127.0.0.1:3100").replace(/\/$/, "");
 const OUT = path.resolve(arg("out", "export/sns"));
 const THEMES = ["a", "b", "c"];
 
-const browser = await chromium.launch();
+const browser = await chromium.launch(process.env.PLAYWRIGHT_CHANNEL ? { channel: process.env.PLAYWRIGHT_CHANNEL } : {});
 const context = await browser.newContext({ viewport: { width: 1280, height: 1000 }, deviceScaleFactor: 3, locale: "ja-JP", reducedMotion: "reduce" });
 const page = await context.newPage();
 let count = 0;

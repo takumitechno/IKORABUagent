@@ -89,7 +89,7 @@ npm run image:index      # content/images/index.json を作り直す
 ```tsx
 import { GeneratedImage } from "@/components/GeneratedImage";
 
-<GeneratedImage slug="hero-home" sizes="(min-width: 768px) 560px, 270px" className="..." fallback={<HeroMockup />} />
+<GeneratedImage slug="check-support" sizes="440px" className="..." fallback={<ResultPreview />} />
 ```
 
 採用済み（`selected`）の画像がなければ `fallback` を出す。縦横・alt は記録から入る。
@@ -98,7 +98,7 @@ import { GeneratedImage } from "@/components/GeneratedImage";
 
 | slug | type | 使う場所 | 状態 |
 | --- | --- | --- | --- |
-| [hero-home](hero-home.md) | hero | トップのヒーロー（`src/app/page.tsx`） | 未生成 |
+| [hero-home](hero-home.md) | hero | 差し込み口なし。現在は条件整理ノートの見本を使用 | 保留・生成不要 |
 | [check-support](check-support.md) | section | トップの「条件整理チェック」（`src/app/page.tsx`） | 未生成 |
 | [sns-theme-a-cover](sns-theme-a-cover.md) | sns-carousel | `/sales/sns/a` の表紙用ビジュアル | 未生成 |
 | [journey-sekkyaku-office](journey-sekkyaku-office.md) | section | （今は差し込み口なし。ケースカードは色帯のデザインに変更） | 未生成 |

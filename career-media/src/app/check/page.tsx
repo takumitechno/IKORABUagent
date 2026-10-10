@@ -18,7 +18,7 @@ export default function CheckPage() {
         crumbs={[{ name: "ホーム", path: "/" }, { name: "条件整理チェック", path: "/check" }]}
         eyebrow="SELF CHECK"
         title="未経験転職 条件整理チェック"
-        lead={`${ALL_QUESTIONS.length}の質問に答えると、ゆずれない条件や面談で聞きたいことが一覧になります。合否や向き不向きの判定はしません。`}
+        lead={`${ALL_QUESTIONS.length}の質問に答えると、優先したい条件や面談で聞きたいことが一覧になります。合否や向き不向きの判定はしません。`}
         icon="clipboard-list"
       >
         <ul className="flex flex-wrap gap-2 text-[12.5px] font-bold">

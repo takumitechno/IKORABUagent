@@ -14,6 +14,7 @@
     "db:seed-sql": "tsx pipeline/src/cli.ts seed-sql",
     "db:verify": "bash scripts/verify-db.sh",
     "screenshots": "node scripts/screenshots.mjs",
+    "test:meeting": "node scripts/meeting-smoke.mjs",
     "motifs": "tsx scripts/gen-motifs.ts",
     "export:static": "tsx scripts/export-static.ts",
     "local": "bash scripts/start-local.sh",

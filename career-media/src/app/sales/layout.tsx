@@ -24,11 +24,14 @@ export default function SalesLayout({ children }: { children: React.ReactNode })
           <Lock className="h-4 w-4 text-accent-bright" aria-hidden="true" />
           {salesAddressee}向け 商談用資料（非公開・ローカル表示のみ）
         </p>
-        <p className="flex flex-wrap gap-2 text-[11.5px]">
+        <details className="text-[11.5px]">
+          <summary className="cursor-pointer">デモの状態を確認</summary>
+          <p className="mt-2 flex flex-wrap gap-2">
           <span className="rounded-full bg-white/10 px-2.5 py-0.5">表示: {partner.profile === "makecareer" ? "商談用プレビュー" : "中立デモ"}</span>
           <span className="rounded-full bg-white/10 px-2.5 py-0.5">本番送客: {consultationMode === "live" ? "ON" : "OFF"}</span>
           <span className="rounded-full bg-white/10 px-2.5 py-0.5">検索エンジン: noindex</span>
-        </p>
+          </p>
+        </details>
       </div>
       <nav aria-label="商談用ページ" className="no-print mt-3 flex gap-2 overflow-x-auto pb-1">
         {NAV.map((n) => (

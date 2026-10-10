@@ -2,7 +2,7 @@
 import type { ContentRepository } from "../src/lib/content/repository";
 import { TAXONOMY, taxonomyPath, type TaxonomyGroup } from "../src/lib/taxonomy";
 
-export const STATIC_ROUTES = ["/", "/articles", "/news", "/jobs", "/check", "/consultation", "/about", "/editorial-policy", "/disclosure", "/privacy", "/disclaimer", "/concerns", "/situations"];
+export const STATIC_ROUTES = ["/", "/articles", "/news", "/jobs", "/check", "/consultation", "/consultation/apply", "/about", "/editorial-policy", "/disclosure", "/privacy", "/disclaimer", "/concerns", "/situations"];
 
 export async function listSiteRoutes(repo: Pick<ContentRepository, "listArticles" | "listCategories">): Promise<string[]> {
   const [articles, categories] = await Promise.all([repo.listArticles(), repo.listCategories()]);

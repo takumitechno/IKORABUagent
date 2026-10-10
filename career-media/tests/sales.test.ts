@@ -5,7 +5,7 @@ import { salesDemoEnabled } from "@/config/sales";
 import { LocalContentRepository } from "@/lib/content/local-repository";
 import { extractNumbers } from "@/lib/figures";
 import { fixedTotal, paymentScenario, PILOT, workloadTotal } from "@/lib/sales/proposal";
-import { RUNBOOK } from "@/lib/sales/runbook";
+import { RUNBOOK, runbookMinutes } from "@/lib/sales/runbook";
 import { SNS_THEMES, type Slide } from "@/lib/sales/sns";
 
 const repo = new LocalContentRepository(path.join(process.cwd(), "content"), () => new Date("2026-10-07T12:00:00Z"));
@@ -59,6 +59,14 @@ describe("sales demo (meeting-only pages)", () => {
     expect(paymentScenario(10).perMeeting).toBe(37_000);
     expect(workloadTotal).toBeGreaterThanOrEqual(10);
     expect(workloadTotal).toBeLessThanOrEqual(12);
+  });
+
+  it("fits the meeting window and starts article attribution with a tagged landing", () => {
+    expect(runbookMinutes()).toBeLessThanOrEqual(8);
+    const article = RUNBOOK.find((s) => s.href.startsWith("/articles/"))!;
+    const url = new URL(article.href, "http://localhost");
+    expect(url.searchParams.get("utm_source")).toBe("instagram");
+    expect(url.searchParams.get("utm_content")).toBe("theme-b-carousel");
   });
 
   it("runs the meeting demo through real pages only", () => {

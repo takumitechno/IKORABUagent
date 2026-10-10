@@ -1,5 +1,5 @@
 import { salesAddressee } from "@/config/sales";
-import { ASSETS_PARTNER, ASSETS_TAKUMI, EXIT_PRINCIPLE, fixedTotal, MONTHLY_SCOPE, OUT_OF_SCOPE, PARTNER_COOPERATION, paymentScenario, PILOT, PLAN, SCENARIO_COUNTS, yen } from "@/lib/sales/proposal";
+import { ACCEPTANCE_NOTE, INITIAL_SCOPE, PRODUCTION_ROLES, ASSETS_PARTNER, ASSETS_TAKUMI, EXIT_PRINCIPLE, fixedTotal, MONTHLY_SCOPE, OUT_OF_SCOPE, PARTNER_COOPERATION, paymentScenario, PILOT, PLAN, SCENARIO_COUNTS, yen } from "@/lib/sales/proposal";
 import { pageMetadata } from "@/lib/seo";
 import { PrintButton } from "./PrintButton";
 
@@ -26,20 +26,7 @@ export default function ProposalPage() {
         <PrintButton />
       </div>
 
-      <div className="mt-6 grid gap-4 md:grid-cols-2 print:grid-cols-2 print:gap-2">
-        <Block title="Instagram のご相談への回答">
-          Instagram の投稿だけを作るのではなく、投稿に興味を持った人が読む記事・比べる材料・条件整理・相談の説明までを、テーマごとにセットで作ります。投稿の反応をその場で終わらせず、検索とコンテンツの資産として残します。
-        </Block>
-        <Block title="既存の TikTok との役割">
-          既存の TikTok 運用は置き換えません。TikTok で反応のよいテーマや言い回しを企画の材料（Research の入力）として使い、Instagram と記事で「保存して見返す・詳しく読む」役割を担います。
-        </Block>
-        <Block title="Web を付ける理由">
-          SNS は「知る」きっかけ、Web は「自分の場合を考える」場所です。相談の前に自分で整理できる人が増えると、面談で話す内容が具体的になります。迷っている人は記事・比較・条件整理へ、すぐ相談したい人は相談の説明へ直接進めるようにしています。
-        </Block>
-        <Block title="3か月の Pilot">
-          3か月で面談数を保証する商品ではありません。メディア資産・SNS 制作物・運用体制・計測の仕組み・改善データを残しながら、相談・面談につながる勝ち筋を検証します。3か月目に条件を見直します。
-        </Block>
-      </div>
+      <p className="mt-5 max-w-4xl text-[15px] leading-7 text-body">月4テーマを軸に、投稿・記事・相談準備までを整え、相談につながるテーマを検証します。既存のTikTokは活かします。制作物を残し、3か月後に継続を判断する提案です。</p>
 
       <div className="mt-4 grid gap-4 md:grid-cols-[1.1fr_1fr] print:grid-cols-2 print:gap-2">
         <Block id="price" title="価格（Pilot 価格・税別・提案仮条件）">
@@ -75,6 +62,17 @@ export default function ProposalPage() {
         </Block>
       </div>
 
+      <div className="mt-4">
+        <Block id="initial" title="初期10万円で納品するもの・完了の確認（案）">
+          <dl className="divide-y divide-line">
+            {INITIAL_SCOPE.map((s) => <div key={s.deliverable} className="py-3 sm:grid sm:grid-cols-[200px_1fr] sm:gap-4">
+              <dt className="font-bold text-ink">{s.deliverable}</dt><dd>{s.acceptance}</dd>
+            </div>)}
+          </dl>
+          <p className="mt-2 text-[12px] leading-6 text-muted">{ACCEPTANCE_NOTE}</p>
+        </Block>
+      </div>
+
       <div className="mt-4 grid gap-4 md:grid-cols-2 print:grid-cols-2 print:gap-2">
         <Block id="scope" title="月額の標準範囲（月4 Research Theme の一案）">
           <ul className="space-y-1">
@@ -85,7 +83,7 @@ export default function ProposalPage() {
               </li>
             ))}
           </ul>
-          <p className="mt-2 text-[12px] leading-6 text-muted">標準に含めないもの: {OUT_OF_SCOPE.join("、")}。素材・撮影は御社からの提供が前提です。最終的な範囲は商談後に調整します。</p>
+          <p className="mt-2 text-[12px] leading-6 text-muted">標準に含めないもの: {OUT_OF_SCOPE.join("、")}。{PRODUCTION_ROLES} 最終的な範囲は商談後に調整します。</p>
         </Block>
         <Block id="plan" title="3か月の進め方">
           <ol className="space-y-1.5">

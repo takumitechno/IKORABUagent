@@ -5,7 +5,7 @@ import { ArticleList, ArticleRow, LeadCard } from "@/components/ArticleCards";
 import { ConsultButton, ConsultationCta } from "@/components/ConsultationCta";
 import { ExploreTabs } from "@/components/EntryGrid";
 import { GeneratedImage } from "@/components/GeneratedImage";
-import { HeroMockup, HeroMockupPeek } from "@/components/HeroMockup";
+import { ResultPreview } from "@/components/ResultPreview";
 import { JobPostingDiagram, ProcessFlow } from "@/components/HomeDiagrams";
 import { ProValueSection } from "@/components/ProValue";
 import { LevelMeter } from "@/components/LevelMeter";
@@ -95,12 +95,7 @@ export default async function HomePage() {
             </h1>
             <p className="enter enter-d2 mt-3 text-[15px] leading-7 text-white/85 sm:text-base">会社選びから面接の練習まで、{partner.proLabel}と一緒に。</p>
 
-            {/* スマホ: 人物のイラストの下半分に検索ボックスを重ねる */}
-            <div className="relative -mb-24 mt-4 h-[330px] overflow-hidden md:hidden">
-              <GeneratedImage slug="hero-home" priority sizes="290px" className="mx-auto h-auto w-[290px]" fallback={<HeroMockupPeek />} />
-            </div>
-
-            <form action="/articles" method="get" role="search" className="enter enter-d3 relative rounded-2xl md:mt-6 bg-surface p-3 text-ink shadow-[0_18px_40px_-18px_rgb(0_0_0/0.45)] sm:p-4">
+            <form action="/articles" method="get" role="search" className="enter enter-d3 relative mt-6 rounded-2xl bg-surface p-3 text-ink shadow-[0_18px_40px_-18px_rgb(0_0_0/0.45)] sm:p-4">
               <label htmlFor="hero-search" className="px-1 text-[12px] font-bold text-muted">
                 キーワードで記事を探す
               </label>
@@ -136,9 +131,9 @@ export default async function HomePage() {
             </Link>
           </div>
 
-          {/* 右側: 人物（写真を採用したら写真）と、このサイトでできることの小さなカード */}
+          {/* 実際の条件整理で持ち帰れるノートの見本 */}
           <div className="hidden md:block">
-            <GeneratedImage slug="hero-home" priority sizes="540px" className="h-auto w-full rounded-2xl" fallback={<HeroMockup />} />
+            <ResultPreview />
           </div>
         </div>
       </section>
@@ -319,38 +314,6 @@ export default async function HomePage() {
         <ConsultationCta placement="home-band" heading="整理したことをもとに、自分の場合を相談する" />
       </div>
     </>
-  );
-}
-
-/** チェックの結果のイメージ（実際の結果は回答によって変わる） */
-function ResultPreview() {
-  const rows: { label: string; chips: string[]; tone: string }[] = [
-    { label: "ゆずれない条件", chips: ["土日休み", "残業少なめ"], tone: "bg-coral text-coral-ink" },
-    { label: "活かせそうな経験", chips: ["接客", "電話対応"], tone: "bg-sand text-sand-ink" },
-    { label: "比べてみたい職種", chips: ["カスタマーサポート", "事務"], tone: "bg-sky text-sky-ink" },
-  ];
-  return (
-    <div className="reveal mx-auto w-full max-w-[400px] rounded-[20px] bg-surface p-4 shadow-[var(--shadow-raised)] ring-1 ring-line sm:p-5" aria-hidden="true">
-      <p className="flex items-center justify-between text-[12px] font-bold text-muted">
-        結果のイメージ
-        <span className="rounded-full bg-brand-soft px-2 py-0.5 text-[11px] text-brand-strong">条件整理ノート</span>
-      </p>
-      <ul className="mt-3 space-y-3">
-        {rows.map((r, i) => (
-          <li key={r.label} className="reveal-pop rounded-xl bg-canvas p-3" style={{ animationRange: `entry ${15 + i * 15}% entry ${60 + i * 15}%` }}>
-            <p className="text-[12px] font-bold text-ink">{r.label}</p>
-            <p className="mt-1.5 flex flex-wrap gap-1.5">
-              {r.chips.map((c) => (
-                <span key={c} className={`rounded-full px-2.5 py-0.5 text-[12px] font-bold ${r.tone}`}>
-                  {c}
-                </span>
-              ))}
-            </p>
-          </li>
-        ))}
-      </ul>
-      <p className="mt-3 text-[11px] leading-5 text-muted">面談で聞くことの例や、次にやることも一緒に表示されます。</p>
-    </div>
   );
 }
 

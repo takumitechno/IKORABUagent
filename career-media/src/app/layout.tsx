@@ -1,8 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Noto_Sans_JP } from "next/font/google";
 import { NavTracker } from "@/components/BackButton";
-import { ConsultPopup } from "@/components/ConsultPopup";
-import { buildConsultationUrl } from "@/lib/consultation";
 import { CategoryBar } from "@/components/CategoryBar";
 import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
@@ -27,6 +25,7 @@ export const metadata: Metadata = {
   title: { default: `${site.fullName}｜はじめての転職・未経験転職の仕事選びメディア`, template: `%s｜${site.fullName}` },
   description: site.description,
   applicationName: site.fullName,
+  icons: { icon: "/favicon.svg" },
   robots: site.indexable ? { index: true, follow: true } : { index: false, follow: false },
   formatDetection: { telephone: false },
 };
@@ -57,7 +56,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <Footer />
         <MeasurementTracker mode={consultationMode} />
         <NavTracker />
-        <ConsultPopup href={buildConsultationUrl("popup")} title={`${partner.proLabel}に相談してみませんか？`} label={partner.consultCta} points={partner.serviceHighlights.slice(0, 3).map((h) => h.title)} />
         <SalesMenuButton />
       </body>
     </html>

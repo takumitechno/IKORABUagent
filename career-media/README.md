@@ -75,7 +75,7 @@ esbuild でバンドルして動かす。相談ボタンは押すと「デモの
 ## Codex などのエージェントに読ませる
 
 - 作業ガイドは `AGENTS.md`（Codex が自動で読む。リポジトリ直下の `AGENTS.md` からも案内している）。
-- 各ページに表示される内容は `export/pages/` に Markdown で置いてある（`INDEX.md` が一覧、各ファイル先頭の `source` が元のソース）。
+- 各ページに表示される内容は `export/pages/` に Markdown で置いてある（`PAGES.md` が一覧、各ファイル先頭の `source` が元のソース）。
   ビルドしなくても読めるようにリポジトリに含めている。画面や記事を変えたら、サーバーを起動したうえで `npm run export:static` で書き出し直す。
 - 同じコマンドで `export/site/` に全ページの静的 HTML（JS・CSS・フォント込み、git 管理外）もできる。
   `python3 -m http.server 8080 -d export/site` で http://localhost:8080 を開く（file:// では JS が読み込めない。記事検索の絞り込みはサーバー側の処理なので効かない）。

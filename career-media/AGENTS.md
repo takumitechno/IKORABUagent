@@ -34,7 +34,7 @@ Codex などのコーディングエージェント向けの作業ガイド。�
 
 | 知りたいこと | 読む場所 |
 |---|---|
-| 各ページに実際に表示される内容 | `export/pages/INDEX.md` から各ページの Markdown（書き出し時点のスナップショット。正本は `src/` と `content/`） |
+| 各ページに実際に表示される内容 | `export/pages/PAGES.md` から各ページの Markdown（書き出し時点のスナップショット。正本は `src/` と `content/`） |
 | 読者像・言葉づかい | `docs/PERSONA.md` |
 | 記事の書き方・frontmatter・図解 | `.claude/skills/career-article-writer/SKILL.md` |
 | 査読の基準（機械チェック C01〜C18） | `.claude/skills/career-article-reviewer/SKILL.md`、`pipeline/src/checks.ts` |
@@ -71,7 +71,7 @@ Node.js 20.9 以上。依存は `npm ci`。環境変数なしで動く（記事�
 
 | URL | ページ | 主な部品・データ |
 |---|---|---|
-| `/` | `src/app/page.tsx` | `HeroMockup`（チャット画面のイメージ）、`ProValue`（プロに頼むよさ）、`EntryGrid`（入口タブ）、`HomeDiagrams`（転職の流れ・求人票の見方）、`ArticleCards`、職種の比較表（`LevelMeter`）、`ConsultationCta` |
+| `/` | `src/app/page.tsx` | `ResultPreview`（条件整理ノートの見本）、`ProValue`（プロに頼むよさ）、`EntryGrid`（入口タブ）、`HomeDiagrams`（転職の流れ・求人票の見方）、`ArticleCards`、職種の比較表（`LevelMeter`）、`ConsultationCta` |
 | `/articles`、`/articles/[slug]` | `src/app/articles/` | `ArticleCards`、`ArticleParts`、`lib/markdown.ts`、`lib/figures.ts`、`content/articles/*.md` |
 | `/news`、`/news/[slug]` | `src/app/news/` | `NewsTimeline`、`content/news/*.md` |
 | `/categories/[slug]` | `src/app/categories/[slug]/page.tsx` | `content/categories.json` |
@@ -80,7 +80,7 @@ Node.js 20.9 以上。依存は `npm ci`。環境変数なしで動く（記事�
 | `/check` | `src/app/check/page.tsx` | `ConditionCheck`（クライアント）、`lib/condition-check/`（設問とルール） |
 | `/consultation` | `src/app/consultation/page.tsx` | `lib/consultation.ts`（相談ボタンの URL はすべて `buildConsultationUrl`） |
 | `/about`、`/editorial-policy`、`/disclosure`、`/privacy`、`/disclaimer` | 各 `page.tsx` | `InfoPage` |
-| 全ページ共通 | `src/app/layout.tsx` | `Header`（`ThemeToggle`）、`MobileNav`、`CategoryBar`、`Footer`、`PreviewBanner`、`ConsultPopup`（相談のポップアップ）、`MobileStickyCta`、`NavTracker`、`src/app/globals.css` |
+| 全ページ共通 | `src/app/layout.tsx` | `Header`（`ThemeToggle`）、`MobileNav`、`CategoryBar`、`Footer`、`PreviewBanner`（自動相談ポップアップは表示しない）、`MobileStickyCta`、`NavTracker`、`src/app/globals.css` |
 | ページ上部の帯 | `src/components/PageHero.tsx` | 記事一覧・カテゴリ・ニュース・職種・チェック・相談・入口ページ・案内ページで共通 |
 | パンくずと「戻る」 | `src/components/Breadcrumbs.tsx` | `BackButton`（サイト内で移動してきたときは履歴で戻る。直接開いたときはひとつ上の階層へ）。アーティファクト版は `scripts/artifact/runtime.js` がページ内の履歴で処理する |
 
@@ -99,7 +99,8 @@ Node.js 20.9 以上。依存は `npm ci`。環境変数なしで動く（記事�
 ## 画像（生成画像）
 
 - 方針は `docs/ART_DIRECTION.md`、手順は `docs/image-briefs/README.md`。まず画像なしで成り立たせ、必要な場所だけに使う。文字は画像に入れない
-- 画像は `src/components/GeneratedImage.tsx` で出す（`content/images/index.json` で status が selected のものだけ。なければ fallback の SVG）。今の差し込み口: トップのヒーロー `hero-home`（なければキャリア相談のチャット画面のイメージ `src/components/HeroMockup.tsx`。デスクトップでは小さなカードを重ねる）、トップのチェック `check-support`（なければ結果の見本、デスクトップのみ）、`/sales/sns/*` の表紙 `sns-theme-*-cover`。`journey-*` の brief はあるが、今のケースカードには差し込み口がない
+- 画像は `src/components/GeneratedImage.tsx` で出す（`content/images/index.json` で status が selected のものだけ。なければ fallback の SVG）。今の差し込み口: トップのチェック `check-support`（なければ結果の見本、デスクトップのみ）、`/sales/sns/*` の表紙 `sns-theme-*-cover`。`journey-*` の brief はあるが、今のケースカードには差し込み口がない
+- トップのヒーローは `ResultPreview`。架空のチャット・予約UIは使わない。スマホでは装飾を省き、検索・チェック・相談の入口を優先する。
 - 生成した画像は draft のまま。実際のページで確認してから `image:status` で selected にする。気に入らなければ brief を直して `--force` で作り直す（前の画像は `.image-history/`）
 - API キー（`OPENAI_API_KEY`）は `.env.local` か環境変数にだけ置く。ロゴ・実在の企業やキャラクターは生成しない（`BLOCKED_TERMS`）
 

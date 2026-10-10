@@ -10,7 +10,7 @@ import { TAXONOMY, type TaxonomyGroup } from "@/lib/taxonomy";
 describe("illustrations", () => {
   it("src/app/motifs.css is generated from motifs.ts (run `npm run motifs` after editing)", () => {
     const file = fs.readFileSync(path.join(__dirname, "../src/app/motifs.css"), "utf8");
-    expect(file).toBe(motifsCss());
+    expect(file.replace(/\r\n/g, "\n")).toBe(motifsCss());
   });
 
   it("every entry tag, category and job role has an illustration, and tiles in one group do not repeat", () => {
