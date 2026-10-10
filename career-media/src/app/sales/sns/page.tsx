@@ -18,7 +18,7 @@ export default function SnsIndexPage() {
       <ul className="mt-8 grid gap-5 md:grid-cols-3">
         {SNS_THEMES.map((t) => (
           <li key={t.id}>
-            <Link href={`/sales/sns/${t.id}`} className="tap lift group flex h-full flex-col rounded-[var(--radius-card)] border border-line bg-white p-4 hover:border-brand/40">
+            <Link href={`/sales/sns/${t.id}`} className="tap lift group flex h-full flex-col rounded-[var(--radius-card)] border border-line bg-surface p-4 hover:border-brand/40">
               <div className="mx-auto w-full max-w-[260px]">
                 <CarouselSlide slide={t.carousel.slides[0]} index={0} total={t.carousel.slides.length} mediaName={site.name} tone={t.tone} />
               </div>

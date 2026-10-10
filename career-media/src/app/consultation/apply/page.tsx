@@ -27,7 +27,7 @@ export default function ConsultationApplyDemoPage() {
           { name: "相談の申し込み（デモ）", path: "/consultation/apply" },
         ]}
       />
-      <section className="mt-6 rounded-[20px] bg-white p-6 ring-1 ring-line sm:p-10">
+      <section className="mt-6 rounded-[20px] bg-surface p-6 ring-1 ring-line sm:p-10">
         <p className="inline-flex items-center gap-1.5 rounded-full bg-accent-soft px-3 py-1 text-[12px] font-bold text-accent-strong">
           <ShieldCheck className="h-4 w-4" aria-hidden="true" />
           {partner.brandUsageApproved ? "申し込みページは準備中です" : "デモ版のため、ここから先へは移動しません"}
@@ -45,7 +45,7 @@ export default function ConsultationApplyDemoPage() {
             <MessageCircle className="h-4 w-4 text-brand" aria-hidden="true" />
             相談でできることを見る
           </Link>
-          <Link href="/check" className="inline-flex items-center justify-center gap-1.5 rounded-full bg-brand px-5 py-3 text-sm font-bold text-white hover:bg-brand-strong">
+          <Link href="/check" className="inline-flex items-center justify-center gap-1.5 rounded-full bg-brand px-5 py-3 text-sm font-bold text-white hover:bg-brand-press">
             <ClipboardList className="h-4 w-4" aria-hidden="true" />
             先に条件を整理する
           </Link>

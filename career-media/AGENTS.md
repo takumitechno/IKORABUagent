@@ -113,6 +113,9 @@ Node.js 20.9 以上。依存は `npm ci`。環境変数なしで動く（記事�
 - 新しい機械チェックを足すときは `pipeline/src/checks.ts`・`tests/checks.test.ts`・reviewer の SKILL.md の表を同時に更新する。
 - 画面はスマホ（幅 390px）を基準に作り、横スクロールを出さない。
 - 動きは `@media (prefers-reduced-motion: no-preference)` の中だけに書き、動き始めの状態でも文字が読めるようにする。
+- 色は必ずトークン（`bg-surface` / `text-ink` / `bg-brand-tint` など）で書く。`bg-white`・`#xxxxxx` を直書きするとダークモードで崩れる。
+  白い文字を載せる面は `bg-night`・`bg-brand`・`bg-accent`・`bg-hero`、その押下色は `bg-brand-press` / `bg-accent-press`（ダークでも変わらない）。
+  ダークモードは OS 設定に従い、ヘッダー（スマホはメニュー内）の `ThemeToggle` で `html[data-theme]` を上書きする。値は `globals.css` のダークの節。
 - イラストは外部素材を使わず `src/lib/illustrations/motifs.ts` に SVG で描く。`src/app/motifs.css` は手で編集せず `npm run motifs` で作る
   （テストが生成漏れを検出する）。外部の画像・フォント・CDN を読み込まない。
 - 独自の CSS は `globals.css` の `@layer components` に書く（Tailwind のユーティリティで上書きできるように）。

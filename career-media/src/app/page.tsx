@@ -100,14 +100,14 @@ export default async function HomePage() {
               <GeneratedImage slug="hero-home" priority sizes="290px" className="mx-auto h-auto w-[290px]" fallback={<HeroMockupPeek />} />
             </div>
 
-            <form action="/articles" method="get" role="search" className="enter enter-d3 relative rounded-2xl md:mt-6 bg-white p-3 text-ink shadow-[0_18px_40px_-18px_rgb(0_0_0/0.45)] sm:p-4">
+            <form action="/articles" method="get" role="search" className="enter enter-d3 relative rounded-2xl md:mt-6 bg-surface p-3 text-ink shadow-[0_18px_40px_-18px_rgb(0_0_0/0.45)] sm:p-4">
               <label htmlFor="hero-search" className="px-1 text-[12px] font-bold text-muted">
                 キーワードで記事を探す
               </label>
               <div className="mt-1.5 flex overflow-hidden rounded-xl border border-line-strong focus-within:border-brand focus-within:ring-2 focus-within:ring-brand/20">
                 <Search className="ml-3 h-4 w-4 shrink-0 self-center text-muted" aria-hidden="true" />
                 <input id="hero-search" name="q" type="search" placeholder="例: 事務、土日休み、履歴書" className="min-w-0 flex-1 bg-transparent px-2.5 py-3 text-[15px] outline-none placeholder:text-muted/70" />
-                <button type="submit" className="m-1 rounded-lg bg-accent px-4 text-[14px] font-bold text-white hover:bg-accent-strong">
+                <button type="submit" className="m-1 rounded-lg bg-accent px-4 text-[14px] font-bold text-white hover:bg-accent-press">
                   検索
                 </button>
               </div>
@@ -125,7 +125,7 @@ export default async function HomePage() {
 
             <div className="mt-5 grid grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)] gap-2.5 sm:flex sm:flex-wrap">
               <ConsultButton placement="home-hero" label={partner.consultCta} />
-              <Link href="/check" className="tap inline-flex items-center justify-center gap-1.5 rounded-full bg-white px-4 py-3 text-[14px] font-bold text-brand-strong hover:bg-brand-tint sm:px-5">
+              <Link href="/check" className="tap inline-flex items-center justify-center gap-1.5 rounded-full bg-surface px-4 py-3 text-[14px] font-bold text-brand-strong hover:bg-brand-tint sm:px-5">
                 <ClipboardList className="h-4 w-4" aria-hidden="true" />
                 条件整理チェック
               </Link>
@@ -209,7 +209,7 @@ export default async function HomePage() {
           <ul className="grid gap-2.5 sm:hidden">
             {JOB_ROLES.map((r) => (
               <li key={r.slug}>
-                <Link href={roleHub(r)} className="block rounded-xl border border-line bg-white p-4 active:bg-brand-tint/60">
+                <Link href={roleHub(r)} className="block rounded-xl border border-line bg-surface p-4 active:bg-brand-tint/60">
                   <span className="flex items-center justify-between gap-2">
                     <span className="text-[15px] font-bold text-ink">{r.name}</span>
                     <ArrowRight className="h-4 w-4 shrink-0 text-brand-strong" aria-hidden="true" />
@@ -235,7 +235,7 @@ export default async function HomePage() {
               </li>
             ))}
           </ul>
-          <div className="hidden overflow-x-auto rounded-xl border border-line bg-white sm:block">
+          <div className="hidden overflow-x-auto rounded-xl border border-line bg-surface sm:block">
             <table className="w-full min-w-[560px] text-[13px]">
               <thead className="bg-canvas text-left text-[12px] text-muted">
                 <tr>
@@ -279,7 +279,7 @@ export default async function HomePage() {
         </section>
 
         {/* 条件整理チェック（転職サイトの「診断」のような入口。ただし判定はしない） */}
-        <section aria-labelledby="home-check" className="reveal overflow-hidden rounded-2xl border-2 border-brand/20 bg-white">
+        <section aria-labelledby="home-check" className="reveal overflow-hidden rounded-2xl border-2 border-brand/20 bg-surface">
           <div className="grid gap-6 p-5 sm:p-9 md:grid-cols-[minmax(0,1fr)_minmax(0,0.9fr)] md:items-center">
             <div>
               <p className="inline-flex items-center gap-1.5 rounded-full bg-brand-tint px-3 py-1 text-[12px] font-bold text-brand-strong">
@@ -305,7 +305,7 @@ export default async function HomePage() {
                   </li>
                 ))}
               </ul>
-              <Link href="/check" className="tap mt-6 flex items-center justify-center gap-2 rounded-xl bg-accent py-3.5 text-[15px] font-bold text-white hover:bg-accent-strong md:inline-flex md:px-10">
+              <Link href="/check" className="tap mt-6 flex items-center justify-center gap-2 rounded-xl bg-accent py-3.5 text-[15px] font-bold text-white hover:bg-accent-press md:inline-flex md:px-10">
                 チェックをはじめる
                 <ArrowRight className="h-4 w-4" aria-hidden="true" />
               </Link>
@@ -330,7 +330,7 @@ function ResultPreview() {
     { label: "比べてみたい職種", chips: ["カスタマーサポート", "事務"], tone: "bg-sky text-sky-ink" },
   ];
   return (
-    <div className="reveal mx-auto w-full max-w-[400px] rounded-[20px] bg-white p-4 shadow-[var(--shadow-raised)] ring-1 ring-line sm:p-5" aria-hidden="true">
+    <div className="reveal mx-auto w-full max-w-[400px] rounded-[20px] bg-surface p-4 shadow-[var(--shadow-raised)] ring-1 ring-line sm:p-5" aria-hidden="true">
       <p className="flex items-center justify-between text-[12px] font-bold text-muted">
         結果のイメージ
         <span className="rounded-full bg-brand-soft px-2 py-0.5 text-[11px] text-brand-strong">条件整理ノート</span>

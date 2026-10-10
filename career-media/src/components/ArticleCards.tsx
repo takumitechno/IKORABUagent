@@ -30,7 +30,7 @@ function Meta({ article, category }: { article: ArticleSummary; category?: Categ
 export function LeadCard({ article, categories }: { article: ArticleSummary; categories: Category[] }) {
   const category = findCategory(categories, article.categories[0]);
   return (
-    <Link href={articlePath(article)} className="tap lift group grid overflow-hidden rounded-2xl border border-line bg-white">
+    <Link href={articlePath(article)} className="tap lift group grid overflow-hidden rounded-2xl border border-line bg-surface">
       <Eyecatch article={article} category={category} size="lg" className="rounded-none" />
       <div className="flex flex-col p-5 sm:p-7">
         <Meta article={article} category={category} />
@@ -46,7 +46,7 @@ export function FeatureCard({ article, categories, showSummary = true }: { artic
   const category = findCategory(categories, article.categories[0]);
   const effective = article.kind === "news" ? article.news?.announcedAt : undefined;
   return (
-    <Link href={articlePath(article)} className="tap lift group flex h-full flex-col overflow-hidden rounded-2xl border border-line bg-white">
+    <Link href={articlePath(article)} className="tap lift group flex h-full flex-col overflow-hidden rounded-2xl border border-line bg-surface">
       <Eyecatch article={article} category={category} size="md" className="rounded-none" />
       <div className="flex flex-1 flex-col p-4 sm:p-5">
         <h3 className="text-[15.5px] font-bold leading-[1.6] text-ink group-hover:text-brand-strong">{article.title}</h3>
@@ -105,7 +105,7 @@ export function TagChips({ article, groups = ["concerns", "situations", "roles"]
     <ul className="flex flex-wrap gap-2">
       {tags.map(({ g, item }) => (
         <li key={`${g}-${item!.slug}`}>
-          <Link href={taxonomyPath(g, item!.slug)} className="inline-flex items-center rounded-full bg-white px-3 py-1 text-[12.5px] font-medium text-body ring-1 ring-line hover:text-brand-strong hover:ring-brand/40">
+          <Link href={taxonomyPath(g, item!.slug)} className="inline-flex items-center rounded-full bg-surface px-3 py-1 text-[12.5px] font-medium text-body ring-1 ring-line hover:text-brand-strong hover:ring-brand/40">
             #{item!.label}
           </Link>
         </li>

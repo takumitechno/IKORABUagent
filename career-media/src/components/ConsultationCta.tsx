@@ -41,7 +41,7 @@ export function ConsultButton({ placement, contentSlug, label, size = "md" }: { 
       data-cta-placement={placement}
       data-cta-kind="consultation-apply"
       data-content-slug={contentSlug}
-      className={`btn-shine inline-flex items-center justify-center gap-1.5 whitespace-nowrap rounded-full bg-accent font-bold text-white transition-colors hover:bg-accent-strong ${
+      className={`btn-shine inline-flex items-center justify-center gap-1.5 whitespace-nowrap rounded-full bg-accent font-bold text-white transition-colors hover:bg-accent-press ${
         size === "lg" ? "px-7 py-4 text-base" : "px-5 py-3 text-[15px]"
       }`}
     >
@@ -99,7 +99,7 @@ export function ConsultationCta({ placement, contentSlug, variant = "band", head
           </div>
           <ul className="mt-4 flex flex-wrap gap-1.5">
             {partner.serviceHighlights.slice(0, 3).map((h) => (
-              <li key={h.title} className="inline-flex items-center gap-1 rounded-full bg-white px-2.5 py-1 text-[12px] font-bold text-accent-strong ring-1 ring-accent/25">
+              <li key={h.title} className="inline-flex items-center gap-1 rounded-full bg-surface px-2.5 py-1 text-[12px] font-bold text-accent-strong ring-1 ring-accent/25">
                 <CheckCircle2 className="h-3.5 w-3.5" aria-hidden="true" />
                 {h.title}
               </li>
@@ -124,7 +124,7 @@ export function ConsultationCta({ placement, contentSlug, variant = "band", head
   }
 
   return (
-    <section aria-labelledby={`cta-${placement}`} className="no-print overflow-hidden rounded-2xl bg-ink text-white">
+    <section aria-labelledby={`cta-${placement}`} className="no-print overflow-hidden rounded-2xl bg-night text-white">
       <div className="grid gap-8 p-6 sm:p-10 md:grid-cols-[1.3fr_1fr] md:items-center">
         <div>
           <h2 id={`cta-${placement}`} className="text-[21px] font-bold leading-snug sm:text-[26px]">

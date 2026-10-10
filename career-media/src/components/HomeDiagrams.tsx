@@ -17,11 +17,12 @@ const FLOW: { icon: LucideIcon; title: string; text: string; slug: string }[] = 
   { icon: Flag, title: "入社", text: "入社前に条件の最終確認", slug: "tenshoku-koukai-shinai" },
 ];
 
-const STEP_COLORS = ["var(--color-brand)", "#1f5f99", "#a8432a", "#b85a12", "#3f6f1f", "#3a5068", "#3c4f8f"];
+/** ブランド色から濃い色へ少しずつ変える（最後の「入社」はアクセント色） */
+const STEP_COLORS = [0, 1, 2, 3, 4, 5].map((i) => `color-mix(in srgb, var(--color-brand) ${100 - i * 14}%, var(--color-hero))`).concat("var(--color-accent)");
 
 export function ProcessFlow({ has }: { has: Has }) {
   return (
-    <div className="overflow-hidden rounded-2xl border border-line bg-white p-4 sm:p-6">
+    <div className="overflow-hidden rounded-2xl border border-line bg-surface p-4 sm:p-6">
       {/* スマホ: 縦のタイムライン / デスクトップ: 横に7つ並べ、線でつなぐ */}
       <ol className="relative grid gap-0 md:grid-cols-7 md:gap-2">
         <span aria-hidden="true" className="absolute bottom-6 left-[21px] top-6 w-0.5 bg-line md:hidden" />
@@ -30,11 +31,11 @@ export function ProcessFlow({ has }: { has: Has }) {
           const Icon = step.icon;
           const inner = (
             <>
-              <span className="relative z-10 flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-white ring-4 ring-white" style={{ background: STEP_COLORS[i] }}>
+              <span className="relative z-10 flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-white ring-4 ring-surface" style={{ background: STEP_COLORS[i] }}>
                 <Icon className="h-5 w-5" aria-hidden="true" />
               </span>
               <span className="min-w-0 md:mt-2 md:text-center">
-                <span className="block text-[11px] font-bold" style={{ color: STEP_COLORS[i] }}>
+                <span className={`block text-[11px] font-bold ${i === FLOW.length - 1 ? "text-accent-strong" : "text-brand-strong"}`}>
                   STEP {i + 1}
                 </span>
                 <span className="block text-[14.5px] font-bold text-ink">{step.title}</span>
@@ -79,7 +80,7 @@ export function JobPostingDiagram({ has }: { has: Has }) {
   return (
     <div className="grid gap-5 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] md:items-center">
       {/* 見本の求人票（架空・数字は〇） */}
-      <figure className="relative rounded-2xl border border-line bg-white p-4 shadow-[0_18px_40px_-28px_rgb(20_43_62/0.5)] sm:p-5" aria-label="求人票の見本（架空）">
+      <figure className="relative rounded-2xl border border-line bg-surface p-4 shadow-[0_18px_40px_-28px_rgb(20_43_62/0.5)] sm:p-5" aria-label="求人票の見本（架空）">
         <figcaption className="flex items-center justify-between border-b border-line pb-3">
           <span className="text-[15px] font-bold text-ink">一般事務（未経験歓迎）</span>
           <span className="rounded-full bg-canvas px-2 py-0.5 text-[10.5px] font-bold text-muted ring-1 ring-line">見本（架空）</span>
@@ -117,11 +118,11 @@ export function JobPostingDiagram({ has }: { has: Has }) {
           return (
             <li key={row.no}>
               {slug ? (
-                <Link href={`/articles/${slug}`} className="flex items-center gap-3 rounded-xl border border-line bg-white p-3.5 hover:border-brand/40">
+                <Link href={`/articles/${slug}`} className="flex items-center gap-3 rounded-xl border border-line bg-surface p-3.5 hover:border-brand/40">
                   {body}
                 </Link>
               ) : (
-                <div className="flex items-center gap-3 rounded-xl border border-line bg-white p-3.5">{body}</div>
+                <div className="flex items-center gap-3 rounded-xl border border-line bg-surface p-3.5">{body}</div>
               )}
             </li>
           );

@@ -36,8 +36,8 @@ export default function MeasurementPage() {
         <ol className="space-y-1.5">
           {FUNNEL.map((f, i) => (
             <li key={f.label}>
-              <div className="flex items-start gap-3 rounded-xl bg-white p-3 ring-1 ring-line">
-                <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-ink text-[11px] font-bold text-white">{i + 1}</span>
+              <div className="flex items-start gap-3 rounded-xl bg-surface p-3 ring-1 ring-line">
+                <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-night text-[11px] font-bold text-white">{i + 1}</span>
                 <div className="min-w-0">
                   <p className="flex flex-wrap items-center gap-2 text-[14px] font-bold text-ink">
                     {f.label}
@@ -51,7 +51,7 @@ export default function MeasurementPage() {
           ))}
         </ol>
         <div className="space-y-5">
-          <section className="rounded-[var(--radius-card)] bg-white p-5 ring-1 ring-line">
+          <section className="rounded-[var(--radius-card)] bg-surface p-5 ring-1 ring-line">
             <h2 className="text-[16px] font-bold text-ink">将来の中心 KPI（案）</h2>
             <p className="mt-2 rounded-lg bg-canvas px-3 py-2 font-bold text-ink">ユニーク承認面談数 ÷ 実測セッション数 × 1,000</p>
             <ul className="mt-3 space-y-1 text-[13px] leading-6 text-body">
@@ -62,7 +62,7 @@ export default function MeasurementPage() {
               <li>・少ない件数で勝ちテーマを決めつけない</li>
             </ul>
           </section>
-          <section className="rounded-[var(--radius-card)] bg-white p-5 ring-1 ring-line">
+          <section className="rounded-[var(--radius-card)] bg-surface p-5 ring-1 ring-line">
             <h2 className="text-[16px] font-bold text-ink">セッション単位で持つもの</h2>
             <ul className="mt-2 space-y-1 text-[13px] leading-6 text-body">
               {SESSION_FIELDS.map((f) => (
@@ -78,7 +78,7 @@ export default function MeasurementPage() {
 
       <section className="mt-10">
         <h2 className="text-[18px] font-bold text-ink">イベント辞書</h2>
-        <div className="mt-3 overflow-x-auto rounded-[var(--radius-card)] bg-white ring-1 ring-line">
+        <div className="mt-3 overflow-x-auto rounded-[var(--radius-card)] bg-surface ring-1 ring-line">
           <table className="w-full min-w-[720px] text-left text-[12.5px]">
             <thead className="bg-canvas text-muted">
               <tr>

@@ -54,7 +54,7 @@ export async function TaxonomyHub({ group, slug }: { group: TaxonomyGroup; slug:
     <div className="mx-auto max-w-6xl px-4 pt-2 sm:px-6">
       <header>
         {comparison && (
-          <div className="relative mt-6 flex flex-col gap-4 rounded-xl bg-white p-4 ring-1 ring-line sm:flex-row sm:items-center sm:justify-between">
+          <div className="relative mt-6 flex flex-col gap-4 rounded-xl bg-surface p-4 ring-1 ring-line sm:flex-row sm:items-center sm:justify-between">
             <div className="flex flex-wrap gap-x-6 gap-y-2">
               <div>
                 <p className="text-xs text-muted">人と話す量</p>
@@ -85,7 +85,7 @@ export async function TaxonomyHub({ group, slug }: { group: TaxonomyGroup; slug:
             key={t.slug}
             href={taxonomyPath(group, t.slug)}
             aria-current={t.slug === slug ? "page" : undefined}
-            className={`shrink-0 rounded-full px-3.5 py-1.5 text-[13px] font-medium ring-1 ${t.slug === slug ? "bg-ink text-white ring-ink" : "bg-white text-body ring-line hover:text-brand-strong"}`}
+            className={`shrink-0 rounded-full px-3.5 py-1.5 text-[13px] font-medium ring-1 ${t.slug === slug ? "bg-night text-white ring-night" : "bg-surface text-body ring-line hover:text-brand-strong"}`}
           >
             {t.label}
           </Link>
@@ -95,7 +95,7 @@ export async function TaxonomyHub({ group, slug }: { group: TaxonomyGroup; slug:
       <div className="mt-6 grid gap-10 lg:grid-cols-[minmax(0,1fr)_300px]">
         <div className="min-w-0">
           {articles.length === 0 ? (
-            <p className="rounded-[var(--radius-card)] bg-white p-10 text-center text-sm text-muted ring-1 ring-line">このテーマの記事は準備中です。</p>
+            <p className="rounded-[var(--radius-card)] bg-surface p-10 text-center text-sm text-muted ring-1 ring-line">このテーマの記事は準備中です。</p>
           ) : (
             <>
               <ul className="swipe md-grid reveal" style={{ ["--cols" as string]: 3 }}>
@@ -106,7 +106,7 @@ export async function TaxonomyHub({ group, slug }: { group: TaxonomyGroup; slug:
                 ))}
               </ul>
               {rest.length > 0 && (
-                <div className="mt-8 rounded-[var(--radius-card)] border border-line bg-white px-5">
+                <div className="mt-8 rounded-[var(--radius-card)] border border-line bg-surface px-5">
                   <ArticleList articles={rest} categories={categories} />
                 </div>
               )}
@@ -114,7 +114,7 @@ export async function TaxonomyHub({ group, slug }: { group: TaxonomyGroup; slug:
           )}
         </div>
         <aside className="space-y-6">
-          <Link href="/check" className="tap lift flex items-center gap-3 rounded-[var(--radius-card)] bg-brand p-5 text-white hover:bg-brand-strong">
+          <Link href="/check" className="tap lift flex items-center gap-3 rounded-[var(--radius-card)] bg-brand p-5 text-white hover:bg-brand-press">
             <span className="motif motif-checklist block h-14 w-14 shrink-0 rounded-full bg-white/90" aria-hidden="true" />
             <span>
               <span className="block font-bold">迷ったら、条件整理チェック</span>
@@ -122,7 +122,7 @@ export async function TaxonomyHub({ group, slug }: { group: TaxonomyGroup; slug:
             </span>
           </Link>
           {otherGroups.map((og) => (
-            <section key={og} aria-label={TAXONOMY_GROUPS[og].title} className="rounded-[var(--radius-card)] border border-line bg-white p-5">
+            <section key={og} aria-label={TAXONOMY_GROUPS[og].title} className="rounded-[var(--radius-card)] border border-line bg-surface p-5">
               <p className="text-sm font-bold text-ink">{TAXONOMY_GROUPS[og].title}</p>
               <div className="mt-3">
                 <EntryGrid group={og} variant="chip" />

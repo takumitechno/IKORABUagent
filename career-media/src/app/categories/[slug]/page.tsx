@@ -56,7 +56,7 @@ export default async function CategoryPage({ params }: Props) {
             key={c.slug}
             href={c.slug === "news" ? "/news" : `/categories/${c.slug}`}
             aria-current={c.slug === slug ? "page" : undefined}
-            className={`shrink-0 rounded-full px-3.5 py-1.5 text-[13px] font-medium ring-1 ${c.slug === slug ? "bg-ink text-white ring-ink" : "bg-white text-body ring-line hover:text-brand-strong"}`}
+            className={`shrink-0 rounded-full px-3.5 py-1.5 text-[13px] font-medium ring-1 ${c.slug === slug ? "bg-night text-white ring-night" : "bg-surface text-body ring-line hover:text-brand-strong"}`}
           >
             {c.name}
           </Link>
@@ -64,7 +64,7 @@ export default async function CategoryPage({ params }: Props) {
       </nav>
 
       <div className="mt-6 grid gap-10 lg:grid-cols-[1fr_300px]">
-        <div className="rounded-[var(--radius-card)] border border-line bg-white px-5">
+        <div className="rounded-[var(--radius-card)] border border-line bg-surface px-5">
           {articles.length > 0 ? <ArticleList articles={articles} categories={categories} /> : <p className="py-10 text-center text-sm text-muted">このテーマの記事は準備中です。</p>}
         </div>
         <aside>

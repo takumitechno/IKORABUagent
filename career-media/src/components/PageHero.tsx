@@ -65,7 +65,7 @@ function HeroBadgeIcon({ name }: { name: string }) {
     <div className="enter-pop enter-d2 relative mr-6 h-[200px] w-[200px]" aria-hidden="true">
       <span className="absolute inset-0 rounded-full border border-dashed border-white/25" />
       <span className="absolute inset-5 rounded-full bg-white/[0.06] ring-1 ring-white/15" />
-      <span className="anim-float absolute inset-[46px] flex items-center justify-center rounded-full bg-white shadow-[0_24px_48px_-16px_rgb(0_0_0/0.55)]">
+      <span className="anim-float absolute inset-[46px] flex items-center justify-center rounded-full bg-surface shadow-[0_24px_48px_-16px_rgb(0_0_0/0.55)]">
         <CategoryIcon name={name} className="h-12 w-12 text-brand" />
       </span>
       <span className="anim-float anim-delay-2 absolute right-3 top-6 h-4 w-4 rounded-full bg-highlight" />

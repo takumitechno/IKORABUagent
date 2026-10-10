@@ -55,7 +55,7 @@ export function ConsultPopup({ href, title, label, points }: { href: string; tit
     <aside
       role="dialog"
       aria-label={title}
-      className="popup-in no-print fixed bottom-[84px] left-3 right-3 z-40 overflow-hidden rounded-2xl bg-ink text-white shadow-[0_24px_60px_-18px_rgb(0_0_0/0.6)] ring-1 ring-white/10 sm:left-auto sm:right-5 sm:w-[340px] md:bottom-5"
+      className="popup-in no-print fixed bottom-[84px] left-3 right-3 z-40 overflow-hidden rounded-2xl bg-night text-white shadow-[0_24px_60px_-18px_rgb(0_0_0/0.6)] ring-1 ring-white/10 sm:left-auto sm:right-5 sm:w-[340px] md:bottom-5"
     >
       <span aria-hidden="true" className="drift pointer-events-none absolute -right-16 -top-16 h-44 w-44 rounded-full bg-[radial-gradient(circle,color-mix(in_srgb,var(--color-accent-bright)_45%,transparent),transparent_65%)]" />
       <button type="button" onClick={dismiss} aria-label="閉じる" className="absolute right-2.5 top-2.5 z-10 flex h-8 w-8 items-center justify-center rounded-full text-white/70 hover:bg-white/10 hover:text-white">
@@ -77,7 +77,7 @@ export function ConsultPopup({ href, title, label, points }: { href: string; tit
           ))}
         </ul>
         <div className="mt-3.5 flex items-center gap-2">
-          <a href={href} data-cta-placement="popup" data-cta-kind="consultation-apply" className="btn-shine inline-flex flex-1 items-center justify-center gap-1.5 rounded-full bg-accent px-4 py-2.5 text-[13.5px] font-bold text-white hover:bg-accent-strong">
+          <a href={href} data-cta-placement="popup" data-cta-kind="consultation-apply" className="btn-shine inline-flex flex-1 items-center justify-center gap-1.5 rounded-full bg-accent px-4 py-2.5 text-[13.5px] font-bold text-white hover:bg-accent-press">
             {label}
             <ArrowRight className="h-4 w-4" aria-hidden="true" />
           </a>

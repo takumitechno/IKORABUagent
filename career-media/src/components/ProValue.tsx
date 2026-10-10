@@ -22,7 +22,7 @@ const PRO = ["職場のことを聞いてから会社を選べる", "模擬面�
 
 /** ひとりで進める／プロに相談しながら進める、の比較 */
 export function SoloVsPro({ dark = false }: { dark?: boolean }) {
-  const card = dark ? "bg-white/[0.06] ring-1 ring-white/10" : "bg-white ring-1 ring-line";
+  const card = dark ? "bg-white/[0.06] ring-1 ring-white/10" : "bg-surface ring-1 ring-line";
   return (
     <div className="grid grid-cols-2 gap-2.5 sm:gap-3">
       <div className={`rounded-2xl p-3.5 sm:p-5 ${card}`}>
@@ -65,7 +65,7 @@ export function ServiceHighlights({ dark = false, compact = false, brief = false
         const Icon = ICONS[h.icon];
         const last = !compact && i === partner.serviceHighlights.length - 1 ? "col-span-2 lg:col-span-1" : "";
         return (
-          <li key={h.title} className={`flex gap-3 rounded-2xl p-3.5 sm:p-4 ${compact ? "" : brief ? "items-center lg:flex-col lg:items-start" : "flex-col"} ${dark ? "bg-white/[0.06] ring-1 ring-white/10" : "bg-white ring-1 ring-line"} ${last}`}>
+          <li key={h.title} className={`flex gap-3 rounded-2xl p-3.5 sm:p-4 ${compact ? "" : brief ? "items-center lg:flex-col lg:items-start" : "flex-col"} ${dark ? "bg-white/[0.06] ring-1 ring-white/10" : "bg-surface ring-1 ring-line"} ${last}`}>
             <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-accent text-white">
               <Icon className="h-5 w-5" aria-hidden="true" />
             </span>
@@ -90,7 +90,7 @@ const READS = [
 export function ProValueSection({ placement = "home-consult", has = () => false }: { placement?: CtaPlacement; has?: (slug: string) => boolean }) {
   const reads = READS.filter((r) => has(r.slug));
   return (
-    <div className="overflow-hidden rounded-[24px] bg-ink text-white">
+    <div className="overflow-hidden rounded-[24px] bg-night text-white">
       <div className="p-5 sm:p-8 lg:p-10">
         <div className="grid gap-6 lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] lg:items-center">
           <div>
@@ -126,7 +126,7 @@ export function ProValueSection({ placement = "home-consult", has = () => false 
             <ul className="anim-list mt-3 grid gap-2.5 md:grid-cols-3">
               {reads.map((r) => (
                 <li key={r.slug}>
-                  <Link href={`/articles/${r.slug}`} className="flex h-full items-center gap-3 rounded-xl bg-white p-3.5 text-[13.5px] font-bold leading-6 text-ink hover:bg-pro-tint">
+                  <Link href={`/articles/${r.slug}`} className="flex h-full items-center gap-3 rounded-xl bg-surface p-3.5 text-[13.5px] font-bold leading-6 text-ink hover:bg-pro-tint">
                     <span className="min-w-0 flex-1">{r.title}</span>
                     <ArrowRight className="h-4 w-4 shrink-0 text-accent-strong" aria-hidden="true" />
                   </Link>

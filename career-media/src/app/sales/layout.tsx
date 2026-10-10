@@ -19,7 +19,7 @@ export default function SalesLayout({ children }: { children: React.ReactNode })
   if (!salesDemoEnabled) notFound();
   return (
     <div className="mx-auto max-w-6xl px-4 pt-6 sm:px-6">
-      <div className="no-print flex flex-wrap items-center justify-between gap-3 rounded-2xl bg-ink px-4 py-3 text-white">
+      <div className="no-print flex flex-wrap items-center justify-between gap-3 rounded-2xl bg-night px-4 py-3 text-white">
         <p className="flex items-center gap-2 text-[12.5px] font-bold">
           <Lock className="h-4 w-4 text-accent-bright" aria-hidden="true" />
           {salesAddressee}向け 商談用資料（非公開・ローカル表示のみ）
@@ -32,7 +32,7 @@ export default function SalesLayout({ children }: { children: React.ReactNode })
       </div>
       <nav aria-label="商談用ページ" className="no-print mt-3 flex gap-2 overflow-x-auto pb-1">
         {NAV.map((n) => (
-          <Link key={n.href} href={n.href} className="shrink-0 rounded-full bg-white px-3.5 py-1.5 text-[13px] font-bold text-ink ring-1 ring-line hover:text-brand-strong">
+          <Link key={n.href} href={n.href} className="shrink-0 rounded-full bg-surface px-3.5 py-1.5 text-[13px] font-bold text-ink ring-1 ring-line hover:text-brand-strong">
             {n.label}
           </Link>
         ))}

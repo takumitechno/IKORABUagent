@@ -22,7 +22,7 @@ const INFO_LINKS = [
 
 export function Footer() {
   return (
-    <footer className="mt-20 border-t border-line bg-white">
+    <footer className="mt-20 border-t border-line bg-surface">
       <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6">
         <div className="grid gap-8 md:grid-cols-[1fr_1.4fr]">
           <div>

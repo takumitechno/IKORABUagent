@@ -235,6 +235,23 @@
     }
   });
 
+  // ---------------------------------------------------------------- ライト／ダーク
+  // 最初は OS の設定に合わせる。ヘッダーのボタンで html[data-theme] を上書きし、保存できれば覚える
+  try {
+    var savedTheme = localStorage.getItem("theme");
+    if (savedTheme === "dark" || savedTheme === "light") document.documentElement.setAttribute("data-theme", savedTheme);
+  } catch (err) {}
+  document.addEventListener("click", function (e) {
+    if (!(e.target.closest && e.target.closest("[data-theme-toggle]"))) return;
+    var root = document.documentElement;
+    var current = root.getAttribute("data-theme") || (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+    var next = current === "dark" ? "light" : "dark";
+    root.setAttribute("data-theme", next);
+    try {
+      localStorage.setItem("theme", next);
+    } catch (err) {}
+  });
+
   // ---------------------------------------------------------------- スマホメニュー
   var menu = document.getElementById("mobile-menu");
   var menuButton = document.querySelector('[aria-controls="mobile-menu"]');

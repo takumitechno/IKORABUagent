@@ -10,7 +10,7 @@ const MESSAGES: { from: "advisor" | "me"; text: string }[] = [
 
 export function ChatMock({ className = "" }: { className?: string }) {
   return (
-    <div className={`mx-auto w-full max-w-[300px] rounded-[30px] bg-white p-3 shadow-[0_24px_60px_-24px_rgb(0_0_0/0.55)] ${className}`} aria-hidden="true">
+    <div className={`mx-auto w-full max-w-[300px] rounded-[30px] bg-surface p-3 shadow-[0_24px_60px_-24px_rgb(0_0_0/0.55)] ${className}`} aria-hidden="true">
       <div className="rounded-[22px] bg-canvas px-3 pb-4 pt-3">
         <div className="mx-auto mb-3 h-1.5 w-14 rounded-full bg-line-strong" />
         <div className="flex items-center gap-2 border-b border-line pb-2.5">
@@ -21,14 +21,14 @@ export function ChatMock({ className = "" }: { className?: string }) {
           {MESSAGES.map((m, i) => (
             <li key={i} className={`reveal-pop flex ${m.from === "me" ? "justify-end" : "justify-start"}`} style={{ animationRange: `entry ${10 + i * 18}% entry ${55 + i * 18}%` }}>
               <span
-                className={`max-w-[85%] rounded-2xl px-3 py-2 text-[12.5px] leading-5 ${m.from === "me" ? "rounded-br-md bg-brand text-white" : "rounded-bl-md bg-white text-ink ring-1 ring-line"}`}
+                className={`max-w-[85%] rounded-2xl px-3 py-2 text-[12.5px] leading-5 ${m.from === "me" ? "rounded-br-md bg-brand text-white" : "rounded-bl-md bg-surface text-ink ring-1 ring-line"}`}
               >
                 {m.text}
               </span>
             </li>
           ))}
           <li className="flex justify-start">
-            <span className="flex gap-1 rounded-2xl rounded-bl-md bg-white px-3 py-2.5 ring-1 ring-line">
+            <span className="flex gap-1 rounded-2xl rounded-bl-md bg-surface px-3 py-2.5 ring-1 ring-line">
               <span className="typing-dot h-1.5 w-1.5 rounded-full bg-muted" />
               <span className="typing-dot h-1.5 w-1.5 rounded-full bg-muted" />
               <span className="typing-dot h-1.5 w-1.5 rounded-full bg-muted" />

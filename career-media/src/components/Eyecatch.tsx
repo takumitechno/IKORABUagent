@@ -9,16 +9,16 @@ import { CategoryIcon } from "./CategoryIcon";
  */
 type Size = "banner" | "lg" | "md" | "sm";
 
-/** カテゴリごとの面の色（白い文字が読めるコントラストにしている） */
+/** カテゴリごとの面の色。ブランドの色（ブランド・アクセント・補助の青・ヒーローの濃色）から選び、サイト全体の色をそろえる（白い文字が読めるコントラスト） */
 export const CATEGORY_COLOR: Record<string, string> = {
   mikeiken: "var(--color-brand)",
-  shokushu: "#1f5f99",
-  keiken: "#b85a12",
-  "shorui-mensetsu": "#a8432a",
-  hatarakikata: "#3f6f1f",
-  junbi: "#3a5068",
-  seido: "#3c4f8f",
-  news: "#142b3e",
+  shokushu: "var(--color-sub)",
+  keiken: "var(--color-accent)",
+  "shorui-mensetsu": "var(--color-accent-press)",
+  hatarakikata: "var(--color-brand-press)",
+  junbi: "color-mix(in srgb, var(--color-sub) 60%, var(--color-brand))",
+  seido: "var(--color-slate)",
+  news: "var(--color-night)",
 };
 export const categoryColor = (slug?: string) => CATEGORY_COLOR[slug ?? ""] ?? "var(--color-brand)";
 

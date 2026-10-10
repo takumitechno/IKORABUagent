@@ -16,7 +16,7 @@ export function JobMap({ roles, hrefFor, className = "" }: { roles: JobRole[]; h
   const TONES = ["bg-sky", "bg-mint", "bg-lime", "bg-sand"];
   return (
     <figure className={className}>
-      <div className="relative aspect-square w-full overflow-hidden rounded-[20px] bg-white ring-1 ring-line">
+      <div className="relative aspect-square w-full overflow-hidden rounded-[20px] bg-surface ring-1 ring-line">
         {/* 4つの領域の色分けと目盛り */}
         <div
           aria-hidden="true"
@@ -53,10 +53,10 @@ export function JobMap({ roles, hrefFor, className = "" }: { roles: JobRole[]; h
             return (
               <li key={r.slug} className={`absolute -translate-y-1/2 ${labelLeft ? "-translate-x-[calc(100%-26px)] sm:-translate-x-[calc(100%-32px)]" : "-translate-x-1/2"}`} style={{ left: `${x}%`, top: `${y}%` }}>
                 <Link href={hrefFor(r)} className={`reveal-pop tap group flex items-center ${labelLeft ? "flex-row-reverse gap-1.5" : "flex-col gap-1"}`} style={{ animationRange: `entry ${15 + i * 12}% entry ${60 + i * 12}%` }}>
-                  <span className={`anim-float relative block aspect-square w-[52px] rounded-full ring-4 ring-white shadow-[var(--shadow-raised)] sm:w-[64px] ${TONES[i % 4]} anim-delay-${(i % 3) + 1}`}>
+                  <span className={`anim-float relative block aspect-square w-[52px] rounded-full ring-4 ring-surface shadow-[var(--shadow-raised)] sm:w-[64px] ${TONES[i % 4]} anim-delay-${(i % 3) + 1}`}>
                     <Motif name={JOB_ROLE_SCENE[r.slug] ?? "briefcase"} className="absolute inset-[6%]" />
                   </span>
-                  <span className="whitespace-nowrap rounded-full bg-ink px-2 py-0.5 text-[11px] font-bold text-white group-hover:bg-brand-strong sm:text-[12px]">{r.shortName}</span>
+                  <span className="whitespace-nowrap rounded-full bg-night px-2 py-0.5 text-[11px] font-bold text-white group-hover:bg-brand-press sm:text-[12px]">{r.shortName}</span>
                 </Link>
               </li>
             );

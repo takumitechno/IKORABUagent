@@ -14,9 +14,9 @@ export function JourneyGuide({ journey, articles }: { journey: Journey; articles
   const consult = steps.find((s) => s.kind === "consult");
   const readSteps = steps.filter((s) => s.kind !== "consult");
   return (
-    <section id={JOURNEY_ANCHOR} aria-labelledby="journey-title" className="mt-6 scroll-mt-24 overflow-hidden rounded-[22px] bg-white ring-1 ring-line">
+    <section id={JOURNEY_ANCHOR} aria-labelledby="journey-title" className="mt-6 scroll-mt-24 overflow-hidden rounded-[22px] bg-surface ring-1 ring-line">
       <div className={`flex items-start gap-4 p-5 sm:p-7 ${journey.tone}`}>
-        <span className="relative block aspect-square w-16 shrink-0 rounded-full bg-white sm:w-20">
+        <span className="relative block aspect-square w-16 shrink-0 rounded-full bg-surface sm:w-20">
           <Motif name={journey.scene} className="absolute inset-[6%]" />
         </span>
         <div className="min-w-0">
@@ -40,11 +40,11 @@ export function JourneyGuide({ journey, articles }: { journey: Journey; articles
             const kind = step.kind === "check" ? "check" : step.kind === "jobs" ? "jobs" : "article";
             return (
               <li key={href} className="relative grid grid-cols-[48px_minmax(0,1fr)] items-start gap-3">
-                <span className={`relative z-[1] block aspect-square w-12 rounded-full ring-4 ring-white ${step.kind === "check" ? "bg-brand-tint" : "bg-mint"}`}>
+                <span className={`relative z-[1] block aspect-square w-12 rounded-full ring-4 ring-surface ${step.kind === "check" ? "bg-brand-tint" : "bg-mint"}`}>
                   <Motif name={step.scene} className="absolute inset-[8%]" />
-                  <span className="absolute -left-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-ink text-[10.5px] font-bold text-white ring-2 ring-white">{i + 1}</span>
+                  <span className="absolute -left-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-night text-[10.5px] font-bold text-white ring-2 ring-surface">{i + 1}</span>
                 </span>
-                <div className="min-w-0 rounded-xl border border-line bg-white p-3.5 sm:p-4">
+                <div className="min-w-0 rounded-xl border border-line bg-surface p-3.5 sm:p-4">
                   <Link
                     href={href}
                     data-cta-kind={kind === "check" ? "check" : "journey-step"}
@@ -85,7 +85,7 @@ export function JourneyGuide({ journey, articles }: { journey: Journey; articles
             <p className="mt-1.5 text-[13.5px] leading-6 text-body">{consult.why}</p>
             <ul className="mt-4 space-y-2">
               {journey.questions.map((q) => (
-                <li key={q} className="rounded-lg border-l-4 border-brand bg-white px-4 py-2.5 text-[14px] leading-6">
+                <li key={q} className="rounded-lg border-l-4 border-brand bg-surface px-4 py-2.5 text-[14px] leading-6">
                   「{q}」
                 </li>
               ))}
@@ -96,7 +96,7 @@ export function JourneyGuide({ journey, articles }: { journey: Journey; articles
                 data-cta-placement="journey"
                 data-cta-kind="consultation-info"
                 data-pattern-id={journey.patternId}
-                className="inline-flex items-center justify-center gap-1.5 rounded-full border border-accent/50 bg-white px-5 py-3 text-sm font-bold text-accent-strong hover:border-accent"
+                className="inline-flex items-center justify-center gap-1.5 rounded-full border border-accent/50 bg-surface px-5 py-3 text-sm font-bold text-accent-strong hover:border-accent"
               >
                 <MessageCircle className="h-4 w-4" aria-hidden="true" />
                 相談でできることを見る
@@ -134,7 +134,7 @@ export function JourneyNav({ journey, index, articles }: { journey: Journey; ind
       </Link>
       <div className="mt-3 grid gap-2 sm:grid-cols-2">
         {prev ? (
-          <Link href={stepHref(prev, journey)} data-cta-placement="journey" data-cta-kind="journey-step" data-pattern-id={journey.patternId} className="flex items-start gap-2 rounded-xl bg-white p-3 text-[13.5px] leading-6 text-ink ring-1 ring-line hover:ring-brand/40">
+          <Link href={stepHref(prev, journey)} data-cta-placement="journey" data-cta-kind="journey-step" data-pattern-id={journey.patternId} className="flex items-start gap-2 rounded-xl bg-surface p-3 text-[13.5px] leading-6 text-ink ring-1 ring-line hover:ring-brand/40">
             <ArrowLeft className="mt-1 h-4 w-4 shrink-0 text-muted" aria-hidden="true" />
             <span>
               <span className="block text-[11px] text-muted">前のステップ</span>
@@ -145,7 +145,7 @@ export function JourneyNav({ journey, index, articles }: { journey: Journey; ind
           <span className="hidden sm:block" />
         )}
         {next && (
-          <Link href={stepHref(next, journey)} data-cta-placement="journey" data-cta-kind={next.kind === "check" ? "check" : "journey-step"} data-pattern-id={journey.patternId} className="flex items-start justify-end gap-2 rounded-xl bg-white p-3 text-right text-[13.5px] font-bold leading-6 text-ink ring-1 ring-brand/30 hover:ring-brand">
+          <Link href={stepHref(next, journey)} data-cta-placement="journey" data-cta-kind={next.kind === "check" ? "check" : "journey-step"} data-pattern-id={journey.patternId} className="flex items-start justify-end gap-2 rounded-xl bg-surface p-3 text-right text-[13.5px] font-bold leading-6 text-ink ring-1 ring-brand/30 hover:ring-brand">
             <span>
               <span className="block text-[11px] font-normal text-muted">次のステップ</span>
               {label(next)}
@@ -158,7 +158,7 @@ export function JourneyNav({ journey, index, articles }: { journey: Journey; ind
   );
 }
 
-const CASE_COLORS = ["var(--color-brand-strong)", "#1f5f99", "#b85a12"];
+const CASE_COLORS = ["var(--color-brand-press)", "var(--color-sub)", "var(--color-accent)"];
 
 /** トップに出す3つのガイドの入口（写真の代わりに、色の帯と最初のステップを見せる） */
 export function JourneyCards() {
@@ -171,7 +171,7 @@ export function JourneyCards() {
             data-cta-placement="home-journeys"
             data-cta-kind="journey-start"
             data-pattern-id={j.patternId}
-            className="tap lift group flex h-full flex-col overflow-hidden rounded-2xl border border-line bg-white hover:border-brand/40"
+            className="tap lift group flex h-full flex-col overflow-hidden rounded-2xl border border-line bg-surface hover:border-brand/40"
           >
             <span className="relative block overflow-hidden px-4 pb-4 pt-4 text-white" style={{ background: CASE_COLORS[i % CASE_COLORS.length] }}>
               <span aria-hidden="true" className="absolute -right-10 -top-12 h-36 w-36 rounded-full bg-white/[0.08]" />

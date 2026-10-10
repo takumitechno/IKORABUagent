@@ -36,7 +36,7 @@ export function BackButton({ fallback, dark = false }: { fallback: string; dark?
         }
       }}
       className={`no-print inline-flex shrink-0 items-center gap-1 rounded-full px-3 py-1.5 text-[12.5px] font-bold ${
-        dark ? "bg-white/10 text-white ring-1 ring-white/20 hover:bg-white/20" : "border border-line bg-white text-ink hover:border-brand/40 hover:text-brand-strong"
+        dark ? "bg-white/10 text-white ring-1 ring-white/20 hover:bg-white/20" : "border border-line bg-surface text-ink hover:border-brand/40 hover:text-brand-strong"
       }`}
     >
       <ArrowLeft className="h-3.5 w-3.5" aria-hidden="true" />

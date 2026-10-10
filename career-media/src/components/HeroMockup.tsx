@@ -16,11 +16,11 @@ function Phone({ peek = false }: { peek?: boolean }) {
   const name = partner.brandName;
   return (
     <div className={`relative mx-auto w-[260px] rounded-[44px] bg-[#0d1626] p-[9px] shadow-[0_40px_80px_-30px_rgb(0_0_0/0.65),inset_0_0_0_1.5px_rgb(255_255_255/0.08)] sm:w-[284px] ${peek ? "" : "rotate-[-3deg]"}`}>
-      <div className="relative overflow-hidden rounded-[36px] bg-[#f6f7fb]">
+      <div className="relative overflow-hidden rounded-[36px] bg-canvas">
         {/* ノッチ */}
         <span aria-hidden="true" className="absolute left-1/2 top-2 z-10 h-[22px] w-[92px] -translate-x-1/2 rounded-full bg-[#0d1626]" />
         {/* ヘッダー */}
-        <div className="bg-white px-4 pb-3 pt-10 shadow-[0_1px_0_rgb(20_43_62/0.06)]">
+        <div className="bg-surface px-4 pb-3 pt-10 shadow-[0_1px_0_rgb(20_43_62/0.06)]">
           <div className="flex items-center gap-2.5">
             <ChevronLeft className="h-4 w-4 text-muted" aria-hidden="true" />
             <span className="flex h-9 w-9 items-center justify-center rounded-full bg-brand text-white">
@@ -42,7 +42,7 @@ function Phone({ peek = false }: { peek?: boolean }) {
             <div key={i} className={`chat-pop flex ${m.from === "me" ? "justify-end" : "justify-start"}`} style={{ animationDelay: `${0.5 + i * 0.45}s` }}>
               <p
                 className={`max-w-[82%] rounded-2xl px-3 py-2 text-[11.5px] leading-[1.55] ${
-                  m.from === "me" ? "rounded-br-md bg-brand text-white" : "rounded-bl-md bg-white text-ink shadow-[0_1px_2px_rgb(20_43_62/0.08)]"
+                  m.from === "me" ? "rounded-br-md bg-brand text-white" : "rounded-bl-md bg-surface text-ink shadow-[0_1px_2px_rgb(20_43_62/0.08)]"
                 }`}
               >
                 {m.text}
@@ -51,7 +51,7 @@ function Phone({ peek = false }: { peek?: boolean }) {
           ))}
           {peek && (
             <div className="chat-pop flex justify-start" style={{ animationDelay: "2.4s" }}>
-              <span className="inline-flex gap-1 rounded-2xl rounded-bl-md bg-white px-3 py-2.5 shadow-[0_1px_2px_rgb(20_43_62/0.08)]">
+              <span className="inline-flex gap-1 rounded-2xl rounded-bl-md bg-surface px-3 py-2.5 shadow-[0_1px_2px_rgb(20_43_62/0.08)]">
                 {[0, 1, 2].map((d) => (
                   <span key={d} className="typing-dot h-1.5 w-1.5 rounded-full bg-muted" />
                 ))}
@@ -60,7 +60,7 @@ function Phone({ peek = false }: { peek?: boolean }) {
           )}
           {!peek && (
             <div className="chat-pop flex justify-start" style={{ animationDelay: "2.4s" }}>
-              <div className="w-[82%] rounded-2xl rounded-bl-md bg-white p-2.5 shadow-[0_1px_2px_rgb(20_43_62/0.08)]">
+              <div className="w-[82%] rounded-2xl rounded-bl-md bg-surface p-2.5 shadow-[0_1px_2px_rgb(20_43_62/0.08)]">
                 <p className="flex items-center gap-1.5 text-[10.5px] font-bold text-ink">
                   <CalendarCheck className="h-3.5 w-3.5 text-accent" aria-hidden="true" />
                   面接の練習を予約
@@ -78,7 +78,7 @@ function Phone({ peek = false }: { peek?: boolean }) {
         </div>
         {/* 入力欄 */}
         {!peek && (
-          <div className="flex items-center gap-2 border-t border-line bg-white px-3 py-2.5">
+          <div className="flex items-center gap-2 border-t border-line bg-surface px-3 py-2.5">
             <Mic className="h-4 w-4 text-muted" aria-hidden="true" />
             <span className="flex-1 rounded-full bg-canvas px-3 py-1.5 text-[10.5px] text-muted">メッセージを入力</span>
             <span className="flex h-7 w-7 items-center justify-center rounded-full bg-brand text-white">
@@ -104,7 +104,7 @@ export function HeroMockup() {
       </div>
 
       {/* 面接の練習 */}
-      <div className="anim-float absolute left-0 top-[70px] w-[200px] rounded-2xl bg-white/95 p-3.5 text-ink shadow-[0_24px_48px_-20px_rgb(0_0_0/0.55)] ring-1 ring-white/60 backdrop-blur">
+      <div className="anim-float absolute left-0 top-[70px] w-[200px] rounded-2xl bg-surface/95 p-3.5 text-ink shadow-[0_24px_48px_-20px_rgb(0_0_0/0.55)] ring-1 ring-white/30 backdrop-blur">
         <p className="flex items-center gap-2 text-[12.5px] font-bold">
           <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-accent text-white">
             <Mic className="h-4 w-4" />
@@ -124,7 +124,7 @@ export function HeroMockup() {
       </div>
 
       {/* 企業選びの相談 */}
-      <div className="anim-float anim-delay-2 absolute left-2 top-[290px] w-[206px] rounded-2xl bg-white/95 p-3.5 text-ink shadow-[0_24px_48px_-20px_rgb(0_0_0/0.55)] ring-1 ring-white/60 backdrop-blur">
+      <div className="anim-float anim-delay-2 absolute left-2 top-[290px] w-[206px] rounded-2xl bg-surface/95 p-3.5 text-ink shadow-[0_24px_48px_-20px_rgb(0_0_0/0.55)] ring-1 ring-white/30 backdrop-blur">
         <p className="flex items-center gap-2 text-[12.5px] font-bold">
           <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-brand text-white">
             <Sparkles className="h-4 w-4" />

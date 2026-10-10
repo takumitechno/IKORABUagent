@@ -67,7 +67,7 @@ export function TocList({ headings }: { headings: Heading[] }) {
 export function MobileToc({ headings }: { headings: Heading[] }) {
   if (headings.length < 2) return null;
   return (
-    <details className="group mt-6 rounded-xl border border-line bg-white lg:hidden">
+    <details className="group mt-6 rounded-xl border border-line bg-surface lg:hidden">
       <summary className="flex cursor-pointer list-none items-center justify-between px-4 py-3 text-[14px] font-bold text-ink">
         <span className="flex items-center gap-2">
           <ListOrdered className="h-4 w-4 text-brand" aria-hidden="true" />

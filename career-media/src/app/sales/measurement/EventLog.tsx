@@ -22,7 +22,7 @@ export function EventLog() {
     setEvents([]);
   };
   return (
-    <div className="rounded-[var(--radius-card)] bg-white p-4 ring-1 ring-line sm:p-5">
+    <div className="rounded-[var(--radius-card)] bg-surface p-4 ring-1 ring-line sm:p-5">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <p className="text-[14px] font-bold text-ink">このタブで記録されたイベント（{events.length}件・送信なし）</p>
         <button type="button" onClick={clear} className="rounded-full border border-line-strong px-3 py-1 text-[12px] font-bold text-muted hover:text-ink">

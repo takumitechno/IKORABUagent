@@ -11,6 +11,7 @@ import { PreviewBanner } from "@/components/PreviewBanner";
 import { SalesMenuButton } from "@/components/sales/SalesMenuButton";
 import { consultationMode, partner } from "@/config/partner";
 import { site } from "@/config/site";
+import { THEME_INIT_SCRIPT } from "@/lib/theme";
 import "./globals.css";
 
 // ビルド時にフォントを取得して自己ホストする（閲覧時に Google へリクエストしない）
@@ -31,16 +32,22 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: partner.theme === "makecareer" ? "#1e4fb8" : "#0f7b6c",
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: partner.theme === "makecareer" ? "#1e4fb8" : "#0f7b6c" },
+    { media: "(prefers-color-scheme: dark)", color: partner.theme === "makecareer" ? "#0b1222" : "#0d1620" },
+  ],
   width: "device-width",
   initialScale: 1,
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="ja" data-brand={partner.theme} className={notoSansJp.variable}>
+    <html lang="ja" data-brand={partner.theme} className={notoSansJp.variable} suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
+      </head>
       <body className="min-h-screen antialiased">
-        <a href="#main" className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded focus:bg-white focus:px-4 focus:py-2">
+        <a href="#main" className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded focus:bg-surface focus:px-4 focus:py-2">
           本文へスキップ
         </a>
         <PreviewBanner />

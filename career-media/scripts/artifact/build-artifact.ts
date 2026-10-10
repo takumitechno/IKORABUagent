@@ -94,7 +94,7 @@ async function main() {
 
   const header = stripScripts(pick(home.html, /(<header class="sticky[\s\S]*?<\/header>)/, "header"));
   const footer = stripScripts(pick(home.html, /(<footer[\s\S]*?<\/footer>)/, "footer"));
-  const banner = pick(home.html, /(<div class="no-print bg-ink[\s\S]*?<\/div>)/, "preview banner");
+  const banner = pick(home.html, /(<div class="no-print bg-night[\s\S]*?<\/div>)/, "preview banner");
 
   // 記事一覧の行（検索結果の表示に使う）
   const listHtml = (await get(base, "/articles")).html;
@@ -155,7 +155,7 @@ async function main() {
 
   const mobileMenu = `<div id="mobile-menu" class="artifact-menu" hidden><nav aria-label="モバイルメニュー"><ul>${NAV_ITEMS.map(
     (i) => `<li><a href="${i.href}">${i.label}<span aria-hidden="true">→</span></a></li>`,
-  ).join("")}</ul><a class="artifact-menu-cta" href="/check">条件を整理する</a><a class="artifact-menu-cta artifact-menu-cta-sub" href="/consultation">キャリア相談について</a></nav></div>`;
+  ).join("")}</ul><a class="artifact-menu-cta" href="/check">条件を整理する</a><a class="artifact-menu-cta artifact-menu-cta-sub" href="/consultation">キャリア相談について</a><button type="button" class="artifact-menu-theme" data-theme-toggle>表示の明るさ（ライト／ダーク）</button></nav></div>`;
 
   const dialog = `<div id="consult-dialog" class="artifact-dialog" role="dialog" aria-modal="true" aria-labelledby="consult-dialog-title" hidden>
   <div class="artifact-dialog-card">
@@ -168,7 +168,7 @@ async function main() {
 </div>`;
 
   const artifactCss = `
-:root{--font-noto-sans-jp:"Noto Sans JP";color-scheme:light}
+:root{--font-noto-sans-jp:"Noto Sans JP"}
 body{font-size:16px;background:var(--color-canvas);color:var(--color-body)}
 header.sticky{top:env(safe-area-inset-top,0px)}
 html.menu-open body{overflow:hidden}
@@ -178,7 +178,8 @@ html.menu-open body{overflow:hidden}
 .artifact-menu li a{display:flex;justify-content:space-between;padding:16px 0;font-weight:500;color:var(--color-ink);text-decoration:none}
 .artifact-menu li a span{color:var(--color-brand)}
 .artifact-menu-cta{display:block;margin-top:24px;padding:14px 20px;border-radius:999px;background:var(--color-brand);color:#fff;font-weight:700;text-align:center;text-decoration:none}
-.artifact-menu-cta-sub{margin-top:12px;background:#fff;color:var(--color-accent-strong);border:1px solid var(--color-accent)}
+.artifact-menu-cta-sub{margin-top:12px;background:var(--color-surface);color:var(--color-accent-strong);border:1px solid var(--color-accent)}
+.artifact-menu-theme{display:block;width:100%;margin-top:12px;padding:12px 20px;border-radius:999px;background:transparent;color:var(--color-ink);border:1px solid var(--color-line-strong);font:inherit;font-weight:700;cursor:pointer}
 .artifact-dialog{position:fixed;inset:0;z-index:60;display:flex;align-items:center;justify-content:center;padding:16px;background:rgb(20 43 62 / .55)}
 .artifact-dialog-card{max-width:440px;width:100%;border-radius:18px;background:var(--color-surface);color:var(--color-body);padding:24px;box-shadow:0 20px 50px -20px rgb(20 43 62 / .5);font-size:14.5px;line-height:1.85}
 .artifact-dialog-card h2{margin:4px 0 8px;font-size:18px;line-height:1.5;color:var(--color-ink)}
@@ -188,7 +189,7 @@ html.menu-open body{overflow:hidden}
 .artifact-dialog-actions{display:flex;flex-wrap:wrap;gap:10px;justify-content:flex-end;margin-top:20px}
 .artifact-dialog-actions a,.artifact-dialog-actions button{border-radius:999px;padding:10px 18px;font-weight:700;font-size:14px;cursor:pointer;text-decoration:none}
 .artifact-dialog-actions a{border:1px solid var(--color-line-strong);color:var(--color-ink);background:var(--color-surface)}
-.artifact-dialog-actions button{border:0;background:var(--color-ink);color:#fff}
+.artifact-dialog-actions button{border:0;background:var(--color-night);color:#fff}
 @media (prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
 `;
 

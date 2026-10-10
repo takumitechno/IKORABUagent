@@ -22,14 +22,14 @@ function OptionButton({ question, optionId, label, selected, onToggle }: { quest
   return (
     <label
       className={`tap flex min-h-[52px] cursor-pointer items-center gap-3 rounded-xl border px-4 py-3 text-[14.5px] leading-6 transition ${
-        selected ? "border-brand bg-brand-tint font-bold text-ink ring-1 ring-brand" : "border-line bg-white text-body hover:border-brand/40"
+        selected ? "border-brand bg-brand-tint font-bold text-ink ring-1 ring-brand" : "border-line bg-surface text-body hover:border-brand/40"
       }`}
     >
       <input type={inputType} name={question.id} value={optionId} checked={selected} onChange={onToggle} className="sr-only" />
       <span
         aria-hidden="true"
         className={`flex h-5 w-5 shrink-0 items-center justify-center border ${inputType === "radio" ? "rounded-full" : "rounded-md"} ${
-          selected ? "border-brand bg-brand text-white" : "border-line-strong bg-white"
+          selected ? "border-brand bg-brand text-white" : "border-line-strong bg-surface"
         }`}
       >
         {selected && <Check className="enter-pop h-3.5 w-3.5" strokeWidth={3} />}
@@ -144,7 +144,7 @@ export function ConditionCheck({ consultationHref, consultationLabel, allowPrint
   return (
     <div ref={topRef} className="scroll-mt-24">
       {!storageOk && (
-        <p role="status" className="no-print mb-4 rounded-xl border border-line bg-white px-4 py-3 text-[13px] leading-6 text-body">
+        <p role="status" className="no-print mb-4 rounded-xl border border-line bg-surface px-4 py-3 text-[13px] leading-6 text-body">
           このブラウザの設定では回答を一時保存できないため、ページを閉じたり再読み込みしたりすると回答が消えます。チェック自体はそのまま使えます。
         </p>
       )}
@@ -165,12 +165,12 @@ export function ConditionCheck({ consultationHref, consultationLabel, allowPrint
                   <li key={title} aria-current={current ? "step" : undefined} className="flex flex-col items-center text-center">
                     <span
                       className={`relative block aspect-square w-11 rounded-full ring-[3px] transition sm:w-[52px] ${
-                        current ? "enter-pop bg-mint ring-brand" : done ? "bg-mint ring-brand/40" : "bg-white ring-line grayscale opacity-60"
+                        current ? "enter-pop bg-mint ring-brand" : done ? "bg-mint ring-brand/40" : "bg-surface ring-line grayscale opacity-60"
                       }`}
                     >
                       {motif(STEP_SCENES[i] ?? "checklist", "absolute inset-[6%]")}
                       {done && (
-                        <span className="absolute -right-1 -top-1 flex h-[18px] w-[18px] items-center justify-center rounded-full bg-brand text-white ring-2 ring-white">
+                        <span className="absolute -right-1 -top-1 flex h-[18px] w-[18px] items-center justify-center rounded-full bg-brand text-white ring-2 ring-surface">
                           <Check className="h-3 w-3" strokeWidth={3.2} aria-hidden="true" />
                         </span>
                       )}
@@ -204,7 +204,7 @@ export function ConditionCheck({ consultationHref, consultationLabel, allowPrint
               const selected = answers[q.id] ?? [];
               const missing = triedNext && selected.length === 0;
               return (
-                <fieldset key={q.id} className="enter rounded-[var(--radius-card)] border border-line bg-white p-5 sm:p-6" style={{ animationDelay: `${0.08 + qi * 0.1}s` }} aria-describedby={missing ? `${q.id}-error` : undefined}>
+                <fieldset key={q.id} className="enter rounded-[var(--radius-card)] border border-line bg-surface p-5 sm:p-6" style={{ animationDelay: `${0.08 + qi * 0.1}s` }} aria-describedby={missing ? `${q.id}-error` : undefined}>
                   <legend className="sr-only">{q.title}</legend>
                   <p className="text-[16px] font-bold leading-7 text-ink" aria-hidden="true">
                     {q.title}
@@ -237,7 +237,7 @@ export function ConditionCheck({ consultationHref, consultationLabel, allowPrint
             <button
               type="button"
               onClick={next}
-              className={`inline-flex items-center gap-2 rounded-full px-7 py-3.5 text-[15px] font-bold text-white transition ${stepComplete ? "bg-brand hover:bg-brand-strong" : "bg-brand/50"}`}
+              className={`inline-flex items-center gap-2 rounded-full px-7 py-3.5 text-[15px] font-bold text-white transition ${stepComplete ? "bg-brand hover:bg-brand-press" : "bg-brand/50"}`}
             >
               {stepIndex === STEPS.length - 1 ? "結果を見る" : "次へ進む"}
               <ArrowRight className="h-4 w-4" aria-hidden="true" />
@@ -266,7 +266,7 @@ const RESULT_SCENES: MotifName[] = ["calendar", "star", "scale", "checklist", "c
 
 function ResultSection({ title, children, number, note }: { title: string; number: number; note?: string; children: React.ReactNode }) {
   return (
-    <section className="reveal break-inside-avoid rounded-[var(--radius-card)] border border-line bg-white p-5 sm:p-6">
+    <section className="reveal break-inside-avoid rounded-[var(--radius-card)] border border-line bg-surface p-5 sm:p-6">
       <h3 className="flex items-center gap-3 text-[17px] font-bold text-ink">
         <span className="relative block aspect-square w-11 shrink-0 rounded-full bg-mint">{motif(RESULT_SCENES[number - 1] ?? "checklist", "absolute inset-[6%]")}</span>
         <span>
@@ -306,7 +306,7 @@ function Result({
   const button = "inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-[13px] font-bold ring-1";
   return (
     <div className="mt-8" aria-live="polite">
-      <div className="enter relative overflow-hidden rounded-[20px] bg-ink p-6 text-white sm:p-8">
+      <div className="enter relative overflow-hidden rounded-[20px] bg-night p-6 text-white sm:p-8">
         <span aria-hidden="true" className="pointer-events-none absolute -right-6 -top-6 block h-28 w-28 rounded-full bg-white/[0.06] sm:h-40 sm:w-40" />
         {motif("checklist", "anim-float-slow absolute right-4 top-4 h-16 w-16 rounded-full bg-white/90 sm:right-8 sm:top-8 sm:h-24 sm:w-24")}
         <p className="text-[11px] font-bold tracking-[0.2em] text-accent-bright">YOUR NOTE</p>
@@ -315,7 +315,7 @@ function Result({
           回答をもとに、求人を比べるときと相談するときに使える形で整理しました。向き不向きや選考の結果を判定するものではありません。このノートは自分で持ち帰るためのもので、どこにも送信されていません。
         </p>
         <div className="no-print mt-5 flex flex-wrap gap-2">
-          <button type="button" onClick={() => onCopy("memo")} className={`${button} bg-accent-bright text-ink ring-accent-bright hover:bg-white`}>
+          <button type="button" onClick={() => onCopy("memo")} className={`${button} bg-accent-bright text-night ring-accent-bright hover:bg-white`}>
             <NotebookPen className="h-4 w-4" aria-hidden="true" />
             {copied === "memo" ? "メモをコピーしました" : "面談で使うメモとしてコピー"}
           </button>
@@ -333,7 +333,7 @@ function Result({
       </div>
 
       {fallbackText && (
-        <div className="no-print mt-4 rounded-xl border border-line bg-white p-4">
+        <div className="no-print mt-4 rounded-xl border border-line bg-surface p-4">
           <label htmlFor="copy-fallback" className="text-[13px] font-bold text-ink">
             この環境では自動でコピーできませんでした。下の文章を選んでコピーしてください。
           </label>
@@ -441,7 +441,7 @@ function Result({
           <ul className="grid gap-2 sm:grid-cols-2">
             {result.conditionsToConfirm.map((t) => (
               <li key={t} className="flex gap-2 rounded-lg bg-canvas px-3 py-2.5 text-[14px] leading-6">
-                <span aria-hidden="true" className="mt-1 h-4 w-4 shrink-0 rounded border border-line-strong bg-white" />
+                <span aria-hidden="true" className="mt-1 h-4 w-4 shrink-0 rounded border border-line-strong bg-surface" />
                 {t}
               </li>
             ))}
@@ -463,7 +463,7 @@ function Result({
             {result.selfActions.map((a, i) => (
               <li key={a.title}>
                 <Link href={a.href} className="group flex h-full gap-3 rounded-xl border border-line p-4 hover:border-brand/40 hover:bg-brand-tint">
-                  <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-ink text-xs font-bold text-white">{i + 1}</span>
+                  <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-night text-xs font-bold text-white">{i + 1}</span>
                   <span>
                     <span className="block font-bold leading-6 text-ink group-hover:text-brand-strong">{a.title}</span>
                     <span className="mt-1 block text-[13px] leading-6 text-muted">{a.description}</span>
@@ -484,15 +484,15 @@ function Result({
             ))}
           </ol>
           <div className="no-print mt-5 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
-            <button type="button" onClick={() => onCopy("memo")} className="inline-flex items-center justify-center gap-1.5 rounded-full border border-line-strong bg-white px-5 py-3 text-sm font-bold text-ink hover:border-brand">
+            <button type="button" onClick={() => onCopy("memo")} className="inline-flex items-center justify-center gap-1.5 rounded-full border border-line-strong bg-surface px-5 py-3 text-sm font-bold text-ink hover:border-brand">
               <NotebookPen className="h-4 w-4 text-brand" aria-hidden="true" />
               {copied === "memo" ? "メモをコピーしました" : "面談で使うメモとしてコピー"}
             </button>
-            <Link href="/consultation" data-cta-placement="check-result" data-cta-kind="consultation-info" className="inline-flex items-center justify-center gap-1.5 rounded-full border border-accent/50 bg-white px-5 py-3 text-sm font-bold text-accent-strong hover:border-accent">
+            <Link href="/consultation" data-cta-placement="check-result" data-cta-kind="consultation-info" className="inline-flex items-center justify-center gap-1.5 rounded-full border border-accent/50 bg-surface px-5 py-3 text-sm font-bold text-accent-strong hover:border-accent">
               <MessageCircle className="h-4 w-4" aria-hidden="true" />
               相談でできることを見る
             </Link>
-            <a href={consultationHref} data-cta-placement="check-result" data-cta-kind="consultation-apply" className="inline-flex items-center justify-center gap-1.5 rounded-full bg-accent px-6 py-3 text-sm font-bold text-white shadow-[0_6px_16px_-6px_rgb(191_82_8/0.6)] hover:bg-accent-strong">
+            <a href={consultationHref} data-cta-placement="check-result" data-cta-kind="consultation-apply" className="inline-flex items-center justify-center gap-1.5 rounded-full bg-accent px-6 py-3 text-sm font-bold text-white shadow-[0_6px_16px_-6px_rgb(191_82_8/0.6)] hover:bg-accent-press">
               {consultationLabel}
               <ArrowRight className="h-4 w-4" aria-hidden="true" />
             </a>

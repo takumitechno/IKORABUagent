@@ -74,7 +74,7 @@ export default function ConsultationPage() {
           <div className="mt-5">
             <SoloVsPro />
           </div>
-          <div className="mt-5 rounded-[var(--radius-card)] border border-line bg-white p-5">
+          <div className="mt-5 rounded-[var(--radius-card)] border border-line bg-surface p-5">
             <p className="flex items-center gap-2 font-bold text-ink">
               <BookOpen className="h-5 w-5 text-brand" aria-hidden="true" />
               このメディアの使い方
@@ -96,7 +96,7 @@ export default function ConsultationPage() {
           </h2>
           <ul className="anim-list mt-5 grid gap-3 sm:grid-cols-2">
             {partner.serviceAudience.map((a) => (
-              <li key={a} className="rounded-xl bg-white p-4 text-[14.5px] leading-7 ring-1 ring-line">
+              <li key={a} className="rounded-xl bg-surface p-4 text-[14.5px] leading-7 ring-1 ring-line">
                 {a}
               </li>
             ))}
@@ -112,10 +112,10 @@ export default function ConsultationPage() {
             <span aria-hidden="true" className="reveal-grow-y absolute bottom-8 left-[35px] top-8 border-l-[3px] border-dashed border-brand/30 md:hidden" />
             <span aria-hidden="true" className="reveal-grow-x absolute left-[10%] right-[10%] top-[44px] hidden border-t-[3px] border-dashed border-brand/30 md:block" />
             {partner.consultationSteps.map((s, i) => (
-              <li key={s.title} className="reveal relative grid grid-cols-[72px_minmax(0,1fr)] items-start gap-3 rounded-xl bg-white p-3 ring-1 ring-line md:flex md:flex-col md:items-center md:p-4 md:text-center">
+              <li key={s.title} className="reveal relative grid grid-cols-[72px_minmax(0,1fr)] items-start gap-3 rounded-xl bg-surface p-3 ring-1 ring-line md:flex md:flex-col md:items-center md:p-4 md:text-center">
                 <span className="relative block aspect-square w-[72px] rounded-full bg-mint md:w-[76px]">
                   <span aria-hidden="true" className={`motif motif-${FLOW_SCENES[i] ?? "chat"} absolute inset-[6%] block`} />
-                  <span className="absolute -left-1 -top-1 flex h-6 w-6 items-center justify-center rounded-full bg-ink text-[11px] font-bold text-white ring-2 ring-white">{i + 1}</span>
+                  <span className="absolute -left-1 -top-1 flex h-6 w-6 items-center justify-center rounded-full bg-night text-[11px] font-bold text-white ring-2 ring-surface">{i + 1}</span>
                 </span>
                 <span className="min-w-0 md:mt-2">
                   <span className="block font-bold leading-6 text-ink">{s.title}</span>
@@ -132,11 +132,11 @@ export default function ConsultationPage() {
           </h2>
           <p className="mt-2 text-[14.5px] leading-7 text-body">すべてを決めておく必要はありません。転職したい時期の目安と、ゆずれない条件が1〜2個あれば十分です。</p>
           <div className="mt-4 flex flex-col gap-3 sm:flex-row">
-            <Link href="/check" className="inline-flex items-center justify-center gap-2 rounded-full bg-brand px-5 py-3 text-sm font-bold text-white hover:bg-brand-strong">
+            <Link href="/check" className="inline-flex items-center justify-center gap-2 rounded-full bg-brand px-5 py-3 text-sm font-bold text-white hover:bg-brand-press">
               <ClipboardList className="h-4 w-4" aria-hidden="true" />
               条件整理チェックで整理する
             </Link>
-            <Link href="/articles/agent-mendan-mae" className="inline-flex items-center justify-center rounded-full border border-line-strong bg-white px-5 py-3 text-sm font-bold text-ink hover:border-brand">
+            <Link href="/articles/agent-mendan-mae" className="inline-flex items-center justify-center rounded-full border border-line-strong bg-surface px-5 py-3 text-sm font-bold text-ink hover:border-brand">
               面談前に決めておくことを読む
             </Link>
           </div>
@@ -148,7 +148,7 @@ export default function ConsultationPage() {
           </h2>
           <dl className="mt-5 space-y-3">
             {FAQ.map((f) => (
-              <div key={f.question} className="rounded-xl bg-white p-5 ring-1 ring-line">
+              <div key={f.question} className="rounded-xl bg-surface p-5 ring-1 ring-line">
                 <dt className="font-bold text-ink">Q. {f.question}</dt>
                 <dd className="mt-2 text-[14.5px] leading-7 text-body">{f.answer}</dd>
               </div>

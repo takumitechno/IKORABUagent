@@ -17,7 +17,7 @@ export function EntryGrid({ group, counts, variant = "tile" }: { group: Taxonomy
       <ul className="flex flex-wrap gap-2">
         {items.map((item) => (
           <li key={item.slug}>
-            <Link href={taxonomyPath(group, item.slug)} className="tap inline-flex items-center gap-1.5 rounded-full bg-white px-3.5 py-2 text-[13.5px] font-medium text-ink ring-1 ring-line transition hover:text-brand-strong hover:ring-brand/40">
+            <Link href={taxonomyPath(group, item.slug)} className="tap inline-flex items-center gap-1.5 rounded-full bg-surface px-3.5 py-2 text-[13.5px] font-medium text-ink ring-1 ring-line transition hover:text-brand-strong hover:ring-brand/40">
               <CategoryIcon name={item.icon} className="h-4 w-4 text-brand" />
               {item.label}
             </Link>
@@ -35,12 +35,12 @@ export function EntryGrid({ group, counts, variant = "tile" }: { group: Taxonomy
           <li key={item.slug}>
             <Link
               href={taxonomyPath(group, item.slug)}
-              className="tap group flex h-full flex-col items-center rounded-xl border border-line bg-white px-1.5 pb-3 pt-4 text-center transition-colors hover:border-brand hover:bg-brand-tint sm:px-2"
+              className="tap group flex h-full flex-col items-center rounded-xl border border-line bg-surface px-1.5 pb-3 pt-4 text-center transition-colors hover:border-brand hover:bg-brand-tint sm:px-2"
             >
               <span className={`tile-icon relative mb-2.5 flex h-12 w-12 items-center justify-center rounded-xl ${tone.bg} ${tone.fg}`}>
                 <CategoryIcon name={item.icon} className="h-6 w-6" />
                 {count !== undefined && (
-                  <span className="absolute -right-2.5 -top-2 flex h-5 min-w-5 items-center justify-center rounded-full bg-accent px-1 text-[10.5px] font-bold tabular-nums text-white ring-2 ring-white" aria-label={`記事${count}件`}>
+                  <span className="absolute -right-2.5 -top-2 flex h-5 min-w-5 items-center justify-center rounded-full bg-accent px-1 text-[10.5px] font-bold tabular-nums text-white ring-2 ring-surface" aria-label={`記事${count}件`}>
                     {count}
                   </span>
                 )}
@@ -83,7 +83,7 @@ export function ExploreTabs({ counts, name = "explore" }: { counts: Record<Taxon
       {groups.map((g, i) => (
         <input key={g} type="radio" name={name} id={`${name}-${g}`} defaultChecked={i === 0} />
       ))}
-      <div className="tab-list mb-4 grid grid-cols-3 gap-1 rounded-full bg-white p-1 ring-1 ring-line sm:inline-grid sm:min-w-[420px]">
+      <div className="tab-list mb-4 grid grid-cols-3 gap-1 rounded-full bg-surface p-1 ring-1 ring-line sm:inline-grid sm:min-w-[420px]">
         {groups.map((g) => (
           <label key={g} htmlFor={`${name}-${g}`} className="tab-label rounded-full px-2 py-2.5 text-center text-[13px] font-bold transition sm:text-sm">
             {TAB_LABEL[g]}

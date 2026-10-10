@@ -36,11 +36,11 @@ export async function generateMetadata({ params }: Props) {
 }
 
 function Block({ icon: Icon, title, children, tone = "default" }: { icon: typeof Megaphone; title: string; children: React.ReactNode; tone?: "default" | "brand" | "warn" }) {
-  const toneClass = tone === "brand" ? "border-brand/25 bg-brand-tint" : tone === "warn" ? "border-accent/25 bg-accent-soft" : "border-line bg-white";
+  const toneClass = tone === "brand" ? "border-brand/25 bg-brand-tint" : tone === "warn" ? "border-accent/25 bg-accent-soft" : "border-line bg-surface";
   return (
     <section className={`reveal rounded-[var(--radius-card)] border p-5 sm:p-6 ${toneClass}`}>
       <h2 className="flex items-center gap-2.5 text-[17px] font-bold text-ink">
-        <span className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full ${tone === "warn" ? "bg-white text-accent" : tone === "brand" ? "bg-brand text-white" : "bg-brand-soft text-brand-strong"}`}>
+        <span className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full ${tone === "warn" ? "bg-surface text-accent" : tone === "brand" ? "bg-brand text-white" : "bg-brand-soft text-brand-strong"}`}>
           <Icon className="h-[18px] w-[18px]" aria-hidden="true" />
         </span>
         {title}
@@ -66,7 +66,7 @@ export default async function NewsDetailPage({ params }: Props) {
       <div className="mx-auto max-w-4xl px-4 pt-6 sm:px-6">
         <Breadcrumbs items={articleCrumbs(article, categories)} />
         <article className="mt-6">
-          <header className="overflow-hidden rounded-[20px] bg-white px-5 py-7 ring-1 ring-line sm:px-10 sm:py-9">
+          <header className="overflow-hidden rounded-[20px] bg-surface px-5 py-7 ring-1 ring-line sm:px-10 sm:py-9">
             <div className="flex flex-wrap items-center gap-2 text-xs">
               <span className="rounded-full bg-mist px-2.5 py-0.5 font-bold text-mist-ink">転職ニュース解説</span>
               <span className="text-muted">発表元: {news.announcedBy}</span>
@@ -113,7 +113,7 @@ export default async function NewsDetailPage({ params }: Props) {
             </Block>
           </div>
 
-          <section aria-labelledby="commentary" className="mt-6 rounded-[20px] bg-white px-5 py-7 ring-1 ring-line sm:px-10">
+          <section aria-labelledby="commentary" className="mt-6 rounded-[20px] bg-surface px-5 py-7 ring-1 ring-line sm:px-10">
             <h2 id="commentary" className="text-[17px] font-bold text-ink">
               編集部の解説
             </h2>

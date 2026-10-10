@@ -7,7 +7,7 @@ export const metadata = pageMetadata({ title: "Pilot のご提案", description:
 
 function Block({ id, title, children }: { id?: string; title: string; children: React.ReactNode }) {
   return (
-    <section id={id} className="break-inside-avoid scroll-mt-24 rounded-[var(--radius-card)] bg-white p-5 ring-1 ring-line print:rounded-none print:p-3 print:ring-0">
+    <section id={id} className="break-inside-avoid scroll-mt-24 rounded-[var(--radius-card)] bg-surface p-5 ring-1 ring-line print:rounded-none print:p-3 print:ring-0">
       <h2 className="text-[16px] font-bold text-ink">{title}</h2>
       <div className="mt-2 text-[13.5px] leading-7 text-body">{children}</div>
     </section>

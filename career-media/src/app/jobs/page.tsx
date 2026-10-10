@@ -102,7 +102,7 @@ export default async function JobsPage() {
       />
     <div className="mx-auto max-w-6xl px-4 pt-8 sm:px-6">
       <JsonLd data={itemList} />
-      <p className="flex items-start gap-2 rounded-xl bg-white p-4 text-[13px] leading-6 text-muted ring-1 ring-line">
+      <p className="flex items-start gap-2 rounded-xl bg-surface p-4 text-[13px] leading-6 text-muted ring-1 ring-line">
         <Info className="mt-0.5 h-4 w-4 shrink-0 text-brand" aria-hidden="true" />
         5段階の目安は一般的な傾向を示したもので、統計にもとづく数値ではありません。同じ職種名でも、会社や配属先によって仕事内容は大きく異なります。
       </p>
@@ -119,7 +119,7 @@ export default async function JobsPage() {
       <h2 className="mt-12 text-lg font-bold text-ink">4つの職種を比べる</h2>
       <nav aria-label="職種へ移動" className="mt-3 flex gap-2 overflow-x-auto pb-2">
         {JOB_ROLES.map((r) => (
-          <a key={r.slug} href={`#${r.slug}`} className="shrink-0 rounded-full bg-white px-4 py-2 text-[13px] font-bold text-ink ring-1 ring-line hover:text-brand-strong hover:ring-brand/40">
+          <a key={r.slug} href={`#${r.slug}`} className="shrink-0 rounded-full bg-surface px-4 py-2 text-[13px] font-bold text-ink ring-1 ring-line hover:text-brand-strong hover:ring-brand/40">
             {r.name}
           </a>
         ))}
@@ -131,7 +131,7 @@ export default async function JobsPage() {
           比べる軸ごとの目安
         </h2>
         {AXES.map((axis) => (
-          <div key={axis.key} className="rounded-[var(--radius-card)] border border-line bg-white p-4">
+          <div key={axis.key} className="rounded-[var(--radius-card)] border border-line bg-surface p-4">
             <p className="text-sm font-bold text-ink">{axis.label}</p>
             <ul className="anim-list mt-3 space-y-3">
               {JOB_ROLES.map((r) => {
@@ -164,7 +164,7 @@ export default async function JobsPage() {
         <h2 id="compare-table" className="sr-only">
           職種の比較表
         </h2>
-        <div className="overflow-x-auto rounded-[var(--radius-card)] border border-line bg-white">
+        <div className="overflow-x-auto rounded-[var(--radius-card)] border border-line bg-surface">
           <table className="w-full min-w-[880px] border-collapse text-left text-body">
             <thead>
               <tr className="border-b border-line">
@@ -183,7 +183,7 @@ export default async function JobsPage() {
             <tbody>
               {ROWS.map((row) => (
                 <tr key={row.label} className="border-b border-line last:border-0">
-                  <th scope="row" className="sticky-col bg-white px-4 py-4 align-top text-[13px] font-bold text-ink shadow-[1px_0_0_var(--color-line)]">
+                  <th scope="row" className="sticky-col bg-surface px-4 py-4 align-top text-[13px] font-bold text-ink shadow-[1px_0_0_var(--color-line)]">
                     {row.label}
                   </th>
                   {JOB_ROLES.map((r) => (
@@ -199,12 +199,12 @@ export default async function JobsPage() {
       </section>
 
       <div className="mt-8 grid gap-4 rounded-[var(--radius-card)] bg-brand-tint p-5 ring-1 ring-brand/15 sm:grid-cols-[auto_1fr_auto] sm:items-center sm:p-6">
-        <span className="motif motif-checklist hidden h-16 w-16 rounded-full bg-white sm:block" aria-hidden="true" />
+        <span className="motif motif-checklist hidden h-16 w-16 rounded-full bg-surface sm:block" aria-hidden="true" />
         <div>
           <p className="font-bold text-ink">どの職種を比べればいいか迷ったら</p>
           <p className="mt-1 text-sm leading-7 text-body">条件整理チェックで、経験や希望から比べてみたい職種と確認ポイントを整理できます。</p>
         </div>
-        <Link href="/check" className="inline-flex items-center justify-center gap-2 rounded-full bg-brand px-5 py-3 text-sm font-bold text-white hover:bg-brand-strong">
+        <Link href="/check" className="inline-flex items-center justify-center gap-2 rounded-full bg-brand px-5 py-3 text-sm font-bold text-white hover:bg-brand-press">
           <ClipboardList className="h-4 w-4" aria-hidden="true" />
           条件整理チェックへ
         </Link>
@@ -212,7 +212,7 @@ export default async function JobsPage() {
 
       <div className="mt-14 space-y-8">
         {JOB_ROLES.map((r) => (
-          <section key={r.slug} id={r.slug} aria-labelledby={`${r.slug}-title`} className="scroll-mt-24 rounded-[20px] bg-white p-5 ring-1 ring-line sm:p-8">
+          <section key={r.slug} id={r.slug} aria-labelledby={`${r.slug}-title`} className="scroll-mt-24 rounded-[20px] bg-surface p-5 ring-1 ring-line sm:p-8">
             <div className="flex items-center gap-3">
               <span className="relative block aspect-square w-14 shrink-0 rounded-full bg-mint sm:w-16">
                 <Motif name={JOB_ROLE_SCENE[r.slug] ?? "briefcase"} className="absolute inset-[4%]" />

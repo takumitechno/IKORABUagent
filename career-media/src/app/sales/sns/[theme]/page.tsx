@@ -46,13 +46,13 @@ export default async function SnsThemePage({ params }: Props) {
       <p className="mt-2 max-w-3xl text-[15px] leading-8 text-body">対象: {theme.audience}</p>
 
       {/* 投稿から先の流れ */}
-      <section aria-labelledby="route" className="mt-6 rounded-[var(--radius-card)] bg-white p-4 ring-1 ring-line sm:p-5">
+      <section aria-labelledby="route" className="mt-6 rounded-[var(--radius-card)] bg-surface p-4 ring-1 ring-line sm:p-5">
         <h2 id="route" className="text-[15px] font-bold text-ink">この投稿から先の流れ（すべて実際に開けます）</h2>
         <ol className="mt-3 grid gap-2 sm:grid-cols-5">
           {route.map((r, i) => (
             <li key={r.label}>
               <Link href={r.href} className="flex h-full items-start gap-2 rounded-xl bg-canvas p-3 ring-1 ring-line hover:ring-brand/40">
-                <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-ink text-[11px] font-bold text-white">{i + 1}</span>
+                <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-night text-[11px] font-bold text-white">{i + 1}</span>
                 <span className="min-w-0">
                   <span className="flex items-center gap-1 text-[13px] font-bold text-ink">
                     <r.icon className="h-3.5 w-3.5 text-brand" aria-hidden="true" />
@@ -69,7 +69,7 @@ export default async function SnsThemePage({ params }: Props) {
 
       {/* 表紙用ビジュアル（OpenAI で生成し、採用済みのものがあるときだけ出す） */}
       {findSelectedImage(`sns-theme-${theme.id}-cover`) && (
-        <section aria-labelledby="cover-visual" className="mt-6 rounded-[var(--radius-card)] bg-white p-4 ring-1 ring-line sm:p-5">
+        <section aria-labelledby="cover-visual" className="mt-6 rounded-[var(--radius-card)] bg-surface p-4 ring-1 ring-line sm:p-5">
           <h2 id="cover-visual" className="flex flex-wrap items-center gap-2 text-[15px] font-bold text-ink">
             表紙用ビジュアル（生成画像）
             <Badge />
@@ -98,12 +98,12 @@ export default async function SnsThemePage({ params }: Props) {
           ))}
         </ol>
         <div className="mt-6 grid gap-5 lg:grid-cols-[minmax(0,1fr)_320px]">
-          <div className="rounded-[var(--radius-card)] bg-white p-5 ring-1 ring-line">
+          <div className="rounded-[var(--radius-card)] bg-surface p-5 ring-1 ring-line">
             <p className="text-[14px] font-bold text-ink">キャプション</p>
             <p className="mt-2 whitespace-pre-line text-[14px] leading-7 text-body">{theme.carousel.caption}</p>
             <p className="mt-3 text-[13px] text-brand-strong">{theme.carousel.hashtags.map((h) => `#${h}`).join(" ")}</p>
           </div>
-          <div className="rounded-[var(--radius-card)] bg-white p-5 ring-1 ring-line">
+          <div className="rounded-[var(--radius-card)] bg-surface p-5 ring-1 ring-line">
             <p className="text-[14px] font-bold text-ink">CTA と行き先</p>
             <ul className="mt-2 space-y-2 text-[13px] leading-6 text-body">
               <li>・保存を促す（あとで見返す内容にしている）</li>
@@ -130,8 +130,8 @@ export default async function SnsThemePage({ params }: Props) {
         </p>
         <ol className="mt-4 grid gap-3 md:grid-cols-5">
           {theme.reel.scenes.map((s, i) => (
-            <li key={s.time} className="flex flex-col rounded-[var(--radius-card)] bg-white p-3 ring-1 ring-line">
-              <div className="relative flex aspect-[9/16] items-center justify-center rounded-xl bg-ink p-3 text-center">
+            <li key={s.time} className="flex flex-col rounded-[var(--radius-card)] bg-surface p-3 ring-1 ring-line">
+              <div className="relative flex aspect-[9/16] items-center justify-center rounded-xl bg-night p-3 text-center">
                 <span className="absolute left-2 top-2 rounded-full bg-white/15 px-2 py-0.5 text-[10px] font-bold text-white">{s.time}</span>
                 <p className="text-[15px] font-bold leading-6 text-white">{s.telop}</p>
                 <Clapperboard className="absolute bottom-2 right-2 h-4 w-4 text-white/40" aria-hidden="true" />
@@ -143,7 +143,7 @@ export default async function SnsThemePage({ params }: Props) {
           ))}
         </ol>
         <div className="mt-4 grid gap-4 md:grid-cols-2">
-          <div className="rounded-[var(--radius-card)] bg-white p-4 ring-1 ring-line">
+          <div className="rounded-[var(--radius-card)] bg-surface p-4 ring-1 ring-line">
             <p className="text-[13.5px] font-bold text-ink">必要な素材（商談で確認）</p>
             <ul className="mt-2 space-y-1 text-[13px] leading-6 text-body">
               {theme.reel.materials.map((m) => (
@@ -151,7 +151,7 @@ export default async function SnsThemePage({ params }: Props) {
               ))}
             </ul>
           </div>
-          <div className="rounded-[var(--radius-card)] bg-white p-4 ring-1 ring-line">
+          <div className="rounded-[var(--radius-card)] bg-surface p-4 ring-1 ring-line">
             <p className="text-[13.5px] font-bold text-ink">CTA・注意</p>
             <p className="mt-2 text-[13px] leading-6 text-body">{theme.reel.cta}</p>
             <ul className="mt-1 space-y-1 text-[13px] leading-6 text-muted">
@@ -174,10 +174,10 @@ export default async function SnsThemePage({ params }: Props) {
           {theme.stories.map((f, i) => (
             <li key={f.text} className="mx-auto w-full max-w-[260px]">
               <div className={`relative flex aspect-[9/16] flex-col justify-center rounded-[22px] p-5 ring-1 ring-line ${theme.tone}`}>
-                <span className="absolute left-3 top-3 rounded-full bg-white/90 px-2 py-0.5 text-[10px] font-bold text-accent-strong">投稿案・未公開</span>
+                <span className="absolute left-3 top-3 rounded-full bg-surface/90 px-2 py-0.5 text-[10px] font-bold text-accent-strong">投稿案・未公開</span>
                 <span className="absolute right-3 top-3 text-[10px] font-bold text-ink/50">{i + 1} / {theme.stories.length}</span>
                 <p className="text-[19px] font-bold leading-8 text-ink">{f.text}</p>
-                <p className="mt-4 rounded-xl border-2 border-dashed border-ink/25 bg-white/80 p-3 text-[12.5px] font-bold leading-5 text-ink">{f.sticker}</p>
+                <p className="mt-4 rounded-xl border-2 border-dashed border-ink/25 bg-surface/80 p-3 text-[12.5px] font-bold leading-5 text-ink">{f.sticker}</p>
               </div>
               <p className="mt-2 text-[12px] leading-5 text-muted">{f.cta}</p>
             </li>
@@ -186,7 +186,7 @@ export default async function SnsThemePage({ params }: Props) {
       </section>
 
       {/* TikTok */}
-      <section aria-labelledby="tiktok-title" className="mt-12 rounded-[var(--radius-card)] bg-white p-5 ring-1 ring-line sm:p-6">
+      <section aria-labelledby="tiktok-title" className="mt-12 rounded-[var(--radius-card)] bg-surface p-5 ring-1 ring-line sm:p-6">
         <h2 id="tiktok-title" className="text-[18px] font-bold text-ink">同じテーマを TikTok で扱う場合の差分メモ</h2>
         <p className="mt-1 text-[12.5px] text-muted">既存の TikTok 運用を置き換える提案ではありません。</p>
         <dl className="mt-4 grid gap-3 text-[13.5px] leading-6 sm:grid-cols-2">
@@ -204,7 +204,7 @@ export default async function SnsThemePage({ params }: Props) {
 
       <div className="mt-10 flex flex-wrap gap-3">
         {SNS_THEMES.filter((t) => t.id !== theme.id).map((t) => (
-          <Link key={t.id} href={`/sales/sns/${t.id}`} className="inline-flex items-center gap-1.5 rounded-full border border-line-strong bg-white px-4 py-2.5 text-sm font-bold text-ink hover:border-brand">
+          <Link key={t.id} href={`/sales/sns/${t.id}`} className="inline-flex items-center gap-1.5 rounded-full border border-line-strong bg-surface px-4 py-2.5 text-sm font-bold text-ink hover:border-brand">
             テーマ{t.id.toUpperCase()}: {t.title}
             <ArrowRight className="h-4 w-4" aria-hidden="true" />
           </Link>

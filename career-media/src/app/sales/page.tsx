@@ -16,8 +16,8 @@ export default function SalesMenuPage() {
       </p>
       <ol className="mt-8 space-y-3">
         {RUNBOOK.map((step, i) => (
-          <li key={step.title} className="grid gap-3 rounded-[var(--radius-card)] border border-line bg-white p-4 sm:grid-cols-[48px_minmax(0,1fr)_auto] sm:items-start sm:p-5">
-            <span className="flex h-10 w-10 items-center justify-center rounded-full bg-ink text-sm font-bold text-white">{i + 1}</span>
+          <li key={step.title} className="grid gap-3 rounded-[var(--radius-card)] border border-line bg-surface p-4 sm:grid-cols-[48px_minmax(0,1fr)_auto] sm:items-start sm:p-5">
+            <span className="flex h-10 w-10 items-center justify-center rounded-full bg-night text-sm font-bold text-white">{i + 1}</span>
             <div className="min-w-0">
               <p className="flex flex-wrap items-center gap-2 text-[16px] font-bold text-ink">
                 {step.title}
@@ -29,7 +29,7 @@ export default function SalesMenuPage() {
               <p className="mt-2 rounded-lg bg-canvas px-3 py-2 text-[14px] leading-7 text-body">話すこと: {step.say}</p>
               <p className="mt-1.5 text-[12.5px] text-brand-strong">次へ: {step.next}</p>
             </div>
-            <Link href={step.href} className="inline-flex shrink-0 items-center justify-center gap-1.5 rounded-full bg-brand px-4 py-2.5 text-sm font-bold text-white hover:bg-brand-strong">
+            <Link href={step.href} className="inline-flex shrink-0 items-center justify-center gap-1.5 rounded-full bg-brand px-4 py-2.5 text-sm font-bold text-white hover:bg-brand-press">
               開く
               <ArrowRight className="h-4 w-4" aria-hidden="true" />
             </Link>

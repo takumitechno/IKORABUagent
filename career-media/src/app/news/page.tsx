@@ -35,7 +35,7 @@ export default async function NewsIndexPage() {
         icon="newspaper"
       />
     <div className="mx-auto max-w-6xl px-4 pt-8 sm:px-6">
-      <p className="flex items-start gap-2 rounded-xl bg-white p-4 text-[13px] leading-6 text-muted ring-1 ring-line">
+      <p className="flex items-start gap-2 rounded-xl bg-surface p-4 text-[13px] leading-6 text-muted ring-1 ring-line">
         <Info className="mt-0.5 h-4 w-4 shrink-0 text-brand" aria-hidden="true" />
         発表内容の全文転載は行わず、要点の解説と確認ポイントをまとめています。正確な内容は各記事の出典（発表元）でご確認ください。
       </p>
@@ -48,7 +48,7 @@ export default async function NewsIndexPage() {
           <li key={n.slug}>
             <Link
               href={`/news/${n.slug}`}
-              className="tap lift group flex h-full flex-col overflow-hidden rounded-[var(--radius-card)] border border-line bg-white hover:border-brand/40"
+              className="tap lift group flex h-full flex-col overflow-hidden rounded-[var(--radius-card)] border border-line bg-surface hover:border-brand/40"
             >
               <Eyecatch article={n} category={newsCategory} size="md" className="rounded-none" />
               <div className="flex flex-1 flex-col p-5 sm:p-6">
@@ -83,7 +83,7 @@ export default async function NewsIndexPage() {
           <h2 id="news-related" className="text-xl font-bold text-ink">
             市場の変化を読み解く記事
           </h2>
-          <ul className="mt-4 divide-y divide-line rounded-[var(--radius-card)] border border-line bg-white px-5">
+          <ul className="mt-4 divide-y divide-line rounded-[var(--radius-card)] border border-line bg-surface px-5">
             {related.map((a) => (
               <li key={a.slug}>
                 <Link href={`/articles/${a.slug}`} className="block py-4 font-bold text-ink hover:text-brand-strong">

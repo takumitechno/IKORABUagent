@@ -41,10 +41,10 @@ export default async function ArticlesPage({ searchParams }: Props) {
           <label htmlFor="article-search" className="sr-only">
             記事を検索
           </label>
-          <div className="flex overflow-hidden rounded-2xl bg-white p-1.5 shadow-[0_18px_40px_-18px_rgb(0_0_0/0.5)] focus-within:ring-2 focus-within:ring-white/60">
+          <div className="flex overflow-hidden rounded-2xl bg-surface p-1.5 shadow-[0_18px_40px_-18px_rgb(0_0_0/0.5)] focus-within:ring-2 focus-within:ring-white/60">
             <Search className="ml-3 h-5 w-5 self-center text-muted" aria-hidden="true" />
             <input id="article-search" name="q" type="search" defaultValue={query} placeholder="キーワードで検索（例: 研修、年間休日）" className="min-w-0 flex-1 bg-transparent px-3 py-2.5 text-[15px] text-ink outline-none" />
-            <button type="submit" className="rounded-xl bg-accent px-5 text-sm font-bold text-white hover:bg-accent-strong">
+            <button type="submit" className="rounded-xl bg-accent px-5 text-sm font-bold text-white hover:bg-accent-press">
               検索
             </button>
           </div>
@@ -53,7 +53,7 @@ export default async function ArticlesPage({ searchParams }: Props) {
     <div className="mx-auto max-w-6xl px-4 pt-8 sm:px-6">
       <div className="grid gap-10 lg:grid-cols-[1fr_300px]">
         <div>
-          <div className="rounded-[var(--radius-card)] border border-line bg-white px-5" data-search-results={query ? "1" : undefined}>
+          <div className="rounded-[var(--radius-card)] border border-line bg-surface px-5" data-search-results={query ? "1" : undefined}>
             {articles.length > 0 ? (
               <ArticleList articles={articles} categories={categories} />
             ) : (
@@ -62,10 +62,10 @@ export default async function ArticlesPage({ searchParams }: Props) {
                 <p className="font-bold text-ink">該当する記事が見つかりませんでした</p>
                 <p className="mt-2 text-sm text-muted">短い言葉（例: 事務、休み、履歴書）で探すか、下の入口から選んでください。</p>
                 <div className="mt-5 flex flex-wrap justify-center gap-2 text-sm font-bold">
-                  <Link href="/concerns" className="rounded-full bg-white px-4 py-2 text-ink ring-1 ring-line hover:text-brand-strong">悩みから探す</Link>
-                  <Link href="/situations" className="rounded-full bg-white px-4 py-2 text-ink ring-1 ring-line hover:text-brand-strong">今の状況から探す</Link>
-                  <Link href="/check" className="rounded-full bg-brand px-4 py-2 text-white hover:bg-brand-strong">条件整理チェック</Link>
-                  <Link href="/articles" className="rounded-full bg-white px-4 py-2 text-ink ring-1 ring-line hover:text-brand-strong">すべての記事</Link>
+                  <Link href="/concerns" className="rounded-full bg-surface px-4 py-2 text-ink ring-1 ring-line hover:text-brand-strong">悩みから探す</Link>
+                  <Link href="/situations" className="rounded-full bg-surface px-4 py-2 text-ink ring-1 ring-line hover:text-brand-strong">今の状況から探す</Link>
+                  <Link href="/check" className="rounded-full bg-brand px-4 py-2 text-white hover:bg-brand-press">条件整理チェック</Link>
+                  <Link href="/articles" className="rounded-full bg-surface px-4 py-2 text-ink ring-1 ring-line hover:text-brand-strong">すべての記事</Link>
                 </div>
               </div>
             )}
@@ -73,7 +73,7 @@ export default async function ArticlesPage({ searchParams }: Props) {
         </div>
 
         <aside className="space-y-6">
-          <section aria-labelledby="concern-nav-title" className="rounded-[var(--radius-card)] border border-line bg-white p-5">
+          <section aria-labelledby="concern-nav-title" className="rounded-[var(--radius-card)] border border-line bg-surface p-5">
             <p id="concern-nav-title" className="text-sm font-bold text-ink">
               悩みから探す
             </p>
@@ -81,7 +81,7 @@ export default async function ArticlesPage({ searchParams }: Props) {
               <EntryGrid group="concerns" variant="chip" />
             </div>
           </section>
-          <section aria-labelledby="situation-nav-title" className="rounded-[var(--radius-card)] border border-line bg-white p-5">
+          <section aria-labelledby="situation-nav-title" className="rounded-[var(--radius-card)] border border-line bg-surface p-5">
             <p id="situation-nav-title" className="text-sm font-bold text-ink">
               今の状況から探す
             </p>
@@ -89,7 +89,7 @@ export default async function ArticlesPage({ searchParams }: Props) {
               <EntryGrid group="situations" variant="chip" />
             </div>
           </section>
-          <nav aria-labelledby="category-nav-title" className="rounded-[var(--radius-card)] border border-line bg-white p-5">
+          <nav aria-labelledby="category-nav-title" className="rounded-[var(--radius-card)] border border-line bg-surface p-5">
             <p id="category-nav-title" className="text-sm font-bold text-ink">
               テーマから探す
             </p>

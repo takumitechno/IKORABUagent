@@ -20,7 +20,7 @@ export function MobileStickyCta({ contentSlug, consultHref = "/consultation", co
   const tab = visible ? 0 : -1;
   return (
     <div
-      className={`no-print fixed inset-x-0 bottom-0 z-30 border-t border-line bg-white/95 px-3 pb-[calc(0.5rem+env(safe-area-inset-bottom,0px))] pt-2 backdrop-blur transition-transform duration-300 md:hidden ${
+      className={`no-print fixed inset-x-0 bottom-0 z-30 border-t border-line bg-surface/95 px-3 pb-[calc(0.5rem+env(safe-area-inset-bottom,0px))] pt-2 backdrop-blur transition-transform duration-300 md:hidden ${
         visible ? "translate-y-0" : "translate-y-full"
       }`}
       aria-hidden={!visible}
@@ -30,7 +30,7 @@ export function MobileStickyCta({ contentSlug, consultHref = "/consultation", co
           <MessageCircle className="h-4 w-4" aria-hidden="true" />
           {consultLabel}
         </a>
-        <Link href="/check" tabIndex={tab} data-cta-placement="article-sticky" data-cta-kind="check" data-content-slug={contentSlug} className="flex items-center justify-center gap-1.5 rounded-full border border-line-strong bg-white py-2.5 text-[13.5px] font-bold text-ink">
+        <Link href="/check" tabIndex={tab} data-cta-placement="article-sticky" data-cta-kind="check" data-content-slug={contentSlug} className="flex items-center justify-center gap-1.5 rounded-full border border-line-strong bg-surface py-2.5 text-[13.5px] font-bold text-ink">
           <ClipboardList className="h-4 w-4" aria-hidden="true" />
           条件を整理
         </Link>

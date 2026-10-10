@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Menu, MessageCircle, X } from "lucide-react";
 import { NAV_ITEMS } from "./nav";
+import { ThemeToggle } from "./ThemeToggle";
 
 export function MobileNav() {
   const [open, setOpen] = useState(false);
@@ -34,7 +35,7 @@ export function MobileNav() {
         <span className="sr-only">{open ? "メニューを閉じる" : "メニューを開く"}</span>
       </button>
       {open && (
-        <div id="mobile-menu" className="fixed inset-x-0 bottom-0 top-16 z-50 overflow-y-auto border-t border-line bg-white">
+        <div id="mobile-menu" className="fixed inset-x-0 bottom-0 top-16 z-50 overflow-y-auto border-t border-line bg-surface">
           <nav aria-label="モバイルメニュー" className="px-4 py-4">
             <ul className="divide-y divide-line">
               {NAV_ITEMS.map((item) => (
@@ -51,6 +52,7 @@ export function MobileNav() {
                 <MessageCircle className="h-5 w-5" aria-hidden="true" />
                 キャリア相談について
               </Link>
+              <ThemeToggle withLabel className="inline-flex" />
             </div>
           </nav>
         </div>

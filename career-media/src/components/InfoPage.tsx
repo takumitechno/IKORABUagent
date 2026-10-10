@@ -5,7 +5,7 @@ export function InfoPage({ title, path, eyebrow, lead, children }: { title: stri
     <>
       <PageHero crumbs={[{ name: "ホーム", path: "/" }, { name: title, path }]} eyebrow={eyebrow} title={title} compact />
       <div className="mx-auto max-w-3xl px-4 pt-8 sm:px-6">
-        <article className="rounded-[20px] bg-white px-5 py-8 ring-1 ring-line sm:px-10 sm:py-10">
+        <article className="rounded-[20px] bg-surface px-5 py-8 ring-1 ring-line sm:px-10 sm:py-10">
           {lead && <p className="text-[15px] leading-8 text-body">{lead}</p>}
           <div className={`article-body ${lead ? "mt-8" : ""}`}>{children}</div>
         </article>

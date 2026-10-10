@@ -12,7 +12,7 @@ export function Roadmap({ steps }: { steps: RoadmapStep[] }) {
     <ol className="grid grid-cols-2 gap-2.5 md:grid-cols-4 md:gap-4">
       {steps.map((s, i) => (
         <li key={s.title}>
-          <Link href={s.href} className="tap group flex h-full flex-col rounded-xl border border-line bg-white p-4 transition-colors hover:border-brand hover:bg-brand-tint">
+          <Link href={s.href} className="tap group flex h-full flex-col rounded-xl border border-line bg-surface p-4 transition-colors hover:border-brand hover:bg-brand-tint">
             <span className="text-[26px] font-bold leading-none tabular-nums text-brand">{String(i + 1).padStart(2, "0")}</span>
             <span className="mt-2 block text-[16px] font-bold leading-tight text-ink group-hover:text-brand-strong">{s.title}</span>
             <span className="mt-1 text-[12.5px] leading-5 text-muted">{s.text}</span>
