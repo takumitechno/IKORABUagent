@@ -44,6 +44,17 @@ describe("sales demo (meeting-only pages)", () => {
     }
   });
 
+  it("does not generalize beyond the linked article in carousel, caption, alt, Reel or Stories", () => {
+    // 記事が正本。記事が仮の例として示す数字を、SNSで「多くの会社」「平均」などの一般論にしない
+    for (const t of SNS_THEMES) {
+      const text = JSON.stringify({ carousel: t.carousel, reel: t.reel, stories: t.stories, tiktok: t.tiktok });
+      expect(text, `theme ${t.id}`).not.toMatch(/会社が多い|多くの会社|ほとんどの会社|大半の会社|平均(は|で|的)?[0-9０-９]/);
+    }
+    const c = SNS_THEMES.find((t) => t.id === "c")!;
+    const holidays = c.carousel.slides.find((s) => s.layout.kind === "stats");
+    expect(JSON.stringify(holidays), "120日は仮の例と明示する").toContain("仮の例");
+  });
+
   it("labels every SNS output as an unpublished draft and invents no account metrics", () => {
     const text = JSON.stringify(SNS_THEMES);
     expect(text).not.toMatch(/フォロワー\d|\d+(万)?(いいね|再生|保存数|フォロワー)|インプレッション\d/);

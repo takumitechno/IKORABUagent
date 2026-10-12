@@ -72,6 +72,41 @@ try {
       assert(await page.locator('.apply-topic#support-' + topic).isVisible());
       evidence.push({ base, javaScriptEnabled, slug, topic, retained: true, localOnly: true });
     }
+    // スマホ固定CTA（記事を読み進めたときの下部ボタン）も、記事末尾と同じ相談テーマを保つ。
+    for (const [slug, topic] of [['sekkyaku-keiken-ikasu', 'experience'], ['donichi-yasumi-nenshu-hikaku', 'conditions'], ['freeter-seishain-hajimeni', 'first-job']]) {
+      await page.goto(base + '/articles/' + slug);
+      const sticky = page.locator('[data-cta-placement="article-sticky"][data-cta-kind="consultation-apply"]');
+      const href = await sticky.getAttribute('href');
+      // 直接href・JavaScript無効でも同じ: サーバーが出したリンク先にテーマとサイト内の行き先が入っている
+      assert(href.startsWith('/consultation/apply?') && href.endsWith('#support-' + topic), `sticky href keeps topic: ${href}`);
+      const bottom = await page.locator('[data-cta-placement="article-bottom"][data-cta-kind="consultation-apply"]').getAttribute('href');
+      assert.equal(new URL(href, base).hash, new URL(bottom, base).hash, 'sticky and article-bottom pass the same topic');
+      const direct = await context.newPage();
+      await direct.goto(new URL(href, base).href);
+      assert.equal(new URL(direct.url()).origin, new URL(base).origin);
+      assert(await direct.locator('.apply-topic#support-' + topic).isVisible());
+      assert.equal(await direct.locator('input').count(), 0);
+      await direct.close();
+      if (javaScriptEnabled) {
+        await page.evaluate(() => window.scrollTo(0, 1600));
+        await page.waitForFunction(() => document.querySelector('[data-cta-placement="article-sticky"][data-cta-kind="consultation-apply"]')?.closest('[aria-hidden]')?.getAttribute('aria-hidden') === 'false');
+        // 新しいタブ（Ctrl/Cmd+クリック）
+        const [popup] = await Promise.all([context.waitForEvent('page'), sticky.click({ modifiers: [process.platform === 'darwin' ? 'Meta' : 'Control'] })]);
+        await popup.waitForURL(url => url.pathname.replace(/\/$/, '') === '/consultation/apply');
+        assert.equal(new URL(popup.url()).origin, new URL(base).origin);
+        assert.equal(new URL(popup.url()).hash, '#support-' + topic);
+        assert(await popup.locator('.apply-topic#support-' + topic).isVisible());
+        await popup.close();
+        // 通常のクリック
+        await sticky.click();
+        await page.waitForURL(url => url.pathname.replace(/\/$/, '') === '/consultation/apply' && url.hash === '#support-' + topic);
+        assert(await page.locator('.apply-topic#support-' + topic).isVisible());
+      } else {
+        // JavaScript無効では固定CTAは表示されない（記事末尾のボタンが同じ行き先を持つ）
+        assert.equal(await sticky.evaluate(el => el.closest('[aria-hidden]')?.getAttribute('aria-hidden')), 'true');
+      }
+      evidence.push({ base, javaScriptEnabled, slug, topic, placement: 'article-sticky', retained: true, localOnly: true });
+    }
     await context.close();
   }
   for (const base of bases.filter(b => !b.includes('3301'))) for (const colorScheme of ['light', 'dark']) for (const width of [320, 390, 1440]) {

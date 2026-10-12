@@ -40,6 +40,14 @@ describe("reader journeys (3 meeting demo paths)", () => {
     expect(journeyForArticle("ai-shigoto-mikeiken")).toBeUndefined();
   });
 
+  it("keeps each journey's consultation topic aligned with the three consultation themes", () => {
+    expect(JOURNEYS.map((j) => [j.id, j.consultationTopic])).toEqual([
+      ["sekkyaku-office", "experience"],
+      ["kyuryo-donichi", "conditions"],
+      ["freeter-hajimete", "first-job"],
+    ]);
+  });
+
   it("does not use guarantee or labeling language in journey copy", () => {
     const text = JSON.stringify(JOURNEYS);
     expect(text).not.toMatch(/必ず|確実|保証|年収\d+万円以下|底辺|弱者/);

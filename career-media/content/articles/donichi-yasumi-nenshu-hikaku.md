@@ -70,15 +70,15 @@ sources:
 
 ```figure
 type: stats
-title: 年間休日の目安
+title: 年間休日の数え方（例）
 items:
   - value: "104"
     unit: 日
     label: 毎週土日が休み
     note: 1年はおよそ52週
   - value: "120"
-    unit: 日前後
-    label: 年間休日が120日の仮の例
+    unit: 日
+    label: 比べるための仮の例
     note: 休みの曜日や内訳は別に確認
 ```
 

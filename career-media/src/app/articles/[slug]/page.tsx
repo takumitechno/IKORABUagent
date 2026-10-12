@@ -56,6 +56,8 @@ export default async function ArticlePage({ params }: Props) {
   const inJourney = journeyForArticle(article.slug);
   const guide = ARTICLE_GUIDES[article.slug];
   const topic = CONSULTATION_TOPICS.find((t) => t.id === guide?.topic);
+  // 相談の説明ページで保つテーマ。記事ガイドがなければ、読者ガイド（3つの導線）のテーマを使う。見出しの文言は変えない
+  const topicId = topic?.id ?? inJourney?.journey.consultationTopic;
 
   return (
     <>
@@ -90,7 +92,7 @@ export default async function ArticlePage({ params }: Props) {
                   </div>
                 </nav>
               )}
-              <ConsultationCta placement="article-sidebar" contentSlug={article.slug} variant="compact" category={article.categories[0]} heading={topic?.title} lead={topic?.help} topic={topic?.id} />
+              <ConsultationCta placement="article-sidebar" contentSlug={article.slug} variant="compact" category={article.categories[0]} heading={topic?.title} lead={topic?.help} topic={topicId} />
               <div className="grid gap-2">
                 <Link href="/check" className="flex items-center gap-2 rounded-xl border border-line bg-surface px-4 py-3 text-sm font-bold text-ink hover:border-brand/40 hover:text-brand-strong">
                   <ClipboardList className="h-4 w-4 text-brand" aria-hidden="true" />
@@ -106,11 +108,11 @@ export default async function ArticlePage({ params }: Props) {
         </div>
 
         <div className="mt-12">
-          <ConsultationCta placement="article-bottom" contentSlug={article.slug} category={article.categories[0]} heading={topic?.title} lead={topic?.help} topic={topic?.id} question={guide?.question} />
+          <ConsultationCta placement="article-bottom" contentSlug={article.slug} category={article.categories[0]} heading={topic?.title} lead={topic?.help} topic={topicId} question={guide?.question} />
         </div>
         <RelatedArticles articles={related} categories={categories} />
       </div>
-      <MobileStickyCta contentSlug={article.slug} consultHref={buildConsultationUrl("article-sticky", article.slug)} consultLabel={partner.consultCta} />
+      <MobileStickyCta contentSlug={article.slug} consultHref={buildConsultationUrl("article-sticky", article.slug)} consultLabel={partner.consultCta} topic={topicId} />
     </>
   );
 }

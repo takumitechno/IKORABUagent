@@ -1,4 +1,5 @@
 import type { MotifName } from "@/lib/illustrations/motifs";
+import type { ConsultationTopicId } from "@/lib/consultation-topics";
 
 /**
  * 読者導線（ガイド）。既存の記事・職種比較・条件整理チェック・相談説明を、読む順番に並べたもの。
@@ -27,6 +28,8 @@ export type Journey = {
   outcome: string;
   /** ガイドを表示する入口ページ（先頭が代表） */
   hubs: string[];
+  /** このガイドの記事から相談の説明へ進むときに保つ相談テーマ（記事ガイドがない記事でも使う） */
+  consultationTopic: ConsultationTopicId;
   scene: MotifName;
   tone: string;
   steps: JourneyStep[];
@@ -37,6 +40,7 @@ export type Journey = {
 export const JOURNEYS: Journey[] = [
   {
     id: "sekkyaku-office",
+    consultationTopic: "experience",
     patternId: "journey-a-sekkyaku-office",
     title: "接客の経験から、オフィスワークへ",
     shortTitle: "接客からオフィスワークへ",
@@ -70,6 +74,7 @@ export const JOURNEYS: Journey[] = [
   },
   {
     id: "kyuryo-donichi",
+    consultationTopic: "conditions",
     patternId: "journey-b-kyuryo-donichi",
     title: "給料は下げずに、休みも増やしたい",
     shortTitle: "給料と休みを両方見る",
@@ -103,6 +108,7 @@ export const JOURNEYS: Journey[] = [
   },
   {
     id: "freeter-hajimete",
+    consultationTopic: "first-job",
     patternId: "journey-c-freeter-hajimete",
     title: "正社員の経験が少なくても、最初の一歩を決めたい",
     shortTitle: "フリーターから最初の一歩",
