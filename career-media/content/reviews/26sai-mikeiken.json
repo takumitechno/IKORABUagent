@@ -1,0 +1,16 @@
+[
+  {
+    "slug": "26sai-mikeiken",
+    "contentHash": "e21c4b1e314ec49ea936517f07872eb37db1893b08f6c324f3c664a5754ab747",
+    "reviewer": "career-reviewer (automated checks; human approval pending)",
+    "verdict": "approved",
+    "findings": [
+      {
+        "code": "C04",
+        "severity": "warning",
+        "message": "査読（reviewed_at）のあとに更新されている。再査読が必要"
+      }
+    ],
+    "reviewedAt": "2026-10-12T07:44:18.611Z"
+  }
+]

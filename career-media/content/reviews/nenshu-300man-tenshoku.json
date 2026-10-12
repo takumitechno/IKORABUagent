@@ -1,0 +1,16 @@
+[
+  {
+    "slug": "nenshu-300man-tenshoku",
+    "contentHash": "69f0cfb850a287f27707c22d5e2ff444e971314aa3c9f533f09734bc9568bc5c",
+    "reviewer": "career-reviewer (automated checks; human approval pending)",
+    "verdict": "approved",
+    "findings": [
+      {
+        "code": "C04",
+        "severity": "warning",
+        "message": "査読（reviewed_at）のあとに更新されている。再査読が必要"
+      }
+    ],
+    "reviewedAt": "2026-10-12T07:44:31.771Z"
+  }
+]

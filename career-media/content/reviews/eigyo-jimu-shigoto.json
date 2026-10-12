@@ -6,5 +6,19 @@
     "verdict": "approved",
     "findings": [],
     "reviewedAt": "2026-10-09T14:44:17.800Z"
+  },
+  {
+    "slug": "eigyo-jimu-shigoto",
+    "contentHash": "460d20b2f42f976898db47b2b7b404a9187423784d7475f02397e8c4aec8c5b3",
+    "reviewer": "career-reviewer (automated checks; human approval pending)",
+    "verdict": "approved",
+    "findings": [
+      {
+        "code": "C04",
+        "severity": "warning",
+        "message": "査読（reviewed_at）のあとに更新されている。再査読が必要"
+      }
+    ],
+    "reviewedAt": "2026-10-12T07:44:22.818Z"
   }
 ]

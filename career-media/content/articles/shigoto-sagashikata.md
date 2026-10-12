@@ -7,7 +7,7 @@ categories: [mikeiken, shokushu]
 featured: true
 recommended: false
 published_at: 2026-10-06
-updated_at: 2026-10-06
+updated_at: 2026-10-12
 reviewed_at: 2026-10-06
 information_checked_at: 2026-10-06
 roles: [sonota]
@@ -154,3 +154,5 @@ job tag には、職業興味検査や仕事価値観検査など、興味や大
 ひとりで決めきれないときは、書き出したメモを持って相談するのも一つの方法です。正社員を目指すおおむね35歳未満の人は、わかものハローワークで担当者に無料で相談できます。キャリアアドバイザーへの相談については[キャリア相談について](/consultation)で紹介しています。
 
 候補が決まったあとの準備の流れは、[未経験転職は何から始める？](/articles/mikeiken-tenshoku-hajimekata)にまとめています。
+
+この記事は、候補の仕事を2〜3つにしぼるところまでを扱っています。書き出した経験や条件を、応募書類や面接で使える形にまとめたいときは、[転職のための自己分析のやり方](/articles/jiko-bunseki-yarikata)の書き出し例を使えます。

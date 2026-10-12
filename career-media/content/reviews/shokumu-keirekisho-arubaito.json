@@ -17,5 +17,24 @@
       }
     ],
     "reviewedAt": "2026-10-11T17:50:49.045Z"
+  },
+  {
+    "slug": "shokumu-keirekisho-arubaito",
+    "contentHash": "a5aeae5773923b4bf794f6aa11c1bb52b9b4b9486371c2f4317d619d77d2b919",
+    "reviewer": "career-reviewer (automated checks; human approval pending)",
+    "verdict": "approved",
+    "findings": [
+      {
+        "code": "C04",
+        "severity": "warning",
+        "message": "査読（reviewed_at）のあとに更新されている。再査読が必要"
+      },
+      {
+        "code": "C04",
+        "severity": "warning",
+        "message": "出典の確認日が情報確認日より新しい。information_checked_at を更新する"
+      }
+    ],
+    "reviewedAt": "2026-10-12T07:44:38.187Z"
   }
 ]

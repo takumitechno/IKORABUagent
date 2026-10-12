@@ -1,0 +1,16 @@
+[
+  {
+    "slug": "mikeiken-tenshoku-hajimekata",
+    "contentHash": "376ea52bf074374242f470e6072e19f12fd7bfc1b8f39fc1dbd980c654b49b57",
+    "reviewer": "career-reviewer (automated checks; human approval pending)",
+    "verdict": "approved",
+    "findings": [
+      {
+        "code": "C04",
+        "severity": "warning",
+        "message": "査読（reviewed_at）のあとに更新されている。再査読が必要"
+      }
+    ],
+    "reviewedAt": "2026-10-12T07:44:31.125Z"
+  }
+]

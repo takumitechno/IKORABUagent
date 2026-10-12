@@ -6,5 +6,19 @@
     "verdict": "approved",
     "findings": [],
     "reviewedAt": "2026-10-10T00:07:46.094Z"
+  },
+  {
+    "slug": "butsuryu-soko-shigoto",
+    "contentHash": "6d03b5ecf79082c2895040b394512bacfc25dbda4ebf93798ad5d6aa09cbb96e",
+    "reviewer": "career-reviewer (automated checks; human approval pending)",
+    "verdict": "approved",
+    "findings": [
+      {
+        "code": "C04",
+        "severity": "warning",
+        "message": "査読（reviewed_at）のあとに更新されている。再査読が必要"
+      }
+    ],
+    "reviewedAt": "2026-10-12T07:44:20.025Z"
   }
 ]

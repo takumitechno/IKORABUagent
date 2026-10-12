@@ -6,5 +6,19 @@
     "verdict": "approved",
     "findings": [],
     "reviewedAt": "2026-10-09T14:44:18.641Z"
+  },
+  {
+    "slug": "keiri-mikeiken",
+    "contentHash": "13a12fb7dc96e0b621ef8eabf58de06f3d5456e0d27e37b451bcd773b3a9e2e8",
+    "reviewer": "career-reviewer (automated checks; human approval pending)",
+    "verdict": "approved",
+    "findings": [
+      {
+        "code": "C04",
+        "severity": "warning",
+        "message": "査読（reviewed_at）のあとに更新されている。再査読が必要"
+      }
+    ],
+    "reviewedAt": "2026-10-12T07:44:28.176Z"
   }
 ]

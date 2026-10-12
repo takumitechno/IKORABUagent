@@ -6,5 +6,19 @@
     "verdict": "approved",
     "findings": [],
     "reviewedAt": "2026-10-09T15:11:14.704Z"
+  },
+  {
+    "slug": "hanbai-seishain",
+    "contentHash": "116d38aa90c2eb99b19e5e65741a7133cf5027e9a0a1a71c8e5fcdc977fa7a77",
+    "reviewer": "career-reviewer (automated checks; human approval pending)",
+    "verdict": "approved",
+    "findings": [
+      {
+        "code": "C04",
+        "severity": "warning",
+        "message": "査読（reviewed_at）のあとに更新されている。再査読が必要"
+      }
+    ],
+    "reviewedAt": "2026-10-12T07:44:24.339Z"
   }
 ]

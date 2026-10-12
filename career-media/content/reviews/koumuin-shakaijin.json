@@ -6,5 +6,19 @@
     "verdict": "approved",
     "findings": [],
     "reviewedAt": "2026-10-10T00:07:44.980Z"
+  },
+  {
+    "slug": "koumuin-shakaijin",
+    "contentHash": "e622cfd2e6779748558aeff105f366611819649d20d7b662e8a8d87ecba22cec",
+    "reviewer": "career-reviewer (automated checks; human approval pending)",
+    "verdict": "approved",
+    "findings": [
+      {
+        "code": "C04",
+        "severity": "warning",
+        "message": "査読（reviewed_at）のあとに更新されている。再査読が必要"
+      }
+    ],
+    "reviewedAt": "2026-10-12T07:44:30.393Z"
   }
 ]

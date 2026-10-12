@@ -12,5 +12,24 @@
       }
     ],
     "reviewedAt": "2026-10-11T17:50:49.475Z"
+  },
+  {
+    "slug": "donichi-yasumi-nenshu-hikaku",
+    "contentHash": "5d6fd1822b598408ad87a19f2b0167640c3a211c8499537b53b1539b93656036",
+    "reviewer": "career-reviewer (automated checks; human approval pending)",
+    "verdict": "approved",
+    "findings": [
+      {
+        "code": "C04",
+        "severity": "warning",
+        "message": "査読（reviewed_at）のあとに更新されている。再査読が必要"
+      },
+      {
+        "code": "C04",
+        "severity": "warning",
+        "message": "出典の確認日が情報確認日より新しい。information_checked_at を更新する"
+      }
+    ],
+    "reviewedAt": "2026-10-12T07:44:20.697Z"
   }
 ]

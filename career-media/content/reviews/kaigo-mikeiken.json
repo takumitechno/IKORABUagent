@@ -6,5 +6,19 @@
     "verdict": "approved",
     "findings": [],
     "reviewedAt": "2026-10-09T14:44:20.363Z"
+  },
+  {
+    "slug": "kaigo-mikeiken",
+    "contentHash": "f1af899b59c69febfc50392f374267523beeac5151232f6d14b7e86a400f6c26",
+    "reviewer": "career-reviewer (automated checks; human approval pending)",
+    "verdict": "approved",
+    "findings": [
+      {
+        "code": "C04",
+        "severity": "warning",
+        "message": "査読（reviewed_at）のあとに更新されている。再査読が必要"
+      }
+    ],
+    "reviewedAt": "2026-10-12T07:44:27.495Z"
   }
 ]

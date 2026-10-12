@@ -20,5 +20,19 @@
       }
     ],
     "reviewedAt": "2026-10-11T17:50:48.556Z"
+  },
+  {
+    "slug": "jimu-mikeiken-mae",
+    "contentHash": "783ff85cb961c5cfb02eaf18a870e96d360faf700123a99c2cd803ba06eef763",
+    "reviewer": "career-reviewer (automated checks; human approval pending)",
+    "verdict": "approved",
+    "findings": [
+      {
+        "code": "C04",
+        "severity": "warning",
+        "message": "査読（reviewed_at）のあとに更新されている。再査読が必要"
+      }
+    ],
+    "reviewedAt": "2026-10-12T07:44:25.915Z"
   }
 ]

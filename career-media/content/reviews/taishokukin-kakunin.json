@@ -6,5 +6,19 @@
     "verdict": "approved",
     "findings": [],
     "reviewedAt": "2026-10-10T00:08:01.189Z"
+  },
+  {
+    "slug": "taishokukin-kakunin",
+    "contentHash": "6fe161afd3f47eb17b86ac9469041c57ed5cefd42d8dbf7b927140d9942a34d1",
+    "reviewer": "career-reviewer (automated checks; human approval pending)",
+    "verdict": "approved",
+    "findings": [
+      {
+        "code": "C04",
+        "severity": "warning",
+        "message": "査読（reviewed_at）のあとに更新されている。再査読が必要"
+      }
+    ],
+    "reviewedAt": "2026-10-12T07:44:39.652Z"
   }
 ]

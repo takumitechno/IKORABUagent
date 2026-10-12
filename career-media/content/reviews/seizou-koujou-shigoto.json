@@ -6,5 +6,19 @@
     "verdict": "approved",
     "findings": [],
     "reviewedAt": "2026-10-10T00:07:49.387Z"
+  },
+  {
+    "slug": "seizou-koujou-shigoto",
+    "contentHash": "dbe11c84811c4bfd1aec6ddb57d8ed809db139cc6296ec711b78750ec24a7dbb",
+    "reviewer": "career-reviewer (automated checks; human approval pending)",
+    "verdict": "approved",
+    "findings": [
+      {
+        "code": "C04",
+        "severity": "warning",
+        "message": "査読（reviewed_at）のあとに更新されている。再査読が必要"
+      }
+    ],
+    "reviewedAt": "2026-10-12T07:44:35.441Z"
   }
 ]

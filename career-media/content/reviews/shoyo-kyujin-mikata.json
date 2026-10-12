@@ -6,5 +6,19 @@
     "verdict": "approved",
     "findings": [],
     "reviewedAt": "2026-10-10T00:07:51.480Z"
+  },
+  {
+    "slug": "shoyo-kyujin-mikata",
+    "contentHash": "7adbad20f078106c045a70a5f820eec531e9031138b98ee565d4cce475fbd356",
+    "reviewer": "career-reviewer (automated checks; human approval pending)",
+    "verdict": "approved",
+    "findings": [
+      {
+        "code": "C04",
+        "severity": "warning",
+        "message": "査読（reviewed_at）のあとに更新されている。再査読が必要"
+      }
+    ],
+    "reviewedAt": "2026-10-12T07:44:38.951Z"
   }
 ]

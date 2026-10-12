@@ -6,5 +6,19 @@
     "verdict": "approved",
     "findings": [],
     "reviewedAt": "2026-10-10T00:07:42.563Z"
+  },
+  {
+    "slug": "iryo-jimu-mikeiken",
+    "contentHash": "186d3fc7d1fd05f549288cdf0f1393f3b1b465149c465f2ce6966922138db12e",
+    "reviewer": "career-reviewer (automated checks; human approval pending)",
+    "verdict": "approved",
+    "findings": [
+      {
+        "code": "C04",
+        "severity": "warning",
+        "message": "査読（reviewed_at）のあとに更新されている。再査読が必要"
+      }
+    ],
+    "reviewedAt": "2026-10-12T07:44:25.097Z"
   }
 ]

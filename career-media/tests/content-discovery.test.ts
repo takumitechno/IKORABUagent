@@ -10,10 +10,10 @@ import { listSiteRoutes } from "../scripts/site-routes";
 const repo = new LocalContentRepository(path.join(process.cwd(), "content"), () => new Date("2026-10-11T00:00:00Z"));
 
 describe("content discovery", () => {
-  it("keeps the 15 guides and all next steps on existing visible articles", async () => {
+  it("keeps the 18 guides and all next steps on existing visible articles", async () => {
     const articles = await repo.listArticles({ kind: "article" });
     const slugs = new Set(articles.map((a) => a.slug));
-    expect(Object.keys(ARTICLE_GUIDES)).toHaveLength(15);
+    expect(Object.keys(ARTICLE_GUIDES)).toHaveLength(18);
     for (const [slug, guide] of Object.entries(ARTICLE_GUIDES)) {
       expect(slugs.has(slug), slug).toBe(true);
       expect(slugs.has(guide.next.slug), guide.next.slug).toBe(true);
@@ -21,6 +21,17 @@ describe("content discovery", () => {
       expect(guide.points).toHaveLength(3);
     }
     for (const read of READING_STARTS) expect(slugs.has(read.slug)).toBe(true);
+  });
+
+  it("keeps a key search term of the SEO title in each guide's short H1", async () => {
+    // 一覧・SNS向けの短いH1でも、検索用タイトルの主な語を1つ以上残す（同じ文にはしない）
+    const articles = await repo.listArticles({ kind: "article" });
+    for (const [slug, guide] of Object.entries(ARTICLE_GUIDES)) {
+      const article = articles.find((a) => a.slug === slug)!;
+      const seoTitle = article.seoTitle ?? article.title;
+      const terms = (seoTitle.match(/[一-龯ァ-ヴー]{2,}|[A-Za-z]{2,}|\d+(?:万円|歳)/g) ?? []).filter((t) => !["こと", "とき"].includes(t));
+      expect(terms.some((t) => guide.displayTitle.includes(t)), `${slug}: ${guide.displayTitle} / ${seoTitle}`).toBe(true);
+    }
   });
 
   it("curates each reader journey from its own tagged articles without duplicates", async () => {

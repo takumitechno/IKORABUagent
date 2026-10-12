@@ -6,5 +6,19 @@
     "verdict": "approved",
     "findings": [],
     "reviewedAt": "2026-10-10T00:07:53.570Z"
+  },
+  {
+    "slug": "remote-work-kyujin",
+    "contentHash": "ac15fd3541b2d82bb9caf5ddf766a8742be90ba93c9e66534a00067ace3458db",
+    "reviewer": "career-reviewer (automated checks; human approval pending)",
+    "verdict": "approved",
+    "findings": [
+      {
+        "code": "C04",
+        "severity": "warning",
+        "message": "査読（reviewed_at）のあとに更新されている。再査読が必要"
+      }
+    ],
+    "reviewedAt": "2026-10-12T07:44:34.681Z"
   }
 ]

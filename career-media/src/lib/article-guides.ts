@@ -28,7 +28,7 @@ export const ARTICLE_GUIDES: Record<string, ArticleGuide> = {
     next: { slug: "jimu-mikeiken-mae", label: "事務の仕事と、必要なパソコン操作を読む" },
   },
   "donichi-yasumi-nenshu-hikaku": {
-    displayTitle: "給料と土日休み、どう比べる？",
+    displayTitle: "土日休みと年収、どう比べる？",
     topic: "conditions",
     answer: "給料と休みは、同じ項目をそろえて比べよう。",
     points: ["月給だけでなく、基本給・固定残業代・賞与を分けて見る。", "「土日休み」の表記と、年間休日・休日出勤を確認する。", "残業や通勤も含め、自分が続けられる働き方かを考える。"],
@@ -52,7 +52,7 @@ export const ARTICLE_GUIDES: Record<string, ArticleGuide> = {
     next: { slug: "tedori-20man-hikaku", label: "求人の給与と手取りの見方を読む" },
   },
   "agent-mendan-mae": {
-    displayTitle: "初めての転職相談、何を準備する？",
+    displayTitle: "エージェント面談の前に、何を準備する？",
     topic: "first-job",
     answer: "相談前に、希望職種を決めきる必要はありません。",
     points: ["これまでの仕事と、転職を考えた理由をメモする。", "給料・休み・勤務地など、まず大事にしたい条件を選ぶ。", "まだ決められないことも、聞きたい質問として持っていく。"],
@@ -65,7 +65,7 @@ export const ARTICLE_GUIDES: Record<string, ArticleGuide> = {
     answer: "手取りを守りたいなら、求人の月給だけで決めない。",
     points: ["今の給与明細で、額面・手取り・控除を確認する。", "転職先の基本給・固定残業代・賞与を分けて比べる。", "手取りは税や保険などで変わるため、概算を確定額として扱わない。"],
     question: "この給与条件で、生活に必要な収入を維持できるか確認したいです。",
-    next: { slug: "donichi-yasumi-nenshu-hikaku", label: "収入と休日を、一緒に比べる方法を読む" },
+    next: { slug: "nenshu-300man-tenshoku", label: "今の年収を内訳に分けて、下がるか上がるかを考える" },
   },
   "freeter-seishain-hajimeni": {
     displayTitle: "フリーターから正社員へ。何から始める？",
@@ -89,7 +89,15 @@ export const ARTICLE_GUIDES: Record<string, ArticleGuide> = {
     answer: "「事務」を一つの仕事として考えず、業務から比べよう。",
     points: ["一般事務・営業事務・経理事務などで、担当業務を確認する。", "入力・メール・表計算など、求人が求める操作を確認する。", "接客の電話対応や確認作業が、どの業務につながるか整理する。"],
     question: "この事務求人では、入社前にどの操作が必要で、何を研修で学べますか？",
-    next: { slug: "sekkyaku-keiken-ikasu", label: "今の経験を、伝わる言葉にする方法を読む" },
+    next: { slug: "pc-nigate-jimu", label: "入社前のPC操作を、練習の順番で確かめる" },
+  },
+  "pc-nigate-jimu": {
+    displayTitle: "PCが苦手でも、事務職は目指せる？",
+    topic: "experience",
+    answer: "目指せます。よく使う操作を知り、苦手なところから練習しよう。",
+    points: ["文字入力・メール・表計算・文書作成・ファイル整理のどこが苦手かを分ける。", "2週間なら、タイピングと1か月分の支出表づくりから始められる。", "面接では、今できる操作と続けている練習をセットで伝える。"],
+    question: "この求人で入社時に必要な操作と、入社後に教わる操作はどれですか？",
+    next: { slug: "jimu-mikeiken-mae", label: "事務の種類と、応募前の確認ポイントを読む" },
   },
   "web-marketing-mikeiken": {
     displayTitle: "未経験でWebマーケへ。最初に確かめること",
@@ -98,6 +106,22 @@ export const ARTICLE_GUIDES: Record<string, ArticleGuide> = {
     points: ["投稿制作・広告運用・記事制作・分析など、求人の業務を分ける。", "自分が担当する範囲と、教わる相手・研修内容を聞く。", "文章や数値の整理など、応募前に試せる作業から始める。"],
     question: "未経験で入る場合、最初に担当する業務と教わる体制はどうなっていますか？",
     next: { slug: "mikeiken-tenshoku-hajimekata", label: "応募前の経験・条件整理に戻る" },
+  },
+  "donichi-yasumi-shigoto": {
+    displayTitle: "土日休みの仕事、どう探す？",
+    topic: "conditions",
+    answer: "職種名より、誰に合わせて働く仕事かと、求人票の休日欄で確かめよう。",
+    points: ["取引先や社内の人が相手の仕事は、平日が中心になりやすい。", "「完全週休2日制（土・日）」のように、曜日まで書かれているかを見る。", "年間休日の日数と、土日に出勤する月があるかを面接で聞く。"],
+    question: "この求人で土日に出勤する日はありますか？部署が変わってシフト勤務になる可能性はありますか？",
+    next: { slug: "donichi-yasumi-nenshu-hikaku", label: "休日と年収を、同じ基準で比べる方法を読む" },
+  },
+  "nenshu-300man-tenshoku": {
+    displayTitle: "年収300万円からの転職、給料はどうなる？",
+    topic: "conditions",
+    answer: "下がるかどうかは、今の給料の中身と求人の条件で変わります。",
+    points: ["今の年収を、毎月決まる分・働き方で変わる分・賞与に分ける。", "求人の年収は、固定残業代・賞与の実績・試用期間中の給与まで確かめる。", "生活に必要な手取りから、これ以上は下げられない金額を決める。"],
+    question: "今の年収の内訳と比べて、この求人の給与は1年目と数年後でどう変わりますか？",
+    next: { slug: "donichi-yasumi-nenshu-hikaku", label: "年収と休日を、同じ基準で比べる方法を読む" },
   },
   "nenshu-dake-erabanai": {
     displayTitle: "年収だけで選ばない、転職の条件整理",

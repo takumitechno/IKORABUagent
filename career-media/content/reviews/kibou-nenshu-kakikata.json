@@ -6,5 +6,19 @@
     "verdict": "approved",
     "findings": [],
     "reviewedAt": "2026-10-09T14:44:24.864Z"
+  },
+  {
+    "slug": "kibou-nenshu-kakikata",
+    "contentHash": "1e44910d704c7aa5afee2ff7d57e38145cffaa237c6d41be271505fc74789b11",
+    "reviewer": "career-reviewer (automated checks; human approval pending)",
+    "verdict": "approved",
+    "findings": [
+      {
+        "code": "C04",
+        "severity": "warning",
+        "message": "査読（reviewed_at）のあとに更新されている。再査読が必要"
+      }
+    ],
+    "reviewedAt": "2026-10-12T07:44:28.921Z"
   }
 ]

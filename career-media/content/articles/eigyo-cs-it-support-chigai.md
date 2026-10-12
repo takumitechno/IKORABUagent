@@ -7,7 +7,7 @@ categories: [shokushu, mikeiken]
 featured: false
 recommended: true
 published_at: 2026-10-06
-updated_at: 2026-10-06
+updated_at: 2026-10-12
 reviewed_at: 2026-10-06
 information_checked_at: 2026-10-06
 roles: [eigyo, customer-support, it-support]
@@ -52,7 +52,7 @@ sources:
 
 ## 営業：相手の困りごとを聞き、提案する仕事
 
-営業は、自社の商品やサービスを取引先に提案し、契約につなげる仕事です。未経験から入りやすい職種の一つで、求人の数も多い傾向があります。
+営業は、自社の商品やサービスを取引先に提案し、契約につなげる仕事です。未経験可の求人もありますが、研修の内容や数字の目標の決め方は求人ごとに確かめましょう（[営業が怖い人へ](/articles/eigyo-kowai)）。
 
 営業と一口に言っても、スタイルは大きく分かれます。
 

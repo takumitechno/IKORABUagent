@@ -6,5 +6,19 @@
     "verdict": "approved",
     "findings": [],
     "reviewedAt": "2026-10-09T15:11:12.490Z"
+  },
+  {
+    "slug": "donichi-yasumi-shigoto",
+    "contentHash": "0333d4fe76033430a7cba6d4d05b5d92317af25e2d00ba1fe78944b0a29c31b4",
+    "reviewer": "career-reviewer (automated checks; human approval pending)",
+    "verdict": "approved",
+    "findings": [
+      {
+        "code": "C04",
+        "severity": "warning",
+        "message": "査読（reviewed_at）のあとに更新されている。再査読が必要"
+      }
+    ],
+    "reviewedAt": "2026-10-12T07:44:21.409Z"
   }
 ]

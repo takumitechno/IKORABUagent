@@ -20,5 +20,19 @@
       }
     ],
     "reviewedAt": "2026-10-11T17:50:48.117Z"
+  },
+  {
+    "slug": "sekkyaku-office",
+    "contentHash": "bb6527c797fd6f5e1edd0b872768413fe1b65bdf41dc2abdc7990dee919d371f",
+    "reviewer": "career-reviewer (automated checks; human approval pending)",
+    "verdict": "approved",
+    "findings": [
+      {
+        "code": "C04",
+        "severity": "warning",
+        "message": "査読（reviewed_at）のあとに更新されている。再査読が必要"
+      }
+    ],
+    "reviewedAt": "2026-10-12T07:44:36.763Z"
   }
 ]
