@@ -50,6 +50,7 @@ function toNews(value: unknown): NewsMeta | undefined {
   return {
     announcedBy: String(n.announced_by ?? ""),
     announcedAt: toDate(n.announced_at) ?? "",
+    dateType: n.date_type === "effective" || n.date_type === "announced" ? n.date_type : undefined,
     whatHappened: String(n.what_happened ?? ""),
     whoIsAffected: String(n.who_is_affected ?? ""),
     impactForCareerChangers: String(n.impact_for_career_changers ?? ""),

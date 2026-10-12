@@ -5,6 +5,10 @@ description: "上司の言動がパワハラにあたるか迷ったときに。
 source:
   - content/articles/pawahara-soudan.md
   - src/app/articles/[slug]/page.tsx
+  - src/components/ConsultationCta.tsx
+  - src/components/SupportSample.tsx
+  - src/components/Eyecatch.tsx
+  - content/images/index.json
 ---
 
 [戻る](/categories/seido)
@@ -18,6 +22,8 @@ source:
 2026年10月10日 更新 約5分で読めます
 
 提案用のサンプル原稿です（人による最終確認・公開承認の前）。[詳しく](/editorial-policy)
+
+[出典5件・記事の確認状況](#editorial-sources)
 
 パワハラかどうかは、厚生労働省が示す3つの要素と6つの類型で整理すると考えやすくなります。指導との違い、会社に義務づけられている相談窓口、相談の前に残しておきたい記録の書き方の例、会社の外の無料の相談先を紹介します。
 
@@ -74,7 +80,7 @@ source:
 
 「必要な教育がないまま、到底こなせない目標を課される」のように、未経験で入った職場で起きやすいものもあります。入ったばかりで比べる基準がないときこそ、表と照らし合わせてみてください。
 
-退職や入社のタイミングも、まとめて相談
+退職・入社のタイミングを相談する
 
 制度の手続きを確かめながら、いつ辞めていつ入社するかなど、転職の進め方をキャリアアドバイザーに相談できます。
 
@@ -158,16 +164,23 @@ source:
 
 **出典とこの記事について出典5件**
 
+以下は原稿作成時の参照情報です。正式公開前に、担当者が出典本文・記事の主張・制度の適用条件を照合します。リンクの掲載やAI査読は、人による確認の完了を意味しません。
+
 1. [パワーハラスメントとは（あかるい職場応援団）（外部サイト）](https://www.no-harassment.mhlw.go.jp/foundation/harassment_list/power-hara/)
    厚生労働省・2026年10月9日確認
+   この記事での参照箇所: パワハラの3つの要素、6つの類型とその例、適正な業務指示や指導はパワハラにあたらないこと
 2. [職場におけるハラスメントの防止のために（外部サイト）](https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/koyou_roudou/koyoukintou/seisaku06/index.html)
    厚生労働省・2026年10月9日確認
+   この記事での参照箇所: パワハラ防止措置（相談窓口の設置・周知など）が事業主の義務であること、中小企業は2022年4月1日から義務になったこと、相談を理由とする不利益取扱いの禁止
 3. [職場でのトラブル解決の援助を求める方へ（外部サイト）](https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/koyou_roudou/koyoukintou/woman/index.html)
    厚生労働省・2026年10月9日確認
+   この記事での参照箇所: 会社が対応しない場合に都道府県労働局の雇用環境・均等部（室）に相談でき、助言・指導や調停による解決の援助を受けられること
 4. [ハラスメント悩み相談室（外部サイト）](https://harasu-soudan.mhlw.go.jp/)
    厚生労働省（委託事業）・2026年10月9日確認
+   この記事での参照箇所: パワハラなどについて電話・メール・SNSで無料で相談できること
 5. [総合労働相談コーナーのご案内（外部サイト）](https://www.mhlw.go.jp/general/seido/chihou/kaiketu/soudan.html)
    厚生労働省・2026年10月9日確認
+   この記事での参照箇所: いじめ・嫌がらせを含む職場のトラブルを、予約不要・無料で相談できること
 
 - **作成**
   2026年10月10日
@@ -191,19 +204,21 @@ source:
 5. [会社の外の相談先](#section-5)
 6. [辞めるかどうかは、そのあとで考えてもいい](#section-6)
 
-退職や入社のタイミングも、まとめて相談
+退職・入社のタイミングを相談する
 
 制度の手続きを確かめながら、いつ辞めていつ入社するかなど、転職の進め方をキャリアアドバイザーに相談できます。
 
 [転職の進め方を相談する](/consultation/apply?placement=article-sidebar__pawahara-soudan)
 
-[相談でできることを見る](/consultation)
+[相談の内容を確認する](/consultation)
 
 [条件整理チェック](/check)
 
 [職種を比べる](/jobs)
 
-## 退職や入社のタイミングも、まとめて相談
+キャリア相談のご案内
+
+## 退職・入社のタイミングを相談する
 
 制度の手続きを確かめながら、いつ辞めていつ入社するかなど、転職の進め方をキャリアアドバイザーに相談できます。
 
@@ -211,15 +226,17 @@ source:
 - 面接の練習
 - 応募書類の添削
 
-[転職の進め方を相談する](/consultation/apply?placement=article-bottom__pawahara-soudan) ・ [相談でできることを見る](/consultation)
+[転職の進め方を相談する](/consultation/apply?placement=article-bottom__pawahara-soudan) ・ [相談の内容を確認する](/consultation)
 
 相談先: 提携する人材紹介会社（正式公開時に掲載）（有料職業紹介事業許可番号: 正式公開時に掲載）
+
+希望を整理してから話したい方は、[相談用のメモを作る](/check)（登録不要）。
 
 ## 次に読むなら
 
 - 転職準備 2026.10.06
-  ### [今の仕事を辞めたいとき、先に確認しておきたいこと](/articles/yametai-mae-kakunin)
+  ### [辞めたい。その前に確認すること](/articles/yametai-mae-kakunin)
 - 面接・書類 2026.10.09
-  ### [面接で退職理由を聞かれたら？不満を前向きに言い換える答え方と例文](/articles/taishoku-riyuu-mensetsu)
+  ### [辞めた理由、正直に言っていい？](/articles/taishoku-riyuu-mensetsu)
 - 転職準備 2026.10.09
-  ### [入社1年以内に辞めた・辞めたいときの転職｜面接での説明のしかたと、次に同じことを繰り返さない確認](/articles/souki-rishoku-tenshoku)
+  ### [早く辞めた経験、面接でどう話す？](/articles/souki-rishoku-tenshoku)

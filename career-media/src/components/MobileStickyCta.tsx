@@ -26,11 +26,11 @@ export function MobileStickyCta({ contentSlug, consultHref = "/consultation", co
       aria-hidden={!visible}
     >
       <div className="grid grid-cols-[minmax(0,1.25fr)_minmax(0,1fr)] gap-2">
-        <a href={consultHref} tabIndex={tab} data-cta-placement="article-sticky" data-cta-kind="consultation-apply" data-content-slug={contentSlug} className="btn-shine flex items-center justify-center gap-1.5 rounded-full bg-accent py-2.5 text-[13.5px] font-bold text-white">
+        <a href={consultHref} tabIndex={tab} data-cta-placement="article-sticky" data-cta-kind="consultation-apply" data-content-slug={contentSlug} className="consult-action flex items-center justify-center gap-1.5 rounded-xl py-2.5 text-[13.5px] font-bold">
           <MessageCircle className="h-4 w-4" aria-hidden="true" />
           {consultLabel}
         </a>
-        <Link href="/check" tabIndex={tab} data-cta-placement="article-sticky" data-cta-kind="check" data-content-slug={contentSlug} className="flex items-center justify-center gap-1.5 rounded-full border border-line-strong bg-surface py-2.5 text-[13.5px] font-bold text-ink">
+        <Link href="/check" tabIndex={tab} data-cta-placement="article-sticky" data-cta-kind="check" data-content-slug={contentSlug} className="flex items-center justify-center gap-1.5 rounded-xl border border-line-strong bg-surface py-2.5 text-[13.5px] font-bold text-ink">
           <ClipboardList className="h-4 w-4" aria-hidden="true" />
           条件を整理
         </Link>

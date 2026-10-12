@@ -1,8 +1,13 @@
 import Link from "next/link";
-import { ArrowDown, ArrowRight, Search } from "lucide-react";
+import { ArrowRight, Search, FileText, SlidersHorizontal, Newspaper } from "lucide-react";
 import { ConsultationPreview } from "@/components/ConsultationPreview";
+import { ConsultationTrust } from "@/components/ConsultationTrust";
+import { ConditionNotePreview } from "@/components/ConditionNotePreview";
 import { partner } from "@/config/partner";
 import { GeneratedImage } from "@/components/GeneratedImage";
+import { Eyecatch } from "@/components/Eyecatch";
+import { announcedLabel, formatDateShort } from "@/components/DateMeta";
+import { articleCardTitle } from "@/lib/article-presentation";
 import { JsonLd } from "@/components/JsonLd";
 import { site } from "@/config/site";
 import { getRepository } from "@/lib/content";
@@ -11,57 +16,74 @@ import { organizationJsonLd, pageMetadata, websiteJsonLd } from "@/lib/seo";
 export const revalidate = 600;
 export const metadata = pageMetadata({ title: site.fullName + "｜はじめて・未経験の転職", description: site.description, path: "/" });
 const READS = [
-  { slug: "shigoto-sagashikata", title: "やりたい仕事が分からないときは？", label: "仕事選び" },
-  { slug: "sekkyaku-keiken-ikasu", title: "「接客しかしてない」も、経験になる。", label: "経験の伝え方" },
-  { slug: "donichi-yasumi-nenshu-hikaku", title: "給料と休み、どっちも大事。", label: "条件の比べ方" },
-  { slug: "tenshoku-agent-merit", title: "転職の相談って、何をしてくれるの？", label: "相談の基本" },
-  { slug: "mensetsu-renshu-pro", title: "面接が不安なら、練習から。", label: "面接の準備" },
-  { slug: "agent-mendan-mae", title: "初めての相談。何を話せばいい？", label: "相談の準備" },
+  { slug: "sekkyaku-keiken-ikasu", title: "接客の経験を、次の仕事へ。", label: "経験の伝え方", detail: "事務やサポートの仕事へ。経験を書き出すところから。" },
+  { slug: "donichi-yasumi-nenshu-hikaku", title: "給料と休み、どっちも大事。", label: "条件の比べ方", detail: "月給・賞与・休日をそろえて、求人を比べる。" },
+  { slug: "freeter-seishain-hajimeni", title: "フリーターから、何を始めればいい？", label: "初めての転職", detail: "アルバイトの経験と、相談で聞きたいことを整理。" },
 ];
 export default async function HomePage() {
-  const articles = await getRepository().listArticles();
+  const repo = getRepository();
+  const [articles, categories] = await Promise.all([repo.listArticles(), repo.listCategories()]);
   const reads = READS.filter((read) => articles.some((article) => article.slug === read.slug));
+  const updates = [
+    { title: "新着・更新記事", href: "/articles", icon: FileText, items: articles.filter((article) => article.kind === "article" && !READS.some((read) => read.slug === article.slug)).sort((a, b) => b.updatedAt.localeCompare(a.updatedAt) || (b.publishedAt ?? "").localeCompare(a.publishedAt ?? "")).slice(0, 3) },
+    { title: "制度・ニュース解説", href: "/news", icon: Newspaper, items: articles.filter((article) => article.kind === "news").slice(0, 3) },
+  ];
   return (
-    <div className="editorial-home consultation-first">
+    <div className="lp-home">
       <JsonLd data={organizationJsonLd()} /><JsonLd data={websiteJsonLd()} />
-      <section className="campaign-hero" aria-labelledby="home-title">
-        <div className="campaign-orbit" aria-hidden="true"><span /><span /></div>
-        <div className="campaign-copy">
-          <p className="campaign-eyebrow"><span />はじめて・未経験の転職ガイド</p>
-          <h1 id="home-title"><span>次の仕事、</span><br /><strong>一緒に考えよう。</strong></h1>
-          <p className="campaign-lead">接客・バイトの経験も、言葉にできなくても。<br />会社選びから面接まで、相談しながら。</p>
+      <section className="lp-hero" aria-labelledby="home-title">
+        <svg className="lp-hero-landscape" viewBox="0 0 1440 600" preserveAspectRatio="none" aria-hidden="true" focusable="false"><path d="M930 0H1440V600H500C760 500 790 210 930 0Z" fill="var(--color-brand-tint)" /><path d="M1440 180C1120 260 1000 460 650 600H1440Z" fill="var(--color-brand-soft)" opacity=".65" /><path d="M780 600C1120 490 1270 410 1440 320" fill="none" stroke="var(--color-surface)" strokeWidth="60" opacity=".5" /></svg>
+        <div className="lp-hero-inner">
+        <div className="lp-hero-intro">
+          <p className="lp-hero-target">接客・アルバイト・はじめての転職に</p>
+          <h1 id="home-title">その経験から、<br />次の仕事を考えよう。</h1>
         </div>
-        <figure className="campaign-people">
-          <GeneratedImage slug="campaign-people" priority sizes="(min-width: 768px) 60vw, 100vw" fallback={<div />} className="h-full w-full max-md:!object-cover" />
-          <figcaption>生成イメージ・人物は架空です</figcaption>
+        <figure className="lp-hero-photo">
+          <div className="lp-hero-portrait"><GeneratedImage slug="career-support-team-cutout" priority sizes="(min-width: 768px) 48vw, 100vw" fallback={<div />} className="lp-team-image !object-contain" /></div>
+          <figcaption>生成イメージ（実在の相談員・利用者ではありません）</figcaption>
         </figure>
-        <a href="#home-journeys" className="campaign-stamp" aria-label="今の気持ちから探す"><ArrowDown aria-hidden="true" /><span>その気持ちから<br />はじめよう。</span></a>
-        <div className="campaign-actions">
-          <Link href="/consultation" data-cta-placement="home-hero" data-cta-kind="consultation-info" className="campaign-cta"><span><small>転職するか迷っていても</small>自分の悩みを相談してみる</span><span className="campaign-arrow"><ArrowRight aria-hidden="true" /></span></Link>
-          <Link href="/check" data-cta-placement="home-hero" data-cta-kind="check" className="campaign-secondary">相談前にメモをつくる<small>約3分・登録不要</small><ArrowRight aria-hidden="true" /></Link>
+        <div className="lp-hero-details">
+          <p className="lp-hero-lead">接客やアルバイトで培った経験を、次の仕事へ。<br />仕事選び・応募書類・面接の準備を相談できます。</p>
+          <ul className="lp-hero-benefits"><li><FileText aria-hidden="true" /><span>経験を<span>言葉にする</span></span></li><li><SlidersHorizontal aria-hidden="true" /><span>働く条件を<span>整理する</span></span></li></ul>
+          <div className="lp-hero-actions"><Link href="/consultation" className="lp-button lp-hero-next" data-cta-placement="home-hero" data-cta-kind="consultation-info">無料相談の内容を見る<ArrowRight aria-hidden="true" /></Link><a href="#home-reads" className="lp-hero-read"><Search aria-hidden="true" />まずは記事を読む</a></div>
+          <p className="lp-hero-note">{partner.consultationFeeNote} 応募するかは、自分で決められます。</p>
+        </div>
         </div>
       </section>
-      <div className="confidence-strip"><span>経験を言葉に</span><ArrowRight aria-hidden="true" /><span>働く条件を整理</span><ArrowRight aria-hidden="true" /><span>応募・面接の準備</span></div>
-      <div className="editorial-shell">
-
-        <section className="editorial-section" aria-labelledby="home-journeys">
-          <div className="editorial-section-head"><div><p className="editorial-kicker">今の気持ちに近いものを選んでみて</p><h2 id="home-journeys">その不安から、相談できる。</h2></div><p>何を頼めるか、具体例で見てみよう。</p></div>
-          <ConsultationPreview />
-          <div className="editorial-browse"><Link href="/concerns">ほかの悩みから探す<ArrowRight aria-hidden="true" /></Link><Link href="/jobs">職種を見比べる<ArrowRight aria-hidden="true" /></Link></div>
-        </section>
-        <section className="talk-path" aria-labelledby="home-consult">
-          <div className="talk-path-heading"><p className="editorial-kicker">相談したら、何をするの？</p><h2 id="home-consult">決める前に、<br />一緒に整理する時間を。</h2><p>求人への応募は、その後に自分で判断できます。</p><Link href="/consultation#first-talk" data-cta-placement="home-band" data-cta-kind="consultation-info" className="editorial-button">相談の進め方を見てみる<ArrowRight aria-hidden="true" /></Link></div>
-          <ol className="talk-path-steps"><li><span>01</span><div><h3>今の状況を話す</h3><p>仕事のこと、転職を考えた理由。<br />うまくまとまっていなくても。</p></div></li><li><span>02</span><div><h3>経験と希望を整理する</h3><p>活かせること、大切にしたい条件。<br />仕事選びの基準を一緒に考えます。</p></div></li><li><span>03</span><div><h3>次の進め方を考える</h3><p>求人の比較、書類の準備、面接の練習。<br />今の状況に合わせて相談できます。</p></div></li></ol>
-          <p className="talk-path-note">相談内容の例です。実際の対応範囲は相談先にご確認ください。{partner.consultationFeeNote}</p>
-        </section>
-        <section className="quiet-check" aria-labelledby="home-check"><div><p className="editorial-kicker">話す前に、自分で整理したいなら</p><h2 id="home-check">相談に持っていけるメモをつくろう。</h2><p>約3分・登録不要。経験と希望を選んで整理できます。</p></div><Link href="/check" data-cta-placement="home-hero" data-cta-kind="check" className="editorial-text-link">条件整理チェックへ<ArrowRight aria-hidden="true" /></Link></section>
-        <section className="editorial-section" aria-labelledby="home-reads">
-          <div className="editorial-section-head"><div><p className="editorial-kicker">転職の読みもの</p><h2 id="home-reads">気になることから、ひとつ。</h2></div><Link href="/articles" className="editorial-text-link">記事をすべて見る<ArrowRight aria-hidden="true" /></Link></div>
-          <ul className="editorial-reads">{reads.map((read, i) => <li key={read.slug}><Link href={"/articles/" + read.slug}><span className="editorial-read-number">0{i + 1}</span><span><small>{read.label}</small><strong>{read.title}</strong></span><ArrowRight aria-hidden="true" /></Link></li>)}</ul>
-          <form action="/articles" method="get" role="search" className="editorial-search"><Search aria-hidden="true" /><label htmlFor="home-search" className="sr-only">キーワードで記事を探す</label><input id="home-search" name="q" type="search" placeholder="事務、土日休み、履歴書…" /><button>検索</button></form>
-          <p className="editorial-fine">未経験の仕事選びから、職種比較、履歴書・面接、働く条件まで。記事で知り、希望を整理して、キャリア相談につなげられる転職ガイドです。</p>
-        </section>
-      </div>
+      <div className="lp-proof-strip"><ConsultationTrust compact /></div>
+      <section className="lp-start" aria-labelledby="home-journeys">
+        <div className="lp-section-heading"><h2 id="home-journeys">相談したいことから選ぶ</h2></div>
+        <ConsultationPreview />
+      </section>
+      <section className="lp-journal" aria-labelledby="home-reads">
+        <div className="lp-journal-heading"><div className="lp-section-heading"><h2 id="home-reads">悩みに合わせて読む</h2></div><Link href="/articles" className="lp-underlink">すべての記事を見る<ArrowRight aria-hidden="true" /></Link></div>
+        <ul className="lp-reading-cards">{reads.map((read) => { const article = articles.find((item) => item.slug === read.slug)!; return <li key={read.slug}><Link href={`/articles/${read.slug}`}>
+          <Eyecatch article={article} category={categories.find((category) => category.slug === article.categories[0])} size="md" />
+          <div className="lp-reading-copy"><span className="lp-read-label">{read.label}</span><h3>{read.title}</h3><p>{read.detail}</p><span className="lp-reading-link">記事を読む<ArrowRight aria-hidden="true" /></span></div>
+        </Link></li>; })}</ul>
+      </section>
+      <section className="lp-updates" aria-labelledby="home-updates">
+        <div className="lp-section-heading"><h2 id="home-updates">新着・更新記事とニュース</h2></div>
+        <div className="lp-updates-grid">{updates.map((group) => { const Icon = group.icon; return <div className="lp-update-group" key={group.href}>
+          <div className="lp-update-heading"><h3><Icon aria-hidden="true" />{group.title}</h3><Link href={group.href}>一覧を見る<ArrowRight aria-hidden="true" /></Link></div>
+          <ul>{group.items.map((article, index) => <li className={index === 0 ? "lp-update-lead" : ""} key={article.slug}><Link href={`/${article.kind === "news" ? "news" : "articles"}/${article.slug}`}>
+            <Eyecatch article={article} category={categories.find((category) => category.slug === article.categories[0])} size={index === 0 ? "md" : "sm"} />
+            <div className="lp-update-copy">
+            <span className="lp-update-date">{site.sampleContent ? "作成" : "掲載"} <time dateTime={article.publishedAt ?? article.updatedAt}>{formatDateShort(article.publishedAt ?? article.updatedAt)}</time>{article.updatedAt.slice(0, 10) > (article.publishedAt ?? "").slice(0, 10) && <span>・更新 {formatDateShort(article.updatedAt)}</span>}</span>
+            {article.kind === "news" && article.news?.announcedAt && <span className="lp-update-date">{announcedLabel(article.news.announcedAt, article.news.dateType)} {formatDateShort(article.news.announcedAt)}</span>}
+            <span className="lp-update-title" title={article.title}>{articleCardTitle(article)}</span>
+            </div><ArrowRight aria-hidden="true" />
+          </Link></li>)}</ul>
+        </div>; })}</div>
+      </section>
+      <section className="lp-check" aria-labelledby="home-check">
+        <div><p className="lp-section-index">相談前に、自分で整理したい方へ</p><h2 id="home-check">希望と経験を、<br />相談用のメモに。</h2><p>13問・約3分・登録不要。<br />作ったメモはコピー・印刷して使えます。</p><Link href="/check" className="lp-button" data-cta-placement="home-hero" data-cta-kind="check">条件を整理してメモを作る<ArrowRight aria-hidden="true" /></Link></div>
+        <ConditionNotePreview />
+      </section>
+      <section className="lp-journal" aria-labelledby="home-search-title">
+        <div className="lp-section-heading"><h2 id="home-search-title">気になる仕事や悩みから探す</h2></div>
+        <form action="/articles" method="get" role="search" className="lp-search"><Search aria-hidden="true" /><label htmlFor="home-search" className="sr-only">キーワードで記事を探す</label><input id="home-search" name="q" type="search" placeholder="事務、土日休み、面接…" /><button aria-label="記事を検索"><ArrowRight aria-hidden="true" /></button></form>
+      </section>
     </div>
   );
 }

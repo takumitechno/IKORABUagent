@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "slug": "career-support-team-cutout",
+  "type": "hero",
+  "status": "selected",
+  "purpose": "既存の架空人物3人から背景だけを取り除いた装飾写真。実在の相談員や利用者ではない。",
+  "used_in": [
+    "/"
+  ],
+  "alt": "",
+  "decorative": true,
+  "brief_file": null,
+  "model": "built-in image_gen",
+  "size": "1254x1254",
+  "quality": "default",
+  "output_format": "webp",
+  "background": "transparent",
+  "prompt_brief": "Use case: background-extraction. Edit target: the attached existing fictional three-person career website photo. Create a precise, clean photographic cutout of ALL THREE adults together as a compact group, keeping their existing identities, expressions, faces, hair, clothing, proportions, folder and hands unchanged as closely as possible. Remove ONLY the entire office/background, including all white and blue haze and all empty space at the right. Actual transparent alpha everywhere outside the people. Tight square composition around the three-person group, from tops of their hair to the current lower crop at upper thighs. Leave a small transparent breathing margin above their heads and at the two sides. All three complete heads and shoulders must remain fully inside the canvas. The people are 100% opaque, especially every face, hair, white jacket and pale blue blouse. No white fade, ghosting, translucent people, rim glow, vignette, white rectangle, halo, checkerboard pixels, background, words, badges or logos. Preserve crisp hair and natural skin; do not add objects or modify anatomy. Intended for placement directly over a pale blue CSS website background. Return only a real transparent cutout image.",
+  "prompt_final": "Use case: background-extraction. Edit target: the attached existing fictional three-person career website photo. Create a precise, clean photographic cutout of ALL THREE adults together as a compact group, keeping their existing identities, expressions, faces, hair, clothing, proportions, folder and hands unchanged as closely as possible. Remove ONLY the entire office/background, including all white and blue haze and all empty space at the right. Actual transparent alpha everywhere outside the people. Tight square composition around the three-person group, from tops of their hair to the current lower crop at upper thighs. Leave a small transparent breathing margin above their heads and at the two sides. All three complete heads and shoulders must remain fully inside the canvas. The people are 100% opaque, especially every face, hair, white jacket and pale blue blouse. No white fade, ghosting, translucent people, rim glow, vignette, white rectangle, halo, checkerboard pixels, background, words, badges or logos. Preserve crisp hair and natural skin; do not add objects or modify anatomy. Intended for placement directly over a pale blue CSS website background. Return only a real transparent cutout image.",
+  "revised_prompt": null,
+  "generated_at": "2026-10-11T16:36:43.941Z",
+  "src": "/images/generated/hero/career-support-team-cutout.webp",
+  "file": "public/images/generated/hero/career-support-team-cutout.webp",
+  "width": 1254,
+  "height": 1254,
+  "bytes": 174460,
+  "sha256": "187658a7051965494b90c3e9b32fb565ef4ae6980c26cc7bc106ce9c96ef1c4b",
+  "usage": null,
+  "regenerated_from": null,
+  "notes": "Built-in image_gen. WebP encoding only; original generated PNG preserved. Selected for local visual verification."
+}

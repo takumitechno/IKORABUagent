@@ -5,6 +5,10 @@ description: "面接で退職理由を聞かれたときの答え方を紹介し
 source:
   - content/articles/taishoku-riyuu-mensetsu.md
   - src/app/articles/[slug]/page.tsx
+  - src/components/ConsultationCta.tsx
+  - src/components/SupportSample.tsx
+  - src/components/Eyecatch.tsx
+  - content/images/index.json
 ---
 
 [戻る](/categories/shorui-mensetsu)
@@ -18,6 +22,8 @@ source:
 2026年10月9日 更新 約5分で読めます
 
 提案用のサンプル原稿です（人による最終確認・公開承認の前）。[詳しく](/editorial-policy)
+
+[出典3件・記事の確認状況](#editorial-sources)
 
 面接で退職理由（転職理由）を聞かれたときは、不満を隠すのではなく、事実を短く伝えて「次にしたいこと」につなげます。面接官が確かめたいこと、答え方の型、人間関係・残業・ノルマなど本音別の言い換え例、言い換えと嘘の違いを紹介します。
 
@@ -59,7 +65,7 @@ source:
 
 ポイントは、**「きっかけ」を短く、「次にしたいこと」を厚めに**話すことです。退職理由の質問ですが、話の後半は志望動機につながっていきます。
 
-面接の練習と書類の添削は、プロに頼める
+面接の練習と書類の添削を相談する
 
 応募先に合わせた模擬面接や、履歴書・職務経歴書の添削を受けてから本番にのぞめます。
 
@@ -153,12 +159,17 @@ source:
 
 **出典とこの記事について出典3件**
 
+以下は原稿作成時の参照情報です。正式公開前に、担当者が出典本文・記事の主張・制度の適用条件を照合します。リンクの掲載やAI査読は、人による確認の完了を意味しません。
+
 1. [ハローワーク布施 面接対策セミナー（外部サイト）](https://jsite.mhlw.go.jp/osaka-hellowork/content/contents/002184437.pdf)
    大阪労働局（ハローワーク布施）・2026年10月9日確認
+   この記事での参照箇所: 前職の批判・不満を全面に出して話すのはすすめないこと。人間関係や労働条件を理由にする場合は客観的に短く伝えること。待遇・経営悪化・個人的な事情など理由の種類ごとの伝え方（個人的な事情の場合は、今は働ける環境になったことを伝える）
 2. [採否通知のコメント欄に書かれた採用・不採用の理由（ハローワーク資料）（外部サイト）](https://jsite.mhlw.go.jp/osaka-hellowork/var/rev0/0058/1693/fusaiyou.pdf)
    大阪労働局（ハローワーク）・2026年10月9日確認
+   この記事での参照箇所: 退職理由も、応募中の会社に当てはまる理由は避けなければいけないこと
 3. [面接対策（外部サイト）](https://jsite.mhlw.go.jp/yamagata-hellowork/content/contents/002350381.pdf)
    山形労働局（ハローワーク）・2026年10月9日確認
+   この記事での参照箇所: 退職理由をあいまいにごまかすことや、話が長くてポイントがぼやけることを避けること
 
 - **作成**
   2026年10月9日
@@ -183,19 +194,21 @@ source:
 6. [自分で決めたのではない退職のとき](#section-6)
 7. [短い期間で辞めたとき](#section-7)
 
-面接の練習と書類の添削は、プロに頼める
+面接の練習と書類の添削を相談する
 
 応募先に合わせた模擬面接や、履歴書・職務経歴書の添削を受けてから本番にのぞめます。
 
 [面接・書類の準備を相談する](/consultation/apply?placement=article-sidebar__taishoku-riyuu-mensetsu)
 
-[相談でできることを見る](/consultation)
+[相談の内容を確認する](/consultation)
 
 [条件整理チェック](/check)
 
 [職種を比べる](/jobs)
 
-## 面接の練習と書類の添削は、プロに頼める
+キャリア相談のご案内
+
+## 面接の練習と書類の添削を相談する
 
 応募先に合わせた模擬面接や、履歴書・職務経歴書の添削を受けてから本番にのぞめます。
 
@@ -203,15 +216,17 @@ source:
 - 面接の練習
 - 応募書類の添削
 
-[面接・書類の準備を相談する](/consultation/apply?placement=article-bottom__taishoku-riyuu-mensetsu) ・ [相談でできることを見る](/consultation)
+[面接・書類の準備を相談する](/consultation/apply?placement=article-bottom__taishoku-riyuu-mensetsu) ・ [相談の内容を確認する](/consultation)
 
 相談先: 提携する人材紹介会社（正式公開時に掲載）（有料職業紹介事業許可番号: 正式公開時に掲載）
+
+希望を整理してから話したい方は、[相談用のメモを作る](/check)（登録不要）。
 
 ## 次に読むなら
 
 - 面接・書類 2026.10.06
-  ### [転職回数が気になるときに整理したいこと｜説明のしかたと次の選び方](/articles/tenshoku-kaisu-kininaru)
+  ### [転職回数が気になる。どう説明する？](/articles/tenshoku-kaisu-kininaru)
 - 転職準備 2026.10.06
-  ### [今の仕事を辞めたいとき、先に確認しておきたいこと](/articles/yametai-mae-kakunin)
+  ### [辞めたい。その前に確認すること](/articles/yametai-mae-kakunin)
 - 面接・書類 2026.10.09
-  ### [職歴に空白期間があるとき、面接でどう説明する？書類の書き方と答え方の例](/articles/kuhaku-kikan-setsumei)
+  ### [空白期間、面接でどう話す？](/articles/kuhaku-kikan-setsumei)

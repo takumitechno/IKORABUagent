@@ -19,6 +19,7 @@ related: [agent-mendan-mae, mikeiken-tenshoku-hajimekata, news-kyouiku-kunren-ky
 news:
   announced_by: 厚生労働省
   announced_at: 2025-04-01
+  date_type: effective
   what_happened: 令和6年の雇用保険法改正により、2025年4月1日以降に正当な理由なく自己都合で退職した人の基本手当の給付制限期間が、原則2か月から1か月に短縮されました。あわせて、離職期間中や離職日前1年以内に一定の教育訓練を受けた場合には、給付制限が解除されるしくみも設けられています。
   who_is_affected: 今の仕事を自己都合で辞めてから転職活動をしようと考えている人が主な対象です。在職中に転職先を決めてから退職する人には、直接の影響はほとんどありません。
   impact_for_career_changers: 退職してから転職活動に集中する場合、収入が途切れる期間の見通しが立てやすくなりました。ただし、手当を受け取るには条件があり、退職すれば誰でもすぐに受け取れるわけではありません。

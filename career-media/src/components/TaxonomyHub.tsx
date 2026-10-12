@@ -1,16 +1,16 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Scale } from "lucide-react";
-import { ArticleList, FeatureCard } from "@/components/ArticleCards";
+import { FeatureCard } from "@/components/ArticleCards";
+import { ArticleDirectory } from "@/components/ArticleDirectory";
 import { PageHero } from "@/components/PageHero";
-import { Motif } from "@/components/illustrations/Motif";
 import { ConsultationCta } from "@/components/ConsultationCta";
 import { EntryGrid } from "@/components/EntryGrid";
 import { JourneyGuide } from "@/components/Journey";
 import { journeyForHub } from "@/lib/journeys";
 import { LevelMeter } from "@/components/LevelMeter";
 import { getRepository } from "@/lib/content";
-import { taxonomyScene } from "@/lib/illustrations/scenes";
+import { MIN_HUB_ARTICLES, pickStartArticles } from "@/lib/content-discovery";
 import { getJobRole, LEVEL_LABELS } from "@/lib/jobs";
 import { pageMetadata } from "@/lib/seo";
 import { findTaxonomy, ROLE_TO_COMPARISON, TAXONOMY, TAXONOMY_GROUPS, taxonomyPath, type TaxonomyGroup } from "@/lib/taxonomy";
@@ -19,10 +19,11 @@ export function hubStaticParams(group: TaxonomyGroup) {
   return TAXONOMY[group].map((t) => ({ slug: t.slug }));
 }
 
-export function hubMetadata(group: TaxonomyGroup, slug: string) {
+export async function hubMetadata(group: TaxonomyGroup, slug: string) {
   const item = findTaxonomy(group, slug);
   if (!item) return {};
-  return pageMetadata({ title: item.heading, description: item.description, path: taxonomyPath(group, slug) });
+  const articles = await getRepository().listArticles({ tag: { group, slug } });
+  return pageMetadata({ title: item.heading, description: item.description, path: taxonomyPath(group, slug), noindex: articles.length < MIN_HUB_ARTICLES });
 }
 
 /** 入口（職種 / 悩み / 今の状況）ごとの記事ハブ */
@@ -34,8 +35,8 @@ export async function TaxonomyHub({ group, slug }: { group: TaxonomyGroup; slug:
   const [categories, articles, all] = await Promise.all([repo.listCategories(), repo.listArticles({ tag: { group, slug } }), repo.listArticles()]);
   const journey = journeyForHub(taxonomyPath(group, slug));
   const comparison = group === "roles" && ROLE_TO_COMPARISON[slug] ? getJobRole(ROLE_TO_COMPARISON[slug]) : undefined;
-  const top = articles.slice(0, 3);
-  const rest = articles.slice(3);
+  const top = pickStartArticles(articles, taxonomyPath(group, slug));
+  const rest = articles.filter((a) => !top.some((start) => start.slug === a.slug));
   const otherGroups = (["concerns", "situations", "roles"] as TaxonomyGroup[]).filter((x) => x !== group);
 
   return (
@@ -77,8 +78,6 @@ export async function TaxonomyHub({ group, slug }: { group: TaxonomyGroup; slug:
         )}
       </header>
 
-      {journey && <JourneyGuide journey={journey} articles={all} />}
-
       <nav aria-label={`ほかの${g.label}`} className="mt-5 flex gap-2 overflow-x-auto pb-2">
         {TAXONOMY[group].map((t) => (
           <Link
@@ -98,6 +97,7 @@ export async function TaxonomyHub({ group, slug }: { group: TaxonomyGroup; slug:
             <p className="rounded-[var(--radius-card)] bg-surface p-10 text-center text-sm text-muted ring-1 ring-line">このテーマの記事は準備中です。</p>
           ) : (
             <>
+              <h2 className="mb-4 text-lg font-bold text-ink">まず読むなら、この{top.length}本</h2>
               <ul className="swipe md-grid reveal" style={{ ["--cols" as string]: 3 }}>
                 {top.map((a) => (
                   <li key={a.slug}>
@@ -106,10 +106,9 @@ export async function TaxonomyHub({ group, slug }: { group: TaxonomyGroup; slug:
                 ))}
               </ul>
               {rest.length > 0 && (
-                <div className="mt-8 rounded-[var(--radius-card)] border border-line bg-surface px-5">
-                  <ArticleList articles={rest} categories={categories} />
-                </div>
+                <section className="mt-8" aria-label="このテーマの関連記事"><h2 className="mb-3 text-base font-bold text-ink">もう少し調べたいこと <span className="text-sm font-normal text-muted">{rest.length}本</span></h2><ArticleDirectory articles={rest} /></section>
               )}
+              {journey && <JourneyGuide journey={journey} articles={all} />}
             </>
           )}
         </div>

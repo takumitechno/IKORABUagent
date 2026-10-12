@@ -15,7 +15,7 @@ export const metadata = pageMetadata({
  */
 export default function PrivacyPage() {
   return (
-    <InfoPage title="プライバシーポリシー" path="/privacy" eyebrow="PRIVACY">
+    <InfoPage title="プライバシーポリシー" path="/privacy" eyebrow="個人情報の取り扱い">
       <p>
         <PendingReview>準備中（正式公開前に運営会社の確認を経て掲載します）</PendingReview>
       </p>

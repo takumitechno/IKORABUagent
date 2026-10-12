@@ -1,5 +1,5 @@
 // next/link の代わりに普通の <a> を出す。画面遷移は runtime.js がクリックを拾って行う
-const R = window.React;
+const R = require("react");
 function Link(props) {
   const { href, prefetch, replace, scroll, shallow, passHref, legacyBehavior, ...rest } = props;
   return R.createElement("a", Object.assign({ href: typeof href === "string" ? href : String(href) }, rest));

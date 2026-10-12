@@ -5,6 +5,10 @@ description: "面接の最後の「何か質問はありますか？」に何を
 source:
   - content/articles/gyaku-shitsumon.md
   - src/app/articles/[slug]/page.tsx
+  - src/components/ConsultationCta.tsx
+  - src/components/SupportSample.tsx
+  - src/components/Eyecatch.tsx
+  - content/images/index.json
 ---
 
 [戻る](/categories/shorui-mensetsu)
@@ -18,6 +22,8 @@ source:
 2026年10月9日 更新 約5分で読めます
 
 提案用のサンプル原稿です（人による最終確認・公開承認の前）。[詳しく](/editorial-policy)
+
+[出典3件・記事の確認状況](#editorial-sources)
 
 面接の最後の「何か質問はありますか？」は、入社後に自分が働けるかを確かめる時間です。質問の作り方、研修・最初の仕事・評価についての未経験向けの質問例、避けたい質問、給料や休みの聞き方、質問がなくなったときの言い方を紹介します。
 
@@ -65,7 +71,7 @@ source:
 
 「研修はありますか？」のように、求人票に書いてあることをそのまま聞くのではなく、**書いてあることの先**を聞くのがポイントです。
 
-面接の練習と書類の添削は、プロに頼める
+面接の練習と書類の添削を相談する
 
 応募先に合わせた模擬面接や、履歴書・職務経歴書の添削を受けてから本番にのぞめます。
 
@@ -169,12 +175,17 @@ source:
 
 **出典とこの記事について出典3件**
 
+以下は原稿作成時の参照情報です。正式公開前に、担当者が出典本文・記事の主張・制度の適用条件を照合します。リンクの掲載やAI査読は、人による確認の完了を意味しません。
+
 1. [さぁ！面接です（外部サイト）](https://jsite.mhlw.go.jp/hokkaido-hellowork/list/sapporo/kyusyokusya/mitiannai-1/mensetsu.html)
    北海道労働局（ハローワーク札幌）・2026年10月9日確認
+   この記事での参照箇所: 面接でよく出る質問に「何か質問はありませんか」があること。仕事の内容や労働条件で聞きたいことは事前にまとめておくこと。面接の最後に採否の結果がいつ分かるかを確認すること
 2. [面接対策（外部サイト）](https://jsite.mhlw.go.jp/yamagata-hellowork/content/contents/002350381.pdf)
    山形労働局（ハローワーク）・2026年10月9日確認
+   この記事での参照箇所: 逆質問で「特にありません」とはしないこと、調べれば分かる質問は避けること
 3. [ハローワークの求人票と実際が異なる旨の申し出等について（ハローワーク求人ホットライン）（外部サイト）](https://www.hellowork.mhlw.go.jp/member/hotline.html)
    厚生労働省（ハローワークインターネットサービス）・2026年10月9日確認
+   この記事での参照箇所: ハローワークの求人票の内容と実際の条件が違う場合に、ハローワーク求人ホットラインに申し出られること
 
 - **作成**
   2026年10月9日
@@ -199,19 +210,21 @@ source:
 6. [質問がなくなったときの言い方](#section-6)
 7. [最後に、結果の連絡時期を確かめる](#section-7)
 
-面接の練習と書類の添削は、プロに頼める
+面接の練習と書類の添削を相談する
 
 応募先に合わせた模擬面接や、履歴書・職務経歴書の添削を受けてから本番にのぞめます。
 
 [面接・書類の準備を相談する](/consultation/apply?placement=article-sidebar__gyaku-shitsumon)
 
-[相談でできることを見る](/consultation)
+[相談の内容を確認する](/consultation)
 
 [条件整理チェック](/check)
 
 [職種を比べる](/jobs)
 
-## 面接の練習と書類の添削は、プロに頼める
+キャリア相談のご案内
+
+## 面接の練習と書類の添削を相談する
 
 応募先に合わせた模擬面接や、履歴書・職務経歴書の添削を受けてから本番にのぞめます。
 
@@ -219,15 +232,17 @@ source:
 - 面接の練習
 - 応募書類の添削
 
-[面接・書類の準備を相談する](/consultation/apply?placement=article-bottom__gyaku-shitsumon) ・ [相談でできることを見る](/consultation)
+[面接・書類の準備を相談する](/consultation/apply?placement=article-bottom__gyaku-shitsumon) ・ [相談の内容を確認する](/consultation)
 
 相談先: 提携する人材紹介会社（正式公開時に掲載）（有料職業紹介事業許可番号: 正式公開時に掲載）
+
+希望を整理してから話したい方は、[相談用のメモを作る](/check)（登録不要）。
 
 ## 次に読むなら
 
 - 面接・書類 2026.10.06
-  ### [未経験職種の面接、何を準備する？よく聞かれる質問と逆質問の例](/articles/mensetsu-junbi-mikeiken)
+  ### [面接が不安。何を準備する？](/articles/mensetsu-junbi-mikeiken)
 - 転職準備 2026.10.06
-  ### [未経験求人の「研修あり」で確認すべきこと｜期間・内容・その後のフォロー](/articles/mikeiken-kenshu-kakunin)
+  ### [「研修あり」の求人、何を確かめる？](/articles/mikeiken-kenshu-kakunin)
 - 転職準備 2026.10.09
-  ### [内定をもらったら、承諾の前に確認すること｜労働条件通知書の見方と返事のしかた](/articles/naitei-shodaku-mae)
+  ### [内定が出た！承諾の前に見ること](/articles/naitei-shodaku-mae)

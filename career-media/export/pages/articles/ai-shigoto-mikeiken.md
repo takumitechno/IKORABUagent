@@ -5,6 +5,10 @@ description: "「AIに仕事を奪われる」という話を聞くと、これ�
 source:
   - content/articles/ai-shigoto-mikeiken.md
   - src/app/articles/[slug]/page.tsx
+  - src/components/ConsultationCta.tsx
+  - src/components/SupportSample.tsx
+  - src/components/Eyecatch.tsx
+  - content/images/index.json
 ---
 
 [戻る](/categories/shokushu)
@@ -18,6 +22,8 @@ source:
 2026年10月6日 更新 約3分で読めます
 
 提案用のサンプル原稿です（人による最終確認・公開承認の前）。[詳しく](/editorial-policy)
+
+[出典2件・記事の確認状況](#editorial-sources)
 
 「AIに仕事を奪われる」という話を聞くと、これから選ぶ職種に不安を感じるかもしれません。職種名ではなく仕事の中の作業（タスク）に分けて考えると、変わりやすい部分と変わりにくい部分が見えてきます。職種選びと面接での確認のしかたを整理します。
 
@@ -81,7 +87,7 @@ AIなどの道具で変わりやすいのは、こうした作業のうち、次
 
 どの職種にも、効率化されやすい作業と人が担う作業の両方があります。大事なのは、職種名で一喜一憂するより、**その会社でどの作業を担当するのか**を確認することです。
 
-その仕事が自分に合うか、プロに聞いてみる
+仕事内容と応募条件を確認する
 
 求人票だけでは分からない仕事の中身や職場のことを、キャリアアドバイザーに聞いてから会社を選べます。
 
@@ -129,10 +135,14 @@ AIの影響は、職種によっても会社によっても違います。漠然
 
 **出典とこの記事について出典2件**
 
+以下は原稿作成時の参照情報です。正式公開前に、担当者が出典本文・記事の主張・制度の適用条件を照合します。リンクの掲載やAI査読は、人による確認の完了を意味しません。
+
 1. [情報通信白書（外部サイト）](https://www.soumu.go.jp/johotsusintokei/whitepaper/)
    総務省・2026年10月6日確認
+   この記事での参照箇所: AIなどデジタル技術の利用状況に関する公的な情報源の紹介
 2. [職業情報提供サイト（job tag）（外部サイト）](https://shigoto.mhlw.go.jp/User/)
    厚生労働省・2026年10月6日確認
+   この記事での参照箇所: 職業を作業（タスク）やスキルの単位で調べる方法
 
 - **作成**
   2026年10月6日
@@ -154,19 +164,21 @@ AIの影響は、職種によっても会社によっても違います。漠然
 3. [未経験転職者が今からできること](#section-3)
 4. [面接や面談で確認したいこと](#section-4)
 
-その仕事が自分に合うか、プロに聞いてみる
+仕事内容と応募条件を確認する
 
 求人票だけでは分からない仕事の中身や職場のことを、キャリアアドバイザーに聞いてから会社を選べます。
 
 [職種・会社選びを相談する](/consultation/apply?placement=article-sidebar__ai-shigoto-mikeiken)
 
-[相談でできることを見る](/consultation)
+[相談の内容を確認する](/consultation)
 
 [条件整理チェック](/check)
 
 [職種を比べる](/jobs)
 
-## その仕事が自分に合うか、プロに聞いてみる
+キャリア相談のご案内
+
+## 仕事内容と応募条件を確認する
 
 求人票だけでは分からない仕事の中身や職場のことを、キャリアアドバイザーに聞いてから会社を選べます。
 
@@ -174,15 +186,17 @@ AIの影響は、職種によっても会社によっても違います。漠然
 - 面接の練習
 - 応募書類の添削
 
-[職種・会社選びを相談する](/consultation/apply?placement=article-bottom__ai-shigoto-mikeiken) ・ [相談でできることを見る](/consultation)
+[職種・会社選びを相談する](/consultation/apply?placement=article-bottom__ai-shigoto-mikeiken) ・ [相談の内容を確認する](/consultation)
 
 相談先: 提携する人材紹介会社（正式公開時に掲載）（有料職業紹介事業許可番号: 正式公開時に掲載）
+
+希望を整理してから話したい方は、[相談用のメモを作る](/check)（登録不要）。
 
 ## 次に読むなら
 
 - 職種を知る 2026.10.06
-  ### [営業・カスタマーサポート・ITサポートの違いは？仕事内容と向き不向きを比べる](/articles/eigyo-cs-it-support-chigai)
+  ### [営業・サポート・IT、どこが違う？](/articles/eigyo-cs-it-support-chigai)
 - 未経験転職 2026.10.06
-  ### [未経験転職は何から始める？最初に整理したい5つのこと](/articles/mikeiken-tenshoku-hajimekata)
+  ### [未経験の転職、何から始める？](/articles/mikeiken-tenshoku-hajimekata)
 - ニュース解説 2026.10.06
-  ### [学び直しの支援が拡充｜教育訓練給付の引き上げと教育訓練休暇給付金](/news/news-kyouiku-kunren-kyufu)
+  ### [転職前に学びたい。講座の費用、補助ある？](/news/news-kyouiku-kunren-kyufu)

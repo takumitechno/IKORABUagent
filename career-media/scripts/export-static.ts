@@ -70,14 +70,18 @@ function sourcesFor(route: string): string[] {
   const candidates: string[] = [];
   const detail = route.match(/^\/(articles|news)\/([^/]+)$/);
   const hub = route.match(/^\/(jobs|concerns|situations)\/([^/]+)$/);
-  if (route === "/") candidates.push("src/app/page.tsx");
+  if (route === "/articles" || /^\/articles\/page\/\d+$/.test(route)) candidates.push("src/components/ArticleCatalogue.tsx", "src/lib/content-discovery.ts", route === "/articles" ? "src/app/articles/page.tsx" : "src/app/articles/page/[page]/page.tsx");
+  else if (route === "/") candidates.push("src/app/page.tsx", "src/components/ConsultationPreview.tsx", "src/components/SupportSample.tsx", "src/components/ConditionNotePreview.tsx");
   else if (detail) candidates.push(`content/${detail[1]}/${detail[2]}.md`, `src/app/${detail[1]}/[slug]/page.tsx`);
   else if (hub) candidates.push(`src/app/${hub[1]}/[slug]/page.tsx`, "src/components/TaxonomyHub.tsx", "src/lib/taxonomy.ts");
   else if (route.startsWith("/categories/")) candidates.push("src/app/categories/[slug]/page.tsx", "content/categories.json");
   else candidates.push(`src/app${route}/page.tsx`);
   if (route === "/jobs") candidates.push("src/components/JobMap.tsx", "src/lib/jobs.ts");
-  if (route === "/check") candidates.push("src/components/ConditionCheck.tsx", "src/lib/condition-check/questions.ts", "src/lib/condition-check/engine.ts");
-  if (route === "/consultation") candidates.push("src/lib/consultation.ts");
+  if (route === "/check") candidates.push("src/components/ConditionCheck.tsx", "src/components/ConditionNotePreview.tsx", "src/lib/condition-check/questions.ts", "src/lib/condition-check/engine.ts", "src/lib/consultation-topics.ts");
+  if (detail) candidates.push("src/components/ConsultationCta.tsx", "src/components/SupportSample.tsx");
+  if (route === "/consultation") candidates.push("src/components/ConsultationTopics.tsx", "src/components/ConsultationTrust.tsx", "src/lib/consultation-topics.ts", "src/lib/consultation.ts");
+  if (route === "/" || route === "/news" || route.startsWith("/articles") || route.startsWith("/news/") || route.startsWith("/categories/") || hub) candidates.push("src/components/Eyecatch.tsx", "content/images/index.json");
+  if (!detail && route !== "/") candidates.push("src/components/PageHero.tsx");
   return candidates.filter((f) => fs.existsSync(path.join(ROOT, f)));
 }
 
@@ -130,10 +134,10 @@ async function exportMarkdown(base: string, routes: string[], pagesDir: string):
 
 function indexMarkdown(pages: PageInfo[], base: string): string {
   const groups: [string, (r: string) => boolean][] = [
-    ["固定ページ", (r) => STATIC_ROUTES.includes(r)],
+    ["固定ページ・記事一覧", (r) => STATIC_ROUTES.includes(r) || /^\/articles\/page\/\d+$/.test(r)],
     ["入口ページ（職種・悩み・今の状況）", (r) => /^\/(jobs|concerns|situations)\/[^/]+$/.test(r)],
     ["カテゴリ", (r) => r.startsWith("/categories/")],
-    ["記事", (r) => r.startsWith("/articles/")],
+    ["記事", (r) => /^\/articles\/[^/]+$/.test(r)],
     ["ニュース解説", (r) => r.startsWith("/news/")],
   ];
   const cell = (s: string) => s.replace(/\|/g, "\\|").replace(/\s+/g, " ").trim();

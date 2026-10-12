@@ -5,6 +5,10 @@ description: "求人の福利厚生欄はどこを見ればいい？法定福利
 source:
   - content/articles/fukuri-kousei-mikata.md
   - src/app/articles/[slug]/page.tsx
+  - src/components/ConsultationCta.tsx
+  - src/components/SupportSample.tsx
+  - src/components/Eyecatch.tsx
+  - content/images/index.json
 ---
 
 [戻る](/categories/hatarakikata)
@@ -18,6 +22,8 @@ source:
 2026年10月10日 更新 約5分で読めます
 
 提案用のサンプル原稿です（人による最終確認・公開承認の前）。[詳しく](/editorial-policy)
+
+[出典4件・記事の確認状況](#editorial-sources)
 
 求人の福利厚生は、法律で加入が決まっている社会保険（法定福利）と、会社が独自に用意する制度（法定外福利）に分けて読むと分かりやすくなります。「社会保険完備」の意味、住宅手当・交通費・退職金・研修で確かめること、面接での聞き方の例を紹介します。
 
@@ -116,7 +122,7 @@ source:
 
 特別休暇（夏季休暇・慶弔休暇など）、社員食堂や食事の補助、健康づくりの補助、福利厚生サービスの会員制度など、会社によってさまざまです。**使う人がどのくらいいるか**、**自分の働き方でも使えるか**（店舗勤務でも使えるか、など）を聞いてみると、実際の役立ち方が分かります。
 
-給料や休みの条件が合う会社を、プロと探す
+給料と休日の条件を比較する
 
 求人票の条件の見方や、求人票には書かれていない働き方のことを、キャリアアドバイザーに確かめてもらえます。
 
@@ -124,7 +130,7 @@ source:
 - 面接の練習
 - 応募書類の添削
 
-[条件の合う会社を相談する](/consultation/apply?placement=article-inline__fukuri-kousei-mikata) ・ [先に条件を整理する（3分・登録不要）](/check)
+[働く条件を相談する](/consultation/apply?placement=article-inline__fukuri-kousei-mikata) ・ [先に条件を整理する（3分・登録不要）](/check)
 
 ## どうやって確かめる？
 
@@ -173,14 +179,20 @@ source:
 
 **出典とこの記事について出典4件**
 
+以下は原稿作成時の参照情報です。正式公開前に、担当者が出典本文・記事の主張・制度の適用条件を照合します。リンクの掲載やAI査読は、人による確認の完了を意味しません。
+
 1. [労働条件の明示（しっかり学ぼう！働くときの基礎知識｜確かめよう労働条件）（外部サイト）](https://www.check-roudou.mhlw.go.jp/study/roudousya_roudoujouken.html)
    厚生労働省・2026年10月9日確認
+   この記事での参照箇所: 求人の募集時に、健康保険・厚生年金・労災保険・雇用保険の適用に関する事項を明示することになっていること
 2. [適用事業所と被保険者（外部サイト）](https://www.nenkin.go.jp/service/kounen/tekiyo/jigyosho/20150518.html)
    日本年金機構・2026年10月9日確認
+   この記事での参照箇所: 法人の事業所は健康保険・厚生年金保険の適用事業所となること。パート・アルバイトでも、所定労働時間・日数が通常の労働者の4分の3以上なら被保険者になること
 3. [一般の中小企業退職金共済制度のしくみ（外部サイト）](https://www.mhlw.go.jp/bunya/roudoukijun/taisilyokukin_kyousai/ippanchuutai/)
    厚生労働省・2026年10月9日確認
+   この記事での参照箇所: 中退共は、単独で退職金制度を持つことが難しい中小企業のための国の退職金制度で、掛金は全額事業主が負担すること
 4. [労働基準法（昭和二十二年法律第四十九号）第八十九条（外部サイト）](https://laws.e-gov.go.jp/law/322AC0000000049)
    e-Gov法令検索（デジタル庁）・2026年10月9日確認
+   この記事での参照箇所: 退職手当の定めをする場合は、対象者の範囲や計算・支払いの方法などを就業規則に記載すること
 
 - **作成**
   2026年10月10日
@@ -202,19 +214,21 @@ source:
 3. [どうやって確かめる？](#section-3)
 4. [まとめ](#section-4)
 
-給料や休みの条件が合う会社を、プロと探す
+給料と休日の条件を比較する
 
 求人票の条件の見方や、求人票には書かれていない働き方のことを、キャリアアドバイザーに確かめてもらえます。
 
-[条件の合う会社を相談する](/consultation/apply?placement=article-sidebar__fukuri-kousei-mikata)
+[働く条件を相談する](/consultation/apply?placement=article-sidebar__fukuri-kousei-mikata)
 
-[相談でできることを見る](/consultation)
+[相談の内容を確認する](/consultation)
 
 [条件整理チェック](/check)
 
 [職種を比べる](/jobs)
 
-## 給料や休みの条件が合う会社を、プロと探す
+キャリア相談のご案内
+
+## 給料と休日の条件を比較する
 
 求人票の条件の見方や、求人票には書かれていない働き方のことを、キャリアアドバイザーに確かめてもらえます。
 
@@ -222,15 +236,17 @@ source:
 - 面接の練習
 - 応募書類の添削
 
-[条件の合う会社を相談する](/consultation/apply?placement=article-bottom__fukuri-kousei-mikata) ・ [相談でできることを見る](/consultation)
+[働く条件を相談する](/consultation/apply?placement=article-bottom__fukuri-kousei-mikata) ・ [相談の内容を確認する](/consultation)
 
 相談先: 提携する人材紹介会社（正式公開時に掲載）（有料職業紹介事業許可番号: 正式公開時に掲載）
+
+希望を整理してから話したい方は、[相談用のメモを作る](/check)（登録不要）。
 
 ## 次に読むなら
 
 - 年収・働き方 2026.10.06
-  ### [手取り20万円から転職を考えるとき、何を比べればいい？](/articles/tedori-20man-hikaku)
+  ### [手取り20万円。転職で何を比べる？](/articles/tedori-20man-hikaku)
 - 制度・手続き 2026.10.09
-  ### [試用期間って何？法律上の扱い・給料と社会保険・入社前に確認したいこと](/articles/shiyou-kikan)
+  ### [試用期間って何を確認すればいい？](/articles/shiyou-kikan)
 - 転職準備 2026.10.06
-  ### [未経験求人の「研修あり」で確認すべきこと｜期間・内容・その後のフォロー](/articles/mikeiken-kenshu-kakunin)
+  ### [「研修あり」の求人、何を確かめる？](/articles/mikeiken-kenshu-kakunin)

@@ -5,6 +5,10 @@ description: "職務経歴書は何をどの順で書けばいい？正社員・
 source:
   - content/articles/shokumu-keirekisho-kakikata.md
   - src/app/articles/[slug]/page.tsx
+  - src/components/ConsultationCta.tsx
+  - src/components/SupportSample.tsx
+  - src/components/Eyecatch.tsx
+  - content/images/index.json
 ---
 
 [戻る](/categories/shorui-mensetsu)
@@ -18,6 +22,8 @@ source:
 2026年10月10日 更新 約6分で読めます
 
 提案用のサンプル原稿です（人による最終確認・公開承認の前）。[詳しく](/editorial-policy)
+
+[出典4件・記事の確認状況](#editorial-sources)
 
 職務経歴書は、決まった様式がない分、「何を、どの順で書くか」で読みやすさが変わります。正社員や契約社員として働いた経験がある人向けに、編年体と逆編年体の選び方、職務要約・職務内容・活かせる経験・自己PRの書き方と例を、ハローワークや厚生労働省の資料をもとに紹介します。
 
@@ -68,7 +74,7 @@ source:
 
 このほかに、時期ではなく仕事の種類ごとにまとめる「キャリア式」もあります。転職を何度かして、似た仕事をいくつかの会社でしてきた人が使うことがあります。転職回数が気になる人は[転職回数が気になるときに整理したいこと](/articles/tenshoku-kaisu-kininaru)もあわせて読んでみてください。
 
-面接の練習と書類の添削は、プロに頼める
+面接の練習と書類の添削を相談する
 
 応募先に合わせた模擬面接や、履歴書・職務経歴書の添削を受けてから本番にのぞめます。
 
@@ -184,14 +190,20 @@ source:
 
 **出典とこの記事について出典4件**
 
+以下は原稿作成時の参照情報です。正式公開前に、担当者が出典本文・記事の主張・制度の適用条件を照合します。リンクの掲載やAI査読は、人による確認の完了を意味しません。
+
 1. [職務経歴書（パンフレット）（外部サイト）](https://www.hellowork.mhlw.go.jp/doc/syokurekisyo_pamphlet_070531.pdf)
    ハローワークインターネットサービス（厚生労働省）・2026年10月9日確認
+   この記事での参照箇所: 職務経歴の書き方に編年体（古い順）・逆編年体（新しい順）・キャリア式があり、迷ったときは編年体にすること、職務要約は職務経歴の概要を書くこと、活かせる経験の例（新規開店や業務改善などのプロジェクト、決算棚卸しなどのイベント）
 2. [応募書類の作り方「2 職務経歴書」（外部サイト）](https://www.hellowork.mhlw.go.jp/doc/oubosyorui_pamphlet_02_070531.pdf)
    ハローワークインターネットサービス（厚生労働省）・2026年10月9日確認
+   この記事での参照箇所: 職務経歴書は決まった様式がなく、A4で1〜2枚程度が目安であること、パソコンでの作成が一般的なこと、和暦・西暦や文体をそろえること
 3. [履歴書と職務経歴書の違いとは？（外部サイト）](https://www.job-card.mhlw.go.jp/column/employed/cv-resume)
    マイジョブ・カード（厚生労働省）・2026年10月9日確認
+   この記事での参照箇所: 履歴書は基本的なプロフィールを見る書類、職務経歴書は職務経験と実務能力が企業のニーズに合うかを見る書類であること、職務経歴書に書く主な項目
 4. [職務経歴書における自己PR欄の必要性と書き方について（外部サイト）](https://www.job-card.mhlw.go.jp/column/employed/self-pr)
    マイジョブ・カード（厚生労働省）・2026年10月9日確認
+   この記事での参照箇所: 職務経歴書には決まった書式がなく、一般的な項目を設けて書くこと、自己PRは具体的な経験と結びつけて書くこと
 
 - **作成**
   2026年10月10日
@@ -216,19 +228,21 @@ source:
 6. [自己PR：強みを1つにしぼって、経験とつなげる](#section-6)
 7. [書けたら確認したいこと](#section-7)
 
-面接の練習と書類の添削は、プロに頼める
+面接の練習と書類の添削を相談する
 
 応募先に合わせた模擬面接や、履歴書・職務経歴書の添削を受けてから本番にのぞめます。
 
 [面接・書類の準備を相談する](/consultation/apply?placement=article-sidebar__shokumu-keirekisho-kakikata)
 
-[相談でできることを見る](/consultation)
+[相談の内容を確認する](/consultation)
 
 [条件整理チェック](/check)
 
 [職種を比べる](/jobs)
 
-## 面接の練習と書類の添削は、プロに頼める
+キャリア相談のご案内
+
+## 面接の練習と書類の添削を相談する
 
 応募先に合わせた模擬面接や、履歴書・職務経歴書の添削を受けてから本番にのぞめます。
 
@@ -236,15 +250,17 @@ source:
 - 面接の練習
 - 応募書類の添削
 
-[面接・書類の準備を相談する](/consultation/apply?placement=article-bottom__shokumu-keirekisho-kakikata) ・ [相談でできることを見る](/consultation)
+[面接・書類の準備を相談する](/consultation/apply?placement=article-bottom__shokumu-keirekisho-kakikata) ・ [相談の内容を確認する](/consultation)
 
 相談先: 提携する人材紹介会社（正式公開時に掲載）（有料職業紹介事業許可番号: 正式公開時に掲載）
+
+希望を整理してから話したい方は、[相談用のメモを作る](/check)（登録不要）。
 
 ## 次に読むなら
 
 - 面接・書類 2026.10.06
-  ### [アルバイト経験だけの職務経歴書、何を書けばいい？構成と書き出し例](/articles/shokumu-keirekisho-arubaito)
+  ### [職務経歴書、アルバイトだけでも？](/articles/shokumu-keirekisho-arubaito)
 - 面接・書類 2026.10.09
-  ### [未経験の仕事の自己PR、何を書く？アルバイト・接客の経験から強みを見つける方法と例文](/articles/jiko-pr-mikeiken)
+  ### [接客の経験、自己PRにできる？](/articles/jiko-pr-mikeiken)
 - 転職準備 2026.10.09
-  ### [転職のための自己分析のやり方｜経験の棚卸し・ゆずれない条件・やりたくないことの書き出し例](/articles/jiko-bunseki-yarikata)
+  ### [自己分析って、何を書けばいい？](/articles/jiko-bunseki-yarikata)

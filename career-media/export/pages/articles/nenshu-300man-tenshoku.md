@@ -5,6 +5,10 @@ description: "未経験の仕事に移ると、給料は下がることもあれ
 source:
   - content/articles/nenshu-300man-tenshoku.md
   - src/app/articles/[slug]/page.tsx
+  - src/components/ConsultationCta.tsx
+  - src/components/SupportSample.tsx
+  - src/components/Eyecatch.tsx
+  - content/images/index.json
 ---
 
 [戻る](/categories/hatarakikata)
@@ -18,6 +22,8 @@ source:
 2026年10月6日 更新 約4分で読めます
 
 提案用のサンプル原稿です（人による最終確認・公開承認の前）。[詳しく](/editorial-policy)
+
+[出典3件・記事の確認状況](#editorial-sources)
 
 未経験の仕事に移ると、給料は下がることもあれば、変わらない・上がることもあります。今の年収の中身、提示された年収の中身、1年目と数年後の見通し、生活に必要な金額の4つを順番に確かめると、自分の場合を判断しやすくなります。
 
@@ -56,7 +62,7 @@ source:
 
 この場合、残業や夜の勤務がない仕事に移ると、同じ基本給でも年36万円分が変わる可能性があります。反対に、転職先の基本給が今より高ければ、残業が減っても年収は大きく変わらないこともあります。「300万円」という合計だけを比べるより、**中身ごとに比べる**ほうが、下がるのか上がるのかが見えやすくなります。
 
-給料や休みの条件が合う会社を、プロと探す
+給料と休日の条件を比較する
 
 求人票の条件の見方や、求人票には書かれていない働き方のことを、キャリアアドバイザーに確かめてもらえます。
 
@@ -64,7 +70,7 @@ source:
 - 面接の練習
 - 応募書類の添削
 
-[条件の合う会社を相談する](/consultation/apply?placement=article-inline__nenshu-300man-tenshoku) ・ [先に条件を整理する（3分・登録不要）](/check)
+[働く条件を相談する](/consultation/apply?placement=article-inline__nenshu-300man-tenshoku) ・ [先に条件を整理する（3分・登録不要）](/check)
 
 ## 提示された年収は「中身」を確認する
 
@@ -102,6 +108,8 @@ source:
 
 下限が決まれば、それを下回る求人は候補から外し、下限を上回る求人の中で仕事内容や働き方を比べればよくなります。年収以外に何を比べるかは[年収だけで求人を選ばないほうがいい理由](/articles/nenshu-dake-erabanai)を参考にしてください。
 
+**関連の記事も読む（任意）**
+
 読む順番ガイド STEP 2 / 6
 
 [給料は下げずに、休みも増やしたい](/concerns/kyuryo#guide)
@@ -126,12 +134,17 @@ source:
 
 **出典とこの記事について出典3件**
 
+以下は原稿作成時の参照情報です。正式公開前に、担当者が出典本文・記事の主張・制度の適用条件を照合します。リンクの掲載やAI査読は、人による確認の完了を意味しません。
+
 1. [固定残業代を賃金に含める場合は、適切な表示をお願いします（外部サイト）](https://www.mhlw.go.jp/content/11600000/000498453.pdf)
    厚生労働省・2026年10月6日確認
+   この記事での参照箇所: 固定残業代がある場合に求人で明示する3つの項目（基本給・時間数と金額・超過分の追加支払い）
 2. [2024年4月から労働条件明示のルールが変わります（外部サイト）](https://www.mhlw.go.jp/stf/newpage_32105.html)
    厚生労働省・2026年10月6日確認
+   この記事での参照箇所: 2024年4月から明示事項に「就業場所・業務の変更の範囲」が加わったこと
 3. [募集時等に明示すべき事項の追加（2024年4月1日施行・職業安定法施行規則の改正）（外部サイト）](https://www.mhlw.go.jp/content/001114110.pdf)
    厚生労働省・2026年10月6日確認
+   この記事での参照箇所: 2024年4月から、求人の募集時などに明示する労働条件に「従事すべき業務の変更の範囲」「就業場所の変更の範囲」が加わったこと
 
 - **作成**
   2026年10月6日
@@ -154,19 +167,21 @@ source:
 4. [1年目だけでなく、数年後も比べる](#section-4)
 5. [「これ以上は下げられない」金額を決める](#section-5)
 
-給料や休みの条件が合う会社を、プロと探す
+給料と休日の条件を比較する
 
 求人票の条件の見方や、求人票には書かれていない働き方のことを、キャリアアドバイザーに確かめてもらえます。
 
-[条件の合う会社を相談する](/consultation/apply?placement=article-sidebar__nenshu-300man-tenshoku)
+[働く条件を相談する](/consultation/apply?placement=article-sidebar__nenshu-300man-tenshoku)
 
-[相談でできることを見る](/consultation)
+[相談の内容を確認する](/consultation)
 
 [条件整理チェック](/check)
 
 [職種を比べる](/jobs)
 
-## 給料や休みの条件が合う会社を、プロと探す
+キャリア相談のご案内
+
+## 給料と休日の条件を比較する
 
 求人票の条件の見方や、求人票には書かれていない働き方のことを、キャリアアドバイザーに確かめてもらえます。
 
@@ -174,15 +189,17 @@ source:
 - 面接の練習
 - 応募書類の添削
 
-[条件の合う会社を相談する](/consultation/apply?placement=article-bottom__nenshu-300man-tenshoku) ・ [相談でできることを見る](/consultation)
+[働く条件を相談する](/consultation/apply?placement=article-bottom__nenshu-300man-tenshoku) ・ [相談の内容を確認する](/consultation)
 
 相談先: 提携する人材紹介会社（正式公開時に掲載）（有料職業紹介事業許可番号: 正式公開時に掲載）
+
+希望を整理してから話したい方は、[相談用のメモを作る](/check)（登録不要）。
 
 ## 次に読むなら
 
 - 年収・働き方 2026.10.06
-  ### [手取り20万円から転職を考えるとき、何を比べればいい？](/articles/tedori-20man-hikaku)
+  ### [手取り20万円。転職で何を比べる？](/articles/tedori-20man-hikaku)
 - 年収・働き方 2026.10.06
-  ### [年収だけで求人を選ばないほうがいい理由](/articles/nenshu-dake-erabanai)
+  ### [年収が高い求人、それだけで決めていい？](/articles/nenshu-dake-erabanai)
 - 年収・働き方 2026.10.06
-  ### [「土日休み」と「年収」をどう比較する？求人票の数字の読み方](/articles/donichi-yasumi-nenshu-hikaku)
+  ### [土日休みと年収、どう比べればいい？](/articles/donichi-yasumi-nenshu-hikaku)

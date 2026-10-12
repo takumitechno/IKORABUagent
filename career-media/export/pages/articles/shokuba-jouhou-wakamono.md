@@ -5,6 +5,10 @@ description: "若者雇用促進法の「青少年雇用情報」では、離職
 source:
   - content/articles/shokuba-jouhou-wakamono.md
   - src/app/articles/[slug]/page.tsx
+  - src/components/ConsultationCta.tsx
+  - src/components/SupportSample.tsx
+  - src/components/Eyecatch.tsx
+  - content/images/index.json
 ---
 
 [戻る](/categories/seido)
@@ -18,6 +22,8 @@ source:
 2026年10月9日 更新 約5分で読めます
 
 提案用のサンプル原稿です（人による最終確認・公開承認の前）。[詳しく](/editorial-policy)
+
+[出典8件・記事の確認状況](#editorial-sources)
 
 若者雇用促進法では、新卒者などを募集する会社に、離職者数・残業時間・有休の取得日数・研修などの「青少年雇用情報」の提供を求めています。どんな情報を求められるか、ユースエール認定企業とは何か、応募前に情報を確かめる方法を整理します。
 
@@ -55,7 +61,7 @@ source:
 
 未経験の仕事に移るなら、「研修の有無と内容」は特に役立ちます。研修について確認したいことは[未経験求人の「研修あり」で確認すべきこと](/articles/mikeiken-kenshu-kakunin)でも紹介しています。
 
-退職や入社のタイミングも、まとめて相談
+退職・入社のタイミングを相談する
 
 制度の手続きを確かめながら、いつ辞めていつ入社するかなど、転職の進め方をキャリアアドバイザーに相談できます。
 
@@ -142,22 +148,32 @@ source:
 
 **出典とこの記事について出典8件**
 
+以下は原稿作成時の参照情報です。正式公開前に、担当者が出典本文・記事の主張・制度の適用条件を照合します。リンクの掲載やAI査読は、人による確認の完了を意味しません。
+
 1. [職場情報の提供制度（外部サイト）](https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/0000122234.html)
    厚生労働省・2026年10月7日確認
+   この記事での参照箇所: 2016年3月1日から、新卒者などの募集で青少年雇用情報の提供が義務になったこと
 2. [職場情報の積極的な提供（平成28年3月1日施行）（外部サイト）](https://www.mhlw.go.jp/file/06-Seisakujouhou-11600000-Shokugyouanteikyoku/0000134614.pdf)
    厚生労働省・2026年10月7日確認
+   この記事での参照箇所: 情報提供は努力義務で、応募者などから求めがあった場合は3つの類型ごとに1つ以上の情報を提供する義務があること。類型ごとの項目
 3. [青少年雇用情報シートの書き方のポイント（外部サイト）](https://www.mhlw.go.jp/file/06-Seisakujouhou-11600000-Shokugyouanteikyoku/0000184082.pdf)
    厚生労働省・2026年10月7日確認
+   この記事での参照箇所: 過去3年間の新卒採用者数・離職者数、平均勤続年数、研修の有無と内容、前年度の月平均所定外労働時間、有休の平均取得日数などの項目
 4. [青少年の雇用の促進等に関する法律第13条及び第14条に基づく青少年雇用情報の提供について（外部サイト）](https://www.mhlw.go.jp/file/05-Shingikai-12602000-Seisakutoukatsukan-Sanjikanshitsu_Roudouseisakutantou/0000101753.pdf)
    厚生労働省・2026年10月7日確認
+   この記事での参照箇所: 提供義務の対象が学校卒業見込者等（卒業見込みの人と卒業者など）の募集であること。ハローワークや職業紹介事業者を通じて求めることもできること
 5. [青少年の雇用機会の確保及び職場への定着に関して事業主、特定地方公共団体、職業紹介事業者等その他の関係者が適切に対処するための指針（外部サイト）](https://www.mhlw.go.jp/content/11800000/000922209.pdf)
    厚生労働省・2026年10月7日確認
+   この記事での参照箇所: 情報を求めた人を不利益に取り扱わないこと、個別の求めにはメールや書面で提供すること
 6. [ユースエール認定制度（外部サイト）](https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/0000100266.html)
    厚生労働省・2026年10月7日確認
+   この記事での参照箇所: ユースエール認定は、若者の採用・育成に積極的で雇用管理が優良な常時雇用300人以下の中小企業を厚生労働大臣が認定する制度であること。主な認定基準
 7. [認定制度とは｜若者雇用促進総合サイト（外部サイト）](https://wakamono-koyou-sokushin.mhlw.go.jp/search/service/staticpage.action?action=nintei)
    厚生労働省・2026年10月7日確認
+   この記事での参照箇所: 離職率20%以下、月平均所定外労働時間20時間以下、有休の取得率70%以上または取得日数10日以上などの認定基準。認定企業を検索できること
 8. [しょくばらぼについて｜職場情報総合サイト しょくばらぼ（外部サイト）](https://shokuba.mhlw.go.jp/010/20180302201542.html)
    厚生労働省・2026年10月7日確認
+   この記事での参照箇所: 残業時間や有休の取得実績などの職場情報を、企業ごとに検索・比較できるサイトであること
 
 - **作成**
   2026年10月9日
@@ -180,19 +196,21 @@ source:
 4. [ユースエール認定企業とは？](#section-4)
 5. [中途採用ならどう調べる？](#section-5)
 
-退職や入社のタイミングも、まとめて相談
+退職・入社のタイミングを相談する
 
 制度の手続きを確かめながら、いつ辞めていつ入社するかなど、転職の進め方をキャリアアドバイザーに相談できます。
 
 [転職の進め方を相談する](/consultation/apply?placement=article-sidebar__shokuba-jouhou-wakamono)
 
-[相談でできることを見る](/consultation)
+[相談の内容を確認する](/consultation)
 
 [条件整理チェック](/check)
 
 [職種を比べる](/jobs)
 
-## 退職や入社のタイミングも、まとめて相談
+キャリア相談のご案内
+
+## 退職・入社のタイミングを相談する
 
 制度の手続きを確かめながら、いつ辞めていつ入社するかなど、転職の進め方をキャリアアドバイザーに相談できます。
 
@@ -200,15 +218,17 @@ source:
 - 面接の練習
 - 応募書類の添削
 
-[転職の進め方を相談する](/consultation/apply?placement=article-bottom__shokuba-jouhou-wakamono) ・ [相談でできることを見る](/consultation)
+[転職の進め方を相談する](/consultation/apply?placement=article-bottom__shokuba-jouhou-wakamono) ・ [相談の内容を確認する](/consultation)
 
 相談先: 提携する人材紹介会社（正式公開時に掲載）（有料職業紹介事業許可番号: 正式公開時に掲載）
+
+希望を整理してから話したい方は、[相談用のメモを作る](/check)（登録不要）。
 
 ## 次に読むなら
 
 - 転職準備 2026.10.06
-  ### [未経験求人の「研修あり」で確認すべきこと｜期間・内容・その後のフォロー](/articles/mikeiken-kenshu-kakunin)
+  ### [「研修あり」の求人、何を確かめる？](/articles/mikeiken-kenshu-kakunin)
 - 年収・働き方 2026.10.06
-  ### [「土日休み」と「年収」をどう比較する？求人票の数字の読み方](/articles/donichi-yasumi-nenshu-hikaku)
+  ### [土日休みと年収、どう比べればいい？](/articles/donichi-yasumi-nenshu-hikaku)
 - 未経験転職 2026.10.06
-  ### [第二新卒って何歳まで？使える場面と探し方](/articles/dainishinsotsu-nansai)
+  ### [第二新卒って何歳まで？](/articles/dainishinsotsu-nansai)

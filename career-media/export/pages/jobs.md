@@ -6,13 +6,14 @@ source:
   - src/app/jobs/page.tsx
   - src/components/JobMap.tsx
   - src/lib/jobs.ts
+  - src/components/PageHero.tsx
 ---
 
 [戻る](/)
 
 パンくず: [ホーム](/) › 職種を比べる
 
-JOB GUIDE
+職種を知る
 
 # 職種から探す・比べる
 
@@ -22,20 +23,20 @@ JOB GUIDE
 
 ## 職種から記事を探す
 
-- 5
-  [営業](/jobs/eigyo)
-- 9
-  [事務](/jobs/jimu)
-- 5
-  [カスタマーサポート](/jobs/customer-support)
-- 5
-  [ITサポート](/jobs/it-support)
-- 2
-  [人事・採用](/jobs/jinji)
-- 3
-  [販売・接客](/jobs/hanbai)
-- 9
-  [その他の職種](/jobs/sonota)
+- [営業](/jobs/eigyo)
+  5記事
+- [事務](/jobs/jimu)
+  9記事
+- [カスタマーサポート](/jobs/customer-support)
+  5記事
+- [ITサポート](/jobs/it-support)
+  5記事
+- [人事・採用](/jobs/jinji)
+  2記事
+- [販売・接客](/jobs/hanbai)
+  3記事
+- [その他の職種](/jobs/sonota)
+  9記事
 
 ## 4つの職種を比べる
 
@@ -219,6 +220,8 @@ JOB GUIDE
 - [接客経験は転職でどう活かせる？職種別のつながりと伝え方](/articles/sekkyaku-keiken-ikasu)
 - [AIで変わる仕事を、未経験転職者はどう見るべきか](/articles/ai-shigoto-mikeiken)
 
+キャリア相談のご案内
+
 ## 気になる職種が見つかったら、具体的な求人や働き方を相談する
 
 同じ職種でも、会社によって働き方は大きく違います。キャリアアドバイザーに、求人票だけでは分からない点を聞いてみましょう。
@@ -227,6 +230,6 @@ JOB GUIDE
 - 面接の練習
 - 応募書類の添削
 
-[整理した内容をもとに相談する](/consultation/apply?placement=jobs) ・ [相談でできることを見る](/consultation)
+[キャリア相談を申し込む](/consultation/apply?placement=jobs) ・ [相談の内容を確認する](/consultation)
 
 相談先: 提携する人材紹介会社（正式公開時に掲載）（有料職業紹介事業許可番号: 正式公開時に掲載）

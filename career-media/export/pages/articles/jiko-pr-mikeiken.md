@@ -5,6 +5,10 @@ description: "未経験の仕事に応募するときの自己PRの書き方を�
 source:
   - content/articles/jiko-pr-mikeiken.md
   - src/app/articles/[slug]/page.tsx
+  - src/components/ConsultationCta.tsx
+  - src/components/SupportSample.tsx
+  - src/components/Eyecatch.tsx
+  - content/images/index.json
 ---
 
 [戻る](/categories/shorui-mensetsu)
@@ -18,6 +22,8 @@ source:
 2026年10月9日 更新 約5分で読めます
 
 提案用のサンプル原稿です（人による最終確認・公開承認の前）。[詳しく](/editorial-policy)
+
+[出典3件・記事の確認状況](#editorial-sources)
 
 未経験の仕事に応募するときの自己PRは、同じ仕事の経験がなくても、アルバイトや接客で「やってきたこと」から作れます。強みの見つけ方、接客の経験を強みの言葉にする言い換え、自己PRの型、職種別の例文、面接で話すときのコツを紹介します。
 
@@ -52,7 +58,7 @@ source:
 
 ひとつの問いに、ひとつでも答えが出れば十分です。たとえば「店長に、品出しが早くて丁寧だと言われた」「常連のお客さんの好みを覚えていて、声をかけていた」のような、小さなことで構いません。
 
-面接の練習と書類の添削は、プロに頼める
+面接の練習と書類の添削を相談する
 
 応募先に合わせた模擬面接や、履歴書・職務経歴書の添削を受けてから本番にのぞめます。
 
@@ -148,12 +154,17 @@ source:
 
 **出典とこの記事について出典3件**
 
+以下は原稿作成時の参照情報です。正式公開前に、担当者が出典本文・記事の主張・制度の適用条件を照合します。リンクの掲載やAI査読は、人による確認の完了を意味しません。
+
 1. [就職活動の苦手を減らそう 自己PR編（外部サイト）](https://jsite.mhlw.go.jp/hyogo-roudoukyoku/content/contents/000836463.pdf)
    兵庫労働局（三宮わかものハローワーク）・2026年10月9日確認
+   この記事での参照箇所: 志望動機は応募先や仕事内容になぜ応募したのかを問われるもの、自己PRは自分の経験や性格、長所・短所、得意なことを問われるものという違い。面接で話しやすい形で考えると整理しやすいこと
 2. [応募書類作成支援（外部サイト）](https://jsite.mhlw.go.jp/hokkaido-hellowork/list/asahikawa/kyushokusha/shigoto05-2.html)
    北海道労働局（ハローワーク旭川）・2026年10月9日確認
+   この記事での参照箇所: 「〇〇ができます」「〇〇の性格です」と書いても根拠がないと、読む側に「なぜ？どうして？どのように？」と疑問を持たせてしまうこと。ハローワークで応募書類の作成を相談できること
 3. [職業情報提供サイト（job tag）（外部サイト）](https://shigoto.mhlw.go.jp/User/)
    厚生労働省・2026年10月9日確認
+   この記事での参照箇所: 職業ごとに仕事の内容や、必要なスキル・知識を調べられること
 
 - **作成**
   2026年10月9日
@@ -178,19 +189,21 @@ source:
 6. [職種別の例文（仮の例）](#section-6)
 7. [面接で話すときは](#section-7)
 
-面接の練習と書類の添削は、プロに頼める
+面接の練習と書類の添削を相談する
 
 応募先に合わせた模擬面接や、履歴書・職務経歴書の添削を受けてから本番にのぞめます。
 
 [面接・書類の準備を相談する](/consultation/apply?placement=article-sidebar__jiko-pr-mikeiken)
 
-[相談でできることを見る](/consultation)
+[相談の内容を確認する](/consultation)
 
 [条件整理チェック](/check)
 
 [職種を比べる](/jobs)
 
-## 面接の練習と書類の添削は、プロに頼める
+キャリア相談のご案内
+
+## 面接の練習と書類の添削を相談する
 
 応募先に合わせた模擬面接や、履歴書・職務経歴書の添削を受けてから本番にのぞめます。
 
@@ -198,15 +211,17 @@ source:
 - 面接の練習
 - 応募書類の添削
 
-[面接・書類の準備を相談する](/consultation/apply?placement=article-bottom__jiko-pr-mikeiken) ・ [相談でできることを見る](/consultation)
+[面接・書類の準備を相談する](/consultation/apply?placement=article-bottom__jiko-pr-mikeiken) ・ [相談の内容を確認する](/consultation)
 
 相談先: 提携する人材紹介会社（正式公開時に掲載）（有料職業紹介事業許可番号: 正式公開時に掲載）
+
+希望を整理してから話したい方は、[相談用のメモを作る](/check)（登録不要）。
 
 ## 次に読むなら
 
 - 経験の活かし方 2026.10.06
-  ### [接客経験は転職でどう活かせる？職種別のつながりと伝え方](/articles/sekkyaku-keiken-ikasu)
+  ### [接客の経験、ほかの仕事で活かせる？](/articles/sekkyaku-keiken-ikasu)
 - 面接・書類 2026.10.06
-  ### [アルバイト経験だけの職務経歴書、何を書けばいい？構成と書き出し例](/articles/shokumu-keirekisho-arubaito)
+  ### [職務経歴書、アルバイトだけでも？](/articles/shokumu-keirekisho-arubaito)
 - 面接・書類 2026.10.06
-  ### [未経験職種の志望動機、何を書けばいい？3つの要素と例文](/articles/shiboudouki-mikeiken)
+  ### [未経験の志望動機、何を書けばいい？](/articles/shiboudouki-mikeiken)

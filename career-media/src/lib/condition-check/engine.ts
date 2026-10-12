@@ -335,7 +335,7 @@ function consultSteps(answers: Answers): string[] {
   const timing = one(answers, "timing");
   const soon = timing === "asap" || timing === "3months";
   return [
-    "下の「面談で使うメモとしてコピー」で、このノートの要点を手元に残す（回答は相談先に自動では送られません）",
+    "「相談用メモをコピー」で要点を手元に残す（回答は相談先に自動では送られません）",
     "相談でできること・できないことを確認する",
     soon
       ? "働き始めたい時期が近いので、申し込みのときに時期と、最優先の条件を最初に伝える"

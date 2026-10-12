@@ -14,7 +14,7 @@ export const metadata = pageMetadata({
 export default function AboutPage() {
   const info = partner.pendingCompanyInfo;
   return (
-    <InfoPage title="運営者情報" path="/about" eyebrow="ABOUT" lead={`${site.name}は、未経験からの転職を考える方が、仕事や働き方について調べ、自分の希望を整理し、必要なときに相談先を見つけられるようにするための情報メディアです。`}>
+    <InfoPage title="運営者情報" path="/about" eyebrow="このメディアについて" lead={`${site.name}は、未経験からの転職を考える方が、仕事や働き方について調べ、自分の希望を整理し、必要なときに相談先を見つけられるようにするための情報メディアです。`}>
       {!partner.brandUsageApproved && (
         <p className="rounded-xl border border-accent/30 bg-accent-soft p-4 text-[14px] leading-7">
           <strong>このサイトは提案用のデモです（非公開）。</strong>

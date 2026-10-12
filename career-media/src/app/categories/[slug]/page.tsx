@@ -1,9 +1,8 @@
-import { notFound } from "next/navigation";
-import { ArticleList } from "@/components/ArticleCards";
+import { notFound, permanentRedirect } from "next/navigation";
+import { FeatureCard } from "@/components/ArticleCards";
+import { ArticleDirectory } from "@/components/ArticleDirectory";
 import { PageHero } from "@/components/PageHero";
-import { categoryTone } from "@/components/CategoryIcon";
-import { Motif } from "@/components/illustrations/Motif";
-import { categoryScene } from "@/lib/illustrations/scenes";
+import { pickStartArticles } from "@/lib/content-discovery";
 import { ConsultationCta } from "@/components/ConsultationCta";
 import { getRepository } from "@/lib/content";
 import { pageMetadata } from "@/lib/seo";
@@ -29,12 +28,14 @@ export async function generateMetadata({ params }: Props) {
 
 export default async function CategoryPage({ params }: Props) {
   const { slug } = await params;
+  if (slug === "news") permanentRedirect("/news");
   const repo = getRepository();
   const categories = await repo.listCategories();
   const category = categories.find((c) => c.slug === slug);
   if (!category) notFound();
   const articles = await repo.listArticles({ category: slug });
-  const tone = categoryTone(slug);
+  const top = pickStartArticles(articles, `/categories/${slug}`);
+  const rest = articles.filter((a) => !top.some((start) => start.slug === a.slug));
 
   return (
     <>
@@ -64,8 +65,12 @@ export default async function CategoryPage({ params }: Props) {
       </nav>
 
       <div className="mt-6 grid gap-10 lg:grid-cols-[1fr_300px]">
-        <div className="rounded-[var(--radius-card)] border border-line bg-surface px-5">
-          {articles.length > 0 ? <ArticleList articles={articles} categories={categories} /> : <p className="py-10 text-center text-sm text-muted">このテーマの記事は準備中です。</p>}
+        <div className="min-w-0">
+          {articles.length > 0 ? <>
+            <h2 className="mb-4 text-lg font-bold text-ink">まず読むなら、この{top.length}本</h2>
+            <ul className="swipe md-grid" style={{ ["--cols" as string]: 3 }}>{top.map((a) => <li key={a.slug}><FeatureCard article={a} categories={categories} showSummary={false} /></li>)}</ul>
+            {rest.length > 0 && <section aria-label="このテーマの関連記事" className="mt-8"><h2 className="mb-3 text-base font-bold text-ink">もう少し調べたいこと <span className="text-sm font-normal text-muted">{rest.length}本</span></h2><ArticleDirectory articles={rest} /></section>}
+          </> : <p className="py-10 text-center text-sm text-muted">このテーマの記事は準備中です。</p>}
         </div>
         <aside>
           <ConsultationCta placement="article-sidebar" variant="compact" />

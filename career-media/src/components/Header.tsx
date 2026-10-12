@@ -28,7 +28,7 @@ export function Header() {
             href="/consultation"
             data-cta-placement="header"
             data-cta-kind="consultation-info"
-            className="hidden items-center gap-1.5 rounded-full bg-accent px-4 py-2 text-[13px] font-bold text-white transition-colors hover:bg-accent-press sm:inline-flex"
+            className="consult-action hidden items-center gap-1.5 rounded-xl px-4 py-2 text-[13px] font-bold sm:inline-flex"
           >
             <MessageCircle className="h-4 w-4" aria-hidden="true" />
             {partner.consultCta}

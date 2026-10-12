@@ -5,6 +5,10 @@ description: "職歴に空白期間があるときの説明のしかたを紹介
 source:
   - content/articles/kuhaku-kikan-setsumei.md
   - src/app/articles/[slug]/page.tsx
+  - src/components/ConsultationCta.tsx
+  - src/components/SupportSample.tsx
+  - src/components/Eyecatch.tsx
+  - content/images/index.json
 ---
 
 [戻る](/categories/shorui-mensetsu)
@@ -18,6 +22,8 @@ source:
 2026年10月9日 更新 約5分で読めます
 
 提案用のサンプル原稿です（人による最終確認・公開承認の前）。[詳しく](/editorial-policy)
+
+[出典4件・記事の確認状況](#editorial-sources)
 
 働いていない期間があるときは、隠すよりも「その間のこと」と「今は働ける状態か」を短く伝えるほうが、面接で話しやすくなります。履歴書・職務経歴書での書き方、面接での説明の型と理由別の例文、その期間にやっていたことの言い方を紹介します。
 
@@ -63,7 +69,7 @@ source:
 
 勉強や資格のように、応募する仕事とつながることがあれば、ここで具体的に書いておくと面接での話題にもなります（資格名は仮の例です）。
 
-面接の練習と書類の添削は、プロに頼める
+面接の練習と書類の添削を相談する
 
 応募先に合わせた模擬面接や、履歴書・職務経歴書の添削を受けてから本番にのぞめます。
 
@@ -160,14 +166,20 @@ source:
 
 **出典とこの記事について出典4件**
 
+以下は原稿作成時の参照情報です。正式公開前に、担当者が出典本文・記事の主張・制度の適用条件を照合します。リンクの掲載やAI査読は、人による確認の完了を意味しません。
+
 1. [採用選考時に配慮すべき事項（公正採用選考特設サイト）（外部サイト）](https://kouseisaiyou.mhlw.go.jp/consider.html)
    厚生労働省・2026年10月7日確認
+   この記事での参照箇所: 家族に関すること（職業・続柄・健康・病歴など）を採用選考で把握することは、就職差別につながるおそれがあるとされていること
 2. [ハローワークの相談支援（外部サイト）](https://www.mhlw.go.jp/stf/newpage_27742.html)
    厚生労働省・2026年10月7日確認
+   この記事での参照箇所: ハローワークで応募書類の作り方や面接の受け答えについて、無料で相談できること
 3. [わかものハローワーク（外部サイト）](https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/0000181329.html)
    厚生労働省・2026年10月7日確認
+   この記事での参照箇所: 正社員を目指すおおむね35歳未満の若者を対象に、担当者制の職業相談などを無料で行っていること
 4. [地域若者サポートステーション（外部サイト）](https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/koyou_roudou/jinzaikaihatsu/saposute.html)
    厚生労働省・2026年10月7日確認
+   この記事での参照箇所: 働くことに悩みを抱えている15歳から49歳までの人を対象に、就労に向けた支援を無料で行っていること
 
 - **作成**
   2026年10月9日
@@ -191,19 +203,21 @@ source:
 5. [「何もしていない」と思っても、言えることはある](#section-5)
 6. [ひとりで準備するのが不安なら](#section-6)
 
-面接の練習と書類の添削は、プロに頼める
+面接の練習と書類の添削を相談する
 
 応募先に合わせた模擬面接や、履歴書・職務経歴書の添削を受けてから本番にのぞめます。
 
 [面接・書類の準備を相談する](/consultation/apply?placement=article-sidebar__kuhaku-kikan-setsumei)
 
-[相談でできることを見る](/consultation)
+[相談の内容を確認する](/consultation)
 
 [条件整理チェック](/check)
 
 [職種を比べる](/jobs)
 
-## 面接の練習と書類の添削は、プロに頼める
+キャリア相談のご案内
+
+## 面接の練習と書類の添削を相談する
 
 応募先に合わせた模擬面接や、履歴書・職務経歴書の添削を受けてから本番にのぞめます。
 
@@ -211,15 +225,17 @@ source:
 - 面接の練習
 - 応募書類の添削
 
-[面接・書類の準備を相談する](/consultation/apply?placement=article-bottom__kuhaku-kikan-setsumei) ・ [相談でできることを見る](/consultation)
+[面接・書類の準備を相談する](/consultation/apply?placement=article-bottom__kuhaku-kikan-setsumei) ・ [相談の内容を確認する](/consultation)
 
 相談先: 提携する人材紹介会社（正式公開時に掲載）（有料職業紹介事業許可番号: 正式公開時に掲載）
+
+希望を整理してから話したい方は、[相談用のメモを作る](/check)（登録不要）。
 
 ## 次に読むなら
 
 - 未経験転職 2026.10.06
-  ### [フリーターから正社員を目指すとき、最初に確認したいこと](/articles/freeter-seishain-hajimeni)
+  ### [フリーターから正社員、最初に何を確認する？](/articles/freeter-seishain-hajimeni)
 - 面接・書類 2026.10.06
-  ### [転職回数が気になるときに整理したいこと｜説明のしかたと次の選び方](/articles/tenshoku-kaisu-kininaru)
+  ### [転職回数が気になる。どう説明する？](/articles/tenshoku-kaisu-kininaru)
 - 面接・書類 2026.10.06
-  ### [未経験職種の面接、何を準備する？よく聞かれる質問と逆質問の例](/articles/mensetsu-junbi-mikeiken)
+  ### [面接が不安。何を準備する？](/articles/mensetsu-junbi-mikeiken)

@@ -5,6 +5,10 @@ description: "在職中の転職活動は、整理→情報集め→応募→面
 source:
   - content/articles/zaishoku-tenshoku-susumekata.md
   - src/app/articles/[slug]/page.tsx
+  - src/components/ConsultationCta.tsx
+  - src/components/SupportSample.tsx
+  - src/components/Eyecatch.tsx
+  - content/images/index.json
 ---
 
 [戻る](/categories/junbi)
@@ -18,6 +22,8 @@ source:
 2026年10月9日 更新 約6分で読めます
 
 提案用のサンプル原稿です（人による最終確認・公開承認の前）。[詳しく](/editorial-policy)
+
+[出典5件・記事の確認状況](#editorial-sources)
 
 今の仕事を続けながら転職活動をするときの進め方を、整理から退職までの順番に沿って紹介します。平日の時間の作り方、面接の日程の合わせ方、今の職場に知られないための注意、退職を伝えるタイミングと就業規則の確かめ方も分かります。
 
@@ -79,7 +85,7 @@ source:
 
 また、会社が労使協定を結んでいる場合は、年5日までの範囲で、時間単位で有給休暇をとれることがあります。午前中だけ休む、といった使い方ができるかは、就業規則や人事の担当者に確認してください。
 
-転職の進め方を、プロと一緒に決める
+応募までの準備を相談する
 
 いつ動くか、何から始めるかを、経験と希望をもとに一緒に考えてもらえます。日程の調整も任せられます。
 
@@ -159,16 +165,23 @@ source:
 
 **出典とこの記事について出典5件**
 
+以下は原稿作成時の参照情報です。正式公開前に、担当者が出典本文・記事の主張・制度の適用条件を照合します。リンクの掲載やAI査読は、人による確認の完了を意味しません。
+
 1. [民法（明治二十九年法律第八十九号）第六百二十七条（外部サイト）](https://laws.e-gov.go.jp/law/129AC0000000089)
    e-Gov法令検索（デジタル庁）・2026年10月7日確認
+   この記事での参照箇所: 期間の定めのない雇用は、解約の申入れの日から2週間を経過すると終了すること
 2. [Q5 このたび、家庭の事情で10年間勤務していた会社を辞めたいと思い退職願を提出しましたが、上司が受け取ってくれません。会社が同意してくれないと私は退職できないのでしょうか。（外部サイト）](https://jsite.mhlw.go.jp/kagoshima-roudoukyoku/yokuaru_goshitsumon/qa07/0701.html)
    鹿児島労働局・2026年10月7日確認
+   この記事での参照箇所: 就業規則に退職の申し出の規定があれば原則としてそれが適用されること、会社の同意がなければ退職できないわけではないこと
 3. [年次有給休暇｜しっかり学ぼう！働くときの基礎知識（確かめよう労働条件）（外部サイト）](https://www.check-roudou.mhlw.go.jp/study/roudousya_yukyu.html)
    厚生労働省・2026年10月7日確認
+   この記事での参照箇所: 年次有給休暇の使い道は労働者の自由で、目的を理由に取得を拒めないこと。事業の正常な運営を妨げる場合は時季変更権があること
 4. [年次有給休暇を時間単位でとるには、どうすればよいのでしょうか？（確かめよう労働条件）（外部サイト）](https://www.check-roudou.mhlw.go.jp/qa/roudousya/yukyu/q3.html)
    厚生労働省・2026年10月7日確認
+   この記事での参照箇所: 労使協定があれば、年5日までの範囲で時間単位の年次有給休暇をとれること
 5. [求職者マイページでできること（ハローワークインターネットサービス）（外部サイト）](https://www.hellowork.mhlw.go.jp/member/mem_possible.html)
    厚生労働省・2026年10月7日確認
+   この記事での参照箇所: 求職者マイページを使うと、自宅のパソコンなどから求人検索やオンラインでの応募ができること
 
 - **作成**
   2026年10月9日
@@ -191,19 +204,21 @@ source:
 4. [退職はいつ・どう伝える？](#section-4)
 5. [疲れてしまったら、ペースを落としていい](#section-5)
 
-転職の進め方を、プロと一緒に決める
+応募までの準備を相談する
 
 いつ動くか、何から始めるかを、経験と希望をもとに一緒に考えてもらえます。日程の調整も任せられます。
 
 [転職の進め方を相談する](/consultation/apply?placement=article-sidebar__zaishoku-tenshoku-susumekata)
 
-[相談でできることを見る](/consultation)
+[相談の内容を確認する](/consultation)
 
 [条件整理チェック](/check)
 
 [職種を比べる](/jobs)
 
-## 転職の進め方を、プロと一緒に決める
+キャリア相談のご案内
+
+## 応募までの準備を相談する
 
 いつ動くか、何から始めるかを、経験と希望をもとに一緒に考えてもらえます。日程の調整も任せられます。
 
@@ -211,15 +226,17 @@ source:
 - 面接の練習
 - 応募書類の添削
 
-[転職の進め方を相談する](/consultation/apply?placement=article-bottom__zaishoku-tenshoku-susumekata) ・ [相談でできることを見る](/consultation)
+[転職の進め方を相談する](/consultation/apply?placement=article-bottom__zaishoku-tenshoku-susumekata) ・ [相談の内容を確認する](/consultation)
 
 相談先: 提携する人材紹介会社（正式公開時に掲載）（有料職業紹介事業許可番号: 正式公開時に掲載）
+
+希望を整理してから話したい方は、[相談用のメモを作る](/check)（登録不要）。
 
 ## 次に読むなら
 
 - 転職準備 2026.10.06
-  ### [今の仕事を辞めたいとき、先に確認しておきたいこと](/articles/yametai-mae-kakunin)
+  ### [辞めたい。その前に確認すること](/articles/yametai-mae-kakunin)
 - 未経験転職 2026.10.06
-  ### [未経験転職は何から始める？最初に整理したい5つのこと](/articles/mikeiken-tenshoku-hajimekata)
+  ### [未経験の転職、何から始める？](/articles/mikeiken-tenshoku-hajimekata)
 - 転職準備 2026.10.06
-  ### [転職エージェントに、何を相談すればいい？相談できることと伝え方の例](/articles/agent-soudan-nani)
+  ### [エージェントに何を相談する？](/articles/agent-soudan-nani)

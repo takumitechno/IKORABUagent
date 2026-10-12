@@ -4,6 +4,7 @@ title: "相談の申し込み（デモ）｜はじめて転職ガイド"
 description: "デモ版のため、相談の申し込みページには移動しません。"
 source:
   - src/app/consultation/apply/page.tsx
+  - src/components/PageHero.tsx
 ---
 
 [戻る](/consultation)
@@ -18,7 +19,7 @@ source:
 
 このページは提案用のデモのため、実際の申し込みページにはつながっていません。条件整理チェックの回答や、このサイトでの閲覧内容が相談先に送られることもありません。
 
-[相談でできることを見る](/consultation)
+[相談の内容を確認する](/consultation)
 
 [先に条件を整理する](/check)
 

@@ -5,6 +5,10 @@ description: "Webマーケティングの仕事内容を、集客・広告・SNS
 source:
   - content/articles/web-marketing-mikeiken.md
   - src/app/articles/[slug]/page.tsx
+  - src/components/ConsultationCta.tsx
+  - src/components/SupportSample.tsx
+  - src/components/Eyecatch.tsx
+  - content/images/index.json
 ---
 
 [戻る](/categories/shokushu)
@@ -13,13 +17,21 @@ source:
 
 [職種を知る](/categories/shokushu)
 
-# Webマーケティングの仕事内容は？種類と、未経験からの近づき方・求人の見方
+# 未経験でWebマーケへ。最初に確かめること
 
 2026年10月10日 更新 約5分で読めます
 
 提案用のサンプル原稿です（人による最終確認・公開承認の前）。[詳しく](/editorial-policy)
 
-Webマーケティングは、Webサイトや広告、SNSを使ってお客さまを集め、アクセスの数字を見ながら改善していく仕事です。仕事の種類、使う力、未経験から近づくときの準備、アシスタント求人で確かめたいことを紹介します。
+[出典3件・記事の確認状況](#editorial-sources)
+
+この記事の要点
+
+「SNSが好き」から、担当する業務を具体的に見よう。
+
+- 投稿制作・広告運用・記事制作・分析など、求人の業務を分ける。
+- 自分が担当する範囲と、教わる相手・研修内容を聞く。
+- 文章や数値の整理など、応募前に試せる作業から始める。
 
 「Webマーケティングに興味がある。でも、実際に毎日何をしている仕事なのか、よく分からない」。そう感じる人は多いと思います。
 
@@ -61,16 +73,6 @@ Webマーケティングは、Webサイトや広告、SNSを使ってお客さ�
 >    結果をもとに次の打ち手を決める
 
 どの仕事でも、**「出して終わり」ではなく、数字を見て直すことをくり返す**のが特徴です。
-
-その仕事が自分に合うか、プロに聞いてみる
-
-求人票だけでは分からない仕事の中身や職場のことを、キャリアアドバイザーに聞いてから会社を選べます。
-
-- 企業選びの相談
-- 面接の練習
-- 応募書類の添削
-
-[職種・会社選びを相談する](/consultation/apply?placement=article-inline__web-marketing-mikeiken) ・ [先に条件を整理する（3分・登録不要）](/check)
 
 ## どんな力を使う？接客の経験はつながる？
 
@@ -149,12 +151,17 @@ Webマーケティングは、名前から想像する仕事と実際の作業�
 
 **出典とこの記事について出典3件**
 
+以下は原稿作成時の参照情報です。正式公開前に、担当者が出典本文・記事の主張・制度の適用条件を照合します。リンクの掲載やAI査読は、人による確認の完了を意味しません。
+
 1. [Webマーケティング（ネット広告・販売促進） - 職業詳細（job tag）（外部サイト）](https://shigoto.mhlw.go.jp/User/Occupation/Detail/240)
    厚生労働省 職業情報提供サイト（job tag）・2026年10月9日確認
+   この記事での参照箇所: Webマーケティングの仕事内容（Webサイトなどを使った集客や市場調査、SEO・リスティング広告などの集客手法、アクセス解析にもとづく改善）、別名にマーケターやWebマーケティング事務員などがあること
 2. [ステルスマーケティングに関するQ&A（外部サイト）](https://www.caa.go.jp/policies/policy/representation/fair_labeling/faq/stealth_marketing/)
    消費者庁・2026年10月9日確認
+   この記事での参照箇所: 広告であることを隠した表示（ステルスマーケティング）が、2023年10月1日から景品表示法の不当表示として規制されていること、規制の対象が広告主（事業者）であること
 3. [景品表示法（外部サイト）](https://www.caa.go.jp/policies/policy/representation/fair_labeling)
    消費者庁・2026年10月9日確認
+   この記事での参照箇所: 景品表示法が、商品やサービスの品質・価格などについて実際より良く見せる表示を規制していること
 
 - **作成**
   2026年10月10日
@@ -179,35 +186,43 @@ Webマーケティングは、名前から想像する仕事と実際の作業�
 6. [知っておきたい広告のルール](#section-6)
 7. [まだ迷っているなら](#section-7)
 
-その仕事が自分に合うか、プロに聞いてみる
+接客の経験を、書類や面接で伝える。
 
-求人票だけでは分からない仕事の中身や職場のことを、キャリアアドバイザーに聞いてから会社を選べます。
+担当した仕事や工夫を整理し、応募先に合わせた伝え方を一緒に考えます。
 
-[職種・会社選びを相談する](/consultation/apply?placement=article-sidebar__web-marketing-mikeiken)
+[職種・会社選びを相談する](/consultation/apply?placement=article-sidebar__web-marketing-mikeiken#support-experience)
 
-[相談でできることを見る](/consultation)
+[相談の内容を確認する](/consultation#support-experience)
 
 [条件整理チェック](/check)
 
 [職種を比べる](/jobs)
 
-## その仕事が自分に合うか、プロに聞いてみる
+キャリア相談のご案内
 
-求人票だけでは分からない仕事の中身や職場のことを、キャリアアドバイザーに聞いてから会社を選べます。
+## 接客の経験を、書類や面接で伝える。
+
+担当した仕事や工夫を整理し、応募先に合わせた伝え方を一緒に考えます。
+
+> 相談では、こんな質問から
+>
+> 「未経験で入る場合、最初に担当する業務と教わる体制はどうなっていますか？」
 
 - 企業選びの相談
 - 面接の練習
 - 応募書類の添削
 
-[職種・会社選びを相談する](/consultation/apply?placement=article-bottom__web-marketing-mikeiken) ・ [相談でできることを見る](/consultation)
+[職種・会社選びを相談する](/consultation/apply?placement=article-bottom__web-marketing-mikeiken#support-experience) ・ [相談の内容を確認する](/consultation#support-experience)
 
 相談先: 提携する人材紹介会社（正式公開時に掲載）（有料職業紹介事業許可番号: 正式公開時に掲載）
+
+希望を整理してから話したい方は、[相談用のメモを作る](/check)（登録不要）。
 
 ## 次に読むなら
 
 - 経験の活かし方 2026.10.06
-  ### [接客経験は転職でどう活かせる？職種別のつながりと伝え方](/articles/sekkyaku-keiken-ikasu)
+  ### [接客の経験、ほかの仕事で活かせる？](/articles/sekkyaku-keiken-ikasu)
 - 転職準備 2026.10.06
-  ### [未経験求人の「研修あり」で確認すべきこと｜期間・内容・その後のフォロー](/articles/mikeiken-kenshu-kakunin)
+  ### [「研修あり」の求人、何を確かめる？](/articles/mikeiken-kenshu-kakunin)
 - 未経験転職 2026.10.06
-  ### [やりたい仕事が分からない。自分に合う仕事の探し方3ステップ](/articles/shigoto-sagashikata)
+  ### [やりたい仕事が分からないときは。](/articles/shigoto-sagashikata)

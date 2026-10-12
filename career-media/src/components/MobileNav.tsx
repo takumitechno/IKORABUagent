@@ -48,7 +48,7 @@ export function MobileNav() {
               ))}
             </ul>
             <div className="mt-6 grid gap-3">
-              <Link href="/consultation" data-cta-placement="header" data-cta-kind="consultation-info" className="flex items-center justify-center gap-1.5 rounded-full border border-accent/50 px-5 py-3.5 text-base font-bold text-accent-strong">
+              <Link href="/consultation" data-cta-placement="header" data-cta-kind="consultation-info" className="consult-action flex items-center justify-center gap-1.5 rounded-full px-5 py-3.5 text-base font-bold">
                 <MessageCircle className="h-5 w-5" aria-hidden="true" />
                 キャリア相談について
               </Link>

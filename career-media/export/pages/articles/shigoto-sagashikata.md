@@ -5,6 +5,10 @@ description: "「やりたいことが見つからない」と止まってしま
 source:
   - content/articles/shigoto-sagashikata.md
   - src/app/articles/[slug]/page.tsx
+  - src/components/ConsultationCta.tsx
+  - src/components/SupportSample.tsx
+  - src/components/Eyecatch.tsx
+  - content/images/index.json
 ---
 
 [戻る](/categories/mikeiken)
@@ -18,6 +22,8 @@ source:
 2026年10月6日 更新 約4分で読めます
 
 提案用のサンプル原稿です（人による最終確認・公開承認の前）。[詳しく](/editorial-policy)
+
+[出典3件・記事の確認状況](#editorial-sources)
 
 「やりたいことが見つからない」と止まってしまったら、やりたいことから探すのをいったんやめてみましょう。「避けたいこと」「続けられた作業」「ゆずれない条件」の3つから候補を2〜3職種にしぼり、比べて確かめる方法を、書き出し例つきで紹介します。
 
@@ -48,9 +54,9 @@ source:
 
 避けたいことがはっきりすると、合わない求人を早めに外せるようになります。
 
-未経験の転職こそ、プロに相談しながら
+未経験の仕事への応募を相談する
 
-経験のない仕事でも応募しやすい求人の探し方や、これまでの経験の伝え方を、キャリアアドバイザーと一緒に考えられます。
+応募条件の確認や、これまでの経験の伝え方を、キャリアアドバイザーと一緒に考えられます。
 
 - 企業選びの相談
 - 面接の練習
@@ -142,12 +148,17 @@ job tag には、職業興味検査や仕事価値観検査など、興味や大
 
 **出典とこの記事について出典3件**
 
+以下は原稿作成時の参照情報です。正式公開前に、担当者が出典本文・記事の主張・制度の適用条件を照合します。リンクの掲載やAI査読は、人による確認の完了を意味しません。
+
 1. [仕事の内容で検索（job tag）（外部サイト）](https://shigoto.mhlw.go.jp/Search/WorkActivity)
    厚生労働省 職業情報提供サイト（job tag）・2026年10月6日確認
+   この記事での参照箇所: 仕事の内容から職業を探せる検索があること
 2. [よくあるお問い合わせ（job tag）（外部サイト）](https://shigoto.mhlw.go.jp/User/faq)
    厚生労働省 職業情報提供サイト（job tag）・2026年10月6日確認
+   この記事での参照箇所: 職業興味検査・仕事価値観検査があること、結果の職業リストは学歴・職務経験・資格などを考慮していないため参考として使うこと
 3. [わかものハローワーク（外部サイト）](https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/0000181329.html)
    厚生労働省・2026年10月6日確認
+   この記事での参照箇所: 正社員を目指すおおむね35歳未満の若者を対象に、担当者制の職業相談などを無料で行っていること
 
 - **作成**
   2026年10月6日
@@ -171,35 +182,39 @@ job tag には、職業興味検査や仕事価値観検査など、興味や大
 5. [候補を2〜3職種にしぼって比べる](#section-5)
 6. [調べてもしぼれないときは？](#section-6)
 
-未経験の転職こそ、プロに相談しながら
+未経験の仕事への応募を相談する
 
-経験のない仕事でも応募しやすい求人の探し方や、これまでの経験の伝え方を、キャリアアドバイザーと一緒に考えられます。
+応募条件の確認や、これまでの経験の伝え方を、キャリアアドバイザーと一緒に考えられます。
 
 [未経験の転職を相談する](/consultation/apply?placement=article-sidebar__shigoto-sagashikata)
 
-[相談でできることを見る](/consultation)
+[相談の内容を確認する](/consultation)
 
 [条件整理チェック](/check)
 
 [職種を比べる](/jobs)
 
-## 未経験の転職こそ、プロに相談しながら
+キャリア相談のご案内
 
-経験のない仕事でも応募しやすい求人の探し方や、これまでの経験の伝え方を、キャリアアドバイザーと一緒に考えられます。
+## 未経験の仕事への応募を相談する
+
+応募条件の確認や、これまでの経験の伝え方を、キャリアアドバイザーと一緒に考えられます。
 
 - 企業選びの相談
 - 面接の練習
 - 応募書類の添削
 
-[未経験の転職を相談する](/consultation/apply?placement=article-bottom__shigoto-sagashikata) ・ [相談でできることを見る](/consultation)
+[未経験の転職を相談する](/consultation/apply?placement=article-bottom__shigoto-sagashikata) ・ [相談の内容を確認する](/consultation)
 
 相談先: 提携する人材紹介会社（正式公開時に掲載）（有料職業紹介事業許可番号: 正式公開時に掲載）
+
+希望を整理してから話したい方は、[相談用のメモを作る](/check)（登録不要）。
 
 ## 次に読むなら
 
 - 未経験転職 2026.10.06
-  ### [未経験転職は何から始める？最初に整理したい5つのこと](/articles/mikeiken-tenshoku-hajimekata)
+  ### [未経験の転職、何から始める？](/articles/mikeiken-tenshoku-hajimekata)
 - 職種を知る 2026.10.06
-  ### [営業・カスタマーサポート・ITサポートの違いは？仕事内容と向き不向きを比べる](/articles/eigyo-cs-it-support-chigai)
+  ### [営業・サポート・IT、どこが違う？](/articles/eigyo-cs-it-support-chigai)
 - 経験の活かし方 2026.10.06
-  ### [接客経験は転職でどう活かせる？職種別のつながりと伝え方](/articles/sekkyaku-keiken-ikasu)
+  ### [接客の経験、ほかの仕事で活かせる？](/articles/sekkyaku-keiken-ikasu)

@@ -5,6 +5,10 @@ description: "「研修制度あり」「未経験でも安心」と書かれた
 source:
   - content/articles/mikeiken-kenshu-kakunin.md
   - src/app/articles/[slug]/page.tsx
+  - src/components/ConsultationCta.tsx
+  - src/components/SupportSample.tsx
+  - src/components/Eyecatch.tsx
+  - content/images/index.json
 ---
 
 [戻る](/categories/junbi)
@@ -18,6 +22,8 @@ source:
 2026年10月6日 更新 約3分で読めます
 
 提案用のサンプル原稿です（人による最終確認・公開承認の前）。[詳しく](/editorial-policy)
+
+[出典2件・記事の確認状況](#editorial-sources)
 
 「研修制度あり」「未経験でも安心」と書かれた求人でも、研修の中身は会社によって大きく違います。期間・形式・教える人・研修後のフォローなど、応募前や面接で確認したいポイントを質問例つきでまとめました。
 
@@ -60,7 +66,7 @@ source:
 
 最後の質問は特におすすめです。会社がどれだけ未経験者の受け入れに慣れているかが見えやすくなります。
 
-転職の進め方を、プロと一緒に決める
+応募までの準備を相談する
 
 いつ動くか、何から始めるかを、経験と希望をもとに一緒に考えてもらえます。日程の調整も任せられます。
 
@@ -111,10 +117,14 @@ source:
 
 **出典とこの記事について出典2件**
 
+以下は原稿作成時の参照情報です。正式公開前に、担当者が出典本文・記事の主張・制度の適用条件を照合します。リンクの掲載やAI査読は、人による確認の完了を意味しません。
+
 1. [職場情報の提供制度（外部サイト）](https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/0000122234.html)
    厚生労働省・2026年10月6日確認
+   この記事での参照箇所: 若者雇用促進法にもとづく職場情報（研修の有無及び内容など）の提供
 2. [2024年4月から労働条件明示のルールが変わります（外部サイト）](https://www.mhlw.go.jp/stf/newpage_32105.html)
    厚生労働省・2026年10月6日確認
+   この記事での参照箇所: 試用期間や業務の変更の範囲など、明示される労働条件の確認
 
 - **作成**
   2026年10月6日
@@ -137,19 +147,21 @@ source:
 4. [研修期間中の条件も確認しておく](#section-4)
 5. [「研修が短い＝悪い会社」ではない](#section-5)
 
-転職の進め方を、プロと一緒に決める
+応募までの準備を相談する
 
 いつ動くか、何から始めるかを、経験と希望をもとに一緒に考えてもらえます。日程の調整も任せられます。
 
 [転職の進め方を相談する](/consultation/apply?placement=article-sidebar__mikeiken-kenshu-kakunin)
 
-[相談でできることを見る](/consultation)
+[相談の内容を確認する](/consultation)
 
 [条件整理チェック](/check)
 
 [職種を比べる](/jobs)
 
-## 転職の進め方を、プロと一緒に決める
+キャリア相談のご案内
+
+## 応募までの準備を相談する
 
 いつ動くか、何から始めるかを、経験と希望をもとに一緒に考えてもらえます。日程の調整も任せられます。
 
@@ -157,15 +169,17 @@ source:
 - 面接の練習
 - 応募書類の添削
 
-[転職の進め方を相談する](/consultation/apply?placement=article-bottom__mikeiken-kenshu-kakunin) ・ [相談でできることを見る](/consultation)
+[転職の進め方を相談する](/consultation/apply?placement=article-bottom__mikeiken-kenshu-kakunin) ・ [相談の内容を確認する](/consultation)
 
 相談先: 提携する人材紹介会社（正式公開時に掲載）（有料職業紹介事業許可番号: 正式公開時に掲載）
+
+希望を整理してから話したい方は、[相談用のメモを作る](/check)（登録不要）。
 
 ## 次に読むなら
 
 - 職種を知る 2026.10.06
-  ### [営業・カスタマーサポート・ITサポートの違いは？仕事内容と向き不向きを比べる](/articles/eigyo-cs-it-support-chigai)
+  ### [営業・サポート・IT、どこが違う？](/articles/eigyo-cs-it-support-chigai)
 - 転職準備 2026.10.06
-  ### [エージェント面談の前に決めておくこと・決めなくていいこと](/articles/agent-mendan-mae)
+  ### [エージェント面談の前、何を決めておく？](/articles/agent-mendan-mae)
 - 未経験転職 2026.10.06
-  ### [未経験転職は何から始める？最初に整理したい5つのこと](/articles/mikeiken-tenshoku-hajimekata)
+  ### [未経験の転職、何から始める？](/articles/mikeiken-tenshoku-hajimekata)

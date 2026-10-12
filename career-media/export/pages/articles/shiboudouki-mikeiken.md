@@ -5,6 +5,10 @@ description: "未経験の職種に応募するとき、志望動機に「経験
 source:
   - content/articles/shiboudouki-mikeiken.md
   - src/app/articles/[slug]/page.tsx
+  - src/components/ConsultationCta.tsx
+  - src/components/SupportSample.tsx
+  - src/components/Eyecatch.tsx
+  - content/images/index.json
 ---
 
 [戻る](/categories/shorui-mensetsu)
@@ -18,6 +22,8 @@ source:
 2026年10月6日 更新 約3分で読めます
 
 提案用のサンプル原稿です（人による最終確認・公開承認の前）。[詳しく](/editorial-policy)
+
+[出典1件・記事の確認状況](#editorial-sources)
 
 未経験の職種に応募するとき、志望動機に「経験がないこと」をどう書けばいいか迷う人は多いはずです。きっかけ・経験との接点・入社後に取り組みたいことの3つの要素で組み立てる方法を、例文つきで紹介します。
 
@@ -57,7 +63,7 @@ source:
 
 応募する職種の仕事内容は、事前に調べておきましょう。厚生労働省の職業情報提供サイト（job tag）や、[職種比較ページ](/jobs)で、どんな作業があるのかを確認できます。
 
-面接の練習と書類の添削は、プロに頼める
+面接の練習と書類の添削を相談する
 
 応募先に合わせた模擬面接や、履歴書・職務経歴書の添削を受けてから本番にのぞめます。
 
@@ -113,8 +119,11 @@ source:
 
 **出典とこの記事について出典1件**
 
+以下は原稿作成時の参照情報です。正式公開前に、担当者が出典本文・記事の主張・制度の適用条件を照合します。リンクの掲載やAI査読は、人による確認の完了を意味しません。
+
 1. [職業情報提供サイト（job tag）（外部サイト）](https://shigoto.mhlw.go.jp/User/)
    厚生労働省・2026年10月6日確認
+   この記事での参照箇所: 応募する職種の仕事内容を調べる方法
 
 - **作成**
   2026年10月6日
@@ -137,19 +146,21 @@ source:
 4. [3つの要素を組み合わせた例文](#section-4)
 5. [書いたあとに確認したいこと](#section-5)
 
-面接の練習と書類の添削は、プロに頼める
+面接の練習と書類の添削を相談する
 
 応募先に合わせた模擬面接や、履歴書・職務経歴書の添削を受けてから本番にのぞめます。
 
 [面接・書類の準備を相談する](/consultation/apply?placement=article-sidebar__shiboudouki-mikeiken)
 
-[相談でできることを見る](/consultation)
+[相談の内容を確認する](/consultation)
 
 [条件整理チェック](/check)
 
 [職種を比べる](/jobs)
 
-## 面接の練習と書類の添削は、プロに頼める
+キャリア相談のご案内
+
+## 面接の練習と書類の添削を相談する
 
 応募先に合わせた模擬面接や、履歴書・職務経歴書の添削を受けてから本番にのぞめます。
 
@@ -157,15 +168,17 @@ source:
 - 面接の練習
 - 応募書類の添削
 
-[面接・書類の準備を相談する](/consultation/apply?placement=article-bottom__shiboudouki-mikeiken) ・ [相談でできることを見る](/consultation)
+[面接・書類の準備を相談する](/consultation/apply?placement=article-bottom__shiboudouki-mikeiken) ・ [相談の内容を確認する](/consultation)
 
 相談先: 提携する人材紹介会社（正式公開時に掲載）（有料職業紹介事業許可番号: 正式公開時に掲載）
+
+希望を整理してから話したい方は、[相談用のメモを作る](/check)（登録不要）。
 
 ## 次に読むなら
 
 - 経験の活かし方 2026.10.06
-  ### [接客経験は転職でどう活かせる？職種別のつながりと伝え方](/articles/sekkyaku-keiken-ikasu)
+  ### [接客の経験、ほかの仕事で活かせる？](/articles/sekkyaku-keiken-ikasu)
 - 面接・書類 2026.10.06
-  ### [転職回数が気になるときに整理したいこと｜説明のしかたと次の選び方](/articles/tenshoku-kaisu-kininaru)
+  ### [転職回数が気になる。どう説明する？](/articles/tenshoku-kaisu-kininaru)
 - 職種を知る 2026.10.06
-  ### [営業・カスタマーサポート・ITサポートの違いは？仕事内容と向き不向きを比べる](/articles/eigyo-cs-it-support-chigai)
+  ### [営業・サポート・IT、どこが違う？](/articles/eigyo-cs-it-support-chigai)

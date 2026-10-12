@@ -30,6 +30,10 @@
     var node = document.createElement("div");
     node.appendChild(tpl.content.cloneNode(true));
     cache[route] = node;
+    if (route === "/") {
+      var preview = node.querySelector(".support-preview");
+      if (preview && window.__mountConsultationPreview) window.__mountConsultationPreview(preview);
+    }
     if (route === "/check") {
       var root = node.querySelector("#condition-check-root");
       if (root && window.__mountConditionCheck) {
@@ -60,6 +64,12 @@
   }
 
   function scrollToAnchor(anchor) {
+    // The artifact hash identifies the route, so CSS :target cannot select a topic.
+    if (current) {
+      var panels = current.querySelectorAll(".topic-panel");
+      var selected = Array.from(panels).find(function (panel) { return panel.id === anchor; }) || panels[0];
+      panels.forEach(function (panel) { panel.style.display = panel === selected ? "block" : "none"; });
+    }
     if (anchor && current) {
       var el = current.querySelector("#" + CSS.escape(anchor));
       if (el) {
@@ -113,7 +123,13 @@
     }
     var input = node.querySelector('input[name="q"]');
     if (input) input.value = q;
-    var list = node.querySelector("ul.divide-y");
+    var starts = node.querySelector("[data-reading-starts]");
+    if (starts) starts.remove();
+    var pager = node.querySelector('nav[aria-label="記事一覧のページ"]');
+    if (pager) pager.remove();
+    var counter = node.querySelector("[data-catalogue-count]");
+    if (counter) counter.textContent = "検索結果 " + hits.length + "件";
+    var list = node.querySelector("[data-catalogue-list] ul");
     if (list) {
       if (hits.length) {
         list.innerHTML = hits
@@ -142,7 +158,7 @@
 
   function draw(e, scroll) {
     if (e.search !== undefined) renderSearch(e.search);
-    else render(e.route, scroll === undefined ? e.anchor : "");
+    else render(e.route, e.anchor);
     if (scroll !== undefined) {
       setTimeout(function () {
         window.scrollTo(0, scroll);
@@ -215,7 +231,7 @@
     }
     if (href.charAt(0) === "#") {
       e.preventDefault();
-      scrollToAnchor(decodeURIComponent(href.slice(1)));
+      go({ route: currentRoute, anchor: decodeURIComponent(href.slice(1)) });
       return;
     }
     if (href.charAt(0) === "/") {
@@ -290,12 +306,20 @@
   var dialog = document.getElementById("consult-dialog");
   function openConsultDialog(href) {
     var content = "";
+    var topic = null;
     try {
       var u = new URL(href, location.href);
       content = u.searchParams.get("placement") || u.searchParams.get("utm_content") || "";
+      var anchor = u.hash.slice(1);
+      var apply = templates[cfg.consultPrefix];
+      if (anchor && apply) topic = apply.content.querySelector(".apply-topic#" + CSS.escape(anchor) + " h2");
     } catch (e) {}
     var place = dialog.querySelector("[data-placement]");
     place.textContent = content || "—";
+    var selectedTopic = dialog.querySelector("[data-consult-topic]");
+    selectedTopic.textContent = topic ? "相談テーマ: " + topic.textContent : "";
+    selectedTopic.hidden = !topic;
+    dialog.querySelector("a").setAttribute("href", topic ? "/consultation#" + topic.parentNode.id : "/consultation");
     dialog.hidden = false;
     dialog.querySelector("button").focus();
   }

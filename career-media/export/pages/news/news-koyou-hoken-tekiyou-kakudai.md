@@ -5,6 +5,10 @@ description: "2024年の雇用保険法改正で、雇用保険に入る条件�
 source:
   - content/news/news-koyou-hoken-tekiyou-kakudai.md
   - src/app/news/[slug]/page.tsx
+  - src/components/ConsultationCta.tsx
+  - src/components/SupportSample.tsx
+  - src/components/Eyecatch.tsx
+  - content/images/index.json
 ---
 
 [戻る](/news)
@@ -13,7 +17,7 @@ source:
 
 転職ニュース解説 ・ 発表元: 厚生労働省
 
-施行予定日: 2028年10月1日
+施行予定：2028年10月1日
 
 # 雇用保険の対象が週10時間以上に広がる予定（2028年10月）｜短時間で働く人に関係すること
 
@@ -115,14 +119,20 @@ source:
 
 **出典とこの記事について出典4件**
 
+以下は原稿作成時の参照情報です。正式公開前に、担当者が出典本文・記事の主張・制度の適用条件を照合します。リンクの掲載やAI査読は、人による確認の完了を意味しません。
+
 1. [雇用保険法等の一部を改正する法律の概要（外部サイト）](https://www.mhlw.go.jp/content/11600000/001255172.pdf)
    厚生労働省・2026年10月6日確認
+   この記事での参照箇所: 被保険者の要件のうち週所定労働時間を20時間以上から10時間以上に変更すること、施行期日が2028年（令和10年）10月1日であること
 2. [令和６年雇用保険制度改正（令和10年10月１日施行分）について（職業安定分科会雇用保険部会 第205回 資料）（外部サイト）](https://www.mhlw.go.jp/content/11601000/001542937.pdf)
    厚生労働省・2026年10月6日確認
+   この記事での参照箇所: 新たに対象になる人にも基本手当・教育訓練給付・育児休業給付等を同じ基準で支給すること、31日以上の雇用見込みの要件は維持されること、被保険者期間の数え方（11日以上→6日以上、80時間以上→40時間以上）の見直し
 3. [雇用保険の被保険者について（外部サイト）](https://www.mhlw.go.jp/new-info/kobetu/roudou/gyousei/hoken/kakikata/dl/koyou-06.pdf)
    厚生労働省・2026年10月6日確認
+   この記事での参照箇所: いまの加入条件（雇用形態や呼び方にかかわらず、週の所定労働時間20時間以上かつ31日以上の雇用見込み）
 4. [令和8年度の雇用保険料率について（外部サイト）](https://jsite.mhlw.go.jp/aichi-hellowork/list/okazaki/news/koyouhokennryouR08.html)
    ハローワーク岡崎（愛知労働局）・2026年10月6日確認
+   この記事での参照箇所: 2026年度の雇用保険料率（一般の事業の労働者負担は1,000分の5）
 
 - **作成**
   2026年10月6日
@@ -139,7 +149,9 @@ source:
 
 [転職ニュース一覧へ戻る](/news)
 
-## ひとりで悩むより、転職のプロと進める
+キャリア相談のご案内
+
+## 仕事選びと応募の準備を相談する
 
 会社選びから面接の練習まで、キャリアアドバイザーに相談しながら準備できます。応募するかどうかは、ご自身で決められます。
 
@@ -147,15 +159,15 @@ source:
 - 面接の練習
 - 応募書類の添削
 
-[整理した内容をもとに相談する](/consultation/apply?placement=news-bottom__news-koyou-hoken-tekiyou-kakudai) ・ [相談でできることを見る](/consultation)
+[キャリア相談を申し込む](/consultation/apply?placement=news-bottom__news-koyou-hoken-tekiyou-kakudai) ・ [相談の内容を確認する](/consultation)
 
 相談先: 提携する人材紹介会社（正式公開時に掲載）（有料職業紹介事業許可番号: 正式公開時に掲載）
 
 ## 次に読むなら
 
 - ニュース解説 2026.10.06
-  ### [学び直しの支援が拡充｜教育訓練給付の引き上げと教育訓練休暇給付金](/news/news-kyouiku-kunren-kyufu)
+  ### [転職前に学びたい。講座の費用、補助ある？](/news/news-kyouiku-kunren-kyufu)
 - ニュース解説 2026.10.06
-  ### [自己都合退職の給付制限が原則1か月に｜退職してから転職活動する人が確認したいこと](/news/news-koyou-hoken-kyufu-seigen)
+  ### [辞めてから転職活動、手当はいつから？](/news/news-koyou-hoken-kyufu-seigen)
 - 未経験転職 2026.10.06
-  ### [フリーターから正社員を目指すとき、最初に確認したいこと](/articles/freeter-seishain-hajimeni)
+  ### [フリーターから正社員、最初に何を確認する？](/articles/freeter-seishain-hajimeni)

@@ -5,6 +5,10 @@ description: "入社1年以内に辞めた・辞めたいときの転職の進�
 source:
   - content/articles/souki-rishoku-tenshoku.md
   - src/app/articles/[slug]/page.tsx
+  - src/components/ConsultationCta.tsx
+  - src/components/SupportSample.tsx
+  - src/components/Eyecatch.tsx
+  - content/images/index.json
 ---
 
 [戻る](/categories/junbi)
@@ -18,6 +22,8 @@ source:
 2026年10月9日 更新 約6分で読めます
 
 提案用のサンプル原稿です（人による最終確認・公開承認の前）。[詳しく](/editorial-policy)
+
+[出典3件・記事の確認状況](#editorial-sources)
 
 入社して早く辞めた経験は、隠すより「何が合わなかったか」と「次は何を確かめて選んだか」をセットで話すほうが伝わりやすくなります。面接での説明の型と例文、次の会社で同じことを繰り返さないための確認ポイント、第二新卒としての応募の考え方と相談先を紹介します。
 
@@ -65,7 +71,7 @@ source:
 - **「なんとなく合わなかった」**：理由が分からないと、次も同じことが起きるのではと思われます
 - **事実と違う理由**：深く聞かれたときに話が食い違います
 
-転職の進め方を、プロと一緒に決める
+応募までの準備を相談する
 
 いつ動くか、何から始めるかを、経験と希望をもとに一緒に考えてもらえます。日程の調整も任せられます。
 
@@ -168,12 +174,17 @@ source:
 
 **出典とこの記事について出典3件**
 
+以下は原稿作成時の参照情報です。正式公開前に、担当者が出典本文・記事の主張・制度の適用条件を照合します。リンクの掲載やAI査読は、人による確認の完了を意味しません。
+
 1. [青少年雇用機会確保指針について（外部サイト）](https://jsite.mhlw.go.jp/tottori-roudoukyoku/hourei_seido_tetsuzuki/shokugyou_shoukai/22seishonen_shishin.html)
    厚生労働省 鳥取労働局・2026年10月9日確認
+   この記事での参照箇所: 学校卒業見込者の採用枠について、既卒者が卒業後少なくとも3年間は応募できるよう努めること、できる限り上限年齢を設けないよう努めることが指針に示されていること
 2. [若者への就職支援（外部サイト）](https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/koyou_roudou/koyou/jakunen/index.html)
    厚生労働省・2026年10月9日確認
+   この記事での参照箇所: 新卒応援ハローワークが学生や学校卒業後おおむね3年以内の人の就職を支援していること、わかものハローワークが正社員就職を目指すおおむね35歳未満の若者を支援していること
 3. [正社員就職を目指す若者の皆さまへ（外部サイト）](https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/0000132151.html)
    厚生労働省・2026年10月9日確認
+   この記事での参照箇所: 就業経験が少ないことや、離転職を繰り返していることに悩む若者を、わかものハローワークなどで支援していること
 
 - **作成**
   2026年10月9日
@@ -197,19 +208,21 @@ source:
 5. [「第二新卒」として応募するときは](#section-5)
 6. [ひとりで整理しきれないときの相談先](#section-6)
 
-転職の進め方を、プロと一緒に決める
+応募までの準備を相談する
 
 いつ動くか、何から始めるかを、経験と希望をもとに一緒に考えてもらえます。日程の調整も任せられます。
 
 [転職の進め方を相談する](/consultation/apply?placement=article-sidebar__souki-rishoku-tenshoku)
 
-[相談でできることを見る](/consultation)
+[相談の内容を確認する](/consultation)
 
 [条件整理チェック](/check)
 
 [職種を比べる](/jobs)
 
-## 転職の進め方を、プロと一緒に決める
+キャリア相談のご案内
+
+## 応募までの準備を相談する
 
 いつ動くか、何から始めるかを、経験と希望をもとに一緒に考えてもらえます。日程の調整も任せられます。
 
@@ -217,15 +230,17 @@ source:
 - 面接の練習
 - 応募書類の添削
 
-[転職の進め方を相談する](/consultation/apply?placement=article-bottom__souki-rishoku-tenshoku) ・ [相談でできることを見る](/consultation)
+[転職の進め方を相談する](/consultation/apply?placement=article-bottom__souki-rishoku-tenshoku) ・ [相談の内容を確認する](/consultation)
 
 相談先: 提携する人材紹介会社（正式公開時に掲載）（有料職業紹介事業許可番号: 正式公開時に掲載）
+
+希望を整理してから話したい方は、[相談用のメモを作る](/check)（登録不要）。
 
 ## 次に読むなら
 
 - 未経験転職 2026.10.06
-  ### [第二新卒って何歳まで？使える場面と探し方](/articles/dainishinsotsu-nansai)
+  ### [第二新卒って何歳まで？](/articles/dainishinsotsu-nansai)
 - 面接・書類 2026.10.06
-  ### [転職回数が気になるときに整理したいこと｜説明のしかたと次の選び方](/articles/tenshoku-kaisu-kininaru)
+  ### [転職回数が気になる。どう説明する？](/articles/tenshoku-kaisu-kininaru)
 - 制度・手続き 2026.10.09
-  ### [求人で「職場の情報」を確かめるには？離職者数・残業・有休とユースエール認定](/articles/shokuba-jouhou-wakamono)
+  ### [残業や離職者数、応募前に確かめる](/articles/shokuba-jouhou-wakamono)

@@ -29,7 +29,8 @@
     "image:status": "tsx scripts/images/cli.ts status",
     "image:index": "tsx scripts/images/cli.ts index",
     "image:validate": "tsx scripts/images/cli.ts validate",
-    "image:prune": "tsx scripts/images/cli.ts prune"
+    "image:prune": "tsx scripts/images/cli.ts prune",
+    "test:consultation": "node scripts/consultation-journey-smoke.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.117.2",

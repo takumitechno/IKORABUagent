@@ -5,6 +5,10 @@ description: "面接の練習をプロに頼むと何が変わる？ひとりで
 source:
   - content/articles/mensetsu-renshu-pro.md
   - src/app/articles/[slug]/page.tsx
+  - src/components/ConsultationCta.tsx
+  - src/components/SupportSample.tsx
+  - src/components/Eyecatch.tsx
+  - content/images/index.json
 ---
 
 [戻る](/categories/shorui-mensetsu)
@@ -18,6 +22,8 @@ source:
 2026年10月10日 更新 約6分で読めます
 
 提案用のサンプル原稿です（人による最終確認・公開承認の前）。[詳しく](/editorial-policy)
+
+[出典2件・記事の確認状況](#editorial-sources)
 
 面接の練習は、ひとりでも声に出してできますが、話の長さや伝わり方は、人に聞いてもらわないと分かりにくいものです。ひとりで練習する限界、模擬面接で分かること、人材紹介会社のキャリアアドバイザーやハローワークでの面接練習、頼む前に準備することを紹介します。
 
@@ -87,7 +93,7 @@ source:
 
 人材紹介会社のキャリアアドバイザーは、応募先の求人を扱っているため、その会社の面接で聞かれやすいことを知っている場合もあります。「この会社の面接では、どんなことを聞かれやすいですか？」と聞いてみましょう。
 
-面接の練習と書類の添削は、プロに頼める
+面接の練習と書類の添削を相談する
 
 応募先に合わせた模擬面接や、履歴書・職務経歴書の添削を受けてから本番にのぞめます。
 
@@ -175,10 +181,14 @@ source:
 
 **出典とこの記事について出典2件**
 
+以下は原稿作成時の参照情報です。正式公開前に、担当者が出典本文・記事の主張・制度の適用条件を照合します。リンクの掲載やAI査読は、人による確認の完了を意味しません。
+
 1. [ハローワークの相談支援（外部サイト）](https://www.mhlw.go.jp/stf/newpage_27742.html)
    厚生労働省・2026年10月10日確認
+   この記事での参照箇所: ハローワークで、応募書類の作り方や面接の受け方について個別相談やセミナーを無料で行い、応募する求人に合わせた面接の受け答えなどについて助言していること
 2. [わかものハローワーク（外部サイト）](https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/0000181329.html)
    厚生労働省・2026年10月10日確認
+   この記事での参照箇所: 正社員を目指すおおむね35歳未満の若者を対象に、担当者制による職業相談などを無料で行っていること
 
 - **作成**
   2026年10月10日
@@ -202,19 +212,21 @@ source:
 5. [練習のあとにやること](#section-5)
 6. [まとめ：相談の前に整理しておくこと](#section-6)
 
-面接の練習と書類の添削は、プロに頼める
+面接の練習と書類の添削を相談する
 
 応募先に合わせた模擬面接や、履歴書・職務経歴書の添削を受けてから本番にのぞめます。
 
 [面接・書類の準備を相談する](/consultation/apply?placement=article-sidebar__mensetsu-renshu-pro)
 
-[相談でできることを見る](/consultation)
+[相談の内容を確認する](/consultation)
 
 [条件整理チェック](/check)
 
 [職種を比べる](/jobs)
 
-## 面接の練習と書類の添削は、プロに頼める
+キャリア相談のご案内
+
+## 面接の練習と書類の添削を相談する
 
 応募先に合わせた模擬面接や、履歴書・職務経歴書の添削を受けてから本番にのぞめます。
 
@@ -222,15 +234,17 @@ source:
 - 面接の練習
 - 応募書類の添削
 
-[面接・書類の準備を相談する](/consultation/apply?placement=article-bottom__mensetsu-renshu-pro) ・ [相談でできることを見る](/consultation)
+[面接・書類の準備を相談する](/consultation/apply?placement=article-bottom__mensetsu-renshu-pro) ・ [相談の内容を確認する](/consultation)
 
 相談先: 提携する人材紹介会社（正式公開時に掲載）（有料職業紹介事業許可番号: 正式公開時に掲載）
+
+希望を整理してから話したい方は、[相談用のメモを作る](/check)（登録不要）。
 
 ## 次に読むなら
 
 - 面接・書類 2026.10.09
-  ### [転職の面接でよく聞かれる質問と答え方｜自己紹介・転職理由・志望動機の型と回答例](/articles/mensetsu-yokukiku-shitsumon)
+  ### [面接の質問、どう答えればいい？](/articles/mensetsu-yokukiku-shitsumon)
 - 面接・書類 2026.10.10
-  ### [面接で緊張してしまうときの準備と当日の対処｜言葉に詰まったときの言い方の例](/articles/mensetsu-kinchou)
+  ### [面接で緊張して頭が真っ白になる](/articles/mensetsu-kinchou)
 - 転職準備 2026.10.10
-  ### [ハローワークの使い方は？求職申込みから紹介状・書類の添削・面接練習まで、在職中に使うときのことも](/articles/hellowork-tsukaikata)
+  ### [ハローワークって、何ができるの？](/articles/hellowork-tsukaikata)

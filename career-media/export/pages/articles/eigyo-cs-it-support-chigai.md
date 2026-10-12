@@ -5,6 +5,10 @@ description: "未経験歓迎の求人で目にすることが多い「営業」
 source:
   - content/articles/eigyo-cs-it-support-chigai.md
   - src/app/articles/[slug]/page.tsx
+  - src/components/ConsultationCta.tsx
+  - src/components/SupportSample.tsx
+  - src/components/Eyecatch.tsx
+  - content/images/index.json
 ---
 
 [戻る](/categories/shokushu)
@@ -18,6 +22,8 @@ source:
 2026年10月6日 更新 約4分で読めます
 
 提案用のサンプル原稿です（人による最終確認・公開承認の前）。[詳しく](/editorial-policy)
+
+[出典2件・記事の確認状況](#editorial-sources)
 
 未経験歓迎の求人で目にすることが多い「営業」「カスタマーサポート」「ITサポート」。人と話す量、パソコン作業、数字の目標という3つの軸で、仕事内容の違いと入社前に確認したいことを整理します。
 
@@ -50,7 +56,7 @@ source:
 
 数字の目標があることが多いのも営業の特徴です。目標の立て方や、達成できなかったときにどうフォローされるかは、面接や面談で聞いておきたいポイントです。
 
-その仕事が自分に合うか、プロに聞いてみる
+仕事内容と応募条件を確認する
 
 求人票だけでは分からない仕事の中身や職場のことを、キャリアアドバイザーに聞いてから会社を選べます。
 
@@ -131,10 +137,14 @@ ITサポートでの経験を足がかりに、サーバーやネットワーク
 
 **出典とこの記事について出典2件**
 
+以下は原稿作成時の参照情報です。正式公開前に、担当者が出典本文・記事の主張・制度の適用条件を照合します。リンクの掲載やAI査読は、人による確認の完了を意味しません。
+
 1. [職業情報提供サイト（job tag）（外部サイト）](https://shigoto.mhlw.go.jp/User/)
    厚生労働省・2026年10月6日確認
+   この記事での参照箇所: 各職種の仕事内容・求められるスキルの確認
 2. [2024年4月から労働条件明示のルールが変わります（外部サイト）](https://www.mhlw.go.jp/stf/newpage_32105.html)
    厚生労働省・2026年10月6日確認
+   この記事での参照箇所: 業務の変更の範囲が明示されるようになった点
 
 - **作成**
   2026年10月6日
@@ -157,19 +167,21 @@ ITサポートでの経験を足がかりに、サーバーやネットワーク
 4. [ITサポート：パソコンやシステムの困りごとを解決する仕事](#section-4)
 5. [どう選ぶ？迷ったときの考え方](#section-5)
 
-その仕事が自分に合うか、プロに聞いてみる
+仕事内容と応募条件を確認する
 
 求人票だけでは分からない仕事の中身や職場のことを、キャリアアドバイザーに聞いてから会社を選べます。
 
 [職種・会社選びを相談する](/consultation/apply?placement=article-sidebar__eigyo-cs-it-support-chigai)
 
-[相談でできることを見る](/consultation)
+[相談の内容を確認する](/consultation)
 
 [条件整理チェック](/check)
 
 [職種を比べる](/jobs)
 
-## その仕事が自分に合うか、プロに聞いてみる
+キャリア相談のご案内
+
+## 仕事内容と応募条件を確認する
 
 求人票だけでは分からない仕事の中身や職場のことを、キャリアアドバイザーに聞いてから会社を選べます。
 
@@ -177,15 +189,17 @@ ITサポートでの経験を足がかりに、サーバーやネットワーク
 - 面接の練習
 - 応募書類の添削
 
-[職種・会社選びを相談する](/consultation/apply?placement=article-bottom__eigyo-cs-it-support-chigai) ・ [相談でできることを見る](/consultation)
+[職種・会社選びを相談する](/consultation/apply?placement=article-bottom__eigyo-cs-it-support-chigai) ・ [相談の内容を確認する](/consultation)
 
 相談先: 提携する人材紹介会社（正式公開時に掲載）（有料職業紹介事業許可番号: 正式公開時に掲載）
+
+希望を整理してから話したい方は、[相談用のメモを作る](/check)（登録不要）。
 
 ## 次に読むなら
 
 - 経験の活かし方 2026.10.06
-  ### [接客経験は転職でどう活かせる？職種別のつながりと伝え方](/articles/sekkyaku-keiken-ikasu)
+  ### [接客の経験、ほかの仕事で活かせる？](/articles/sekkyaku-keiken-ikasu)
 - 職種を知る 2026.10.06
-  ### [AIで変わる仕事を、未経験転職者はどう見るべきか](/articles/ai-shigoto-mikeiken)
+  ### [AIで変わる仕事、今から選んで大丈夫？](/articles/ai-shigoto-mikeiken)
 - 転職準備 2026.10.06
-  ### [未経験求人の「研修あり」で確認すべきこと｜期間・内容・その後のフォロー](/articles/mikeiken-kenshu-kakunin)
+  ### [「研修あり」の求人、何を確かめる？](/articles/mikeiken-kenshu-kakunin)

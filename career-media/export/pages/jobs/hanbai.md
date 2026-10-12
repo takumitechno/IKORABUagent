@@ -6,6 +6,9 @@ source:
   - src/app/jobs/[slug]/page.tsx
   - src/components/TaxonomyHub.tsx
   - src/lib/taxonomy.ts
+  - src/components/Eyecatch.tsx
+  - content/images/index.json
+  - src/components/PageHero.tsx
 ---
 
 [戻る](/jobs)
@@ -20,13 +23,15 @@ source:
 
 [営業](/jobs/eigyo) ・ [事務](/jobs/jimu) ・ [カスタマーサポート](/jobs/customer-support) ・ [ITサポート](/jobs/it-support) ・ [人事・採用](/jobs/jinji) ・ [販売・接客](/jobs/hanbai) ・ [その他の職種](/jobs/sonota)
 
-- ### [受付の仕事内容は？企業・ホテル・クリニックの違いと接客経験の活かし方](/articles/uketsuke-shigoto)
+## まず読むなら、この3本
+
+- ### [接客の経験、受付の仕事で活かせる？](/articles/uketsuke-shigoto)
   受付の仕事は、来た人を迎えて用件を聞き、担当者や行き先につなぐことが中心です。企業受付・ホテルのフロント・クリニックの受付で何が違うか、接客経験をどう伝えるか、雇用形態や勤務時間など求人で確認したいことを紹介します。
   更新 2026.10.10
-- ### [接客経験は転職でどう活かせる？職種別のつながりと伝え方](/articles/sekkyaku-keiken-ikasu)
+- ### [接客の経験、ほかの仕事で活かせる？](/articles/sekkyaku-keiken-ikasu)
   接客の仕事には、相手の要望を聞き取る力や、混雑時の段取り、クレーム対応など、ほかの職種でも使える経験が含まれています。経験を分解して、営業・カスタマーサポート・事務などにどうつながるかを整理します。
-  更新 2026.10.07
-- ### [販売・接客の仕事で正社員を目指すという選択｜変わることと求人の確認ポイント](/articles/hanbai-seishain)
+  更新 2026.10.12
+- ### [販売・接客のまま、正社員になる道。](/articles/hanbai-seishain)
   別の職種に移るだけが転職ではありません。慣れた販売・接客の仕事で正社員を目指す道もあります。アルバイトと正社員で変わること、時給と月給の比べ方、店長候補などの求人で確認したい休日・シフト・異動の範囲、アルバイト経験の伝え方を整理します。
   更新 2026.10.06
 
@@ -54,10 +59,10 @@ source:
 - [転職回数が多い](/situations/kaisu)
 - [PC仕事が未経験](/situations/pc-mikeiken)
 
-ひとりで悩むより、転職のプロと進める
+仕事選びと応募の準備を相談する
 
 会社選びから面接の練習まで、キャリアアドバイザーに相談しながら準備できます。応募するかどうかは、ご自身で決められます。
 
 [キャリア相談を申し込む](/consultation/apply?placement=article-sidebar__roles-hanbai)
 
-[相談でできることを見る](/consultation)
+[相談の内容を確認する](/consultation)

@@ -79,6 +79,13 @@ for (const [vpName, viewport] of Object.entries(VIEWPORTS)) {
     page.on("pageerror", (err) => problems.push(`[${vpName}] ${url} pageerror: ${err.message}`));
     const res = await page.goto(BASE_URL + url, { waitUntil: "load" });
     await page.waitForTimeout(600);
+    // Full-page captures include images below the fold; scroll as a reader would before saving.
+    for (const picture of await page.locator("img").all()) {
+      if (!(await picture.isVisible())) continue;
+      await picture.scrollIntoViewIfNeeded();
+      await picture.evaluate((img) => img.decode()).catch(() => problems.push(`[${vpName}] ${url} image failed to load`));
+    }
+    await page.evaluate(() => window.scrollTo(0, 0));
     const expected = name === "not-found" ? 404 : 200;
     if (res?.status() !== expected) problems.push(`[${vpName}] ${url} status ${res?.status()} (expected ${expected})`);
     // 横スクロールが発生していないか（モバイル崩れの検出）
@@ -137,7 +144,7 @@ for (const [vpName, viewport] of Object.entries(VIEWPORTS)) {
       }
       await page.getByRole("button", { name: step === answers.length - 1 ? "結果を見る" : "次へ進む" }).click();
     }
-    await page.getByRole("heading", { name: "あなたの条件整理ノート" }).waitFor();
+    await page.getByRole("heading", { name: "相談用のメモ", exact: true }).waitFor();
     await page.evaluate(() => window.scrollTo({ top: 0, behavior: "instant" }));
     await page.waitForTimeout(600);
     await page.screenshot({ path: path.join(OUT, `${vpName}-check-result.png`), fullPage: true });

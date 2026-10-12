@@ -5,6 +5,10 @@ description: "面接に落ちたとき、何をどう振り返ればいい？気
 source:
   - content/articles/mensetsu-ochita-furikaeri.md
   - src/app/articles/[slug]/page.tsx
+  - src/components/ConsultationCta.tsx
+  - src/components/SupportSample.tsx
+  - src/components/Eyecatch.tsx
+  - content/images/index.json
 ---
 
 [戻る](/categories/shorui-mensetsu)
@@ -18,6 +22,8 @@ source:
 2026年10月10日 更新 約5分で読めます
 
 提案用のサンプル原稿です（人による最終確認・公開承認の前）。[詳しく](/editorial-policy)
+
+[出典3件・記事の確認状況](#editorial-sources)
 
 面接に落ちたときは、自分を責めるより、「準備で直せること」と「相性やタイミングなど自分では変えられないこと」を分けて振り返ると、次の面接につなげやすくなります。気持ちの整理のしかた、振り返りの項目、答えの直し方の例、ハローワークで面接の相談をするときの使い方を紹介します。
 
@@ -65,7 +71,7 @@ source:
 
 右側のことは、考えても答えが出ません。時間を使うのは左側だけにします。
 
-面接の練習と書類の添削は、プロに頼める
+面接の練習と書類の添削を相談する
 
 応募先に合わせた模擬面接や、履歴書・職務経歴書の添削を受けてから本番にのぞめます。
 
@@ -167,12 +173,17 @@ source:
 
 **出典とこの記事について出典3件**
 
+以下は原稿作成時の参照情報です。正式公開前に、担当者が出典本文・記事の主張・制度の適用条件を照合します。リンクの掲載やAI査読は、人による確認の完了を意味しません。
+
 1. [ハローワークの相談支援（外部サイト）](https://www.mhlw.go.jp/stf/newpage_27742.html)
    厚生労働省・2026年10月9日確認
+   この記事での参照箇所: ハローワークで、応募書類の作り方や面接の受け方について個別相談やセミナーを無料で行い、求人に合わせた面接での受け答えについて助言していること
 2. [ハローワークのご案内（リーフレット）（外部サイト）](https://www.mhlw.go.jp/content/11600000/001441500.pdf)
    厚生労働省・2026年10月9日確認
+   この記事での参照箇所: 希望に応じて応募書類の添削や面接に向けた相談を受けられること、利用は無料であること
 3. [わかものハローワーク（外部サイト）](https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/0000181329.html)
    厚生労働省・2026年10月9日確認
+   この記事での参照箇所: 正社員を目指すおおむね35歳未満の若者を対象に、担当者制の職業相談や応募準備のサポートを無料で行っていること
 
 - **作成**
   2026年10月10日
@@ -196,19 +207,21 @@ source:
 5. [何社か落ちたら、「どこで落ちているか」を見る](#section-5)
 6. [ひとりで振り返るのがつらいときは](#section-6)
 
-面接の練習と書類の添削は、プロに頼める
+面接の練習と書類の添削を相談する
 
 応募先に合わせた模擬面接や、履歴書・職務経歴書の添削を受けてから本番にのぞめます。
 
 [面接・書類の準備を相談する](/consultation/apply?placement=article-sidebar__mensetsu-ochita-furikaeri)
 
-[相談でできることを見る](/consultation)
+[相談の内容を確認する](/consultation)
 
 [条件整理チェック](/check)
 
 [職種を比べる](/jobs)
 
-## 面接の練習と書類の添削は、プロに頼める
+キャリア相談のご案内
+
+## 面接の練習と書類の添削を相談する
 
 応募先に合わせた模擬面接や、履歴書・職務経歴書の添削を受けてから本番にのぞめます。
 
@@ -216,15 +229,17 @@ source:
 - 面接の練習
 - 応募書類の添削
 
-[面接・書類の準備を相談する](/consultation/apply?placement=article-bottom__mensetsu-ochita-furikaeri) ・ [相談でできることを見る](/consultation)
+[面接・書類の準備を相談する](/consultation/apply?placement=article-bottom__mensetsu-ochita-furikaeri) ・ [相談の内容を確認する](/consultation)
 
 相談先: 提携する人材紹介会社（正式公開時に掲載）（有料職業紹介事業許可番号: 正式公開時に掲載）
+
+希望を整理してから話したい方は、[相談用のメモを作る](/check)（登録不要）。
 
 ## 次に読むなら
 
 - 面接・書類 2026.10.09
-  ### [転職の面接でよく聞かれる質問と答え方｜自己紹介・転職理由・志望動機の型と回答例](/articles/mensetsu-yokukiku-shitsumon)
+  ### [面接の質問、どう答えればいい？](/articles/mensetsu-yokukiku-shitsumon)
 - 面接・書類 2026.10.06
-  ### [未経験職種の面接、何を準備する？よく聞かれる質問と逆質問の例](/articles/mensetsu-junbi-mikeiken)
+  ### [面接が不安。何を準備する？](/articles/mensetsu-junbi-mikeiken)
 - 面接・書類 2026.10.09
-  ### [面接の逆質問、何を聞けばいい？聞くとよいこと・避けたいことと未経験向けの質問例](/articles/gyaku-shitsumon)
+  ### [「何か質問は？」何を聞けばいい？](/articles/gyaku-shitsumon)

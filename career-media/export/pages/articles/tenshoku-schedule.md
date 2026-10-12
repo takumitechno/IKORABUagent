@@ -5,6 +5,10 @@ description: "転職活動の流れを、自己分析・応募・面接・内定
 source:
   - content/articles/tenshoku-schedule.md
   - src/app/articles/[slug]/page.tsx
+  - src/components/ConsultationCta.tsx
+  - src/components/SupportSample.tsx
+  - src/components/Eyecatch.tsx
+  - content/images/index.json
 ---
 
 [戻る](/categories/junbi)
@@ -18,6 +22,8 @@ source:
 2026年10月9日 更新 約6分で読めます
 
 提案用のサンプル原稿です（人による最終確認・公開承認の前）。[詳しく](/editorial-policy)
+
+[出典4件・記事の確認状況](#editorial-sources)
 
 転職活動は「自己分析→情報集め→応募→面接→内定→退職手続き→入社」の順に進みます。働きながら進める場合と辞めてから進める場合の違い、各ステップでやること、入社日から逆算するスケジュールの立て方、退職後に期限がある手続きを紹介します。
 
@@ -108,7 +114,7 @@ source:
 
 入社日までに、転職先から求められる書類（年金や雇用保険の番号が分かるもの、源泉徴収票など）をそろえます。何が必要かは会社によって違うので、内定後の案内で確認しましょう。
 
-転職の進め方を、プロと一緒に決める
+応募までの準備を相談する
 
 いつ動くか、何から始めるかを、経験と希望をもとに一緒に考えてもらえます。日程の調整も任せられます。
 
@@ -181,14 +187,20 @@ source:
 
 **出典とこの記事について出典4件**
 
+以下は原稿作成時の参照情報です。正式公開前に、担当者が出典本文・記事の主張・制度の適用条件を照合します。リンクの掲載やAI査読は、人による確認の完了を意味しません。
+
 1. [会社を退職したときの国民年金の手続き（外部サイト）](https://www.nenkin.go.jp/service/kokunen/kanyu/20140710-03.html)
    日本年金機構・2026年10月9日確認
+   この記事での参照箇所: 退職して次の会社の厚生年金に入らない場合、退職日の翌日から14日以内に住所地の市区町村で国民年金の手続きをすること
 2. [国民健康保険の加入・脱退について（外部サイト）](https://www.mhlw.go.jp/stf/newpage_21539.html)
    厚生労働省・2026年10月9日確認
+   この記事での参照箇所: 国民健康保険に加入するときは、14日以内に住所地の市町村の窓口へ届け出ること
 3. [よくあるご質問（雇用保険について）（外部サイト）](https://www.hellowork.mhlw.go.jp/help/question05.html)
    ハローワークインターネットサービス（厚生労働省）・2026年10月9日確認
+   この記事での参照箇所: 離職票の提出と求職の申込みを行った日から通算して7日間は待期期間で、基本手当が支給されないこと
 4. [令和７年４月１日以降に離職された方は、正当な理由がない自己都合により退職した場合、給付制限期間が原則１か月となります。（外部サイト）](https://jsite.mhlw.go.jp/gunma-roudoukyoku/content/contents/002182062.pdf)
    群馬労働局・ハローワーク・2026年10月9日確認
+   この記事での参照箇所: 2025年4月1日以降に正当な理由のない自己都合で離職した場合、給付制限期間が原則1か月であること
 
 - **作成**
   2026年10月9日
@@ -211,19 +223,21 @@ source:
 4. [辞めてから進める場合に、期限がある手続き](#section-4)
 5. [進め方に迷ったら](#section-5)
 
-転職の進め方を、プロと一緒に決める
+応募までの準備を相談する
 
 いつ動くか、何から始めるかを、経験と希望をもとに一緒に考えてもらえます。日程の調整も任せられます。
 
 [転職の進め方を相談する](/consultation/apply?placement=article-sidebar__tenshoku-schedule)
 
-[相談でできることを見る](/consultation)
+[相談の内容を確認する](/consultation)
 
 [条件整理チェック](/check)
 
 [職種を比べる](/jobs)
 
-## 転職の進め方を、プロと一緒に決める
+キャリア相談のご案内
+
+## 応募までの準備を相談する
 
 いつ動くか、何から始めるかを、経験と希望をもとに一緒に考えてもらえます。日程の調整も任せられます。
 
@@ -231,15 +245,17 @@ source:
 - 面接の練習
 - 応募書類の添削
 
-[転職の進め方を相談する](/consultation/apply?placement=article-bottom__tenshoku-schedule) ・ [相談でできることを見る](/consultation)
+[転職の進め方を相談する](/consultation/apply?placement=article-bottom__tenshoku-schedule) ・ [相談の内容を確認する](/consultation)
 
 相談先: 提携する人材紹介会社（正式公開時に掲載）（有料職業紹介事業許可番号: 正式公開時に掲載）
+
+希望を整理してから話したい方は、[相談用のメモを作る](/check)（登録不要）。
 
 ## 次に読むなら
 
 - 転職準備 2026.10.09
-  ### [働きながらの転職活動、何から？進める順番と時間の作り方・退職を伝える時期](/articles/zaishoku-tenshoku-susumekata)
+  ### [働きながらの転職、何から始める？](/articles/zaishoku-tenshoku-susumekata)
 - 未経験転職 2026.10.06
-  ### [未経験転職は何から始める？最初に整理したい5つのこと](/articles/mikeiken-tenshoku-hajimekata)
+  ### [未経験の転職、何から始める？](/articles/mikeiken-tenshoku-hajimekata)
 - 転職準備 2026.10.09
-  ### [退職の伝え方は？誰に・いつ・どう言うか｜引き止めへの答え方と退職届の書き方](/articles/taishoku-tsutaekata)
+  ### [退職、どう切り出せばいい？](/articles/taishoku-tsutaekata)

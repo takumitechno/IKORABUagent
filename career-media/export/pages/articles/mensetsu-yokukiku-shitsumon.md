@@ -5,6 +5,10 @@ description: "転職の面接でよく聞かれる自己紹介・転職理由・
 source:
   - content/articles/mensetsu-yokukiku-shitsumon.md
   - src/app/articles/[slug]/page.tsx
+  - src/components/ConsultationCta.tsx
+  - src/components/SupportSample.tsx
+  - src/components/Eyecatch.tsx
+  - content/images/index.json
 ---
 
 [戻る](/categories/shorui-mensetsu)
@@ -18,6 +22,8 @@ source:
 2026年10月9日 更新 約6分で読めます
 
 提案用のサンプル原稿です（人による最終確認・公開承認の前）。[詳しく](/editorial-policy)
+
+[出典5件・記事の確認状況](#editorial-sources)
 
 転職の面接で聞かれることの多くは、「何ができるか」「どのくらい入りたいか」「どんな人か」を確かめる質問です。自己紹介・転職理由・志望動機・強み弱み・未経験の仕事を選んだ理由について、答え方の型と回答例を紹介します。応募者に聞いてはいけないとされている質問の考え方も紹介します。
 
@@ -62,7 +68,7 @@ source:
 
 いちばん大事なのは**最初の「結論」**です。エピソードから話し始めると、何の話か分からないまま長くなりがちです。結論を言ってから理由を足し、最後に「だから御社で〇〇したい」とつなげます。
 
-面接の練習と書類の添削は、プロに頼める
+面接の練習と書類の添削を相談する
 
 応募先に合わせた模擬面接や、履歴書・職務経歴書の添削を受けてから本番にのぞめます。
 
@@ -183,16 +189,23 @@ source:
 
 **出典とこの記事について出典5件**
 
+以下は原稿作成時の参照情報です。正式公開前に、担当者が出典本文・記事の主張・制度の適用条件を照合します。リンクの掲載やAI査読は、人による確認の完了を意味しません。
+
 1. [ハローワーク布施 面接対策セミナー（外部サイト）](https://jsite.mhlw.go.jp/osaka-hellowork/content/contents/002184437.pdf)
    大阪労働局 ハローワーク布施・2026年10月9日確認
+   この記事での参照箇所: 面接に決まったマニュアルはなく、答える内容は一人ひとり違うこと。企業は能力・適性・経験や意欲を見ていること。自己PRには具体的な根拠やエピソードを入れること
 2. [応募書類（パンフレット）（外部サイト）](https://www.hellowork.mhlw.go.jp/doc/oubosyorui_pamphlet_202406.pdf)
    ハローワークインターネットサービス（厚生労働省）・2026年10月9日確認
+   この記事での参照箇所: 面接では提出した応募書類の内容をもとに質問されることが多いので、書類のコピーを取り、面接の前に見直すこと
 3. [採用選考時に配慮すべき事項（公正採用選考特設サイト）（外部サイト）](https://kouseisaiyou.mhlw.go.jp/consider.html)
    厚生労働省・2026年10月9日確認
+   この記事での参照箇所: 本籍・出生地、家族、住宅状況、生活環境・家庭環境、宗教、支持政党などを応募書類や面接で把握することは、就職差別につながるおそれがあるとされていること
 4. [求職者の皆様へ（公正採用選考特設サイト）（外部サイト）](https://kouseisaiyou.mhlw.go.jp/jobseekers.html)
    厚生労働省・2026年10月9日確認
+   この記事での参照箇所: 不適切な質問をされたときに、ハローワークや都道府県労働局に相談できること
 5. [ハローワークのご案内（リーフレット）（外部サイト）](https://www.mhlw.go.jp/content/11600000/001441500.pdf)
    厚生労働省・2026年10月9日確認
+   この記事での参照箇所: ハローワークで、応募書類の添削や面接に向けた相談を無料で受けられること
 
 - **作成**
   2026年10月9日
@@ -216,19 +229,21 @@ source:
 5. [応募者に聞いてはいけない質問もある](#section-5)
 6. [練習は「書類を見返す」ところから](#section-6)
 
-面接の練習と書類の添削は、プロに頼める
+面接の練習と書類の添削を相談する
 
 応募先に合わせた模擬面接や、履歴書・職務経歴書の添削を受けてから本番にのぞめます。
 
 [面接・書類の準備を相談する](/consultation/apply?placement=article-sidebar__mensetsu-yokukiku-shitsumon)
 
-[相談でできることを見る](/consultation)
+[相談の内容を確認する](/consultation)
 
 [条件整理チェック](/check)
 
 [職種を比べる](/jobs)
 
-## 面接の練習と書類の添削は、プロに頼める
+キャリア相談のご案内
+
+## 面接の練習と書類の添削を相談する
 
 応募先に合わせた模擬面接や、履歴書・職務経歴書の添削を受けてから本番にのぞめます。
 
@@ -236,15 +251,17 @@ source:
 - 面接の練習
 - 応募書類の添削
 
-[面接・書類の準備を相談する](/consultation/apply?placement=article-bottom__mensetsu-yokukiku-shitsumon) ・ [相談でできることを見る](/consultation)
+[面接・書類の準備を相談する](/consultation/apply?placement=article-bottom__mensetsu-yokukiku-shitsumon) ・ [相談の内容を確認する](/consultation)
 
 相談先: 提携する人材紹介会社（正式公開時に掲載）（有料職業紹介事業許可番号: 正式公開時に掲載）
+
+希望を整理してから話したい方は、[相談用のメモを作る](/check)（登録不要）。
 
 ## 次に読むなら
 
 - 面接・書類 2026.10.06
-  ### [未経験職種の面接、何を準備する？よく聞かれる質問と逆質問の例](/articles/mensetsu-junbi-mikeiken)
+  ### [面接が不安。何を準備する？](/articles/mensetsu-junbi-mikeiken)
 - 面接・書類 2026.10.06
-  ### [未経験職種の志望動機、何を書けばいい？3つの要素と例文](/articles/shiboudouki-mikeiken)
+  ### [未経験の志望動機、何を書けばいい？](/articles/shiboudouki-mikeiken)
 - 面接・書類 2026.10.09
-  ### [職歴に空白期間があるとき、面接でどう説明する？書類の書き方と答え方の例](/articles/kuhaku-kikan-setsumei)
+  ### [空白期間、面接でどう話す？](/articles/kuhaku-kikan-setsumei)

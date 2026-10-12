@@ -5,6 +5,7 @@ import { findTaxonomy, taxonomyPath, type TaxonomyGroup } from "@/lib/taxonomy";
 import { categoryTone } from "./CategoryIcon";
 import { announcedLabel, formatDate, formatDateShort } from "./DateMeta";
 import { Eyecatch } from "./Eyecatch";
+import { articleCardTitle } from "@/lib/article-presentation";
 
 export function findCategory(categories: Category[], slug?: string) {
   return categories.find((c) => c.slug === slug);
@@ -34,7 +35,7 @@ export function LeadCard({ article, categories }: { article: ArticleSummary; cat
       <Eyecatch article={article} category={category} size="lg" className="rounded-none" />
       <div className="flex flex-col p-5 sm:p-7">
         <Meta article={article} category={category} />
-        <h3 className="mt-2 text-[19px] font-bold leading-[1.55] text-ink group-hover:text-brand-strong sm:text-[22px]">{article.title}</h3>
+        <h3 className="mt-2 text-[19px] font-bold leading-[1.55] text-ink group-hover:text-brand-strong sm:text-[22px]" title={article.title}>{articleCardTitle(article)}</h3>
         <p className="mt-2 line-clamp-2 text-[14px] leading-7 text-muted">{article.summary}</p>
       </div>
     </Link>
@@ -46,15 +47,15 @@ export function FeatureCard({ article, categories, showSummary = true }: { artic
   const category = findCategory(categories, article.categories[0]);
   const effective = article.kind === "news" ? article.news?.announcedAt : undefined;
   return (
-    <Link href={articlePath(article)} className="tap lift group flex h-full flex-col overflow-hidden rounded-2xl border border-line bg-surface">
-      <Eyecatch article={article} category={category} size="md" className="rounded-none" />
-      <div className="flex flex-1 flex-col p-4 sm:p-5">
-        <h3 className="text-[15.5px] font-bold leading-[1.6] text-ink group-hover:text-brand-strong">{article.title}</h3>
+    <Link href={articlePath(article)} className="feature-card tap lift group h-full">
+      <Eyecatch article={article} category={category} size="md" />
+      <div className="flex flex-1 flex-col pt-4">
+        <h3 className="text-[15.5px] font-bold leading-[1.6] text-ink group-hover:text-brand-strong" title={article.title}>{articleCardTitle(article)}</h3>
         {showSummary && <p className="mt-2 line-clamp-2 text-[13px] leading-6 text-muted">{article.summary}</p>}
         <div className="mt-auto pt-3">
           {effective ? (
             <span className="text-[12px] font-bold text-mist-ink">
-              {announcedLabel(effective)} {formatDate(effective)}
+              {announcedLabel(effective, article.news?.dateType)} {formatDate(effective)}
             </span>
           ) : (
             <time dateTime={article.updatedAt} className="text-xs text-muted">
@@ -76,7 +77,7 @@ export function ArticleRow({ article, categories, showSummary = true }: { articl
         <Eyecatch article={article} category={category} size="sm" className="w-[96px] self-start sm:w-[132px]" />
         <div className="min-w-0 flex-1">
           <Meta article={article} category={category} />
-          <h3 className="mt-1 text-[15px] font-bold leading-[1.6] text-ink group-hover:text-brand-strong sm:text-[15.5px]">{article.title}</h3>
+          <h3 className="mt-1 text-[15px] font-bold leading-[1.6] text-ink group-hover:text-brand-strong sm:text-[15.5px]" title={article.title}>{articleCardTitle(article)}</h3>
           {showSummary && (
             <div className="hidden sm:block">
               <p className="mt-1 line-clamp-2 text-[13px] leading-6 text-muted">{article.summary}</p>

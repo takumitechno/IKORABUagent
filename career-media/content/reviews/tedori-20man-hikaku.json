@@ -1,0 +1,16 @@
+[
+  {
+    "slug": "tedori-20man-hikaku",
+    "contentHash": "27f57ad29e338eb80f6bb796fd03dfe5a544ad02d6a433075acb544e82d51fe1",
+    "reviewer": "career-reviewer (automated checks; human approval pending)",
+    "verdict": "approved",
+    "findings": [
+      {
+        "code": "C04",
+        "severity": "warning",
+        "message": "査読（reviewed_at）のあとに更新されている。再査読が必要"
+      }
+    ],
+    "reviewedAt": "2026-10-11T17:50:49.899Z"
+  }
+]

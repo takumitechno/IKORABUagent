@@ -5,6 +5,10 @@ description: "年の途中で転職したら、前の会社の源泉徴収票を
 source:
   - content/articles/tenshoku-nenmatsu-chosei.md
   - src/app/articles/[slug]/page.tsx
+  - src/components/ConsultationCta.tsx
+  - src/components/SupportSample.tsx
+  - src/components/Eyecatch.tsx
+  - content/images/index.json
 ---
 
 [戻る](/categories/seido)
@@ -18,6 +22,8 @@ source:
 2026年10月9日 更新 約4分で読めます
 
 提案用のサンプル原稿です（人による最終確認・公開承認の前）。[詳しく](/editorial-policy)
+
+[出典6件・記事の確認状況](#editorial-sources)
 
 年の途中で転職した年は、前の会社の源泉徴収票を新しい会社に出して、前の会社の給料も含めて年末調整をしてもらいます。年内に再就職しなかったときの確定申告（還付申告）のしかたと、源泉徴収票が届かないときの対処もまとめます。
 
@@ -46,7 +52,7 @@ source:
 
 退職日から1か月たっても届かないときは、まず前の会社に問い合わせましょう。それでも渡してもらえない場合は、税務署に「源泉徴収票不交付の届出」をする手続きがあります。
 
-退職や入社のタイミングも、まとめて相談
+退職・入社のタイミングを相談する
 
 制度の手続きを確かめながら、いつ辞めていつ入社するかなど、転職の進め方をキャリアアドバイザーに相談できます。
 
@@ -131,18 +137,26 @@ source:
 
 **出典とこの記事について出典6件**
 
+以下は原稿作成時の参照情報です。正式公開前に、担当者が出典本文・記事の主張・制度の適用条件を照合します。リンクの掲載やAI査読は、人による確認の完了を意味しません。
+
 1. [No.2674 中途就職者の年末調整（外部サイト）](https://www.nta.go.jp/taxes/shiraberu/taxanswer/gensen/2674.htm)
    国税庁・2026年10月7日確認
+   この記事での参照箇所: 年の途中で就職した人は、就職前の給与も含めて年末調整を行うこと、前の会社の給与は源泉徴収票などで確認し、確認できないときは年末調整ができず確定申告で精算すること
 2. [No.7411 「給与所得の源泉徴収票」の提出範囲と提出枚数等（外部サイト）](https://www.nta.go.jp/taxes/shiraberu/taxanswer/hotei/7411.htm)
    国税庁・2026年10月7日確認
+   この記事での参照箇所: 年の途中で退職した人には、退職の日以後1か月以内に源泉徴収票を交付しなければならないこと
 3. [F5-4 源泉徴収票不交付の届出手続（外部サイト）](https://www.nta.go.jp/taxes/tetsuzuki/shinsei/annai/hotei/23100017.htm)
    国税庁・2026年10月7日確認
+   この記事での参照箇所: 源泉徴収票が交付されない場合に、交付期限を過ぎたあと税務署に届け出る手続きがあること
 4. [No.1910 中途退職で年末調整を受けていないとき（外部サイト）](https://www.nta.go.jp/taxes/shiraberu/taxanswer/shotoku/1910.htm)
    国税庁・2026年10月7日確認
+   この記事での参照箇所: 年の途中で退職したまま再就職しない場合は年末調整を受けられず、所得税を納めすぎている場合があること、翌年以降に確定申告をすれば還付を受けられること、確定申告書等作成コーナーで作成・提出できること
 5. [No.2030 還付申告（外部サイト）](https://www.nta.go.jp/taxes/shiraberu/taxanswer/shotoku/2030.htm)
    国税庁・2026年10月7日確認
+   この記事での参照箇所: 還付申告書は、その年の翌年1月1日から5年間提出できること
 6. [No.1130 社会保険料控除（外部サイト）](https://www.nta.go.jp/taxes/shiraberu/taxanswer/shotoku/1130.htm)
    国税庁・2026年10月7日確認
+   この記事での参照箇所: 自分で支払った国民健康保険料や国民年金保険料が社会保険料控除の対象になること、国民年金保険料を年末調整で控除するときは控除証明書の添付または提示が必要なこと
 
 - **作成**
   2026年10月9日
@@ -165,19 +179,21 @@ source:
 4. [年内に再就職しなかったら：翌年に確定申告](#section-4)
 5. [辞める前・転職したあとに確認すること](#section-5)
 
-退職や入社のタイミングも、まとめて相談
+退職・入社のタイミングを相談する
 
 制度の手続きを確かめながら、いつ辞めていつ入社するかなど、転職の進め方をキャリアアドバイザーに相談できます。
 
 [転職の進め方を相談する](/consultation/apply?placement=article-sidebar__tenshoku-nenmatsu-chosei)
 
-[相談でできることを見る](/consultation)
+[相談の内容を確認する](/consultation)
 
 [条件整理チェック](/check)
 
 [職種を比べる](/jobs)
 
-## 退職や入社のタイミングも、まとめて相談
+キャリア相談のご案内
+
+## 退職・入社のタイミングを相談する
 
 制度の手続きを確かめながら、いつ辞めていつ入社するかなど、転職の進め方をキャリアアドバイザーに相談できます。
 
@@ -185,15 +201,17 @@ source:
 - 面接の練習
 - 応募書類の添削
 
-[転職の進め方を相談する](/consultation/apply?placement=article-bottom__tenshoku-nenmatsu-chosei) ・ [相談でできることを見る](/consultation)
+[転職の進め方を相談する](/consultation/apply?placement=article-bottom__tenshoku-nenmatsu-chosei) ・ [相談の内容を確認する](/consultation)
 
 相談先: 提携する人材紹介会社（正式公開時に掲載）（有料職業紹介事業許可番号: 正式公開時に掲載）
+
+希望を整理してから話したい方は、[相談用のメモを作る](/check)（登録不要）。
 
 ## 次に読むなら
 
 - 年収・働き方 2026.10.06
-  ### [手取り20万円から転職を考えるとき、何を比べればいい？](/articles/tedori-20man-hikaku)
+  ### [手取り20万円。転職で何を比べる？](/articles/tedori-20man-hikaku)
 - 転職準備 2026.10.06
-  ### [今の仕事を辞めたいとき、先に確認しておきたいこと](/articles/yametai-mae-kakunin)
+  ### [辞めたい。その前に確認すること](/articles/yametai-mae-kakunin)
 - 年収・働き方 2026.10.06
-  ### [年収300万円から転職すると、給料は下がる？上げられる？](/articles/nenshu-300man-tenshoku)
+  ### [年収300万円、転職したら下がる？](/articles/nenshu-300man-tenshoku)

@@ -5,6 +5,10 @@ description: "改正育児・介護休業法により、2025年10月1日から�
 source:
   - content/news/news-ikuji-kaigo-2025-10.md
   - src/app/news/[slug]/page.tsx
+  - src/components/ConsultationCta.tsx
+  - src/components/SupportSample.tsx
+  - src/components/Eyecatch.tsx
+  - content/images/index.json
 ---
 
 [戻る](/news)
@@ -13,7 +17,7 @@ source:
 
 転職ニュース解説 ・ 発表元: 厚生労働省
 
-施行・発表日: 2025年10月1日
+施行日：2025年10月1日
 
 # 子育てと仕事の両立の制度が変わった（2025年10月施行）｜求人を見るときの確認ポイント
 
@@ -106,14 +110,20 @@ source:
 
 **出典とこの記事について出典4件**
 
+以下は原稿作成時の参照情報です。正式公開前に、担当者が出典本文・記事の主張・制度の適用条件を照合します。リンクの掲載やAI査読は、人による確認の完了を意味しません。
+
 1. [柔軟な働き方を実現するための措置｜育児休業制度特設サイト（外部サイト）](https://www.mhlw.go.jp/seisakunitsuite/bunya/koyou_roudou/koyoukintou/ryouritsu/ikuji/flexiblework/)
    厚生労働省・2026年10月6日確認
+   この記事での参照箇所: 3歳から小学校就学前の子を養育する労働者に対し、事業主が5つの措置から2つ以上を選んで講じ、労働者が1つを選んで利用できること、テレワーク等（月10日以上）・養育両立支援休暇（年10日以上）、子が3歳になる前の個別の周知・意向確認
 2. [法改正のポイント｜育児休業制度特設サイト（外部サイト）](https://www.mhlw.go.jp/seisakunitsuite/bunya/koyou_roudou/koyoukintou/ryouritsu/ikuji/law-amendment/)
    厚生労働省・2026年10月6日確認
+   この記事での参照箇所: 2025年10月1日施行の柔軟な働き方を実現するための措置と、妊娠・出産等の申出時と子が3歳になる前の個別の意向聴取・配慮、2025年4月1日施行の所定外労働の制限（残業免除）の対象拡大、従業員300人超の企業への男性の育児休業等取得状況の公表義務の拡大
 3. [改正育児・介護休業法が令和7年10月1日から全面施行されました（外部サイト）](https://jsite.mhlw.go.jp/fukui-roudoukyoku/hourei_seido_tetsuzuki/koyou_kintou/hourei_seido/newpage_00587.html)
    福井労働局・2026年10月6日確認
+   この記事での参照箇所: 改正法が2025年10月1日に全面施行されたこと
 4. [子の看護等休暇｜育児休業制度特設サイト（外部サイト）](https://www.mhlw.go.jp/seisakunitsuite/bunya/koyou_roudou/koyoukintou/ryouritsu/ikuji/nursing/)
    厚生労働省・2026年10月6日確認
+   この記事での参照箇所: 2025年4月1日から、子の看護等休暇の対象が小学校3年生修了までに広がり、学級閉鎖や入園式・卒園式なども取得の理由に加わったこと
 
 - **作成**
   2026年10月6日
@@ -130,7 +140,9 @@ source:
 
 [転職ニュース一覧へ戻る](/news)
 
-## ひとりで悩むより、転職のプロと進める
+キャリア相談のご案内
+
+## 仕事選びと応募の準備を相談する
 
 会社選びから面接の練習まで、キャリアアドバイザーに相談しながら準備できます。応募するかどうかは、ご自身で決められます。
 
@@ -138,15 +150,15 @@ source:
 - 面接の練習
 - 応募書類の添削
 
-[整理した内容をもとに相談する](/consultation/apply?placement=news-bottom__news-ikuji-kaigo-2025-10) ・ [相談でできることを見る](/consultation)
+[キャリア相談を申し込む](/consultation/apply?placement=news-bottom__news-ikuji-kaigo-2025-10) ・ [相談の内容を確認する](/consultation)
 
 相談先: 提携する人材紹介会社（正式公開時に掲載）（有料職業紹介事業許可番号: 正式公開時に掲載）
 
 ## 次に読むなら
 
 - 転職準備 2026.10.06
-  ### [今の仕事を辞めたいとき、先に確認しておきたいこと](/articles/yametai-mae-kakunin)
+  ### [辞めたい。その前に確認すること](/articles/yametai-mae-kakunin)
 - 転職準備 2026.10.06
-  ### [エージェント面談の前に決めておくこと・決めなくていいこと](/articles/agent-mendan-mae)
+  ### [エージェント面談の前、何を決めておく？](/articles/agent-mendan-mae)
 - ニュース解説 2026.10.06
-  ### [求人で明示される労働条件が増えた｜「業務・就業場所の変更の範囲」とは](/news/news-roudou-jouken-meiji)
+  ### [入社後の仕事や勤務地、どこまで変わる？](/news/news-roudou-jouken-meiji)

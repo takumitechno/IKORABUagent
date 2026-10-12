@@ -11,6 +11,8 @@ import { getRepository } from "@/lib/content";
 import { renderMarkdown } from "@/lib/markdown";
 import { articleCrumbs, articleJsonLd, pageMetadata } from "@/lib/seo";
 import Link from "next/link";
+import { articleCover } from "@/lib/article-presentation";
+import { Eyecatch } from "@/components/Eyecatch";
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -32,6 +34,7 @@ export async function generateMetadata({ params }: Props) {
     type: "article",
     publishedTime: article.publishedAt ?? undefined,
     modifiedTime: article.updatedAt,
+    image: articleCover(article) ?? undefined,
   });
 }
 
@@ -73,13 +76,14 @@ export default async function NewsDetailPage({ params }: Props) {
             </div>
             <p className={`mt-3 inline-flex items-center gap-2 rounded-xl px-3 py-2 text-[13.5px] font-bold ${news.announcedAt > new Date().toISOString().slice(0, 10) ? "bg-sand text-sand-ink" : "bg-mist text-mist-ink"}`}>
               <CalendarDays className="h-4 w-4" aria-hidden="true" />
-              {announcedLabel(news.announcedAt)}日: {formatDate(news.announcedAt)}
+              {announcedLabel(news.announcedAt, news.dateType)}：{formatDate(news.announcedAt)}
             </p>
             <h1 className="mt-4 text-[24px] font-bold leading-[1.55] text-ink sm:text-[28px]">{article.title}</h1>
             <p className="mt-4 text-[16px] leading-[1.95] text-body">{article.summary}</p>
             <p className="mt-4 text-[13px] text-muted">{formatDate(article.updatedAt)} 更新</p>
             {site.sampleContent && <SampleNotice />}
           </header>
+          <Eyecatch article={article} size="banner" className="mt-6" />
 
           <div className="mt-6 space-y-4">
             <Block icon={Megaphone} title="何が発表されたか">

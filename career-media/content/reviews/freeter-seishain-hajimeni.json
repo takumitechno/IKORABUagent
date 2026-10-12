@@ -6,5 +6,24 @@
     "verdict": "approved",
     "findings": [],
     "reviewedAt": "2026-10-09T15:11:13.780Z"
+  },
+  {
+    "slug": "freeter-seishain-hajimeni",
+    "contentHash": "cf59f09c0a208d4c3f29ae0a831bfda707c3119f0c93cb737221050f2d3a2b02",
+    "reviewer": "career-reviewer (automated checks; human approval pending)",
+    "verdict": "approved",
+    "findings": [
+      {
+        "code": "C04",
+        "severity": "warning",
+        "message": "査読（reviewed_at）のあとに更新されている。再査読が必要"
+      },
+      {
+        "code": "C04",
+        "severity": "warning",
+        "message": "出典の確認日が情報確認日より新しい。information_checked_at を更新する"
+      }
+    ],
+    "reviewedAt": "2026-10-11T17:50:50.329Z"
   }
 ]

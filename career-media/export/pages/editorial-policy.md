@@ -4,13 +4,14 @@ title: "編集方針｜はじめて転職ガイド"
 description: "はじめて転職ガイドの編集方針です。記事の作り方、出典と情報確認日の考え方、AIの利用、訂正の方針について説明します。"
 source:
   - src/app/editorial-policy/page.tsx
+  - src/components/PageHero.tsx
 ---
 
 [戻る](/)
 
 パンくず: [ホーム](/) › 編集方針
 
-EDITORIAL POLICY
+記事の制作と確認
 
 # 編集方針
 

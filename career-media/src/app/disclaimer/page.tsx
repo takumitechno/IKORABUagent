@@ -11,7 +11,7 @@ export const metadata = pageMetadata({
 // TODO(正式公開前にMakeCareer確認が必要): 免責事項の確定文面
 export default function DisclaimerPage() {
   return (
-    <InfoPage title="免責事項" path="/disclaimer" eyebrow="DISCLAIMER">
+    <InfoPage title="免責事項" path="/disclaimer" eyebrow="情報の利用について">
       <p>
         <PendingReview>確定版は正式公開前に掲載します</PendingReview>
       </p>

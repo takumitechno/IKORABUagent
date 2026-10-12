@@ -4,13 +4,14 @@ title: "プライバシーポリシー｜はじめて転職ガイド"
 description: "プライバシーポリシー（正式公開前に確定予定）"
 source:
   - src/app/privacy/page.tsx
+  - src/components/PageHero.tsx
 ---
 
 [戻る](/)
 
 パンくず: [ホーム](/) › プライバシーポリシー
 
-PRIVACY
+個人情報の取り扱い
 
 # プライバシーポリシー
 

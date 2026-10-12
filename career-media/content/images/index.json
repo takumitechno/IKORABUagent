@@ -14,6 +14,181 @@
       ]
     },
     {
+      "slug": "career-support-team-cutout",
+      "type": "hero",
+      "status": "selected",
+      "src": "/images/generated/hero/career-support-team-cutout.webp",
+      "width": 1254,
+      "height": 1254,
+      "alt": "",
+      "decorative": true,
+      "used_in": [
+        "/"
+      ]
+    },
+    {
+      "slug": "career-support-team",
+      "type": "hero",
+      "status": "selected",
+      "src": "/images/generated/hero/career-support-team.webp",
+      "width": 1536,
+      "height": 1024,
+      "alt": "",
+      "decorative": true,
+      "used_in": []
+    },
+    {
+      "slug": "cover-driver",
+      "type": "section",
+      "status": "selected",
+      "src": "/images/generated/sections/cover-driver.webp",
+      "width": 1672,
+      "height": 941,
+      "alt": "",
+      "decorative": true,
+      "used_in": [
+        "/",
+        "/articles"
+      ]
+    },
+    {
+      "slug": "cover-employment-insurance",
+      "type": "section",
+      "status": "selected",
+      "src": "/images/generated/sections/cover-employment-insurance.webp",
+      "width": 1672,
+      "height": 941,
+      "alt": "",
+      "decorative": true,
+      "used_in": [
+        "/",
+        "/news"
+      ]
+    },
+    {
+      "slug": "cover-experience-notes",
+      "type": "section",
+      "status": "selected",
+      "src": "/images/generated/sections/cover-experience-notes.webp",
+      "width": 1672,
+      "height": 941,
+      "alt": "",
+      "decorative": true,
+      "used_in": [
+        "/",
+        "/articles",
+        "/articles/sekkyaku-keiken-ikasu",
+        "/articles/sekkyaku-office",
+        "/articles/shokumu-keirekisho-arubaito"
+      ]
+    },
+    {
+      "slug": "cover-first-step",
+      "type": "section",
+      "status": "selected",
+      "src": "/images/generated/sections/cover-first-step.webp",
+      "width": 1672,
+      "height": 941,
+      "alt": "",
+      "decorative": true,
+      "used_in": [
+        "/",
+        "/articles",
+        "/articles/jimu-mikeiken-mae",
+        "/articles/freeter-seishain-hajimeni",
+        "/articles/agent-mendan-mae"
+      ]
+    },
+    {
+      "slug": "cover-housing",
+      "type": "section",
+      "status": "selected",
+      "src": "/images/generated/sections/cover-housing.webp",
+      "width": 1672,
+      "height": 941,
+      "alt": "",
+      "decorative": true,
+      "used_in": [
+        "/",
+        "/articles"
+      ]
+    },
+    {
+      "slug": "cover-office-work",
+      "type": "section",
+      "status": "selected",
+      "src": "/images/generated/sections/cover-office-work.webp",
+      "width": 1672,
+      "height": 941,
+      "alt": "",
+      "decorative": true,
+      "used_in": [
+        "/",
+        "/articles",
+        "/articles/jimu-mikeiken-mae",
+        "/articles/pc-nigate-jimu",
+        "/articles/sekkyaku-office"
+      ]
+    },
+    {
+      "slug": "cover-pay-holidays",
+      "type": "section",
+      "status": "selected",
+      "src": "/images/generated/sections/cover-pay-holidays.webp",
+      "width": 1672,
+      "height": 941,
+      "alt": "",
+      "decorative": true,
+      "used_in": [
+        "/",
+        "/articles",
+        "/articles/donichi-yasumi-nenshu-hikaku",
+        "/articles/tedori-20man-hikaku"
+      ]
+    },
+    {
+      "slug": "cover-retirement-benefits",
+      "type": "section",
+      "status": "selected",
+      "src": "/images/generated/sections/cover-retirement-benefits.webp",
+      "width": 1672,
+      "height": 941,
+      "alt": "",
+      "decorative": true,
+      "used_in": [
+        "/",
+        "/news"
+      ]
+    },
+    {
+      "slug": "cover-warehouse",
+      "type": "section",
+      "status": "selected",
+      "src": "/images/generated/sections/cover-warehouse.webp",
+      "width": 1672,
+      "height": 941,
+      "alt": "",
+      "decorative": true,
+      "used_in": [
+        "/",
+        "/articles"
+      ]
+    },
+    {
+      "slug": "cover-work-family",
+      "type": "section",
+      "status": "selected",
+      "src": "/images/generated/sections/cover-work-family.webp",
+      "width": 1672,
+      "height": 941,
+      "alt": "",
+      "decorative": true,
+      "used_in": [
+        "/",
+        "/news"
+      ]
+    },
+    {
       "slug": "editorial-conversation",
       "type": "hero",
       "status": "selected",
@@ -70,6 +245,19 @@
       "src": "/images/generated/sections/editorial-workday.webp",
       "width": 1536,
       "height": 1024,
+      "alt": "",
+      "decorative": true,
+      "used_in": [
+        "/"
+      ]
+    },
+    {
+      "slug": "next-chapter",
+      "type": "hero",
+      "status": "selected",
+      "src": "/images/generated/hero/next-chapter.webp",
+      "width": 1122,
+      "height": 1402,
       "alt": "",
       "decorative": true,
       "used_in": [

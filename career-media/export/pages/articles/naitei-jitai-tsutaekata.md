@@ -5,6 +5,10 @@ description: "内定辞退はいつ、どう伝える？決めたらすぐ連絡
 source:
   - content/articles/naitei-jitai-tsutaekata.md
   - src/app/articles/[slug]/page.tsx
+  - src/components/ConsultationCta.tsx
+  - src/components/SupportSample.tsx
+  - src/components/Eyecatch.tsx
+  - content/images/index.json
 ---
 
 [戻る](/categories/junbi)
@@ -18,6 +22,8 @@ source:
 2026年10月9日 更新 約6分で読めます
 
 提案用のサンプル原稿です（人による最終確認・公開承認の前）。[詳しく](/editorial-policy)
+
+[出典4件・記事の確認状況](#editorial-sources)
 
 内定を辞退すると決めたら、できるだけ早く、まず電話で採用担当者に伝え、メールでも残すのが基本です。連絡のタイミング、電話での言い方とメールの例文、理由の伝え方、承諾したあとに辞退するときの民法の考え方と注意点を紹介します。
 
@@ -66,7 +72,7 @@ source:
 
 担当者が不在で電話がつながらないときは、電話に出た人に伝言を頼むより、「あらためてお電話します」と伝えて、メールで先に辞退の連絡を送っておく方法があります。
 
-転職の進め方を、プロと一緒に決める
+応募までの準備を相談する
 
 いつ動くか、何から始めるかを、経験と希望をもとに一緒に考えてもらえます。日程の調整も任せられます。
 
@@ -180,14 +186,20 @@ source:
 
 **出典とこの記事について出典4件**
 
+以下は原稿作成時の参照情報です。正式公開前に、担当者が出典本文・記事の主張・制度の適用条件を照合します。リンクの掲載やAI査読は、人による確認の完了を意味しません。
+
 1. [内定後のこと（京都新卒応援ハローワーク）（外部サイト）](https://jsite.mhlw.go.jp/nisizinkarasumaoike-kyoto-plaza/home/shinsotsu/kyu-shoku/kosokoso_00003.html)
    厚生労働省 京都労働局・2026年10月9日確認
+   この記事での参照箇所: 内定承諾書を出したあとでも、職業選択の自由（憲法第22条）から、民法第627条に準じて2週間以上前に内定辞退を申し入れることは法的に問題はないと考えられること。内定承諾書に強い拘束力はないと言えること
 2. [民法（明治二十九年法律第八十九号）第六百二十七条（外部サイト）](https://laws.e-gov.go.jp/law/129AC0000000089)
    e-Gov法令検索（デジタル庁）・2026年10月9日確認
+   この記事での参照箇所: 期間の定めのない雇用は、各当事者がいつでも解約の申入れができ、申入れの日から2週間を経過すると終了すること
 3. [内定者からの辞退（TOKYOはたらくネット 資料）（外部サイト）](https://www.hataraku.metro.tokyo.lg.jp/shiryo/2-3_naiteisyakaranozitai.pdf)
    東京都産業労働局・2026年10月9日確認
+   この記事での参照箇所: 内定の辞退は一度した約束を取り消すことになるため、なるべく早く、はっきりと意思表示することが大切なこと。複数の内定があるときは早めに就職先を決め、就職しない会社には速やかに辞退を伝えること
 4. [総合労働相談コーナーのご案内（外部サイト）](https://www.mhlw.go.jp/general/seido/chihou/kaiketu/soudan.html)
    厚生労働省・2026年10月9日確認
+   この記事での参照箇所: 都道府県労働局・労働基準監督署内などの総合労働相談コーナーで、職場のトラブルを予約不要・無料で相談できること
 
 - **作成**
   2026年10月9日
@@ -211,19 +223,21 @@ source:
 5. [理由はどこまで言う？](#section-5)
 6. [承諾したあとに辞退したいときは](#section-6)
 
-転職の進め方を、プロと一緒に決める
+応募までの準備を相談する
 
 いつ動くか、何から始めるかを、経験と希望をもとに一緒に考えてもらえます。日程の調整も任せられます。
 
 [転職の進め方を相談する](/consultation/apply?placement=article-sidebar__naitei-jitai-tsutaekata)
 
-[相談でできることを見る](/consultation)
+[相談の内容を確認する](/consultation)
 
 [条件整理チェック](/check)
 
 [職種を比べる](/jobs)
 
-## 転職の進め方を、プロと一緒に決める
+キャリア相談のご案内
+
+## 応募までの準備を相談する
 
 いつ動くか、何から始めるかを、経験と希望をもとに一緒に考えてもらえます。日程の調整も任せられます。
 
@@ -231,15 +245,17 @@ source:
 - 面接の練習
 - 応募書類の添削
 
-[転職の進め方を相談する](/consultation/apply?placement=article-bottom__naitei-jitai-tsutaekata) ・ [相談でできることを見る](/consultation)
+[転職の進め方を相談する](/consultation/apply?placement=article-bottom__naitei-jitai-tsutaekata) ・ [相談の内容を確認する](/consultation)
 
 相談先: 提携する人材紹介会社（正式公開時に掲載）（有料職業紹介事業許可番号: 正式公開時に掲載）
+
+希望を整理してから話したい方は、[相談用のメモを作る](/check)（登録不要）。
 
 ## 次に読むなら
 
 - 転職準備 2026.10.09
-  ### [内定をもらったら、承諾の前に確認すること｜労働条件通知書の見方と返事のしかた](/articles/naitei-shodaku-mae)
+  ### [内定が出た！承諾の前に見ること](/articles/naitei-shodaku-mae)
 - 転職準備 2026.10.09
-  ### [退職の伝え方は？誰に・いつ・どう言うか｜引き止めへの答え方と退職届の書き方](/articles/taishoku-tsutaekata)
+  ### [退職、どう切り出せばいい？](/articles/taishoku-tsutaekata)
 - 転職準備 2026.10.09
-  ### [働きながらの転職活動、何から？進める順番と時間の作り方・退職を伝える時期](/articles/zaishoku-tenshoku-susumekata)
+  ### [働きながらの転職、何から始める？](/articles/zaishoku-tenshoku-susumekata)

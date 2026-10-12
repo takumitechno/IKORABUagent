@@ -8,11 +8,10 @@ import { CHECK_VERSION, isStepComplete, sanitizeAnswers, STEPS, type Answers, ty
 import { track } from "@/lib/measurement/client";
 import type { MotifName } from "@/lib/illustrations/motifs";
 import { JOB_ROLE_SCENE } from "@/lib/illustrations/scenes";
+import { CONSULTATION_TOPICS, checkConsultationTopic, withConsultationTopic, type ConsultationTopicId } from "@/lib/consultation-topics";
 
 const STORAGE_KEY = "condition-check:v1";
 
-/** ステップごとのイラスト（状況 → 経験 → 条件 → スタイル → 結果） */
-const STEP_SCENES: MotifName[] = ["clock", "star", "calendar", "chat", "checklist"];
 const motif = (name: MotifName, className: string) => <span aria-hidden="true" className={`motif motif-${name} block ${className}`} />;
 
 type Props = { consultationHref: string; consultationLabel: string; allowPrint?: boolean };
@@ -148,58 +147,23 @@ export function ConditionCheck({ consultationHref, consultationLabel, allowPrint
           このブラウザの設定では回答を一時保存できないため、ページを閉じたり再読み込みしたりすると回答が消えます。チェック自体はそのまま使えます。
         </p>
       )}
-      {/* ステップ表示（イラスト付き。進むと線が伸びる） */}
-      {(() => {
-        const steps = [...STEPS.map((st) => ({ title: st.title, short: st.shortTitle })), { title: "結果", short: "結果" }];
-        const currentIndex = showResult ? STEPS.length : stepIndex;
-        return (
-          <div className="no-print relative">
-            <div aria-hidden="true" className="absolute left-[10%] right-[10%] top-[22px] h-1 rounded-full bg-line sm:top-[26px]">
-              <div className="h-full rounded-full bg-brand transition-[width] duration-500 ease-out" style={{ width: `${(currentIndex / (steps.length - 1)) * 100}%` }} />
-            </div>
-            <ol className="relative grid grid-cols-5 gap-1" aria-label="進み具合">
-              {steps.map(({ title, short }, i) => {
-                const done = i < currentIndex;
-                const current = i === currentIndex;
-                return (
-                  <li key={title} aria-current={current ? "step" : undefined} className="flex flex-col items-center text-center">
-                    <span
-                      className={`relative block aspect-square w-11 rounded-full ring-[3px] transition sm:w-[52px] ${
-                        current ? "enter-pop bg-mint ring-brand" : done ? "bg-mint ring-brand/40" : "bg-surface ring-line grayscale opacity-60"
-                      }`}
-                    >
-                      {motif(STEP_SCENES[i] ?? "checklist", "absolute inset-[6%]")}
-                      {done && (
-                        <span className="absolute -right-1 -top-1 flex h-[18px] w-[18px] items-center justify-center rounded-full bg-brand text-white ring-2 ring-surface">
-                          <Check className="h-3 w-3" strokeWidth={3.2} aria-hidden="true" />
-                        </span>
-                      )}
-                    </span>
-                    <p className={`mt-1.5 text-[11px] leading-4 sm:text-xs ${current ? "font-bold text-ink" : "text-muted"}`}>
-                      <span className="hidden sm:inline">
-                        {i < STEPS.length ? `STEP ${i + 1} ` : ""}
-                        {title}
-                      </span>
-                      <span className="sm:hidden">{short}</span>
-                    </p>
-                  </li>
-                );
-              })}
-            </ol>
-          </div>
-        );
-      })()}
+      <ol className="check-progress no-print" aria-label="進み具合">
+        {[...STEPS.map(st => st.shortTitle), "結果"].map((title, i) => {
+          const currentIndex = showResult ? STEPS.length : stepIndex;
+          return <li key={title} aria-current={i === currentIndex ? "step" : undefined} data-complete={i < currentIndex || undefined}><span>{i < currentIndex ? <Check aria-hidden="true" /> : String(i + 1).padStart(2, "0")}</span>{title}</li>;
+        })}
+      </ol>
 
       {!result ? (
-        <div key={stepIndex} className="enter mt-8">
+        <div key={stepIndex} className="enter mt-4">
           <div className="flex items-center gap-3">
-            <span className="relative block aspect-square w-14 shrink-0 rounded-full bg-mint">{motif(STEP_SCENES[stepIndex] ?? "checklist", "absolute inset-[6%]")}</span>
+            <span className="check-step-number" aria-hidden="true">0{stepIndex + 1}</span>
             <div className="min-w-0">
               <h2 className="text-[21px] font-bold leading-snug text-ink sm:text-[22px]">{step.title}</h2>
-              <p className="mt-0.5 text-sm leading-6 text-muted">{step.description}</p>
             </div>
           </div>
-          <div className="mt-6 space-y-8">
+          <p className="mt-2 text-sm leading-6 text-muted">{step.description}</p>
+          <div className="mt-4 space-y-8">
             {step.questions.map((q, qi) => {
               const selected = answers[q.id] ?? [];
               const missing = triedNext && selected.length === 0;
@@ -229,7 +193,7 @@ export function ConditionCheck({ consultationHref, consultationLabel, allowPrint
               type="button"
               onClick={back}
               disabled={stepIndex === 0}
-              className="inline-flex items-center gap-1.5 rounded-full px-4 py-3 text-sm font-bold text-muted hover:text-ink disabled:invisible"
+              className="inline-flex items-center gap-1.5 rounded-xl px-4 py-3 text-sm font-bold text-muted hover:text-ink disabled:invisible"
             >
               <ArrowLeft className="h-4 w-4" aria-hidden="true" />
               戻る
@@ -237,7 +201,7 @@ export function ConditionCheck({ consultationHref, consultationLabel, allowPrint
             <button
               type="button"
               onClick={next}
-              className={`inline-flex items-center gap-2 rounded-full px-7 py-3.5 text-[15px] font-bold text-white transition ${stepComplete ? "bg-brand hover:bg-brand-press" : "bg-brand/50"}`}
+              className={`inline-flex items-center gap-2 rounded-xl px-7 py-3.5 text-[15px] font-bold text-white transition ${stepComplete ? "bg-brand hover:bg-brand-press" : "bg-brand/50"}`}
             >
               {stepIndex === STEPS.length - 1 ? "結果を見る" : "次へ進む"}
               <ArrowRight className="h-4 w-4" aria-hidden="true" />
@@ -247,6 +211,7 @@ export function ConditionCheck({ consultationHref, consultationLabel, allowPrint
       ) : (
         <Result
           result={result}
+          initialTopic={checkConsultationTopic(answers)}
           consultationHref={consultationHref}
           consultationLabel={consultationLabel}
           allowPrint={allowPrint}
@@ -262,17 +227,12 @@ export function ConditionCheck({ consultationHref, consultationLabel, allowPrint
 }
 
 
-const RESULT_SCENES: MotifName[] = ["calendar", "star", "scale", "checklist", "chat", "flag", "interview"];
-
 function ResultSection({ title, children, number, note }: { title: string; number: number; note?: string; children: React.ReactNode }) {
   return (
     <details className="result-detail break-inside-avoid border-b border-line bg-surface">
       <summary className="flex cursor-pointer items-center gap-3 py-4 text-[15px] font-bold text-ink sm:text-[17px]">
-        <span className="relative block aspect-square w-11 shrink-0 rounded-full bg-mint">{motif(RESULT_SCENES[number - 1] ?? "checklist", "absolute inset-[6%]")}</span>
-        <span>
-          <span className="mr-1.5 text-xs font-bold text-brand">{number}</span>
-          {title}
-        </span>
+        <span className="check-step-number" aria-hidden="true">0{number}</span>
+        <span>{title}</span>
         <span className="result-detail-toggle ml-auto shrink-0" aria-hidden="true">＋</span>
       </summary>
       {note && <p className="mt-2 text-[12.5px] leading-6 text-muted">{note}</p>}
@@ -283,6 +243,7 @@ function ResultSection({ title, children, number, note }: { title: string; numbe
 
 function Result({
   result,
+  initialTopic,
   consultationHref,
   consultationLabel,
   allowPrint,
@@ -293,6 +254,7 @@ function Result({
   fallbackText,
 }: {
   result: CheckResult;
+  initialTopic: ConsultationTopicId;
   consultationHref: string;
   consultationLabel: string;
   allowPrint: boolean;
@@ -303,6 +265,10 @@ function Result({
   fallbackText: string | null;
 }) {
   const resultRef = useRef<HTMLDivElement>(null);
+  const [topicId, setTopicId] = useState(initialTopic);
+  const topic = CONSULTATION_TOPICS.find((item) => item.id === topicId)!;
+  const applyHref = withConsultationTopic(consultationHref, topicId);
+  const infoHref = `/consultation#support-${topicId}`;
   useEffect(() => {
     let closed: HTMLDetailsElement[] = [];
     const expand = () => {
@@ -322,35 +288,33 @@ function Result({
   }, []);
   const top = result.candidates.slice(0, 3);
   const [s1, s2, s3, s4, s5, s6, s7] = RESULT_SECTIONS;
-  const button = "inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-[13px] font-bold ring-1";
+  const button = "inline-flex items-center gap-1.5 rounded-xl px-4 py-2.5 text-[13px] font-bold ring-1";
   return (
     <div ref={resultRef} className="check-result mt-8" aria-live="polite">
-      <div className="enter relative overflow-hidden rounded-[20px] bg-night p-6 text-white sm:p-8">
-        <span aria-hidden="true" className="pointer-events-none absolute -right-6 -top-6 block h-28 w-28 rounded-full bg-white/[0.06] sm:h-40 sm:w-40" />
-        {motif("checklist", "anim-float-slow absolute right-4 top-4 h-16 w-16 rounded-full bg-white/90 sm:right-8 sm:top-8 sm:h-24 sm:w-24")}
-        <p className="text-[11px] font-bold tracking-[0.2em] text-accent-bright">YOUR NOTE</p>
-        <h2 className="mt-2 pr-20 text-[22px] font-bold leading-snug sm:pr-28 sm:text-[26px]">あなたの条件整理ノート</h2>
-        <p className="mt-3 text-sm leading-7 text-white/80">
-          希望と経験を、話せるメモにしました。適職の判定ではありません。回答は相談先に送信されません。
+      <div className="enter rounded-[18px] border border-line-strong bg-surface p-6 text-ink sm:p-8">
+        <p className="editorial-kicker">条件整理の結果</p>
+        <h2 className="mt-2 text-[22px] font-bold leading-snug sm:text-[26px]">相談用のメモ</h2>
+        <p className="mt-3 text-sm leading-7 text-body">
+          回答をもとに希望と経験をまとめました。適職の判定や、相談先への送信は行いません。
         </p>
         <dl className="result-summary">
-          <div><dt>ゆずれない条件</dt><dd>{result.priorityConditions.map((c) => c.label).join("・") || "まだ決めていなくて大丈夫"}</dd></div>
-          <div><dt>活かせそうな経験</dt><dd>{result.skills[0]?.skill ?? "学校や日常で続けてきたことから整理しよう"}</dd></div>
-          <div><dt>まず、ここから</dt><dd>{result.selfActions[0]?.title ?? "気になる条件をひとつ書き出す"}</dd></div>
+          <div><dt>譲れない条件</dt><dd>{result.priorityConditions.map((c) => c.label).join("・") || "まだ決めていなくて大丈夫"}</dd></div>
+          <div><dt>活かせる経験</dt><dd>{result.skills[0]?.skill ?? "学校や日常で続けてきたことから整理しよう"}</dd></div>
+          <div><dt>次に確認すること</dt><dd>{result.selfActions[0]?.title ?? "気になる条件をひとつ書き出す"}</dd></div>
         </dl>
         <div className="no-print mt-5 flex flex-wrap gap-2">
-          <button type="button" onClick={() => onCopy("memo")} className={`${button} bg-accent-bright text-night ring-accent-bright hover:bg-white`}>
+          <button type="button" onClick={() => onCopy("memo")} className={`${button} bg-brand text-white ring-brand hover:bg-brand-press`}>
             <NotebookPen className="h-4 w-4" aria-hidden="true" />
-            {copied === "memo" ? "メモをコピーしました" : "面談で使うメモとしてコピー"}
+            {copied === "memo" ? "メモをコピーしました" : "相談用メモをコピー"}
           </button>
-          <button type="button" onClick={() => onCopy("all")} className={`${button} bg-white/10 ring-white/20 hover:bg-white/20`}>
+          <button type="button" onClick={() => onCopy("all")} className={`${button} bg-surface text-ink ring-line-strong hover:bg-brand-tint`}>
             <ClipboardCopy className="h-4 w-4" aria-hidden="true" />
-            {copied === "all" ? "コピーしました" : "結果をすべてコピー"}
+            {copied === "all" ? "コピーしました" : "すべての項目をコピー"}
           </button>
           {allowPrint && (
-            <button type="button" onClick={() => window.print()} className={`${button} bg-white/10 ring-white/20 hover:bg-white/20`}>
+            <button type="button" onClick={() => window.print()} className={`${button} bg-surface text-ink ring-line-strong hover:bg-brand-tint`}>
               <Printer className="h-4 w-4" aria-hidden="true" />
-              印刷・PDFで保存
+              印刷・PDF保存
             </button>
           )}
         </div>
@@ -365,10 +329,21 @@ function Result({
         </div>
       )}
 
-      <div className="result-next no-print">
-        <div><p className="font-bold text-ink">このメモを持って、次の一歩へ。</p><p className="mt-1 text-xs leading-6 text-muted">相談は任意です。伝えたい内容だけ選んで話せます。</p></div>
-        <Link href="/consultation" data-cta-placement="check-result" data-cta-kind="consultation-info" className="editorial-button">相談でできることを見る<ArrowRight className="h-4 w-4" aria-hidden="true" /></Link>
-      </div>
+      <section className="result-next no-print" aria-labelledby="result-consult-title">
+        <h3 id="result-consult-title">相談したい内容を選ぶ</h3>
+        <p className="result-topic-note">回答をもとに選んでいます。別の内容にも変更できます。</p>
+        <div className="result-topic-choices" role="group" aria-label="相談テーマを選ぶ">
+          {CONSULTATION_TOPICS.map((item) => <button key={item.id} type="button" aria-pressed={topicId === item.id} aria-controls="result-consult-actions" onClick={() => setTopicId(item.id)}>{item.short}</button>)}
+        </div>
+        <div id="result-consult-actions" aria-live="polite" aria-atomic="true">
+          <p className="result-consult-help">{topic.help}</p>
+          <div className="result-consult-links">
+            <a href={applyHref} data-cta-placement="check-result" data-cta-kind="consultation-apply" className="editorial-button">{topic.consult}<ArrowRight aria-hidden="true" /></a>
+            <a href={infoHref} data-cta-placement="check-result" data-cta-kind="consultation-info" className="editorial-text-link">相談の内容を確認する<ArrowRight aria-hidden="true" /></a>
+          </div>
+        </div>
+        <p className="result-topic-note">相談は任意です。回答やメモは自動送信されません。伝えたい内容だけ話せます。</p>
+      </section>
       <p className="mt-8 text-xs font-bold text-muted">詳しい内容は、項目を開いて確認できます。</p>
       <div className="mt-3">
         <ResultSection title={s1} number={1}>
@@ -513,15 +488,15 @@ function Result({
             ))}
           </ol>
           <div className="no-print mt-5 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
-            <button type="button" onClick={() => onCopy("memo")} className="inline-flex items-center justify-center gap-1.5 rounded-full border border-line-strong bg-surface px-5 py-3 text-sm font-bold text-ink hover:border-brand">
+            <button type="button" onClick={() => onCopy("memo")} className="inline-flex items-center justify-center gap-1.5 rounded-xl border border-line-strong bg-surface px-5 py-3 text-sm font-bold text-ink hover:border-brand">
               <NotebookPen className="h-4 w-4 text-brand" aria-hidden="true" />
-              {copied === "memo" ? "メモをコピーしました" : "面談で使うメモとしてコピー"}
+              {copied === "memo" ? "メモをコピーしました" : "相談用メモをコピー"}
             </button>
-            <Link href="/consultation" data-cta-placement="check-result" data-cta-kind="consultation-info" className="inline-flex items-center justify-center gap-1.5 rounded-full border border-accent/50 bg-surface px-5 py-3 text-sm font-bold text-accent-strong hover:border-accent">
+            <a href={infoHref} data-cta-placement="check-result" data-cta-kind="consultation-info" className="inline-flex items-center justify-center gap-1.5 rounded-xl border border-line-strong bg-surface px-5 py-3 text-sm font-bold text-brand-strong hover:border-brand">
               <MessageCircle className="h-4 w-4" aria-hidden="true" />
               相談の内容をもう一度確認する
-            </Link>
-            <a href={consultationHref} data-cta-placement="check-result" data-cta-kind="consultation-apply" className="inline-flex items-center justify-center gap-1.5 rounded-full bg-accent px-6 py-3 text-sm font-bold text-white shadow-[0_6px_16px_-6px_rgb(191_82_8/0.6)] hover:bg-accent-press">
+            </a>
+            <a href={applyHref} data-cta-placement="check-result" data-cta-kind="consultation-apply" className="inline-flex items-center justify-center gap-1.5 rounded-xl bg-brand px-6 py-3 text-sm font-bold text-white hover:bg-brand-press">
               {consultationLabel}
               <ArrowRight className="h-4 w-4" aria-hidden="true" />
             </a>
@@ -531,11 +506,11 @@ function Result({
       </div>
 
       <div className="no-print mt-6 flex flex-wrap items-center justify-between gap-3">
-        <button type="button" onClick={onBack} className="inline-flex items-center gap-1.5 rounded-full px-4 py-3 text-sm font-bold text-muted hover:text-ink">
+        <button type="button" onClick={onBack} className="inline-flex items-center gap-1.5 rounded-xl px-4 py-3 text-sm font-bold text-muted hover:text-ink">
           <ArrowLeft className="h-4 w-4" aria-hidden="true" />
           回答を見直す
         </button>
-        <button type="button" onClick={onRestart} className="inline-flex items-center gap-1.5 rounded-full px-4 py-3 text-sm font-bold text-muted hover:text-ink">
+        <button type="button" onClick={onRestart} className="inline-flex items-center gap-1.5 rounded-xl px-4 py-3 text-sm font-bold text-muted hover:text-ink">
           <RotateCcw className="h-4 w-4" aria-hidden="true" />
           最初からやり直す（回答を消す）
         </button>

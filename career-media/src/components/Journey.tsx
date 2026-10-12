@@ -6,9 +6,6 @@ import { ConsultButton } from "./ConsultationCta";
 import { Motif } from "./illustrations/Motif";
 import { GeneratedImage } from "./GeneratedImage";
 
-const stepTitle = (step: JourneyStep, articles: ArticleSummary[]) =>
-  step.kind === "article" ? (articles.find((a) => a.slug === step.slug)?.title ?? null) : null;
-
 /** 入口ページに表示する「順番に読むなら」ガイド（相談しなくても判断の材料がそろう順番） */
 export function JourneyGuide({ journey, articles }: { journey: Journey; articles: ArticleSummary[] }) {
   const steps = journey.steps.filter((s) => s.kind !== "article" || articles.some((a) => a.slug === s.slug));
@@ -17,9 +14,6 @@ export function JourneyGuide({ journey, articles }: { journey: Journey; articles
   return (
     <section id={JOURNEY_ANCHOR} aria-labelledby="journey-title" className="mt-6 scroll-mt-24 overflow-hidden rounded-[22px] bg-surface ring-1 ring-line">
       <div className={`flex items-start gap-4 p-5 sm:p-7 ${journey.tone}`}>
-        <span className="relative block aspect-square w-16 shrink-0 rounded-full bg-surface sm:w-20">
-          <Motif name={journey.scene} className="absolute inset-[6%]" />
-        </span>
         <div className="min-w-0">
           <p className="flex items-center gap-1.5 text-[11px] font-bold tracking-[0.18em] text-ink/70">
             <Compass className="h-3.5 w-3.5" aria-hidden="true" />
@@ -28,24 +22,17 @@ export function JourneyGuide({ journey, articles }: { journey: Journey; articles
           <h2 id="journey-title" className="mt-1 text-[20px] font-bold leading-snug text-ink sm:text-[24px]">
             {journey.title}
           </h2>
-          <p className="mt-1.5 text-[13.5px] leading-6 text-body">{journey.who}</p>
         </div>
       </div>
       <div className="p-5 sm:p-7">
-        <p className="text-[14px] leading-7 text-body">{journey.outcome}</p>
-        <ol className="relative mt-5 space-y-3">
-          <span aria-hidden="true" className="absolute bottom-6 left-[23px] top-6 border-l-[3px] border-dotted border-brand/30" />
+        <ol className="divide-y divide-line">
           {readSteps.map((step, i) => {
             const href = stepHref(step, journey);
-            const title = stepTitle(step, articles);
             const kind = step.kind === "check" ? "check" : step.kind === "jobs" ? "jobs" : "article";
             return (
-              <li key={href} className="relative grid grid-cols-[48px_minmax(0,1fr)] items-start gap-3">
-                <span className={`relative z-[1] block aspect-square w-12 rounded-full ring-4 ring-surface ${step.kind === "check" ? "bg-brand-tint" : "bg-mint"}`}>
-                  <Motif name={step.scene} className="absolute inset-[8%]" />
-                  <span className="absolute -left-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-night text-[10.5px] font-bold text-white ring-2 ring-surface">{i + 1}</span>
-                </span>
-                <div className="min-w-0 rounded-xl border border-line bg-surface p-3.5 sm:p-4">
+              <li key={href} className="grid grid-cols-[24px_minmax(0,1fr)] items-start gap-3 py-3.5">
+                <span className="pt-0.5 text-sm font-bold text-brand">0{i + 1}</span>
+                <div className="min-w-0">
                   <Link
                     href={href}
                     data-cta-kind={kind === "check" ? "check" : "journey-step"}
@@ -54,8 +41,6 @@ export function JourneyGuide({ journey, articles }: { journey: Journey; articles
                     className="group block"
                   >
                     <span className="block text-[15px] font-bold leading-6 text-ink group-hover:text-brand-strong">{step.label}</span>
-                    <span className="mt-1 block text-[13px] leading-6 text-body">{step.why}</span>
-                    {title && <span className="mt-1.5 block text-[12.5px] font-medium leading-5 text-brand-strong underline underline-offset-4">記事: {title}</span>}
                     {step.kind === "jobs" && <span className="mt-1.5 block text-[12.5px] font-medium text-brand-strong underline underline-offset-4">職種を比べるページへ</span>}
                     {step.kind === "check" && (
                       <span className="mt-2 inline-flex items-center gap-1.5 rounded-full bg-brand px-4 py-2 text-[13px] font-bold text-white">
@@ -83,14 +68,15 @@ export function JourneyGuide({ journey, articles }: { journey: Journey; articles
               <MessageSquareText className="h-5 w-5 text-brand" aria-hidden="true" />
               {consult.label}
             </p>
-            <p className="mt-1.5 text-[13.5px] leading-6 text-body">{consult.why}</p>
-            <ul className="mt-4 space-y-2">
+            <details className="mt-3"><summary className="cursor-pointer text-sm font-bold text-brand-strong">相談で聞く質問の例（{journey.questions.length}件）</summary>
+            <ul className="mt-3 space-y-2">
               {journey.questions.map((q) => (
                 <li key={q} className="rounded-lg border-l-4 border-brand bg-surface px-4 py-2.5 text-[14px] leading-6">
                   「{q}」
                 </li>
               ))}
             </ul>
+            </details>
             <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
               <Link
                 href="/consultation"
@@ -100,7 +86,7 @@ export function JourneyGuide({ journey, articles }: { journey: Journey; articles
                 className="inline-flex items-center justify-center gap-1.5 rounded-full border border-accent/50 bg-surface px-5 py-3 text-sm font-bold text-accent-strong hover:border-accent"
               >
                 <MessageCircle className="h-4 w-4" aria-hidden="true" />
-                相談でできることを見る
+                相談の内容を確認する
               </Link>
               <ConsultButton placement="journey" contentSlug={journey.id} label="この質問をもとに相談する" />
             </div>

@@ -5,6 +5,10 @@ description: "接客や販売の仕事から、土日休みの仕事に移りた
 source:
   - content/articles/donichi-yasumi-shigoto.md
   - src/app/articles/[slug]/page.tsx
+  - src/components/ConsultationCta.tsx
+  - src/components/SupportSample.tsx
+  - src/components/Eyecatch.tsx
+  - content/images/index.json
 ---
 
 [戻る](/categories/hatarakikata)
@@ -18,6 +22,8 @@ source:
 2026年10月6日 更新 約4分で読めます
 
 提案用のサンプル原稿です（人による最終確認・公開承認の前）。[詳しく](/editorial-policy)
+
+[出典3件・記事の確認状況](#editorial-sources)
 
 接客や販売の仕事から、土日休みの仕事に移りたいと考えている人へ。土日休みになりやすい仕事の考え方、事務・カスタマーサポート・ITサポートでの違い、求人票の休日欄の読み方、面接での確認のしかたを紹介します。
 
@@ -78,7 +84,7 @@ source:
 
 なお、労働基準法で会社に求められている休日は、毎週少なくとも1日（または4週間で4日以上）です。土日休みかどうかは法律で決まっているわけではなく、会社ごとのルールなので、求人ごとに確かめる必要があります。
 
-給料や休みの条件が合う会社を、プロと探す
+給料と休日の条件を比較する
 
 求人票の条件の見方や、求人票には書かれていない働き方のことを、キャリアアドバイザーに確かめてもらえます。
 
@@ -86,7 +92,7 @@ source:
 - 面接の練習
 - 応募書類の添削
 
-[条件の合う会社を相談する](/consultation/apply?placement=article-inline__donichi-yasumi-shigoto) ・ [先に条件を整理する（3分・登録不要）](/check)
+[働く条件を相談する](/consultation/apply?placement=article-inline__donichi-yasumi-shigoto) ・ [先に条件を整理する（3分・登録不要）](/check)
 
 ## 面接で確認したいこと
 
@@ -125,12 +131,17 @@ source:
 
 **出典とこの記事について出典3件**
 
+以下は原稿作成時の参照情報です。正式公開前に、担当者が出典本文・記事の主張・制度の適用条件を照合します。リンクの掲載やAI査読は、人による確認の完了を意味しません。
+
 1. [求人票の見方（外部サイト）](https://jsite.mhlw.go.jp/chiba-roudoukyoku/content/contents/K_ex_mikata_R020106.pdf)
    千葉労働局（厚生労働省）・2026年10月6日確認
+   この記事での参照箇所: ハローワークの求人票の「週休二日制」欄（「毎週」は曜日に関わらず毎週2日の休み、「その他」は毎週2日とは限らない）と、週休二日制と年間休日数をセットで見ること
 2. [労働基準法（外部サイト）](https://laws.e-gov.go.jp/law/322AC0000000049)
    e-Gov法令検索（デジタル庁）・2026年10月6日確認
+   この記事での参照箇所: 法定休日（第35条：毎週少なくとも1回、または4週間を通じて4日以上）
 3. [2024年4月から労働条件明示のルールが変わります（外部サイト）](https://www.mhlw.go.jp/stf/newpage_32105.html)
    厚生労働省・2026年10月6日確認
+   この記事での参照箇所: 2024年4月から明示事項に「就業場所・業務の変更の範囲」が加わったこと
 
 - **作成**
   2026年10月6日
@@ -152,19 +163,21 @@ source:
 3. [面接で確認したいこと](#section-3)
 4. [接客から移るときに考えておきたいこと](#section-4)
 
-給料や休みの条件が合う会社を、プロと探す
+給料と休日の条件を比較する
 
 求人票の条件の見方や、求人票には書かれていない働き方のことを、キャリアアドバイザーに確かめてもらえます。
 
-[条件の合う会社を相談する](/consultation/apply?placement=article-sidebar__donichi-yasumi-shigoto)
+[働く条件を相談する](/consultation/apply?placement=article-sidebar__donichi-yasumi-shigoto)
 
-[相談でできることを見る](/consultation)
+[相談の内容を確認する](/consultation)
 
 [条件整理チェック](/check)
 
 [職種を比べる](/jobs)
 
-## 給料や休みの条件が合う会社を、プロと探す
+キャリア相談のご案内
+
+## 給料と休日の条件を比較する
 
 求人票の条件の見方や、求人票には書かれていない働き方のことを、キャリアアドバイザーに確かめてもらえます。
 
@@ -172,15 +185,17 @@ source:
 - 面接の練習
 - 応募書類の添削
 
-[条件の合う会社を相談する](/consultation/apply?placement=article-bottom__donichi-yasumi-shigoto) ・ [相談でできることを見る](/consultation)
+[働く条件を相談する](/consultation/apply?placement=article-bottom__donichi-yasumi-shigoto) ・ [相談の内容を確認する](/consultation)
 
 相談先: 提携する人材紹介会社（正式公開時に掲載）（有料職業紹介事業許可番号: 正式公開時に掲載）
+
+希望を整理してから話したい方は、[相談用のメモを作る](/check)（登録不要）。
 
 ## 次に読むなら
 
 - 年収・働き方 2026.10.06
-  ### [「土日休み」と「年収」をどう比較する？求人票の数字の読み方](/articles/donichi-yasumi-nenshu-hikaku)
+  ### [土日休みと年収、どう比べればいい？](/articles/donichi-yasumi-nenshu-hikaku)
 - 職種を知る 2026.10.06
-  ### [営業・カスタマーサポート・ITサポートの違いは？仕事内容と向き不向きを比べる](/articles/eigyo-cs-it-support-chigai)
+  ### [営業・サポート・IT、どこが違う？](/articles/eigyo-cs-it-support-chigai)
 - 経験の活かし方 2026.10.06
-  ### [接客経験は転職でどう活かせる？職種別のつながりと伝え方](/articles/sekkyaku-keiken-ikasu)
+  ### [接客の経験、ほかの仕事で活かせる？](/articles/sekkyaku-keiken-ikasu)

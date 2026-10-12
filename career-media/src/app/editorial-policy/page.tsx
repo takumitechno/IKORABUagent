@@ -12,7 +12,7 @@ export const metadata = pageMetadata({
 
 export default function EditorialPolicyPage() {
   return (
-    <InfoPage title="編集方針" path="/editorial-policy" eyebrow="EDITORIAL POLICY" lead={`${site.name}は、${site.editorialTeam}が編集しています（運営: ${partner.operatorDisplay}／企画・制作: ${partner.producerDisplay}）。読者が自分で判断するための材料を、正確で分かりやすく届けることを大切にしています。`}>
+    <InfoPage title="編集方針" path="/editorial-policy" eyebrow="記事の制作と確認" lead={`${site.name}は、${site.editorialTeam}が編集しています（運営: ${partner.operatorDisplay}／企画・制作: ${partner.producerDisplay}）。読者が自分で判断するための材料を、正確で分かりやすく届けることを大切にしています。`}>
       {!partner.brandUsageApproved && (
         <>
           <h2>このデモの記事について</h2>

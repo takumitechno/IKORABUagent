@@ -1,4 +1,5 @@
 import { partner } from "./partner";
+import { resolveSiteUrl } from "../lib/site-url";
 
 /**
  * メディア自体の設定。名前は partner config（ブランドの正本）から作る。
@@ -7,6 +8,7 @@ import { partner } from "./partner";
  */
 /** メディア名にブランド名が入っているとき（例: MakeCareer転職ガイド）は、"by ブランド" を付けない */
 const sameBrand = partner.brandName === partner.mediaName || partner.mediaName.startsWith(partner.brandName);
+const indexable = process.env.SITE_INDEXABLE === "true" && partner.brandUsageApproved;
 
 export const site = {
   name: partner.mediaName,
@@ -15,13 +17,13 @@ export const site = {
   tagline: partner.mediaTagline,
   description:
     "はじめて・未経験の転職を考える20〜30代のための仕事選びメディア。休み・給料・経験から、次の働き方を探せます。",
-  url: (process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000").replace(/\/$/, ""),
+  url: resolveSiteUrl(process.env.NEXT_PUBLIC_SITE_URL, indexable),
   locale: "ja_JP",
   /**
    * 正式な提携・ブランド利用許諾が済むまでは index させない。
    * SITE_INDEXABLE=true かつ partner.brandUsageApproved=true の両方が必要。
    */
-  indexable: process.env.SITE_INDEXABLE === "true" && partner.brandUsageApproved,
+  indexable,
   /** 提案用プレビューであることを画面上部に表示する */
   showPreviewBanner: !partner.brandUsageApproved,
   /**

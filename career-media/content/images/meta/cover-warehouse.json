@@ -1,0 +1,32 @@
+{
+  "schema_version": 1,
+  "slug": "cover-warehouse",
+  "type": "section",
+  "status": "selected",
+  "purpose": "記事のテーマを伝える装飾的な生成イラスト。実際の職場・求人・制度の証明ではない。",
+  "used_in": [
+    "/",
+    "/articles"
+  ],
+  "alt": "",
+  "decorative": true,
+  "brief_file": null,
+  "model": "built-in image_gen",
+  "size": "1672x941",
+  "quality": "default",
+  "output_format": "webp",
+  "background": "opaque",
+  "prompt_brief": "Use case: illustration-story. Asset: original editorial thumbnail for a Japanese career media website, landscape 16:9. Sophisticated contemporary editorial illustration, flat vector forms with very subtle paper texture, soft daylight feeling, pale warm ivory background, restrained navy outlines, muted periwinkle blue and sage accents, small apricot details. A clear large object composition filling the central 75 percent, balanced generous breathing room around edges. The image must be instantly legible at 110px wide. Use only three or four relevant objects, avoid clutter. Absolutely no words, letters, numbers, symbols that look like writing, logos, watermarks, people, human faces, charts with invented claims or interface mockups. Not glossy 3D, not clipart, not a futuristic AI image. A modern warehouse shelving bay with a few neat cardboard boxes, a handheld barcode scanner and a small pallet trolley. Calm professional warehouse scene, practical and inviting, clear shapes.",
+  "prompt_final": "Use case: illustration-story. Asset: original editorial thumbnail for a Japanese career media website, landscape 16:9. Sophisticated contemporary editorial illustration, flat vector forms with very subtle paper texture, soft daylight feeling, pale warm ivory background, restrained navy outlines, muted periwinkle blue and sage accents, small apricot details. A clear large object composition filling the central 75 percent, balanced generous breathing room around edges. The image must be instantly legible at 110px wide. Use only three or four relevant objects, avoid clutter. Absolutely no words, letters, numbers, symbols that look like writing, logos, watermarks, people, human faces, charts with invented claims or interface mockups. Not glossy 3D, not clipart, not a futuristic AI image. A modern warehouse shelving bay with a few neat cardboard boxes, a handheld barcode scanner and a small pallet trolley. Calm professional warehouse scene, practical and inviting, clear shapes.",
+  "revised_prompt": null,
+  "generated_at": "2026-10-11T16:39:38.697Z",
+  "src": "/images/generated/sections/cover-warehouse.webp",
+  "file": "public/images/generated/sections/cover-warehouse.webp",
+  "width": 1672,
+  "height": 941,
+  "bytes": 119864,
+  "sha256": "20d9f85a0e3ffc63779b8d50e00574b0aacead556774ee7ce31a0d84e18119d2",
+  "usage": null,
+  "regenerated_from": null,
+  "notes": "Built-in image_gen. WebP encoding only; original generated PNG preserved. Selected for local visual verification."
+}

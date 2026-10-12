@@ -5,6 +5,10 @@ description: "履歴書の希望給与はどう書く？「貴社規定に従い
 source:
   - content/articles/kibou-nenshu-kakikata.md
   - src/app/articles/[slug]/page.tsx
+  - src/components/ConsultationCta.tsx
+  - src/components/SupportSample.tsx
+  - src/components/Eyecatch.tsx
+  - content/images/index.json
 ---
 
 [戻る](/categories/hatarakikata)
@@ -18,6 +22,8 @@ source:
 2026年10月9日 更新 約5分で読めます
 
 提案用のサンプル原稿です（人による最終確認・公開承認の前）。[詳しく](/editorial-policy)
+
+[出典3件・記事の確認状況](#editorial-sources)
 
 希望年収は、書類では「貴社規定に従います」を基本にしつつ、ゆずれない金額があるときは根拠をそえて書きます。面接では、額面の年額で、今の年収と希望をセットで伝えると話がずれません。手取りと額面の違い、今の年収の確かめ方、場面別の答え方の例を紹介します。
 
@@ -85,7 +91,7 @@ source:
 
 「貴社規定に従います」と書いたあとで、内定のときに「その金額では生活できません」と言うと、話がこじれやすくなります。ゆずれない金額があるなら、面接のどこかで伝えておくほうが、あとで困りません。
 
-給料や休みの条件が合う会社を、プロと探す
+給料と休日の条件を比較する
 
 求人票の条件の見方や、求人票には書かれていない働き方のことを、キャリアアドバイザーに確かめてもらえます。
 
@@ -93,7 +99,7 @@ source:
 - 面接の練習
 - 応募書類の添削
 
-[条件の合う会社を相談する](/consultation/apply?placement=article-inline__kibou-nenshu-kakikata) ・ [先に条件を整理する（3分・登録不要）](/check)
+[働く条件を相談する](/consultation/apply?placement=article-inline__kibou-nenshu-kakikata) ・ [先に条件を整理する（3分・登録不要）](/check)
 
 ## 履歴書・応募書類での書き方
 
@@ -184,12 +190,17 @@ source:
 
 **出典とこの記事について出典3件**
 
+以下は原稿作成時の参照情報です。正式公開前に、担当者が出典本文・記事の主張・制度の適用条件を照合します。リンクの掲載やAI査読は、人による確認の完了を意味しません。
+
 1. [履歴書（厚生労働省履歴書様式例）（外部サイト）](https://www.hellowork.mhlw.go.jp/doc/kouroushourirekisho.pdf)
    厚生労働省（ハローワークインターネットサービス）・2026年10月9日確認
+   この記事での参照箇所: 履歴書様式例に「本人希望記入欄」があり、給料・職種・勤務時間・勤務地などの希望があれば記入する欄であること
 2. [「支払金額」欄（給与所得の源泉徴収票等の法定調書の作成と提出の手引）（外部サイト）](https://www.nta.go.jp/publication/pamph/hotei/tebikihtml/2-2-3.htm)
    国税庁・2026年10月9日確認
+   この記事での参照箇所: 源泉徴収票の「支払金額」の欄には、その年中に支払の確定した給与等の総額が書かれること
 3. [厚生年金保険の保険料（外部サイト）](https://www.nenkin.go.jp/service/kounen/hokenryo/hoshu/20150515-01.html)
    日本年金機構・2026年10月9日確認
+   この記事での参照箇所: 厚生年金保険料は標準報酬月額に保険料率をかけて計算し、事業主と被保険者が半分ずつ負担し、本人の分は給与から差し引かれること
 
 - **作成**
   2026年10月9日
@@ -212,19 +223,21 @@ source:
 4. [面接での答え方の例](#section-4)
 5. [内定のあとは、書面で確かめる](#section-5)
 
-給料や休みの条件が合う会社を、プロと探す
+給料と休日の条件を比較する
 
 求人票の条件の見方や、求人票には書かれていない働き方のことを、キャリアアドバイザーに確かめてもらえます。
 
-[条件の合う会社を相談する](/consultation/apply?placement=article-sidebar__kibou-nenshu-kakikata)
+[働く条件を相談する](/consultation/apply?placement=article-sidebar__kibou-nenshu-kakikata)
 
-[相談でできることを見る](/consultation)
+[相談の内容を確認する](/consultation)
 
 [条件整理チェック](/check)
 
 [職種を比べる](/jobs)
 
-## 給料や休みの条件が合う会社を、プロと探す
+キャリア相談のご案内
+
+## 給料と休日の条件を比較する
 
 求人票の条件の見方や、求人票には書かれていない働き方のことを、キャリアアドバイザーに確かめてもらえます。
 
@@ -232,15 +245,17 @@ source:
 - 面接の練習
 - 応募書類の添削
 
-[条件の合う会社を相談する](/consultation/apply?placement=article-bottom__kibou-nenshu-kakikata) ・ [相談でできることを見る](/consultation)
+[働く条件を相談する](/consultation/apply?placement=article-bottom__kibou-nenshu-kakikata) ・ [相談の内容を確認する](/consultation)
 
 相談先: 提携する人材紹介会社（正式公開時に掲載）（有料職業紹介事業許可番号: 正式公開時に掲載）
+
+希望を整理してから話したい方は、[相談用のメモを作る](/check)（登録不要）。
 
 ## 次に読むなら
 
 - 年収・働き方 2026.10.06
-  ### [年収300万円から転職すると、給料は下がる？上げられる？](/articles/nenshu-300man-tenshoku)
+  ### [年収300万円、転職したら下がる？](/articles/nenshu-300man-tenshoku)
 - 年収・働き方 2026.10.06
-  ### [手取り20万円から転職を考えるとき、何を比べればいい？](/articles/tedori-20man-hikaku)
+  ### [手取り20万円。転職で何を比べる？](/articles/tedori-20man-hikaku)
 - 面接・書類 2026.10.06
-  ### [未経験職種の面接、何を準備する？よく聞かれる質問と逆質問の例](/articles/mensetsu-junbi-mikeiken)
+  ### [面接が不安。何を準備する？](/articles/mensetsu-junbi-mikeiken)

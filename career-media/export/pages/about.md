@@ -4,13 +4,14 @@ title: "運営者情報｜はじめて転職ガイド"
 description: "はじめて転職ガイドの運営者情報です。メディアの運営・制作と、キャリア相談の相談先を分けて記載しています。"
 source:
   - src/app/about/page.tsx
+  - src/components/PageHero.tsx
 ---
 
 [戻る](/)
 
 パンくず: [ホーム](/) › 運営者情報
 
-ABOUT
+このメディアについて
 
 # 運営者情報
 

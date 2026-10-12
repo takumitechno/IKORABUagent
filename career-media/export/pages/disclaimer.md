@@ -4,13 +4,14 @@ title: "免責事項｜はじめて転職ガイド"
 description: "免責事項（正式公開前に確定予定）"
 source:
   - src/app/disclaimer/page.tsx
+  - src/components/PageHero.tsx
 ---
 
 [戻る](/)
 
 パンくず: [ホーム](/) › 免責事項
 
-DISCLAIMER
+情報の利用について
 
 # 免責事項
 

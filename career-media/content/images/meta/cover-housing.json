@@ -1,0 +1,32 @@
+{
+  "schema_version": 1,
+  "slug": "cover-housing",
+  "type": "section",
+  "status": "selected",
+  "purpose": "記事のテーマを伝える装飾的な生成イラスト。実際の職場・求人・制度の証明ではない。",
+  "used_in": [
+    "/",
+    "/articles"
+  ],
+  "alt": "",
+  "decorative": true,
+  "brief_file": null,
+  "model": "built-in image_gen",
+  "size": "1672x941",
+  "quality": "default",
+  "output_format": "webp",
+  "background": "opaque",
+  "prompt_brief": "Use case: illustration-story. Asset: original editorial thumbnail for a Japanese career media website, landscape 16:9. Sophisticated contemporary editorial illustration, flat vector forms with very subtle paper texture, soft daylight feeling, pale warm ivory background, restrained navy outlines, muted periwinkle blue and sage accents, small apricot details. A clear large object composition filling the central 75 percent, balanced generous breathing room around edges. The image must be instantly legible at 110px wide. Use only three or four relevant objects, avoid clutter. Absolutely no words, letters, numbers, symbols that look like writing, logos, watermarks, people, human faces, charts with invented claims or interface mockups. Not glossy 3D, not clipart, not a futuristic AI image. An attractive small modern apartment building and a detached house grouped with a single large house key on a pale blue shape. Real estate work and understanding different housing roles, no sale labels.",
+  "prompt_final": "Use case: illustration-story. Asset: original editorial thumbnail for a Japanese career media website, landscape 16:9. Sophisticated contemporary editorial illustration, flat vector forms with very subtle paper texture, soft daylight feeling, pale warm ivory background, restrained navy outlines, muted periwinkle blue and sage accents, small apricot details. A clear large object composition filling the central 75 percent, balanced generous breathing room around edges. The image must be instantly legible at 110px wide. Use only three or four relevant objects, avoid clutter. Absolutely no words, letters, numbers, symbols that look like writing, logos, watermarks, people, human faces, charts with invented claims or interface mockups. Not glossy 3D, not clipart, not a futuristic AI image. An attractive small modern apartment building and a detached house grouped with a single large house key on a pale blue shape. Real estate work and understanding different housing roles, no sale labels.",
+  "revised_prompt": null,
+  "generated_at": "2026-10-11T16:40:14.703Z",
+  "src": "/images/generated/sections/cover-housing.webp",
+  "file": "public/images/generated/sections/cover-housing.webp",
+  "width": 1672,
+  "height": 941,
+  "bytes": 120968,
+  "sha256": "a56daec21ec2eecb1b1d7543abb7fb0db9ad8c0512710e1cc695a9e408a9b63c",
+  "usage": null,
+  "regenerated_from": null,
+  "notes": "Built-in image_gen. WebP encoding only; original generated PNG preserved. Selected for local visual verification."
+}

@@ -5,6 +5,10 @@ description: "2024年4月から、求人の募集時や労働契約を結ぶと�
 source:
   - content/news/news-roudou-jouken-meiji.md
   - src/app/news/[slug]/page.tsx
+  - src/components/ConsultationCta.tsx
+  - src/components/SupportSample.tsx
+  - src/components/Eyecatch.tsx
+  - content/images/index.json
 ---
 
 [戻る](/news)
@@ -13,7 +17,7 @@ source:
 
 転職ニュース解説 ・ 発表元: 厚生労働省
 
-施行・発表日: 2024年4月1日
+施行日：2024年4月1日
 
 # 求人で明示される労働条件が増えた｜「業務・就業場所の変更の範囲」とは
 
@@ -67,10 +71,14 @@ source:
 
 **出典とこの記事について出典2件**
 
+以下は原稿作成時の参照情報です。正式公開前に、担当者が出典本文・記事の主張・制度の適用条件を照合します。リンクの掲載やAI査読は、人による確認の完了を意味しません。
+
 1. [2024年4月から労働条件明示のルールが変わります（外部サイト）](https://www.mhlw.go.jp/stf/newpage_32105.html)
    厚生労働省・2026年10月6日確認
+   この記事での参照箇所: 改正の概要と施行日
 2. [企業から受ける労働条件明示のルールが変わります（求職者向けリーフレット）（外部サイト）](https://www.mhlw.go.jp/content/001114112.pdf)
    厚生労働省・2026年10月6日確認
+   この記事での参照箇所: 募集時・職業紹介時に追加された明示事項
 
 - **作成**
   2026年10月6日
@@ -87,7 +95,9 @@ source:
 
 [転職ニュース一覧へ戻る](/news)
 
-## ひとりで悩むより、転職のプロと進める
+キャリア相談のご案内
+
+## 仕事選びと応募の準備を相談する
 
 会社選びから面接の練習まで、キャリアアドバイザーに相談しながら準備できます。応募するかどうかは、ご自身で決められます。
 
@@ -95,15 +105,15 @@ source:
 - 面接の練習
 - 応募書類の添削
 
-[整理した内容をもとに相談する](/consultation/apply?placement=news-bottom__news-roudou-jouken-meiji) ・ [相談でできることを見る](/consultation)
+[キャリア相談を申し込む](/consultation/apply?placement=news-bottom__news-roudou-jouken-meiji) ・ [相談の内容を確認する](/consultation)
 
 相談先: 提携する人材紹介会社（正式公開時に掲載）（有料職業紹介事業許可番号: 正式公開時に掲載）
 
 ## 次に読むなら
 
 - 年収・働き方 2026.10.06
-  ### [「土日休み」と「年収」をどう比較する？求人票の数字の読み方](/articles/donichi-yasumi-nenshu-hikaku)
+  ### [土日休みと年収、どう比べればいい？](/articles/donichi-yasumi-nenshu-hikaku)
 - 面接・書類 2026.10.06
-  ### [転職回数が気になるときに整理したいこと｜説明のしかたと次の選び方](/articles/tenshoku-kaisu-kininaru)
+  ### [転職回数が気になる。どう説明する？](/articles/tenshoku-kaisu-kininaru)
 - 未経験転職 2026.10.06
-  ### [フリーターから正社員を目指すとき、最初に確認したいこと](/articles/freeter-seishain-hajimeni)
+  ### [フリーターから正社員、最初に何を確認する？](/articles/freeter-seishain-hajimeni)

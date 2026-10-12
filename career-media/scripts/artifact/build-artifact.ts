@@ -76,7 +76,9 @@ async function main() {
   if (privateBrand) {
     const sales = await get(base, "/sales");
     if (sales.status === 200) {
-      const found = new Set(["/sales", ...[...sales.html.matchAll(/href="(\/sales[^"#?]*)"/g)].map((m) => m[1])]);
+      const sns = await get(base, "/sales/sns");
+      if (sns.status !== 200) throw new Error(`商談用SNS一覧: HTTP ${sns.status}`);
+      const found = new Set(["/sales", ...[...(sales.html + sns.html).matchAll(/href="(\/sales[^"#?]*)"/g)].map((m) => m[1])]);
       routes.push(...[...found].filter((r) => !routes.includes(r)));
     }
   }
@@ -97,9 +99,11 @@ async function main() {
   const banner = pick(home.html, /(<div class="no-print bg-night[\s\S]*?<\/div>)/, "preview banner");
 
   // 記事一覧の行（検索結果の表示に使う）
-  const listHtml = (await get(base, "/articles")).html;
   const rows = new Map<string, string>();
-  for (const m of listHtml.matchAll(/<li><a class="[^"]*\bgroup flex gap-4[^"]*" href="([^"]+)">[\s\S]*?<\/a><\/li>/g)) rows.set(m[1], m[0]);
+  for (const route of routes.filter((r) => r === "/articles" || /^\/articles\/page\/\d+$/.test(r))) {
+    const listHtml = (await get(base, route)).html;
+    for (const m of listHtml.matchAll(/<li><a class="[^"]*\bgroup flex gap-4[^"]*" href="([^"]+)">[\s\S]*?<\/a><\/li>/g)) rows.set(m[1], m[0]);
+  }
   const searchIndex = await Promise.all(
     articles.map(async (a) => {
       const full = await repo.getArticle(a.slug);
@@ -111,7 +115,7 @@ async function main() {
     }),
   );
 
-  // CSS: next/font の @font-face（/_next/static/media を参照）は除き、Google Fonts で読む
+  // 1ファイル版ではローカルの日本語フォントを使い、外部フォントを読み込まない。
   const cssLinks = [...home.html.matchAll(/<link rel="stylesheet" href="([^"]+\.css)"/g)].map((m) => m[1]);
   let css = "";
   for (const href of cssLinks) css += (await get(base, href)).html + "\n";
@@ -130,10 +134,6 @@ async function main() {
     jsx: "automatic",
     tsconfig: path.join(ROOT, "tsconfig.json"),
     alias: {
-      react: path.join(__dirname, "shims/react.cjs"),
-      "react-dom": path.join(__dirname, "shims/react-dom.cjs"),
-      "react/jsx-runtime": path.join(__dirname, "shims/jsx-runtime.cjs"),
-      "react/jsx-dev-runtime": path.join(__dirname, "shims/jsx-runtime.cjs"),
       "next/link": path.join(__dirname, "shims/next-link.cjs"),
     },
     define: { "process.env.NODE_ENV": '"production"' },
@@ -162,13 +162,14 @@ async function main() {
     <p class="artifact-dialog-eyebrow">DEMO</p>
     <h2 id="consult-dialog-title">ここから相談の申し込みページへ移動します</h2>
     <p>デモ版のため、実際の申し込みページには移動しません。正式に公開するときは、相談先の申し込みページへ、どの導線から来たかが分かる計測パラメータを付けて移動します。</p>
+    <p data-consult-topic hidden></p>
     <p class="artifact-dialog-meta">このボタンの設置場所: <code data-placement></code></p>
     <div class="artifact-dialog-actions"><a href="/consultation">相談サービスの説明を見る</a><button type="button" data-close>閉じる</button></div>
   </div>
 </div>`;
 
   const artifactCss = `
-:root{--font-noto-sans-jp:"Noto Sans JP"}
+:root{--font-noto-sans-jp:"Noto Sans JP","Yu Gothic",Meiryo,sans-serif}
 body{font-size:16px;background:var(--color-canvas);color:var(--color-body)}
 header.sticky{top:env(safe-area-inset-top,0px)}
 html.menu-open body{overflow:hidden}
@@ -194,9 +195,6 @@ html.menu-open body{overflow:hidden}
 `;
 
   const html = `<title>${site.name}</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap">
 <style>${css}
 ${artifactCss}</style>
 <div lang="ja" class="min-h-screen antialiased">
@@ -208,8 +206,6 @@ ${footer}
 </div>
 ${dialog}
 ${templates.join("\n")}
-<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.3.1/umd/react.production.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.3.1/umd/react-dom.production.min.js"></script>
 <script>window.__ARTIFACT__=${JSON.stringify(config).replace(/</g, "\\u003c")};</script>
 <script>${checkJs}</script>
 <script>${runtimeJs}</script>

@@ -5,6 +5,10 @@ description: "転職サイト、転職エージェント、ハローワークは
 source:
   - content/articles/tenshoku-service-chigai.md
   - src/app/articles/[slug]/page.tsx
+  - src/components/ConsultationCta.tsx
+  - src/components/SupportSample.tsx
+  - src/components/Eyecatch.tsx
+  - content/images/index.json
 ---
 
 [戻る](/categories/junbi)
@@ -18,6 +22,8 @@ source:
 2026年10月9日 更新 約6分で読めます
 
 提案用のサンプル原稿です（人による最終確認・公開承認の前）。[詳しく](/editorial-policy)
+
+[出典9件・記事の確認状況](#editorial-sources)
 
 転職サイト、転職エージェント（人材紹介）、ハローワークは、だれが運営し、どこからお金が出て、どこまで手伝ってくれるかが違います。それぞれのしくみと向いている使い方、人材紹介が求職者から原則として手数料を取らないという職業安定法のルール、許可を受けた事業者かの確かめ方を紹介します。
 
@@ -72,7 +78,7 @@ source:
 
 **気をつけたいこと**：応募書類の書き方や面接の準備は、自分で進める必要があります。経歴を登録するときは、どこまで公開されるかの設定も確かめておきましょう。
 
-転職の進め方を、プロと一緒に決める
+応募までの準備を相談する
 
 いつ動くか、何から始めるかを、経験と希望をもとに一緒に考えてもらえます。日程の調整も任せられます。
 
@@ -173,24 +179,35 @@ source:
 
 **出典とこの記事について出典9件**
 
+以下は原稿作成時の参照情報です。正式公開前に、担当者が出典本文・記事の主張・制度の適用条件を照合します。リンクの掲載やAI査読は、人による確認の完了を意味しません。
+
 1. [ハローワーク（外部サイト）](https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/koyou_roudou/koyou/hellowork.html)
    厚生労働省・2026年10月7日確認
+   この記事での参照箇所: ハローワークは国（厚生労働省）が運営し、職業紹介・雇用保険・雇用対策などのサービスを無償で提供していること
 2. [求職者マイページでできること（ハローワークインターネットサービス）（外部サイト）](https://www.hellowork.mhlw.go.jp/member/mem_possible.html)
    厚生労働省・2026年10月7日確認
+   この記事での参照箇所: 求職者マイページで、自宅のパソコンなどから求人検索やオンライン自主応募ができること
 3. [募集情報等提供事業（外部サイト）](https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/boshuujouhouteikyou.html)
    厚生労働省・2026年10月7日確認
+   この記事での参照箇所: 求人サイト・求人情報誌などが募集情報等提供事業にあたること、求職者の情報を集める事業者（特定募集情報等提供事業者）は厚生労働大臣への届出が必要なこと
 4. [令和４年職業安定法の改正について（外部サイト）](https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/0000172497_00003.html)
    厚生労働省・2026年10月7日確認
+   この記事での参照箇所: 2022年10月1日施行の改正で、特定募集情報等提供事業に厚生労働大臣への届出が必要になったこと
 5. [職業紹介事業とは（外部サイト）](https://jsite.mhlw.go.jp/ishikawa-roudoukyoku/hourei_seido_tetsuzuki/roudousha_haken/syoukai_gaiyou.html)
    石川労働局・2026年10月7日確認
+   この記事での参照箇所: 職業紹介の定義（職業安定法第4条第1項）と、有料職業紹介事業は厚生労働大臣の許可を受けて行うこと
 6. [有料職業紹介事業の概要（外部サイト）](https://jsite.mhlw.go.jp/osaka-roudoukyoku/hourei_seido_tetsuzuki/yuryou_muryou_shokugyou/hourei_seido/gaiyou.html)
    大阪労働局・2026年10月7日確認
+   この記事での参照箇所: 有料職業紹介事業者が受け取れる手数料の種類が限られていること、求職者から手数料を受け取れるのは芸能家・モデル・経営管理者・科学技術者・熟練技能者（後の3つは年収700万円超の場合）に限られること
 7. [人材サービス総合サイト（外部サイト）](https://jinzai.hellowork.mhlw.go.jp/JinzaiWeb/)
    厚生労働省・2026年10月7日確認
+   この記事での参照箇所: 労働者派遣事業・職業紹介事業・特定募集情報等提供事業を行う事業者を検索できること
 8. [職業紹介事業者は、厚生労働省の運営する人材サービス総合サイトにおいて、職業紹介の実績に関する情報提供を行うことが義務付けられます（外部サイト）](https://www.mhlw.go.jp/file/06-Seisakujouhou-11600000-Shokugyouanteikyoku/0000171018_2.pdf)
    厚生労働省・2026年10月7日確認
+   この記事での参照箇所: 職業紹介事業者が、就職者数、就職後6か月以内の離職者数、手数料、返戻金制度の有無などを人材サービス総合サイトで公開する義務があること
 9. [「就職お祝い金」などの名目で求職者に金銭等を提供して求職の申し込みの勧奨を行うことを禁止しました（外部サイト）](https://jsite.mhlw.go.jp/tokyo-roudoukyoku/news_topics/jyukyuuchousei_030303.html)
    東京労働局・2026年10月7日確認
+   この記事での参照箇所: 2021年4月1日から、職業紹介事業者が「就職お祝い金」などの名目で金銭等を提供して求職の申込みをすすめることが禁止されたこと
 
 - **作成**
   2026年10月9日
@@ -214,19 +231,21 @@ source:
 5. [許可を受けているかの確かめ方](#section-5)
 6. [どう組み合わせる？状況別の使い方](#section-6)
 
-転職の進め方を、プロと一緒に決める
+応募までの準備を相談する
 
 いつ動くか、何から始めるかを、経験と希望をもとに一緒に考えてもらえます。日程の調整も任せられます。
 
 [転職の進め方を相談する](/consultation/apply?placement=article-sidebar__tenshoku-service-chigai)
 
-[相談でできることを見る](/consultation)
+[相談の内容を確認する](/consultation)
 
 [条件整理チェック](/check)
 
 [職種を比べる](/jobs)
 
-## 転職の進め方を、プロと一緒に決める
+キャリア相談のご案内
+
+## 応募までの準備を相談する
 
 いつ動くか、何から始めるかを、経験と希望をもとに一緒に考えてもらえます。日程の調整も任せられます。
 
@@ -234,15 +253,17 @@ source:
 - 面接の練習
 - 応募書類の添削
 
-[転職の進め方を相談する](/consultation/apply?placement=article-bottom__tenshoku-service-chigai) ・ [相談でできることを見る](/consultation)
+[転職の進め方を相談する](/consultation/apply?placement=article-bottom__tenshoku-service-chigai) ・ [相談の内容を確認する](/consultation)
 
 相談先: 提携する人材紹介会社（正式公開時に掲載）（有料職業紹介事業許可番号: 正式公開時に掲載）
+
+希望を整理してから話したい方は、[相談用のメモを作る](/check)（登録不要）。
 
 ## 次に読むなら
 
 - 転職準備 2026.10.06
-  ### [転職エージェントに、何を相談すればいい？相談できることと伝え方の例](/articles/agent-soudan-nani)
+  ### [エージェントに何を相談する？](/articles/agent-soudan-nani)
 - 転職準備 2026.10.06
-  ### [エージェント面談の前に決めておくこと・決めなくていいこと](/articles/agent-mendan-mae)
+  ### [エージェント面談の前、何を決めておく？](/articles/agent-mendan-mae)
 - 未経験転職 2026.10.06
-  ### [フリーターから正社員を目指すとき、最初に確認したいこと](/articles/freeter-seishain-hajimeni)
+  ### [フリーターから正社員、最初に何を確認する？](/articles/freeter-seishain-hajimeni)

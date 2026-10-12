@@ -5,6 +5,10 @@ description: "別の職種に移るだけが転職ではありません。慣れ
 source:
   - content/articles/hanbai-seishain.md
   - src/app/articles/[slug]/page.tsx
+  - src/components/ConsultationCta.tsx
+  - src/components/SupportSample.tsx
+  - src/components/Eyecatch.tsx
+  - content/images/index.json
 ---
 
 [戻る](/categories/shokushu)
@@ -18,6 +22,8 @@ source:
 2026年10月6日 更新 約4分で読めます
 
 提案用のサンプル原稿です（人による最終確認・公開承認の前）。[詳しく](/editorial-policy)
+
+[出典5件・記事の確認状況](#editorial-sources)
 
 別の職種に移るだけが転職ではありません。慣れた販売・接客の仕事で正社員を目指す道もあります。アルバイトと正社員で変わること、時給と月給の比べ方、店長候補などの求人で確認したい休日・シフト・異動の範囲、アルバイト経験の伝え方を整理します。
 
@@ -56,7 +62,7 @@ source:
 
 休みと年収の比べ方は、[「土日休み」と「年収」をどう比較する？](/articles/donichi-yasumi-nenshu-hikaku)で時給換算の計算例つきで紹介しています。
 
-その仕事が自分に合うか、プロに聞いてみる
+仕事内容と応募条件を確認する
 
 求人票だけでは分からない仕事の中身や職場のことを、キャリアアドバイザーに聞いてから会社を選べます。
 
@@ -121,16 +127,23 @@ source:
 
 **出典とこの記事について出典5件**
 
+以下は原稿作成時の参照情報です。正式公開前に、担当者が出典本文・記事の主張・制度の適用条件を照合します。リンクの掲載やAI査読は、人による確認の完了を意味しません。
+
 1. [衣料品販売 - 職業詳細（job tag）（外部サイト）](https://shigoto.mhlw.go.jp/User/Occupation/Detail/73)
    厚生労働省 職業情報提供サイト（job tag）・2026年10月6日確認
+   この記事での参照箇所: 正社員は店の営業時間に合わせて早番・遅番で働くこと、土日祝日も営業する店が多く交代で休みを取ること、経験を積むと仕入れや在庫管理を任されることがあること
 2. [2024年4月から労働条件明示のルールが変わります（外部サイト）](https://www.mhlw.go.jp/stf/newpage_32105.html)
    厚生労働省・2026年10月6日確認
+   この記事での参照箇所: 2024年4月から、募集時などに就業場所・業務の変更の範囲が明示されるようになったこと
 3. [労働基準法における管理監督者の範囲の適正化のために（外部サイト）](https://www.mhlw.go.jp/bunya/roudoukijun/dl/kanri.pdf)
    厚生労働省・2026年10月6日確認
+   この記事での参照箇所: 管理監督者に当たるかは役職名ではなく、職務内容・責任と権限・勤務態様・待遇などの実態で判断されること
 4. [多店舗展開する小売業、飲食業等の店舗における管理監督者の範囲の適正化について（外部サイト）](https://www.mhlw.go.jp/houdou/2008/09/h0909-2.html)
    厚生労働省・2026年10月6日確認
+   この記事での参照箇所: 小売業などの店長について、管理監督者に当たるかの判断要素が示されていること
 5. [わかものハローワーク（外部サイト）](https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/0000181329.html)
    厚生労働省・2026年10月6日確認
+   この記事での参照箇所: 正社員を目指すおおむね35歳未満の若者を対象に、担当者制の職業相談などを無料で行っていること
 
 - **作成**
   2026年10月6日
@@ -153,19 +166,21 @@ source:
 4. [アルバイト経験は、どう見られる？](#section-4)
 5. [その先の選択肢は？](#section-5)
 
-その仕事が自分に合うか、プロに聞いてみる
+仕事内容と応募条件を確認する
 
 求人票だけでは分からない仕事の中身や職場のことを、キャリアアドバイザーに聞いてから会社を選べます。
 
 [職種・会社選びを相談する](/consultation/apply?placement=article-sidebar__hanbai-seishain)
 
-[相談でできることを見る](/consultation)
+[相談の内容を確認する](/consultation)
 
 [条件整理チェック](/check)
 
 [職種を比べる](/jobs)
 
-## その仕事が自分に合うか、プロに聞いてみる
+キャリア相談のご案内
+
+## 仕事内容と応募条件を確認する
 
 求人票だけでは分からない仕事の中身や職場のことを、キャリアアドバイザーに聞いてから会社を選べます。
 
@@ -173,15 +188,17 @@ source:
 - 面接の練習
 - 応募書類の添削
 
-[職種・会社選びを相談する](/consultation/apply?placement=article-bottom__hanbai-seishain) ・ [相談でできることを見る](/consultation)
+[職種・会社選びを相談する](/consultation/apply?placement=article-bottom__hanbai-seishain) ・ [相談の内容を確認する](/consultation)
 
 相談先: 提携する人材紹介会社（正式公開時に掲載）（有料職業紹介事業許可番号: 正式公開時に掲載）
+
+希望を整理してから話したい方は、[相談用のメモを作る](/check)（登録不要）。
 
 ## 次に読むなら
 
 - 未経験転職 2026.10.06
-  ### [フリーターから正社員を目指すとき、最初に確認したいこと](/articles/freeter-seishain-hajimeni)
+  ### [フリーターから正社員、最初に何を確認する？](/articles/freeter-seishain-hajimeni)
 - 経験の活かし方 2026.10.06
-  ### [接客経験は転職でどう活かせる？職種別のつながりと伝え方](/articles/sekkyaku-keiken-ikasu)
+  ### [接客の経験、ほかの仕事で活かせる？](/articles/sekkyaku-keiken-ikasu)
 - 年収・働き方 2026.10.06
-  ### [「土日休み」と「年収」をどう比較する？求人票の数字の読み方](/articles/donichi-yasumi-nenshu-hikaku)
+  ### [土日休みと年収、どう比べればいい？](/articles/donichi-yasumi-nenshu-hikaku)

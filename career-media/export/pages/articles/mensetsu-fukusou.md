@@ -5,6 +5,10 @@ description: "転職の面接はスーツで行くべき？「私服可」「服
 source:
   - content/articles/mensetsu-fukusou.md
   - src/app/articles/[slug]/page.tsx
+  - src/components/ConsultationCta.tsx
+  - src/components/SupportSample.tsx
+  - src/components/Eyecatch.tsx
+  - content/images/index.json
 ---
 
 [戻る](/categories/shorui-mensetsu)
@@ -18,6 +22,8 @@ source:
 2026年10月9日 更新 約4分で読めます
 
 提案用のサンプル原稿です（人による最終確認・公開承認の前）。[詳しく](/editorial-policy)
+
+[出典5件・記事の確認状況](#editorial-sources)
 
 転職の面接の服装は、指定がなければスーツを選ぶと迷いにくくなります。「私服可」「服装自由」「オフィスカジュアル」と書かれていたときの考え方、迷ったときの確かめ方と問い合わせの例、スーツがないときの選び方、当日の身だしなみチェックを紹介します。
 
@@ -55,7 +61,7 @@ source:
 
 高いスーツかどうかより、**シワや汚れがないか、サイズが合っているか**のほうが印象に関わります。
 
-面接の練習と書類の添削は、プロに頼める
+面接の練習と書類の添削を相談する
 
 応募先に合わせた模擬面接や、履歴書・職務経歴書の添削を受けてから本番にのぞめます。
 
@@ -155,16 +161,23 @@ source:
 
 **出典とこの記事について出典5件**
 
+以下は原稿作成時の参照情報です。正式公開前に、担当者が出典本文・記事の主張・制度の適用条件を照合します。リンクの掲載やAI査読は、人による確認の完了を意味しません。
+
 1. [面接対策（ハローワーク山形の資料）（外部サイト）](https://jsite.mhlw.go.jp/yamagata-hellowork/content/contents/002350381.pdf)
    山形労働局（ハローワーク山形）・2026年10月9日確認
+   この記事での参照箇所: 服装で個性を出す必要はなく、無難で清潔感のある服装を目指すこと、髪・靴・爪などにも気を配ること
 2. [事前の準備が大事です 面接試験の受け方（青森労働局の資料）（外部サイト）](https://jsite.mhlw.go.jp/aomori-roudoukyoku/content/contents/002105371.pdf)
    青森労働局・2026年10月9日確認
+   この記事での参照箇所: 会社や業界にふさわしい服装で臨むこと、迷ったときは会社の社員の服装を確認する方法があること
 3. [ハローワーク阿倍野 マザーズコーナー 就活体験談（外部サイト）](https://jsite.mhlw.go.jp/osaka-hellowork/list/abeno/mother-syukatsutaikendan002_00002.html)
    大阪労働局（ハローワーク阿倍野）・2026年10月9日確認
+   この記事での参照箇所: アパレルなど一部の業界を除き、面接の服装は基本はスーツとされていること
 4. [ハローワーク布施 面接対策セミナー（外部サイト）](https://jsite.mhlw.go.jp/osaka-hellowork/content/contents/002184437.pdf)
    大阪労働局（ハローワーク布施）・2026年10月9日確認
+   この記事での参照箇所: スーツは黒・紺・グレー、シャツは白が基本で、靴下・ストッキング・カバンも落ち着いた色にすること
 5. [面接対策 面接のマナーとよく聞かれる質問（ハローワーク川崎）（外部サイト）](https://jsite.mhlw.go.jp/kanagawa-hellowork/content/contents/002604524.pdf)
    神奈川労働局（ハローワーク川崎）・2026年10月9日確認
+   この記事での参照箇所: 髪は清潔にし、靴は革靴にすること、オンライン面接でも通常の面接と同じ服装で臨み、カメラを目線の高さに合わせること
 
 - **作成**
   2026年10月9日
@@ -189,19 +202,21 @@ source:
 6. [オンライン面接の服装](#section-6)
 7. [当日の身だしなみチェック](#section-7)
 
-面接の練習と書類の添削は、プロに頼める
+面接の練習と書類の添削を相談する
 
 応募先に合わせた模擬面接や、履歴書・職務経歴書の添削を受けてから本番にのぞめます。
 
 [面接・書類の準備を相談する](/consultation/apply?placement=article-sidebar__mensetsu-fukusou)
 
-[相談でできることを見る](/consultation)
+[相談の内容を確認する](/consultation)
 
 [条件整理チェック](/check)
 
 [職種を比べる](/jobs)
 
-## 面接の練習と書類の添削は、プロに頼める
+キャリア相談のご案内
+
+## 面接の練習と書類の添削を相談する
 
 応募先に合わせた模擬面接や、履歴書・職務経歴書の添削を受けてから本番にのぞめます。
 
@@ -209,15 +224,17 @@ source:
 - 面接の練習
 - 応募書類の添削
 
-[面接・書類の準備を相談する](/consultation/apply?placement=article-bottom__mensetsu-fukusou) ・ [相談でできることを見る](/consultation)
+[面接・書類の準備を相談する](/consultation/apply?placement=article-bottom__mensetsu-fukusou) ・ [相談の内容を確認する](/consultation)
 
 相談先: 提携する人材紹介会社（正式公開時に掲載）（有料職業紹介事業許可番号: 正式公開時に掲載）
+
+希望を整理してから話したい方は、[相談用のメモを作る](/check)（登録不要）。
 
 ## 次に読むなら
 
 - 面接・書類 2026.10.06
-  ### [未経験職種の面接、何を準備する？よく聞かれる質問と逆質問の例](/articles/mensetsu-junbi-mikeiken)
+  ### [面接が不安。何を準備する？](/articles/mensetsu-junbi-mikeiken)
 - 面接・書類 2026.10.06
-  ### [未経験職種の志望動機、何を書けばいい？3つの要素と例文](/articles/shiboudouki-mikeiken)
+  ### [未経験の志望動機、何を書けばいい？](/articles/shiboudouki-mikeiken)
 - 面接・書類 2026.10.09
-  ### [職歴に空白期間があるとき、面接でどう説明する？書類の書き方と答え方の例](/articles/kuhaku-kikan-setsumei)
+  ### [空白期間、面接でどう話す？](/articles/kuhaku-kikan-setsumei)

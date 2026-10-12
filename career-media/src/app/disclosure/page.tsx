@@ -13,7 +13,7 @@ export const metadata = pageMetadata({
 // TODO(正式公開前にMakeCareer確認が必要): 表記文言の最終確認（ステルスマーケティング規制への対応方針を含む）
 export default function DisclosurePage() {
   return (
-    <InfoPage title="広告・提携表記" path="/disclosure" eyebrow="DISCLOSURE">
+    <InfoPage title="広告・提携表記" path="/disclosure" eyebrow="広告と相談先の関係">
       <h2>運営者とご案内するサービスの関係</h2>
       <p>{partner.disclosure}</p>
       <p>

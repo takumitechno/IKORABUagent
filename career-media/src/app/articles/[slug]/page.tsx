@@ -14,6 +14,9 @@ import { MobileStickyCta } from "@/components/MobileStickyCta";
 import { getRepository } from "@/lib/content";
 import { readingMinutes, renderMarkdown } from "@/lib/markdown";
 import { articleCrumbs, articleJsonLd, faqJsonLd, pageMetadata } from "@/lib/seo";
+import { ARTICLE_GUIDES } from "@/lib/article-guides";
+import { CONSULTATION_TOPICS } from "@/lib/consultation-topics";
+import { articleCover } from "@/lib/article-presentation";
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -38,6 +41,7 @@ export async function generateMetadata({ params }: Props) {
     type: "article",
     publishedTime: article.publishedAt ?? undefined,
     modifiedTime: article.updatedAt,
+    image: articleCover(article) ?? undefined,
   });
 }
 
@@ -50,6 +54,8 @@ export default async function ArticlePage({ params }: Props) {
   const { sections, headings } = renderMarkdown(article.body);
   const related = pickRelated(article, all);
   const inJourney = journeyForArticle(article.slug);
+  const guide = ARTICLE_GUIDES[article.slug];
+  const topic = CONSULTATION_TOPICS.find((t) => t.id === guide?.topic);
 
   return (
     <>
@@ -65,11 +71,11 @@ export default async function ArticlePage({ params }: Props) {
             <div className="article-body mt-8" dangerouslySetInnerHTML={{ __html: sections[0] }} />
             {sections[1] && (
               <>
-                <ConsultationCta placement="article-inline" contentSlug={article.slug} variant="inline" category={article.categories[0]} />
+                {!guide && <ConsultationCta placement="article-inline" contentSlug={article.slug} variant="inline" category={article.categories[0]} />}
                 <div className="article-body" dangerouslySetInnerHTML={{ __html: sections[1] }} />
               </>
             )}
-            {inJourney && <JourneyNav journey={inJourney.journey} index={inJourney.index} articles={all} />}
+            {inJourney && <details className="article-reading-guide"><summary>関連の記事も読む（任意）</summary><JourneyNav journey={inJourney.journey} index={inJourney.index} articles={all} /></details>}
             <FaqSection article={article} />
             <EditorialNote article={article} />
           </article>
@@ -84,7 +90,7 @@ export default async function ArticlePage({ params }: Props) {
                   </div>
                 </nav>
               )}
-              <ConsultationCta placement="article-sidebar" contentSlug={article.slug} variant="compact" category={article.categories[0]} />
+              <ConsultationCta placement="article-sidebar" contentSlug={article.slug} variant="compact" category={article.categories[0]} heading={topic?.title} lead={topic?.help} topic={topic?.id} />
               <div className="grid gap-2">
                 <Link href="/check" className="flex items-center gap-2 rounded-xl border border-line bg-surface px-4 py-3 text-sm font-bold text-ink hover:border-brand/40 hover:text-brand-strong">
                   <ClipboardList className="h-4 w-4 text-brand" aria-hidden="true" />
@@ -100,7 +106,7 @@ export default async function ArticlePage({ params }: Props) {
         </div>
 
         <div className="mt-12">
-          <ConsultationCta placement="article-bottom" contentSlug={article.slug} category={article.categories[0]} />
+          <ConsultationCta placement="article-bottom" contentSlug={article.slug} category={article.categories[0]} heading={topic?.title} lead={topic?.help} topic={topic?.id} question={guide?.question} />
         </div>
         <RelatedArticles articles={related} categories={categories} />
       </div>

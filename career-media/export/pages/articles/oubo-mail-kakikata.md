@@ -5,6 +5,10 @@ description: "転職活動で送るメールの書き方を紹介します。件
 source:
   - content/articles/oubo-mail-kakikata.md
   - src/app/articles/[slug]/page.tsx
+  - src/components/ConsultationCta.tsx
+  - src/components/SupportSample.tsx
+  - src/components/Eyecatch.tsx
+  - content/images/index.json
 ---
 
 [戻る](/categories/shorui-mensetsu)
@@ -18,6 +22,8 @@ source:
 2026年10月9日 更新 約6分で読めます
 
 提案用のサンプル原稿です（人による最終確認・公開承認の前）。[詳しく](/editorial-policy)
+
+[出典3件・記事の確認状況](#editorial-sources)
 
 転職活動のメールは「件名で用件と名前が分かる」「結論を先に書く」「署名を入れる」の3つを押さえれば、むずかしい言い回しはいりません。応募書類を送るとき、面接の日程を調整するとき、面接のあとにお礼を送るときの例文と、返信のタイミングを紹介します。
 
@@ -91,7 +97,7 @@ source:
 
 書類の中身を整えたいときは、[履歴書に書くことがないと思ったとき](/articles/rirekisho-kakukoto-nai)や[アルバイト経験だけの職務経歴書、何を書けばいい？](/articles/shokumu-keirekisho-arubaito)を参考にしてください。
 
-面接の練習と書類の添削は、プロに頼める
+面接の練習と書類の添削を相談する
 
 応募先に合わせた模擬面接や、履歴書・職務経歴書の添削を受けてから本番にのぞめます。
 
@@ -207,12 +213,17 @@ source:
 
 **出典とこの記事について出典3件**
 
+以下は原稿作成時の参照情報です。正式公開前に、担当者が出典本文・記事の主張・制度の適用条件を照合します。リンクの掲載やAI査読は、人による確認の完了を意味しません。
+
 1. [応募書類をメールで送る場合の例（資料）（外部サイト）](https://jsite.mhlw.go.jp/aomori-roudoukyoku/content/contents/002105366.pdf)
    厚生労働省 青森労働局・2026年10月9日確認
+   この記事での参照箇所: 件名は「用件と氏名」で簡潔にすること（例：応募書類送付の件／氏名）、メール本文が送付状の役割をすること、添付ファイルは企業の指示がなければPDFにし、ファイル名を「書類名と氏名」にすること、署名に氏名と連絡先を入れること、送信前に宛先と添付ファイルを確かめること
 2. [就活メールに困ったら（ハローワーク浦和 就職支援ナビゲーターのコラム）（外部サイト）](https://jsite.mhlw.go.jp/saitama-hellowork/content/contents/001671336.pdf)
    厚生労働省 埼玉労働局 ハローワーク浦和・2026年10月9日確認
+   この記事での参照箇所: 就職活動では問い合わせ・面接の日程調整・お礼などでメールを使う機会が多いこと、本文の敬語はむずかしく、迷ったらハローワークに相談できること
 3. [ハローワークの相談支援（外部サイト）](https://www.mhlw.go.jp/stf/newpage_27742.html)
    厚生労働省・2026年10月9日確認
+   この記事での参照箇所: ハローワークで応募書類の作り方や面接の受け答えについて、無料で相談できること
 
 - **作成**
   2026年10月9日
@@ -236,19 +247,21 @@ source:
 5. [返信はいつまでに？](#section-5)
 6. [敬語に自信がないときは](#section-6)
 
-面接の練習と書類の添削は、プロに頼める
+面接の練習と書類の添削を相談する
 
 応募先に合わせた模擬面接や、履歴書・職務経歴書の添削を受けてから本番にのぞめます。
 
 [面接・書類の準備を相談する](/consultation/apply?placement=article-sidebar__oubo-mail-kakikata)
 
-[相談でできることを見る](/consultation)
+[相談の内容を確認する](/consultation)
 
 [条件整理チェック](/check)
 
 [職種を比べる](/jobs)
 
-## 面接の練習と書類の添削は、プロに頼める
+キャリア相談のご案内
+
+## 面接の練習と書類の添削を相談する
 
 応募先に合わせた模擬面接や、履歴書・職務経歴書の添削を受けてから本番にのぞめます。
 
@@ -256,15 +269,17 @@ source:
 - 面接の練習
 - 応募書類の添削
 
-[面接・書類の準備を相談する](/consultation/apply?placement=article-bottom__oubo-mail-kakikata) ・ [相談でできることを見る](/consultation)
+[面接・書類の準備を相談する](/consultation/apply?placement=article-bottom__oubo-mail-kakikata) ・ [相談の内容を確認する](/consultation)
 
 相談先: 提携する人材紹介会社（正式公開時に掲載）（有料職業紹介事業許可番号: 正式公開時に掲載）
+
+希望を整理してから話したい方は、[相談用のメモを作る](/check)（登録不要）。
 
 ## 次に読むなら
 
 - 面接・書類 2026.10.06
-  ### [未経験職種の面接、何を準備する？よく聞かれる質問と逆質問の例](/articles/mensetsu-junbi-mikeiken)
+  ### [面接が不安。何を準備する？](/articles/mensetsu-junbi-mikeiken)
 - 面接・書類 2026.10.06
-  ### [履歴書に書くことがないと思ったとき｜アルバイト歴・資格・自己PRの書き方](/articles/rirekisho-kakukoto-nai)
+  ### [履歴書に書くことがない…？](/articles/rirekisho-kakukoto-nai)
 - 転職準備 2026.10.09
-  ### [働きながらの転職活動、何から？進める順番と時間の作り方・退職を伝える時期](/articles/zaishoku-tenshoku-susumekata)
+  ### [働きながらの転職、何から始める？](/articles/zaishoku-tenshoku-susumekata)

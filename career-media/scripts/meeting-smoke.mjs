@@ -12,13 +12,14 @@ const out=path.resolve(process.env.SCREENSHOT_DIR||'screenshots/meeting-smoke');
 const browser=await chromium.launch(process.env.PLAYWRIGHT_CHANNEL?{channel:process.env.PLAYWRIGHT_CHANNEL}:{});
 const evidence={flows:[],attribution:null,safety:[],errors:[]};
 const ids=['status','timing','experiences','strengths','priority','income','holidays','hours','location','talk','pc','avoid','learning'];
-const cases={A:['fulltime','3months',['sales_service'],['listening'],'holidays','keep_current','weekends','no_overtime','commute_home','ok','little',['numbers_pressure'],'weekly'],B:['fulltime','3months',['office'],['accuracy'],'income','keep_current','weekends','no_overtime','commute_home','ok','ok',['none'],'weekly'],C:['parttime','undecided',['none'],['none'],'stability','undecided','undecided','undecided','undecided','little','little',['none'],'none']};
+const cases={A:['fulltime','3months',['sales_service'],['listening'],'growth','keep_current','weekends','no_overtime','commute_home','ok','little',['numbers_pressure'],'weekly'],B:['fulltime','3months',['office'],['accuracy'],'income','keep_current','weekends','no_overtime','commute_home','ok','ok',['none'],'weekly'],C:['parttime','undecided',['none'],['none'],'stability','undecided','undecided','undecided','undecided','little','little',['none'],'none']};
+const consultationTopics={A:'experience',B:'conditions',C:'first-job'};
 async function complete(page,values){
  for(const [start,end] of [[0,2],[2,4],[4,9],[9,13]]){
   for(let i=start;i<end;i++)for(const val of [].concat(values[i]))await page.locator(`label:has(input[name="${ids[i]}"][value="${val}"])`).click();
   await page.getByRole('button',{name:end===13?'結果を見る':'次へ進む',exact:true}).click();
  }
- await page.getByRole('heading',{name:'あなたの条件整理ノート'}).waitFor();
+ await page.getByRole('heading',{name:'相談用のメモ',exact:true}).waitFor();
 }
 try{
  const intentContext=await browser.newContext({viewport:{width:390,height:844},reducedMotion:'reduce'});const intentPage=await intentContext.newPage();
@@ -33,9 +34,11 @@ try{
    assert(await intentPage.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1));
   }
   await intentPage.locator('#support-answer [data-cta-kind="consultation-info"]').click();await intentPage.locator('#first-talk-title').waitFor();
-  assert.equal(new URL(intentPage.url()).hash,'#first-talk');
-  const firstTalk=await intentPage.locator('#first-talk').boundingBox();assert(firstTalk.y>=0&&firstTalk.y<250);
-  await intentPage.locator('#first-talk [data-cta-kind="consultation-apply"]').click();assert.equal(new URL(intentPage.url()).pathname.replace(/\/$/,''),'/consultation/apply');
+  assert.equal(new URL(intentPage.url()).hash,'#support-first-job');
+  assert(await intentPage.locator('#support-first-job').isVisible());
+  assert(!(await intentPage.locator('#support-experience').isVisible()));
+  const firstTalk=await intentPage.locator('#support-first-job').boundingBox();assert(firstTalk.y>=0&&firstTalk.y<250);
+  await intentPage.locator('#support-first-job [data-cta-kind="consultation-apply"]').click();assert.equal(new URL(intentPage.url()).pathname.replace(/\/$/,''),'/consultation/apply');
  }
  await intentContext.close();evidence.intent={choices:3,keyboard:true,reducedMotion:true,consultationAnchor:true,static:!!staticBase};
  for(const [name,values] of Object.entries(cases)){
@@ -57,22 +60,31 @@ try{
    await page.pdf({path:path.join(out,'result-A-print.pdf'),format:'A4',printBackground:true});
    assert.equal(await page.locator('.result-detail[open]').count(),0);
   }
-  assert(await page.getByRole('link',{name:'相談でできることを見る',exact:true}).isVisible());
-  await page.getByRole('button',{name:'結果をすべてコピー',exact:true}).click();
+  assert(await page.getByRole('link',{name:'相談の内容を確認する',exact:true}).isVisible());
+  const topic=consultationTopics[name];
+  const apply=page.locator('.result-next [data-cta-kind="consultation-apply"]');
+  assert(await apply.isVisible(),'Applying must not require opening a detail');
+  assert((await apply.getAttribute('href')).endsWith('#support-'+topic));
+  const direct=await ctx.newPage();await direct.goto(new URL(await apply.getAttribute('href'),base).href);
+  assert(await direct.locator('.apply-topic#support-'+topic).isVisible());await direct.close();
+  await page.locator('.result-topic-choices button').first().focus();await page.keyboard.press('Enter');
+  assert((await apply.getAttribute('href')).endsWith('#support-experience'));
+  await page.locator('.result-topic-choices button').nth(['experience','conditions','first-job'].indexOf(topic)).click();
+  await page.getByRole('button',{name:'すべての項目をコピー',exact:true}).click();
   const fullCopy=await page.evaluate(()=>navigator.clipboard.readText());
   for(const section of ['最優先の条件','今までの経験','比べてみたい職種','求人で確認すること','面談で聞く質問','自分でできる次の一歩','相談する場合の次の一歩'])assert(fullCopy.includes(section));
-  await page.getByRole('button',{name:'面談で使うメモとしてコピー',exact:true}).first().click();const memo=await page.evaluate(()=>navigator.clipboard.readText());
+  await page.getByRole('button',{name:'相談用メモをコピー',exact:true}).first().click();const memo=await page.evaluate(()=>navigator.clipboard.readText());
   assert(memo.includes('最優先の条件'));if(name!=='C'){assert(memo.includes('今の収入を下げない'));assert(memo.includes('土日祝休み'));assert(!memo.includes('できれば'));}
   await page.evaluate(()=>window.scrollTo({top:0,behavior:'instant'}));
   await page.screenshot({path:path.join(out,`result-${name}.png`),fullPage:true});fs.writeFileSync(path.join(out,`memo-${name}.txt`),memo);
-  await page.getByRole('link',{name:'相談でできることを見る',exact:true}).click();await page.locator('[data-cta-kind="consultation-apply"]').first().click();assert.equal(new URL(page.url()).pathname,'/consultation/apply');
-  evidence.flows.push({name,copy:true,summary:true,details:7,keyboard:true,printRestore:true,url:page.url()});await ctx.close();
+  await page.getByRole('link',{name:'相談の内容を確認する',exact:true}).click();await page.locator('.topic-panel#support-'+topic).waitFor({state:'visible'});await page.locator('.topic-panel#support-'+topic+' [data-cta-kind="consultation-apply"]').click();assert.equal(new URL(page.url()).pathname,'/consultation/apply');assert.equal(new URL(page.url()).hash,'#support-'+topic);
+  evidence.flows.push({name,topic,copy:true,summary:true,details:7,keyboard:true,printRestore:true,visibleApply:true,directHref:true,url:page.url()});await ctx.close();
  }
  // Follow the actual SNS link after an untagged visit; noopener must start a new session.
  const ctx=await browser.newContext();const page=await ctx.newPage();await page.goto(base+'/');await page.waitForTimeout(300);await page.goto(base+'/sales/sns/b');
  const [landing]=await Promise.all([page.waitForEvent('popup'),page.locator('a[href*="utm_source=instagram"]').first().click()]);await landing.waitForLoadState('networkidle');
  const session=await landing.evaluate(()=>JSON.parse(sessionStorage.getItem('career-media:session:v1')));assert.equal(session.source,'instagram');assert.equal(session.content,'theme-b-carousel');assert.equal(await landing.evaluate(()=>window.opener),null);
- await landing.goto(base+'/check');await complete(landing,cases.B);await landing.getByRole('link',{name:'相談でできることを見る',exact:true}).click();await landing.locator('[data-cta-kind="consultation-apply"]').first().click();await landing.goto(base+'/sales/measurement');
+ await landing.goto(base+'/check');await complete(landing,cases.B);await landing.getByRole('link',{name:'相談の内容を確認する',exact:true}).click();await landing.locator('.topic-panel#support-conditions [data-cta-kind="consultation-apply"]').click();assert.equal(new URL(landing.url()).hash,'#support-conditions');await landing.goto(base+'/sales/measurement');
  const events=await landing.evaluate(()=>JSON.parse(sessionStorage.getItem('career-media:events:v1')));for(const name of ['article_view','check_started','check_completed','cta_clicked'])assert(events.some(e=>e.event_name===name));assert(events.every(e=>e.session.source==='instagram'));assert(!events.some(e=>e.event_name==='partner_outbound'));
  evidence.attribution={session,eventNames:events.map(e=>e.event_name)};await landing.screenshot({path:path.join(out,'measurement.png'),fullPage:true});await ctx.close();
  for(const url of [base,staticBase].filter(Boolean))for(const js of [true,false]){

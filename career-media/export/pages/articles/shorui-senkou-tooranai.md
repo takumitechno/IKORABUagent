@@ -5,6 +5,10 @@ description: "書類選考が通らないときは何を見直せばいい？応
 source:
   - content/articles/shorui-senkou-tooranai.md
   - src/app/articles/[slug]/page.tsx
+  - src/components/ConsultationCta.tsx
+  - src/components/SupportSample.tsx
+  - src/components/Eyecatch.tsx
+  - content/images/index.json
 ---
 
 [戻る](/categories/shorui-mensetsu)
@@ -18,6 +22,8 @@ source:
 2026年10月10日 更新 約5分で読めます
 
 提案用のサンプル原稿です（人による最終確認・公開承認の前）。[詳しく](/editorial-policy)
+
+[出典4件・記事の確認状況](#editorial-sources)
 
 書類選考が続けて通らないときは、書類の文章だけでなく、応募先の選び方や求人票の条件との合い方から順に見直すと、原因をしぼりやすくなります。求人票の「必須」「あれば尚可」の読み方、書類の見直し項目、応募の記録のつけ方を紹介します。
 
@@ -74,7 +80,7 @@ source:
 
 厚生労働省の求人票の見方の資料では、「求人に関する特記事項」に応募の条件など大事なことが書かれている場合があるとされています。最後まで目を通しましょう。
 
-面接の練習と書類の添削は、プロに頼める
+面接の練習と書類の添削を相談する
 
 応募先に合わせた模擬面接や、履歴書・職務経歴書の添削を受けてから本番にのぞめます。
 
@@ -153,14 +159,20 @@ source:
 
 **出典とこの記事について出典4件**
 
+以下は原稿作成時の参照情報です。正式公開前に、担当者が出典本文・記事の主張・制度の適用条件を照合します。リンクの掲載やAI査読は、人による確認の完了を意味しません。
+
 1. [求人票の見方（外部サイト）](https://www.mhlw.go.jp/content/000616349.pdf)
    厚生労働省・2026年10月9日確認
+   この記事での参照箇所: ハローワークの求人票の項目の見方、「求人に関する特記事項」に労働条件や応募条件など重要なことが書かれている場合があること
 2. [求人情報の入力のしかた（外部サイト）](https://jsite.mhlw.go.jp/kanagawa-hellowork/content/contents/001418112.pdf)
    神奈川労働局・ハローワーク（厚生労働省）・2026年10月9日確認
+   この記事での参照箇所: ハローワークの求人では、必要な経験・知識・技能がある場合に「必須」か「あれば尚可」を選んで内容を書き、特にない場合は「不問」を選ぶしくみであること
 3. [求人票の記載内容を見直しましょう！～その『経験』や『免許・資格』はホントに必要ですか？～（外部サイト）](https://jsite.mhlw.go.jp/tokyo-hellowork/content/contents/002655962.pdf)
    ハローワーク飯田橋（東京労働局）・2026年10月9日確認
+   この記事での参照箇所: 事業主に対して、経験や免許・資格を「必須」とする場合は必要最低限にするよう案内していること（「必須」は応募の条件として扱われること）
 4. [ハローワークの相談支援（外部サイト）](https://www.mhlw.go.jp/stf/newpage_27742.html)
    厚生労働省・2026年10月9日確認
+   この記事での参照箇所: ハローワークで、応募する求人に合わせた書類の書き方などについて無料で相談・助言を受けられること
 
 - **作成**
   2026年10月10日
@@ -183,19 +195,21 @@ source:
 4. [応募数と記録を見直す](#section-4)
 5. [ひとりで見直しても分からないときは](#section-5)
 
-面接の練習と書類の添削は、プロに頼める
+面接の練習と書類の添削を相談する
 
 応募先に合わせた模擬面接や、履歴書・職務経歴書の添削を受けてから本番にのぞめます。
 
 [面接・書類の準備を相談する](/consultation/apply?placement=article-sidebar__shorui-senkou-tooranai)
 
-[相談でできることを見る](/consultation)
+[相談の内容を確認する](/consultation)
 
 [条件整理チェック](/check)
 
 [職種を比べる](/jobs)
 
-## 面接の練習と書類の添削は、プロに頼める
+キャリア相談のご案内
+
+## 面接の練習と書類の添削を相談する
 
 応募先に合わせた模擬面接や、履歴書・職務経歴書の添削を受けてから本番にのぞめます。
 
@@ -203,15 +217,17 @@ source:
 - 面接の練習
 - 応募書類の添削
 
-[面接・書類の準備を相談する](/consultation/apply?placement=article-bottom__shorui-senkou-tooranai) ・ [相談でできることを見る](/consultation)
+[面接・書類の準備を相談する](/consultation/apply?placement=article-bottom__shorui-senkou-tooranai) ・ [相談の内容を確認する](/consultation)
 
 相談先: 提携する人材紹介会社（正式公開時に掲載）（有料職業紹介事業許可番号: 正式公開時に掲載）
+
+希望を整理してから話したい方は、[相談用のメモを作る](/check)（登録不要）。
 
 ## 次に読むなら
 
 - 面接・書類 2026.10.06
-  ### [未経験職種の志望動機、何を書けばいい？3つの要素と例文](/articles/shiboudouki-mikeiken)
+  ### [未経験の志望動機、何を書けばいい？](/articles/shiboudouki-mikeiken)
 - 面接・書類 2026.10.06
-  ### [履歴書に書くことがないと思ったとき｜アルバイト歴・資格・自己PRの書き方](/articles/rirekisho-kakukoto-nai)
+  ### [履歴書に書くことがない…？](/articles/rirekisho-kakukoto-nai)
 - 転職準備 2026.10.09
-  ### [転職サイト・転職エージェント・ハローワークの違いは？しくみと使い分け](/articles/tenshoku-service-chigai)
+  ### [転職サイト？エージェント？ハローワーク？](/articles/tenshoku-service-chigai)

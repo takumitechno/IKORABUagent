@@ -6,6 +6,9 @@ import type { Article, ArticleSummary, Category } from "@/lib/content/types";
 import type { Heading } from "@/lib/markdown";
 import { ArticleList, findCategory } from "./ArticleCards";
 import { formatDate } from "./DateMeta";
+import { ARTICLE_GUIDES } from "@/lib/article-guides";
+import { ArticleAnswer } from "./ArticleGuide";
+import { Eyecatch } from "./Eyecatch";
 
 export function ArticleHeader({ article, categories, readingMinutes, headings = [] }: { article: Article; categories: Category[]; readingMinutes: number; headings?: Heading[] }) {
   const category = findCategory(categories, article.categories[0]);
@@ -16,7 +19,7 @@ export function ArticleHeader({ article, categories, readingMinutes, headings = 
           {category.name}
         </Link>
       )}
-      <h1 className="mt-2 text-[24px] font-bold leading-[1.5] text-ink sm:text-[32px]">{article.title}</h1>
+      <h1 className="mt-2 text-[24px] font-bold leading-[1.5] text-ink sm:text-[32px]">{ARTICLE_GUIDES[article.slug]?.displayTitle ?? article.title}</h1>
       <p className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-[13px] text-muted">
         <span>
           <time dateTime={article.updatedAt}>{formatDate(article.updatedAt)}</time> 更新
@@ -25,7 +28,9 @@ export function ArticleHeader({ article, categories, readingMinutes, headings = 
         <span>約{readingMinutes}分で読めます</span>
       </p>
       {site.sampleContent && <SampleNotice />}
-      <p className="mt-6 text-[16px] leading-[1.95] text-body">{article.summary}</p>
+      <a href="#editorial-sources" className="mt-3 inline-flex items-center gap-1.5 text-xs text-brand-strong underline underline-offset-4"><BookMarked className="h-3.5 w-3.5" aria-hidden="true" />出典{article.sources.length}件・記事の確認状況</a>
+      {ARTICLE_GUIDES[article.slug] ? <ArticleAnswer guide={ARTICLE_GUIDES[article.slug]} /> : <p className="mt-6 text-[16px] leading-[1.95] text-body">{article.summary}</p>}
+      <Eyecatch article={article} category={category} size="banner" className="mt-6" />
       <MobileToc headings={headings} />
     </header>
   );
@@ -118,6 +123,7 @@ export function SourcesSection({ article }: { article: Pick<Article, "sources"> 
           <span className="block text-[12px] text-muted">
             {s.publisher}・{formatDate(s.accessedAt)}確認
           </span>
+          {s.usedFor && <p className="mt-1 text-[12px] leading-5 text-body">この記事での参照箇所: {s.usedFor}</p>}
         </li>
       ))}
     </ol>
@@ -145,7 +151,7 @@ export function EditorialNote({ article }: { article: Article }) {
         ["最終確認日", formatDate(article.reviewedAt)],
       ];
   return (
-    <section aria-label="出典とこの記事について" className="mt-12">
+    <section id="editorial-sources" aria-label="出典とこの記事について" className="mt-12 scroll-mt-24">
       <details className="group rounded-xl border border-line bg-canvas">
         <summary className="flex cursor-pointer list-none items-center justify-between gap-3 px-4 py-3.5">
           <span className="flex items-center gap-2 text-[14px] font-bold text-ink">
@@ -156,6 +162,7 @@ export function EditorialNote({ article }: { article: Article }) {
           <ChevronDown className="h-4 w-4 shrink-0 text-muted transition group-open:rotate-180" aria-hidden="true" />
         </summary>
         <div className="space-y-5 border-t border-line px-4 py-4">
+          {site.sampleContent && <p className="text-xs leading-6 text-muted">以下は原稿作成時の参照情報です。正式公開前に、担当者が出典本文・記事の主張・制度の適用条件を照合します。リンクの掲載やAI査読は、人による確認の完了を意味しません。</p>}
           <SourcesSection article={article} />
           <dl className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-1 text-[12.5px]">
             {rows.map(([k, v]) => (

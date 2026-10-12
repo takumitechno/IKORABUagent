@@ -3,11 +3,9 @@ import { absoluteUrl } from "@/config/site";
 import { getRepository } from "@/lib/content";
 import { articlePath } from "@/lib/seo";
 import { TAXONOMY, taxonomyPath, type TaxonomyGroup } from "@/lib/taxonomy";
+import { ARTICLES_PER_PAGE, articlePagePath, latestArticleDate, MIN_HUB_ARTICLES } from "@/lib/content-discovery";
 
 export const revalidate = 600;
-
-/** sitemap に載せる入口ページの記事数の下限 */
-const MIN_HUB_ARTICLES = 3;
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const repo = getRepository();
@@ -30,7 +28,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   const categoryPages: MetadataRoute.Sitemap = categories
     .filter((c) => c.slug !== "news")
-    .map((c) => ({ url: absoluteUrl(`/categories/${c.slug}`), lastModified: latest, changeFrequency: "weekly" as const, priority: 0.6 }));
+    .map((c) => ({ url: absoluteUrl(`/categories/${c.slug}`), lastModified: latestArticleDate(articles.filter((a) => a.categories.includes(c.slug))), changeFrequency: "weekly" as const, priority: 0.6 }));
+
+  const listPages: MetadataRoute.Sitemap = Array.from({ length: Math.max(0, Math.ceil(articles.length / ARTICLES_PER_PAGE) - 1) }, (_, i) => ({ url: absoluteUrl(articlePagePath(i + 2)), changeFrequency: "weekly", priority: 0.5 }));
 
   // 公開済み (published) の記事だけ。draft / review は repository が返さない
   const articlePages: MetadataRoute.Sitemap = articles.map((a) => ({
@@ -44,8 +44,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const hubPages: MetadataRoute.Sitemap = (["roles", "concerns", "situations"] as TaxonomyGroup[]).flatMap((group) =>
     TAXONOMY[group]
       .filter((t) => articles.filter((a) => a[group].includes(t.slug)).length >= MIN_HUB_ARTICLES)
-      .map((t) => ({ url: absoluteUrl(taxonomyPath(group, t.slug)), lastModified: latest, changeFrequency: "weekly" as const, priority: 0.6 })),
+      .map((t) => ({ url: absoluteUrl(taxonomyPath(group, t.slug)), lastModified: latestArticleDate(articles.filter((a) => a[group].includes(t.slug))), changeFrequency: "weekly" as const, priority: 0.6 })),
   );
 
-  return [...staticPages, ...categoryPages, ...hubPages, ...articlePages];
+  return [...staticPages, ...listPages, ...categoryPages, ...hubPages, ...articlePages];
 }

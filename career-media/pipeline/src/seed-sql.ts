@@ -16,6 +16,7 @@ function newsMeta(a: Article) {
   return {
     announced_by: a.news.announcedBy,
     announced_at: a.news.announcedAt,
+    date_type: a.news.dateType,
     what_happened: a.news.whatHappened,
     who_is_affected: a.news.whoIsAffected,
     impact_for_career_changers: a.news.impactForCareerChangers,

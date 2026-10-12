@@ -28,7 +28,15 @@ async function main() {
   let pages = 0;
   let consultLinks = 0;
   for (const route of routes) {
-    const res = await fetch(base + route, { redirect: "manual" });
+    let res = await fetch(base + route, { redirect: "manual" });
+    // 静的サーバーの末尾 / 補完だけ許可する。外部や別ページへの転送は追わない。
+    if ((res.status === 301 || res.status === 308) && res.headers.get("location")) {
+      const requested = new URL(base + route);
+      const target = new URL(res.headers.get("location")!, requested);
+      if (target.origin === requested.origin && target.pathname === `${requested.pathname}/` && target.search === requested.search) {
+        res = await fetch(target, { redirect: "manual" });
+      }
+    }
     if (route.startsWith("/sales") && res.status === 404) continue; // 商談用ページは SALES_DEMO=1 のときだけ
     if (res.status !== 200) {
       problems.push(`${route}: HTTP ${res.status}`);

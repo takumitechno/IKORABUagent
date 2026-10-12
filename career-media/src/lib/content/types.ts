@@ -33,6 +33,7 @@ export type Faq = { question: string; answer: string };
 export type NewsMeta = {
   announcedBy: string;
   announcedAt: string;
+  dateType?: "effective" | "announced";
   whatHappened: string;
   whoIsAffected: string;
   impactForCareerChangers: string;

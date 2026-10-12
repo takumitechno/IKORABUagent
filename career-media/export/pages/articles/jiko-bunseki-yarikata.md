@@ -5,6 +5,10 @@ description: "転職のための自己分析は何をすればいい？経験の
 source:
   - content/articles/jiko-bunseki-yarikata.md
   - src/app/articles/[slug]/page.tsx
+  - src/components/ConsultationCta.tsx
+  - src/components/SupportSample.tsx
+  - src/components/Eyecatch.tsx
+  - content/images/index.json
 ---
 
 [戻る](/categories/junbi)
@@ -18,6 +22,8 @@ source:
 2026年10月9日 更新 約6分で読めます
 
 提案用のサンプル原稿です（人による最終確認・公開承認の前）。[詳しく](/editorial-policy)
+
+[出典5件・記事の確認状況](#editorial-sources)
 
 転職の自己分析は、性格をくわしく調べることより「やってきたこと」「ゆずれない条件」「やりたくないこと」の3つを紙に書き出すことから始めると進めやすくなります。書き出しのワーク例と、まとめ方、書類や面接での使い方、無料で使える公的なツールを紹介します。
 
@@ -73,7 +79,7 @@ source:
 
 時期や順番が正確に思い出せなくても、まずは思いつくところから書いて大丈夫です。
 
-転職の進め方を、プロと一緒に決める
+応募までの準備を相談する
 
 いつ動くか、何から始めるかを、経験と希望をもとに一緒に考えてもらえます。日程の調整も任せられます。
 
@@ -181,16 +187,23 @@ source:
 
 **出典とこの記事について出典5件**
 
+以下は原稿作成時の参照情報です。正式公開前に、担当者が出典本文・記事の主張・制度の適用条件を照合します。リンクの掲載やAI査読は、人による確認の完了を意味しません。
+
 1. [職業情報提供サイト（job tag）（外部サイト）](https://shigoto.mhlw.go.jp/User)
    厚生労働省・2026年10月9日確認
+   この記事での参照箇所: 仕事の内容や必要なスキル・知識などを調べられること。職業興味検査・仕事価値観検査などの自己診断ツールがあること
 2. [しごと能力プロフィールの作成（job tag）（外部サイト）](https://shigoto.mhlw.go.jp/User/MyProfile/Step1)
    厚生労働省・2026年10月9日確認
+   この記事での参照箇所: これまでの職歴からスキルや知識を整理したプロフィールを作り、近い職業を検索できること
 3. [よくあるお問い合わせ（job tag）（外部サイト）](https://shigoto.mhlw.go.jp/User/faq)
    厚生労働省・2026年10月9日確認
+   この記事での参照箇所: 自己診断の結果の職業リストは学歴・職務経験・資格などを考慮していないため、参考として使うこと
 4. [求職者の方へ（ジョブ・カード制度総合サイト）（外部サイト）](https://www.job-card.mhlw.go.jp/guidance/jobseeker)
    厚生労働省・2026年10月9日確認
+   この記事での参照箇所: ジョブ・カードで職務経歴の整理から自己理解、キャリア・プランの作成まで順に進められること。正確な時期が分からなくても記入を進めてよいこと。就業経験がない人は職務経歴シートを書ける内容がなければ作らなくてよいこと
 5. [ジョブ・カード様式のダウンロード（外部サイト）](https://www.job-card.mhlw.go.jp/guidance/download_blank)
    厚生労働省・2026年10月9日確認
+   この記事での参照箇所: ジョブ・カードの様式を無料でダウンロードできること
 
 - **作成**
   2026年10月9日
@@ -215,19 +228,21 @@ source:
 6. [書類と面接で、どう使う？](#section-6)
 7. [ひとりでまとまらないときに使える無料のツール](#section-7)
 
-転職の進め方を、プロと一緒に決める
+応募までの準備を相談する
 
 いつ動くか、何から始めるかを、経験と希望をもとに一緒に考えてもらえます。日程の調整も任せられます。
 
 [転職の進め方を相談する](/consultation/apply?placement=article-sidebar__jiko-bunseki-yarikata)
 
-[相談でできることを見る](/consultation)
+[相談の内容を確認する](/consultation)
 
 [条件整理チェック](/check)
 
 [職種を比べる](/jobs)
 
-## 転職の進め方を、プロと一緒に決める
+キャリア相談のご案内
+
+## 応募までの準備を相談する
 
 いつ動くか、何から始めるかを、経験と希望をもとに一緒に考えてもらえます。日程の調整も任せられます。
 
@@ -235,15 +250,17 @@ source:
 - 面接の練習
 - 応募書類の添削
 
-[転職の進め方を相談する](/consultation/apply?placement=article-bottom__jiko-bunseki-yarikata) ・ [相談でできることを見る](/consultation)
+[転職の進め方を相談する](/consultation/apply?placement=article-bottom__jiko-bunseki-yarikata) ・ [相談の内容を確認する](/consultation)
 
 相談先: 提携する人材紹介会社（正式公開時に掲載）（有料職業紹介事業許可番号: 正式公開時に掲載）
+
+希望を整理してから話したい方は、[相談用のメモを作る](/check)（登録不要）。
 
 ## 次に読むなら
 
 - 未経験転職 2026.10.06
-  ### [やりたい仕事が分からない。自分に合う仕事の探し方3ステップ](/articles/shigoto-sagashikata)
+  ### [やりたい仕事が分からないときは。](/articles/shigoto-sagashikata)
 - 未経験転職 2026.10.06
-  ### [未経験転職は何から始める？最初に整理したい5つのこと](/articles/mikeiken-tenshoku-hajimekata)
+  ### [未経験の転職、何から始める？](/articles/mikeiken-tenshoku-hajimekata)
 - 経験の活かし方 2026.10.06
-  ### [接客経験は転職でどう活かせる？職種別のつながりと伝え方](/articles/sekkyaku-keiken-ikasu)
+  ### [接客の経験、ほかの仕事で活かせる？](/articles/sekkyaku-keiken-ikasu)

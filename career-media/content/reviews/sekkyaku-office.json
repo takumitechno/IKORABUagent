@@ -6,5 +6,19 @@
     "verdict": "approved",
     "findings": [],
     "reviewedAt": "2026-10-09T15:11:18.832Z"
+  },
+  {
+    "slug": "sekkyaku-office",
+    "contentHash": "8263db6b96cca7251aa5778c3b0e7f9121c127cf20a89711731abdf97c50f1fe",
+    "reviewer": "career-reviewer (automated checks; human approval pending)",
+    "verdict": "approved",
+    "findings": [
+      {
+        "code": "C04",
+        "severity": "warning",
+        "message": "査読（reviewed_at）のあとに更新されている。再査読が必要"
+      }
+    ],
+    "reviewedAt": "2026-10-11T17:50:48.117Z"
   }
 ]

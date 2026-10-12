@@ -5,6 +5,10 @@ description: "求人票の「賞与年2回」「昨年実績〇か月分」は�
 source:
   - content/articles/shoyo-kyujin-mikata.md
   - src/app/articles/[slug]/page.tsx
+  - src/components/ConsultationCta.tsx
+  - src/components/SupportSample.tsx
+  - src/components/Eyecatch.tsx
+  - content/images/index.json
 ---
 
 [戻る](/categories/hatarakikata)
@@ -18,6 +22,8 @@ source:
 2026年10月10日 更新 約5分で読めます
 
 提案用のサンプル原稿です（人による最終確認・公開承認の前）。[詳しく](/editorial-policy)
+
+[出典3件・記事の確認状況](#editorial-sources)
 
 求人票の賞与（ボーナス）欄は、過去の実績を示していることが多く、次の支給額を約束するものではありません。「賞与年2回」「昨年実績〇か月分」の読み方、業績や評価で変わるしくみ、試用期間中や入社1年目の支給、面接での聞き方の例を紹介します。
 
@@ -73,7 +79,7 @@ source:
 
 もう1つは、賞与を0として「月給×12」で出した金額です。賞与が減った年でも生活できるかは、こちらの金額で考えておくと安心です。年収の数字だけで決めないほうがいい理由は、[年収だけで求人を選ばないほうがいい理由](/articles/nenshu-dake-erabanai)にまとめています。
 
-給料や休みの条件が合う会社を、プロと探す
+給料と休日の条件を比較する
 
 求人票の条件の見方や、求人票には書かれていない働き方のことを、キャリアアドバイザーに確かめてもらえます。
 
@@ -81,7 +87,7 @@ source:
 - 面接の練習
 - 応募書類の添削
 
-[条件の合う会社を相談する](/consultation/apply?placement=article-inline__shoyo-kyujin-mikata) ・ [先に条件を整理する（3分・登録不要）](/check)
+[働く条件を相談する](/consultation/apply?placement=article-inline__shoyo-kyujin-mikata) ・ [先に条件を整理する（3分・登録不要）](/check)
 
 ## 賞与のルールはどこに書いてある？
 
@@ -157,12 +163,17 @@ source:
 
 **出典とこの記事について出典3件**
 
+以下は原稿作成時の参照情報です。正式公開前に、担当者が出典本文・記事の主張・制度の適用条件を照合します。リンクの掲載やAI査読は、人による確認の完了を意味しません。
+
 1. [求人票の見方（兵庫労働局の資料）（外部サイト）](https://jsite.mhlw.go.jp/hyogo-roudoukyoku/content/contents/002078962.pdf)
    兵庫労働局・2026年10月9日確認
+   この記事での参照箇所: 昇給や賞与は会社の業績や個人の評価で大きく変わるため、求人票には確定した前年の実績を載せていること。「賞与（実績）〇か月分」は次回も同じ月数がもらえるという意味ではないこと
 2. [労働基準法（昭和二十二年法律第四十九号）第八十九条（外部サイト）](https://laws.e-gov.go.jp/law/322AC0000000049)
    e-Gov法令検索（デジタル庁）・2026年10月9日確認
+   この記事での参照箇所: 臨時の賃金等（賞与など）の定めをする場合は、就業規則に記載する必要があること
 3. [労働条件の明示に関する資料（神奈川労働局）（外部サイト）](https://jsite.mhlw.go.jp/kanagawa-roudoukyoku/content/contents/001875667.pdf)
    神奈川労働局・2026年10月9日確認
+   この記事での参照箇所: 臨時に支払われる賃金・賞与等に関する事項は、定めをした場合に明示すべき労働条件にあたること
 
 - **作成**
   2026年10月10日
@@ -186,19 +197,21 @@ source:
 5. [面接やオファー面談で、どう聞く？](#section-5)
 6. [まとめ：賞与は「参考」、月給は「土台」](#section-6)
 
-給料や休みの条件が合う会社を、プロと探す
+給料と休日の条件を比較する
 
 求人票の条件の見方や、求人票には書かれていない働き方のことを、キャリアアドバイザーに確かめてもらえます。
 
-[条件の合う会社を相談する](/consultation/apply?placement=article-sidebar__shoyo-kyujin-mikata)
+[働く条件を相談する](/consultation/apply?placement=article-sidebar__shoyo-kyujin-mikata)
 
-[相談でできることを見る](/consultation)
+[相談の内容を確認する](/consultation)
 
 [条件整理チェック](/check)
 
 [職種を比べる](/jobs)
 
-## 給料や休みの条件が合う会社を、プロと探す
+キャリア相談のご案内
+
+## 給料と休日の条件を比較する
 
 求人票の条件の見方や、求人票には書かれていない働き方のことを、キャリアアドバイザーに確かめてもらえます。
 
@@ -206,15 +219,17 @@ source:
 - 面接の練習
 - 応募書類の添削
 
-[条件の合う会社を相談する](/consultation/apply?placement=article-bottom__shoyo-kyujin-mikata) ・ [相談でできることを見る](/consultation)
+[働く条件を相談する](/consultation/apply?placement=article-bottom__shoyo-kyujin-mikata) ・ [相談の内容を確認する](/consultation)
 
 相談先: 提携する人材紹介会社（正式公開時に掲載）（有料職業紹介事業許可番号: 正式公開時に掲載）
+
+希望を整理してから話したい方は、[相談用のメモを作る](/check)（登録不要）。
 
 ## 次に読むなら
 
 - 年収・働き方 2026.10.09
-  ### [固定残業代（みなし残業）がある求人の見方｜求人に書かれるべき3つの項目と確認のしかた](/articles/koteizangyo-kyujin)
+  ### [「みなし残業」ってどこを見ればいい？](/articles/koteizangyo-kyujin)
 - 転職準備 2026.10.09
-  ### [内定をもらったら、承諾の前に確認すること｜労働条件通知書の見方と返事のしかた](/articles/naitei-shodaku-mae)
+  ### [内定が出た！承諾の前に見ること](/articles/naitei-shodaku-mae)
 - 年収・働き方 2026.10.06
-  ### [年収だけで求人を選ばないほうがいい理由](/articles/nenshu-dake-erabanai)
+  ### [年収が高い求人、それだけで決めていい？](/articles/nenshu-dake-erabanai)

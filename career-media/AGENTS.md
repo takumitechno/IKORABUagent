@@ -9,7 +9,7 @@ Codex などのコーディングエージェント向けの作業ガイド。�
 - **サイトの目的（プロジェクトオーナーの方針、2026-10-10）:** 読者に提携先のキャリア相談（面談）を使ってもらい、自分に合う会社への就職につなげる。
   「はじめて・未経験の転職は、ひとりで悩むより転職のプロ（キャリアアドバイザー／転職エージェント）に相談しながら進めたほうがいい」という方向でサイト全体を作る。
   相談でできること（企業選びの相談・面接の練習・書類の添削・求人の紹介・日程や条件の調整）は `partner.serviceHighlights`、
-  記事のカテゴリごとの相談 CTA の文言は `src/lib/cta-copy.ts`、トップの「プロに頼むよさ」は `src/components/ProValue.tsx`。
+  記事のカテゴリごとの相談 CTA の文言は `src/lib/cta-copy.ts`、トップの悩み別導線は `ConsultationPreview`、支援見本は `SupportSample`、相談先説明は `ConsultationTrust`。
   ただし成果の保証（必ず内定・年収が上がる）や根拠のない数字・体験談は書かない。応募するかどうかは本人が決める、を添える。
 - **提案用・非公開。** 本番環境や公開 URL にデプロイしない（Vercel・Netlify・GitHub Pages なども含む）。
   `partner.brandUsageApproved` を `true` にしない。`SITE_INDEXABLE` を設定しない。
@@ -71,24 +71,24 @@ Node.js 20.9 以上。依存は `npm ci`。環境変数なしで動く（記事�
 
 | URL | ページ | 主な部品・データ |
 |---|---|---|
-| `/` | `src/app/page.tsx` | 透過人物・大見出し・CSSモーションのヒーロー、`ConsultationPreview`（3つの悩みと具体例）、相談の進め方、条件整理への任意導線、代表記事6件と検索。SEO記事本文を保持 |
+| `/` | `src/app/page.tsx` | 短い見出しと背景だけ透過した人物写真、`ConsultationPreview`（3つのアイコン入口→支援内容・相談ボタン→架空の具体例）、アイキャッチ付き新着記事3件・ニュース3件と一覧へのリンク、`ConsultationTrust`、`ConditionNotePreview`、代表記事6件と検索。新着は既存リポジトリの公開日順、10分ごとに再検証（静的版は再書き出しが必要）。明暗に対応し、SEO記事本文を保持 |
 | `/articles`、`/articles/[slug]` | `src/app/articles/` | `ArticleCards`、`ArticleParts`、`lib/markdown.ts`、`lib/figures.ts`、`content/articles/*.md` |
 | `/news`、`/news/[slug]` | `src/app/news/` | `NewsTimeline`、`content/news/*.md` |
 | `/categories/[slug]` | `src/app/categories/[slug]/page.tsx` | `content/categories.json` |
 | `/jobs`、`/jobs/[slug]` | `src/app/jobs/` | `JobMap`、`LevelMeter`、`TaxonomyHub`、`lib/jobs.ts` |
 | `/concerns`、`/situations`（と各 `[slug]`） | `src/app/concerns/`、`src/app/situations/` | `TaxonomyHub`、`lib/taxonomy.ts` |
-| `/check` | `src/app/check/page.tsx` | `ConditionCheck`（クライアント）、`lib/condition-check/`（設問とルール） |
+| `/check` | `src/app/check/page.tsx` | 架空の出力見本は折りたたみ、最初の質問を優先。`ConditionCheck`（クライアント）、`lib/condition-check/`（設問とルール） |
 | `/consultation` | `src/app/consultation/page.tsx` | `lib/consultation.ts`（相談ボタンの URL はすべて `buildConsultationUrl`） |
 | `/about`、`/editorial-policy`、`/disclosure`、`/privacy`、`/disclaimer` | 各 `page.tsx` | `InfoPage` |
 | 全ページ共通 | `src/app/layout.tsx` | `Header`（`ThemeToggle`）、`MobileNav`、`CategoryBar`、`Footer`、`PreviewBanner`（自動相談ポップアップは表示しない）、`MobileStickyCta`、`NavTracker`、`src/app/globals.css` |
-| ページ上部の帯 | `src/components/PageHero.tsx` | 記事一覧・カテゴリ・ニュース・職種・チェック・相談・入口ページ・案内ページで共通 |
+| ページ上部 | `src/components/PageHero.tsx` | 記事一覧・カテゴリ・ニュース・職種・チェック・相談・入口ページ・案内ページで共通。キャンバス色・細い区切り・同じ文字階層を使う |
 | パンくずと「戻る」 | `src/components/Breadcrumbs.tsx` | `BackButton`（サイト内で移動してきたときは履歴で戻る。直接開いたときはひとつ上の階層へ）。アーティファクト版は `scripts/artifact/runtime.js` がページ内の履歴で処理する |
 
 | `/consultation/apply` | `src/app/consultation/apply/page.tsx` | 本番送客が無効な間の、相談の申込ボタンの行き先（noindex） |
 | `/sales/*`（SALES_DEMO=1 のときだけ） | `src/app/sales/` | 商談用ページ（Instagram 投稿案・提案・計測）。データは `src/lib/sales/` |
 
 現在の掲載数: 記事103本（未公開の下書き2本は別）（うち「制度・手続き」カテゴリ `seido` に失業手当・健康保険・年金・住民税・年末調整・試用期間・有休など。面接・書類の実践記事、営業事務・経理・コールセンター・介護・医療事務・施工管理・ドライバーなどの職種記事、求人の条件（賞与・福利厚生・転勤・リモート）や相談先の記事、エージェント・面接練習・企業選びをプロに頼むよさの記事も）、ニュース解説7本。
-査読の記録は `content/reviews/<slug>.json`（`npm run pipeline -- review <slug>` が書く）。入口タイルのアイコンには、その入口の記事数をバッジで出している（`EntryGrid` の `counts`）。
+査読の記録は `content/reviews/<slug>.json`（`npm run pipeline -- review <slug>` が書く）。入口タイルは同じブランド色の丸いアイコンを使い、その入口の記事数をラベル下に出している（`EntryGrid` の `counts`）。
 
 読者導線（3つのガイド）は `src/lib/journeys.ts`（入口ページの「順番に読むなら」と、記事の「ガイドの現在地」に出る）。
 計測イベントは `src/lib/measurement/`（ブラウザ内に記録するだけで送信しない）。
@@ -99,7 +99,7 @@ Node.js 20.9 以上。依存は `npm ci`。環境変数なしで動く（記事�
 ## 画像（生成画像）
 
 - 方針は `docs/ART_DIRECTION.md`、手順は `docs/image-briefs/README.md`。まず画像なしで成り立たせ、必要な場所だけに使う。文字は画像に入れない
-- 生成画像は `src/components/GeneratedImage.tsx` で出す（`content/images/index.json` で status が selected のものだけ）。差し込み口は `/sales/sns/*` の表紙 `sns-theme-*-cover` とトップ・相談ページ。トップ・相談では生成した架空人物の写真イメージ、3経路には生活写真を使用。実在の利用者・相談員の証明には使わない。
+- 生成画像は `src/components/GeneratedImage.tsx` で出す（`content/images/index.json` で status が selected のものだけ）。差し込み口は `/sales/sns/*` の表紙 `sns-theme-*-cover` とトップ・共有 `Eyecatch`。トップでは `career-support-team-cutout` の架空人物写真を補助に使い、顔に透明度やグラデーションをかけない。背景の色・曲線と写真を一体にし、短い相談価値・悩みの選択肢・CTAを優先。新着6件の生成イラストはHomeと記事・ニュース一覧で共通。追加記事に専用絵がなければ既存SVGのモチーフとHTMLの短い問いを使い、本文や日付は変えない。共通の色・区切り・ボタン形状を相談・チェック・結果まで揃える。相談ページでは生成人物写真を使わず、公開情報に基づく相談先の説明と架空と明示した支援見本を表示。実在の利用者・相談員の証明には使わない。
 - トップは短いコピーと選べる入口を優先。長い比較表・手順・相談説明を重複させない。架空のチャット・予約UIは使わない。
 - 生成した画像は draft のまま。実際のページで確認してから `image:status` で selected にする。気に入らなければ brief を直して `--force` で作り直す（前の画像は `.image-history/`）
 - API キー（`OPENAI_API_KEY`）は `.env.local` か環境変数にだけ置く。ロゴ・実在の企業やキャラクターは生成しない（`BLOCKED_TERMS`）
@@ -127,3 +127,7 @@ Node.js 20.9 以上。依存は `npm ci`。環境変数なしで動く（記事�
 - 計測イベントに、氏名・連絡先・自由記述・検索語・条件整理チェックの回答を入れない。登録・面談などの成果イベントをフロントで発火しない。
   本番の解析ツール（GA4・GTM・各種ピクセル）を入れない。
 - 商談用ページ（/sales）は読者向けのメディアと分ける。sitemap・ナビに載せない。
+
+## この制作環境の追加ツール
+
+UI設計・改修では、利用可能な `frontend-design` を優先する（このPCの配置は `C:/Users/takum/.agents/skills/frontend-design/SKILL.md`）。既存の制作方針・SEO原稿・上記の安全ルールを優先する。共通の `playwright_local` は `enabled = false` を維持し、関連作業時だけ `python C:/Users/takum/.codex/tools/playwright-local/check_local.py http://127.0.0.1:<port> --project <このチャットの作業フォルダー>` で確認する。実行前に認証なし・本番接続なし・外部通信なしのローカル開発ページであることをソースと起動設定で確かめる。既存プロジェクトの上書き・禁止・安全設定を迂回しない。画像とログを確認してから報告し、PC・スマホで問題があれば修正して再確認する。既存 `scripts/screenshots.mjs` とアプリ内ブラウザも使用可。導入記録は `../../../.codex/WEB_TOOLS.md`。グローバル設定や他プロジェクトは変更しない。

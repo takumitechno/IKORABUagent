@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "slug": "next-chapter",
+  "type": "hero",
+  "status": "selected",
+  "purpose": "新しい仕事への前向きな気持ちを伝える装飾写真。実在の社員・利用者ではない。",
+  "used_in": [
+    "/"
+  ],
+  "alt": "",
+  "decorative": true,
+  "brief_file": null,
+  "model": "OpenAI built-in image_gen (model not exposed)",
+  "size": "1122x1402",
+  "quality": "auto",
+  "output_format": "webp",
+  "background": "opaque",
+  "prompt_brief": "Use case: photorealistic-natural. Create one premium editorial lifestyle photograph for a Japanese early-career website, portrait 4:5 composition. A fictional Japanese woman aged about 27, in a loose off-white cotton overshirt over a cobalt-blue simple top and charcoal wide-leg trousers, walking up one broad concrete outdoor step in a modern Japanese city courtyard, a small everyday canvas shoulder bag. She glances back towards the camera with a relaxed, spontaneous half smile; confident but approachable, naturally imperfect skin and hair, no model glamour or office stock-photo posing. Framed from head to mid calf, subject in central-right area, enough breathing room above head. Strong architectural graphic composition: a vivid ultramarine blue wall occupies the right background, warm pale concrete and oblique sunlight/shadows on the left, no signs. Slightly low camera angle, 35mm editorial fashion photography, bright crisp late afternoon natural sunlight, tactile fabric, realistic hands and anatomy, warm skin tones against cool blue, very subtle film grain, sharp subject. It must feel like a fresh magazine campaign about ordinary people's next chapter. No text, logos, badges, interface, watermark, office desks, business suits, handshake, laptop or financial symbols. Output only the photo, not a website mockup.\n",
+  "prompt_final": "Use case: photorealistic-natural. Create one premium editorial lifestyle photograph for a Japanese early-career website, portrait 4:5 composition. A fictional Japanese woman aged about 27, in a loose off-white cotton overshirt over a cobalt-blue simple top and charcoal wide-leg trousers, walking up one broad concrete outdoor step in a modern Japanese city courtyard, a small everyday canvas shoulder bag. She glances back towards the camera with a relaxed, spontaneous half smile; confident but approachable, naturally imperfect skin and hair, no model glamour or office stock-photo posing. Framed from head to mid calf, subject in central-right area, enough breathing room above head. Strong architectural graphic composition: a vivid ultramarine blue wall occupies the right background, warm pale concrete and oblique sunlight/shadows on the left, no signs. Slightly low camera angle, 35mm editorial fashion photography, bright crisp late afternoon natural sunlight, tactile fabric, realistic hands and anatomy, warm skin tones against cool blue, very subtle film grain, sharp subject. It must feel like a fresh magazine campaign about ordinary people's next chapter. No text, logos, badges, interface, watermark, office desks, business suits, handshake, laptop or financial symbols. Output only the photo, not a website mockup.\n",
+  "revised_prompt": null,
+  "generated_at": "2026-10-10T16:51:15.339Z",
+  "src": "/images/generated/hero/next-chapter.webp",
+  "file": "public/images/generated/hero/next-chapter.webp",
+  "width": 1122,
+  "height": 1402,
+  "bytes": 159852,
+  "sha256": "aec0d3e467a71ea23da3d134be2a34582d33bcee06e8abb0d9cbf0822e226ccf",
+  "usage": null,
+  "regenerated_from": null,
+  "notes": "Built-in image_gen; fictional editorial image. WebP format conversion only."
+}

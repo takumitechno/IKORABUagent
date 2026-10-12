@@ -5,6 +5,10 @@ description: "「正社員の経験がない」「資格もない」と、履歴
 source:
   - content/articles/rirekisho-kakukoto-nai.md
   - src/app/articles/[slug]/page.tsx
+  - src/components/ConsultationCta.tsx
+  - src/components/SupportSample.tsx
+  - src/components/Eyecatch.tsx
+  - content/images/index.json
 ---
 
 [戻る](/categories/shorui-mensetsu)
@@ -18,6 +22,8 @@ source:
 2026年10月6日 更新 約4分で読めます
 
 提案用のサンプル原稿です（人による最終確認・公開承認の前）。[詳しく](/editorial-policy)
+
+[出典3件・記事の確認状況](#editorial-sources)
 
 「正社員の経験がない」「資格もない」と、履歴書の欄が埋まらずに手が止まっていませんか。アルバイト歴の書き方、資格欄が空くとき、空白期間、自己PR欄の考え方を、厚生労働省の履歴書様式例やハローワークの資料をもとに欄ごとに整理します。
 
@@ -65,7 +71,7 @@ source:
 > - 店名だけでなく会社名も書く
 > - 「何をしていたか」を1行添える
 
-面接の練習と書類の添削は、プロに頼める
+面接の練習と書類の添削を相談する
 
 応募先に合わせた模擬面接や、履歴書・職務経歴書の添削を受けてから本番にのぞめます。
 
@@ -134,12 +140,17 @@ source:
 
 **出典とこの記事について出典3件**
 
+以下は原稿作成時の参照情報です。正式公開前に、担当者が出典本文・記事の主張・制度の適用条件を照合します。リンクの掲載やAI査読は、人による確認の完了を意味しません。
+
 1. [履歴書の様式例の作成について（外部サイト）](https://www.mhlw.go.jp/content/11601000/000769679.pdf)
    厚生労働省・2026年10月6日確認
+   この記事での参照箇所: 厚生労働省が2021年4月に履歴書の様式例を作成したこと、性別欄が任意記載（未記載も可）であること、通勤時間・扶養家族数・配偶者などの欄を設けていないこと
 2. [厚生労働省履歴書様式例（外部サイト）](https://www.hellowork.mhlw.go.jp/doc/kouroushourirekisho.pdf)
    ハローワークインターネットサービス（厚生労働省）・2026年10月6日確認
+   この記事での参照箇所: 様式例がハローワークインターネットサービスで公開されていること
 3. [応募書類の作り方「1 履歴書」（外部サイト）](https://www.hellowork.mhlw.go.jp/doc/oubosyorui_pamphlet_01_070531.pdf)
    ハローワークインターネットサービス（厚生労働省）・2026年10月6日確認
+   この記事での参照箇所: 卒業後や応募先に関係するアルバイトは「アルバイト」と明記して職歴に書くこと、勉強中の資格も勉強中であることを明示して書けること
 
 - **作成**
   2026年10月6日
@@ -162,19 +173,21 @@ source:
 4. [空白期間がある。どう書く？](#section-4)
 5. [自己PR欄、実績がなくても書ける？](#section-5)
 
-面接の練習と書類の添削は、プロに頼める
+面接の練習と書類の添削を相談する
 
 応募先に合わせた模擬面接や、履歴書・職務経歴書の添削を受けてから本番にのぞめます。
 
 [面接・書類の準備を相談する](/consultation/apply?placement=article-sidebar__rirekisho-kakukoto-nai)
 
-[相談でできることを見る](/consultation)
+[相談の内容を確認する](/consultation)
 
 [条件整理チェック](/check)
 
 [職種を比べる](/jobs)
 
-## 面接の練習と書類の添削は、プロに頼める
+キャリア相談のご案内
+
+## 面接の練習と書類の添削を相談する
 
 応募先に合わせた模擬面接や、履歴書・職務経歴書の添削を受けてから本番にのぞめます。
 
@@ -182,15 +195,17 @@ source:
 - 面接の練習
 - 応募書類の添削
 
-[面接・書類の準備を相談する](/consultation/apply?placement=article-bottom__rirekisho-kakukoto-nai) ・ [相談でできることを見る](/consultation)
+[面接・書類の準備を相談する](/consultation/apply?placement=article-bottom__rirekisho-kakukoto-nai) ・ [相談の内容を確認する](/consultation)
 
 相談先: 提携する人材紹介会社（正式公開時に掲載）（有料職業紹介事業許可番号: 正式公開時に掲載）
+
+希望を整理してから話したい方は、[相談用のメモを作る](/check)（登録不要）。
 
 ## 次に読むなら
 
 - 面接・書類 2026.10.06
-  ### [アルバイト経験だけの職務経歴書、何を書けばいい？構成と書き出し例](/articles/shokumu-keirekisho-arubaito)
+  ### [職務経歴書、アルバイトだけでも？](/articles/shokumu-keirekisho-arubaito)
 - 面接・書類 2026.10.06
-  ### [未経験職種の志望動機、何を書けばいい？3つの要素と例文](/articles/shiboudouki-mikeiken)
+  ### [未経験の志望動機、何を書けばいい？](/articles/shiboudouki-mikeiken)
 - 未経験転職 2026.10.06
-  ### [フリーターから正社員を目指すとき、最初に確認したいこと](/articles/freeter-seishain-hajimeni)
+  ### [フリーターから正社員、最初に何を確認する？](/articles/freeter-seishain-hajimeni)

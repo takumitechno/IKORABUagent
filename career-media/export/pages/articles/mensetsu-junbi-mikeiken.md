@@ -5,6 +5,10 @@ description: "未経験の職種の面接では、志望動機・転職理由・
 source:
   - content/articles/mensetsu-junbi-mikeiken.md
   - src/app/articles/[slug]/page.tsx
+  - src/components/ConsultationCta.tsx
+  - src/components/SupportSample.tsx
+  - src/components/Eyecatch.tsx
+  - content/images/index.json
 ---
 
 [戻る](/categories/shorui-mensetsu)
@@ -18,6 +22,8 @@ source:
 2026年10月6日 更新 約3分で読めます
 
 提案用のサンプル原稿です（人による最終確認・公開承認の前）。[詳しく](/editorial-policy)
+
+[出典4件・記事の確認状況](#editorial-sources)
 
 未経験の職種の面接では、志望動機・転職理由・これまでの経験・入社後のことを聞かれやすいものです。質問ごとの準備のしかたと答え方の例、逆質問の例、オンライン面接の確認ポイント、答えなくていい質問についてまとめました。
 
@@ -51,7 +57,7 @@ source:
 
 > はい、事務の仕事は未経験です。ただ、アルバイトではレジ締めやシフト表の入力を3年間担当してきたので、数字を正確に扱うことには慣れています。今は表計算ソフトの基本操作を練習していて、入社後は研修で教わることを早く一人でできるようにしたいと考えています。
 
-面接の練習と書類の添削は、プロに頼める
+面接の練習と書類の添削を相談する
 
 応募先に合わせた模擬面接や、履歴書・職務経歴書の添削を受けてから本番にのぞめます。
 
@@ -124,14 +130,20 @@ source:
 
 **出典とこの記事について出典4件**
 
+以下は原稿作成時の参照情報です。正式公開前に、担当者が出典本文・記事の主張・制度の適用条件を照合します。リンクの掲載やAI査読は、人による確認の完了を意味しません。
+
 1. [公正な採用選考の基本（外部サイト）](https://kouseisaiyou.mhlw.go.jp/basic.html)
    厚生労働省・2026年10月6日確認
+   この記事での参照箇所: 採用選考は応募者の適性・能力のみを基準として行うという考え方
 2. [採用選考時に配慮すべき事項（外部サイト）](https://kouseisaiyou.mhlw.go.jp/consider.html)
    厚生労働省・2026年10月6日確認
+   この記事での参照箇所: 本籍・出生地、家族、住宅状況、宗教、支持政党などを面接で尋ねることが就職差別につながるおそれがあること
 3. [求職者の皆様へ（外部サイト）](https://kouseisaiyou.mhlw.go.jp/jobseekers.html)
    厚生労働省・2026年10月6日確認
+   この記事での参照箇所: 不適切な質問をされたときに、ハローワークや都道府県労働局に相談できること
 4. [応募書類（パンフレット）（外部サイト）](https://www.hellowork.mhlw.go.jp/doc/oubosyorui_pamphlet_202406.pdf)
    ハローワークインターネットサービス（厚生労働省）・2026年10月6日確認
+   この記事での参照箇所: 面接では提出した履歴書・職務経歴書の内容をもとに質問されることが多いので、コピーを取って面接前に確認すること
 
 - **作成**
   2026年10月6日
@@ -155,19 +167,21 @@ source:
 5. [オンライン面接で確認すること](#section-5)
 6. [答えなくていい質問もある](#section-6)
 
-面接の練習と書類の添削は、プロに頼める
+面接の練習と書類の添削を相談する
 
 応募先に合わせた模擬面接や、履歴書・職務経歴書の添削を受けてから本番にのぞめます。
 
 [面接・書類の準備を相談する](/consultation/apply?placement=article-sidebar__mensetsu-junbi-mikeiken)
 
-[相談でできることを見る](/consultation)
+[相談の内容を確認する](/consultation)
 
 [条件整理チェック](/check)
 
 [職種を比べる](/jobs)
 
-## 面接の練習と書類の添削は、プロに頼める
+キャリア相談のご案内
+
+## 面接の練習と書類の添削を相談する
 
 応募先に合わせた模擬面接や、履歴書・職務経歴書の添削を受けてから本番にのぞめます。
 
@@ -175,15 +189,17 @@ source:
 - 面接の練習
 - 応募書類の添削
 
-[面接・書類の準備を相談する](/consultation/apply?placement=article-bottom__mensetsu-junbi-mikeiken) ・ [相談でできることを見る](/consultation)
+[面接・書類の準備を相談する](/consultation/apply?placement=article-bottom__mensetsu-junbi-mikeiken) ・ [相談の内容を確認する](/consultation)
 
 相談先: 提携する人材紹介会社（正式公開時に掲載）（有料職業紹介事業許可番号: 正式公開時に掲載）
+
+希望を整理してから話したい方は、[相談用のメモを作る](/check)（登録不要）。
 
 ## 次に読むなら
 
 - 面接・書類 2026.10.06
-  ### [未経験職種の志望動機、何を書けばいい？3つの要素と例文](/articles/shiboudouki-mikeiken)
+  ### [未経験の志望動機、何を書けばいい？](/articles/shiboudouki-mikeiken)
 - 転職準備 2026.10.06
-  ### [未経験求人の「研修あり」で確認すべきこと｜期間・内容・その後のフォロー](/articles/mikeiken-kenshu-kakunin)
+  ### [「研修あり」の求人、何を確かめる？](/articles/mikeiken-kenshu-kakunin)
 - 面接・書類 2026.10.06
-  ### [アルバイト経験だけの職務経歴書、何を書けばいい？構成と書き出し例](/articles/shokumu-keirekisho-arubaito)
+  ### [職務経歴書、アルバイトだけでも？](/articles/shokumu-keirekisho-arubaito)

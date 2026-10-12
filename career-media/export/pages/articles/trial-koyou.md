@@ -5,6 +5,10 @@ description: "トライアル雇用は、未経験の仕事を原則3か月試�
 source:
   - content/articles/trial-koyou.md
   - src/app/articles/[slug]/page.tsx
+  - src/components/ConsultationCta.tsx
+  - src/components/SupportSample.tsx
+  - src/components/Eyecatch.tsx
+  - content/images/index.json
 ---
 
 [戻る](/categories/seido)
@@ -18,6 +22,8 @@ source:
 2026年10月9日 更新 約4分で読めます
 
 提案用のサンプル原稿です（人による最終確認・公開承認の前）。[詳しく](/editorial-policy)
+
+[出典4件・記事の確認状況](#editorial-sources)
 
 トライアル雇用は、職業経験の不足などで就職に不安のある人が、原則3か月の試しの雇用で仕事を経験し、会社と本人が納得したうえで常用雇用への移行をめざす国の制度です。しくみ、対象になる人、ハローワークでの探し方、注意点を整理します。
 
@@ -67,7 +73,7 @@ source:
 
 条件の細かい部分は、自分では判断しにくいこともあります。「自分は当てはまるか」は、ハローワークの窓口で求職の申込みをするときに相談するのが確実です。
 
-退職や入社のタイミングも、まとめて相談
+退職・入社のタイミングを相談する
 
 制度の手続きを確かめながら、いつ辞めていつ入社するかなど、転職の進め方をキャリアアドバイザーに相談できます。
 
@@ -136,14 +142,20 @@ source:
 
 **出典とこの記事について出典4件**
 
+以下は原稿作成時の参照情報です。正式公開前に、担当者が出典本文・記事の主張・制度の適用条件を照合します。リンクの掲載やAI査読は、人による確認の完了を意味しません。
+
 1. [トライアル雇用（外部サイト）](https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/koyou_roudou/koyou/jigyounushi/page06_00002.html)
    厚生労働省・2026年10月7日確認
+   この記事での参照箇所: 職業経験の不足などから就職が困難な求職者を原則3か月試行雇用し、期間の定めのない雇用への移行のきっかけとする制度であること。ハローワークインターネットサービスでのトライアル雇用求人の探し方
 2. [職業経験、技能、知識の不足などで就職に不安のある皆さん 常用雇用での就職に向けて（求職者向けリーフレット）（外部サイト）](https://www.mhlw.go.jp/seisakunitsuite/bunya/koyou_roudou/koyou/kyufukin/dl/trial_koyou_leaflet02.pdf)
    厚生労働省・2026年10月7日確認
+   この記事での参照箇所: 期間中も労働者として労働基準法などが適用され賃金が支払われること、双方が納得したうえで常用雇用に移行すること、会社が求める能力を満たさない場合は移行しないことがあること
 3. [トライアル雇用助成金（一般トライアルコース）（外部サイト）](https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/koyou_roudou/koyou/kyufukin/trial_koyou.html)
    厚生労働省・2026年10月7日確認
+   この記事での参照箇所: 対象になる人の条件（過去2年以内に2回以上の離職・転職、離職期間が1年超、妊娠・出産・育児で離職し安定した職業に就いていない期間が1年超、担当者制の個別支援を受けている人、特別な配慮が必要な人など）、週30時間以上の無期雇用を希望していること、ハローワーク等の紹介で雇い入れること、会社に支給される助成金の額
 4. [障害者トライアルコース・障害者短時間トライアルコース（外部サイト）](https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/koyou_roudou/koyou/kyufukin/shougai_trial.html)
    厚生労働省・2026年10月7日確認
+   この記事での参照箇所: 障害のある人向けのトライアル雇用のコースがあること
 
 - **作成**
   2026年10月9日
@@ -166,19 +178,21 @@ source:
 4. [期間中の給料や働き方](#section-4)
 5. [注意したいこと](#section-5)
 
-退職や入社のタイミングも、まとめて相談
+退職・入社のタイミングを相談する
 
 制度の手続きを確かめながら、いつ辞めていつ入社するかなど、転職の進め方をキャリアアドバイザーに相談できます。
 
 [転職の進め方を相談する](/consultation/apply?placement=article-sidebar__trial-koyou)
 
-[相談でできることを見る](/consultation)
+[相談の内容を確認する](/consultation)
 
 [条件整理チェック](/check)
 
 [職種を比べる](/jobs)
 
-## 退職や入社のタイミングも、まとめて相談
+キャリア相談のご案内
+
+## 退職・入社のタイミングを相談する
 
 制度の手続きを確かめながら、いつ辞めていつ入社するかなど、転職の進め方をキャリアアドバイザーに相談できます。
 
@@ -186,15 +200,17 @@ source:
 - 面接の練習
 - 応募書類の添削
 
-[転職の進め方を相談する](/consultation/apply?placement=article-bottom__trial-koyou) ・ [相談でできることを見る](/consultation)
+[転職の進め方を相談する](/consultation/apply?placement=article-bottom__trial-koyou) ・ [相談の内容を確認する](/consultation)
 
 相談先: 提携する人材紹介会社（正式公開時に掲載）（有料職業紹介事業許可番号: 正式公開時に掲載）
+
+希望を整理してから話したい方は、[相談用のメモを作る](/check)（登録不要）。
 
 ## 次に読むなら
 
 - 転職準備 2026.10.06
-  ### [未経験求人の「研修あり」で確認すべきこと｜期間・内容・その後のフォロー](/articles/mikeiken-kenshu-kakunin)
+  ### [「研修あり」の求人、何を確かめる？](/articles/mikeiken-kenshu-kakunin)
 - 未経験転職 2026.10.06
-  ### [フリーターから正社員を目指すとき、最初に確認したいこと](/articles/freeter-seishain-hajimeni)
+  ### [フリーターから正社員、最初に何を確認する？](/articles/freeter-seishain-hajimeni)
 - 未経験転職 2026.10.06
-  ### [26歳で未経験の職種に転職するのは遅い？](/articles/26sai-mikeiken)
+  ### [26歳からの未経験転職。何を準備すればいい？](/articles/26sai-mikeiken)

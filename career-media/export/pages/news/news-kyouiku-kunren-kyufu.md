@@ -5,6 +5,10 @@ description: "雇用保険の教育訓練給付は、2024年10月から給付率
 source:
   - content/news/news-kyouiku-kunren-kyufu.md
   - src/app/news/[slug]/page.tsx
+  - src/components/ConsultationCta.tsx
+  - src/components/SupportSample.tsx
+  - src/components/Eyecatch.tsx
+  - content/images/index.json
 ---
 
 [戻る](/news)
@@ -13,7 +17,7 @@ source:
 
 転職ニュース解説 ・ 発表元: 厚生労働省
 
-施行・発表日: 2025年10月1日
+施行日：2025年10月1日
 
 # 学び直しの支援が拡充｜教育訓練給付の引き上げと教育訓練休暇給付金
 
@@ -65,10 +69,14 @@ AIの普及で仕事の中身がどう変わるかについては、[AIで変わ
 
 **出典とこの記事について出典2件**
 
+以下は原稿作成時の参照情報です。正式公開前に、担当者が出典本文・記事の主張・制度の適用条件を照合します。リンクの掲載やAI査読は、人による確認の完了を意味しません。
+
 1. [雇用保険制度の改正内容について（外部サイト）](https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/0000160564.html)
    厚生労働省・2026年10月6日確認
+   この記事での参照箇所: 教育訓練給付の拡充と教育訓練休暇給付金の概要
 2. [雇用保険法等の一部を改正する法律の概要（外部サイト）](https://www.mhlw.go.jp/content/11600000/001255172.pdf)
    厚生労働省・2026年10月6日確認
+   この記事での参照箇所: 各改正の施行期日
 
 - **作成**
   2026年10月6日
@@ -85,7 +93,9 @@ AIの普及で仕事の中身がどう変わるかについては、[AIで変わ
 
 [転職ニュース一覧へ戻る](/news)
 
-## ひとりで悩むより、転職のプロと進める
+キャリア相談のご案内
+
+## 仕事選びと応募の準備を相談する
 
 会社選びから面接の練習まで、キャリアアドバイザーに相談しながら準備できます。応募するかどうかは、ご自身で決められます。
 
@@ -93,15 +103,15 @@ AIの普及で仕事の中身がどう変わるかについては、[AIで変わ
 - 面接の練習
 - 応募書類の添削
 
-[整理した内容をもとに相談する](/consultation/apply?placement=news-bottom__news-kyouiku-kunren-kyufu) ・ [相談でできることを見る](/consultation)
+[キャリア相談を申し込む](/consultation/apply?placement=news-bottom__news-kyouiku-kunren-kyufu) ・ [相談の内容を確認する](/consultation)
 
 相談先: 提携する人材紹介会社（正式公開時に掲載）（有料職業紹介事業許可番号: 正式公開時に掲載）
 
 ## 次に読むなら
 
 - 職種を知る 2026.10.06
-  ### [AIで変わる仕事を、未経験転職者はどう見るべきか](/articles/ai-shigoto-mikeiken)
+  ### [AIで変わる仕事、今から選んで大丈夫？](/articles/ai-shigoto-mikeiken)
 - ニュース解説 2026.10.06
-  ### [自己都合退職の給付制限が原則1か月に｜退職してから転職活動する人が確認したいこと](/news/news-koyou-hoken-kyufu-seigen)
+  ### [辞めてから転職活動、手当はいつから？](/news/news-koyou-hoken-kyufu-seigen)
 - 職種を知る 2026.10.06
-  ### [営業・カスタマーサポート・ITサポートの違いは？仕事内容と向き不向きを比べる](/articles/eigyo-cs-it-support-chigai)
+  ### [営業・サポート・IT、どこが違う？](/articles/eigyo-cs-it-support-chigai)

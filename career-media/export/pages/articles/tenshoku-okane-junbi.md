@@ -5,6 +5,10 @@ description: "転職活動にかかるお金と、退職後に必要になる生
 source:
   - content/articles/tenshoku-okane-junbi.md
   - src/app/articles/[slug]/page.tsx
+  - src/components/ConsultationCta.tsx
+  - src/components/SupportSample.tsx
+  - src/components/Eyecatch.tsx
+  - content/images/index.json
 ---
 
 [戻る](/categories/junbi)
@@ -18,6 +22,8 @@ source:
 2026年10月9日 更新 約5分で読めます
 
 提案用のサンプル原稿です（人による最終確認・公開承認の前）。[詳しく](/editorial-policy)
+
+[出典4件・記事の確認状況](#editorial-sources)
 
 転職活動では、面接の交通費や身だしなみなどの出費に加えて、仕事をしない期間ができると、住民税・健康保険・年金を自分で払う場面が出てきます。退職後に失業給付を受ける場合も、待期と給付制限があり、すぐには受け取れません。かかるお金の種類と、準備しておきたい生活費の考え方を紹介します。
 
@@ -91,7 +97,7 @@ source:
 
 払うのがむずかしいときは、失業を理由にした免除や納付猶予の制度があります。手続きは[転職で働かない期間ができたら、年金はどうする？](/articles/taishoku-nenkin-tetsuzuki)で紹介しています。
 
-転職の進め方を、プロと一緒に決める
+応募までの準備を相談する
 
 いつ動くか、何から始めるかを、経験と希望をもとに一緒に考えてもらえます。日程の調整も任せられます。
 
@@ -165,14 +171,20 @@ source:
 
 **出典とこの記事について出典4件**
 
+以下は原稿作成時の参照情報です。正式公開前に、担当者が出典本文・記事の主張・制度の適用条件を照合します。リンクの掲載やAI査読は、人による確認の完了を意味しません。
+
 1. [令和７年４月以降に教育訓練等を受ける場合、給付制限が解除され、基本手当を受給できます（外部サイト）](https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/0000160564_00045.html)
    厚生労働省・2026年10月9日確認
+   この記事での参照箇所: 正当な理由のない自己都合退職の場合、受給資格決定日から7日間の待期期間満了後、給付制限の期間は基本手当が支給されないこと。2025年4月1日以降の離職は給付制限が原則1か月であること。2025年4月以降に教育訓練等を受けた場合に給付制限が解除されること
 2. [国民年金保険料（外部サイト）](https://www.nenkin.go.jp/service/kokunen/hokenryo/hokenryo.html)
    日本年金機構・2026年10月9日確認
+   この記事での参照箇所: 2026年度（令和8年度）の国民年金保険料が月額17,920円であること、納付期限が納付対象月の翌月末日であること
 3. [特別徴収にかかる手続きについて（個人住民税の特別徴収推進ステーション）（外部サイト）](https://www.tax.metro.tokyo.lg.jp/kazei/life/kojin_ju/tokubetsu/tetsuzuki)
    東京都主税局・2026年10月9日確認
+   この記事での参照箇所: 6月1日から12月31日に退職した場合は残りの税額が普通徴収に切り替わり、本人の申出があれば一括徴収できること。1月1日から4月30日に退職した場合は、5月31日までに支払われる給与・退職金等が残りの税額を超えれば、申出がなくても一括徴収されること
 4. [個人住民税（暮らしと税金）（外部サイト）](https://www.tax.metro.tokyo.lg.jp/kazei/life/kojin_ju)
    東京都主税局・2026年10月9日確認
+   この記事での参照箇所: 個人住民税は前年の所得をもとに課税されること
 
 - **作成**
   2026年10月9日
@@ -194,19 +206,21 @@ source:
 3. [失業給付は、すぐには受け取れない](#section-3)
 4. [準備したいお金の見積もり方](#section-4)
 
-転職の進め方を、プロと一緒に決める
+応募までの準備を相談する
 
 いつ動くか、何から始めるかを、経験と希望をもとに一緒に考えてもらえます。日程の調整も任せられます。
 
 [転職の進め方を相談する](/consultation/apply?placement=article-sidebar__tenshoku-okane-junbi)
 
-[相談でできることを見る](/consultation)
+[相談の内容を確認する](/consultation)
 
 [条件整理チェック](/check)
 
 [職種を比べる](/jobs)
 
-## 転職の進め方を、プロと一緒に決める
+キャリア相談のご案内
+
+## 応募までの準備を相談する
 
 いつ動くか、何から始めるかを、経験と希望をもとに一緒に考えてもらえます。日程の調整も任せられます。
 
@@ -214,15 +228,17 @@ source:
 - 面接の練習
 - 応募書類の添削
 
-[転職の進め方を相談する](/consultation/apply?placement=article-bottom__tenshoku-okane-junbi) ・ [相談でできることを見る](/consultation)
+[転職の進め方を相談する](/consultation/apply?placement=article-bottom__tenshoku-okane-junbi) ・ [相談の内容を確認する](/consultation)
 
 相談先: 提携する人材紹介会社（正式公開時に掲載）（有料職業紹介事業許可番号: 正式公開時に掲載）
+
+希望を整理してから話したい方は、[相談用のメモを作る](/check)（登録不要）。
 
 ## 次に読むなら
 
 - 制度・手続き 2026.10.09
-  ### [退職後の失業手当はもらえる？条件・自己都合と会社都合の違い・手続きの流れ](/articles/shitsugyo-teate-kihon)
+  ### [辞めたあとの失業手当、わたしはもらえる？](/articles/shitsugyo-teate-kihon)
 - 制度・手続き 2026.10.09
-  ### [退職したあとの住民税はどう払う？辞める時期による違いと、転職先で続ける方法](/articles/taishoku-juminzei)
+  ### [辞めたあとの住民税はどう払う？](/articles/taishoku-juminzei)
 - 転職準備 2026.10.09
-  ### [働きながらの転職活動、何から？進める順番と時間の作り方・退職を伝える時期](/articles/zaishoku-tenshoku-susumekata)
+  ### [働きながらの転職、何から始める？](/articles/zaishoku-tenshoku-susumekata)

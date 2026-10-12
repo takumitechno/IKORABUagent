@@ -5,6 +5,10 @@ description: "2026年度（令和8年度）の地域別最低賃金の改定額�
 source:
   - content/news/news-saitei-chingin-2026.md
   - src/app/news/[slug]/page.tsx
+  - src/components/ConsultationCta.tsx
+  - src/components/SupportSample.tsx
+  - src/components/Eyecatch.tsx
+  - content/images/index.json
 ---
 
 [戻る](/news)
@@ -13,7 +17,7 @@ source:
 
 転職ニュース解説 ・ 発表元: 厚生労働省
 
-施行・発表日: 2026年9月3日
+発表日：2026年9月3日
 
 # 2026年度の最低賃金改定｜全国加重平均は1,177円に。時給で働く人が確認したいこと
 
@@ -124,18 +128,26 @@ source:
 
 **出典とこの記事について出典6件**
 
+以下は原稿作成時の参照情報です。正式公開前に、担当者が出典本文・記事の主張・制度の適用条件を照合します。リンクの掲載やAI査読は、人による確認の完了を意味しません。
+
 1. [全ての都道府県で地域別最低賃金の改定額が答申されました（外部サイト）](https://www.mhlw.go.jp/stf/newpage_75950.html)
    厚生労働省・2026年10月6日確認
+   この記事での参照箇所: 2026年度の改定額（47都道府県で54円〜65円の引上げ、全国加重平均1,177円、2025年度は1,121円、最高額1,280円・最低額1,085円）と、2026年10月1日〜12月2日の間に順次発効する予定であること
 2. [地域別最低賃金の全国一覧（外部サイト）](https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/koyou_roudou/roudoukijun/minimumichiran/index.html)
    厚生労働省・2026年10月6日確認
+   この記事での参照箇所: 都道府県ごとの最低賃金額と発効日の確認先、東京都の額（1,280円）
 3. [最低賃金制度の概要（外部サイト）](https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/koyou_roudou/roudoukijun/chingin/newpage_43875.html)
    厚生労働省・2026年10月6日確認
+   この記事での参照箇所: 使用者は最低賃金額以上の賃金を支払う必要があること、パート・アルバイトなど雇用形態にかかわらず適用されること、地域別最低賃金と特定（産業別）最低賃金の2種類があること
 4. [最低賃金の対象となる賃金（外部サイト）](https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/koyou_roudou/roudoukijun/chingin/newpage_43898.html)
    厚生労働省・2026年10月6日確認
+   この記事での参照箇所: 最低賃金の計算に入れない賃金（臨時の賃金、賞与、時間外・休日・深夜の割増賃金、精皆勤手当・通勤手当・家族手当）
 5. [最低賃金額以上かどうかを確認する方法（外部サイト）](https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/koyou_roudou/roudoukijun/chingin/newpage_43899.html)
    厚生労働省・2026年10月6日確認
+   この記事での参照箇所: 月給の場合は「月給÷1か月平均所定労働時間」で比べること、1か月平均所定労働時間の求め方
 6. [派遣先の事業場に適用される最低賃金を把握しておく必要があります（外部サイト）](https://saiteichingin.mhlw.go.jp/point/page_point_haken.html)
    厚生労働省（最低賃金制度 特設サイト）・2026年10月6日確認
+   この記事での参照箇所: 派遣で働く人には、派遣元ではなく派遣先の事業場の最低賃金が適用されること
 
 - **作成**
   2026年10月6日
@@ -152,7 +164,9 @@ source:
 
 [転職ニュース一覧へ戻る](/news)
 
-## ひとりで悩むより、転職のプロと進める
+キャリア相談のご案内
+
+## 仕事選びと応募の準備を相談する
 
 会社選びから面接の練習まで、キャリアアドバイザーに相談しながら準備できます。応募するかどうかは、ご自身で決められます。
 
@@ -160,15 +174,15 @@ source:
 - 面接の練習
 - 応募書類の添削
 
-[整理した内容をもとに相談する](/consultation/apply?placement=news-bottom__news-saitei-chingin-2026) ・ [相談でできることを見る](/consultation)
+[キャリア相談を申し込む](/consultation/apply?placement=news-bottom__news-saitei-chingin-2026) ・ [相談の内容を確認する](/consultation)
 
 相談先: 提携する人材紹介会社（正式公開時に掲載）（有料職業紹介事業許可番号: 正式公開時に掲載）
 
 ## 次に読むなら
 
 - 年収・働き方 2026.10.06
-  ### [「土日休み」と「年収」をどう比較する？求人票の数字の読み方](/articles/donichi-yasumi-nenshu-hikaku)
+  ### [土日休みと年収、どう比べればいい？](/articles/donichi-yasumi-nenshu-hikaku)
 - 年収・働き方 2026.10.06
-  ### [手取り20万円から転職を考えるとき、何を比べればいい？](/articles/tedori-20man-hikaku)
+  ### [手取り20万円。転職で何を比べる？](/articles/tedori-20man-hikaku)
 - 年収・働き方 2026.10.06
-  ### [年収だけで求人を選ばないほうがいい理由](/articles/nenshu-dake-erabanai)
+  ### [年収が高い求人、それだけで決めていい？](/articles/nenshu-dake-erabanai)

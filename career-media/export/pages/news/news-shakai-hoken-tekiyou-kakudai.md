@@ -5,6 +5,10 @@ description: "2025年の年金制度改正法で、パート・アルバイト�
 source:
   - content/news/news-shakai-hoken-tekiyou-kakudai.md
   - src/app/news/[slug]/page.tsx
+  - src/components/ConsultationCta.tsx
+  - src/components/SupportSample.tsx
+  - src/components/Eyecatch.tsx
+  - content/images/index.json
 ---
 
 [戻る](/news)
@@ -13,7 +17,7 @@ source:
 
 転職ニュース解説 ・ 発表元: 厚生労働省・日本年金機構
 
-施行・発表日: 2026年10月1日
+施行日：2026年10月1日
 
 # 社会保険の加入対象が広がる（2026年10月〜）｜アルバイト・パートの人が知っておきたいこと
 
@@ -119,16 +123,23 @@ source:
 
 **出典とこの記事について出典5件**
 
+以下は原稿作成時の参照情報です。正式公開前に、担当者が出典本文・記事の主張・制度の適用条件を照合します。リンクの掲載やAI査読は、人による確認の完了を意味しません。
+
 1. [2026（令和8）年10月に社会保険の短時間労働者に係る賃金要件が撤廃されました（外部サイト）](https://www.nenkin.go.jp/oshirase/taisetu/jigyosho/2026/202610/100104.html)
    日本年金機構・2026年10月6日確認
+   この記事での参照箇所: 令和7年年金制度改正法により、所定内賃金が月額8.8万円以上という賃金要件が2026年10月1日に撤廃されたこと、残る要件（週20時間以上・従業員51人以上・学生でないこと）
 2. [社会保険加入の要件｜社会保険適用拡大特設サイト（外部サイト）](https://www.mhlw.go.jp/tekiyoukakudai/jugyouin/taisho/)
    厚生労働省・2026年10月6日確認
+   この記事での参照箇所: 企業規模の条件の段階的な縮小（2027年10月36人以上、2029年10月21人以上、2032年10月11人以上、2035年10月に撤廃）と、2か月を超える雇用見込みの要件
 3. [社会保険加入のメリット｜社会保険適用拡大特設サイト（外部サイト）](https://www.mhlw.go.jp/tekiyoukakudai/jugyouin/merit/)
    厚生労働省・2026年10月6日確認
+   この記事での参照箇所: 加入すると基礎年金に加えて厚生年金を受け取れること、傷病手当金・出産手当金、障害厚生年金
 4. [社会保険適用拡大特設サイト（外部サイト）](https://www.mhlw.go.jp/tekiyoukakudai/)
    厚生労働省・2026年10月6日確認
+   この記事での参照箇所: 従業員向けの試算ツールで、加入後の手取り額や将来の年金額を試算できること
 5. [保険料調整制度とは（外部サイト）](https://www.nenkin.go.jp/service/kounen/hokenryo/hokenryochosei/gaiyo.html)
    日本年金機構・2026年10月6日確認
+   この記事での参照箇所: 事業主の追加負担で、標準報酬月額12.6万円以下の短時間労働者の保険料負担を通算3年間軽減できること、対象になる事業所の条件、軽減されても将来の年金額は減らないこと
 
 - **作成**
   2026年10月6日
@@ -145,7 +156,9 @@ source:
 
 [転職ニュース一覧へ戻る](/news)
 
-## ひとりで悩むより、転職のプロと進める
+キャリア相談のご案内
+
+## 仕事選びと応募の準備を相談する
 
 会社選びから面接の練習まで、キャリアアドバイザーに相談しながら準備できます。応募するかどうかは、ご自身で決められます。
 
@@ -153,15 +166,15 @@ source:
 - 面接の練習
 - 応募書類の添削
 
-[整理した内容をもとに相談する](/consultation/apply?placement=news-bottom__news-shakai-hoken-tekiyou-kakudai) ・ [相談でできることを見る](/consultation)
+[キャリア相談を申し込む](/consultation/apply?placement=news-bottom__news-shakai-hoken-tekiyou-kakudai) ・ [相談の内容を確認する](/consultation)
 
 相談先: 提携する人材紹介会社（正式公開時に掲載）（有料職業紹介事業許可番号: 正式公開時に掲載）
 
 ## 次に読むなら
 
 - 未経験転職 2026.10.06
-  ### [フリーターから正社員を目指すとき、最初に確認したいこと](/articles/freeter-seishain-hajimeni)
+  ### [フリーターから正社員、最初に何を確認する？](/articles/freeter-seishain-hajimeni)
 - 年収・働き方 2026.10.06
-  ### [手取り20万円から転職を考えるとき、何を比べればいい？](/articles/tedori-20man-hikaku)
+  ### [手取り20万円。転職で何を比べる？](/articles/tedori-20man-hikaku)
 - 未経験転職 2026.10.06
-  ### [派遣から正社員を考えるとき、最初に確認したいこと](/articles/haken-seishain)
+  ### [派遣から正社員、何から考える？](/articles/haken-seishain)

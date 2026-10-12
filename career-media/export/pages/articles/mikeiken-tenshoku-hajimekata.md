@@ -5,6 +5,10 @@ description: "未経験転職の最初の一歩は、求人探しより「整理
 source:
   - content/articles/mikeiken-tenshoku-hajimekata.md
   - src/app/articles/[slug]/page.tsx
+  - src/components/ConsultationCta.tsx
+  - src/components/SupportSample.tsx
+  - src/components/Eyecatch.tsx
+  - content/images/index.json
 ---
 
 [戻る](/categories/mikeiken)
@@ -13,13 +17,21 @@ source:
 
 [未経験転職](/categories/mikeiken)
 
-# 未経験転職は何から始める？最初に整理したい5つのこと
+# 未経験転職、最初にする5つのこと
 
 2026年10月7日 更新 約4分で読めます
 
 提案用のサンプル原稿です（人による最終確認・公開承認の前）。[詳しく](/editorial-policy)
 
-求人を眺める前に「転職したい理由」「経験」「希望条件」「比べる職種」「スケジュール」の5つを整理しておくと、求人の良し悪しを自分の基準で判断しやすくなります。それぞれの整理のしかたを具体的に紹介します。
+[出典2件・記事の確認状況](#editorial-sources)
+
+この記事の要点
+
+応募を増やす前に、経験と希望を整理しよう。
+
+- 転職したい理由と、今までに担当した仕事を分けて書く。
+- 希望条件は、ゆずれないものと相談できるものに分ける。
+- 職種をいくつか比べ、準備に必要な時間を確認する。
 
 未経験から転職を考え始めたとき、最初につまずきやすいのは「何から手をつければいいのか分からない」ことです。求人サイトを開いても、職種も条件も幅が広すぎて、どれが自分に合っているのか判断できません。
 
@@ -70,16 +82,6 @@ source:
 
 経験の言葉にしかたは、[接客経験は転職でどう活かせる？](/articles/sekkyaku-keiken-ikasu)でも詳しく紹介しています。
 
-未経験の転職こそ、プロに相談しながら
-
-経験のない仕事でも応募しやすい求人の探し方や、これまでの経験の伝え方を、キャリアアドバイザーと一緒に考えられます。
-
-- 企業選びの相談
-- 面接の練習
-- 応募書類の添削
-
-[未経験の転職を相談する](/consultation/apply?placement=article-inline__mikeiken-tenshoku-hajimekata) ・ [先に条件を整理する（3分・登録不要）](/check)
-
 ## 3. 希望条件を「ゆずれない」と「できれば」に分ける
 
 年収、休日、勤務地、勤務時間、仕事内容。希望条件はたくさん出てきますが、すべてを満たす求人はほとんどありません。そこで、条件を2つのグループに分けておきます。
@@ -125,6 +127,8 @@ source:
 
 整理したメモは完成品である必要はありません。調べたり人と話したりする中で、何度書き直しても大丈夫です。大切なのは、求人を見る前に「自分にとって何が大事か」の手がかりを持っておくことです。
 
+**関連の記事も読む（任意）**
+
 読む順番ガイド STEP 3 / 6
 
 [正社員の経験が少なくても、最初の一歩を決めたい](/situations/freeter#guide)
@@ -149,10 +153,14 @@ source:
 
 **出典とこの記事について出典2件**
 
+以下は原稿作成時の参照情報です。正式公開前に、担当者が出典本文・記事の主張・制度の適用条件を照合します。リンクの掲載やAI査読は、人による確認の完了を意味しません。
+
 1. [職業情報提供サイト（job tag）（外部サイト）](https://shigoto.mhlw.go.jp/User/)
    厚生労働省・2026年10月6日確認
+   この記事での参照箇所: 職種ごとの仕事内容を調べる方法の紹介
 2. [2024年4月から労働条件明示のルールが変わります（外部サイト）](https://www.mhlw.go.jp/stf/newpage_32105.html)
    厚生労働省・2026年10月6日確認
+   この記事での参照箇所: 求人や内定時に確認できる労働条件の範囲
 
 - **作成**
   2026年10月6日
@@ -176,35 +184,43 @@ source:
 5. [いつまでに・どのくらいの時間を使えるかを決める](#section-5)
 6. [整理ができたら次にやること](#section-6)
 
-未経験の転職こそ、プロに相談しながら
+初めての応募に向けて、準備を進める。
 
-経験のない仕事でも応募しやすい求人の探し方や、これまでの経験の伝え方を、キャリアアドバイザーと一緒に考えられます。
+アルバイトの経験や気になる仕事をもとに、応募までに必要な準備を一緒に考えます。
 
-[未経験の転職を相談する](/consultation/apply?placement=article-sidebar__mikeiken-tenshoku-hajimekata)
+[未経験の転職を相談する](/consultation/apply?placement=article-sidebar__mikeiken-tenshoku-hajimekata#support-first-job)
 
-[相談でできることを見る](/consultation)
+[相談の内容を確認する](/consultation#support-first-job)
 
 [条件整理チェック](/check)
 
 [職種を比べる](/jobs)
 
-## 未経験の転職こそ、プロに相談しながら
+キャリア相談のご案内
 
-経験のない仕事でも応募しやすい求人の探し方や、これまでの経験の伝え方を、キャリアアドバイザーと一緒に考えられます。
+## 初めての応募に向けて、準備を進める。
+
+アルバイトの経験や気になる仕事をもとに、応募までに必要な準備を一緒に考えます。
+
+> 相談では、こんな質問から
+>
+> 「今の経験と希望条件から、まず比較する職種を整理したいです。」
 
 - 企業選びの相談
 - 面接の練習
 - 応募書類の添削
 
-[未経験の転職を相談する](/consultation/apply?placement=article-bottom__mikeiken-tenshoku-hajimekata) ・ [相談でできることを見る](/consultation)
+[未経験の転職を相談する](/consultation/apply?placement=article-bottom__mikeiken-tenshoku-hajimekata#support-first-job) ・ [相談の内容を確認する](/consultation#support-first-job)
 
 相談先: 提携する人材紹介会社（正式公開時に掲載）（有料職業紹介事業許可番号: 正式公開時に掲載）
+
+希望を整理してから話したい方は、[相談用のメモを作る](/check)（登録不要）。
 
 ## 次に読むなら
 
 - 転職準備 2026.10.06
-  ### [エージェント面談の前に決めておくこと・決めなくていいこと](/articles/agent-mendan-mae)
+  ### [エージェント面談の前、何を決めておく？](/articles/agent-mendan-mae)
 - 年収・働き方 2026.10.06
-  ### [「土日休み」と「年収」をどう比較する？求人票の数字の読み方](/articles/donichi-yasumi-nenshu-hikaku)
+  ### [土日休みと年収、どう比べればいい？](/articles/donichi-yasumi-nenshu-hikaku)
 - 職種を知る 2026.10.06
-  ### [営業・カスタマーサポート・ITサポートの違いは？仕事内容と向き不向きを比べる](/articles/eigyo-cs-it-support-chigai)
+  ### [営業・サポート・IT、どこが違う？](/articles/eigyo-cs-it-support-chigai)

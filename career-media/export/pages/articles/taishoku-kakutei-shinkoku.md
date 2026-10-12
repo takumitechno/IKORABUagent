@@ -5,6 +5,10 @@ description: "年の途中で退職し、年内に再就職しなかったとき
 source:
   - content/articles/taishoku-kakutei-shinkoku.md
   - src/app/articles/[slug]/page.tsx
+  - src/components/ConsultationCta.tsx
+  - src/components/SupportSample.tsx
+  - src/components/Eyecatch.tsx
+  - content/images/index.json
 ---
 
 [戻る](/categories/seido)
@@ -18,6 +22,8 @@ source:
 2026年10月10日 更新 約5分で読めます
 
 提案用のサンプル原稿です（人による最終確認・公開承認の前）。[詳しく](/editorial-policy)
+
+[出典5件・記事の確認状況](#editorial-sources)
 
 年の途中で辞めて、その年のうちに次の会社に入らなかった人は、年末調整を受けていないため、所得税を納めすぎている場合があります。翌年1月1日から5年間出せる還付申告のしくみ、源泉徴収票など必要な書類、失業手当や退職金の扱い、作成コーナーでの入力の流れを紹介します。
 
@@ -70,7 +76,7 @@ source:
 > 4. 還付を受ける
 >    指定した本人名義の口座に振り込まれる
 
-退職や入社のタイミングも、まとめて相談
+退職・入社のタイミングを相談する
 
 制度の手続きを確かめながら、いつ辞めていつ入社するかなど、転職の進め方をキャリアアドバイザーに相談できます。
 
@@ -172,16 +178,23 @@ source:
 
 **出典とこの記事について出典5件**
 
+以下は原稿作成時の参照情報です。正式公開前に、担当者が出典本文・記事の主張・制度の適用条件を照合します。リンクの掲載やAI査読は、人による確認の完了を意味しません。
+
 1. [No.1910 中途退職で年末調整を受けていないとき（外部サイト）](https://www.nta.go.jp/taxes/shiraberu/taxanswer/shotoku/1910.htm)
    国税庁・2026年10月9日確認
+   この記事での参照箇所: 中途退職したまま再就職しない場合は年末調整を受けられず、所得税を納めすぎている場合があること、翌年以降に確定申告をすると還付を受けられること
 2. [No.2030 還付申告（外部サイト）](https://www.nta.go.jp/taxes/shiraberu/taxanswer/shotoku/2030.htm)
    国税庁・2026年10月9日確認
+   この記事での参照箇所: 還付申告は確定申告期間とは関係なく、その年の翌年1月1日から5年間提出できること。源泉徴収税額がなければ還付はないこと
 3. [No.1130 社会保険料控除（外部サイト）](https://www.nta.go.jp/taxes/shiraberu/taxanswer/shotoku/1130.htm)
    国税庁・2026年10月9日確認
+   この記事での参照箇所: 退職後に自分で払った国民健康保険料・国民年金保険料が社会保険料控除の対象になること、国民年金保険料は証明する書類の添付か提示が必要なこと
 4. [No.1420 退職金を受け取ったとき（退職所得）（外部サイト）](https://www.nta.go.jp/taxes/shiraberu/taxanswer/shotoku/1420.htm)
    国税庁・2026年10月9日確認
+   この記事での参照箇所: 退職所得の受給に関する申告書を出していれば原則として確定申告は不要で、出していない場合は20.42%が源泉徴収され確定申告で精算すること
 5. [雇用保険法上の求職者給付を受給している配偶者（確定申告書等作成コーナー よくある質問）（外部サイト）](https://www.keisan.nta.go.jp/r3yokuaru/cat2/cat22/cat22a/cid021.html)
    国税庁・2026年10月9日確認
+   この記事での参照箇所: 雇用保険の求職者給付は雇用保険法の規定により課税されないこと
 
 - **作成**
   2026年10月10日
@@ -206,19 +219,21 @@ source:
 6. [住民税は別に届く](#section-6)
 7. [チェックリスト：辞める前・辞めたあと](#section-7)
 
-退職や入社のタイミングも、まとめて相談
+退職・入社のタイミングを相談する
 
 制度の手続きを確かめながら、いつ辞めていつ入社するかなど、転職の進め方をキャリアアドバイザーに相談できます。
 
 [転職の進め方を相談する](/consultation/apply?placement=article-sidebar__taishoku-kakutei-shinkoku)
 
-[相談でできることを見る](/consultation)
+[相談の内容を確認する](/consultation)
 
 [条件整理チェック](/check)
 
 [職種を比べる](/jobs)
 
-## 退職や入社のタイミングも、まとめて相談
+キャリア相談のご案内
+
+## 退職・入社のタイミングを相談する
 
 制度の手続きを確かめながら、いつ辞めていつ入社するかなど、転職の進め方をキャリアアドバイザーに相談できます。
 
@@ -226,15 +241,17 @@ source:
 - 面接の練習
 - 応募書類の添削
 
-[転職の進め方を相談する](/consultation/apply?placement=article-bottom__taishoku-kakutei-shinkoku) ・ [相談でできることを見る](/consultation)
+[転職の進め方を相談する](/consultation/apply?placement=article-bottom__taishoku-kakutei-shinkoku) ・ [相談の内容を確認する](/consultation)
 
 相談先: 提携する人材紹介会社（正式公開時に掲載）（有料職業紹介事業許可番号: 正式公開時に掲載）
+
+希望を整理してから話したい方は、[相談用のメモを作る](/check)（登録不要）。
 
 ## 次に読むなら
 
 - 制度・手続き 2026.10.09
-  ### [転職した年の年末調整と確定申告｜前の会社の源泉徴収票はどうする？](/articles/tenshoku-nenmatsu-chosei)
+  ### [転職した年の年末調整どうする？](/articles/tenshoku-nenmatsu-chosei)
 - 制度・手続き 2026.10.09
-  ### [退職するときに受け取る書類・返す書類｜離職票や源泉徴収票は何に使う？](/articles/taishoku-shorui)
+  ### [辞めるときの書類、何に使う？](/articles/taishoku-shorui)
 - 制度・手続き 2026.10.09
-  ### [退職したあとの住民税はどう払う？辞める時期による違いと、転職先で続ける方法](/articles/taishoku-juminzei)
+  ### [辞めたあとの住民税はどう払う？](/articles/taishoku-juminzei)

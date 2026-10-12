@@ -95,7 +95,7 @@ export default async function JobsPage() {
     <>
       <PageHero
         crumbs={[{ name: "ホーム", path: "/" }, { name: "職種を比べる", path: "/jobs" }]}
-        eyebrow="JOB GUIDE"
+        eyebrow="職種を知る"
         title="職種から探す・比べる"
         lead="未経験歓迎の求人でよく見る職種を、人と話す量・パソコン作業・数字の目標で比べられます。"
         icon="scale"

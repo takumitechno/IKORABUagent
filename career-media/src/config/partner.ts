@@ -54,6 +54,9 @@ export type PartnerConfig = {
   serviceAudience: string[];
   consultationFeeNote: string;
   consultationEligibilityNote: string;
+  consultationFormatNote: string;
+  consultationProof: { title: string; body: string }[];
+  consultationProofSource: string;
   /** 本番の申込先（本番送客が有効なときだけ使う）。未確定なら null */
   liveConsultationUrl: string | null;
   /** 本番送客の承認記録。null の間は本番の申込先へ送らない */
@@ -94,7 +97,14 @@ const common = {
   serviceDescription:
     "キャリアアドバイザーが、これまでの経験や希望条件を一緒に整理し、条件に合いそうな求人の紹介、応募書類や面接の準備、選考の日程や条件の調整などをサポートする人材紹介サービスです。",
   consultationFeeNote: "求職者の利用は原則無料。実際の条件は相談先の案内をご確認ください。",
+  consultationProof: [
+    { title: "経験の伝え方を相談", body: "書類や面接の準備を、一緒に考える。" },
+    { title: "仕事選びを相談", body: "希望条件と、求人で確認したいことを整理。" },
+    { title: "応募は自分で決める", body: "紹介された求人を見てから判断できます。" },
+  ],
+  consultationProofSource: "人材紹介サービスの一般的な支援例です。相談先・対応範囲は正式公開前に確認します。",
   consultationEligibilityNote: "相談先の対象年齢・地域・希望職種は、正式公開前に確認して掲載します。",
+  consultationFormatNote: "相談方法と初回の所要時間は、正式公開前に確認して掲載します。",
   serviceAudience: [
     "はじめての転職で、何から始めればいいか迷っている方",
     "フリーター・派遣から正社員を目指したい方",
@@ -137,10 +147,10 @@ const neutral: PartnerConfig = {
   campaignId: "owned-media-demo",
   corporateUrl: null,
   disclosure:
-    "このサイトは、人材紹介会社と組んで運営するオウンドメディアの提案用デモです（企画・制作: 匠Technologies）。正式に公開するときは、提携する人材紹介会社のキャリア相談を、記事や条件整理チェックの中でご案内する想定です。デモ版のため、相談ボタンを押しても申し込みページには移動しません。記事は、特定の求人や企業への応募をすすめるものではありません。",
+    "このサイトは、人材紹介会社と組んで運営するオウンドメディアの提案用デモです（企画・制作: 匠Technologies）。正式に公開するときは、提携する人材紹介会社のキャリア相談を、記事や条件整理チェックの中でご案内する想定です。デモ版のため、相談ボタンを押しても外部の申し込みフォームには移動しません。記事は、特定の求人や企業への応募をすすめるものではありません。",
   consultationStepsNote: "人材紹介サービスの一般的な流れです。実際の流れは、正式公開時に相談先の案内を掲載します。",
   serviceHighlightsNote: "人材紹介会社のキャリア相談で一般的に受けられるサポートの例です。求職者の利用は原則無料です（職業安定法により、求職者から手数料を取ることは原則禁止されています）。",
-  previewNotice: "提案用デモ（非公開）｜相談ボタンは申し込みページに移動しません",
+  previewNotice: "提案用デモ（非公開）｜相談ボタンは外部の申し込みフォームに移動しません",
   adviserLabel: "人材紹介会社のキャリアアドバイザー（転職エージェント）",
   consultCta: "プロに相談する",
   proLabel: "転職のプロ",
@@ -153,10 +163,18 @@ const makecareer: PartnerConfig = {
   ...common,
   profile: "makecareer",
   consultationFeeNote: "求職者の方は無料で利用できます。",
-  consultationEligibilityNote: "相談先は主に20代の転職を支援しています。30代の方や地域・希望職種ごとの対応可否は、事前確認が必要です。",
+  consultationProof: [
+    { title: "国家資格を持つ相談員が在籍", body: "キャリアコンサルタントによる転職支援を案内しています。" },
+    { title: "若手・未経験の転職を支援", body: "第二新卒・既卒・フリーターの仕事選びも。" },
+    { title: "求職者の利用は無料", body: "採用した企業が紹介手数料を支払うしくみです。" },
+  ],
+  consultationProofSource: "MakeCareer公式サイト「キャリアサポート」の公開情報を2026年10月11日に確認。担当者個人の指定・対応日時を保証するものではありません。",
+  // プロジェクトオーナーによる確認（2026-10-12）。地域・紹介職種や連絡時期までは未確認。
+  consultationEligibilityNote: "20代・30代の方が相談できます。地域や希望職種に応じた求人紹介の可否は、相談時にご確認ください。",
+  consultationFormatNote: "オンラインでの相談が可能です。初回相談は30〜60分程度が目安です。",
   // メディア名は未定。PO の指示（2026-10-10）で「転職エージェント（仮）」にしている
   mediaName: "MakeCareer転職エージェント（仮）",
-  mediaTagline: "20代・第二新卒・既卒・フリーターの転職を、プロと一緒に。",
+  mediaTagline: "20代・30代のはじめての転職を、プロと一緒に。",
   operatorDisplay: "MakeCareer株式会社",
   operatorShort: "MakeCareer",
   producerDisplay: "匠Technologies（企画・制作・運用の提案）",
@@ -168,7 +186,7 @@ const makecareer: PartnerConfig = {
   campaignId: "owned-media-pilot",
   corporateUrl: null,
   disclosure:
-    "このサイトは、MakeCareer株式会社が運営するオウンドメディアの完成イメージとして、匠Technologiesが商談用に試作したものです（正式提携・ブランド利用許諾前、非公開）。正式に公開する場合は、記事や条件整理チェックの中で MakeCareer株式会社のキャリア相談をご案内する想定です。商談用プレビューのため、相談ボタンを押しても申し込みページには移動しません。記事は、特定の求人や企業への応募をすすめるものではありません。",
+    "このサイトは、MakeCareer株式会社が運営するオウンドメディアの完成イメージとして、匠Technologiesが商談用に試作したものです（正式提携・ブランド利用許諾前、非公開）。正式に公開する場合は、記事や条件整理チェックの中で MakeCareer株式会社のキャリア相談をご案内する想定です。商談用プレビューのため、相談ボタンを押しても外部の申し込みフォームには移動しません。記事は、特定の求人や企業への応募をすすめるものではありません。",
   consultationStepsNote: "人材紹介サービスの一般的な流れの例です。MakeCareer株式会社の実際の流れは、相談の申し込み後にご案内します。",
   // 面接の練習・企業選びの相談は PO から共有され、サイトへの掲載も PO が了承（2026-10-10）。
   // 20代・第二新卒・既卒・フリーター向け、国家資格のキャリアコンサルタント在籍、求職者は無料、は会社サイトの記載を Web 検索の結果で確認
@@ -181,11 +199,11 @@ const makecareer: PartnerConfig = {
     "接客・販売などから、別の職種を考えている方",
     "未経験の仕事に挑戦したい20代の方",
   ],
-  previewNotice: "MakeCareer様 商談用プレビュー（非公開・正式提携前）｜相談ボタンは申し込みページに移動しません",
+  previewNotice: "MakeCareer様 商談用プレビュー（非公開・正式提携前）｜相談ボタンは外部の申し込みフォームに移動しません",
   adviserLabel: "MakeCareerのキャリアアドバイザー",
   consultCta: "MakeCareerに相談する",
   proLabel: "MakeCareerのプロ",
-  heroBadge: "20代・第二新卒・既卒・フリーターの転職を、プロと一緒に",
+  heroBadge: "20代・30代のはじめての転職を、プロと一緒に",
   theme: "makecareer",
 };
 

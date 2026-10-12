@@ -5,6 +5,10 @@ description: "転職すると有給休暇は入社日から数え直しです。
 source:
   - content/articles/yukyu-tenshoku.md
   - src/app/articles/[slug]/page.tsx
+  - src/components/ConsultationCta.tsx
+  - src/components/SupportSample.tsx
+  - src/components/Eyecatch.tsx
+  - content/images/index.json
 ---
 
 [戻る](/categories/seido)
@@ -18,6 +22,8 @@ source:
 2026年10月9日 更新 約5分で読めます
 
 提案用のサンプル原稿です（人による最終確認・公開承認の前）。[詳しく](/editorial-policy)
+
+[出典6件・記事の確認状況](#editorial-sources)
 
 有給休暇は、転職すると新しい会社で入社日から数え直しになります。法律で決まっている付与の時期と日数、前の会社の有休が引き継がれないこと、退職前に残りの有休を使うときの考え方、年5日の取得義務を整理します。
 
@@ -74,7 +80,7 @@ source:
 
 そのため、入社してから最初の6か月ほどは、有休がない期間になることがあります。この間に休むと欠勤になり、給料が減ることもあります。通院や引っ越しなど、休む予定が分かっている場合は、内定後に就業規則で有休の付与時期を確認し、必要なら入社日の調整を相談しておきましょう。
 
-退職や入社のタイミングも、まとめて相談
+退職・入社のタイミングを相談する
 
 制度の手続きを確かめながら、いつ辞めていつ入社するかなど、転職の進め方をキャリアアドバイザーに相談できます。
 
@@ -150,18 +156,26 @@ source:
 
 **出典とこの記事について出典6件**
 
+以下は原稿作成時の参照情報です。正式公開前に、担当者が出典本文・記事の主張・制度の適用条件を照合します。リンクの掲載やAI査読は、人による確認の完了を意味しません。
+
 1. [年次有給休暇とはどのような制度ですか。パートタイム労働者でも有休があると聞きましたが、本当ですか。（外部サイト）](https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/koyou_roudou/roudoukijun/faq/kijyunhou_6_00001.html)
    厚生労働省・2026年10月7日確認
+   この記事での参照箇所: 有休が付与される2つの条件（雇い入れから6か月・全労働日の8割以上出勤）と、継続勤務年数ごとの付与日数
 2. [年次有給休暇｜しっかり学ぼう！働くときの基礎知識｜確かめよう労働条件（外部サイト）](https://www.check-roudou.mhlw.go.jp/study/roudousya_yukyu.html)
    厚生労働省・2026年10月7日確認
+   この記事での参照箇所: 付与日数の表、有休は発生日から2年で時効になること、パートタイムの人の比例付与
 3. [年次有給休暇はどのような場合に、何日与えなければならないのでしょうか？｜スタートアップ労働条件（外部サイト）](https://www.startup-roudou.mhlw.go.jp/qa/zigyonushi/yukyu/q1.html)
    厚生労働省・2026年10月7日確認
+   この記事での参照箇所: 継続勤務は在籍期間のことで、実質的に労働関係が続いているかで判断されること（パートから正社員への切り替えなどは通算）
 4. [年5日の年次有給休暇の確実な取得 わかりやすい解説（2019年4月施行）（外部サイト）](https://www.mhlw.go.jp/content/000463186.pdf)
    厚生労働省・2026年10月7日確認
+   この記事での参照箇所: 2019年4月から、有休が10日以上付与される人に、付与日から1年以内に5日を取得させることが会社の義務になったこと。自分で取った日数は5日に含まれること
 5. [労働相談事例 年休Q1（外部サイト）](https://jsite.mhlw.go.jp/okinawa-roudoukyoku/yokuaru_goshitsumon/jigyounushi/question_1_nenkyu.html)
    沖縄労働局（厚生労働省）・2026年10月7日確認
+   この記事での参照箇所: 退職を予定している人が残りの有休をまとめて申し出た場合、会社は退職日を超えて時季変更権を行使できないこと
 6. [年次有給休暇のポイント（外部サイト）](https://jsite.mhlw.go.jp/aichi-roudoukyoku/library/aichi-roudoukyoku/images/2014121215452.pdf)
    愛知労働局（厚生労働省）・2026年10月7日確認
+   この記事での参照箇所: 時季変更権は事業の正常な運営を妨げる場合に限られ、退職予定日を超えては行使できないこと
 
 - **作成**
   2026年10月9日
@@ -184,19 +198,21 @@ source:
 4. [年5日の取得義務とは](#section-4)
 5. [求人や面接で確認したいこと](#section-5)
 
-退職や入社のタイミングも、まとめて相談
+退職・入社のタイミングを相談する
 
 制度の手続きを確かめながら、いつ辞めていつ入社するかなど、転職の進め方をキャリアアドバイザーに相談できます。
 
 [転職の進め方を相談する](/consultation/apply?placement=article-sidebar__yukyu-tenshoku)
 
-[相談でできることを見る](/consultation)
+[相談の内容を確認する](/consultation)
 
 [条件整理チェック](/check)
 
 [職種を比べる](/jobs)
 
-## 退職や入社のタイミングも、まとめて相談
+キャリア相談のご案内
+
+## 退職・入社のタイミングを相談する
 
 制度の手続きを確かめながら、いつ辞めていつ入社するかなど、転職の進め方をキャリアアドバイザーに相談できます。
 
@@ -204,15 +220,17 @@ source:
 - 面接の練習
 - 応募書類の添削
 
-[転職の進め方を相談する](/consultation/apply?placement=article-bottom__yukyu-tenshoku) ・ [相談でできることを見る](/consultation)
+[転職の進め方を相談する](/consultation/apply?placement=article-bottom__yukyu-tenshoku) ・ [相談の内容を確認する](/consultation)
 
 相談先: 提携する人材紹介会社（正式公開時に掲載）（有料職業紹介事業許可番号: 正式公開時に掲載）
+
+希望を整理してから話したい方は、[相談用のメモを作る](/check)（登録不要）。
 
 ## 次に読むなら
 
 - 転職準備 2026.10.06
-  ### [今の仕事を辞めたいとき、先に確認しておきたいこと](/articles/yametai-mae-kakunin)
+  ### [辞めたい。その前に確認すること](/articles/yametai-mae-kakunin)
 - 年収・働き方 2026.10.06
-  ### [「土日休み」と「年収」をどう比較する？求人票の数字の読み方](/articles/donichi-yasumi-nenshu-hikaku)
+  ### [土日休みと年収、どう比べればいい？](/articles/donichi-yasumi-nenshu-hikaku)
 - 年収・働き方 2026.10.06
-  ### [年収だけで求人を選ばないほうがいい理由](/articles/nenshu-dake-erabanai)
+  ### [年収が高い求人、それだけで決めていい？](/articles/nenshu-dake-erabanai)

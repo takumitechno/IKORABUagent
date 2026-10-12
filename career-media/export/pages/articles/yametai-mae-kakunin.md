@@ -5,6 +5,10 @@ description: "今の仕事を辞めたいと思ったら、辞める前に、つ
 source:
   - content/articles/yametai-mae-kakunin.md
   - src/app/articles/[slug]/page.tsx
+  - src/components/ConsultationCta.tsx
+  - src/components/SupportSample.tsx
+  - src/components/Eyecatch.tsx
+  - content/images/index.json
 ---
 
 [戻る](/categories/junbi)
@@ -18,6 +22,8 @@ source:
 2026年10月6日 更新 約4分で読めます
 
 提案用のサンプル原稿です（人による最終確認・公開承認の前）。[詳しく](/editorial-policy)
+
+[出典5件・記事の確認状況](#editorial-sources)
 
 今の仕事を辞めたいと思ったら、辞める前に、つらい理由の整理、働きながら探すかどうか、退職を伝える時期、有給休暇の残りを確認しておくと、あとで困りにくくなります。心や体がつらいときの相談先もあわせて紹介します。
 
@@ -50,7 +56,7 @@ source:
 
 辞めてから探す場合は、雇用保険の基本手当（いわゆる失業手当）を受け取れるかが、生活費の見通しに関わります。2025年4月1日以降に自己都合で退職した場合、給付制限期間は原則1か月になりました。受け取るための条件もあるので、くわしくは[自己都合退職の給付制限が原則1か月に](/news/news-koyou-hoken-kyufu-seigen)を確認してください。
 
-転職の進め方を、プロと一緒に決める
+応募までの準備を相談する
 
 いつ動くか、何から始めるかを、経験と希望をもとに一緒に考えてもらえます。日程の調整も任せられます。
 
@@ -131,16 +137,23 @@ source:
 
 **出典とこの記事について出典5件**
 
+以下は原稿作成時の参照情報です。正式公開前に、担当者が出典本文・記事の主張・制度の適用条件を照合します。リンクの掲載やAI査読は、人による確認の完了を意味しません。
+
 1. [Q5 このたび、家庭の事情で10年間勤務していた会社を辞めたいと思い退職願を提出しましたが、上司が受け取ってくれません。会社が同意してくれないと私は退職できないのでしょうか。（外部サイト）](https://jsite.mhlw.go.jp/kagoshima-roudoukyoku/yokuaru_goshitsumon/qa07/0701.html)
    鹿児島労働局・2026年10月6日確認
+   この記事での参照箇所: 期間の定めのない雇用は申し入れから2週間で終了し、会社の同意は必要ないこと（民法第627条）、就業規則に規定があれば原則としてそれが適用されること
 2. [年次有給休暇はどのような場合に与えられるのですか（確かめよう労働条件）（外部サイト）](https://www.check-roudou.mhlw.go.jp/qa/roudousya/yukyu/q1.html)
    厚生労働省・2026年10月6日確認
+   この記事での参照箇所: 6か月継続勤務・全労働日の8割以上出勤で10日の年次有給休暇が与えられ、勤続年数に応じて日数が増えること
 3. [総合労働相談コーナーのご案内（外部サイト）](https://www.mhlw.go.jp/general/seido/chihou/kaiketu/soudan.html)
    厚生労働省・2026年10月6日確認
+   この記事での参照箇所: 都道府県労働局・労働基準監督署内の総合労働相談コーナーで、解雇やいじめなど職場のあらゆる労働問題を、面談または電話で、予約不要・無料で相談できること
 4. [こころの耳 働く人のメンタルヘルス・ポータルサイト（外部サイト）](https://kokoro.mhlw.go.jp/)
    厚生労働省・2026年10月6日確認
+   この記事での参照箇所: 働く人向けに電話・SNS・メールで無料の相談窓口があること
 5. [雇用保険制度の改正内容について（外部サイト）](https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/0000160564.html)
    厚生労働省・2026年10月6日確認
+   この記事での参照箇所: 2025年4月1日以降の自己都合退職で、基本手当の給付制限期間が原則1か月になったこと
 
 - **作成**
   2026年10月6日
@@ -163,19 +176,21 @@ source:
 4. [有給休暇は残っている？](#section-4)
 5. [つらさが強いときの相談先](#section-5)
 
-転職の進め方を、プロと一緒に決める
+応募までの準備を相談する
 
 いつ動くか、何から始めるかを、経験と希望をもとに一緒に考えてもらえます。日程の調整も任せられます。
 
 [転職の進め方を相談する](/consultation/apply?placement=article-sidebar__yametai-mae-kakunin)
 
-[相談でできることを見る](/consultation)
+[相談の内容を確認する](/consultation)
 
 [条件整理チェック](/check)
 
 [職種を比べる](/jobs)
 
-## 転職の進め方を、プロと一緒に決める
+キャリア相談のご案内
+
+## 応募までの準備を相談する
 
 いつ動くか、何から始めるかを、経験と希望をもとに一緒に考えてもらえます。日程の調整も任せられます。
 
@@ -183,15 +198,17 @@ source:
 - 面接の練習
 - 応募書類の添削
 
-[転職の進め方を相談する](/consultation/apply?placement=article-bottom__yametai-mae-kakunin) ・ [相談でできることを見る](/consultation)
+[転職の進め方を相談する](/consultation/apply?placement=article-bottom__yametai-mae-kakunin) ・ [相談の内容を確認する](/consultation)
 
 相談先: 提携する人材紹介会社（正式公開時に掲載）（有料職業紹介事業許可番号: 正式公開時に掲載）
+
+希望を整理してから話したい方は、[相談用のメモを作る](/check)（登録不要）。
 
 ## 次に読むなら
 
 - ニュース解説 2026.10.06
-  ### [自己都合退職の給付制限が原則1か月に｜退職してから転職活動する人が確認したいこと](/news/news-koyou-hoken-kyufu-seigen)
+  ### [辞めてから転職活動、手当はいつから？](/news/news-koyou-hoken-kyufu-seigen)
 - 面接・書類 2026.10.06
-  ### [転職回数が気になるときに整理したいこと｜説明のしかたと次の選び方](/articles/tenshoku-kaisu-kininaru)
+  ### [転職回数が気になる。どう説明する？](/articles/tenshoku-kaisu-kininaru)
 - 未経験転職 2026.10.06
-  ### [未経験転職は何から始める？最初に整理したい5つのこと](/articles/mikeiken-tenshoku-hajimekata)
+  ### [未経験の転職、何から始める？](/articles/mikeiken-tenshoku-hajimekata)

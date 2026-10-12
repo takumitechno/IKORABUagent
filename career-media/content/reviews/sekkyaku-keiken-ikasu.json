@@ -12,5 +12,24 @@
       }
     ],
     "reviewedAt": "2026-10-09T15:11:18.387Z"
+  },
+  {
+    "slug": "sekkyaku-keiken-ikasu",
+    "contentHash": "62862fd433454f575f54680b1a73406a823d3a02c08c5ec0866b34d92ba19e1d",
+    "reviewer": "career-reviewer (automated checks; human approval pending)",
+    "verdict": "approved",
+    "findings": [
+      {
+        "code": "C04",
+        "severity": "warning",
+        "message": "査読（reviewed_at）のあとに更新されている。再査読が必要"
+      },
+      {
+        "code": "C04",
+        "severity": "warning",
+        "message": "出典の確認日が情報確認日より新しい。information_checked_at を更新する"
+      }
+    ],
+    "reviewedAt": "2026-10-11T17:50:47.690Z"
   }
 ]

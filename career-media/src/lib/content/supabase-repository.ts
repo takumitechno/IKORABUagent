@@ -89,6 +89,7 @@ export function mapArticleRow(row: Row): Article {
       ? {
           announcedBy: String(news.announced_by ?? ""),
           announcedAt: date(news.announced_at) ?? "",
+          dateType: news.date_type === "effective" || news.date_type === "announced" ? news.date_type : undefined,
           whatHappened: String(news.what_happened ?? ""),
           whoIsAffected: String(news.who_is_affected ?? ""),
           impactForCareerChangers: String(news.impact_for_career_changers ?? ""),

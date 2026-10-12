@@ -1,13 +1,7 @@
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { TAXONOMY, TAXONOMY_GROUPS, taxonomyPath, type TaxonomyGroup } from "@/lib/taxonomy";
-import { CategoryIcon, TONE_CLASSES, type Tone } from "./CategoryIcon";
-
-const GROUP_TONE: Record<TaxonomyGroup, Tone[]> = {
-  situations: ["mint", "sky", "sand", "lime"],
-  concerns: ["sand", "coral", "mint", "sky"],
-  roles: ["sky", "mint", "lime", "sand"],
-};
+import { CategoryIcon } from "./CategoryIcon";
 
 /** 入口（職種 / 悩み / 今の状況）のタイル一覧。イラスト＋短い言葉で、読まなくても選べるようにする */
 export function EntryGrid({ group, counts, variant = "tile" }: { group: TaxonomyGroup; counts?: Record<string, number>; variant?: "tile" | "chip" }) {
@@ -28,8 +22,7 @@ export function EntryGrid({ group, counts, variant = "tile" }: { group: Taxonomy
   }
   return (
     <ul className="anim-list grid grid-cols-3 gap-2 sm:grid-cols-4 sm:gap-3 lg:grid-cols-8">
-      {items.map((item, i) => {
-        const tone = TONE_CLASSES[GROUP_TONE[group][i % 4]];
+      {items.map((item) => {
         const count = counts?.[item.slug];
         return (
           <li key={item.slug}>
@@ -37,15 +30,11 @@ export function EntryGrid({ group, counts, variant = "tile" }: { group: Taxonomy
               href={taxonomyPath(group, item.slug)}
               className="tap group flex h-full flex-col items-center rounded-xl border border-line bg-surface px-1.5 pb-3 pt-4 text-center transition-colors hover:border-brand hover:bg-brand-tint sm:px-2"
             >
-              <span className={`tile-icon relative mb-2.5 flex h-12 w-12 items-center justify-center rounded-xl ${tone.bg} ${tone.fg}`}>
+              <span className="tile-icon mb-2.5 flex h-12 w-12 items-center justify-center rounded-full bg-brand-tint text-brand-strong">
                 <CategoryIcon name={item.icon} className="h-6 w-6" />
-                {count !== undefined && (
-                  <span className="absolute -right-2.5 -top-2 flex h-5 min-w-5 items-center justify-center rounded-full bg-accent px-1 text-[10.5px] font-bold tabular-nums text-white ring-2 ring-surface" aria-label={`記事${count}件`}>
-                    {count}
-                  </span>
-                )}
               </span>
               <span className="text-[12.5px] font-bold leading-[1.45] text-ink group-hover:text-brand-strong sm:text-[13.5px]">{item.label}</span>
+              {count !== undefined && <span className="mt-1 text-[11px] text-muted">{count}記事</span>}
             </Link>
           </li>
         );

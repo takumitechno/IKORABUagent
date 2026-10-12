@@ -4,6 +4,7 @@ import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { PartnerNote } from "@/components/ConsultationCta";
 import { partner } from "@/config/partner";
 import { pageMetadata } from "@/lib/seo";
+import { CONSULTATION_TOPICS } from "@/lib/consultation-topics";
 import { PlacementNote } from "./PlacementNote";
 
 /**
@@ -39,11 +40,12 @@ export default function ConsultationApplyDemoPage() {
         <p className="mt-3 text-[15px] leading-8 text-body">
           このページは提案用のデモのため、実際の申し込みページにはつながっていません。条件整理チェックの回答や、このサイトでの閲覧内容が相談先に送られることもありません。
         </p>
+        <div className="apply-topic-list">{CONSULTATION_TOPICS.map(topic => <section className="apply-topic" id={`support-${topic.id}`} key={topic.id} aria-label="選んだ相談テーマ"><p className="editorial-kicker">選んだ相談テーマ</p><h2>{topic.short}</h2><p>{topic.question}</p><p>このテーマやチェックの回答は、相談先に送信されていません。</p><a href={`/consultation#support-${topic.id}`} className="editorial-text-link">この相談内容に戻る</a></section>)}</div>
         <PlacementNote />
         <div className="mt-8 grid gap-3 sm:grid-cols-2">
           <Link href="/consultation" className="inline-flex items-center justify-center gap-1.5 rounded-full border border-line-strong px-5 py-3 text-sm font-bold text-ink hover:border-brand">
             <MessageCircle className="h-4 w-4 text-brand" aria-hidden="true" />
-            相談でできることを見る
+            相談の内容を確認する
           </Link>
           <Link href="/check" className="inline-flex items-center justify-center gap-1.5 rounded-full bg-brand px-5 py-3 text-sm font-bold text-white hover:bg-brand-press">
             <ClipboardList className="h-4 w-4" aria-hidden="true" />

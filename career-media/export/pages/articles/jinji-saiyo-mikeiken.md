@@ -5,6 +5,10 @@ description: "人事の仕事は、採用・勤怠や給与の管理・研修な
 source:
   - content/articles/jinji-saiyo-mikeiken.md
   - src/app/articles/[slug]/page.tsx
+  - src/components/ConsultationCta.tsx
+  - src/components/SupportSample.tsx
+  - src/components/Eyecatch.tsx
+  - content/images/index.json
 ---
 
 [戻る](/categories/shokushu)
@@ -18,6 +22,8 @@ source:
 2026年10月6日 更新 約4分で読めます
 
 提案用のサンプル原稿です（人による最終確認・公開承認の前）。[詳しく](/editorial-policy)
+
+[出典4件・記事の確認状況](#editorial-sources)
 
 人事の仕事は、採用・勤怠や給与の管理・研修などに分かれています。未経験からなら、採用アシスタントや人事事務など、決まった手続きを支える仕事が入口になりやすいです。仕事の種類、接客やバイトリーダーの経験の伝え方、知っておきたい採用のルールを紹介します。
 
@@ -48,7 +54,7 @@ source:
 
 どれも、パソコンでの書類づくりやデータ入力が多くなりやすい仕事です。何を任されるかは会社によって違うので、求人票の仕事内容の欄で確かめましょう。事務の仕事でよく使う操作やパソコン作業の多さは、[職種比較ページの事務](/jobs#jimu)でも確認できます。
 
-その仕事が自分に合うか、プロに聞いてみる
+仕事内容と応募条件を確認する
 
 求人票だけでは分からない仕事の中身や職場のことを、キャリアアドバイザーに聞いてから会社を選べます。
 
@@ -129,14 +135,20 @@ source:
 
 **出典とこの記事について出典4件**
 
+以下は原稿作成時の参照情報です。正式公開前に、担当者が出典本文・記事の主張・制度の適用条件を照合します。リンクの掲載やAI査読は、人による確認の完了を意味しません。
+
 1. [人事事務 - 職業詳細（job tag）（外部サイト）](https://shigoto.mhlw.go.jp/User/Occupation/Detail/432)
    厚生労働省 職業情報提供サイト（job tag）・2026年10月6日確認
+   この記事での参照箇所: 人事事務が、社員の採用から退職までの人事管理に関する事務を行う仕事であること
 2. [公正採用選考特設サイト（外部サイト）](https://kouseisaiyou.mhlw.go.jp/)
    厚生労働省・2026年10月6日確認
+   この記事での参照箇所: 公正な採用選考は応募者の適性と能力で判断すること
 3. [公正な採用選考について（外部サイト）](https://jsite.mhlw.go.jp/shiga-roudoukyoku/hourei_seido_tetsuzuki/shokugyou_shoukai/kouseinasaiyousennkou_00142.html)
    滋賀労働局・2026年10月6日確認
+   この記事での参照箇所: 公正な採用選考の基本（応募者の基本的人権の尊重、適性と能力に基づいた基準）
 4. [就職差別につながるおそれがある質問（公正採用選考特設サイト）（外部サイト）](https://kouseisaiyou.mhlw.go.jp/question.html)
    厚生労働省・2026年10月6日確認
+   この記事での参照箇所: 本籍・出生地や家族のこと、思想・宗教など、就職差別につながるおそれがあり採用選考で聞かないよう求められている事項
 
 - **作成**
   2026年10月6日
@@ -159,19 +171,21 @@ source:
 4. [知っておきたい「公正な採用選考」](#section-4)
 5. [応募前・面接で確認したいこと](#section-5)
 
-その仕事が自分に合うか、プロに聞いてみる
+仕事内容と応募条件を確認する
 
 求人票だけでは分からない仕事の中身や職場のことを、キャリアアドバイザーに聞いてから会社を選べます。
 
 [職種・会社選びを相談する](/consultation/apply?placement=article-sidebar__jinji-saiyo-mikeiken)
 
-[相談でできることを見る](/consultation)
+[相談の内容を確認する](/consultation)
 
 [条件整理チェック](/check)
 
 [職種を比べる](/jobs)
 
-## その仕事が自分に合うか、プロに聞いてみる
+キャリア相談のご案内
+
+## 仕事内容と応募条件を確認する
 
 求人票だけでは分からない仕事の中身や職場のことを、キャリアアドバイザーに聞いてから会社を選べます。
 
@@ -179,15 +193,17 @@ source:
 - 面接の練習
 - 応募書類の添削
 
-[職種・会社選びを相談する](/consultation/apply?placement=article-bottom__jinji-saiyo-mikeiken) ・ [相談でできることを見る](/consultation)
+[職種・会社選びを相談する](/consultation/apply?placement=article-bottom__jinji-saiyo-mikeiken) ・ [相談の内容を確認する](/consultation)
 
 相談先: 提携する人材紹介会社（正式公開時に掲載）（有料職業紹介事業許可番号: 正式公開時に掲載）
+
+希望を整理してから話したい方は、[相談用のメモを作る](/check)（登録不要）。
 
 ## 次に読むなら
 
 - 経験の活かし方 2026.10.06
-  ### [接客経験は転職でどう活かせる？職種別のつながりと伝え方](/articles/sekkyaku-keiken-ikasu)
+  ### [接客の経験、ほかの仕事で活かせる？](/articles/sekkyaku-keiken-ikasu)
 - 未経験転職 2026.10.06
-  ### [未経験転職は何から始める？最初に整理したい5つのこと](/articles/mikeiken-tenshoku-hajimekata)
+  ### [未経験の転職、何から始める？](/articles/mikeiken-tenshoku-hajimekata)
 - 職種を知る 2026.10.10
-  ### [物流・倉庫の仕事内容は？ピッキング・検品・在庫管理・フォークリフトの違いと未経験からの始め方](/articles/butsuryu-soko-shigoto)
+  ### [倉庫の仕事って、未経験でもできる？](/articles/butsuryu-soko-shigoto)

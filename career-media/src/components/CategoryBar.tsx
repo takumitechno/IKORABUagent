@@ -1,9 +1,15 @@
+"use client";
+
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import categories from "../../content/categories.json";
 import { CategoryIcon } from "./CategoryIcon";
 
 /** ヘッダーの下のカテゴリ一覧（転職メディアでよくある横並びのナビ）。スマホでは横にスクロールする */
 export function CategoryBar() {
+  // Static hosts add a trailing slash; keep server and hydrated markup identical.
+  const pathname = usePathname().replace(/\/$/, "") || "/";
+  if (pathname === "/" || pathname === "/consultation") return null;
   const items = [...categories].sort((a, b) => a.sort_order - b.sort_order);
   return (
     <nav aria-label="カテゴリ" className="no-print hidden border-b border-line bg-surface sm:block">

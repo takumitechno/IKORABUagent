@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { partner } from "@/config/partner";
 import { absoluteUrl, site } from "@/config/site";
 import type { Article, Category } from "@/lib/content/types";
+import { articleCover } from "./article-presentation";
 
 type PageMetaInput = {
   title: string;
@@ -11,6 +12,7 @@ type PageMetaInput = {
   publishedTime?: string;
   modifiedTime?: string;
   noindex?: boolean;
+  image?: { src: string; width: number; height: number };
 };
 
 /** ページごとの title / description / canonical / OGP をまとめて作る */
@@ -21,7 +23,7 @@ export function pageMetadata(input: PageMetaInput): Metadata {
     title: input.title,
     description: input.description,
     alternates: { canonical: url },
-    robots: indexable ? { index: true, follow: true } : { index: false, follow: false },
+    robots: { index: indexable, follow: site.indexable },
     openGraph: {
       type: input.type ?? "website",
       url,
@@ -29,14 +31,14 @@ export function pageMetadata(input: PageMetaInput): Metadata {
       description: input.description,
       siteName: site.fullName,
       locale: site.locale,
-      images: [{ url: absoluteUrl("/og-default.png"), width: 1200, height: 630, alt: site.fullName }],
+      images: [{ url: absoluteUrl(input.image?.src ?? "/og-default.png"), width: input.image?.width ?? 1200, height: input.image?.height ?? 630, alt: input.title }],
       ...(input.type === "article" ? { publishedTime: input.publishedTime, modifiedTime: input.modifiedTime } : {}),
     },
     twitter: {
       card: "summary_large_image",
       title: input.title,
       description: input.description,
-      images: [absoluteUrl("/og-default.png")],
+      images: [absoluteUrl(input.image?.src ?? "/og-default.png")],
     },
   };
 }
@@ -86,7 +88,7 @@ export function articleJsonLd(article: Article) {
     inLanguage: "ja",
     mainEntityOfPage: { "@type": "WebPage", "@id": url },
     url,
-    image: [absoluteUrl("/og-default.png")],
+    image: [absoluteUrl(articleCover(article)?.src ?? "/og-default.png")],
     author: { "@type": "Organization", name: site.editorialTeam, url: absoluteUrl("/editorial-policy") },
     publisher: organization(),
     // 出典を citation として明示する

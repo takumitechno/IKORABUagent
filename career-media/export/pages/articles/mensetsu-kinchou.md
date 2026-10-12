@@ -5,6 +5,10 @@ description: "面接で緊張して頭が真っ白になりそう…。話す内
 source:
   - content/articles/mensetsu-kinchou.md
   - src/app/articles/[slug]/page.tsx
+  - src/components/ConsultationCta.tsx
+  - src/components/SupportSample.tsx
+  - src/components/Eyecatch.tsx
+  - content/images/index.json
 ---
 
 [戻る](/categories/shorui-mensetsu)
@@ -18,6 +22,8 @@ source:
 2026年10月10日 更新 約5分で読めます
 
 提案用のサンプル原稿です（人による最終確認・公開承認の前）。[詳しく](/editorial-policy)
+
+[出典3件・記事の確認状況](#editorial-sources)
 
 面接の緊張は、なくそうとするより「緊張しても話せる準備」をしておくほうが現実的です。話す内容の準備のしかた、声に出す練習、当日の流れの確認、ゆっくり話すコツ、言葉に詰まったときや質問が分からないときの言い方の例を、ハローワークの資料をもとに紹介します。
 
@@ -57,7 +63,7 @@ source:
 
 書類に書いたことは、面接でもそのまま質問されやすいところです。提出した履歴書や職務経歴書を読み返して、「この経験について教えてください」と聞かれたときの要点もメモしておきましょう。
 
-面接の練習と書類の添削は、プロに頼める
+面接の練習と書類の添削を相談する
 
 応募先に合わせた模擬面接や、履歴書・職務経歴書の添削を受けてから本番にのぞめます。
 
@@ -180,12 +186,17 @@ source:
 
 **出典とこの記事について出典3件**
 
+以下は原稿作成時の参照情報です。正式公開前に、担当者が出典本文・記事の主張・制度の適用条件を照合します。リンクの掲載やAI査読は、人による確認の完了を意味しません。
+
 1. [おさえておきたい面接マナー（外部サイト）](https://jsite.mhlw.go.jp/hokkaido-hellowork/list/sapporo/shisetsu/shinsotsu-column3.html)
    札幌新卒応援ハローワーク（北海道労働局）・2026年10月9日確認
+   この記事での参照箇所: 緊張するといつもより早口になりやすいので、聞き取りやすい大きさの声でいつも以上にゆっくり話すこと、面接官の話を最後まで聞いてから一呼吸おいて話し始めること
 2. [面接対策（外部サイト）](https://jsite.mhlw.go.jp/yamagata-hellowork/content/contents/002350381.pdf)
    ハローワーク山形（山形労働局）・2026年10月9日確認
+   この記事での参照箇所: 質問には語尾をはっきりと、短く簡潔に答えること、緊張から早口になりがちなので声の大きさ・スピードに注意すること
 3. [ハローワークの相談支援（外部サイト）](https://www.mhlw.go.jp/stf/newpage_27742.html)
    厚生労働省・2026年10月9日確認
+   この記事での参照箇所: ハローワークで、応募書類の作り方や面接の受け方などの個別相談やセミナーを無料で行っていること
 
 - **作成**
   2026年10月10日
@@ -210,19 +221,21 @@ source:
 6. [言葉に詰まったときの言い方](#section-6)
 7. [終わったら、ふり返りをメモする](#section-7)
 
-面接の練習と書類の添削は、プロに頼める
+面接の練習と書類の添削を相談する
 
 応募先に合わせた模擬面接や、履歴書・職務経歴書の添削を受けてから本番にのぞめます。
 
 [面接・書類の準備を相談する](/consultation/apply?placement=article-sidebar__mensetsu-kinchou)
 
-[相談でできることを見る](/consultation)
+[相談の内容を確認する](/consultation)
 
 [条件整理チェック](/check)
 
 [職種を比べる](/jobs)
 
-## 面接の練習と書類の添削は、プロに頼める
+キャリア相談のご案内
+
+## 面接の練習と書類の添削を相談する
 
 応募先に合わせた模擬面接や、履歴書・職務経歴書の添削を受けてから本番にのぞめます。
 
@@ -230,15 +243,17 @@ source:
 - 面接の練習
 - 応募書類の添削
 
-[面接・書類の準備を相談する](/consultation/apply?placement=article-bottom__mensetsu-kinchou) ・ [相談でできることを見る](/consultation)
+[面接・書類の準備を相談する](/consultation/apply?placement=article-bottom__mensetsu-kinchou) ・ [相談の内容を確認する](/consultation)
 
 相談先: 提携する人材紹介会社（正式公開時に掲載）（有料職業紹介事業許可番号: 正式公開時に掲載）
+
+希望を整理してから話したい方は、[相談用のメモを作る](/check)（登録不要）。
 
 ## 次に読むなら
 
 - 面接・書類 2026.10.09
-  ### [転職の面接でよく聞かれる質問と答え方｜自己紹介・転職理由・志望動機の型と回答例](/articles/mensetsu-yokukiku-shitsumon)
+  ### [面接の質問、どう答えればいい？](/articles/mensetsu-yokukiku-shitsumon)
 - 面接・書類 2026.10.09
-  ### [Web面接（オンライン面接）の準備は？通信・カメラ位置・背景・服装と、つながらないときの連絡](/articles/web-mensetsu-junbi)
+  ### [Web面接、何を準備すればいい？](/articles/web-mensetsu-junbi)
 - 面接・書類 2026.10.09
-  ### [転職の面接、服装はスーツ？「私服可」「服装自由」「オフィスカジュアル」の考え方と身だしなみチェック](/articles/mensetsu-fukusou)
+  ### [面接の服装、スーツじゃなきゃダメ？](/articles/mensetsu-fukusou)

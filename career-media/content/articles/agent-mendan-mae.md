@@ -7,14 +7,14 @@ categories: [junbi, mikeiken]
 featured: false
 recommended: true
 published_at: 2026-10-06
-updated_at: 2026-10-06
+updated_at: 2026-10-12
 reviewed_at: 2026-10-06
 information_checked_at: 2026-10-06
 roles: []
 concerns: [yaritai]
 situations: [hajimete]
 eyecatch: ["エージェント面談の前、", "何を決めておく？"]
-related: [mikeiken-tenshoku-hajimekata, donichi-yasumi-nenshu-hikaku, mikeiken-kenshu-kakunin, tenshoku-agent-merit, mensetsu-renshu-pro]
+related: [mikeiken-tenshoku-hajimekata, donichi-yasumi-nenshu-hikaku, mikeiken-kenshu-kakunin, tenshoku-agent-merit, mensetsu-renshu-pro, freeter-seishain-hajimeni, shokumu-keirekisho-arubaito]
 faq:
   - q: 人材紹介会社に相談すると、お金はかかりますか？
     a: 職業安定法にもとづく有料職業紹介事業では、原則として求職者から手数料を受け取ることはできず、紹介手数料は採用した企業が支払うしくみです。一部の職業では例外もあるため、気になる場合は相談先に確認しましょう。
@@ -33,6 +33,11 @@ sources:
     url: https://jinzai.hellowork.mhlw.go.jp/JinzaiWeb/GICB101010.do?action=transition&screenId=GICB101010&params=1
     accessed_at: 2026-10-06
     used_for: 職業紹介事業者の許可番号の確認方法
+  - title: 求職者の方へ（経験の整理と応募書類への活用）
+    publisher: 厚生労働省 マイジョブ・カード
+    url: https://www.job-card.mhlw.go.jp/guidance/jobseeker
+    accessed_at: 2026-10-12
+    used_for: 追加した整理メモにおける経験の振り返りの考え方。表と例は本メディアの編集上の作成物で、公式様式の転載ではない
 ---
 
 転職エージェント（人材紹介会社）のキャリアアドバイザーとの面談を前に、「何を話せばいいのか」「志望動機を固めてから行くべきか」と悩む人は多いものです。
@@ -57,6 +62,25 @@ columns:
       - 完璧な志望動機や自己PR
       - 応募するかどうか
 ```
+
+## 初回の相談で使える、書きかけのメモ
+
+次の項目を手元の紙やメモアプリに書きます。空欄は「まだ決めていない」で構いません。**相談方法・所要時間・連絡手段は事業者ごとに確認**し、このメモだけで相談の申し込みが完了するわけではありません。
+
+| 項目 | 記入する内容の例 |
+| --- | --- |
+| いまの状況 | アルバイト・在職中・離職中など。勤務した期間は事実だけ |
+| 変えたいこと | 帰宅時刻、毎月の収入、休みの曜日など |
+| 続けてきたこと | 担当作業・自分の工夫・人から任されたこと |
+| 守りたい条件 | 1つ選ぶ。ほかは「できれば」か「相談して決める」に分ける |
+| 聞きたいこと | 検討できる仕事、応募条件、最初に準備する書類 |
+| 連絡について | 希望する時間帯や方法。対応可能かは相談先に確認 |
+
+経験の振り返りは[マイジョブ・カードの求職者向け案内](https://www.job-card.mhlw.go.jp/guidance/jobseeker)も参考になります。上の表は本メディアの相談準備用で、公式様式や、特定の事業者の申込フォームではありません。
+
+たとえば、正社員経験が少ない場合は「アルバイトで会計と品出しをしていました。書類の準備から教えてほしいです」と話せます。これは**架空の話し始める例**です。自分に当てはまる事実へ置き換えてください。
+
+条件のメモを作るなら[条件整理チェック](/check)。相談先の説明を確認してから、[初めての相談の話題](/consultation#support-first-job)、[経験の伝え方](/consultation#support-experience)、[給料と休みの比較](/consultation#support-conditions)から、今の悩みに近いものを選べます。
 
 ## 人材紹介会社の面談でできること
 
@@ -111,16 +135,17 @@ columns:
 - 研修の内容や、入社後のフォローの体制（[研修の確認ポイント](/articles/mikeiken-kenshu-kakunin)）
 - 年収や休日などの条件の、ほかの求人との比べ方（[比べ方の例](/articles/donichi-yasumi-nenshu-hikaku)）
 
-```figure
-type: checklist
-title: 面談で聞いておきたいこと
-items:
-  - 自分の経験や希望で考えられる職種や求人
-  - 未経験で入社した人が多い職場の特徴
-  - 求人票だけでは分からない職場の雰囲気や働き方
-  - 研修の内容と、入社後のフォローの体制
-  - 年収や休日などの条件の、ほかの求人との比べ方
-```
+## 相談のあとに残すメモは3つ
+
+相談を受けたことと、紹介された求人への応募は別の判断です。話した内容を次の3つに分けると、何を決め、何を待つかを整理できます。これは本メディアのメモの作り方で、特定の事業者の対応を保証するものではありません。
+
+| 残すもの | メモの例 |
+| --- | --- |
+| 気になった求人と理由 | 業務内容には興味がある。休日の曜日を確認してから応募を考える |
+| まだ確認できていないこと | 研修中の給与、配属先、入社後の担当業務 |
+| 次にすることと連絡の希望 | 書類の下書きを作る。連絡できる時間帯と次の確認日を相談する |
+
+その場で応募を決められなければ、検討に必要な情報と、回答する時期を相談します。条件が合わない場合は、何が合わないかを伝えると、比較する基準を共有できます。
 
 ## 相談先が許可を受けた事業者か確認するには
 
