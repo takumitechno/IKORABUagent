@@ -33,9 +33,9 @@ source:
 
 ## もう少し調べたいこと 8本
 
+- [受付の仕事内容は？企業・ホテル・クリニックの違いと接客経験の活かし方](/articles/uketsuke-shigoto)
 - [不動産営業の仕事内容は？賃貸仲介と売買仲介の違い・宅建士の役割・歩合の給与の確認と接客経験の活かし方](/articles/fudousan-eigyo)
 - [職務経歴書の書き方｜編年体と逆編年体の選び方と、職務要約・職務内容・自己PRの例](/articles/shokumu-keirekisho-kakikata)
-- [受付の仕事内容は？企業・ホテル・クリニックの違いと接客経験の活かし方](/articles/uketsuke-shigoto)
 - [コールセンターの仕事内容は？受信と発信の違い・向き不向きと、接客経験の活かし方](/articles/callcenter-shigoto)
 - [未経験の仕事の自己PR、何を書く？アルバイト・接客の経験から強みを見つける方法と例文](/articles/jiko-pr-mikeiken)
 - [フリーターから正社員を目指すとき、最初に確認したいこと](/articles/freeter-seishain-hajimeni)

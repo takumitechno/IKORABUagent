@@ -42,9 +42,9 @@ source:
 
 **ほかの記事を読む 7〜18本目**
 
+- [希望年収・希望給与の書き方と面接での答え方｜「貴社規定に従います」の使いどころと例文](/articles/kibou-nenshu-kakikata)
 - [面接の逆質問、何を聞けばいい？聞くとよいこと・避けたいことと未経験向けの質問例](/articles/gyaku-shitsumon)
 - [未経験の仕事の自己PR、何を書く？アルバイト・接客の経験から強みを見つける方法と例文](/articles/jiko-pr-mikeiken)
-- [希望年収・希望給与の書き方と面接での答え方｜「貴社規定に従います」の使いどころと例文](/articles/kibou-nenshu-kakikata)
 - [職歴に空白期間があるとき、面接でどう説明する？書類の書き方と答え方の例](/articles/kuhaku-kikan-setsumei)
 - [転職の面接、服装はスーツ？「私服可」「服装自由」「オフィスカジュアル」の考え方と身だしなみチェック](/articles/mensetsu-fukusou)
 - [転職の面接でよく聞かれる質問と答え方｜自己紹介・転職理由・志望動機の型と回答例](/articles/mensetsu-yokukiku-shitsumon)

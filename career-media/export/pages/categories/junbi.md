@@ -25,32 +25,32 @@ source:
 ## まず読むなら、この3本
 
 - ### [未経験の転職、何から始める？](/articles/mikeiken-tenshoku-hajimekata)
-  更新 2026.10.07
+  更新 2026.10.12
 - ### [エージェント面談の前、何を決めておく？](/articles/agent-mendan-mae)
   更新 2026.10.12
 - ### [年収が高い求人、それだけで決めていい？](/articles/nenshu-dake-erabanai)
-  更新 2026.10.06
+  更新 2026.10.12
 
 ## もう少し調べたいこと 51本
 
+- [社会人から公務員を目指すには？年齢要件の確かめ方と試験の流れ・準備](/articles/koumuin-shakaijin)
+- [「リモートワーク可」の求人、どこを見る？頻度・条件・費用と入社直後の出社を確かめる](/articles/remote-work-kyujin)
+- [求人の「賞与年2回」「昨年実績」はどう読む？ボーナスの見方と面接での聞き方](/articles/shoyo-kyujin-mikata)
 - [求人の「福利厚生」はどう見る？社会保険と会社独自の制度の違い、住宅手当・交通費・退職金の確かめ方](/articles/fukuri-kousei-mikata)
 - [ハローワークの使い方は？求職申込みから紹介状・書類の添削・面接練習まで、在職中に使うときのことも](/articles/hellowork-tsukaikata)
 - [自分に合う会社選びを、プロに相談するとよい理由｜求人票で分からないことの聞き方と確かめ方](/articles/kigyou-erabi-soudan)
-- [転職の企業研究、何を見ればいい？公式サイト・求人票・職場情報の調べ方と面接での使い方](/articles/kigyou-kenkyu-yarikata)
-- [退職後に国民年金の保険料が払えないときは？免除・納付猶予と失業の特例、申請先と追納](/articles/kokumin-nenkin-menjo)
-- [社会人から公務員を目指すには？年齢要件の確かめ方と試験の流れ・準備](/articles/koumuin-shakaijin)
 
 **ほかの記事を読む 7〜18本目**
 
+- [転職の企業研究、何を見ればいい？公式サイト・求人票・職場情報の調べ方と面接での使い方](/articles/kigyou-kenkyu-yarikata)
+- [退職後に国民年金の保険料が払えないときは？免除・納付猶予と失業の特例、申請先と追納](/articles/kokumin-nenkin-menjo)
 - [面接で緊張してしまうときの準備と当日の対処｜言葉に詰まったときの言い方の例](/articles/mensetsu-kinchou)
 - [面接に落ちたら、どう振り返る？気持ちの整理と、次の面接に向けた直し方](/articles/mensetsu-ochita-furikaeri)
 - [面接の練習は、プロに頼むと何が変わる？模擬面接で分かることと、頼む前の準備](/articles/mensetsu-renshu-pro)
 - [内定から入社までにやることは？退職手続きとの順番・入社日の調整・入社書類の準備](/articles/naitei-go-junbi)
 - [転職して最初の1か月、どう過ごす？仕事の覚え方・メモと質問のしかた・試用期間中に確認すること](/articles/nyusha-go-hajime)
-- [「リモートワーク可」の求人、どこを見る？頻度・条件・費用と入社直後の出社を確かめる](/articles/remote-work-kyujin)
 - [転職の履歴書の書き方｜学歴・職歴・資格・志望動機・本人希望欄を欄ごとに確認](/articles/rirekisho-kakikata-kihon)
 - [給料未払い・残業代・解雇の相談先は？総合労働相談コーナー・労基署・法テラスの違いと相談の準備](/articles/roudou-soudan-saki)
-- [求人の「賞与年2回」「昨年実績」はどう読む？ボーナスの見方と面接での聞き方](/articles/shoyo-kyujin-mikata)
 - [年の途中で退職して年内に再就職しなかったら？確定申告（還付申告）の流れと必要な書類](/articles/taishoku-kakutei-shinkoku)
 - [転職の適性検査とは？能力検査と性格検査の違い・受け方の種類と準備のしかた](/articles/tekisei-kensa-tenshoku)
 - [はじめて・未経験の転職こそ、転職エージェントに相談したほうがいい理由｜頼めることと注意点](/articles/tenshoku-agent-merit)
@@ -89,11 +89,11 @@ source:
 
 - [働きながらの転職活動、何から？進める順番と時間の作り方・退職を伝える時期](/articles/zaishoku-tenshoku-susumekata)
 - [「土日休み」と「年収」をどう比較する？求人票の数字の読み方](/articles/donichi-yasumi-nenshu-hikaku)
+- [PCが得意じゃなくても、事務職は目指せる？よく使う操作と練習のしかた](/articles/pc-nigate-jimu)
+- [今の仕事を辞めたいとき、先に確認しておきたいこと](/articles/yametai-mae-kakunin)
 - [転職エージェントに、何を相談すればいい？相談できることと伝え方の例](/articles/agent-soudan-nani)
 - [第二新卒って何歳まで？使える場面と探し方](/articles/dainishinsotsu-nansai)
 - [未経験求人の「研修あり」で確認すべきこと｜期間・内容・その後のフォロー](/articles/mikeiken-kenshu-kakunin)
-- [PCが得意じゃなくても、事務職は目指せる？よく使う操作と練習のしかた](/articles/pc-nigate-jimu)
-- [今の仕事を辞めたいとき、先に確認しておきたいこと](/articles/yametai-mae-kakunin)
 - [自己都合退職の給付制限が原則1か月に｜退職してから転職活動する人が確認したいこと](/news/news-koyou-hoken-kyufu-seigen)
 - [学び直しの支援が拡充｜教育訓練給付の引き上げと教育訓練休暇給付金](/news/news-kyouiku-kunren-kyufu)
 

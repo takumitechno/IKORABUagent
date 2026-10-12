@@ -33,27 +33,27 @@ source:
   更新 2026.10.12
 - ### [倉庫の仕事って、未経験でもできる？](/articles/butsuryu-soko-shigoto)
   物流倉庫の仕事は、荷物を受け入れる・保管する・集める・確かめる・送り出す、の流れで分かれています。ピッキング・検品・在庫管理・フォークリフトの仕事の違い、フォークリフトに必要な資格、未経験から働くときに求人で確認することを紹介します。
-  更新 2026.10.10
+  更新 2026.10.12
 
 ## もう少し調べたいこと 18本
 
+- [工場の仕事内容は？ライン作業・検査・機械オペレーターの違いと、交替制・雇用の形の確認](/articles/seizou-koujou-shigoto)
+- [受付の仕事内容は？企業・ホテル・クリニックの違いと接客経験の活かし方](/articles/uketsuke-shigoto)
 - [ドライバーの仕事内容と必要な免許は？準中型・中型・大型・二種の違いと、2024年4月からの働き方の確認](/articles/driver-shigoto)
 - [求人の「福利厚生」はどう見る？社会保険と会社独自の制度の違い、住宅手当・交通費・退職金の確かめ方](/articles/fukuri-kousei-mikata)
 - [限定正社員（勤務地・職務・短時間）とは？普通の正社員との違いと、応募前に確認すること](/articles/gentei-seishain)
 - [ハローワークの使い方は？求職申込みから紹介状・書類の添削・面接練習まで、在職中に使うときのことも](/articles/hellowork-tsukaikata)
-- [工場の仕事内容は？ライン作業・検査・機械オペレーターの違いと、交替制・雇用の形の確認](/articles/seizou-koujou-shigoto)
-- [書類選考が通らないときの見直しポイント｜応募先の選び方・求人票の条件・書類の書き方](/articles/shorui-senkou-tooranai)
 
 **ほかの記事を読む 7〜18本目**
 
-- [受付の仕事内容は？企業・ホテル・クリニックの違いと接客経験の活かし方](/articles/uketsuke-shigoto)
+- [書類選考が通らないときの見直しポイント｜応募先の選び方・求人票の条件・書類の書き方](/articles/shorui-senkou-tooranai)
 - [未経験の仕事の自己PR、何を書く？アルバイト・接客の経験から強みを見つける方法と例文](/articles/jiko-pr-mikeiken)
 - [職歴に空白期間があるとき、面接でどう説明する？書類の書き方と答え方の例](/articles/kuhaku-kikan-setsumei)
 - [求職者支援制度とは？失業手当がない人が無料で職業訓練を受けられるしくみ](/articles/kyushokusha-shien-seido)
 - [転職の面接、服装はスーツ？「私服可」「服装自由」「オフィスカジュアル」の考え方と身だしなみチェック](/articles/mensetsu-fukusou)
 - [トライアル雇用とは？未経験の仕事を原則3か月試しながら働ける制度のしくみと探し方](/articles/trial-koyou)
-- [転職エージェントに、何を相談すればいい？相談できることと伝え方の例](/articles/agent-soudan-nani)
 - [販売・接客の仕事で正社員を目指すという選択｜変わることと求人の確認ポイント](/articles/hanbai-seishain)
+- [転職エージェントに、何を相談すればいい？相談できることと伝え方の例](/articles/agent-soudan-nani)
 - [履歴書に書くことがないと思ったとき｜アルバイト歴・資格・自己PRの書き方](/articles/rirekisho-kakukoto-nai)
 - [雇用保険の対象が週10時間以上に広がる予定（2028年10月）｜短時間で働く人に関係すること](/news/news-koyou-hoken-tekiyou-kakudai)
 - [2026年度の最低賃金改定｜全国加重平均は1,177円に。時給で働く人が確認したいこと](/news/news-saitei-chingin-2026)

@@ -2,7 +2,8 @@ import path from "node:path";
 import { describe, expect, it } from "vitest";
 import { LocalContentRepository } from "@/lib/content/local-repository";
 import { ARTICLE_GUIDES } from "@/lib/article-guides";
-import { ARTICLES_PER_PAGE, articlePagePath, latestArticleDate, parseArticlePage, pickStartArticles, READING_STARTS } from "@/lib/content-discovery";
+import { ARTICLES_PER_PAGE, articlePagePath, latestArticleDate, parseArticlePage, pickLatestArticles, pickStartArticles, READING_STARTS } from "@/lib/content-discovery";
+import type { ArticleSummary } from "@/lib/content/types";
 import { JOURNEYS } from "@/lib/journeys";
 import { resolveSiteUrl } from "@/lib/site-url";
 import { listSiteRoutes } from "../scripts/site-routes";
@@ -32,6 +33,13 @@ describe("content discovery", () => {
       const terms = (seoTitle.match(/[一-龯ァ-ヴー]{2,}|[A-Za-z]{2,}|\d+(?:万円|歳)/g) ?? []).filter((t) => !["こと", "とき"].includes(t));
       expect(terms.some((t) => guide.displayTitle.includes(t)), `${slug}: ${guide.displayTitle} / ${seoTitle}`).toBe(true);
     }
+  });
+
+  it("orders home updates by updated date, then by reader-journey articles on the same date", () => {
+    const a = (slug: string, updatedAt: string, publishedAt: string) => ({ slug, kind: "article", updatedAt, publishedAt }) as unknown as ArticleSummary;
+    const items = [a("koumuin-shakaijin", "2026-10-12", "2026-10-10"), a("sekkyaku-office", "2026-10-12", "2026-10-06"), a("hanbai-seishain", "2026-10-13", "2026-10-01"), a("jimu-mikeiken-mae", "2026-10-11", "2026-10-06")];
+    expect(pickLatestArticles(items, [], 3).map((x) => x.slug)).toEqual(["hanbai-seishain", "sekkyaku-office", "koumuin-shakaijin"]);
+    expect(pickLatestArticles(items, ["hanbai-seishain"], 2).map((x) => x.slug)).toEqual(["sekkyaku-office", "koumuin-shakaijin"]);
   });
 
   it("curates each reader journey from its own tagged articles without duplicates", async () => {

@@ -37,26 +37,26 @@ source:
 
 ## もう少し調べたいこと 18本
 
-- [不動産営業の仕事内容は？賃貸仲介と売買仲介の違い・宅建士の役割・歩合の給与の確認と接客経験の活かし方](/articles/fudousan-eigyo)
 - [医療事務ってどんな仕事？受付・会計・レセプトの中身と、未経験から目指すときの確認](/articles/iryo-jimu-mikeiken)
 - [「リモートワーク可」の求人、どこを見る？頻度・条件・費用と入社直後の出社を確かめる](/articles/remote-work-kyujin)
 - [受付の仕事内容は？企業・ホテル・クリニックの違いと接客経験の活かし方](/articles/uketsuke-shigoto)
 - [Webマーケティングの仕事内容は？種類と、未経験からの近づき方・求人の見方](/articles/web-marketing-mikeiken)
-- [コールセンターの仕事内容は？受信と発信の違い・向き不向きと、接客経験の活かし方](/articles/callcenter-shigoto)
+- [不動産営業の仕事内容は？賃貸仲介と売買仲介の違い・宅建士の役割・歩合の給与の確認と接客経験の活かし方](/articles/fudousan-eigyo)
+- [営業事務ってどんな仕事？一般事務との違い・1日の流れと、応募前に求人で確認すること](/articles/eigyo-jimu-shigoto)
 
 **ほかの記事を読む 7〜18本目**
 
-- [営業事務ってどんな仕事？一般事務との違い・1日の流れと、応募前に求人で確認すること](/articles/eigyo-jimu-shigoto)
+- [未経験から介護職へ転職するときに知っておきたいこと｜仕事内容・資格の段階・夜勤](/articles/kaigo-mikeiken)
+- [コールセンターの仕事内容は？受信と発信の違い・向き不向きと、接客経験の活かし方](/articles/callcenter-shigoto)
 - [転職のための自己分析のやり方｜経験の棚卸し・ゆずれない条件・やりたくないことの書き出し例](/articles/jiko-bunseki-yarikata)
 - [未経験の仕事の自己PR、何を書く？アルバイト・接客の経験から強みを見つける方法と例文](/articles/jiko-pr-mikeiken)
-- [未経験から介護職へ転職するときに知っておきたいこと｜仕事内容・資格の段階・夜勤](/articles/kaigo-mikeiken)
 - [転職の面接でよく聞かれる質問と答え方｜自己紹介・転職理由・志望動機の型と回答例](/articles/mensetsu-yokukiku-shitsumon)
-- [アルバイト経験だけの職務経歴書、何を書けばいい？構成と書き出し例](/articles/shokumu-keirekisho-arubaito)
 - [「土日休み」を優先すると、どんな仕事がある？](/articles/donichi-yasumi-shigoto)
-- [営業が怖い人へ。不安を分けて確認したい仕事内容と面接での質問例](/articles/eigyo-kowai)
 - [販売・接客の仕事で正社員を目指すという選択｜変わることと求人の確認ポイント](/articles/hanbai-seishain)
 - [人事・採用の仕事に、未経験から近づくには？入口になりやすい仕事と準備](/articles/jinji-saiyo-mikeiken)
 - [年収300万円から転職すると、給料は下がる？上げられる？](/articles/nenshu-300man-tenshoku)
+- [アルバイト経験だけの職務経歴書、何を書けばいい？構成と書き出し例](/articles/shokumu-keirekisho-arubaito)
+- [営業が怖い人へ。不安を分けて確認したい仕事内容と面接での質問例](/articles/eigyo-kowai)
 - [未経験職種の志望動機、何を書けばいい？3つの要素と例文](/articles/shiboudouki-mikeiken)
 
 順番に読むなら

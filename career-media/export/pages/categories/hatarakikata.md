@@ -29,21 +29,21 @@ source:
 - ### [手取り20万円。転職で何を比べる？](/articles/tedori-20man-hikaku)
   更新 2026.10.12
 - ### [年収が高い求人、それだけで決めていい？](/articles/nenshu-dake-erabanai)
-  更新 2026.10.06
+  更新 2026.10.12
 
 ## もう少し調べたいこと 25本
 
+- [「リモートワーク可」の求人、どこを見る？頻度・条件・費用と入社直後の出社を確かめる](/articles/remote-work-kyujin)
+- [求人の「賞与年2回」「昨年実績」はどう読む？ボーナスの見方と面接での聞き方](/articles/shoyo-kyujin-mikata)
+- [退職金はもらえる？会社によって違う理由と確かめ方｜就業規則・勤続年数・中退共・求人票の見方](/articles/taishokukin-kakunin)
 - [求人の「福利厚生」はどう見る？社会保険と会社独自の制度の違い、住宅手当・交通費・退職金の確かめ方](/articles/fukuri-kousei-mikata)
 - [限定正社員（勤務地・職務・短時間）とは？普通の正社員との違いと、応募前に確認すること](/articles/gentei-seishain)
 - [自分に合う会社選びを、プロに相談するとよい理由｜求人票で分からないことの聞き方と確かめ方](/articles/kigyou-erabi-soudan)
-- [転職して最初の1か月、どう過ごす？仕事の覚え方・メモと質問のしかた・試用期間中に確認すること](/articles/nyusha-go-hajime)
-- [これってパワハラ？3つの要素と6つの類型で確かめる｜記録の残し方と相談先](/articles/pawahara-soudan)
-- [「リモートワーク可」の求人、どこを見る？頻度・条件・費用と入社直後の出社を確かめる](/articles/remote-work-kyujin)
 
 **ほかの記事を読む 7〜18本目**
 
-- [求人の「賞与年2回」「昨年実績」はどう読む？ボーナスの見方と面接での聞き方](/articles/shoyo-kyujin-mikata)
-- [退職金はもらえる？会社によって違う理由と確かめ方｜就業規則・勤続年数・中退共・求人票の見方](/articles/taishokukin-kakunin)
+- [転職して最初の1か月、どう過ごす？仕事の覚え方・メモと質問のしかた・試用期間中に確認すること](/articles/nyusha-go-hajime)
+- [これってパワハラ？3つの要素と6つの類型で確かめる｜記録の残し方と相談先](/articles/pawahara-soudan)
 - [転勤あり・なしはどこで分かる？求人の「就業場所の変更の範囲」の読み方と確認のしかた](/articles/tenkin-kinmuchi-kakunin)
 - [希望年収・希望給与の書き方と面接での答え方｜「貴社規定に従います」の使いどころと例文](/articles/kibou-nenshu-kakikata)
 - [固定残業代（みなし残業）がある求人の見方｜求人に書かれるべき3つの項目と確認のしかた](/articles/koteizangyo-kyujin)

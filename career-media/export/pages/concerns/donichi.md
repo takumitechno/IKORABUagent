@@ -37,8 +37,8 @@ source:
 
 ## もう少し調べたいこと 2本
 
-- [接客からオフィスワークに移るとき、働き方はどう変わる？](/articles/sekkyaku-office)
 - [「土日休み」を優先すると、どんな仕事がある？](/articles/donichi-yasumi-shigoto)
+- [接客からオフィスワークに移るとき、働き方はどう変わる？](/articles/sekkyaku-office)
 
 順番に読むなら
 

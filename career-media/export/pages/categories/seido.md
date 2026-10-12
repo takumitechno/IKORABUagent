@@ -25,24 +25,24 @@ source:
 ## まず読むなら、この3本
 
 - ### [「みなし残業」ってどこを見ればいい？](/articles/koteizangyo-kyujin)
-  更新 2026.10.09
+  更新 2026.10.12
 - ### [転職した年の年末調整どうする？](/articles/tenshoku-nenmatsu-chosei)
   更新 2026.10.09
-- ### [転勤なしの正社員、普通の正社員と違う？](/articles/gentei-seishain)
-  更新 2026.10.10
+- ### [退職金ってどこでも出るの？](/articles/taishokukin-kakunin)
+  更新 2026.10.12
 
 ## もう少し調べたいこと 23本
 
+- [限定正社員（勤務地・職務・短時間）とは？普通の正社員との違いと、応募前に確認すること](/articles/gentei-seishain)
 - [ハローワークの使い方は？求職申込みから紹介状・書類の添削・面接練習まで、在職中に使うときのことも](/articles/hellowork-tsukaikata)
 - [退職後に国民年金の保険料が払えないときは？免除・納付猶予と失業の特例、申請先と追納](/articles/kokumin-nenkin-menjo)
 - [内定から入社までにやることは？退職手続きとの順番・入社日の調整・入社書類の準備](/articles/naitei-go-junbi)
 - [これってパワハラ？3つの要素と6つの類型で確かめる｜記録の残し方と相談先](/articles/pawahara-soudan)
 - [給料未払い・残業代・解雇の相談先は？総合労働相談コーナー・労基署・法テラスの違いと相談の準備](/articles/roudou-soudan-saki)
-- [年の途中で退職して年内に再就職しなかったら？確定申告（還付申告）の流れと必要な書類](/articles/taishoku-kakutei-shinkoku)
 
 **ほかの記事を読む 7〜18本目**
 
-- [退職金はもらえる？会社によって違う理由と確かめ方｜就業規則・勤続年数・中退共・求人票の見方](/articles/taishokukin-kakunin)
+- [年の途中で退職して年内に再就職しなかったら？確定申告（還付申告）の流れと必要な書類](/articles/taishoku-kakutei-shinkoku)
 - [転勤あり・なしはどこで分かる？求人の「就業場所の変更の範囲」の読み方と確認のしかた](/articles/tenkin-kinmuchi-kakunin)
 - [ハロートレーニング（公共職業訓練）とは？未経験の仕事のスキルを無料で学ぶ流れ](/articles/hello-training)
 - [教育訓練給付金の使い方｜3つの種類と、講座を申し込む前に確認すること](/articles/kyouiku-kunren-kyufu-tsukaikata)

@@ -1,5 +1,5 @@
 import type { ArticleSummary } from "./content/types";
-import { journeyForHub } from "./journeys";
+import { journeyArticleSlugs, journeyForHub } from "./journeys";
 
 export const ARTICLES_PER_PAGE = 18;
 export const MIN_HUB_ARTICLES = 3;
@@ -48,4 +48,17 @@ export function pickStartArticles(articles: ArticleSummary[], path: string) {
 
 export function latestArticleDate(articles: ArticleSummary[]) {
   return articles.length ? articles.reduce((latest, a) => a.updatedAt > latest ? a.updatedAt : latest, articles[0].updatedAt) : undefined;
+}
+
+/**
+ * トップの「新着・更新記事」。更新日の新しい順（本文を編集した日）を守り、
+ * 同じ日に更新された記事どうしでは、3つの読者ガイドに入っている記事を先に出す。
+ * 小さな表記の修正で更新日が並んだときに、相談の対象から遠い記事が先頭に来ないようにするため。
+ */
+export function pickLatestArticles(articles: ArticleSummary[], exclude: string[] = [], limit = 3): ArticleSummary[] {
+  const inJourney = new Set(journeyArticleSlugs());
+  return articles
+    .filter((a) => a.kind === "article" && !exclude.includes(a.slug))
+    .sort((a, b) => b.updatedAt.localeCompare(a.updatedAt) || Number(inJourney.has(b.slug)) - Number(inJourney.has(a.slug)) || (b.publishedAt ?? "").localeCompare(a.publishedAt ?? ""))
+    .slice(0, limit);
 }

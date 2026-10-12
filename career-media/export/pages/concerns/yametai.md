@@ -57,13 +57,13 @@ source:
 - [転職活動の流れとスケジュールの立て方｜自己分析から入社まで、各ステップでやること](/articles/tenshoku-schedule)
 - [転職すると有給休暇はどうなる？もらえる時期と日数、退職前の使い方](/articles/yukyu-tenshoku)
 - [働きながらの転職活動、何から？進める順番と時間の作り方・退職を伝える時期](/articles/zaishoku-tenshoku-susumekata)
-- [手取り20万円から転職を考えるとき、何を比べればいい？](/articles/tedori-20man-hikaku)
+- [年収だけで求人を選ばないほうがいい理由](/articles/nenshu-dake-erabanai)
 
 **ほかの記事を読む 19〜23本目**
 
-- [年収だけで求人を選ばないほうがいい理由](/articles/nenshu-dake-erabanai)
-- [転職回数が気になるときに整理したいこと｜説明のしかたと次の選び方](/articles/tenshoku-kaisu-kininaru)
+- [手取り20万円から転職を考えるとき、何を比べればいい？](/articles/tedori-20man-hikaku)
 - [今の仕事を辞めたいとき、先に確認しておきたいこと](/articles/yametai-mae-kakunin)
+- [転職回数が気になるときに整理したいこと｜説明のしかたと次の選び方](/articles/tenshoku-kaisu-kininaru)
 - [子育てと仕事の両立の制度が変わった（2025年10月施行）｜求人を見るときの確認ポイント](/news/news-ikuji-kaigo-2025-10)
 - [自己都合退職の給付制限が原則1か月に｜退職してから転職活動する人が確認したいこと](/news/news-koyou-hoken-kyufu-seigen)
 

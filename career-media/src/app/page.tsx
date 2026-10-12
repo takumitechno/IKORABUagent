@@ -12,6 +12,7 @@ import { JsonLd } from "@/components/JsonLd";
 import { site } from "@/config/site";
 import { getRepository } from "@/lib/content";
 import { organizationJsonLd, pageMetadata, websiteJsonLd } from "@/lib/seo";
+import { pickLatestArticles } from "@/lib/content-discovery";
 
 export const revalidate = 600;
 export const metadata = pageMetadata({ title: site.fullName + "｜はじめて・未経験の転職", description: site.description, path: "/" });
@@ -25,7 +26,7 @@ export default async function HomePage() {
   const [articles, categories] = await Promise.all([repo.listArticles(), repo.listCategories()]);
   const reads = READS.filter((read) => articles.some((article) => article.slug === read.slug));
   const updates = [
-    { title: "新着・更新記事", href: "/articles", icon: FileText, items: articles.filter((article) => article.kind === "article" && !READS.some((read) => read.slug === article.slug)).sort((a, b) => b.updatedAt.localeCompare(a.updatedAt) || (b.publishedAt ?? "").localeCompare(a.publishedAt ?? "")).slice(0, 3) },
+    { title: "新着・更新記事", href: "/articles", icon: FileText, items: pickLatestArticles(articles, READS.map((read) => read.slug)) },
     { title: "制度・ニュース解説", href: "/news", icon: Newspaper, items: articles.filter((article) => article.kind === "news").slice(0, 3) },
   ];
   return (
