@@ -47,8 +47,8 @@ source:
 **ほかの記事を読む 7〜10本目**
 
 - [未経験で事務職を目指す前に知っておきたいこと｜種類・PC・電話対応](/articles/jimu-mikeiken-mae)
-- [PCが得意じゃなくても、事務職は目指せる？よく使う操作と練習のしかた](/articles/pc-nigate-jimu)
 - [未経験のIT、どんな仕事から始まる？入口になりやすい仕事と入社前の確認](/articles/mikeiken-it-hajimari)
+- [PCが得意じゃなくても、事務職は目指せる？よく使う操作と練習のしかた](/articles/pc-nigate-jimu)
 - [学び直しの支援が拡充｜教育訓練給付の引き上げと教育訓練休暇給付金](/news/news-kyouiku-kunren-kyufu)
 
 [迷ったら、条件整理チェック 13の質問で、比べる職種と確認ポイントを整理](/check)

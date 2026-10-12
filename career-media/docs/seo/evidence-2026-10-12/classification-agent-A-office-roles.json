@@ -1,0 +1,1156 @@
+{
+ "cluster": "A_office_roles",
+ "items": [
+  {
+   "slug": "sekkyaku-office",
+   "primary_queries_guess": [
+    "接客 オフィスワーク 転職",
+    "販売 から 事務 転職 違い",
+    "立ち仕事 から 座り仕事 転職",
+    "接客業 から オフィスワーク 土日休み"
+   ],
+   "reader_question": "接客・販売からオフィスワークに移ると、勤務時間・休日・体の負担・人とのやりとりは実際どう変わるのか。オフィスなら土日休みになるのか。",
+   "owns": "接客からオフィスに移ったときの『1日の過ごし方・働き方の変化』（勤務時間・休日・座り仕事の負担・対面から電話やメールへ）と、求人1件ずつ確かめる質問。経験の言語化は sekkyaku-keiken-ikasu、事務の種類とPC操作は jimu-mikeiken-mae、休日欄の読み方は donichi-yasumi-shigoto、年収と休日の数値比較は donichi-yasumi-nenshu-hikaku に渡す。",
+   "adjacent": [
+    {
+     "slug": "sekkyaku-keiken-ikasu",
+     "difference": "向こうは経験の分解と書類での伝え方。本記事の「接客の経験は、どこで活きる？」節は向こうの縮約版で重複している（経路Aでは直前のステップで読んでいる）。"
+    },
+    {
+     "slug": "donichi-yasumi-shigoto",
+     "difference": "向こうは休日欄の読み方と『誰に合わせて働く仕事か』。本記事の『オフィスワーク＝土日休みとは限らない』と結論が同じで、向こうの末尾『接客から移るときに考えておきたいこと』とも重なる。部分的な重複。"
+    },
+    {
+     "slug": "jimu-mikeiken-mae",
+     "difference": "事務の種類とPC操作の記事。本記事の接点表の一般事務・営業事務の行が向こうの要約。"
+    },
+    {
+     "slug": "eigyo-cs-it-support-chigai",
+     "difference": "3職種比較。本記事の接点表と比較軸（人と話す量・PC作業）が近い。"
+    },
+    {
+     "slug": "callcenter-shigoto",
+     "difference": "接点表のカスタマーサポートの行の詳細記事だが、本文からリンクされていない。"
+    },
+    {
+     "slug": "uketsuke-shigoto",
+     "difference": "接点表の受付事務の行の詳細記事だが、本文からリンクされていない。"
+    }
+   ],
+   "next_action": "経路Aのステップ2。読後は冒頭の『変えたい1日』表で未確認のまま残った欄を持って /jobs で職種を比べ（ステップ3）、jimu-mikeiken-mae（ステップ4）へ。休日も給料も譲れない人は経路Bの donichi-yasumi-nenshu-hikaku → /check に分岐するのが自然。",
+   "classification": "needs_polish",
+   "reasons": "冒頭の『変えたい1日』表（編集上のメモ例と明記）、情報機器作業ガイドラインの数値、接点表は独自で方向は正しい。ただし10/12の補強で同じ趣旨の表が3つ（冒頭の比較メモ表、『職種名と、雇用・配属の条件を分けて確認する』表、最後のチェックリスト）並び、最後のチェックリストは箇条書きと figure で同じ5項目を2回表示している。donichi-yasumi-nenshu-hikaku へのリンクが3回、jimu-mikeiken-mae が2回と重なる一方、接点表のカスタマーサポート・受付・営業事務の行から callcenter-shigoto / uketsuke-shigoto / eigyo-jimu-shigoto へは行けない。締めは『決まった正解はありません』で終わり、次の一歩（/jobs・/check・相談）が示されない。",
+   "concrete_fixes": [
+    "『移る前に確かめておきたいこと』の箇条書きと figure checklist の重複を1つにし、『職種名と、雇用・配属の条件』表は雇用形態・研修の2行だけを冒頭表に移して統合する",
+    "接点表の各行に詳細記事リンクを付ける：カスタマーサポート→callcenter-shigoto、受付事務→uketsuke-shigoto、営業事務→eigyo-jimu-shigoto（人事の jinji-saiyo-mikeiken は既存）",
+    "donichi-yasumi-nenshu-hikaku へのリンクは冒頭の1回に絞り、『オフィスワーク＝土日休みとは限らない』の段落のリンク先は donichi-yasumi-shigoto（休日欄の読み方）に替える",
+    "『接客の経験は、どこで活きる？』節は2〜3行に縮め、sekkyaku-keiken-ikasu に渡す",
+    "締めに『未確認の欄が残ったら /check で優先順位をつけ、求人ごとの実態は相談で確かめる』という次の一歩を1文追加する",
+    "冒頭『オフィスワークに移りたいと考える人は少なくありません』は根拠のない一般化なので、『〜と感じたことはありませんか』のような問いかけに直す"
+   ],
+   "consult_bridge": "冒頭表の『分からない欄は未確認で残し、相談で質問に使う』は、記事だけでは分からない求人ごとの実態を相談で確かめる流れとして自然。ただしリンク先は #support-experience（経験の伝え方）なのに、表の中身（勤務時間・休日・通勤）は #support-conditions（給料と休み）に近く、話題がずれる。ガイドの質問『自分の接客経験が活かせる業務と、覚える必要がある業務は何ですか？』も表の未確認欄とつながっていない。表の下で『条件の未確認欄は条件の相談、どの職種で活きるかは経験の相談』と2つに分けて案内するとよい。",
+   "risks": [
+    "updated_at（10/12）が reviewed_at・information_checked_at（10/06）より新しく、補強した部分がまだ査読されていない",
+    "情報機器作業ガイドラインは策定後に一部改正されている可能性がある。引用した数値（1時間・10〜15分・1〜2回）が現行版でも同じか要確認",
+    "接点表には採用されやすさの表ではないと明記しているが、SNSから来た読者が『移りやすい仕事の一覧』と受け取るおそれがある"
+   ],
+   "title_h1_note": "seo_title はない。title・eyecatch『接客からオフィスへ。働き方はどう変わる？』・本文の主題は一致している。title に検索語の『事務』『土日休み』がないので、seo_title で補うことを検討（例:『接客から事務・オフィスワークへ｜働き方の変化と求人で確かめること』）。"
+  },
+  {
+   "slug": "sekkyaku-keiken-ikasu",
+   "primary_queries_guess": [
+    "接客経験 活かせる 仕事",
+    "接客業 転職 活かせる スキル",
+    "接客 経験 職務経歴書 書き方",
+    "販売 経験 活かせる 職種"
+   ],
+   "reader_question": "接客しかしていない自分の経験は、ほかの職種で通用するのか。どう言葉にすれば伝わるのか。",
+   "owns": "接客経験を作業ごとに分け、営業・カスタマーサポート・事務・ITサポートとのつながりを示すハブ。求人の作業と自分の経験を並べる3行メモ。職務経歴書の書き方の詳細は shokumu-keirekisho-arubaito、自己PR文は jiko-pr-mikeiken、志望動機は shiboudouki-mikeiken に渡す。",
+   "adjacent": [
+    {
+     "slug": "jiko-pr-mikeiken",
+     "difference": "向こうの『接客の行動を強みの言葉にする』表は、本記事の分解表とほぼ同じ構造。向こうの中心は自己PR文の型と職種別の例文。部分的な重複。"
+    },
+    {
+     "slug": "shokumu-keirekisho-arubaito",
+     "difference": "職務経歴書の構成と書き出し例。本記事の『職務経歴書での書き方の例』節と役割が重なる。"
+    },
+    {
+     "slug": "sekkyaku-office",
+     "difference": "働き方の変化。経路Aで本記事の次のステップ。"
+    },
+    {
+     "slug": "eigyo-cs-it-support-chigai",
+     "difference": "3職種の比較。本記事の職種ごとのつながりと軸が近い。"
+    },
+    {
+     "slug": "callcenter-shigoto",
+     "difference": "カスタマーサポート節の詳細記事。related にはあるが本文からリンクしていない。"
+    },
+    {
+     "slug": "mikeiken-it-hajimari",
+     "difference": "ITサポート節の詳細記事。本文からリンクしていない。"
+    }
+   ],
+   "next_action": "経路Aのステップ1。読後は3行メモを持って sekkyaku-office（働き方の変化）へ。書類にする段階なら shokumu-keirekisho-arubaito。メモができたら #support-experience の相談で『応募先に合わせた伝え方』を確かめる。",
+   "classification": "strong",
+   "reasons": "求人の作業→自分の経験→まだ未経験のことを分ける3行メモ（架空の記入例と明記）、分解表、職種別のつながり、書き方の before/after の例があり、検索意図に具体的に答えている。仮の例の明示や『数字を盛らない』注意もある。気になるのは隣の記事との重複（分解表と jiko-pr-mikeiken、職務経歴書の例と shokumu-keirekisho-arubaito）と、職種別の節から詳細記事への送客がないこと。出典の job tag トップページは使い道があいまい。",
+   "concrete_fixes": [
+    "『職種ごとのつながり方』の各小見出しに詳細記事へのリンクを付ける：営業→eigyo-kowai、カスタマーサポート→callcenter-shigoto、事務→jimu-mikeiken-mae（受付は uketsuke-shigoto）、ITサポート→mikeiken-it-hajimari",
+    "『職務経歴書での書き方の例』は before/after の1例だけを残し、構成の説明は shokumu-keirekisho-arubaito、強みの言葉への言い換えは jiko-pr-mikeiken に渡すと1行で書く",
+    "出典の『職業情報提供サイト（job tag）』トップは、営業・カスタマーサポートなど具体的な職業ページに替えるか削る",
+    "末尾の相談リンクの前に『3行メモの「まだ学ぶ必要があること」の欄が、相談で確かめる質問になる』と1文でつなぐ"
+   ],
+   "consult_bridge": "記事では経験の分解と3行メモまで自分でできるようにし、相談では『応募先に合わせた伝え方』『経験が応募条件を満たすかの見極め』を確かめる、という役割分担がはっきりしていて自然。#support-experience へのリンクが冒頭と末尾の2か所にあり、ガイドの topic: experience とも合っている。『経験が似ていても応募条件を満たすとは限らない』の直後に、相談で使う具体的な問い（例:『この求人の必須条件に、自分の経験は当てはまりますか』）を置くとさらにつながりやすい。",
+   "risks": [
+    "updated_at（10/12）が reviewed_at（10/07）より新しく、補強した部分がまだ査読されていない",
+    "コールセンターの出典URLが Detail?occupationId=64 の形で、他の記事（Detail/64）と形式が違う。リンク切れがないか要確認",
+    "ITサポート節には『必要な技術や資格を代わりに満たすものではない』と注意があるが、SNSの読者が『接客からITサポートへ行ける』と短絡しないよう mikeiken-it-hajimari への誘導が必要"
+   ],
+   "title_h1_note": "seo_title はない。title と本文は一致している。eyecatch『接客の経験、ほかの仕事で活かせる？』が uketsuke-shigoto（受付の仕事で活かせる？）・jiko-pr-mikeiken（自己PRにできる？）・callcenter-shigoto（接客経験が活きる？）とよく似ていて、/situations/sekkyaku の一覧で見分けにくい。"
+  },
+  {
+   "slug": "jimu-mikeiken-mae",
+   "primary_queries_guess": [
+    "事務職 未経験",
+    "未経験 事務 転職 何から",
+    "事務職 種類 違い",
+    "事務 未経験 PCスキル どのくらい"
+   ],
+   "reader_question": "未経験から事務職を目指すなら、どんな種類があり、PCや電話対応はどこまで必要で、応募前に何を確かめればいいのか。",
+   "owns": "事務職のハブ（一般・営業・経理・受付の違い、『未経験可』と必須条件の読み分け、電話・来客対応、応募前の確認）。PC練習の詳細は pc-nigate-jimu、各事務の詳細は eigyo-jimu-shigoto / keiri-mikeiken / uketsuke-shigoto / iryo-jimu-mikeiken、研修の確認は mikeiken-kenshu-kakunin に渡す。",
+   "adjacent": [
+    {
+     "slug": "pc-nigate-jimu",
+     "difference": "PC操作の自己診断と練習。本記事の冒頭表『試す操作』と『パソコンはどのくらい使える必要がある？』節は、向こうと同じ内容を扱っており部分的に重複。"
+    },
+    {
+     "slug": "eigyo-jimu-shigoto",
+     "difference": "営業事務の詳細。本記事の FAQ『一般事務と営業事務、どちらがいい？』と表の営業事務の行がその要約。本文からリンクしていない。"
+    },
+    {
+     "slug": "keiri-mikeiken",
+     "difference": "経理事務の詳細。本文からリンクしていない（related のみ）。"
+    },
+    {
+     "slug": "uketsuke-shigoto",
+     "difference": "受付事務の詳細。本文からリンクしていない。"
+    },
+    {
+     "slug": "iryo-jimu-mikeiken",
+     "difference": "医療事務の詳細。種類の表に医療事務の行がなく、本文からもリンクしていない。"
+    },
+    {
+     "slug": "mikeiken-kenshu-kakunin",
+     "difference": "研修ありの確認。本記事の『研修あり』表記の行と重なる。"
+    }
+   ],
+   "next_action": "経路Aのステップ4。PCに不安がある人は pc-nigate-jimu（サイド）へ、それ以外は /check で条件を整理（ステップ5）し、#support-experience の相談で『この求人で入社前に必要な操作』を確かめる。",
+   "classification": "needs_polish",
+   "reasons": "種類の比較表、『未経験可』と必須条件の読み分け表（架空と明記）、電話対応の例文（架空と明記）、応募前のチェックなど材料は多い。しかし10/12の補強で冒頭にPC練習の表が入り、ハブとして最初に答えるべき『事務の種類』が2番目のH2になった。PCの節が2つ（冒頭表と『パソコンはどのくらい使える必要がある？』）、未経験の節も2つ（『未経験でも応募できる？』『「未経験可」と「必須条件」をどう読み分ける？』）あり、pc-nigate-jimu とも重なる。ハブなのに本文から eigyo-jimu-shigoto・keiri-mikeiken・uketsuke-shigoto・iryo-jimu-mikeiken にリンクしておらず、子記事からの一方通行になっている。ARTICLE_GUIDES の next が経路Aの先頭（sekkyaku-keiken-ikasu）に戻るため、ステップ4から /check・相談へ進む流れが途切れる。",
+   "concrete_fixes": [
+    "H2の順を『事務職って、どんな仕事？』→『未経験可と必須条件の読み分け』→『PC（要約して pc-nigate-jimu へ）』→『電話・来客』→『応募前の確認』に並べ替える。冒頭のPC表は pc-nigate-jimu に移すか3行に要約する",
+    "『パソコンはどのくらい使える必要がある？』と冒頭表を1つにまとめ、『未経験でも応募できる？』と『読み分け』も1節にまとめる",
+    "種類の比較表の各行に子記事へのリンクを付け（営業事務→eigyo-jimu-shigoto、経理事務→keiri-mikeiken、受付事務→uketsuke-shigoto）、医療事務の行を足して iryo-jimu-mikeiken へつなぐ",
+    "ARTICLE_GUIDES の next を sekkyaku-keiken-ikasu から /check（または pc-nigate-jimu）に変え、経路Aを先へ進める",
+    "経理事務の出典URLに付いている追跡用パラメータ（?media=4876）を外す",
+    "冒頭『そんな理由で事務職を考える人は多いと思います』は問いかけに変える"
+   ],
+   "consult_bridge": "『自力でできる操作・手順を見ればできる操作・未経験の操作を分けると、学ぶ順番を相談できる』という橋渡しは具体的でよい。相談トピック experience の ask（『必要なPC操作は、何から練習するとよいですか？』）とも合う。ただし相談リンクは冒頭の節にしかなく、記事の最後は mikeiken-kenshu-kakunin への案内で終わるため、最後まで読んだ人に相談・チェックの一歩が示されない。末尾の応募前チェックリストの直後に『求人票で分からなかった項目は相談で確かめられる』を置くとよい。",
+   "risks": [
+    "updated_at（10/12）が reviewed_at（10/06）より新しく、補強した部分がまだ査読されていない",
+    "事務職の求人の倍率や応募の集まりやすさは書かれていない。書くなら公的統計で要確認",
+    "job tag 経理事務のURLに追跡用パラメータが付いている"
+   ],
+   "title_h1_note": "title の『｜種類・PC・電話対応』と本文の順（PCが先、種類が後）がずれている。eyecatch『未経験から事務職へ。最初に知っておきたいこと』は抽象的で、SNSでは中身が伝わりにくい（例:『事務職って、何種類ある？』）。"
+  },
+  {
+   "slug": "pc-nigate-jimu",
+   "primary_queries_guess": [
+    "PC 苦手 事務職",
+    "パソコン 苦手 事務 未経験",
+    "事務 パソコンスキル 必要 どのくらい",
+    "エクセル できない 事務 転職"
+   ],
+   "reader_question": "パソコンが得意じゃない自分でも事務職を目指せるのか。何をどこまで練習すればいいのか。",
+   "owns": "『PCが苦手』の自己診断、事務でよく使う操作の目安、2週間の練習例、MOSの位置づけ、面接での伝え方。事務の種類は jimu-mikeiken-mae、資格全般は mikeiken-shikaku、無料の訓練は hello-training、講座費用の補助は kyouiku-kunren-kyufu-tsukaikata に渡す。",
+   "adjacent": [
+    {
+     "slug": "jimu-mikeiken-mae",
+     "difference": "親記事。向こうの冒頭表と『パソコンはどのくらい使える必要がある？』節は本記事と同じ内容の要約で、部分的に重複。本記事の related に入っていない。"
+    },
+    {
+     "slug": "mikeiken-shikaku",
+     "difference": "MOSを含む資格の要否の判断。本記事の資格節の上位にあたるが、本文からリンクしていない。"
+    },
+    {
+     "slug": "hello-training",
+     "difference": "本文・FAQでハロートレーニングに触れているのにリンクしていない。"
+    },
+    {
+     "slug": "mikeiken-kenshu-kakunin",
+     "difference": "入社後の教わり方の確認。本文で唯一リンクしている記事。"
+    }
+   ],
+   "next_action": "経路Aのサイド。自己診断表で『まだ』に印がついた操作を2週間で練習し、jimu-mikeiken-mae で事務の種類を選び、/check → 相談で『その求人で入社時に必要な操作』を確かめる。",
+   "classification": "needs_polish",
+   "reasons": "自己診断表、2週間の練習ステップ、面接での伝え方の例は独自で、PERSONA の『PCが苦手』にまっすぐ答えている。一方で本文からの送客が弱く（catalogue の out_links は1件）、親記事 jimu-mikeiken-mae、資格の mikeiken-shikaku、訓練の hello-training、給付の kyouiku-kunren-kyufu-tsukaikata にリンクしていない。/check も相談リンクもなく、最後は /situations/pc-mikeiken で終わる。MOSのレベル構成の補足出典が民間（ユーキャン）。10/12の補強の対象外で、jimu-mikeiken-mae に新しく入った冒頭表と内容が重なった。",
+   "concrete_fixes": [
+    "related に jimu-mikeiken-mae と mikeiken-shikaku を足す。本文の『資格は取ったほうがいい？』節から mikeiken-shikaku、ハロートレーニングの段落から hello-training、講座費用の話から kyouiku-kunren-kyufu-tsukaikata へリンクする",
+    "jimu-mikeiken-mae の冒頭PC表を本記事に寄せ、PCの準備は本記事を正本にする（どちらに何を書くかを決める）",
+    "ARTICLE_GUIDES に topic: experience で登録し、question を『この求人で入社前に必要な操作と、研修で学べる操作はどれですか』にする",
+    "MOSのレベル構成の出典を、民間サイトから公式（mos.odyssey-com.co.jp）の該当ページに替える",
+    "締めに /check へのリンクを1文足す（『練習する操作が決まったら、条件も整理しておく』）"
+   ],
+   "consult_bridge": "記事で『自分の苦手の中身と練習の順番』は解決でき、相談で確かめるのは『応募先ごとに入社時に必要な操作のレベル』と『練習中であることの伝え方』。この分担は自然で、相談トピック experience の ask『必要なPC操作は、何から練習するとよいですか？』と一致している。それなのに本文にもガイドにも相談への言及がなく、カテゴリ汎用のCTAだけ。いちばん相談に結びつけやすい記事の一つなのに、橋渡しが欠けている。",
+   "risks": [
+    "MOS 365の科目・レベル構成（Word・Excel のエキスパートなど）は版によって変わるため、公式で最新を要確認",
+    "ハロートレーニングの対象・受講料の説明が2026年時点の制度と合っているか要確認（information_checked_at 10/06）"
+   ],
+   "title_h1_note": "seo_title はない。title・eyecatch『PCが苦手でも、事務職って目指せる？』・本文は一致。eyecatch は PERSONA の言葉どおりでよい。"
+  },
+  {
+   "slug": "eigyo-jimu-shigoto",
+   "primary_queries_guess": [
+    "営業事務 仕事内容",
+    "営業事務 一般事務 違い",
+    "営業事務 未経験",
+    "営業アシスタント とは"
+   ],
+   "reader_question": "営業事務は営業をするのか事務なのか。一般事務と何が違い、未経験で応募して大丈夫か。",
+   "owns": "営業事務の仕事内容、一般事務との違い（相手・数字と期限）、1日の流れ、スキル、求人での確認と質問例。事務全体の比較は jimu-mikeiken-mae、PC練習は pc-nigate-jimu、接客経験の伝え方は sekkyaku-keiken-ikasu に渡す。",
+   "adjacent": [
+    {
+     "slug": "jimu-mikeiken-mae",
+     "difference": "事務の種類全体のハブ。FAQ『一般事務と営業事務、どちらがいい？』と重なるが、本記事はその詳細版。"
+    },
+    {
+     "slug": "eigyo-kowai",
+     "difference": "営業そのものへの不安。営業事務を検討する人の『ノルマはある？』と関連するが、本文からリンクなし。"
+    },
+    {
+     "slug": "callcenter-shigoto",
+     "difference": "電話対応という点は近いが、相手（取引先か一般のお客さまか）と目的が違う。"
+    },
+    {
+     "slug": "keiri-mikeiken",
+     "difference": "入金管理の部分で接する。"
+    }
+   ],
+   "next_action": "一般事務と比べて候補に残ったら /check で希望条件を整理し、求人の『個人の売上目標』『電話の割合』を相談で確かめる。営業そのものに不安が残る人は eigyo-kowai へ。",
+   "classification": "strong",
+   "reasons": "job tag に基づく仕事内容、一般事務との違いを2つの軸で示す compare、1日の流れ（出典にない時刻を入れない配慮）、取引先との会話例、スキルと場面の表、確認リストと質問例がそろい、検索意図に具体的に答えている。research_notes で属性ラベル（女性が多い）を避けている点もよい。弱いのは出口で、/check・相談・経路B（土日・残業）へのリンクがない。",
+   "concrete_fixes": [
+    "『残業は一般に少なく、週休2日制が基本』の段落に donichi-yasumi-shigoto（休日欄の読み方）へのリンクを足し、経路Bの読者を受ける",
+    "まとめの後に /check と相談（#support-experience）への1文を足す",
+    "取引先との会話例に『（仮の例です）』を付ける",
+    "FAQ の『呼び方が違うだけのことも多い』は根拠がないので『会社によって呼び方が違う』にする"
+   ],
+   "consult_bridge": "本文の『求人票に書かれていないことは面接で聞く』質問例は相談でもそのまま使えるが、記事から相談への言及はない。カテゴリ汎用CTA（職種・会社選びを相談する）は内容に合う。『個人の売上目標がない営業事務の求人か』『取引先対応の量』を求人単位で確かめる相談、と1文でつなぐと自然。",
+   "risks": [
+    "job tag の引用は research_notes に『直接接続できず検索結果で確認』とあり、『残業は少ない・週休2日が基本』などが現行ページと一致するか要確認",
+    "job tag の『残業は少ない』という一般的な記述を、読者が個別求人の保証と受け取るおそれ（本文に会社ごとに違う旨の注意はある）"
+   ],
+   "title_h1_note": "title は長いが seo_title『営業事務の仕事内容｜一般事務との違いと1日の流れ』で補っている。eyecatch『営業事務って、一般事務と何が違う？』は本文の核心と一致。"
+  },
+  {
+   "slug": "uketsuke-shigoto",
+   "primary_queries_guess": [
+    "受付 仕事内容",
+    "受付事務 未経験",
+    "企業受付 ホテル フロント 違い",
+    "クリニック 受付 仕事"
+   ],
+   "reader_question": "受付の仕事は何をするのか。企業・ホテル・クリニックでどう違い、接客経験は活かせるのか。",
+   "owns": "受付の仕事の流れ、企業・ホテル・クリニックの違い（すること・相手・勤務時間）、電話取り次ぎの型、求人で確認すること。医療機関の受付・会計の詳細は iryo-jimu-mikeiken、事務全体は jimu-mikeiken-mae、接客経験の分解は sekkyaku-keiken-ikasu に渡す。",
+   "adjacent": [
+    {
+     "slug": "iryo-jimu-mikeiken",
+     "difference": "クリニック受付は医療事務の仕事だと本文で書いているのに、本文からリンクしていない（related のみ）。"
+    },
+    {
+     "slug": "jimu-mikeiken-mae",
+     "difference": "受付事務の行が要約版。"
+    },
+    {
+     "slug": "sekkyaku-keiken-ikasu",
+     "difference": "接客経験の伝え方の節が重なる。"
+    },
+    {
+     "slug": "sekkyaku-office",
+     "difference": "接客からオフィスに移るときの働き方の変化。"
+    }
+   ],
+   "next_action": "働く場所（企業・ホテル・クリニック）を1つ決めたら、土日休みを優先する人は donichi-yasumi-shigoto、医療機関なら iryo-jimu-mikeiken へ。その後 /check → 相談で『受付以外の業務』を確かめる。",
+   "classification": "needs_polish",
+   "reasons": "3種類の受付の比較表、来客対応の流れ、電話取り次ぎの型と例、見落としやすい『受付以外の担当』の強調は独自でよい。一方、接客経験の例文2つ（家電量販店、ホテル宴会場）に『仮の例』の表示がない。FAQの『会社が土日休みなら受付も土日休みのことが多い』『電話の取り次ぎやパソコンでの予約管理もあることが多い』は根拠が示されていない。クリニック節で医療事務に触れながら iryo-jimu-mikeiken にリンクしておらず、相談・/check への言及もない。",
+   "concrete_fixes": [
+    "接客経験の例文2つに『（仮の例です）』を付ける",
+    "FAQ『土日休みのことが多い』を『会社の営業日に合わせることが多く、会社の休日と同じかは求人の休日欄で確かめる』に直し、donichi-yasumi-shigoto へリンクする",
+    "『クリニック・病院の受付』の節に iryo-jimu-mikeiken へのリンクを足す",
+    "締めに /check と相談への1文を足す（『土日休みにしたい』『深夜は避けたい』など、受付を選ぶ理由を条件として整理する）",
+    "eyecatch を受付ならではの問い（例:『受付の仕事、企業とホテルで何が違う？』）にして、sekkyaku-keiken-ikasu のカードと見分けやすくする"
+   ],
+   "consult_bridge": "末尾で『受付を選ぶ理由がはっきりしている人は、その条件に合うかを先に確かめる』と書いており、相談トピック conditions にも experience にもつなげやすい位置にあるが、相談への言及がない。カテゴリ汎用CTAのみ。",
+   "risks": [
+    "ホテル・医療事務の job tag 引用は research_notes に『検索結果で確認』とある。現行ページと一致するか要確認",
+    "雇用形態の傾向（派遣が多いなど）は書かないと research_notes に書かれており、本文も守れている"
+   ],
+   "title_h1_note": "seo_title あり。eyecatch『接客の経験、受付の仕事で活かせる？』は本文の主題（受付の種類による違い）より接客経験に寄っていて、sekkyaku-keiken-ikasu の eyecatch とよく似ている。"
+  },
+  {
+   "slug": "callcenter-shigoto",
+   "primary_queries_guess": [
+    "コールセンター 仕事内容",
+    "コールセンター 未経験",
+    "インバウンド アウトバウンド 違い",
+    "コールセンター 向いてる人"
+   ],
+   "reader_question": "コールセンターは何をする仕事で、受信と発信でどう違い、接客経験は活かせるのか。クレームはつらくないか。",
+   "owns": "コールセンターの仕事の流れ（聞く・入力する・つなぐ）、求人の言葉での受信と発信の見分け方、向き不向き、接客経験との重なりと違い、クレーム対応の体制の確かめ方、求人の確認リスト。CS・営業・ITサポートの比較は eigyo-cs-it-support-chigai、研修の確認は mikeiken-kenshu-kakunin に渡す。",
+   "adjacent": [
+    {
+     "slug": "eigyo-cs-it-support-chigai",
+     "difference": "向こうのCS節が本記事の要約版。メール・チャット中心のCSは向こうでも触れるだけ。"
+    },
+    {
+     "slug": "sekkyaku-keiken-ikasu",
+     "difference": "向こうのCS節で、本記事と同じく接客との重なりを説明している。"
+    },
+    {
+     "slug": "sekkyaku-office",
+     "difference": "CSはシフト勤務の場合がある、という点で重なる。経路Aで本記事から戻るべきハブ。"
+    },
+    {
+     "slug": "donichi-yasumi-shigoto",
+     "difference": "CSの土日勤務の考え方。本文で土日休みに触れながらリンクしていない。"
+    }
+   ],
+   "next_action": "受信・発信のどちらかを決めたら、土日休みを優先する人は donichi-yasumi-shigoto で休日欄の見方を確認する。接客から移る全体像は sekkyaku-office。候補の求人ができたら /check → 相談で『件数の目標・引き継ぎ体制・シフト』を確かめる。",
+   "classification": "strong",
+   "reasons": "1本の電話の流れ（仮の例と明記）、受信と発信の compare と求人の言葉での見分け方、接客との重なり表と違い、カスタマーハラスメント対策と面接での質問、確認リストまで、検索意図に具体的に答える独自の材料がある。弱いのは、本文から入ってくるリンクが0件で、出口も経路A・Bのハブ（sekkyaku-office・donichi-yasumi-shigoto・/check・相談）につながっていないこと。",
+   "concrete_fixes": [
+    "sekkyaku-keiken-ikasu のカスタマーサポート節、eigyo-cs-it-support-chigai のCS節、sekkyaku-office の接点表から本記事へリンクする（本文の被リンク0件を解消する）",
+    "『土日休みを希望する人は特に』の段落に donichi-yasumi-shigoto へのリンクを足す",
+    "締めに /check と相談（#support-experience）への1文を足す",
+    "メール・チャット中心のカスタマーサポートとの違いを1段落足し、eigyo-cs-it-support-chigai の FAQ『カスタマーサポートとコールセンターは同じ？』と役割をそろえる"
+   ],
+   "consult_bridge": "『引き継ぎ体制を聞く』『件数の目標を聞く』という面接の質問は、そのまま相談で求人ごとに確かめる内容になるが、相談への言及はない。接客から電話応対への移り方は経路Aの中心的な選択肢なので、#support-experience（経験の伝え方）へつなぐと自然。",
+   "risks": [
+    "カスタマーハラスメント対策の事業主義務化の施行日（2026年10月1日）は research_notes で『検索結果で確認』にとどまっている。厚生労働省の一次資料で施行日と求められる措置を要確認",
+    "求人の表記（受電＝受信、架電＝発信）との対応は一般的な読み方で、出典はない"
+   ],
+   "title_h1_note": "seo_title あり。title（H1）は長いが seo_title で短くしている。eyecatch『コールセンターって、接客経験が活きる？』は他の接客系記事の eyecatch と似ている。"
+  },
+  {
+   "slug": "hanbai-seishain",
+   "primary_queries_guess": [
+    "販売 正社員 なるには",
+    "アパレル アルバイト から 正社員",
+    "店長候補 求人 注意",
+    "販売職 正社員 転職"
+   ],
+   "reader_question": "接客・販売の仕事は好き。職種を変えずに正社員になる道はあるのか。何が変わり、求人の何を確かめればいいのか。",
+   "owns": "販売・接客のまま正社員になるという選択肢、アルバイトと正社員の違い（販売職に限る）、時給と月給のそろえ方、店長候補の求人の確認（休日・異動・管理監督者）、正社員登用。フリーター全般の最初の確認は freeter-seishain-hajimeni、給料と休日の比較は donichi-yasumi-nenshu-hikaku、固定残業代は koteizangyo-kyujin、異動の範囲は tenkin-kinmuchi-kakunin に渡す。",
+   "adjacent": [
+    {
+     "slug": "freeter-seishain-hajimeni",
+     "difference": "正社員とアルバイトの違いの表が重なる。向こうは職種を問わない最初の一歩（経路Cのステップ1）。"
+    },
+    {
+     "slug": "sekkyaku-keiken-ikasu",
+     "difference": "別の職種に移る選択。本記事は職種を変えない選択で、対になる。"
+    },
+    {
+     "slug": "donichi-yasumi-nenshu-hikaku",
+     "difference": "時給換算と休日の比較の詳細版。本記事の計算例はその簡易版。"
+    },
+    {
+     "slug": "koteizangyo-kyujin",
+     "difference": "本文で固定残業代に触れているがリンクしていない。"
+    },
+    {
+     "slug": "shoyo-kyujin-mikata",
+     "difference": "本文で賞与の『前年実績』に触れているがリンクしていない。"
+    },
+    {
+     "slug": "tenkin-kinmuchi-kakunin",
+     "difference": "向こうからは本記事にリンクがあるが、本記事の『異動の範囲』からは返していない。"
+    }
+   ],
+   "next_action": "経路Cと経路Aの分かれ道。『職種を変えるか、販売で正社員になるか』を比べる段階なので、店長候補のチェック項目を持って /check → 相談（first-job か conditions）へ。給料と休みの両立を重視する人は経路Bの donichi-yasumi-nenshu-hikaku へ。",
+   "classification": "needs_polish",
+   "reasons": "『別の職種に移るだけが転職ではない』という独自の切り口、店長と管理監督者についての公的な解説、異動の範囲の説明は読者の不安に合う。ただし1962字と短めで、時給換算は donichi-yasumi-nenshu-hikaku の簡易版にとどまる。固定残業代・賞与の前年実績・異動の範囲に触れながら、詳しい記事（koteizangyo-kyujin・shoyo-kyujin-mikata・tenkin-kinmuchi-kakunin）にリンクしていない。相談の出口が『わかものハローワーク』だけで、サイトの /check・相談につながっていない。freeter-seishain-hajimeni と違いの表が重なる。",
+   "concrete_fixes": [
+    "『給料はどう比べる？』の箇条書きの『固定残業代』を koteizangyo-kyujin、『賞与（前年実績）』を shoyo-kyujin-mikata、店長候補の『異動の範囲』を tenkin-kinmuchi-kakunin にリンクする",
+    "時給1,200円の計算例に『（仮の例です）』を付ける",
+    "『アルバイトと正社員、何が変わる？』の表は販売職ならではの行（シフトづくり・売上管理・店舗異動）だけを残し、一般的な違いは freeter-seishain-hajimeni に渡す",
+    "『その先の選択肢は？』に、わかものハローワークと並べてサイトの /check と相談（#support-first-job）を置き、『店長候補の求人を比べたい』という相談として案内する",
+    "seo_title を設定する（例:『販売職で正社員になるには｜店長候補の求人で確認すること』）"
+   ],
+   "consult_bridge": "記事で『何が変わるか』『店長候補の求人で何を確かめるか』は整理できるが、『今の店で登用を待つか、別の会社の正社員に応募するか』は個人の事情によるので相談に向いている。それなのに出口は公的窓口（わかものハローワーク）だけで、サイトの相談への橋渡しがない。公的窓口の紹介は残しつつ、民間の相談も選べると並べて書くのが自然。",
+   "risks": [
+    "わかものハローワークの対象（おおむね35歳未満）と名称は、厚生労働省の最新のページで要確認",
+    "updated_at が 10/06 のままで、関連記事（koteizangyo-kyujin など）の補強が反映されていない"
+   ],
+   "title_h1_note": "seo_title はない。title『販売・接客の仕事で正社員を目指すという選択｜…』の『という選択』は検索語になりにくい。eyecatch『販売・接客のまま、正社員になる道。』は本文と一致しており、SNS向き。"
+  },
+  {
+   "slug": "eigyo-cs-it-support-chigai",
+   "primary_queries_guess": [
+    "営業 カスタマーサポート 違い",
+    "カスタマーサポート ITサポート 違い",
+    "未経験 営業 カスタマーサポート どっち",
+    "ヘルプデスク 営業 向き不向き"
+   ],
+   "reader_question": "未経験歓迎の求人でよく見る営業・カスタマーサポート・ITサポートは、何が違って、自分にはどれが合いそうか。",
+   "owns": "3職種を『人と話す量・パソコン作業・数字の目標』で比べる比較記事と、迷ったときの考え方。営業の中の違いと不安は eigyo-kowai、コールセンターの詳細は callcenter-shigoto、ITの入口は mikeiken-it-hajimari に渡す。",
+   "adjacent": [
+    {
+     "slug": "eigyo-kowai",
+     "difference": "営業のやり方（新規・ルート・反響）の説明が重なる。向こうは不安の分解と面接の質問。"
+    },
+    {
+     "slug": "callcenter-shigoto",
+     "difference": "CS節の詳細版。向こうからは本記事にリンクがあるが、本記事からは返していない。"
+    },
+    {
+     "slug": "mikeiken-it-hajimari",
+     "difference": "ITサポート節の詳細版。向こうからは本記事にリンクがあるが、本記事からは返していない。"
+    },
+    {
+     "slug": "sekkyaku-keiken-ikasu",
+     "difference": "同じ3職種と事務とのつながりを経験の側から説明している。"
+    }
+   ],
+   "next_action": "候補を1〜2職種に絞ったら、それぞれの詳しい記事（callcenter-shigoto / mikeiken-it-hajimari / eigyo-kowai）へ。その後 /check → 相談で『求人ごとの目標・シフト・研修』を確かめる。",
+   "classification": "needs_polish",
+   "reasons": "3軸の比較表と『迷ったときの考え方』の compare は分かりやすく、被 related 13件のハブになっている。しかし出典は job tag のトップページと労働条件明示のページだけで、比較表の中身（『数字の目標：ITサポートは少なめ』など）や『営業は未経験から入りやすい職種の一つで、求人の数も多い傾向』は根拠のない一般化。各職種の説明は一般論が中心で、詳しい記事から一方的にリンクされているのに本文からは返していない（out_links 1）。経路Aでは同じ3軸の比較を /jobs（職種比較ページ）が担っており、記事として独自の材料を足さないと /jobs と役割が重なる。重なりが解消できない場合は、/jobs との統合を人が検討する余地がある。",
+   "concrete_fixes": [
+    "各職種のH2に詳しい記事へのリンクを付ける：営業→eigyo-kowai、カスタマーサポート→callcenter-shigoto、ITサポート→mikeiken-it-hajimari",
+    "『未経験から入りやすい職種の一つで、求人の数も多い傾向』は削るか、職業別の有効求人倍率など公的統計で確かめてから出典つきで書く",
+    "比較表に『職場によって違う』の注記を残しつつ、job tag の各職業ページ（法人営業・コールセンターオペレーター・ヘルプデスク）を出典に足す",
+    "/jobs との違いを出すため、『求人票でこう書かれていたらどの職種か（受電、反響営業、社内ヘルプデスクなど）』の読み替え表を足す",
+    "締めの /check のあとに相談（#support-experience）への1文を足す"
+   ],
+   "consult_bridge": "『迷ったときの3つの問い』に自分で答えたあと、その答えに合う求人の具体的な条件（目標・シフト・研修）を相談で確かめる、という流れは作れる。ただ本文は /check で終わり、相談には触れていない。比較記事は相談の手前に置きやすいので、迷った軸をそのまま相談の質問にする1文があると自然。",
+   "risks": [
+    "比較表の傾向（数字の目標・人と話す量）は出典がなく編集部の見立て。断定に読まれないか要確認",
+    "『2024年4月から業務の変更の範囲が明示』の説明で、募集時と労働契約の締結時の明示の範囲を混同していないか要確認"
+   ],
+   "title_h1_note": "seo_title はない。title・本文・eyecatch『営業・サポート・IT、どこが違う？』は一致している。"
+  },
+  {
+   "slug": "iryo-jimu-mikeiken",
+   "primary_queries_guess": [
+    "医療事務 未経験",
+    "医療事務 仕事内容",
+    "医療事務 資格 必要",
+    "レセプト とは"
+   ],
+   "reader_question": "医療事務は何をする仕事で、資格がないとなれないのか。土日休みにできるのか。",
+   "owns": "医療事務の受付・会計・レセプト・入退院の仕事内容、レセプトの流れ、資格が民間資格であることの意味、働き方（診療時間・土曜勤務・パートが多い）の確認。資格全般は mikeiken-shikaku、事務全体は jimu-mikeiken-mae、PC練習は pc-nigate-jimu に渡す。",
+   "adjacent": [
+    {
+     "slug": "uketsuke-shigoto",
+     "difference": "クリニック受付の行が重なる。向こうは受付全般で、related のみで本文の相互リンクはない。"
+    },
+    {
+     "slug": "jimu-mikeiken-mae",
+     "difference": "事務全体のハブ。向こうの種類の表に医療事務の行がない。"
+    },
+    {
+     "slug": "mikeiken-shikaku",
+     "difference": "資格の要否の判断。本記事から本文でリンクしている。"
+    },
+    {
+     "slug": "keiri-mikeiken",
+     "difference": "お金を正確に扱う点で近い。"
+    }
+   ],
+   "next_action": "資格を取るか迷ったら、求人の『必須・歓迎・不問』を数えてから mikeiken-shikaku へ。土日休みを優先するなら donichi-yasumi-shigoto で休日欄を確認する。候補の医療機関が決まったら相談で『土曜勤務・レセプトの時期の残業』を確かめる。",
+   "classification": "strong",
+   "reasons": "受付・会計・レセプトを分けた表、社会保険診療報酬支払基金の説明に基づくレセプトの流れ（翌月10日）、民間資格の意味を4点で整理、求人の『必須・歓迎・不問』を数えるという具体的な行動、働き方の確認と質問例があり、検索意図に具体的に答えている。弱いのは、面接例文（ドラッグストア）に『仮の例』の表示がないこと、末尾が『土日休みを優先したいなら確かめる』で終わり、経路Bや相談へリンクしていないこと。",
+   "concrete_fixes": [
+    "面接例文に『（仮の例です）』を付ける",
+    "末尾の『土日休みを優先したい』段落に donichi-yasumi-shigoto へのリンクと /check への1文を足す",
+    "受付の表の行から uketsuke-shigoto（企業・ホテルとの違い）へ相互リンクする",
+    "受付で確認するものの『保険証など』を、マイナ保険証・資格確認書も含む表現に見直す（要確認）"
+   ],
+   "consult_bridge": "『資格を先に取るかは求人の条件を見てから決める』という結論は、相談で『資格不問で教わり方のある医療機関の求人があるか』を確かめる形に自然につながるが、本文に相談への言及はない。カテゴリ汎用CTAのみ。",
+   "risks": [
+    "2024年12月以降の保険証の扱い（マイナ保険証・資格確認書）に合わせて、受付で確認するものの表現を要確認",
+    "FAQ の『今は電子のレセプトが原則』は出典が示されていない。支払基金などで要確認",
+    "job tag の『医院・診療所ではパートタイムが多い』は検索結果で確認との記録。現行ページで要確認"
+   ],
+   "title_h1_note": "seo_title あり。title・eyecatch『医療事務、未経験から目指せる？』・本文は一致。"
+  },
+  {
+   "slug": "keiri-mikeiken",
+   "primary_queries_guess": [
+    "経理 未経験",
+    "経理 仕事内容",
+    "経理 簿記 何級 必要",
+    "経理補助 未経験"
+   ],
+   "reader_question": "経理はどんな仕事で、未経験から目指すには簿記が必要か。求人の『経理補助』は何をするのか。",
+   "owns": "経理の日次・月次・年次の仕事、簿記の2つの役割と3級・2級の位置づけ、『経理補助』の読み方、準備の順番。資格全般は mikeiken-shikaku、講座費用は kyouiku-kunren-kyufu-tsukaikata、PC練習は pc-nigate-jimu、事務全体は jimu-mikeiken-mae に渡す。",
+   "adjacent": [
+    {
+     "slug": "mikeiken-shikaku",
+     "difference": "日商簿記の行が重なるが、向こうは要否の判断だけ。本記事から本文でリンクしていない（related のみ）。"
+    },
+    {
+     "slug": "jimu-mikeiken-mae",
+     "difference": "経理事務の行が要約版。"
+    },
+    {
+     "slug": "eigyo-jimu-shigoto",
+     "difference": "入金管理の部分で接する。"
+    },
+    {
+     "slug": "kyouiku-kunren-kyufu-tsukaikata",
+     "difference": "講座費用の制度。本文からリンクしている。"
+    }
+   ],
+   "next_action": "『経理補助』の読み方の表で自分が応募できる範囲を確かめ、簿記3級の勉強を始めるかを決める（mikeiken-shikaku / kyouiku-kunren-kyufu-tsukaikata）。応募先を絞る段階で、相談で『入社後どの仕事から担当するか』を確かめる。",
+   "classification": "strong",
+   "reasons": "日次・月次・年次の compare、国税庁の出典つきの年次業務、簿記の『応募の条件』『入社後の土台』という2つの役割、日本商工会議所の位置づけの表、『経理補助』の求人表記の読み方（仮の例と明記）、準備の順番と面接例まで、独自の材料が多い。弱いのは、面接例文（レジ締め）に仮の例の表示がないこと、mikeiken-shikaku に本文でリンクしていないこと、相談・/check への出口がないこと。",
+   "concrete_fixes": [
+    "面接例文に『（仮の例です）』を付ける",
+    "『簿記の資格はどのくらい必要？』節から mikeiken-shikaku へリンクする",
+    "FAQ にある『土日祝日が休みのことが多い（job tag）』を本文でも扱い、経路Bの donichi-yasumi-shigoto へリンクする",
+    "締めに /check と相談への1文を足す（『簿記を先に取るか、補助の求人で働きながら学ぶか』を相談で確かめる）"
+   ],
+   "consult_bridge": "『資格を取ってから応募するか、補助の求人で働きながら学ぶか』は求人の状況しだいで、相談で確かめる価値が高い判断。記事はその判断材料（補助求人の読み方）を用意しているのに、相談への橋がない。",
+   "risks": [
+    "job tag 経理事務の記述（一人前まで数年、決算期の残業）は検索結果で確認との記録。現行ページで要確認",
+    "日商簿記の級の位置づけの文言は、公式ページの改訂に合わせて要確認"
+   ],
+   "title_h1_note": "seo_title あり。title・eyecatch『経理って、未経験からどう目指す？』・本文は一致。"
+  },
+  {
+   "slug": "jinji-saiyo-mikeiken",
+   "primary_queries_guess": [
+    "人事 未経験",
+    "採用アシスタント 未経験",
+    "人事 仕事内容 未経験 転職",
+    "人事事務 なるには"
+   ],
+   "reader_question": "人事・採用の仕事に未経験から近づくには、どの仕事が入口で、接客やバイトリーダーの経験は活かせるのか。",
+   "owns": "人事の分野（採用・労務・教育・配置）、未経験の入口（採用アシスタント・人事事務・総務）、接客・バイトリーダーの経験との対応表、公正な採用選考の基本、確認事項。事務全体は jimu-mikeiken-mae、経験の分解は sekkyaku-keiken-ikasu に渡す。",
+   "adjacent": [
+    {
+     "slug": "sekkyaku-office",
+     "difference": "向こうの接点表の『採用アシスタント』の行から本記事にリンクしている（唯一の本文被リンク）。"
+    },
+    {
+     "slug": "jimu-mikeiken-mae",
+     "difference": "人事事務は事務の一種。related に入っていない。"
+    },
+    {
+     "slug": "sekkyaku-keiken-ikasu",
+     "difference": "経験の分解の方法。"
+    },
+    {
+     "slug": "mensetsu-yokukiku-shitsumon",
+     "difference": "応募者側から『聞いてはいけない質問』に触れる点で、公正採用選考の節と重なる。"
+    }
+   ],
+   "next_action": "入口（採用アシスタント・人事事務・総務）を1つ選び、jimu-mikeiken-mae で事務の基本操作を確認し、/check → 相談で『どの分野が中心の求人か』を確かめる。",
+   "classification": "needs_polish",
+   "reasons": "経験と人事の場面の対応表、公正採用選考の節は独自で、PERSONA の『人と関わる仕事をオフィスで』に合う。しかし1954字と短く、仕事内容の出典は job tag の1行（人事事務）だけで、分野の表は『よくある分け方の一例』として出典がない。職務経歴書の例（15人分のシフト作成）に仮の例の表示がない。related は2件、被 related は0件で孤立気味。相談・/check への出口がなく、最後は mikeiken-tenshoku-hajimekata への案内で終わる。",
+   "concrete_fixes": [
+    "job tag の人事事務・総務事務などの職業ページから仕事内容と入職の経路を引用し、分野の表に根拠を足す",
+    "職務経歴書の例に『（仮の例です）』を付ける",
+    "related に jimu-mikeiken-mae・sekkyaku-office・shokumu-keirekisho-arubaito を足す",
+    "志望動機の compare のあとに、相談（#support-experience）で『人と話す経験と正確に進める経験を、どの求人に合わせて伝えるか』を確かめる1文を足す"
+   ],
+   "consult_bridge": "人事の求人には経験者前提のものもあると本文に書かれており、『未経験で応募できる人事・採用の求人があるか』を相談で確かめる流れが自然なのに、相談には触れていない。sekkyaku-office の接点表から来る経路Aの読者の受け皿になるので、相談への橋渡しが特に必要。",
+   "risks": [
+    "人事の分野の分け方は出典がない。断定に読まれないか要確認",
+    "出典の滋賀労働局ページは、厚生労働省の公正採用選考特設サイトで足りる。地方局ページはURLが変わりやすい"
+   ],
+   "title_h1_note": "seo_title はない。title・eyecatch『人事・採用の仕事、未経験からどう近づく？』・本文は一致。"
+  },
+  {
+   "slug": "eigyo-kowai",
+   "primary_queries_guess": [
+    "営業 怖い",
+    "営業 未経験 ノルマ 不安",
+    "営業 向いてない 人見知り",
+    "インセンティブ 求人 不安"
+   ],
+   "reader_question": "営業はノルマや飛び込みが怖い。何が怖いのかを分けて、どんな営業なら自分にもできそうか、何を確かめればいいか。",
+   "owns": "営業への不安の分解（ノルマ・飛び込み・電話・断られる・給料の振れ幅）、営業のやり方の違い、不安ごとの確認点と面接の質問、固定給とインセンティブの比べ方。3職種の比較は eigyo-cs-it-support-chigai、不動産業界の歩合と宅建は fudousan-eigyo に渡す。",
+   "adjacent": [
+    {
+     "slug": "eigyo-cs-it-support-chigai",
+     "difference": "営業のやり方の説明が重なる。向こうは3職種の比較。"
+    },
+    {
+     "slug": "fudousan-eigyo",
+     "difference": "歩合給と労働基準法第27条の説明が重なる。向こうは不動産業界に特化。本記事からは related のみ。"
+    },
+    {
+     "slug": "eigyo-jimu-shigoto",
+     "difference": "営業を支える事務という別の選択肢。本記事からリンクしていない。"
+    },
+    {
+     "slug": "sekkyaku-keiken-ikasu",
+     "difference": "営業節で接客経験とのつながりを説明している。"
+    }
+   ],
+   "next_action": "不安を分けた結果『この営業なら』という候補があれば、/check で給料の最低ラインを決め、相談で『新規と既存の割合・固定給』を確かめる。合わないと分かったら eigyo-cs-it-support-chigai か eigyo-jimu-shigoto へ。",
+   "classification": "strong",
+   "reasons": "不安を5つに分けるチェック、job tag に基づく営業のやり方の表、不安ごとの確認、求人A・Bの固定給の比較（説明のための例と明記）、労働基準法第27条の正確な扱い、面接の質問と前置きの言い方まで、SNSから来る不安を持つ読者に具体的に答えている。弱いのは、給料の比較から経路B（nenshu-dake-erabanai・koteizangyo-kyujin）へつながっていないこと、営業事務という代わりの選択肢へのリンクがないこと、相談の出口がないこと。",
+   "concrete_fixes": [
+    "求人A・Bの比較のあとに、経路Bの nenshu-dake-erabanai（年収だけで選ばない）か koteizangyo-kyujin へリンクする",
+    "締めの代わりの選択肢に eigyo-jimu-shigoto（営業を支える事務）を加える",
+    "面接の質問の節のあとに『聞きにくい質問は、相談で先に確かめられる』と相談（#support-conditions）への1文を足す",
+    "FAQ の『営業は目標が置かれていることが多い仕事』は job tag の記述に合わせるか、出典を示す"
+   ],
+   "consult_bridge": "『目標の決め方』『固定給とインセンティブの割合』は面接で聞きにくいと本文自身が書いており、相談で先に確かめる価値がいちばん分かりやすい記事。それなのに相談には触れていない。給料の不安は conditions、経験の活かし方は experience のどちらのトピックにもつながる。",
+   "risks": [
+    "job tag『営業の仕事』ページの記述が2026年時点の内容と合っているか要確認",
+    "求人A・Bの数字は例と明記済み。インセンティブの『Aより多め』に具体的な数字がないので、誤解のおそれは小さい"
+   ],
+   "title_h1_note": "seo_title はない。title・eyecatch『営業って怖い？中身を分けて考える。』・本文が一致しており、PERSONA の言葉に近い。"
+  },
+  {
+   "slug": "fudousan-eigyo",
+   "primary_queries_guess": [
+    "不動産営業 未経験",
+    "不動産営業 仕事内容",
+    "不動産営業 歩合 給料",
+    "宅建 なし 不動産営業"
+   ],
+   "reader_question": "不動産営業は何をする仕事で、宅建がなくてもできるのか。歩合給は不安定ではないか。",
+   "owns": "賃貸仲介と売買仲介の違い、宅建士だけができる仕事と設置義務、試験の受験資格、歩合給の確認（固定給・計算方法・保障給・最低賃金）、休日の不規則さ、接客経験の伝え方。営業一般の不安は eigyo-kowai、固定残業代は koteizangyo-kyujin、土日休みの考え方は donichi-yasumi-shigoto、資格の要否は mikeiken-shikaku に渡す。",
+   "adjacent": [
+    {
+     "slug": "eigyo-kowai",
+     "difference": "固定給とインセンティブ、第27条の説明が重なる。向こうは営業一般の不安の分解。"
+    },
+    {
+     "slug": "donichi-yasumi-shigoto",
+     "difference": "土日休みを優先するならほかの仕事と比べる、という受け皿。本文からリンクしている。"
+    },
+    {
+     "slug": "mikeiken-shikaku",
+     "difference": "宅建は『なくても入社できるが、宅建士だけができる仕事がある』という中間の例だが、向こうの表にはない。"
+    },
+    {
+     "slug": "shoyo-kyujin-mikata",
+     "difference": "related のみ。賞与の見方。"
+    }
+   ],
+   "next_action": "給料を上げたい（経路B）読者は、固定給と歩合の内訳を確かめたうえで nenshu-dake-erabanai へ。土日休みも譲れないなら donichi-yasumi-shigoto でほかの仕事と比べる。応募先を比べる段階で、相談で『歩合の計算方法・売れない月の金額』を確かめる。",
+   "classification": "strong",
+   "reasons": "賃貸と売買の compare と1日の流れ、宅建士の設置割合の説明、受験資格（不動産適正取引推進機構）、歩合給についての厚生労働省の解説と最低賃金、求人表記の仮の例、接客経験の対応表と例文（仮の例と明記）まで独自の材料が多く、経路B（給料を上げたい）に直結する。弱いのは、H1 がとても長いことと、相談への出口がないこと。",
+   "concrete_fixes": [
+    "『給料はどう決まる？』節のあとに nenshu-dake-erabanai（年収だけで選ばない）へリンクし、経路Bに戻す",
+    "締めに『売れなかった月はいくらになるか』は相談で先に確かめられる、という1文を足す（#support-conditions）",
+    "mikeiken-shikaku の資格の分類に宅建士の例を足してもらい、相互リンクにする",
+    "『宅建士の資格は入社の条件ではないことが多く』は、job tag の『入職に資格は不要』に合わせた表現にする"
+   ],
+   "consult_bridge": "歩合・保障給・休日は求人票だけでは分からず、面接でも聞きにくい内容なので、相談で確かめる意味がはっきりしている。記事に確認項目がそろっているので、それを相談で使う質問として1文でつなげば自然。今は相談に触れていない。",
+   "risks": [
+    "job tag 住宅・不動産営業のURLが Occupation/Detail?occupationId=59 と他の記事と違う形式。リンク先が開けるか要確認",
+    "専任の宅建士の設置割合（5人に1人以上）は job tag 経由の記述。宅地建物取引業法の施行規則で要確認",
+    "試験の受験資格・出題数は、不動産適正取引推進機構の最新年度の案内で要確認"
+   ],
+   "title_h1_note": "title（H1）が約60字と非常に長く、スマホの記事冒頭で3〜4行になる。seo_title は短くしてある。eyecatch『不動産営業、歩合ってどうなの？』は本文の一部（給与）に寄っているが、SNS向けの入口としては有効。"
+  },
+  {
+   "slug": "mikeiken-it-hajimari",
+   "primary_queries_guess": [
+    "未経験 IT 仕事",
+    "IT 未経験 何から",
+    "ヘルプデスク 未経験",
+    "IT 未経験 職種 種類"
+   ],
+   "reader_question": "プログラミングの経験がなくても入れるITの仕事はどれで、入社前に何を確かめればいいのか。",
+   "owns": "ITの入口になりやすい『支える仕事』（ヘルプデスク・運用監視・テスト）の地図、入社前の4つの確認（研修・勤務時間・働く場所・その後）、ITパスポートの位置づけ。作る仕事は programmer-mikeiken、ITサポートと営業・CSの比較は eigyo-cs-it-support-chigai、研修は mikeiken-kenshu-kakunin に渡す。",
+   "adjacent": [
+    {
+     "slug": "programmer-mikeiken",
+     "difference": "作る仕事。research_notes で役割分担されているが、本記事の本文からはリンクしていない（related のみ）。"
+    },
+    {
+     "slug": "eigyo-cs-it-support-chigai",
+     "difference": "ITサポート節が本記事の要約版。"
+    },
+    {
+     "slug": "mikeiken-shikaku",
+     "difference": "ITパスポートの行が重なる。向こうからは本記事へリンクがあるが、本記事からは返していない。"
+    },
+    {
+     "slug": "hello-training",
+     "difference": "IT系の職業訓練。向こうからは本記事へリンクがあるが、本記事からは返していない。"
+    }
+   ],
+   "next_action": "入口の仕事を1つ決め、プログラムを書く仕事に興味があれば programmer-mikeiken へ。勉強の目標がほしければ mikeiken-shikaku。求人を比べる段階で、相談で『取引先への常駐の有無・夜勤・研修期間』を確かめる。",
+   "classification": "needs_polish",
+   "reasons": "3つの入口の表、社内向け・社外向けのヘルプデスク、4つの確認と面接の質問は具体的でよい。ただし『未経験のIT』を調べる読者が気にしやすい『取引先に常駐して働く』ことの確認は1行だけで、雇用契約の相手・指示を出す人・夜勤手当など判断の材料が少ない。2036字と短く、出口（相談・/check）がない。ITパスポートの節から mikeiken-shikaku へ、勉強の話から hello-training へのリンクがなく、programmer-mikeiken とは役割を分けているのに本文から送っていない。",
+   "concrete_fixes": [
+    "『働く場所』の確認を1節に広げ、自社で働く場合と取引先に常駐する場合の違い（雇用契約の相手・仕事の指示を出す人・就業場所の変更の範囲）を確認項目として書く（既存の労働条件明示の出典を使う）",
+    "『プログラムを書く仕事に興味がある人も』の段落に programmer-mikeiken へのリンクを足す",
+    "ITパスポートの節から mikeiken-shikaku、勉強の場として hello-training へリンクする",
+    "締めに /check と相談への1文を足す（『常駐の有無や研修の中身は求人票だけでは分かりにくいので、相談で確かめる』）"
+   ],
+   "consult_bridge": "常駐・研修・夜勤など、求人票だけでは分からず相談で確かめる意味が大きい項目を本文が挙げているのに、相談への言及がない。PCに自信がない読者（pc-mikeiken）が来る記事なので、相談トピック experience の『必要なPC操作は何から練習する？』にもつながる。",
+   "risks": [
+    "ITパスポート試験の制度変更（mikeiken-shikaku では2027年度に新制度へ移る予定と記載）について本記事では触れておらず、記事間で記述がそろっていない。IPAで要確認",
+    "updated_at が 10/06。IT系の研修や雇用の状況は変わりやすく、情報確認日の更新が必要"
+   ],
+   "title_h1_note": "seo_title はない。title・eyecatch『未経験のIT、最初はどんな仕事？』・本文は一致。"
+  },
+  {
+   "slug": "programmer-mikeiken",
+   "primary_queries_guess": [
+    "プログラマー 未経験",
+    "未経験 プログラマー なるには",
+    "プログラミング 独学 就職",
+    "研修あり プログラマー 求人 注意"
+   ],
+   "reader_question": "プログラミングの経験がほとんどないが、プログラマーになるには何をどの順でやり、どんな求人を選べばいいのか。",
+   "owns": "プログラマーの仕事の流れ、学び方の4段階、『研修あり』求人の確認（配属先・常駐・研修中の給料）、ITサポートから近づく道、基本情報技術者試験の位置づけ。ITの入口全体は mikeiken-it-hajimari、訓練は hello-training、研修全般は mikeiken-kenshu-kakunin に渡す。",
+   "adjacent": [
+    {
+     "slug": "mikeiken-it-hajimari",
+     "difference": "ITの入口全体の地図。本記事の冒頭で役割分担を明記し、リンクしている。"
+    },
+    {
+     "slug": "mikeiken-kenshu-kakunin",
+     "difference": "研修ありの確認の一般版。本記事は開発職ならではの見落とし（配属先・常駐）を足している。"
+    },
+    {
+     "slug": "eigyo-cs-it-support-chigai",
+     "difference": "ITサポートと他職種の比較。"
+    },
+    {
+     "slug": "hello-training",
+     "difference": "職業訓練の受け皿。本文からリンクしている。"
+    }
+   ],
+   "next_action": "小さなものを作ってみたうえで、研修求人のチェックリストを持って相談へ（『研修後の配属先が開発か』を確かめる）。まだ迷うなら mikeiken-it-hajimari で支える仕事も比べる。",
+   "classification": "strong",
+   "reasons": "仕事の流れ、イメージとのずれ（原因を調べる時間が長い）、学ぶ順番（作るものを決める→1冊を終える→小さく作る→言葉にする）、研修求人で見落としやすい2点（常駐・配属先）、プログラマーとITサポートの比較表があり、成果を保証しない配慮も research_notes に明記されている。弱いのは、面接の例文に仮の例の表示がないことと、相談への出口がないこと。",
+   "concrete_fixes": [
+    "面接の例文に『（仮の例です）』を付ける",
+    "『研修あり』の節のあとに、相談（#support-experience）で『研修後の配属先・常駐の有無』を確かめられる、という1文を足す",
+    "roles が it-support になっている。/jobs/it-support に並べる前提なら問題ないが、分類の意図を確認する"
+   ],
+   "consult_bridge": "『研修のあと開発以外から始まる』ずれを防ぐための質問を本文が用意しており、相談で求人ごとに確かめる流れは自然に作れる。今は相談に触れていない。",
+   "risks": [
+    "job tag のプログラマー・ヘルプデスク、IPA の基本情報技術者試験の記述は『検索結果で確認』との記録。現行ページで要確認"
+   ],
+   "title_h1_note": "seo_title あり。title・eyecatch『プログラマー、未経験からどう目指す？』・本文は一致。"
+  },
+  {
+   "slug": "web-marketing-mikeiken",
+   "primary_queries_guess": [
+    "Webマーケティング 未経験",
+    "Webマーケティング 仕事内容",
+    "Webマーケター なるには 未経験",
+    "SNS運用 仕事 未経験"
+   ],
+   "reader_question": "Webマーケティングは毎日何をする仕事で、未経験からどう近づけばいいのか。",
+   "owns": "Webマーケティングの4つの仕事（SEO・広告・SNS・解析）と改善のくり返し、使う力と接客経験のつながり、準備のしかた、アシスタント求人の確認（自社の商品か取引先か）、ステマ規制の基本。研修は mikeiken-kenshu-kakunin、職種選び全体は shigoto-sagashikata、リモートは remote-work-kyujin に渡す。",
+   "adjacent": [
+    {
+     "slug": "shigoto-sagashikata",
+     "difference": "まだ迷っている人の受け皿。本文の最後でリンクしている。"
+    },
+    {
+     "slug": "sekkyaku-keiken-ikasu",
+     "difference": "接客経験の言語化の方法。"
+    },
+    {
+     "slug": "remote-work-kyujin",
+     "difference": "related のみ。Web系はリモート可の求人と結びつきやすいが、本文からリンクしていない。"
+    },
+    {
+     "slug": "mikeiken-kenshu-kakunin",
+     "difference": "研修ありの確認の一般版。"
+    }
+   ],
+   "next_action": "『この作業なら続けられそうか』を確かめたら、ガイドの next（mikeiken-tenshoku-hajimekata）で経験と条件を整理し、相談で『最初に任される作業・教わる体制』を確かめる。",
+   "classification": "strong",
+   "reasons": "job tag に基づく定義、4分類の表、改善のくり返しの図、接客経験とのつながり、準備の4ステップ、『自社か取引先か』という見落としやすい確認点、消費者庁に基づくステマ規制まで、検索意図に具体的に答えている。ARTICLE_GUIDES があり相談トピックも設定済み。弱いのは、POPの例文に仮の例の表示がないことと、『最初は〜から任されることが多い』という一般化に出典がないこと。",
+   "concrete_fixes": [
+    "POPの例文に『（仮の例です）』を付ける",
+    "『広告の入稿作業、投稿の作成、数字の集計といった作業から任されることが多い』を『任されることがある』に弱めるか、根拠を示す",
+    "『アシスタント求人』の節に remote-work-kyujin へのリンクを足す（Web系で気になりやすい在宅の可否）"
+   ],
+   "consult_bridge": "ガイド（topic: experience、question『最初に担当する業務と教わる体制はどうなっていますか？』）があり、本文の『アシスタント求人で確かめたいこと』とそのまま対応している。記事で仕事の中身が分かり、相談で求人ごとの担当範囲を確かめる、という分担が自然。",
+   "risks": [
+    "ステマ規制の対象（広告主）と、インフルエンサーに依頼したときの扱いは、消費者庁Q&Aの最新版で要確認",
+    "job tag の記述は検索結果で確認との記録"
+   ],
+   "title_h1_note": "seo_title あり。title・eyecatch『Webマーケティング、未経験から近づくには？』・本文は一致。"
+  },
+  {
+   "slug": "ai-shigoto-mikeiken",
+   "primary_queries_guess": [
+    "AI 仕事 なくなる 未経験",
+    "AI 奪われない 仕事 転職",
+    "事務 AI なくなる",
+    "AI時代 転職 職種 選び方"
+   ],
+   "reader_question": "AIで仕事がなくなるなら、今から未経験で選ぶ職種は大丈夫なのか。",
+   "owns": "AIの影響を職種名ではなく作業に分けて考える方法、職種ごとの考え方の例、面接で確かめる質問。教育訓練給付は news-kyouiku-kunren-kyufu、接客経験は sekkyaku-keiken-ikasu に渡す。",
+   "adjacent": [
+    {
+     "slug": "eigyo-cs-it-support-chigai",
+     "difference": "同じ職種群（営業・CS・ITサポート）を扱い、本記事の職種表と対象が重なる。"
+    },
+    {
+     "slug": "jimu-mikeiken-mae",
+     "difference": "『事務はAIでなくなる？』という不安の受け皿になりうるが、本記事から送っていない。"
+    },
+    {
+     "slug": "mikeiken-shikaku",
+     "difference": "学び直しの判断。"
+    },
+    {
+     "slug": "news-kyouiku-kunren-kyufu",
+     "difference": "学び直しの制度の変更点。本文からリンクしている。"
+    }
+   ],
+   "next_action": "気になる職種の作業を job tag で並べたあと、各職種の記事（jimu-mikeiken-mae など）で担当する作業を確かめる。相談では『入社後に担当する作業と使うツール』を聞く。職種がまだ決まっていない人は先に /check か shigoto-sagashikata。",
+   "classification": "thin",
+   "reasons": "『作業に分けて考える』という視点は役に立つが、本文の中身は編集部の見立てが中心で、出典は総務省の情報通信白書のトップページと job tag のトップページだけ（白書の内容は本文で使われていない）。職種ごとの表は『考え方の例』と断っているが、裏づけになる公的な調査や数字がない。2026年時点でAIの影響を扱うなら、公的資料を確かめたうえでの材料が必要。categories に news が付いているがニュースではない。相談への橋も弱い。",
+   "concrete_fixes": [
+    "情報通信白書や労働経済の分析など、公的資料の該当箇所を開いて確かめ、AIの利用状況や作業の変化に関する記述を1〜2点、出典つきで引用する（確かめられないなら数字は書かない）",
+    "職種の表に、このメディアの職種記事（jimu-mikeiken-mae・callcenter-shigoto・mikeiken-it-hajimari・eigyo-kowai）へのリンクを付け、各記事で担当する作業を確かめる流れにする",
+    "categories から news を外す（ニュースとして扱うなら発表日を持たせる）",
+    "材料を足せない場合は、eigyo-cs-it-support-chigai か jimu-mikeiken-mae に『AIで変わる作業』の短い節として統合することを人が検討する（統合する場合は、本記事にリンクしている kyouiku-kunren-kyufu-tsukaikata・news-kyouiku-kunren-kyufu のリンク先の付け替えが必要）"
+   ],
+   "consult_bridge": "ぼんやりした不安を『担当する作業を確かめる』に変える記事なので、相談で求人ごとの担当作業や使うツールを確かめる流れとは相性がよい。ただ本文では相談に触れておらず、職種が決まっていない読者をそのまま相談に送るより、先に /check や shigoto-sagashikata をはさむほうが自然。",
+   "risks": [
+    "AIの影響についての記述は編集部の見立てで、公的な根拠がない。『人が担う部分が残りやすい』が将来の予測として読まれるおそれがある（要確認）",
+    "published 10/06 のまま。AI関連は情報が古くなりやすく、更新日の管理が必要",
+    "出典に挙げた情報通信白書の内容が本文で使われておらず、出典の形だけになっている"
+   ],
+   "title_h1_note": "seo_title はない。title『…未経験転職者はどう見るべきか』は硬く、PERSONA の言葉（『今から選んで大丈夫？』）は eyecatch 側にしかない。categories に news が入っていて、カード上で『ニュース』と誤解されるおそれがある。"
+  },
+  {
+   "slug": "kaigo-mikeiken",
+   "primary_queries_guess": [
+    "介護職 未経験",
+    "介護 資格なし 働ける",
+    "介護職員初任者研修 必要",
+    "介護 夜勤 未経験"
+   ],
+   "reader_question": "未経験・無資格でも介護職になれるのか。資格はどの順に取り、夜勤は必ずあるのか。",
+   "owns": "介護職の仕事内容、施設・デイサービス・訪問の違い、資格の段階（初任者研修→実務者研修→介護福祉士）、無資格で働く場合の認知症介護基礎研修、夜勤の有無、確認事項。資格全般は mikeiken-shikaku、訓練は hello-training、給付は kyouiku-kunren-kyufu-tsukaikata に渡す。",
+   "adjacent": [
+    {
+     "slug": "mikeiken-shikaku",
+     "difference": "訪問介護の初任者研修を『なくては働けない資格』の例として使っている。お互いに related のみで、本文の相互リンクがない。"
+    },
+    {
+     "slug": "hello-training",
+     "difference": "訓練で資格を取る方法。本文からリンクしている。"
+    },
+    {
+     "slug": "kyouiku-kunren-kyufu-tsukaikata",
+     "difference": "講座費用の制度。本文からリンクしている。"
+    },
+    {
+     "slug": "mikeiken-kenshu-kakunin",
+     "difference": "研修ありの求人の確認。"
+    }
+   ],
+   "next_action": "働く場所（施設・デイサービス・訪問）と夜勤ができるかを決めたら、資格を先に取るかを hello-training / kyouiku-kunren-kyufu-tsukaikata で検討する。応募先を比べる段階で、相談先が介護職を扱うかを確かめたうえで相談へ。",
+   "classification": "strong",
+   "reasons": "働く場所ごとの違いの表と compare、資格の段階と研修時間、無資格者への研修義務（2024年4月完全施行）、先に取るか働きながら取るかの比較、夜勤の確認、確認リストと質問例がそろい、出典も公的。弱いのは『未経験の場合は、まず施設かデイサービスで…形が多くなります』が根拠のない一般化であること、本文の被リンクがないこと、相談先が介護職を扱うか分からないこと。",
+   "concrete_fixes": [
+    "『〜形が多くなります』を『〜形もあります（訪問介護は初任者研修の修了が必要なため）』に直す",
+    "mikeiken-shikaku の介護職の節から本記事へ、本記事の資格の節から mikeiken-shikaku へ、本文でリンクする",
+    "相談CTAを出すなら、相談先が介護職の求人に対応しているかを確かめてから文言を決める"
+   ],
+   "consult_bridge": "記事で資格・夜勤・働く場所は自分で整理できる。相談で確かめるのは『無資格可で研修支援のある事業所か』『夜勤の回数と人数』。ただし相談先（民間の人材紹介）が介護職の求人を扱うかは確認されておらず、カテゴリ汎用CTA『職種・会社選びを相談する』が当てはまらないおそれがある。",
+   "risks": [
+    "相談先の対応職種に介護職が含まれるかは先方の確認が必要（含まれない場合、CTAが読者の期待とずれる）",
+    "介護福祉士の受験には実務経験ルート以外もあり、図の『実務者研修：介護福祉士の受験に必要』は実務経験ルートの説明として正しいか要確認",
+    "研修時間数の出典（石川労働局の資料）は検索結果で確認との記録。厚生労働省の一次資料で要確認"
+   ],
+   "title_h1_note": "seo_title あり。title・eyecatch『介護職、未経験から始められる？』・本文は一致。"
+  },
+  {
+   "slug": "seko-kanri-mikeiken",
+   "primary_queries_guess": [
+    "施工管理 未経験",
+    "施工管理 仕事内容",
+    "施工管理技士 受検資格 2024",
+    "施工管理 残業 上限"
+   ],
+   "reader_question": "施工管理は未経験でもなれるのか。資格はどう取り、残業はどうなったのか。",
+   "owns": "4つの管理の具体的な場面、建築と土木の違い、技士補→技士と2024年度からの受検資格、建設業の時間外労働の上限規制、確認リスト。固定残業代は koteizangyo-kyujin、職場の情報は shokuba-jouhou-wakamono、資格の要否は mikeiken-shikaku に渡す。",
+   "adjacent": [
+    {
+     "slug": "driver-shigoto",
+     "difference": "2024年4月の上限規制という同じ論点を、運輸業で扱っている。"
+    },
+    {
+     "slug": "mikeiken-shikaku",
+     "difference": "資格の段階の考え方。本文からリンクしているが、向こうの表に施工管理技士はない。"
+    },
+    {
+     "slug": "koteizangyo-kyujin",
+     "difference": "固定残業代の見方。本文からリンクしている。"
+    },
+    {
+     "slug": "shokuba-jouhou-wakamono",
+     "difference": "残業・定着の職場情報。本文からリンクしている。"
+    }
+   ],
+   "next_action": "建築・土木・設備のどれかと、残業をどこまで受け入れられるかを決め、求人の『職場の情報』を shokuba-jouhou-wakamono で確かめる。応募先を比べる段階で、相談先の対応範囲を確かめて相談へ。",
+   "classification": "strong",
+   "reasons": "4つの管理を具体的な場面で説明し、建築と土木の表、国土交通省の受検資格（技士補・技士、19歳・17歳）、厚生労働省の資料に基づく上限規制の表と災害復旧の例外、面接例文（仮の例と明記）、確認リストと質問例まで、公的な出典で具体的に答えている。弱いのは、PERSONA の中心（接客から事務・IT・営業へ）から遠く、相談先が扱うか分からないことと、本文の被リンクがないこと。",
+   "concrete_fixes": [
+    "相談CTAを出すなら、相談先の対応職種を確かめてから文言を決める",
+    "mikeiken-shikaku の資格の分類に施工管理技士の例を足し、相互リンクにする",
+    "確認リストの『休日の決まり方』に donichi-yasumi-shigoto（休日欄の読み方）へのリンクを足す"
+   ],
+   "consult_bridge": "記事で制度と確認点は整理でき、相談で確かめるのは残業の実績や受検支援など求人ごとの情報。ただし相談先が建設業の求人を扱うかは確認されておらず、カテゴリ汎用CTAが期待とずれるおそれがある。",
+   "risks": [
+    "相談先の対応職種に建設業（施工管理）が含まれるかは先方の確認が必要",
+    "第二次検定に必要な実務経験の年数は、最新年度の受検の手引きで要確認（本文は年数を書かず手引きを見るよう案内している）",
+    "国土交通省・厚生労働省の資料は『検索結果で確認』との記録。一次資料で要確認"
+   ],
+   "title_h1_note": "seo_title あり。title（H1）は約45字でやや長い。eyecatch『施工管理って、未経験でもなれる？』は本文と一致。"
+  },
+  {
+   "slug": "driver-shigoto",
+   "primary_queries_guess": [
+    "ドライバー 未経験",
+    "トラック 運転手 免許 必要",
+    "準中型 中型 大型 違い",
+    "タクシー 二種免許 取り方"
+   ],
+   "reader_question": "ドライバーの仕事にはどの免許が必要で、未経験から始められるのか。2024年4月から働き方はどう変わったのか。",
+   "owns": "荷物を運ぶ仕事と人を乗せる仕事の違い、免許の区分と受験資格（特例教習）、2024年4月からの時間外労働の上限と改善基準告示、給料の内訳の確認、雇用か業務委託か。固定残業代は koteizangyo-kyujin、労働条件通知書は naitei-shodaku-mae、資格の要否は mikeiken-shikaku、倉庫は butsuryu-soko-shigoto に渡す。",
+   "adjacent": [
+    {
+     "slug": "butsuryu-soko-shigoto",
+     "difference": "物流の倉庫の中の仕事。運ぶ側と倉庫側で役割が分かれている。"
+    },
+    {
+     "slug": "seko-kanri-mikeiken",
+     "difference": "同じ2024年4月の上限規制を、建設業で扱っている。"
+    },
+    {
+     "slug": "mikeiken-shikaku",
+     "difference": "免許は『なくては働けない資格』の典型だが、向こうの表にない。"
+    },
+    {
+     "slug": "naitei-shodaku-mae",
+     "difference": "労働条件通知書の確認。本文からリンクしている。"
+    }
+   ],
+   "next_action": "自分の免許で運転できる車を確かめ、免許の取得支援がある求人を比べる。雇用か業務委託か分からない求人は応募前に確かめる。相談先が扱う職種かを確かめてから相談へ。",
+   "classification": "strong",
+   "reasons": "警察庁の資料に基づく免許区分の表と特例、厚生労働省の改善基準告示の数値の表、拘束時間・休息期間の言い換え、『残業代を前提にした給料の見込みは変わりうる』という給料の確認、業務委託の注意、面接例文（仮の例と明記）と質問例まで具体的で、公的な出典で答えている。弱いのは、H1 がとても長いこと、PERSONA の中心から遠く相談先が扱うか分からないこと、本文の被リンクがないこと。",
+   "concrete_fixes": [
+    "mikeiken-shikaku の『なくては働けない資格』に普通第二種免許（タクシー）の例を足してもらい、本記事と相互リンクにする",
+    "業務委託の段落に、雇用か業務委託かで社会保険や労働時間のルールが変わることの公的な案内（確かめられたもの）へのリンクを検討する",
+    "相談CTAを出すなら、相談先の対応職種を確かめてから文言を決める"
+   ],
+   "consult_bridge": "記事で免許と働き方のルールは整理でき、相談で確かめるのは求人ごとの拘束時間の実態・給料の内訳・免許の支援。ただし相談先が運輸の求人を扱うかは確認されておらず、汎用CTAが当てはまらないおそれがある。",
+   "risks": [
+    "相談先の対応職種に運輸・ドライバーが含まれるかは先方の確認が必要",
+    "表の『普通免許：3.5トン未満』が、取った時期によって違うことを見落として全員に当てはまると読まれないか要確認（本文に免許証の条件欄を確かめる注意はある）",
+    "改善基準告示の数値は、厚生労働省の特設サイトで最新か要確認"
+   ],
+   "title_h1_note": "title（H1）が約60字で非常に長い。seo_title は短くしてある。eyecatch『ドライバーの仕事、どの免許が必要？』は本文の一部（免許）に寄っているが、入口としては有効。"
+  },
+  {
+   "slug": "butsuryu-soko-shigoto",
+   "primary_queries_guess": [
+    "倉庫 仕事 未経験",
+    "ピッキング 仕事内容",
+    "検品 仕事 とは",
+    "フォークリフト 資格 必要"
+   ],
+   "reader_question": "倉庫の仕事は未経験でもできるのか。ピッキング・検品・在庫管理・フォークリフトは何が違い、資格は必要か。",
+   "owns": "入庫から出荷までの流れ、各担当の違い、フォークリフトの技能講習と特別教育の線引き、向き不向き、求人で確認すること（扱う商品・温度帯・時間帯・雇用の形）。派遣から正社員は haken-seishain、研修は mikeiken-kenshu-kakunin、資格の要否は mikeiken-shikaku に渡す。",
+   "adjacent": [
+    {
+     "slug": "seizou-koujou-shigoto",
+     "difference": "黙々と手を動かす仕事、雇用の形の確認という点で読者も構成も近い。"
+    },
+    {
+     "slug": "driver-shigoto",
+     "difference": "物流の運ぶ側。"
+    },
+    {
+     "slug": "haken-seishain",
+     "difference": "派遣から正社員を考える受け皿。本文からリンクしている。"
+    },
+    {
+     "slug": "mikeiken-shikaku",
+     "difference": "フォークリフトは『なくては働けない資格』の例になるが、向こうの表にない。"
+    }
+   ],
+   "next_action": "担当・時間帯・扱う商品の3つを決めて求人を比べる。派遣で働いている人は haken-seishain、正社員の経験が少ない人は freeter-seishain-hajimeni（経路C）へ。",
+   "classification": "strong",
+   "reasons": "流れの図、各担当の job tag 引用、フォークリフトの1トン基準と公道を走れない注意、温度帯や重さなど具体的な確認項目、面接例文（仮の例と明記）と質問例がそろっている。弱いのは、FAQ と本文の『資格がなくても応募できる求人が多い仕事』『派遣・契約社員・パートの求人も多い仕事』が根拠のない一般化であること（uketsuke-shigoto の research_notes では同じ種類の傾向の表現を避けている）。経路C（フリーター・派遣）向けのタグなのに、freeter-seishain-hajimeni や相談（first-job）につながらない。",
+   "concrete_fixes": [
+    "『求人が多い仕事』の2か所を『求人もある』に直すか、公的統計で確かめて出典を付ける",
+    "『雇用の形は先に決めておく』の節に freeter-seishain-hajimeni へのリンクを足し、経路Cにつなぐ",
+    "mikeiken-shikaku の『なくては働けない資格』にフォークリフト（1トン以上は技能講習）の例を足してもらい、相互リンクにする"
+   ],
+   "consult_bridge": "記事で仕事の違いと資格の線引きは分かり、相談で確かめるのは『正社員の求人か、入社後に資格の支援があるか』。経路Cの読者（フリーター・派遣）が多い記事なので first-job トピックへの橋が自然だが、相談先が倉庫・物流の仕事を扱うかは確認されていない。",
+   "risks": [
+    "『求人が多い』という一般化に根拠がない",
+    "相談先の対応職種に倉庫・物流が含まれるかは先方の確認が必要",
+    "フォークリフトの資格区分は厚生労働省の資料（検索結果で確認）。一次資料で要確認"
+   ],
+   "title_h1_note": "title（H1）が約50字と長い。seo_title は短くしてある。eyecatch『倉庫の仕事って、未経験でもできる？』は本文と一致。"
+  },
+  {
+   "slug": "seizou-koujou-shigoto",
+   "primary_queries_guess": [
+    "工場 仕事 未経験",
+    "ライン作業 とは",
+    "期間従業員 派遣 違い",
+    "工場 夜勤 手当"
+   ],
+   "reader_question": "工場の仕事は未経験でも大丈夫か。ライン・検査・オペレーターの違い、交替制や雇用の形はどう違うのか。",
+   "owns": "ライン・検査・オペレーターの違い、交替制と深夜の割増賃金、正社員・期間従業員・派遣の雇い主と期間の違い、確認リスト。無期転換は muki-tenkan-keiyaku、派遣から正社員は haken-seishain、限定正社員は gentei-seishain、研修は mikeiken-kenshu-kakunin に渡す。",
+   "adjacent": [
+    {
+     "slug": "butsuryu-soko-shigoto",
+     "difference": "構成と読者が近い。"
+    },
+    {
+     "slug": "haken-seishain",
+     "difference": "派遣と正社員の比較。本文からリンクしている。"
+    },
+    {
+     "slug": "muki-tenkan-keiyaku",
+     "difference": "期間従業員の更新と無期転換。本文からリンクしている。"
+    },
+    {
+     "slug": "gentei-seishain",
+     "difference": "related のみ。"
+    }
+   ],
+   "next_action": "担当・時間帯・雇用の形を決めて求人を比べる。期間従業員や派遣を考える人は muki-tenkan-keiyaku・haken-seishain で長い目で見た見通しを確かめる。正社員の経験が少ない人は freeter-seishain-hajimeni（経路C）へ。",
+   "classification": "strong",
+   "reasons": "job tag の具体的な記述（1人の作業は1〜10分、検査は社内異動で就くことが多い）、検査の種類、深夜割増の法令、雇用の形の compare と登用実績の確認、面接例文（仮の例と明記）と質問例があり、具体的。弱いのは『未経験の人は、まず1つの工程を覚え…形が多くなります』に根拠がないこと、経路C・相談への出口がないこと。",
+   "concrete_fixes": [
+    "『形が多くなります』を『形もあります』に直す",
+    "雇用の形の節に freeter-seishain-hajimeni へのリンクを足し、経路Cにつなぐ",
+    "相談CTAを出すなら、相談先の対応職種を確かめてから文言を決める"
+   ],
+   "consult_bridge": "記事で雇用の形の違いは整理でき、相談で確かめるのは『正社員登用の実績』『交替のパターン』。相談先が製造業の求人を扱うかは確認されていない。",
+   "risks": [
+    "相談先の対応職種に製造業が含まれるかは先方の確認が必要",
+    "job tag の自動車組立・検査工の記述は検索結果で確認との記録。一次資料で要確認"
+   ],
+   "title_h1_note": "title（H1）が約50字と長い。seo_title は短くしてある。eyecatch『工場の仕事、未経験でも大丈夫？』は本文と一致。"
+  },
+  {
+   "slug": "koumuin-shakaijin",
+   "primary_queries_guess": [
+    "社会人 公務員 転職",
+    "公務員 社会人経験者採用 年齢",
+    "公務員試験 何歳まで",
+    "民間 から 公務員 転職"
+   ],
+   "reader_question": "社会人から公務員を目指せるのか。年齢や職務経験の要件はどう確かめ、どう準備すればいいのか。",
+   "owns": "社会人の2つの入口、受験案内で年齢・職務経験の要件を確かめる手順、試験の流れ、民間との違い（異動・休日・兼業の許可・採用の時期）、働きながらの準備と面接の質問。働きながらの進め方は zaishoku-tenshoku-susumekata、自己分析は jiko-bunseki-yarikata、志望動機は shiboudouki-mikeiken に渡す。",
+   "adjacent": [
+    {
+     "slug": "zaishoku-tenshoku-susumekata",
+     "difference": "働きながら時間を作る方法。本文からリンクしている。"
+    },
+    {
+     "slug": "jiko-bunseki-yarikata",
+     "difference": "経験の書き出し。本文からリンクしている。"
+    },
+    {
+     "slug": "shiboudouki-mikeiken",
+     "difference": "志望動機の組み立て。本文からリンクしている。"
+    },
+    {
+     "slug": "tekisei-kensa-tenshoku",
+     "difference": "related のみ。民間の適性検査と公務員の筆記試験は別物で、つながりは弱い。"
+    }
+   ],
+   "next_action": "受けたい自治体の受験案内を開き、受験資格を確かめる（記事の外での行動）。民間企業も並行して考える人は /check で条件を整理し、民間の求人について相談する。",
+   "classification": "needs_polish",
+   "reasons": "数字を断定せず受験案内の読み方に落とした方針、受験案内で確かめるチェック、民間との違い（兼業許可の法的根拠）、面接の質問は丁寧。ただし、このメディアの相談先は民間の人材紹介で、公務員試験は相談で扱えない可能性が高いのに、カテゴリ汎用CTA『職種・会社選びを相談する』が表示される。本文の被リンクも被 related も0件で孤立している。『正社員以外の経験も含める試験もある』『民間の中途採用は一年中募集があることが多い』に出典がなく、答え方の例に仮の例の表示もない。",
+   "concrete_fixes": [
+    "この記事では相談CTAの文言を『民間企業も並行して考えるなら』に限るか、相談CTAを出さないかを人が検討する（相談先の対応範囲を確かめる）",
+    "『正社員以外の経験も数える試験もある』は具体的な自治体の受験案内で1例を確かめて出典を付けるか、『試験によって定義が違う』に弱める",
+    "答え方の例に『（仮の例です）』を付ける",
+    "『土日休みにしたい』理由で考える人向けに donichi-yasumi-shigoto、異動の考え方として tenkin-kinmuchi-kakunin へのリンクを足し、孤立を解く"
+   ],
+   "consult_bridge": "記事が解決するのは『受験案内の読み方』で、確かめる相手は自治体の採用窓口。サイトの相談（民間の人材紹介）で確かめられることは少なく、相談への自然なつながりは『民間と公務員を比べて迷っている人』に限られる。今の汎用CTAは読者の期待とずれる。",
+   "risks": [
+    "相談先が公務員試験の相談を扱わない場合、CTAが誤解を招く（要確認）",
+    "人事院の経験者採用試験の内容やページURLは年度によって変わるため要確認",
+    "地方公務員法第38条の説明は総務省のページ（検索結果で確認）。一次資料で要確認"
+   ],
+   "title_h1_note": "seo_title あり。title・eyecatch『社会人から公務員、何を確かめる？』・本文は一致。"
+  },
+  {
+   "slug": "mikeiken-shikaku",
+   "primary_queries_guess": [
+    "未経験 転職 資格 必要",
+    "未経験 転職 資格 おすすめ",
+    "転職 資格 取るべきか",
+    "資格 勉強中 履歴書 書き方"
+   ],
+   "reader_question": "未経験の仕事に転職するなら、先に資格を取ったほうがいいのか。どの資格をいつ取ればいいのか。",
+   "owns": "『なくては働けない資格』と『あると役立つ資格』の見分け方、資格より先に考えること、職種別の例（MOS・簿記・ITパスポート・介護職員初任者研修）、取る前の確認、勉強中の書き方、教育訓練給付の入口。各資格の詳細は pc-nigate-jimu・keiri-mikeiken・mikeiken-it-hajimari・kaigo-mikeiken、給付は kyouiku-kunren-kyufu-tsukaikata に渡す。",
+   "adjacent": [
+    {
+     "slug": "kyouiku-kunren-kyufu-tsukaikata",
+     "difference": "向こうの『資格を取れば転職できるとは限らない』節が重なる。向こうの中心は給付制度。"
+    },
+    {
+     "slug": "keiri-mikeiken",
+     "difference": "簿記の詳細。本記事から本文でリンクしていない（related のみ）。"
+    },
+    {
+     "slug": "kaigo-mikeiken",
+     "difference": "初任者研修の詳細。本記事から本文でリンクしていない（related のみ）。"
+    },
+    {
+     "slug": "driver-shigoto",
+     "difference": "普通第二種免許という『なくては働けない資格』の実例を持ち、本記事にリンクしてくるが、本記事の表にない。"
+    },
+    {
+     "slug": "butsuryu-soko-shigoto",
+     "difference": "フォークリフトの技能講習という実例を持ち、本記事にリンクしてくるが、本記事の表にない。"
+    },
+    {
+     "slug": "fudousan-eigyo",
+     "difference": "宅建士という『入社に必須ではないが独占業務がある資格』の実例を持ち、本記事にリンクしてくる。"
+    }
+   ],
+   "next_action": "応募したい求人の『必須・歓迎』を数え、取ると決めたら kyouiku-kunren-kyufu-tsukaikata で費用を確かめる。資格より書類が先と分かったら rirekisho-kakukoto-nai / shokumu-keirekisho-arubaito（経路C）へ。どの職種を目指すか決まらない人は /check → 相談。",
+   "classification": "strong",
+   "reasons": "2種類の資格の compare、職種別の表、取る前のチェック、求人の資格名を数えるという具体的な行動、勉強中の書き方、成果を保証しない注意があり、検索意図に具体的に答えるハブ。弱いのは、『なくては働けない資格』の例が訪問介護の1つだけで、同じクラスターにある実例（フォークリフトの技能講習、普通第二種免許、宅建士の重要事項の説明）を使っていないこと、keiri-mikeiken・kaigo-mikeiken に本文でリンクしていないこと、相談への出口がないこと。",
+   "concrete_fixes": [
+    "『なくては働けない資格』の例にフォークリフト（butsuryu-soko-shigoto）と普通第二種免許（driver-shigoto）を、『入社に必須ではないが、その資格の人だけができる仕事がある』例として宅建士（fudousan-eigyo）を足し、相互リンクにする",
+    "事務職の節から keiri-mikeiken（簿記）、介護職の節から kaigo-mikeiken へ本文でリンクする",
+    "締めに『どの仕事に就きたいかがまだ決まらないなら /check、決まっていれば応募先の条件を相談で確かめる』という1文を足す"
+   ],
+   "consult_bridge": "記事の結論『資格より、どの仕事に就きたいかから逆算する』は、相談で『その求人で資格が必要か、入社後に取れるか』を確かめる流れに自然につながる。カテゴリCTA（mikeiken：未経験の仕事への応募を相談する）とも内容が合うが、本文では相談に触れていない。",
+   "risks": [
+    "IPA が『2027年度から新しい試験制度に移る予定』と案内しているという記述は、ipa.go.jp で要確認",
+    "教育訓練給付の説明が2024年10月以降の拡充を反映しているか、kyouiku-kunren-kyufu-tsukaikata と内容がそろっているか要確認"
+   ],
+   "title_h1_note": "seo_title あり。title・eyecatch『未経験の転職、資格は取るべき？』・本文は一致。"
+  }
+ ],
+ "cluster_notes": "【全体の傾向】25本はおおむね公的出典（job tag・厚生労働省・国土交通省・警察庁など）にもとづいて仕事の中身と確認事項を書けており、事実の質は高い。判定は strong 13本、needs_polish 11本、thin 1本（ai-shigoto-mikeiken）。overlap に当たる記事はないが、部分的な重複が多い。弱点は内容よりも『つなぎ』。(1) ハブから子記事への本文リンクがない：jimu-mikeiken-mae の種類表から eigyo-jimu-shigoto・keiri-mikeiken・uketsuke-shigoto・iryo-jimu-mikeiken へ、sekkyaku-office の接点表から callcenter-shigoto・uketsuke-shigoto・eigyo-jimu-shigoto へ、eigyo-cs-it-support-chigai から callcenter-shigoto・mikeiken-it-hajimari・eigyo-kowai へ、それぞれリンクしていない。子記事からハブへの一方通行で、callcenter・eigyo-jimu・uketsuke・iryo-jimu・keiri・fudousan・programmer・web-marketing・kaigo・koumuin は本文の被リンクが0件。(2) 25本のうち ARTICLE_GUIDES があるのは4本（sekkyaku-keiken-ikasu・sekkyaku-office・jimu-mikeiken-mae・web-marketing-mikeiken）だけ。残りはカテゴリ汎用CTA（shokushu：職種・会社選びを相談する）で、本文中で相談や /check に触れる記事はほとんどない。\n\n【経路A（接客経験→オフィス比較→条件整理→相談）】ステップ1 sekkyaku-keiken-ikasu・ステップ2 sekkyaku-office・ステップ4 jimu-mikeiken-mae（サイドは pc-nigate-jimu）。3本とも10/12に補強されたが reviewed_at が古いままで、再査読が必要。問題は3つ。(a) jimu-mikeiken-mae のガイドの next が sekkyaku-keiken-ikasu（ステップ1）に戻っており、ステップ4から /check→相談へ進まない。(b) sekkyaku-office は条件の表（勤務時間・休日・通勤）が中心なのに、相談リンクは #support-experience で、話題がずれる。(c) pc-nigate-jimu は相談トピック experience の ask『必要なPC操作は、何から練習するとよいですか？』とそのまま対応しているのに、ガイドも相談リンクもなく、out_links も1件。経路Aの受け皿になる callcenter-shigoto・uketsuke-shigoto・eigyo-jimu-shigoto・jinji-saiyo-mikeiken は、どれも経路Aのハブや相談に戻る出口を持たない。\n\n【経路B（給料を下げたくない＋土日休み）】このクラスターの職種記事の多くは『土日休み？』『残業は？』に触れている（eigyo-jimu・keiri・iryo-jimu・uketsuke・callcenter・kaigo・seko-kanri）のに、donichi-yasumi-shigoto・donichi-yasumi-nenshu-hikaku・nenshu-dake-erabanai や #support-conditions へ送っていない。給料の構造に答える eigyo-kowai（固定給とインセンティブ）・fudousan-eigyo（歩合・保障給）・hanbai-seishain（時給と月給）は経路Bの入口として有力だが、経路Bの記事へ戻るリンクが弱い。職種別の給料の数字は意図して書いていない（妥当）ので、代わりに『給料の内訳をどう確かめるか』を経路Bへ渡す1行を足すとよい。\n\n【経路C（フリーター・正社員経験が少ない）】situations が freeter・haken の hanbai-seishain・butsuryu-soko-shigoto・seizou-koujou-shigoto・driver-shigoto・uketsuke-shigoto のうち、freeter-seishain-hajimeni へリンクするのは hanbai-seishain だけ。shokumu-keirekisho-arubaito・agent-mendan-mae・#support-first-job にはどれもつながっていない。hanbai-seishain は相談の出口が公的窓口（わかものハローワーク）だけ。\n\n【重複の多い領域】(1) 接客経験の言語化：sekkyaku-keiken-ikasu・jiko-pr-mikeiken・shokumu-keirekisho-arubaito の3本が分解表と書き方の例でかなり重なるうえ、職種記事のほぼ全部（約15本）に『接客経験はどう活かせる？』の節と例文がある。職種記事では、その職種に固有の重なりと違いだけを残し、方法は sekkyaku-keiken-ikasu に渡すとよい。(2) PC操作：jimu-mikeiken-mae の冒頭表・PC節と pc-nigate-jimu。(3) 『オフィス＝土日休みとは限らない』：sekkyaku-office・donichi-yasumi-shigoto のほか、uketsuke・iryo-jimu・callcenter の FAQ。(4) 営業のやり方（新規・ルート・反響）：eigyo-cs-it-support-chigai と eigyo-kowai。(5) 歩合給と労働基準法第27条：eigyo-kowai と fudousan-eigyo。(6) eigyo-cs-it-support-chigai と /jobs（職種比較ページ）が同じ3軸の比較を担っている。\n\n【量産に見える箇所】10/09〜10/10に公開した職種記事（callcenter・eigyo-jimu・uketsuke・iryo-jimu・keiri・fudousan・programmer・web-marketing・kaigo・seko-kanri・driver・butsuryu・seizou・koumuin・mikeiken-shikaku）は、『先に結論を言うと』→『この記事で分かること：』→job tag の引用→『向いている人・合わないと感じやすい場面』→接客経験の例文『（仮の例です）』→『〜の求人で確認すること』チェックリスト→面接の質問3〜4個、という同じ骨組み。中身は職種ごとに具体的なので、量産というだけで低品質とは言えないが、締めがどれも相談や経路につながらずに終わる点も同じで、テンプレート感が強まっている。『資格は勉強の目標を決めるための目安と考えると気が楽になります』という文は pc-nigate-jimu と mikeiken-it-hajimari でほぼ同じ。また research_notes の多くに『job tag へ直接接続できなかったため、検索結果に表示されたページ内容で確認』とあり、事実の根拠が検索結果の抜粋にとどまる。公開前に人が一次資料を開いて確かめる必要がある。\n\n【仮の例・一般化】仮の例の表示が抜けているもの：uketsuke（例文2つ）、iryo-jimu・keiri・programmer（面接例文）、jinji（シフト15人の例）、web-marketing（POP例文）、hanbai-seishain（時給の計算例）、koumuin（答え方の例）、eigyo-jimu（会話例）。根拠のない一般化：eigyo-cs-it-support-chigai『求人の数も多い傾向』、butsuryu『求人が多い仕事』（2か所）、uketsuke FAQ『土日休みのことが多い』、kaigo・seizou『〜形が多くなります』、web-marketing『〜から任されることが多い』、koumuin『一年中募集があることが多い』。\n\n【欠けている検索意図（記事を増やさず既存記事で補うもの）】(1) メール・チャット中心のカスタマーサポート：callcenter-shigoto か eigyo-cs-it-support-chigai で補う。(2) IT未経験の『取引先への常駐』と雇用の形：mikeiken-it-hajimari で補う。(3) 職種ごとの『土日休みか』の確かめ方：各記事から donichi-yasumi-shigoto へ集める。(4) 『なくては働けない資格』の実例（フォークリフト・普通第二種免許・宅建士の独占業務）：mikeiken-shikaku の表に集める。\n\n【人が検討すべきこと（決定ではない）】(a) 介護・施工管理・ドライバー・倉庫・工場・公務員の6本は PERSONA の中心（接客から事務・IT・営業へ）から外れ、本文の被リンクが少なく、相談先（民間の人材紹介）がこれらの職種を扱うかが確認されていない。特に koumuin-shakaijin は相談で扱えない可能性が高いので、CTAの出し方を先方の確認後に決める必要がある。(b) ai-shigoto-mikeiken は公的な材料を足せなければ、eigyo-cs-it-support-chigai か jimu-mikeiken-mae への統合を検討する（被リンク元は kyouiku-kunren-kyufu-tsukaikata と news-kyouiku-kunren-kyufu の2本なので、リンク先の付け替えが必要）。(c) eigyo-cs-it-support-chigai は /jobs との役割分担を決める。(d) eyecatch『接客の経験、〜で活かせる？』系の4本（sekkyaku-keiken-ikasu・uketsuke・callcenter・jiko-pr-mikeiken）が /situations/sekkyaku の一覧で見分けにくい。(e) fudousan・driver・butsuryu・seizou は H1 が45〜60字と長く、スマホの冒頭が重い。"
+}

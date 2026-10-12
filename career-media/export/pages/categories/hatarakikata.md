@@ -33,10 +33,10 @@ source:
 
 ## もう少し調べたいこと 25本
 
+- [求人の「福利厚生」はどう見る？社会保険と会社独自の制度の違い、住宅手当・交通費・退職金の確かめ方](/articles/fukuri-kousei-mikata)
 - [「リモートワーク可」の求人、どこを見る？頻度・条件・費用と入社直後の出社を確かめる](/articles/remote-work-kyujin)
 - [求人の「賞与年2回」「昨年実績」はどう読む？ボーナスの見方と面接での聞き方](/articles/shoyo-kyujin-mikata)
 - [退職金はもらえる？会社によって違う理由と確かめ方｜就業規則・勤続年数・中退共・求人票の見方](/articles/taishokukin-kakunin)
-- [求人の「福利厚生」はどう見る？社会保険と会社独自の制度の違い、住宅手当・交通費・退職金の確かめ方](/articles/fukuri-kousei-mikata)
 - [限定正社員（勤務地・職務・短時間）とは？普通の正社員との違いと、応募前に確認すること](/articles/gentei-seishain)
 - [自分に合う会社選びを、プロに相談するとよい理由｜求人票で分からないことの聞き方と確かめ方](/articles/kigyou-erabi-soudan)
 
@@ -47,8 +47,8 @@ source:
 - [転勤あり・なしはどこで分かる？求人の「就業場所の変更の範囲」の読み方と確認のしかた](/articles/tenkin-kinmuchi-kakunin)
 - [希望年収・希望給与の書き方と面接での答え方｜「貴社規定に従います」の使いどころと例文](/articles/kibou-nenshu-kakikata)
 - [固定残業代（みなし残業）がある求人の見方｜求人に書かれるべき3つの項目と確認のしかた](/articles/koteizangyo-kyujin)
-- [契約社員と正社員は何が違う？「無期転換ルール」のしくみと求人で確認すること](/articles/muki-tenkan-keiyaku)
 - [内定をもらったら、承諾の前に確認すること｜労働条件通知書の見方と返事のしかた](/articles/naitei-shodaku-mae)
+- [契約社員と正社員は何が違う？「無期転換ルール」のしくみと求人で確認すること](/articles/muki-tenkan-keiyaku)
 - [試用期間って何？法律上の扱い・給料と社会保険・入社前に確認したいこと](/articles/shiyou-kikan)
 - [退職したあとの住民税はどう払う？辞める時期による違いと、転職先で続ける方法](/articles/taishoku-juminzei)
 - [転職で後悔しないために、入社前に確認したいこと｜労働条件通知書・求人票との違い・休日・残業・試用期間・配属](/articles/tenshoku-koukai-shinai)

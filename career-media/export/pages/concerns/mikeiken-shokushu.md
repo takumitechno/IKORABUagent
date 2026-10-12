@@ -71,18 +71,18 @@ source:
 - [営業・カスタマーサポート・ITサポートの違いは？仕事内容と向き不向きを比べる](/articles/eigyo-cs-it-support-chigai)
 - [未経験で事務職を目指す前に知っておきたいこと｜種類・PC・電話対応](/articles/jimu-mikeiken-mae)
 - [人事・採用の仕事に、未経験から近づくには？入口になりやすい仕事と準備](/articles/jinji-saiyo-mikeiken)
+- [未経験のIT、どんな仕事から始まる？入口になりやすい仕事と入社前の確認](/articles/mikeiken-it-hajimari)
 - [未経験転職は何から始める？最初に整理したい5つのこと](/articles/mikeiken-tenshoku-hajimekata)
-- [PCが得意じゃなくても、事務職は目指せる？よく使う操作と練習のしかた](/articles/pc-nigate-jimu)
 
 **ほかの記事を読む 31〜41本目**
 
+- [PCが得意じゃなくても、事務職は目指せる？よく使う操作と練習のしかた](/articles/pc-nigate-jimu)
 - [接客経験は転職でどう活かせる？職種別のつながりと伝え方](/articles/sekkyaku-keiken-ikasu)
 - [やりたい仕事が分からない。自分に合う仕事の探し方3ステップ](/articles/shigoto-sagashikata)
 - [AIで変わる仕事を、未経験転職者はどう見るべきか](/articles/ai-shigoto-mikeiken)
 - [第二新卒って何歳まで？使える場面と探し方](/articles/dainishinsotsu-nansai)
 - [営業が怖い人へ。不安を分けて確認したい仕事内容と面接での質問例](/articles/eigyo-kowai)
 - [未経験職種の面接、何を準備する？よく聞かれる質問と逆質問の例](/articles/mensetsu-junbi-mikeiken)
-- [未経験のIT、どんな仕事から始まる？入口になりやすい仕事と入社前の確認](/articles/mikeiken-it-hajimari)
 - [未経験求人の「研修あり」で確認すべきこと｜期間・内容・その後のフォロー](/articles/mikeiken-kenshu-kakunin)
 - [未経験職種の志望動機、何を書けばいい？3つの要素と例文](/articles/shiboudouki-mikeiken)
 - [学び直しの支援が拡充｜教育訓練給付の引き上げと教育訓練休暇給付金](/news/news-kyouiku-kunren-kyufu)

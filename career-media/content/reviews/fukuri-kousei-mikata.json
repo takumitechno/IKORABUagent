@@ -6,5 +6,19 @@
     "verdict": "approved",
     "findings": [],
     "reviewedAt": "2026-10-10T00:07:54.708Z"
+  },
+  {
+    "slug": "fukuri-kousei-mikata",
+    "contentHash": "e86bc9cb4d2ef425eeb4c59dffc454e25783aed47c2db847d1c45d8caa8e046b",
+    "reviewer": "career-reviewer (automated checks; human approval pending)",
+    "verdict": "approved",
+    "findings": [
+      {
+        "code": "C04",
+        "severity": "warning",
+        "message": "査読（reviewed_at）のあとに更新されている。再査読が必要"
+      }
+    ],
+    "reviewedAt": "2026-10-12T08:14:47.966Z"
   }
 ]

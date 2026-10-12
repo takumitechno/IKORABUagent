@@ -6,5 +6,19 @@
     "verdict": "approved",
     "findings": [],
     "reviewedAt": "2026-10-09T04:25:34.979Z"
+  },
+  {
+    "slug": "hello-training",
+    "contentHash": "cc2ba47fa0bc5317f5e8ff7e082b806deebe9c19ba1995a5699b2c4c51a8921c",
+    "reviewer": "career-reviewer (automated checks; human approval pending)",
+    "verdict": "approved",
+    "findings": [
+      {
+        "code": "C04",
+        "severity": "warning",
+        "message": "査読（reviewed_at）のあとに更新されている。再査読が必要"
+      }
+    ],
+    "reviewedAt": "2026-10-12T08:23:34.185Z"
   }
 ]

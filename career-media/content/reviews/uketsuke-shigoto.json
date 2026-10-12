@@ -20,5 +20,19 @@
       }
     ],
     "reviewedAt": "2026-10-12T07:44:41.191Z"
+  },
+  {
+    "slug": "uketsuke-shigoto",
+    "contentHash": "9e1c973a8b3702794aa3fb2840b238570f51578d73b91bdb0d1bd0816083d994",
+    "reviewer": "career-reviewer (automated checks; human approval pending)",
+    "verdict": "approved",
+    "findings": [
+      {
+        "code": "C04",
+        "severity": "warning",
+        "message": "査読（reviewed_at）のあとに更新されている。再査読が必要"
+      }
+    ],
+    "reviewedAt": "2026-10-12T08:14:45.140Z"
   }
 ]

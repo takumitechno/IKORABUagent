@@ -1,0 +1,97 @@
+
+> career-media@0.1.0 test:meeting
+> node scripts/meeting-smoke.mjs --base http://127.0.0.1:3100 --static-base http://127.0.0.1:3301
+
+{
+  "flows": [
+    {
+      "name": "A",
+      "topic": "experience",
+      "copy": true,
+      "summary": true,
+      "details": 7,
+      "keyboard": true,
+      "printRestore": true,
+      "visibleApply": true,
+      "directHref": true,
+      "url": "http://127.0.0.1:3100/consultation/apply?placement=consultation-page#support-experience"
+    },
+    {
+      "name": "B",
+      "topic": "conditions",
+      "copy": true,
+      "summary": true,
+      "details": 7,
+      "keyboard": true,
+      "printRestore": true,
+      "visibleApply": true,
+      "directHref": true,
+      "url": "http://127.0.0.1:3100/consultation/apply?placement=consultation-page#support-conditions"
+    },
+    {
+      "name": "C",
+      "topic": "first-job",
+      "copy": true,
+      "summary": true,
+      "details": 7,
+      "keyboard": true,
+      "printRestore": true,
+      "visibleApply": true,
+      "directHref": true,
+      "url": "http://127.0.0.1:3100/consultation/apply?placement=consultation-page#support-first-job"
+    },
+    {
+      "name": "static-B",
+      "result": true
+    }
+  ],
+  "attribution": {
+    "session": {
+      "session_id": "5af88ef6-87c9-467e-9377-2cd72ad22018",
+      "source": "instagram",
+      "medium": "social",
+      "campaign": "owned-media-pilot",
+      "content": "theme-b-carousel",
+      "referrer_host": null,
+      "landing_path": "/articles/sekkyaku-keiken-ikasu",
+      "started_at": "2026-10-12T08:20:05.091Z"
+    },
+    "eventNames": [
+      "article_view",
+      "check_started",
+      "check_completed",
+      "cta_clicked",
+      "cta_clicked"
+    ]
+  },
+  "safety": [
+    {
+      "url": "http://127.0.0.1:3100",
+      "js": true,
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:3100",
+      "js": false,
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:3301",
+      "js": true,
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:3301",
+      "js": false,
+      "status": 200
+    }
+  ],
+  "errors": [],
+  "intent": {
+    "choices": 3,
+    "keyboard": true,
+    "reducedMotion": true,
+    "consultationAnchor": true,
+    "static": true
+  }
+}

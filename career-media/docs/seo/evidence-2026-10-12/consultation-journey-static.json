@@ -1,0 +1,152 @@
+[
+  {
+    "base": "http://127.0.0.1:3301",
+    "javaScriptEnabled": true,
+    "topic": "experience",
+    "retained": true,
+    "localOnly": true,
+    "keyboard": true
+  },
+  {
+    "base": "http://127.0.0.1:3301",
+    "javaScriptEnabled": true,
+    "topic": "conditions",
+    "retained": true,
+    "localOnly": true,
+    "keyboard": true
+  },
+  {
+    "base": "http://127.0.0.1:3301",
+    "javaScriptEnabled": true,
+    "topic": "first-job",
+    "retained": true,
+    "localOnly": true,
+    "keyboard": true
+  },
+  {
+    "base": "http://127.0.0.1:3301",
+    "javaScriptEnabled": true,
+    "slug": "sekkyaku-keiken-ikasu",
+    "topic": "experience",
+    "retained": true,
+    "localOnly": true
+  },
+  {
+    "base": "http://127.0.0.1:3301",
+    "javaScriptEnabled": true,
+    "slug": "donichi-yasumi-nenshu-hikaku",
+    "topic": "conditions",
+    "retained": true,
+    "localOnly": true
+  },
+  {
+    "base": "http://127.0.0.1:3301",
+    "javaScriptEnabled": true,
+    "slug": "freeter-seishain-hajimeni",
+    "topic": "first-job",
+    "retained": true,
+    "localOnly": true
+  },
+  {
+    "base": "http://127.0.0.1:3301",
+    "javaScriptEnabled": true,
+    "slug": "sekkyaku-keiken-ikasu",
+    "topic": "experience",
+    "placement": "article-sticky",
+    "retained": true,
+    "localOnly": true
+  },
+  {
+    "base": "http://127.0.0.1:3301",
+    "javaScriptEnabled": true,
+    "slug": "donichi-yasumi-nenshu-hikaku",
+    "topic": "conditions",
+    "placement": "article-sticky",
+    "retained": true,
+    "localOnly": true
+  },
+  {
+    "base": "http://127.0.0.1:3301",
+    "javaScriptEnabled": true,
+    "slug": "freeter-seishain-hajimeni",
+    "topic": "first-job",
+    "placement": "article-sticky",
+    "retained": true,
+    "localOnly": true
+  },
+  {
+    "base": "http://127.0.0.1:3301",
+    "javaScriptEnabled": false,
+    "topic": "experience",
+    "retained": true,
+    "localOnly": true,
+    "keyboard": true
+  },
+  {
+    "base": "http://127.0.0.1:3301",
+    "javaScriptEnabled": false,
+    "topic": "conditions",
+    "retained": true,
+    "localOnly": true,
+    "keyboard": true
+  },
+  {
+    "base": "http://127.0.0.1:3301",
+    "javaScriptEnabled": false,
+    "topic": "first-job",
+    "retained": true,
+    "localOnly": true,
+    "keyboard": true
+  },
+  {
+    "base": "http://127.0.0.1:3301",
+    "javaScriptEnabled": false,
+    "slug": "sekkyaku-keiken-ikasu",
+    "topic": "experience",
+    "retained": true,
+    "localOnly": true
+  },
+  {
+    "base": "http://127.0.0.1:3301",
+    "javaScriptEnabled": false,
+    "slug": "donichi-yasumi-nenshu-hikaku",
+    "topic": "conditions",
+    "retained": true,
+    "localOnly": true
+  },
+  {
+    "base": "http://127.0.0.1:3301",
+    "javaScriptEnabled": false,
+    "slug": "freeter-seishain-hajimeni",
+    "topic": "first-job",
+    "retained": true,
+    "localOnly": true
+  },
+  {
+    "base": "http://127.0.0.1:3301",
+    "javaScriptEnabled": false,
+    "slug": "sekkyaku-keiken-ikasu",
+    "topic": "experience",
+    "placement": "article-sticky",
+    "retained": true,
+    "localOnly": true
+  },
+  {
+    "base": "http://127.0.0.1:3301",
+    "javaScriptEnabled": false,
+    "slug": "donichi-yasumi-nenshu-hikaku",
+    "topic": "conditions",
+    "placement": "article-sticky",
+    "retained": true,
+    "localOnly": true
+  },
+  {
+    "base": "http://127.0.0.1:3301",
+    "javaScriptEnabled": false,
+    "slug": "freeter-seishain-hajimeni",
+    "topic": "first-job",
+    "placement": "article-sticky",
+    "retained": true,
+    "localOnly": true
+  }
+]

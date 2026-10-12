@@ -245,5 +245,5 @@ source:
   ### [辞めたい。その前に確認すること](/articles/yametai-mae-kakunin)
 - 面接・書類 2026.10.06
   ### [転職回数が気になる。どう説明する？](/articles/tenshoku-kaisu-kininaru)
-- 職種を知る 2026.10.10
-  ### [社会人から公務員、何を確かめる？](/articles/koumuin-shakaijin)
+- 年収・働き方 2026.10.10
+  ### [福利厚生の欄、どこを見ればいい？](/articles/fukuri-kousei-mikata)

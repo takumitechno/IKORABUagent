@@ -1,0 +1,14 @@
+{
+ "base": "http://127.0.0.1:3200",
+ "checkedPages": 161,
+ "pagesWithProblems": [],
+ "brokenInternalLinks": [],
+ "duplicateTitles": [],
+ "duplicateDescriptions": [],
+ "sitemap": {
+  "urls": 156,
+  "problems": []
+ },
+ "robotsTxt": "User-Agent: *\nDisallow: /",
+ "noindexPages": 161
+}

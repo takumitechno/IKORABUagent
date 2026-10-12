@@ -1,0 +1,338 @@
+{
+ "items": [
+  {
+   "id": "HC-1",
+   "topic": "1. 有用なコンテンツ：独自性",
+   "statement": "Googleの自己評価質問は、独自の情報・報道・調査・分析があるか、網羅的で十分な説明か、自明な内容を超える洞察があるかを問う。他の情報源を使う場合は、書き直しや言い換えではなく、大きな付加価値を加えることを求めている。",
+   "url": "https://developers.google.com/search/docs/fundamentals/creating-helpful-content",
+   "evidence": "developers.google.com限定のWebSearchで、該当ページの次の質問文を確認した。\"Does the content provide original information, reporting, research, or analysis?\" / \"Does the content provide a substantial, complete, or comprehensive description of the topic?\" / \"Does the content provide insightful analysis or interesting information that is beyond the obvious?\" 他の情報源を基にする場合も、言い換えでなく付加価値を求める趣旨の記述がある。注意：WebFetchはdevelopers.google.comのDNS解決ができず（プロキシもCONNECTを403で拒否）、ページを直接開けていない。文言は検索インデックスの抜粋で確認したもの。",
+   "implication_for_project": "「20代・未経験転職」のような一般論の言い換え記事は評価されにくい。独自要素を各記事に1つ以上入れる。例：編集部の一次取材（転職経験者の実例）、公的統計（厚労省など）の独自整理、未経験者向けのチェックリストや判断フロー。出典を明記したうえで、その出典を超える付加価値を示す。",
+   "confidence": "confirmed_official",
+   "page_updated": "二次情報では「Last updated 2026-10-01 UTC」。公式ドメインの検索要約では「2026-10-05 UTC」と表示された。直接確認はしておらず、確定していない"
+  },
+  {
+   "id": "HC-2",
+   "topic": "1. 有用なコンテンツ：Who / How / Why と著者情報",
+   "statement": "Who（誰が作ったか）：読者が期待する場所に署名（byline）を置き、署名から著者の経歴や専門分野へ辿れるようにすることを推奨。How（どう作ったか）：自動化やAIを使った場合は、読者が「どう作られたのか」と思いそうな場面で開示すると有用。Why（なぜ作ったか）：最も重要な問い。人の役に立つことを主目的にすべきで、検索流入の獲得が主目的であってはならない。",
+   "url": "https://developers.google.com/search/docs/fundamentals/creating-helpful-content",
+   "evidence": "公式ドメイン限定のWebSearchで次の内容を確認した。著者が明確で、期待される場所にbylineがあり、著者の背景へリンクしていることを推奨（正確な著者情報を強く推奨）。How：自動化・AIの関与を説明し、\"How was this created?\" と問われそうな場面での開示が有用。Why：人を助けることが主目的であるべきで、ランキング操作のためのAI利用はスパムポリシー違反。ページの直接閲覧はできていない。",
+   "implication_for_project": "全記事に執筆者・監修者の署名を表示し、プロフィールページ（経歴・キャリア支援実績・担当領域）へリンクする。AIを下書きや校正に使う場合は、編集方針ページに制作プロセス（AIの使用範囲と人による事実確認）を明記する。「なぜこの記事を作ったか」（初めての転職者の不安解消）がわかる編集ポリシーページを用意する。",
+   "confidence": "confirmed_official",
+   "page_updated": "HC-1と同じ（2026-10-01または2026-10-05、未確定）"
+  },
+  {
+   "id": "HC-3",
+   "topic": "1. 有用なコンテンツ：偽の著者プロフィール（2026年10月追記）",
+   "statement": "作成者プロフィールの捏造は「欺瞞」と明記された。例として、AI生成の顔写真、架空の名前、虚偽の資格が挙げられている。欺瞞があると、ページはユーザーにもGoogleの自動品質システムにも信頼できないものとなり、低品質ページのシグナルになる。",
+   "url": "https://developers.google.com/search/docs/fundamentals/creating-helpful-content",
+   "evidence": "公式ドメイン限定のWebSearchで、同ページに次の趣旨の記述があることを確認した。「creator profilesを捏造すること（AI-generated headshots、made-up names、false credentials）は欺瞞であり、ユーザーと automated quality systems の双方にとってページを信頼できないものにし、低品質ページのシグナルとなる」。追記時期は二次情報による（Search Engine Journal 591806、ppc.land、Search Engine Land 493701）。SEJは2026-10-01付の版を参照し、別の情報源は10月2日としている。6月8日のアーカイブ版にはこの段落がなかったとの報道もある。",
+   "implication_for_project": "最重要リスク。人物写真は維持する方針だが、著者・監修者として表示する写真は実在する本人の写真である必要がある。ストック写真やAI生成の人物を「キャリアアドバイザー」などとして著者欄に使っている場合は、写真自体は維持したまま、著者表記から切り離す。具体的には、イメージ写真である旨を明示するか、著者欄では実在人物の情報だけを使う。架空のアドバイザー名、根拠のない資格（例：国家資格キャリアコンサルタント）の表記は使わない。",
+   "confidence": "confirmed_official",
+   "page_updated": "二次情報では2026-10-01（または10-02）に追記。公式の更新履歴ページでは、このページについての10月の項目を確認できていない"
+  },
+  {
+   "id": "HC-4",
+   "topic": "1. 有用なコンテンツ：日付だけの更新を避ける",
+   "statement": "「検索エンジン優先」の警告サインの一つとして、内容が実質的に変わっていないのに、新しく見せるためにページの日付を変えていないか、という問いがある。サイトを「新鮮」に見せる目的で大量に追加・削除していないか、という問いも含まれる（2023年9月追加）。",
+   "url": "https://developers.google.com/search/docs/fundamentals/creating-helpful-content",
+   "evidence": "公式ドメイン限定のWebSearchで、警告サインに \"changing the date of pages to make them seem fresh when the content has not substantially changed\" の趣旨の問いがあることを確認した。更新履歴によると、2023年9月にコンテンツの削除や日付変更に関する項目が追加されている。",
+   "implication_for_project": "「更新日」は、本文の実質的な改訂（統計の差し替え、制度変更の反映、事例の追加）を行ったときだけ変える。テンプレートの一括変更やデザイン修正で更新日を書き換えない。改訂履歴（何を更新したか）を記事末に残す運用を推奨する。",
+   "confidence": "confirmed_official",
+   "page_updated": "HC-1と同じ"
+  },
+  {
+   "id": "HC-5",
+   "topic": "1. 有用なコンテンツ：検索エンジン向けコンテンツの警告サイン",
+   "statement": "警告サインとして次の問いが挙がっている。主に検索流入のために作っていないか。多くのトピックで大量に作り、どれかが当たるのを期待していないか。多くのトピックで大規模な自動化を使っていないか。付加価値なしに他者の要約をしていないか。流行りだから書いていないか。読後に読者がもう一度検索し直す必要を感じないか。特定の文字数に合わせて書いていないか（Googleは「No, we don't」として推奨文字数を否定）。専門性のないニッチに参入していないか。答えのない問い（未確定の発売日など）に答えると約束していないか。日付だけの変更。",
+   "url": "https://developers.google.com/search/docs/fundamentals/creating-helpful-content",
+   "evidence": "公式ドメイン限定のWebSearchで次の問いを確認した。\"Are you writing to a particular word count because you've heard or read that Google has a preferred word count? (No, we don't.)\"、\"Are you mainly summarizing what others have to say without adding much value?\"、\"Are you using extensive automation to produce content on many topics?\"、多トピック量産の問い、日付変更の問い。2022年8月の有用なコンテンツのアップデートに関するブログにも同種のチェックリストがある。",
+   "implication_for_project": "KPIに「文字数」を入れない。読者が次に取る行動（自己分析、求人の見方、面接準備）まで1ページで完結させ、「検索し直し」が起きない構成にする。転職と無関係な流行トピックや、専門外のジャンル（投資・副業など）への拡張は避ける。",
+   "confidence": "confirmed_official",
+   "page_updated": "HC-1と同じ"
+  },
+  {
+   "id": "HC-6",
+   "topic": "1. 有用なコンテンツ：メインコンテンツと労力（2026年10月追記）",
+   "statement": "2026年10月の改訂で、「メインコンテンツ」の定義と、評価者が見る4つの属性（労力 effort、独自性 originality、才能・技能 talent or skill、正確性 accuracy）が追加されたと報じられている。フィードからの自動生成や、人の監督・選別なしに生成AIで大量のテキストを作ることは「ほとんど労力がない」とされる。",
+   "url": "https://developers.google.com/search/docs/fundamentals/creating-helpful-content",
+   "evidence": "公式ドメイン限定のWebSearch要約では、同ページに「automatically generating pages from feeds or using generative AI to produce large amounts of text without manual oversight or curation represents little to no effort」の趣旨の記述があるとされた。メインコンテンツの定義と4属性は二次情報（relevantaudience.com、dev.to、ppc.land）のみで確認しており、公式の原文は直接確認できていない。",
+   "implication_for_project": "記事の主役は本文（メインコンテンツ）であり、アイキャッチや装飾ではない。デザインは維持したうえで、本文で労力と独自性を示す。転職はYMYL（Your Money or Your Life：生活やお金に大きく影響するテーマ）に近い領域なので、正確性の基準を高く保つ。統計・法制度・給与に関する記述には一次情報の出典と確認日を付ける。",
+   "confidence": "secondary_only",
+   "page_updated": "二次情報では2026-10-01 UTC"
+  },
+  {
+   "id": "FAQ-1",
+   "topic": "2. FAQリッチリザルト提供終了：公式告知の日付",
+   "statement": "Google検索のドキュメント更新履歴には、2026年5月8日の項目として「FAQリッチリザルト機能の廃止」が載っている。この機能は2026年5月7日からGoogle検索に表示されなくなった。",
+   "url": "https://developers.google.com/search/updates",
+   "evidence": "公式ドメイン限定のWebSearchで、更新履歴の項目「May 8: Deprecating the FAQ rich result feature. ... This feature will no longer appear in Google Search starting May 7, 2026.」を確認した。旧FAQPageドキュメントのURL（/search/docs/appearance/structured-data/faqpage）は、検索結果上で「Latest Google Search Documentation Updates」というタイトルで表示されており、更新履歴ページへ転送されている可能性がある（推測）。",
+   "implication_for_project": "提案書・KPIに「FAQリッチリザルト獲得」を入れない。FAQの表示によるクリック率向上を前提にした説明は、2026年5月7日以降は根拠がない。",
+   "confidence": "confirmed_official",
+   "page_updated": "更新履歴ページの最新項目は2026年10月8日（UGC Fresh Data Program）"
+  },
+  {
+   "id": "FAQ-2",
+   "topic": "2. FAQリッチリザルト提供終了：ドキュメント削除（2026年6月）",
+   "statement": "2026年6月の更新履歴項目で、FAQリッチリザルト機能のドキュメントが削除された。理由として、5月の告知どおりGoogle検索に表示されなくなったことが挙げられている。",
+   "url": "https://developers.google.com/search/updates",
+   "evidence": "WebSearchで更新履歴の文言「Removed documentation for the FAQ rich result feature. ... The FAQ rich result feature is no longer shown in Google Search results, as announced in the changelog entry in May 2026.」を確認した。6月の正確な日付は特定できていない。二次情報の一つは「6月15日までに削除」としているが、公式では未確認。",
+   "implication_for_project": "FAQPageの公式ガイドラインはもう参照先がない。社内資料で旧FAQPageドキュメントを根拠にしている箇所があれば、更新履歴の5月・6月の項目へ差し替える。",
+   "confidence": "confirmed_official",
+   "page_updated": "2026年6月（日は未確定）"
+  },
+  {
+   "id": "FAQ-3",
+   "topic": "2. FAQリッチリザルト提供終了：Search Console・リッチリザルトテスト・API",
+   "statement": "旧FAQドキュメントの告知では、次の段階的な終了が示されていたと報じられている。FAQの検索での見え方（Search Consoleの検索パフォーマンスの絞り込み）、FAQのリッチリザルトレポート、リッチリザルトテストでのサポートを2026年6月に終了。Search Console APIでのFAQサポートを2026年8月に終了。",
+   "url": "https://searchengineland.com/google-to-no-longer-support-faq-rich-results-476957",
+   "evidence": "二次情報（Search Engine Land、Search Engine Roundtable 41298、Bluehostなど）が引用する告知文。\"As of May 7, 2026, FAQ rich results are no longer appearing in Google Search. We will be dropping the FAQ search appearance, rich result report, and support in the Rich results test in June 2026. To allow time for adjusting your API calls, support for the FAQ rich result in the Search Console API will be removed in August 2026.\" 公式ドメイン限定の検索では、このAPI終了日を確認できなかった。",
+   "implication_for_project": "検証手順から「リッチリザルトテストでFAQが有効」「Search ConsoleのFAQレポート」を外す。前回納品時の検証記録にFAQのリッチリザルトテスト結果が含まれていれば、今回の再検証では比較基準として使えない（2026年6月以降はサポート対象外）。FAQPageの構文検証が必要なら、Schema Markup Validator（validator.schema.org）などの汎用検証で代替する（推測）。",
+   "confidence": "secondary_only",
+   "page_updated": "告知は2026-05-07/05-08（公式の更新履歴による）"
+  },
+  {
+   "id": "FAQ-4",
+   "topic": "2. FAQPage構造化データ自体の扱い",
+   "statement": "FAQPageのマークアップは削除してもよいし、残してもよい（2026年の告知の趣旨として報道されている）。2023年の公式ブログは、使われていない構造化データが検索に問題を起こすことはないが、Google検索での目に見える効果もない、としている。FAQPageはSchema.orgの型としては引き続き有効。",
+   "url": "https://developers.google.com/search/blog/2023/08/howto-faq-changes",
+   "evidence": "2023年8月の公式ブログ（公式ドメインの検索で確認）は「there's no need to proactively remove it」とし、使われない構造化データは問題を起こさないが目に見える効果もない、としている。2026年の告知の「You can remove the FAQ structured data from your code, if you want but you can also leave it」は二次情報（Search Engine Land、Search Engine Roundtable）経由でのみ確認した。",
+   "implication_for_project": "既存のFAQ JSON-LDは、すぐに削除しなくても検索上の害はない。ただし残す場合は、構造化データの一般ガイドライン（表示内容との一致）を守る。ページ上に見えないQ&AをJSON-LDだけに入れない。FAQ本文は読者の役に立つ限り、見える形で維持してよい（レイアウトとアニメーションは維持）。",
+   "confidence": "secondary_only",
+   "page_updated": "ブログは2023-08-08。2026年の告知はFAQ-1参照"
+  },
+  {
+   "id": "FAQ-5",
+   "topic": "2. 構造化データ機能の整理（給与推定などの終了）",
+   "statement": "2025年6月と11月の公式ブログで、利用の少ない構造化データ機能の段階的な廃止が告知された。対象はBook Actions、Course Info、Claim Review、Estimated Salary、Learning Video、Special Announcement、Vehicle Listing。ランキングには影響しないとされ、Search Consoleでのサポートも終了した。",
+   "url": "https://developers.google.com/search/blog/2025/11/update-on-our-efforts",
+   "evidence": "公式ドメイン限定のWebSearchで次を確認した。2025年11月のブログ「Here's an update on our efforts to simplify the search results page」は、2026年1月からSearch ConsoleとAPIでこれらのサポートを外すとしている。2025年6月のブログ「Simplifying the search results page」に対象の型が列挙されている。更新履歴によると、2025年9月9日に給与推定（Estimated Salary）などのドキュメントが削除された。",
+   "implication_for_project": "転職メディアで使いたくなる「給与推定（Occupation／Estimated Salary）構造化データ」は、Google検索では表示されないため提案しない。求人情報（JobPosting）は実在の求人掲載ページ専用で、記事ページに付けるものではない（推測。今回は求人ガイドの詳細を未確認）。",
+   "confidence": "confirmed_official",
+   "page_updated": "ブログは2025-11（日は未確定）。ドキュメント削除は2025-09-09"
+  },
+  {
+   "id": "TL-1",
+   "topic": "3. タイトルリンク：title要素とH1、書き換えの条件",
+   "statement": "タイトルリンクの生成元は、title要素、ページ上の主見出し、h1などの見出し要素、og:title、その他の大きく目立つテキスト、アンカーテキストなど。Googleは次の場合に、titleとは異なるタイトルリンクを生成することがある。titleが一部欠けている（half-empty）。年号などが古い（obsolete）。titleが内容を反映していない（inaccurate）。同程度に目立つ見出しが複数あれば、最初の見出しを使う場合がある。推奨は、ページごとに固有で簡潔なtitle、定型文やキーワードの詰め込みの回避、ページ内容と同じ言語、主見出しをページで最も目立たせること。",
+   "url": "https://developers.google.com/search/docs/appearance/title-link",
+   "evidence": "公式ドメイン限定のWebSearchで、同ページの次の記述を確認した。half-empty／obsolete（例：見出しは「2021 admissions criteria」なのにtitleが2020のまま）／inaccurate の各例。\"Google Search might modify the title link ... if it determines that the page title doesn't reflect the page content\"。主見出しを最も目立つ位置・大きさにする推奨。サイト名は区切り文字を挟んでtitleの先頭か末尾に置く推奨。2021年の公式ブログでは、title要素が約87%で使われたとある（数値は古い）。",
+   "implication_for_project": "titleとH1の主題を一致させる（完全一致でなくてよい）。H1は既存デザインのまま、記事内で最も目立つ見出しとして1つだけ置く。titleに年号（例：2026年版）を入れる場合は、毎年本文とH1も更新しないとobsoleteとして書き換えられる。テンプレートで「| サイト名」を付けるのはよいが、titleの中身が空や定型文にならないようにする。",
+   "confidence": "confirmed_official",
+   "page_updated": "未確認"
+  },
+  {
+   "id": "SN-1",
+   "topic": "3. スニペットとmeta description",
+   "statement": "スニペットは主にページ本文から生成される。meta descriptionは、本文から取るより正確な説明になる場合に使われる。ページごとに固有のdescriptionを推奨（トップページなどの集約ページはサイト単位、それ以外はページ単位）。長さに上限はないが表示時に切り詰められる。キーワードを並べただけのdescriptionは表示されにくい。",
+   "url": "https://developers.google.com/search/docs/appearance/snippet",
+   "evidence": "公式ドメイン限定のWebSearchで次を確認した。\"Google sometimes uses the meta description HTML element if it might give users a more accurate description of the page than content taken directly from the page.\"、\"Use site-level descriptions on the main home page or other aggregation pages, and use page-level descriptions everywhere else.\"、\"There's no limit on how long a meta description can be, but the snippet is truncated ...\"",
+   "implication_for_project": "全記事で固有のmeta descriptionを書き、対象読者（20〜30代の初めての転職・未経験）と、記事で得られる具体的な答えを要約する。同一テンプレートの使い回しやキーワードの羅列は避ける。生成AIで下書きする場合も、本文との一致を人が確認する（AI-1参照）。",
+   "confidence": "confirmed_official",
+   "page_updated": "未確認（検索メタデータでは約175日前。推定2026年4月ごろ）"
+  },
+  {
+   "id": "SN-2",
+   "topic": "3. スニペット制御（nosnippet / max-snippet / data-nosnippet）",
+   "statement": "nosnippetはウェブ検索、画像、Discover、AI Overviews、AI Modeのすべてでテキストスニペットを出さず、AI Overviews／AI Modeへの直接入力にも使われなくなる。max-snippet:[数値]で長さを制限でき、0はnosnippetと同等。data-nosnippet属性はspan・div・section要素の部分除外に使える。ルールが矛盾する場合は、より厳しいルールが適用される。",
+   "url": "https://developers.google.com/search/docs/appearance/snippet",
+   "evidence": "公式ドメイン限定のWebSearchで、nosnippetが \"will also prevent the content from being used as a direct input for AI Overviews and AI Mode\" であること、\"In the case of conflicting robots rules, the more restrictive rule applies\" を確認した（同ページと robots-meta-tag ページ）。",
+   "implication_for_project": "プレビュー期間中はnoindexだけで足り、nosnippetを追加する必要はない。公開時にnosnippetやmax-snippet:0が残っていると、通常検索のスニペットにもAI機能にも出なくなる。そのため、公開切替チェックリストに「robots metaの全ルールを確認」を入れる。",
+   "confidence": "confirmed_official",
+   "page_updated": "未確認"
+  },
+  {
+   "id": "CN-1",
+   "topic": "4. 正規化（canonical）",
+   "statement": "正規化の手段には強さの違いがある。リダイレクトとrel=\"canonical\"は強いシグナル、サイトマップへの掲載は弱いシグナル。canonicalの指定はヒントであって強制ではなく、Googleは別のURLを選ぶことがある。手段ごとに異なるcanonicalを示さない（例：サイトマップのURLとrel=canonicalのURLが違う）。重複の解消にnoindexを使うことは推奨されない。",
+   "url": "https://developers.google.com/search/docs/crawling-indexing/consolidate-duplicate-urls",
+   "evidence": "公式ドメイン限定のWebSearchで次を確認した。\"Redirects: a strong signal ...\"、\"rel=\"canonical\" link annotations: a strong signal ...\"、\"Sitemap inclusion: a weak signal ...\"。サイトマップとcanonicalで異なるURLを指定しないこと。更新履歴では、2025年12月にJavaScriptでの正規化ガイダンスが追加され、2026年7月10日に正規化トラブルシューティングガイドに再評価までの時間についての説明が追加された。",
+   "implication_for_project": "全記事に自己参照canonical（公開予定の本番URL、https、末尾スラッシュの方針を統一）を出力する。プレビュー環境のホストを本番canonicalに向けるかは別途判断が必要（プレビューはnoindexなので索引されない）。JSでcanonicalを書き換えない。パラメータ付きURL（utm、ソート）は本体URLへcanonicalを向ける。",
+   "confidence": "confirmed_official",
+   "page_updated": "未確認（検索メタデータでは約94日前、推定2026年7月ごろ）。関連する更新履歴：2025-12、2026-07-10"
+  },
+  {
+   "id": "PG-1",
+   "topic": "4. ページ送り（pagination）",
+   "statement": "一覧のページは順番にリンクし、任意で各ページから1ページ目へリンクしてもよい。各ページに固有URL（例：?page=n）を与え、各ページは自身をcanonicalにする。全ページを1ページ目にcanonicalしない。ページ番号に#フラグメントを使わない（Googleはフラグメントを無視する）。Googleはrel=\"next\"/\"prev\"をもう使っていない。",
+   "url": "https://developers.google.com/search/docs/specialty/ecommerce/pagination-and-incremental-page-loading",
+   "evidence": "公式ドメイン限定のWebSearchで次を確認した。順番にリンクすること。\"Don't use the first page of a paginated sequence as the canonical page. Instead, give each page its own canonical URL\" の趣旨の記述。フラグメント識別子を使わないこと。rel next/prevを使っていないこと。2013年のブログでも、2ページ目以降を1ページ目にcanonicalすると索引されないと注意している。",
+   "implication_for_project": "カテゴリやタグの記事一覧（例：/category/mikeiken/?page=2）では、各ページを自己canonicalにし、<a href>で辿れるリンクにする。「もっと見る」ボタンなど、JSだけで読み込む方式の場合も、クロール可能なページURLを併用する。",
+   "confidence": "confirmed_official",
+   "page_updated": "未確認"
+  },
+  {
+   "id": "FN-1",
+   "topic": "4. 絞り込みURL（faceted navigation）",
+   "statement": "絞り込みURLを索引させる必要がなければ、robots.txtでクロールを禁止するか、絞り込みに#フラグメントを使うことが推奨されている。個々の詳細ページと絞り込みなしの一覧はクロール可能にしておく。canonicalやnofollowは長期的には効果が劣る。robots.txtで禁止したURLも、外部リンクなどで説明文なしのまま索引されることがある。",
+   "url": "https://developers.google.com/crawling/docs/faceted-navigation",
+   "evidence": "公式ドメイン限定のWebSearchで次を確認した。\"Managing crawling of faceted navigation URLs\"（クロール関連ドキュメントは developers.google.com/crawling/docs/ 配下へ移設済み）。2024年12月のブログ「Crawling December: Faceted navigation」では、索引不要ならrobots.txtを使うか、フラグメントを使うとしている。canonicalやnofollowは \"generally less effective in the long term\" とされている。",
+   "implication_for_project": "年代・職種・エリア・雇用形態などで記事や求人特集を絞り込むUIがある場合、パラメータ付きURL（?age=20s&job=sales）が無数に生成される。索引させたい切り口だけを固有の静的ページとして作り、本文も固有にする（SP-1参照）。残りの組み合わせはrobots.txtで禁止するか#で処理する。ただしnoindexを効かせたいURLはrobots.txtで禁止しない（NI-1参照）。",
+   "confidence": "confirmed_official",
+   "page_updated": "未確認"
+  },
+  {
+   "id": "IS-1",
+   "topic": "4. 内部検索結果ページ",
+   "statement": "現行の公式ドキュメントで、サイト内検索結果ページだけを名指しした指針は見つからなかった。クロールバジェットのガイドは、統合できない重要度の低いURLの変種（例：並び替えだけ違うページ）をrobots.txtでブロックするよう述べている。noindexはクロール自体は発生するため、クロールの節約にはならない。数千URL未満のサイトでは、多くの場合クロールバジェットを気にする必要はない。",
+   "url": "https://developers.google.com/crawling/docs/crawl-budget",
+   "evidence": "公式ドメイン限定のWebSearchで、crawl-budgetページの次の記述を確認した。\"block these unimportant pages using robots.txt\"。noindexについて \"Google will still request, but then drop the page ... wasting crawling time\"。\"fewer than a few thousand URLs\" なら概ね効率的にクロールされる。2022年のオフィスアワーでは、ボットが作るページには404またはnoindex、あるいはrobots.txtでの禁止でよいとの回答がある。内部検索に特化した現行の記述は未発見。",
+   "implication_for_project": "サイト内検索（/search?q=）の結果ページは索引対象にしない。中規模までのメディアなら、検索結果ページにnoindexを付けるか、robots.txtで/search を禁止する方針でよい（どちらを選ぶかは推測による判断）。両方を同時に使うとnoindexが読まれない点に注意する（NI-1）。内部検索結果ページをサイトマップや内部リンクの対象にしない。",
+   "confidence": "unverified",
+   "page_updated": "未確認"
+  },
+  {
+   "id": "SD-1",
+   "topic": "5. 記事（Article）構造化データの著者表記",
+   "statement": "著者が複数いる場合は、1人ずつ別のauthorとして配列で記述する。ページ上で著者として表示している全員をマークアップに含める。author.nameには氏名だけを入れ、肩書・敬称・媒体名・「文：」などの前置きは入れない（肩書はjobTitle、敬称はhonorificPrefix、媒体はpublisherへ）。author.urlには著者を一意に識別するページ（プロフィールページ）を指定する。社内のプロフィールページにはProfilePageのマークアップを併用でき、sameAsも使える。人物はPerson、組織はOrganizationとする。",
+   "url": "https://developers.google.com/search/docs/appearance/structured-data/article",
+   "evidence": "公式ドメイン限定のWebSearchで次を確認した。\"When specifying multiple authors, list each author in their own author field.\"、\"Make sure that all the authors that are presented as authors on the web page are also included in markup.\"、\"In the author.name property, only specify the name of the author.\"、author.urlは \"A link to a web page that uniquely identifies the author\"。",
+   "implication_for_project": "Article（またはBlogPosting）のJSON-LDで、author=Person{name:実名, url:/authors/xxx/} とし、監修者を著者として表示する場合は監修者も含める。「キャリアアドバイザー 山田太郎」のような肩書付きの文字列をnameに入れない。著者ページにProfilePageを付ける。HC-3のとおり、実在しない人物をPersonとしてマークアップしない。",
+   "confidence": "confirmed_official",
+   "page_updated": "未確認"
+  },
+  {
+   "id": "SD-2",
+   "topic": "5. パンくずリスト構造化データ",
+   "statement": "BreadcrumbListは、URL構造をなぞるのではなく、ユーザーがたどる典型的な経路を表すよう推奨されている。ListItemは2つ以上。positionは1から始まる整数。nameは表示名。itemは各階層のURLで、最後の項目では省略可能（その場合は含んでいるページのURLが使われる）。",
+   "url": "https://developers.google.com/search/docs/appearance/structured-data/breadcrumb",
+   "evidence": "公式ドメイン限定のWebSearchで、典型的なユーザー経路を表すこと、ListItemが2つ以上必要なこと、positionの仕様、最後の項目のitemが省略可能なことを確認した。",
+   "implication_for_project": "ページ上のパンくず表示（デザインは維持）とJSON-LDの階層を一致させる。例：ホーム > 未経験転職 > 20代の職種選び > 記事。タグや絞り込みURLを経路に入れない。",
+   "confidence": "confirmed_official",
+   "page_updated": "未確認（検索メタデータでは約306日前、推定2025年12月ごろ）"
+  },
+  {
+   "id": "SD-3",
+   "topic": "5. 構造化データの一般ガイドライン（表示内容との一致）",
+   "statement": "ページの読者に見えない内容をマークアップしない（JSON-LDが説明する対象は、本文でも同じものとして記述されている必要がある）。無関係・誤解を招く内容（偽のレビューなど）をマークアップしない。必須プロパティを満たし、表示されている項目はすべて含める。構造化データの手動対策を受けるとリッチリザルトの対象外になるが、ウェブ検索の順位には影響しない。",
+   "url": "https://developers.google.com/search/docs/appearance/structured-data/sd-policies",
+   "evidence": "公式ドメイン限定のWebSearchで次を確認した。\"Don't mark up content that is not visible to readers of the page. For example, if the JSON-LD markup describes a performer, the HTML body must describe that same performer.\"、\"Don't mark up irrelevant or misleading content, such as fake reviews ...\"、手動対策は \"it doesn't affect how the page ranks in Google web search\"。",
+   "implication_for_project": "JSON-LDのheadline、日付、著者、画像（アイキャッチ）、FAQなどは、すべて画面表示と一致させる。体験談や口コミに見える要素にReview/AggregateRatingを付けない（実在の評価でなければ偽レビュー扱いになりうる）。",
+   "confidence": "confirmed_official",
+   "page_updated": "未確認（検索メタデータでは約279日前、推定2026年1月ごろ）"
+  },
+  {
+   "id": "SP-1",
+   "topic": "6. 大量生成コンテンツの不正使用（scaled content abuse）",
+   "statement": "主に検索順位の操作を目的として、ユーザーにほとんど価値のないページを大量に生成する行為。作成方法（自動化、人手、その組み合わせ）を問わない。例として次が挙がっている。付加価値なしに生成AIなどで多数のページを作る。フィードや検索結果をスクレイピングし、同義語置換や翻訳で変形して量産する。複数ページの内容を付加価値なしにつなぎ合わせる。量産の実態を隠すために複数サイトを作る。",
+   "url": "https://developers.google.com/search/docs/essentials/spam-policies",
+   "evidence": "公式ドメイン限定のWebSearchで、スパムポリシーページと2024年3月の公式ブログ「What web creators should know about our March 2024 core update and new spam policies」を確認した。\"no matter how it's created\"、\"using generative AI tools or other similar tools to generate many pages without adding value for users may violate Google's spam policy on scaled content abuse\"（生成AIガイドにも同じ趣旨の記述あり）。",
+   "implication_for_project": "「年齢 × 職種 × 未経験」の組み合わせで、見出しや数字だけ差し替えたページ（例：『20代未経験から営業へ』『25歳未経験から営業へ』『30代未経験から営業へ』）を量産するのは典型的なリスクパターン。切り口ごとに固有の一次情報（年代別の採用実態データ、実例、職種ごとに異なる必要スキルや選考の違い）がないなら、1本の総合記事に統合し、年代別の違いは章立てで扱う。",
+   "confidence": "confirmed_official",
+   "page_updated": "未確認（2026-04-13にback button hijackingの定義が追加された履歴あり）"
+  },
+  {
+   "id": "SP-2",
+   "topic": "6. 誘導ページの不正使用（doorway abuse）",
+   "statement": "特定の似た検索クエリで上位表示させるために作られ、最終目的地ほど有用でない中間ページへユーザーを導くサイトやページ。例として次が挙がっている。閲覧可能な明確な階層というより検索結果に近い、実質的に似たページの作成。地域や都市ごとに作り、1つのページへ誘導するページ。",
+   "url": "https://developers.google.com/search/docs/essentials/spam-policies",
+   "evidence": "公式ドメイン限定のWebSearchで次を確認した。doorway abuseの定義「created to rank for specific, similar search queries」、例の「substantially similar pages that are closer to search results than a clearly defined, browseable hierarchy」、地域・都市ごとのページ。2015年のブログ「An update on doorway pages」には、既存の集約を検索流入のために複製していないかを問う自己点検の質問がある。",
+   "implication_for_project": "「東京 未経験 転職」「大阪 未経験 転職」のような地域別ページや、職種別ページが、どれも同じ転職エージェントへの送客に流れる構造は誘導ページと見なされうる。本番での送客はOFFのまま維持する。地域別・職種別ページを作る場合は、その地域や職種に固有の情報を実質的に持たせる。",
+   "confidence": "confirmed_official",
+   "page_updated": "未確認"
+  },
+  {
+   "id": "SP-3",
+   "topic": "6. サイトの評判の不正使用（site reputation abuse）",
+   "statement": "ホストサイトのランキングシグナルを悪用する目的で、第三者のページを掲載する行為。第三者コンテンツがあること自体は違反ではない。2024年11月の改定で、ファーストパーティの関与や監督があっても、ホストのシグナルを利用する目的なら違反とされた。2026年8月28日の公式ブログでは、8月30日以降、EEA（欧州経済領域）内ではこのポリシーによる手動対策の影響を適用しない運用に変わると告知された（EEA外では従来どおり、該当部分に影響）。",
+   "url": "https://developers.google.com/search/blog/2026/08/update-site-reputation-policy",
+   "evidence": "公式ドメイン限定のWebSearchで次を確認した。2024年11月のブログ「Updating our site reputation abuse policy」（\"regardless of whether there is first-party involvement or oversight\"）。2026年8月28日のブログ「Update to the Site Reputation Policy」（EEAでの扱い、欧州委員会との協議を踏まえた変更）。",
+   "implication_for_project": "自社運営の単一メディアで第三者の記事を載せていなければ、リスクは低い。将来、転職エージェントや求人企業が提供する記事・PR記事を、本体の評価を借りる目的で載せることは避ける。サブディレクトリやサブドメインへの移設は、回避行為と見なされうると2024年11月の公式ブログが注意している。日本はEEA外のため、従来どおりの扱い。",
+   "confidence": "confirmed_official",
+   "page_updated": "2026-08-28（ブログ）"
+  },
+  {
+   "id": "SP-4",
+   "topic": "6. 補足：ブラウザの戻る操作の乗っ取り（back button hijacking）",
+   "statement": "2026年4月13日、悪意のある行為に関するスパムポリシーに「back button hijacking」が明示的な違反として追加された。ブラウザの戻る操作を妨げ、直前のページへすぐ戻れなくする行為が対象で、手動対策や自動的な順位低下の対象になる。施行は2026年6月15日。広告や外部ライブラリが原因の場合も含めて点検するよう求めている。",
+   "url": "https://developers.google.com/search/blog/2026/04/back-button-hijacking",
+   "evidence": "公式ドメイン限定のWebSearchで、2026年4月13日の公式ブログ「Introducing a new spam policy for \"back button hijacking\"」を確認した。施行が2026年6月15日であること、スパムポリシーページに定義が追加されたこと、更新履歴にも2026年4月13日の項目があることを確認した。",
+   "implication_for_project": "アニメーションやページ遷移の演出は維持するが、history.pushState/replaceStateで偽の履歴を挿入していないか、離脱防止のモーダルや送客ウィジェットが戻る操作を妨げていないかを点検項目に加える。",
+   "confidence": "confirmed_official",
+   "page_updated": "2026-04-13（ブログ）"
+  },
+  {
+   "id": "NI-1",
+   "topic": "7. noindex（robots meta / X-Robots-Tag）とrobots.txtの併用",
+   "statement": "noindexはmetaタグかHTTPヘッダー（X-Robots-Tag）で指定する。noindexを効かせるには、ページがrobots.txtでブロックされておらず、クローラーがアクセスできる必要がある。robots.txtでブロックするとクローラーはnoindexを読めず、他ページからリンクされていればURLが検索結果に出ることがある。robots.txt内のnoindex指定はサポートされない（2019年9月1日に処理を廃止）。X-Robots-TagはHTML以外のファイルにも使える。",
+   "url": "https://developers.google.com/search/docs/crawling-indexing/block-indexing",
+   "evidence": "公式ドメイン限定のWebSearchで次を確認した。noindexが効くにはページが \"must not be blocked by a robots.txt file\" であること。\"the crawler will never see the noindex rule\"、\"specifying the noindex rule in the robots.txt file is not supported by Google\"。2019年7月のブログ「A note on unsupported rules in robots.txt」も確認した。",
+   "implication_for_project": "非公開プレビューのnoindexを維持する際は、全HTMLにmeta robots noindexを付け、PDFや画像などにはX-Robots-Tag: noindexを付ける。同じURLをrobots.txtでDisallowしない（noindexが読まれなくなる）。前回納品時の設定がrobots.txtの全面Disallowとnoindexの併用になっていないか、再検証で確認する。",
+   "confidence": "confirmed_official",
+   "page_updated": "未確認"
+  },
+  {
+   "id": "NI-2",
+   "topic": "7. 非公開コンテンツはパスワード保護が確実",
+   "statement": "機密コンテンツは、許可したユーザーだけがアクセスできるようパスワードで保護する必要がある。そうすれば検索結果にも出ない。robots.txtは主にサーバーへの過負荷を避けるためのもので、ページを検索から除外する手段ではない。robots.txt自体が公開されるため、非公開の場所を示す用途にも向かない。",
+   "url": "https://developers.google.com/search/docs/crawling-indexing/control-what-you-share",
+   "evidence": "公式ドメイン限定のWebSearchで次を確認した。control-what-you-shareページの \"you need to password protect it to ensure only authorized users can access it. This will also prevent that content from appearing in Google Search.\"。robots.txtガイドの \"not a mechanism for keeping a web page out of Google\"。",
+   "implication_for_project": "提案用の非公開プレビューは、noindexに加えてBasic認証などのサーバー側認証をかけるのが最も確実。認証をかけるとGooglebotはnoindexを読めないが、アクセスもできないため索引されない。公開時にnoindexと認証を外す手順を、送客ONとは別の承認項目として管理する。robots.txtにプレビューのパスを書かない。",
+   "confidence": "confirmed_official",
+   "page_updated": "未確認"
+  },
+  {
+   "id": "NI-3",
+   "topic": "7. サイトマップとnoindexページ",
+   "statement": "サイトマップには、Googleの検索結果に表示させたいURLを含める。同じ内容が複数のURLにある場合は、優先するURLだけを載せる。サイトマップとrel=canonicalで異なるURLを指定しない。公式の文言として「noindexのページをサイトマップに入れるな」は確認できなかったが、上記の原則から、noindexのURLは載せないのが整合的（推測）。Search Consoleのページのインデックス登録レポートには「noindexタグによって除外」の理由と、サイトマップ掲載URLで絞り込む機能がある。",
+   "url": "https://developers.google.com/search/docs/crawling-indexing/sitemaps/build-sitemap",
+   "evidence": "公式ドメイン限定のWebSearchで次を確認した。\"Include the URLs in your sitemap that you want to see in Google's search results.\"、\"choose the URL you prefer and include that in the sitemap instead of all URLs that lead to the same content\"。ECサイトのURL構造ガイドに、索引可能なページだけをサイトマップに含める趣旨の記述あり。Search Consoleヘルプ（support.google.com/webmasters/answer/7440203）に noindex の除外理由がある。",
+   "implication_for_project": "プレビュー期間中は、Search Consoleへのサイトマップ送信や、robots.txtでのSitemap宣言をしない。sitemap.xmlを生成する場合も、公開時にnoindexを外したURLだけを載せる。生成ロジックでnoindexページ、パラメータURL、内部検索結果を除外する。",
+   "confidence": "confirmed_official",
+   "page_updated": "未確認"
+  },
+  {
+   "id": "DT-1",
+   "topic": "8. 公開日・更新日（byline date）",
+   "statement": "ページ上に日付を目立つ形で表示し、「公開」「最終更新」などのラベルを付ける。構造化データ（ArticleなどCreativeWorkのサブタイプ）ではdatePublishedやdateModifiedをISO 8601形式で指定し、表示上の日付と完全に一致させる。時刻を示す場合は正しいタイムゾーン（夏時間も考慮）を付ける。未来の日付や、記事で扱う出来事の日付を指定しない。内容が実質的に変わったときは日付を更新してよいが、重要な情報の追加などの理由なしに人為的に新しく見せない。誤った日付が選ばれる場合は、ページ上の他の日付を減らすことを検討する。Googleは単一の日付要素には依存しない。",
+   "url": "https://developers.google.com/search/docs/appearance/publication-dates",
+   "evidence": "公式ドメイン限定のWebSearchで次を確認した。\"show a visible date prominently on the page\"、\"Label your dates appropriately with text like 'Publish' or 'Last updated'\"、\"use exactly the same date (and, potentially, time) in structured data as well as in the visible part of the page\"、\"Don't specify future dates, or the date of the action described on the page\"。人為的に新しく見せない（don't artificially freshen）との記述。2019年3月の公式ブログ「Help Google Search know the best date for your web page」も同じ趣旨。",
+   "implication_for_project": "記事上部に「公開日：2026年◯月◯日／更新日：2026年◯月◯日」を表示する（デザインと配色は維持し、文言とデータだけを整える）。JSON-LDのdatePublishedとdateModifiedは、表示と同じ日付をISO 8601＋タイムゾーン（例：2026-10-12T09:00:00+09:00）で出す。サイドバーの関連記事やランキングの日付が本文の日付と混同されないようにする。HC-4のとおり、日付だけの更新は行わない。",
+   "confidence": "confirmed_official",
+   "page_updated": "未確認"
+  },
+  {
+   "id": "AI-1",
+   "topic": "9. 生成AIコンテンツの扱い（サイト運営者向けガイド）",
+   "statement": "生成AIの利用自体は問題ないが、正確性・品質・関連性を重視する必要がある。生成モデルは事実を取り出すのではなく単語列を予測するため、誤りやハルシネーションがありうる。公開前に人が事実確認とレビューを行い、その対象にはメタデータ（title要素、meta description、構造化データ、画像のalt）も含まれる。どう作ったかの文脈を読者に示すとよい。付加価値なしに生成AIで多数のページを作ると、大量生成コンテンツの不正使用にあたりうる。2026年10月1日、検索品質評価ガイドライン（Search Quality Rater Guidelines）の内容を反映する更新が入った。",
+   "url": "https://developers.google.com/search/docs/fundamentals/using-gen-ai-content",
+   "evidence": "公式ドメイン限定のWebSearchで次を確認した。\"It is critical to manually factcheck and review all AI-generated content for accuracy and trustworthiness before publishing. This review also applies to metadata\"、見出し「Focus on accuracy, quality, and relevance」「Give users context」、\"using generative AI tools or other similar tools to generate many pages without adding value for users may violate Google's spam policy on scaled content abuse\"。更新履歴の2026年10月1日項目「Updated the using generative AI content guide with information from the Search Quality Raters guidelines.」",
+   "implication_for_project": "今回のSEO改善でAIを使ってtitleやdescription、FAQ、構造化データを書き換える場合も、人が全件を目視レビューし、本文との一致と事実を確認する。転職関連の制度（失業給付、雇用保険、試用期間など）や数値は、一次情報（*.go.jp）で確認したうえで記載する。編集方針ページでAIの使用範囲を開示する。",
+   "confidence": "confirmed_official",
+   "page_updated": "2026-10-01（公式の更新履歴による）"
+  },
+  {
+   "id": "AI-2",
+   "topic": "9. AI生成コンテンツ：自動化の位置づけと著者表記",
+   "statement": "2023年2月の公式ブログの見解は次のとおり。自動化やAIの適切な利用はガイドライン違反ではない。ただし、検索順位の操作を主目的として自動化（AIを含む）でコンテンツを生成するのはスパムポリシー違反。読者が「誰が書いたか」と思う場面では正確な署名を推奨する。AIを著者として署名に記すのは、AIの関与を明示するという推奨に沿う最善の方法とはいえない。",
+   "url": "https://developers.google.com/search/blog/2023/02/google-search-and-ai-content",
+   "evidence": "公式ドメイン限定のWebSearchで次を確認した。\"Using automation—including AI—to generate content with the primary purpose of manipulating ranking in search results is a violation of our spam policies.\"。同ブログのFAQには、正確な署名の推奨と、AIを著者欄に入れることは最善でないという趣旨の回答がある。",
+   "implication_for_project": "著者欄（表示とJSON-LDの両方）に「AI」や架空のAIペルソナを入れない。著者・監修者は実在の人物とし、AIの使用は編集方針や記事末の注記で開示する。",
+   "confidence": "confirmed_official",
+   "page_updated": "2023-02-08（ブログ）"
+  },
+  {
+   "id": "AI-3",
+   "topic": "9. 生成AI機能（AI Overviews / AI Mode）向けの最適化ガイド",
+   "statement": "2026年5月、生成AI機能向けの最適化ガイドが公開された（ブログでは2026年5月）。AI機能に表示されるには、ページが索引済みで、スニペット付きで表示可能であることが前提。AI向けの特別なファイルやマークアップは不要とされ、Google検索はllms.txtを無視する（2026年6月15日に注記を追加）。コンテンツをAI向けに細かく分割する必要はなく、SEOの基本が引き続き重要とされる。Search ConsoleにはGenerative AI（AI機能）のパフォーマンスレポートが追加された（2026年6月のブログ）。",
+   "url": "https://developers.google.com/search/docs/fundamentals/ai-optimization-guide",
+   "evidence": "公式ドメイン限定のWebSearchで次を確認した。2026年5月の公式ブログ「A new resource for optimizing for generative AI in Google Search」と、ガイド本体（索引とスニペット表示が前提であること、llms.txtは検索で無視されること、分割不要であること）。2026年6月の公式ブログ「Introducing Search Generative AI performance reports in Search Console」。更新履歴では5月15日公開、6月15日にllms.txtの注記追加とされているが、原文の日付は直接確認できていない。",
+   "implication_for_project": "「AIO対策」と称してllms.txtやAI専用マークアップを追加する提案はしない。公開時にnoindexを外したうえで、nosnippet/max-snippetの制限をかけないことが、AI機能に表示される前提条件になる（SN-2）。プレビュー期間中はnoindexのため、どのAI機能にも出ない状態が正しい。",
+   "confidence": "confirmed_official",
+   "page_updated": "ガイド公開は2026-05（更新履歴によると05-15）。llms.txtの注記は2026-06-15（いずれも未確定）"
+  }
+ ],
+ "unverified": [
+  "【調査方法の制約】WebFetchは developers.google.com を含む全ドメインでDNS解決に失敗した（getaddrinfo ENOTFOUND）。curlでもプロキシがdevelopers.google.com:443へのCONNECTを403で拒否した。そのため公式ページを直接開けていない。confirmed_officialの各項目は、developers.google.com に限定したWebSearch（米国リージョン）の検索結果抜粋と要約で確認したもの。原文の一字一句と、ページ末尾の「Last updated」表示は直接確認できていない。",
+  "creating-helpful-content の最終更新日は確定していない。二次情報は2026-10-01 UTC、公式ドメインの検索要約は2026-10-05 UTCと表示しており、食い違っている。また、公式の更新履歴ページで、このページに関する2026年10月の項目は確認できなかった（10月1日の項目は生成AIコンテンツガイドの更新）。",
+  "偽の著者プロフィールに関する段落（HC-3）は、公式ドメインの検索でも確認できたが、追記日は二次情報のみ（10月1日説と10月2日説がある）。「メインコンテンツ」の定義と4属性（effort / originality / talent or skill / accuracy）の原文は、二次情報でしか確認できていない。",
+  "FAQリッチリザルトについて、Search ConsoleのFAQレポートとリッチリザルトテストのサポート終了（2026年6月）、Search Console APIのサポート終了（2026年8月）は二次情報でのみ確認した。現時点（2026-10-12）で実際に終了済みかは未確認。2026年の告知文の「leave it」（マークアップを残してよい）という文言も二次情報経由。",
+  "FAQドキュメント削除の正確な日付（2026年6月の何日か）は未確認。旧FAQPageドキュメントのURLが更新履歴ページへ転送されているかは、検索結果のタイトルからの推測。",
+  "FAQPageマークアップが、AI Overviews / AI Modeなどの生成AI機能に何らかの効果を持つかについて、公式の記述は見つからなかった。",
+  "サイト内検索結果ページに特化した、現行の公式ガイダンスは見つからなかった（IS-1の方針は、クロールバジェットのガイドからの推測）。",
+  "「noindexのページをサイトマップに入れてはいけない」という明示的な公式文言は見つからなかった（NI-3は「検索結果に表示させたいURLを含める」という原則からの推論）。",
+  "タイトルリンク、スニペット、正規化、ページ送り、絞り込み、記事構造化データ、パンくず、一般ガイドライン、byline date、block-indexing、control-what-you-share、spam-policies、using-gen-ai-content の各ページについて、ページ自体の「Last updated」は直接確認できていない。検索メタデータからの「約○日前」は推定値にすぎない。",
+  "Google検索セントラルの日本語版ページ（hl=ja）と英語版の差分は確認していない。日本語版は翻訳の反映が遅れることがある。",
+  "求人情報（JobPosting）構造化データの現行ガイドラインと、記事ページへの付与の可否は、今回確認していない（FAQ-5の含意で触れたが推測）。",
+  "本プロジェクトの実ファイル（添付ZIPの展開物、asset-lock.json、人物写真が実在の著者本人かどうか、既存のFAQ JSON-LDやrobots.txt・noindexの現状）は、/home/user/IKORABUagent に存在しなかった（CLAUDE.md、README.md、docs、pokemon-agents、scriptsのみ）。そのため照合していない。含意は一般論として記述した。"
+ ]
+}

@@ -37,10 +37,10 @@ source:
 
 ## もう少し調べたいこと 18本
 
+- [求人の「福利厚生」はどう見る？社会保険と会社独自の制度の違い、住宅手当・交通費・退職金の確かめ方](/articles/fukuri-kousei-mikata)
 - [工場の仕事内容は？ライン作業・検査・機械オペレーターの違いと、交替制・雇用の形の確認](/articles/seizou-koujou-shigoto)
 - [受付の仕事内容は？企業・ホテル・クリニックの違いと接客経験の活かし方](/articles/uketsuke-shigoto)
 - [ドライバーの仕事内容と必要な免許は？準中型・中型・大型・二種の違いと、2024年4月からの働き方の確認](/articles/driver-shigoto)
-- [求人の「福利厚生」はどう見る？社会保険と会社独自の制度の違い、住宅手当・交通費・退職金の確かめ方](/articles/fukuri-kousei-mikata)
 - [限定正社員（勤務地・職務・短時間）とは？普通の正社員との違いと、応募前に確認すること](/articles/gentei-seishain)
 - [ハローワークの使い方は？求職申込みから紹介状・書類の添削・面接練習まで、在職中に使うときのことも](/articles/hellowork-tsukaikata)
 

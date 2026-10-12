@@ -53,14 +53,14 @@ source:
 - [営業・カスタマーサポート・ITサポートの違いは？仕事内容と向き不向きを比べる](/articles/eigyo-cs-it-support-chigai)
 - [販売・接客の仕事で正社員を目指すという選択｜変わることと求人の確認ポイント](/articles/hanbai-seishain)
 - [人事・採用の仕事に、未経験から近づくには？入口になりやすい仕事と準備](/articles/jinji-saiyo-mikeiken)
-- [PCが得意じゃなくても、事務職は目指せる？よく使う操作と練習のしかた](/articles/pc-nigate-jimu)
+- [未経験のIT、どんな仕事から始まる？入口になりやすい仕事と入社前の確認](/articles/mikeiken-it-hajimari)
 
 **ほかの記事を読む 19〜22本目**
 
+- [PCが得意じゃなくても、事務職は目指せる？よく使う操作と練習のしかた](/articles/pc-nigate-jimu)
 - [やりたい仕事が分からない。自分に合う仕事の探し方3ステップ](/articles/shigoto-sagashikata)
 - [AIで変わる仕事を、未経験転職者はどう見るべきか](/articles/ai-shigoto-mikeiken)
 - [営業が怖い人へ。不安を分けて確認したい仕事内容と面接での質問例](/articles/eigyo-kowai)
-- [未経験のIT、どんな仕事から始まる？入口になりやすい仕事と入社前の確認](/articles/mikeiken-it-hajimari)
 
 仕事選びと応募の準備を相談する
 

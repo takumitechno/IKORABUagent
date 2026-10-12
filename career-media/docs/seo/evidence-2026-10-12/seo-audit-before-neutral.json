@@ -1,0 +1,51 @@
+{
+ "base": "http://127.0.0.1:3201",
+ "checkedPages": 161,
+ "pagesWithProblems": [
+  {
+   "route": "/articles/page/2",
+   "problems": [
+    "パンくずの末尾が別のページ: http://localhost:3201/articles"
+   ]
+  },
+  {
+   "route": "/articles/page/3",
+   "problems": [
+    "パンくずの末尾が別のページ: http://localhost:3201/articles"
+   ]
+  },
+  {
+   "route": "/articles/page/4",
+   "problems": [
+    "パンくずの末尾が別のページ: http://localhost:3201/articles"
+   ]
+  },
+  {
+   "route": "/articles/page/5",
+   "problems": [
+    "パンくずの末尾が別のページ: http://localhost:3201/articles"
+   ]
+  },
+  {
+   "route": "/articles/page/6",
+   "problems": [
+    "パンくずの末尾が別のページ: http://localhost:3201/articles"
+   ]
+  },
+  {
+   "route": "/articles/page/7",
+   "problems": [
+    "パンくずの末尾が別のページ: http://localhost:3201/articles"
+   ]
+  }
+ ],
+ "brokenInternalLinks": [],
+ "duplicateTitles": [],
+ "duplicateDescriptions": [],
+ "sitemap": {
+  "urls": 156,
+  "problems": []
+ },
+ "robotsTxt": "User-Agent: *\nDisallow: /",
+ "noindexPages": 161
+}

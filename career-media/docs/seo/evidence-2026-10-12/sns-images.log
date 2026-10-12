@@ -1,0 +1,5 @@
+
+> career-media@0.1.0 sns:images
+> node scripts/sns-images.mjs --base http://127.0.0.1:3100
+
+22枚 → export/sns

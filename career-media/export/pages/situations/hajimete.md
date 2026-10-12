@@ -37,18 +37,18 @@ source:
 
 ## もう少し調べたいこと 73本
 
+- [求人の「福利厚生」はどう見る？社会保険と会社独自の制度の違い、住宅手当・交通費・退職金の確かめ方](/articles/fukuri-kousei-mikata)
 - [社会人から公務員を目指すには？年齢要件の確かめ方と試験の流れ・準備](/articles/koumuin-shakaijin)
 - [未経験からプログラマーを目指すには？仕事内容・学び方と、研修のある求人の見方](/articles/programmer-mikeiken)
 - [「リモートワーク可」の求人、どこを見る？頻度・条件・費用と入社直後の出社を確かめる](/articles/remote-work-kyujin)
 - [求人の「賞与年2回」「昨年実績」はどう読む？ボーナスの見方と面接での聞き方](/articles/shoyo-kyujin-mikata)
 - [退職金はもらえる？会社によって違う理由と確かめ方｜就業規則・勤続年数・中退共・求人票の見方](/articles/taishokukin-kakunin)
-- [Webマーケティングの仕事内容は？種類と、未経験からの近づき方・求人の見方](/articles/web-marketing-mikeiken)
 
 **ほかの記事を読む 7〜18本目**
 
+- [Webマーケティングの仕事内容は？種類と、未経験からの近づき方・求人の見方](/articles/web-marketing-mikeiken)
 - [ドライバーの仕事内容と必要な免許は？準中型・中型・大型・二種の違いと、2024年4月からの働き方の確認](/articles/driver-shigoto)
 - [不動産営業の仕事内容は？賃貸仲介と売買仲介の違い・宅建士の役割・歩合の給与の確認と接客経験の活かし方](/articles/fudousan-eigyo)
-- [求人の「福利厚生」はどう見る？社会保険と会社独自の制度の違い、住宅手当・交通費・退職金の確かめ方](/articles/fukuri-kousei-mikata)
 - [ハローワークの使い方は？求職申込みから紹介状・書類の添削・面接練習まで、在職中に使うときのことも](/articles/hellowork-tsukaikata)
 - [自分に合う会社選びを、プロに相談するとよい理由｜求人票で分からないことの聞き方と確かめ方](/articles/kigyou-erabi-soudan)
 - [転職の企業研究、何を見ればいい？公式サイト・求人票・職場情報の調べ方と面接での使い方](/articles/kigyou-kenkyu-yarikata)
@@ -72,10 +72,11 @@ source:
 - [未経験から介護職へ転職するときに知っておきたいこと｜仕事内容・資格の段階・夜勤](/articles/kaigo-mikeiken)
 - [希望年収・希望給与の書き方と面接での答え方｜「貴社規定に従います」の使いどころと例文](/articles/kibou-nenshu-kakikata)
 - [固定残業代（みなし残業）がある求人の見方｜求人に書かれるべき3つの項目と確認のしかた](/articles/koteizangyo-kyujin)
-- [コールセンターの仕事内容は？受信と発信の違い・向き不向きと、接客経験の活かし方](/articles/callcenter-shigoto)
+- [内定をもらったら、承諾の前に確認すること｜労働条件通知書の見方と返事のしかた](/articles/naitei-shodaku-mae)
 
 **ほかの記事を読む 31〜42本目**
 
+- [コールセンターの仕事内容は？受信と発信の違い・向き不向きと、接客経験の活かし方](/articles/callcenter-shigoto)
 - [面接の逆質問、何を聞けばいい？聞くとよいこと・避けたいことと未経験向けの質問例](/articles/gyaku-shitsumon)
 - [転職のための自己分析のやり方｜経験の棚卸し・ゆずれない条件・やりたくないことの書き出し例](/articles/jiko-bunseki-yarikata)
 - [教育訓練給付金の使い方｜3つの種類と、講座を申し込む前に確認すること](/articles/kyouiku-kunren-kyufu-tsukaikata)
@@ -84,7 +85,6 @@ source:
 - [未経験の転職に資格は必要？取る前に考えたいことと、職種別に検討されやすい資格の例](/articles/mikeiken-shikaku)
 - [契約社員と正社員は何が違う？「無期転換ルール」のしくみと求人で確認すること](/articles/muki-tenkan-keiyaku)
 - [内定辞退の伝え方は？電話とメールの使い分け・例文と、承諾後に辞退するときの注意](/articles/naitei-jitai-tsutaekata)
-- [内定をもらったら、承諾の前に確認すること｜労働条件通知書の見方と返事のしかた](/articles/naitei-shodaku-mae)
 - [転職の応募・面接日程・お礼のメールはどう書く？件名の付け方と返信のタイミング、例文](/articles/oubo-mail-kakikata)
 - [再就職手当とは？早く次の仕事が決まったときにもらえる条件と金額の考え方](/articles/saishushoku-teate)
 - [退職後の失業手当はもらえる？条件・自己都合と会社都合の違い・手続きの流れ](/articles/shitsugyo-teate-kihon)
@@ -111,19 +111,19 @@ source:
 - [転職すると有給休暇はどうなる？もらえる時期と日数、退職前の使い方](/articles/yukyu-tenshoku)
 - [働きながらの転職活動、何から？進める順番と時間の作り方・退職を伝える時期](/articles/zaishoku-tenshoku-susumekata)
 - [26歳で未経験の職種に転職するのは遅い？](/articles/26sai-mikeiken)
+- [未経験のIT、どんな仕事から始まる？入口になりやすい仕事と入社前の確認](/articles/mikeiken-it-hajimari)
 - [年収300万円から転職すると、給料は下がる？上げられる？](/articles/nenshu-300man-tenshoku)
 - [年収だけで求人を選ばないほうがいい理由](/articles/nenshu-dake-erabanai)
 - [やりたい仕事が分からない。自分に合う仕事の探し方3ステップ](/articles/shigoto-sagashikata)
 - [手取り20万円から転職を考えるとき、何を比べればいい？](/articles/tedori-20man-hikaku)
 - [今の仕事を辞めたいとき、先に確認しておきたいこと](/articles/yametai-mae-kakunin)
 - [転職エージェントに、何を相談すればいい？相談できることと伝え方の例](/articles/agent-soudan-nani)
-- [第二新卒って何歳まで？使える場面と探し方](/articles/dainishinsotsu-nansai)
 
 **ほかの記事を読む 67〜73本目**
 
+- [第二新卒って何歳まで？使える場面と探し方](/articles/dainishinsotsu-nansai)
 - [営業が怖い人へ。不安を分けて確認したい仕事内容と面接での質問例](/articles/eigyo-kowai)
 - [未経験職種の面接、何を準備する？よく聞かれる質問と逆質問の例](/articles/mensetsu-junbi-mikeiken)
-- [未経験のIT、どんな仕事から始まる？入口になりやすい仕事と入社前の確認](/articles/mikeiken-it-hajimari)
 - [未経験求人の「研修あり」で確認すべきこと｜期間・内容・その後のフォロー](/articles/mikeiken-kenshu-kakunin)
 - [子育てと仕事の両立の制度が変わった（2025年10月施行）｜求人を見るときの確認ポイント](/news/news-ikuji-kaigo-2025-10)
 - [自己都合退職の給付制限が原則1か月に｜退職してから転職活動する人が確認したいこと](/news/news-koyou-hoken-kyufu-seigen)

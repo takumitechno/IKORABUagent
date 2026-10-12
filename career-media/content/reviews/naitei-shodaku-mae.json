@@ -6,5 +6,19 @@
     "verdict": "approved",
     "findings": [],
     "reviewedAt": "2026-10-09T04:25:42.135Z"
+  },
+  {
+    "slug": "naitei-shodaku-mae",
+    "contentHash": "2aab47d930458d2770d107b3be205a6270963563ef8a601bb8c5d83d52ec7da8",
+    "reviewer": "career-reviewer (automated checks; human approval pending)",
+    "verdict": "approved",
+    "findings": [
+      {
+        "code": "C04",
+        "severity": "warning",
+        "message": "査読（reviewed_at）のあとに更新されている。再査読が必要"
+      }
+    ],
+    "reviewedAt": "2026-10-12T08:14:47.256Z"
   }
 ]

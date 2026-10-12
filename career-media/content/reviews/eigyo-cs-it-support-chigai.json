@@ -20,5 +20,19 @@
       }
     ],
     "reviewedAt": "2026-10-12T07:44:22.138Z"
+  },
+  {
+    "slug": "eigyo-cs-it-support-chigai",
+    "contentHash": "8b1234b0018f343563feb4c62ed3dde851e3ce9ca0f9798e6a87ba97d0b1282e",
+    "reviewer": "career-reviewer (automated checks; human approval pending)",
+    "verdict": "approved",
+    "findings": [
+      {
+        "code": "C04",
+        "severity": "warning",
+        "message": "査読（reviewed_at）のあとに更新されている。再査読が必要"
+      }
+    ],
+    "reviewedAt": "2026-10-12T08:14:45.812Z"
   }
 ]

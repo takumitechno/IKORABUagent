@@ -65,14 +65,14 @@ source:
 - [26歳で未経験の職種に転職するのは遅い？](/articles/26sai-mikeiken)
 - [エージェント面談の前に決めておくこと・決めなくていいこと](/articles/agent-mendan-mae)
 - [営業・カスタマーサポート・ITサポートの違いは？仕事内容と向き不向きを比べる](/articles/eigyo-cs-it-support-chigai)
+- [未経験のIT、どんな仕事から始まる？入口になりやすい仕事と入社前の確認](/articles/mikeiken-it-hajimari)
 - [年収300万円から転職すると、給料は下がる？上げられる？](/articles/nenshu-300man-tenshoku)
 - [やりたい仕事が分からない。自分に合う仕事の探し方3ステップ](/articles/shigoto-sagashikata)
 - [第二新卒って何歳まで？使える場面と探し方](/articles/dainishinsotsu-nansai)
-- [派遣から正社員を考えるとき、最初に確認したいこと](/articles/haken-seishain)
 
 **ほかの記事を読む 31〜32本目**
 
-- [未経験のIT、どんな仕事から始まる？入口になりやすい仕事と入社前の確認](/articles/mikeiken-it-hajimari)
+- [派遣から正社員を考えるとき、最初に確認したいこと](/articles/haken-seishain)
 - [未経験求人の「研修あり」で確認すべきこと｜期間・内容・その後のフォロー](/articles/mikeiken-kenshu-kakunin)
 
 仕事選びと応募の準備を相談する

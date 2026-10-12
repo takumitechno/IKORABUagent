@@ -1,0 +1,6 @@
+
+> career-media@0.1.0 export:static
+> tsx scripts/export-static.ts --base http://127.0.0.1:3200
+
+site/: 160ページ + 404、ファイル 152件（7.8MB） → export/site
+pages/: 160ページの Markdown と PAGES.md・_layout.md → export/pages

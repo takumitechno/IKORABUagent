@@ -33,10 +33,10 @@ source:
 
 ## もう少し調べたいこと 51本
 
+- [求人の「福利厚生」はどう見る？社会保険と会社独自の制度の違い、住宅手当・交通費・退職金の確かめ方](/articles/fukuri-kousei-mikata)
 - [社会人から公務員を目指すには？年齢要件の確かめ方と試験の流れ・準備](/articles/koumuin-shakaijin)
 - [「リモートワーク可」の求人、どこを見る？頻度・条件・費用と入社直後の出社を確かめる](/articles/remote-work-kyujin)
 - [求人の「賞与年2回」「昨年実績」はどう読む？ボーナスの見方と面接での聞き方](/articles/shoyo-kyujin-mikata)
-- [求人の「福利厚生」はどう見る？社会保険と会社独自の制度の違い、住宅手当・交通費・退職金の確かめ方](/articles/fukuri-kousei-mikata)
 - [ハローワークの使い方は？求職申込みから紹介状・書類の添削・面接練習まで、在職中に使うときのことも](/articles/hellowork-tsukaikata)
 - [自分に合う会社選びを、プロに相談するとよい理由｜求人票で分からないことの聞き方と確かめ方](/articles/kigyou-erabi-soudan)
 
@@ -57,6 +57,7 @@ source:
 
 **ほかの記事を読む 19〜30本目**
 
+- [内定をもらったら、承諾の前に確認すること｜労働条件通知書の見方と返事のしかた](/articles/naitei-shodaku-mae)
 - [面接の逆質問、何を聞けばいい？聞くとよいこと・避けたいことと未経験向けの質問例](/articles/gyaku-shitsumon)
 - [転職のための自己分析のやり方｜経験の棚卸し・ゆずれない条件・やりたくないことの書き出し例](/articles/jiko-bunseki-yarikata)
 - [職歴に空白期間があるとき、面接でどう説明する？書類の書き方と答え方の例](/articles/kuhaku-kikan-setsumei)
@@ -64,7 +65,6 @@ source:
 - [転職の面接、服装はスーツ？「私服可」「服装自由」「オフィスカジュアル」の考え方と身だしなみチェック](/articles/mensetsu-fukusou)
 - [未経験の転職に資格は必要？取る前に考えたいことと、職種別に検討されやすい資格の例](/articles/mikeiken-shikaku)
 - [内定辞退の伝え方は？電話とメールの使い分け・例文と、承諾後に辞退するときの注意](/articles/naitei-jitai-tsutaekata)
-- [内定をもらったら、承諾の前に確認すること｜労働条件通知書の見方と返事のしかた](/articles/naitei-shodaku-mae)
 - [転職の応募・面接日程・お礼のメールはどう書く？件名の付け方と返信のタイミング、例文](/articles/oubo-mail-kakikata)
 - [再就職手当とは？早く次の仕事が決まったときにもらえる条件と金額の考え方](/articles/saishushoku-teate)
 - [退職後の失業手当はもらえる？条件・自己都合と会社都合の違い・手続きの流れ](/articles/shitsugyo-teate-kihon)

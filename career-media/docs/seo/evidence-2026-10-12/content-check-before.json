@@ -1,0 +1,658 @@
+[
+  {
+    "slug": "26sai-mikeiken",
+    "status": "published",
+    "findings": [
+      {
+        "code": "C04",
+        "severity": "warning",
+        "message": "査読（reviewed_at）のあとに更新されている。再査読が必要"
+      }
+    ]
+  },
+  {
+    "slug": "agent-mendan-mae",
+    "status": "published",
+    "findings": [
+      {
+        "code": "C04",
+        "severity": "warning",
+        "message": "査読（reviewed_at）のあとに更新されている。再査読が必要"
+      },
+      {
+        "code": "C04",
+        "severity": "warning",
+        "message": "出典の確認日が情報確認日より新しい。information_checked_at を更新する"
+      }
+    ]
+  },
+  {
+    "slug": "agent-soudan-nani",
+    "status": "published",
+    "findings": []
+  },
+  {
+    "slug": "ai-shigoto-mikeiken",
+    "status": "published",
+    "findings": []
+  },
+  {
+    "slug": "butsuryu-soko-shigoto",
+    "status": "published",
+    "findings": []
+  },
+  {
+    "slug": "callcenter-shigoto",
+    "status": "published",
+    "findings": []
+  },
+  {
+    "slug": "dainishinsotsu-nansai",
+    "status": "published",
+    "findings": []
+  },
+  {
+    "slug": "dainishinsotsu-tenshoku-timing",
+    "status": "review",
+    "findings": [
+      {
+        "code": "C03",
+        "severity": "warning",
+        "message": "出典が1件のみ。可能なら2件以上で裏付ける"
+      },
+      {
+        "code": "C14",
+        "severity": "warning",
+        "message": "本文が短い（800文字未満）"
+      }
+    ]
+  },
+  {
+    "slug": "donichi-yasumi-nenshu-hikaku",
+    "status": "published",
+    "findings": [
+      {
+        "code": "C04",
+        "severity": "warning",
+        "message": "査読（reviewed_at）のあとに更新されている。再査読が必要"
+      },
+      {
+        "code": "C04",
+        "severity": "warning",
+        "message": "出典の確認日が情報確認日より新しい。information_checked_at を更新する"
+      }
+    ]
+  },
+  {
+    "slug": "donichi-yasumi-shigoto",
+    "status": "published",
+    "findings": []
+  },
+  {
+    "slug": "driver-shigoto",
+    "status": "published",
+    "findings": []
+  },
+  {
+    "slug": "eigyo-cs-it-support-chigai",
+    "status": "published",
+    "findings": []
+  },
+  {
+    "slug": "eigyo-jimu-shigoto",
+    "status": "published",
+    "findings": []
+  },
+  {
+    "slug": "eigyo-kowai",
+    "status": "published",
+    "findings": []
+  },
+  {
+    "slug": "freeter-seishain-hajimeni",
+    "status": "published",
+    "findings": [
+      {
+        "code": "C04",
+        "severity": "warning",
+        "message": "査読（reviewed_at）のあとに更新されている。再査読が必要"
+      },
+      {
+        "code": "C04",
+        "severity": "warning",
+        "message": "出典の確認日が情報確認日より新しい。information_checked_at を更新する"
+      }
+    ]
+  },
+  {
+    "slug": "fudousan-eigyo",
+    "status": "published",
+    "findings": []
+  },
+  {
+    "slug": "fukuri-kousei-mikata",
+    "status": "published",
+    "findings": []
+  },
+  {
+    "slug": "gentei-seishain",
+    "status": "published",
+    "findings": []
+  },
+  {
+    "slug": "gyaku-shitsumon",
+    "status": "published",
+    "findings": []
+  },
+  {
+    "slug": "haken-seishain",
+    "status": "published",
+    "findings": []
+  },
+  {
+    "slug": "hanbai-seishain",
+    "status": "published",
+    "findings": []
+  },
+  {
+    "slug": "hello-training",
+    "status": "published",
+    "findings": []
+  },
+  {
+    "slug": "hellowork-tsukaikata",
+    "status": "published",
+    "findings": []
+  },
+  {
+    "slug": "iryo-jimu-mikeiken",
+    "status": "published",
+    "findings": []
+  },
+  {
+    "slug": "jiko-bunseki-yarikata",
+    "status": "published",
+    "findings": []
+  },
+  {
+    "slug": "jiko-pr-mikeiken",
+    "status": "published",
+    "findings": []
+  },
+  {
+    "slug": "jimu-mikeiken-mae",
+    "status": "published",
+    "findings": [
+      {
+        "code": "C04",
+        "severity": "warning",
+        "message": "査読（reviewed_at）のあとに更新されている。再査読が必要"
+      }
+    ]
+  },
+  {
+    "slug": "jinji-saiyo-mikeiken",
+    "status": "published",
+    "findings": []
+  },
+  {
+    "slug": "kaigo-mikeiken",
+    "status": "published",
+    "findings": []
+  },
+  {
+    "slug": "keiri-mikeiken",
+    "status": "published",
+    "findings": []
+  },
+  {
+    "slug": "kibou-nenshu-kakikata",
+    "status": "published",
+    "findings": []
+  },
+  {
+    "slug": "kigyou-erabi-soudan",
+    "status": "published",
+    "findings": []
+  },
+  {
+    "slug": "kigyou-kenkyu-yarikata",
+    "status": "published",
+    "findings": []
+  },
+  {
+    "slug": "kokumin-nenkin-menjo",
+    "status": "published",
+    "findings": []
+  },
+  {
+    "slug": "koteizangyo-kyujin",
+    "status": "published",
+    "findings": []
+  },
+  {
+    "slug": "koumuin-shakaijin",
+    "status": "published",
+    "findings": []
+  },
+  {
+    "slug": "kuhaku-kikan-setsumei",
+    "status": "published",
+    "findings": []
+  },
+  {
+    "slug": "kyouiku-kunren-kyufu-tsukaikata",
+    "status": "published",
+    "findings": []
+  },
+  {
+    "slug": "kyujin-hyo-yomikata",
+    "status": "draft",
+    "findings": []
+  },
+  {
+    "slug": "kyushokusha-shien-seido",
+    "status": "published",
+    "findings": []
+  },
+  {
+    "slug": "mensetsu-fukusou",
+    "status": "published",
+    "findings": []
+  },
+  {
+    "slug": "mensetsu-junbi-mikeiken",
+    "status": "published",
+    "findings": []
+  },
+  {
+    "slug": "mensetsu-kinchou",
+    "status": "published",
+    "findings": []
+  },
+  {
+    "slug": "mensetsu-ochita-furikaeri",
+    "status": "published",
+    "findings": []
+  },
+  {
+    "slug": "mensetsu-renshu-pro",
+    "status": "published",
+    "findings": []
+  },
+  {
+    "slug": "mensetsu-yokukiku-shitsumon",
+    "status": "published",
+    "findings": []
+  },
+  {
+    "slug": "mikeiken-it-hajimari",
+    "status": "published",
+    "findings": []
+  },
+  {
+    "slug": "mikeiken-kenshu-kakunin",
+    "status": "published",
+    "findings": []
+  },
+  {
+    "slug": "mikeiken-shikaku",
+    "status": "published",
+    "findings": []
+  },
+  {
+    "slug": "mikeiken-tenshoku-hajimekata",
+    "status": "published",
+    "findings": []
+  },
+  {
+    "slug": "muki-tenkan-keiyaku",
+    "status": "published",
+    "findings": []
+  },
+  {
+    "slug": "naitei-go-junbi",
+    "status": "published",
+    "findings": []
+  },
+  {
+    "slug": "naitei-jitai-tsutaekata",
+    "status": "published",
+    "findings": []
+  },
+  {
+    "slug": "naitei-shodaku-mae",
+    "status": "published",
+    "findings": []
+  },
+  {
+    "slug": "nenshu-300man-tenshoku",
+    "status": "published",
+    "findings": []
+  },
+  {
+    "slug": "nenshu-dake-erabanai",
+    "status": "published",
+    "findings": []
+  },
+  {
+    "slug": "nyusha-go-hajime",
+    "status": "published",
+    "findings": []
+  },
+  {
+    "slug": "oubo-mail-kakikata",
+    "status": "published",
+    "findings": []
+  },
+  {
+    "slug": "pawahara-soudan",
+    "status": "published",
+    "findings": []
+  },
+  {
+    "slug": "pc-nigate-jimu",
+    "status": "published",
+    "findings": []
+  },
+  {
+    "slug": "programmer-mikeiken",
+    "status": "published",
+    "findings": []
+  },
+  {
+    "slug": "remote-work-kyujin",
+    "status": "published",
+    "findings": []
+  },
+  {
+    "slug": "rirekisho-kakikata-kihon",
+    "status": "published",
+    "findings": []
+  },
+  {
+    "slug": "rirekisho-kakukoto-nai",
+    "status": "published",
+    "findings": []
+  },
+  {
+    "slug": "roudou-soudan-saki",
+    "status": "published",
+    "findings": []
+  },
+  {
+    "slug": "saishushoku-teate",
+    "status": "published",
+    "findings": []
+  },
+  {
+    "slug": "seizou-koujou-shigoto",
+    "status": "published",
+    "findings": []
+  },
+  {
+    "slug": "sekkyaku-keiken-ikasu",
+    "status": "published",
+    "findings": [
+      {
+        "code": "C04",
+        "severity": "warning",
+        "message": "査読（reviewed_at）のあとに更新されている。再査読が必要"
+      },
+      {
+        "code": "C04",
+        "severity": "warning",
+        "message": "出典の確認日が情報確認日より新しい。information_checked_at を更新する"
+      }
+    ]
+  },
+  {
+    "slug": "sekkyaku-office",
+    "status": "published",
+    "findings": [
+      {
+        "code": "C04",
+        "severity": "warning",
+        "message": "査読（reviewed_at）のあとに更新されている。再査読が必要"
+      }
+    ]
+  },
+  {
+    "slug": "seko-kanri-mikeiken",
+    "status": "published",
+    "findings": []
+  },
+  {
+    "slug": "shiboudouki-mikeiken",
+    "status": "published",
+    "findings": [
+      {
+        "code": "C03",
+        "severity": "warning",
+        "message": "出典が1件のみ。可能なら2件以上で裏付ける"
+      }
+    ]
+  },
+  {
+    "slug": "shigoto-sagashikata",
+    "status": "published",
+    "findings": []
+  },
+  {
+    "slug": "shitsugyo-teate-kihon",
+    "status": "published",
+    "findings": []
+  },
+  {
+    "slug": "shiyou-kikan",
+    "status": "published",
+    "findings": []
+  },
+  {
+    "slug": "shokuba-jouhou-wakamono",
+    "status": "published",
+    "findings": []
+  },
+  {
+    "slug": "shokumu-keirekisho-arubaito",
+    "status": "published",
+    "findings": [
+      {
+        "code": "C04",
+        "severity": "warning",
+        "message": "査読（reviewed_at）のあとに更新されている。再査読が必要"
+      },
+      {
+        "code": "C04",
+        "severity": "warning",
+        "message": "出典の確認日が情報確認日より新しい。information_checked_at を更新する"
+      }
+    ]
+  },
+  {
+    "slug": "shokumu-keirekisho-kakikata",
+    "status": "published",
+    "findings": []
+  },
+  {
+    "slug": "shorui-senkou-tooranai",
+    "status": "published",
+    "findings": []
+  },
+  {
+    "slug": "shoyo-kyujin-mikata",
+    "status": "published",
+    "findings": []
+  },
+  {
+    "slug": "souki-rishoku-tenshoku",
+    "status": "published",
+    "findings": []
+  },
+  {
+    "slug": "taishoku-juminzei",
+    "status": "published",
+    "findings": []
+  },
+  {
+    "slug": "taishoku-kakutei-shinkoku",
+    "status": "published",
+    "findings": []
+  },
+  {
+    "slug": "taishoku-kenko-hoken",
+    "status": "published",
+    "findings": []
+  },
+  {
+    "slug": "taishoku-nenkin-tetsuzuki",
+    "status": "published",
+    "findings": []
+  },
+  {
+    "slug": "taishoku-riyuu-mensetsu",
+    "status": "published",
+    "findings": []
+  },
+  {
+    "slug": "taishoku-shorui",
+    "status": "published",
+    "findings": []
+  },
+  {
+    "slug": "taishoku-tsutaekata",
+    "status": "published",
+    "findings": []
+  },
+  {
+    "slug": "taishokukin-kakunin",
+    "status": "published",
+    "findings": []
+  },
+  {
+    "slug": "tedori-20man-hikaku",
+    "status": "published",
+    "findings": [
+      {
+        "code": "C04",
+        "severity": "warning",
+        "message": "査読（reviewed_at）のあとに更新されている。再査読が必要"
+      }
+    ]
+  },
+  {
+    "slug": "tekisei-kensa-tenshoku",
+    "status": "published",
+    "findings": []
+  },
+  {
+    "slug": "tenkin-kinmuchi-kakunin",
+    "status": "published",
+    "findings": []
+  },
+  {
+    "slug": "tenshoku-agent-merit",
+    "status": "published",
+    "findings": []
+  },
+  {
+    "slug": "tenshoku-kaisu-kininaru",
+    "status": "published",
+    "findings": []
+  },
+  {
+    "slug": "tenshoku-koukai-shinai",
+    "status": "published",
+    "findings": []
+  },
+  {
+    "slug": "tenshoku-nenmatsu-chosei",
+    "status": "published",
+    "findings": []
+  },
+  {
+    "slug": "tenshoku-okane-junbi",
+    "status": "published",
+    "findings": []
+  },
+  {
+    "slug": "tenshoku-schedule",
+    "status": "published",
+    "findings": []
+  },
+  {
+    "slug": "tenshoku-service-chigai",
+    "status": "published",
+    "findings": []
+  },
+  {
+    "slug": "trial-koyou",
+    "status": "published",
+    "findings": []
+  },
+  {
+    "slug": "uketsuke-shigoto",
+    "status": "published",
+    "findings": []
+  },
+  {
+    "slug": "web-marketing-mikeiken",
+    "status": "published",
+    "findings": []
+  },
+  {
+    "slug": "web-mensetsu-junbi",
+    "status": "published",
+    "findings": []
+  },
+  {
+    "slug": "yametai-mae-kakunin",
+    "status": "published",
+    "findings": []
+  },
+  {
+    "slug": "yukyu-tenshoku",
+    "status": "published",
+    "findings": []
+  },
+  {
+    "slug": "zaishoku-tenshoku-susumekata",
+    "status": "published",
+    "findings": []
+  },
+  {
+    "slug": "news-ikuji-kaigo-2025-10",
+    "status": "published",
+    "findings": []
+  },
+  {
+    "slug": "news-koyou-hoken-kyufu-seigen",
+    "status": "published",
+    "findings": []
+  },
+  {
+    "slug": "news-koyou-hoken-tekiyou-kakudai",
+    "status": "published",
+    "findings": []
+  },
+  {
+    "slug": "news-kyouiku-kunren-kyufu",
+    "status": "published",
+    "findings": []
+  },
+  {
+    "slug": "news-roudou-jouken-meiji",
+    "status": "published",
+    "findings": []
+  },
+  {
+    "slug": "news-saitei-chingin-2026",
+    "status": "published",
+    "findings": []
+  },
+  {
+    "slug": "news-shakai-hoken-tekiyou-kakudai",
+    "status": "published",
+    "findings": []
+  }
+]

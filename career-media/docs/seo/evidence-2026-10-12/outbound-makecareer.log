@@ -1,0 +1,7 @@
+
+> career-media@0.1.0 check:outbound
+> tsx scripts/check-outbound.ts --base http://127.0.0.1:3100
+
+168ページを確認、相談の申込ボタン 451個（すべてサイト内の説明ページを指しているか確認）
+確認した申込ページのホスト: lp.make-career.co.jp, consultation.example
+OK: 本番の申込ページへのリンクはありません（本番送客 OFF）

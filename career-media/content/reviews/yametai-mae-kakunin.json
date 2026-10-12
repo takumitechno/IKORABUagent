@@ -6,5 +6,19 @@
     "verdict": "approved",
     "findings": [],
     "reviewedAt": "2026-10-09T15:11:20.585Z"
+  },
+  {
+    "slug": "yametai-mae-kakunin",
+    "contentHash": "6041eef281c5f772f25adabb36607fbd85771cd1419e7c3e00aab40619dccd9d",
+    "reviewer": "career-reviewer (automated checks; human approval pending)",
+    "verdict": "approved",
+    "findings": [
+      {
+        "code": "C04",
+        "severity": "warning",
+        "message": "査読（reviewed_at）のあとに更新されている。再査読が必要"
+      }
+    ],
+    "reviewedAt": "2026-10-12T08:23:35.118Z"
   }
 ]
