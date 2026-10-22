@@ -26,7 +26,7 @@ def backend_name():
 
 def speed_mul():
     """Per-backend pacing so every engine lands near the same short-form tempo."""
-    default = {"openjtalk": 1.3, "voicevox": 1.18, "fish": 1.1, "kokoro": 1.12}.get(backend_name(), 1.0)
+    default = {"openjtalk": 1.3, "voicevox": 1.18, "fish": 1.1, "kokoro": 1.4}.get(backend_name(), 1.0)
     return float(os.environ.get("TTS_SPEED_MUL", default))
 
 

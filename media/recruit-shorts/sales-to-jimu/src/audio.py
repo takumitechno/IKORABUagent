@@ -274,3 +274,59 @@ def master(music, sfx, path, fade_in=0.05, fade_out=1.2, total=None):
         w.setsampwidth(2)
         w.setframerate(SR)
         w.writeframes(data.tobytes())
+
+
+def sfx_swish(dur=0.2):
+    """Short airy swish for jump-cuts."""
+    t = tl(dur)
+    nz = filt(rng.normal(0, 1, len(t)), "bandpass", [2500, 9000])
+    e = np.sin(np.pi * np.clip(t / dur, 0, 1)) ** 2
+    return nz * e * 0.22
+
+
+def sfx_buzz(dur=0.55):
+    """Phone vibration on a desk."""
+    t = tl(dur)
+    s = np.sign(np.sin(2 * np.pi * 175 * t)) * 0.5 + np.sin(2 * np.pi * 350 * t) * 0.3
+    am = (np.sin(2 * np.pi * 9 * t) > -0.2).astype(float)
+    return filt(s * am, "lowpass", 1800) * env_adsr(t, dur, 0.01, 0.05) * 0.3
+
+
+def sfx_heartbeat():
+    out = np.zeros(int(1.0 * SR))
+    for st, g in ((0.0, 1.0), (0.22, 0.7)):
+        t = tl(0.25)
+        s = np.sin(2 * np.pi * (55 + 25 * np.exp(-t * 30)) * t) * np.exp(-t * 18)
+        i = int(st * SR)
+        out[i:i + len(s)] += s * g
+    return out * 0.7
+
+
+def sfx_bass_drop(dur=0.9):
+    t = tl(dur)
+    f = 35 + 110 * np.exp(-t * 5)
+    return np.sin(2 * np.pi * np.cumsum(f) / SR) * np.exp(-t * 2.8) * 0.6
+
+
+def sfx_glitch(dur=0.28):
+    """Digital stutter for the opening frame."""
+    out = np.zeros(int(dur * SR))
+    k, step = 0, int(0.035 * SR)
+    while k * step < len(out):
+        t = tl(0.025)
+        f = rng.choice([880, 1320, 1760, 660])
+        s = np.sign(np.sin(2 * np.pi * f * t)) * 0.4 + rng.normal(0, 0.25, len(t))
+        i = k * step
+        out[i:i + len(s)] += s[: len(out) - i] * (1 - k * step / len(out))
+        k += 1
+    return filt(out, "bandpass", [400, 7000]) * 0.3
+
+
+def sfx_chime2():
+    """Two-tone door/notice chime (generic)."""
+    out = np.zeros(int(1.2 * SR))
+    for st, nm in ((0.0, "E6"), (0.28, "C6")):
+        s = piano(midi(n(nm)), 0.5, 0.9, bright=1.5)
+        i = int(st * SR)
+        out[i:i + len(s)] += s[: len(out) - i]
+    return out * 0.8

@@ -1,34 +1,53 @@
-"""Narration-driven timeline: scene lengths follow the synthesized voice."""
+"""Narration-driven timeline: scene lengths follow the synthesized voice.
+
+Retention devices built in:
+  * beats      — every phrase (split on 、。！？) triggers a jump-cut zoom and a soft SE
+  * subs       — optional chunked subtitles that pop in on each beat (TikTok style)
+  * hits       — screen shake on impact moments
+  * progress   — thin progress bar across the top
+"""
+import math
+import re
+
 import numpy as np
+from PIL import Image
 
 import audio as au
 import tts
-from engine import W, Scene, Telop, ease_in_out, handheld, lerp, text_block
+from engine import W, H, Scene, Telop, clamp, ease_in_out, ease_out_cubic, handheld, lerp, text_block
 
 CAP_Y = 1330
+SUB_Y = 1400
+_PUNCT = "、。！？!?，,"
 
 
 class Line:
-    def __init__(self, voice, caption=None, size=78, cy=CAP_Y, speed=1.0, gap=0.16, hl=(255, 225, 77),
-                 anim="pop", weight=900, show_from_start=False):
+    def __init__(self, voice, caption=None, size=78, cy=CAP_Y, speed=1.0, gap=0.06, hl=(255, 225, 77),
+                 anim="pop", weight=900, show_from_start=False, subs=None, sub_size=86, sub_cy=SUB_Y):
         self.voice, self.caption, self.size, self.cy = voice, caption, size, cy
         self.speed, self.gap, self.hl, self.anim, self.weight = speed, gap, hl, anim, weight
         self.show_from_start = show_from_start
+        self.subs, self.sub_size, self.sub_cy = subs, sub_size, sub_cy
         self.wave = None
         self.t0 = self.t1 = 0.0  # segment-local voice span
         self.g0 = 0.0  # global voice start
+        self.beats = []  # segment-local phrase starts
+        self.sub_times = []
 
 
 class Segment:
     """One scene covering one or more narration lines."""
 
-    def __init__(self, lines, visual, extra=None, lead=0.08, tail=0.12, trans="cut", trans_dur=0.0,
-                 min_dur=0.0, fade_out=0.0):
+    def __init__(self, lines, visual, extra=None, lead=0.04, tail=0.08, trans="cut", trans_dur=0.0,
+                 min_dur=0.0, fade_out=0.0, jump=True, hits=None):
         self.lines, self.visual, self.extra = lines, visual, extra
         self.lead, self.tail, self.trans, self.trans_dur = lead, tail, trans, trans_dur
         self.min_dur, self.fade_out = min_dur, fade_out
+        self.jump = jump
+        self.hits = hits  # fn(seg) -> list of local impact times
         self.start = 0.0
         self.dur = 0.0
+        self.hit_times = []
 
 
 def shot(photo, z0, z1, c0, c1, shake=3.0, seed=0.0):
@@ -42,9 +61,56 @@ def shot(photo, z0, z1, c0, c1, shake=3.0, seed=0.0):
     return make
 
 
+def _weights(parts):
+    return [max(1.0, len(re.sub(r"[{}\s]", "", p))) for p in parts]
+
+
+def split_phrases(text):
+    parts = [p for p in re.split(r"(?<=[、。！？!?])", text) if p.strip(_PUNCT + " ")]
+    return parts or [text]
+
+
+def spread(parts, t0, t1):
+    """Estimate when each phrase starts inside [t0, t1] from its length."""
+    w = _weights(parts)
+    tot = sum(w)
+    out, acc = [], 0.0
+    for x in w:
+        out.append(t0 + (t1 - t0) * acc / tot)
+        acc += x
+    return out
+
+
 def caption(line, t_in, t_out):
     img = text_block(line.caption, size=line.size, hl=line.hl, weight=line.weight)
-    return Telop(img, W / 2, line.cy, t_in, t_out, anim=line.anim, dur_in=0.16, dur_out=0.1)
+    return Telop(img, W / 2, line.cy, t_in, t_out, anim=line.anim, dur_in=0.14, dur_out=0.08)
+
+
+def jump_cut(fn, beats, hits, amount=0.075):
+    """Alternate punch-in zoom on every beat and shake on hits (post-render crop)."""
+    def wrapped(t):
+        fr = fn(t)
+        k = sum(1 for b in beats if b <= t)
+        z = 1.0 + (amount if k % 2 else 0.0)
+        if k and t - beats[k - 1] < 0.07:  # quick ease into the new framing
+            prev = 1.0 + (amount if (k - 1) % 2 else 0.0)
+            z = lerp(prev, z, ease_out_cubic((t - beats[k - 1]) / 0.07))
+        ox = oy = 0.0
+        for h in hits:
+            d = t - h
+            if 0 <= d < 0.3:
+                a = (1 - d / 0.3) * 18
+                ox += a * math.sin(d * 95)
+                oy += a * math.cos(d * 77)
+        if ox or oy:
+            z = max(z, 1.05)  # leave room to shake inside the frame
+        if z > 1.001:
+            ww, hh = W / z, H / z
+            x0 = clamp((W - ww) / 2 + ox, 0, W - ww)
+            y0 = clamp((H - hh) / 2 + oy, 0, H - hh)
+            fr = fr.resize((W, H), Image.BILINEAR, box=(x0, y0, x0 + ww, y0 + hh))
+        return fr
+    return wrapped
 
 
 def build(segments):
@@ -59,6 +125,9 @@ def build(segments):
             ln.t0, ln.t1 = lt, lt + d
             ln.g0 = t + lt
             voice.append((ln.g0, ln.wave))
+            ln.beats = spread(split_phrases(ln.voice), ln.t0, ln.t1)
+            if ln.subs:
+                ln.sub_times = spread(ln.subs, ln.t0, ln.t1)
             lt = ln.t1 + ln.gap
         dur = max(seg.min_dur, lt - seg.lines[-1].gap + seg.tail)
         seg.dur, seg.start = dur, t
@@ -66,16 +135,55 @@ def build(segments):
         for k, ln in enumerate(seg.lines):
             if ln.caption:
                 end = seg.lines[k + 1].t0 - 0.02 if k + 1 < len(seg.lines) and seg.lines[k + 1].caption else dur + 0.05
-                start = -1.0 if (si == 0 and k == 0) or ln.show_from_start else ln.t0 - 0.06
+                start = -1.0 if (si == 0 and k == 0) or ln.show_from_start else ln.t0 - 0.05
                 overlays.append(caption(ln, start, end))
+            if ln.subs:
+                for j, (txt, st) in enumerate(zip(ln.subs, ln.sub_times)):
+                    nxt = ln.sub_times[j + 1] if j + 1 < len(ln.subs) else (
+                        seg.lines[k + 1].t0 if k + 1 < len(seg.lines) else dur + 0.05)
+                    img = text_block(txt, size=ln.sub_size, hl=ln.hl)
+                    overlays.append(Telop(img, W / 2, ln.sub_cy, st - 0.04, nxt - 0.01, anim="pop",
+                                          dur_in=0.1, dur_out=0.05))
         if seg.extra:
             overlays = seg.extra(seg) + overlays
-        sc = Scene(dur, seg.visual(dur), overlays, trans=seg.trans, trans_dur=seg.trans_dur)
+        seg.hit_times = seg.hits(seg) if seg.hits else []
+        fn = seg.visual(dur)
+        beats = [b for ln in seg.lines for b in ln.beats][1:] if seg.jump else []
+        if beats or seg.hit_times:
+            fn = jump_cut(fn, beats, seg.hit_times)
+        sc = Scene(dur, fn, overlays, trans=seg.trans, trans_dur=seg.trans_dur)
         sc.fade_out = seg.fade_out
         sc.start = t
         scenes.append(sc)
         t += dur
     return scenes, voice, t
+
+
+class ProgressBar:
+    """Thin top progress bar — makes the clip feel short and finite."""
+
+    def __init__(self, total, color=(255, 225, 77)):
+        self.total, self.color = total, color
+        self.track = Image.new("RGBA", (W, 9), (0, 0, 0, 90))
+
+    def draw(self, frame, t):
+        frame.alpha_composite(self.track, (0, 0))
+        w = int(W * clamp(t / self.total))
+        if w > 0:
+            frame.alpha_composite(Image.new("RGBA", (w, 9), self.color + (235,)), (0, 0))
+
+
+def beat_sfx(sfx, segments, skip_first=True, gain=0.28):
+    """Soft swish on every jump-cut beat, pop on every subtitle chunk."""
+    for seg in segments:
+        if not seg.jump:
+            continue
+        beats = [b for ln in seg.lines for b in ln.beats]
+        for b in beats[1:] if skip_first else beats:
+            sfx.add(au.sfx_swish(0.16), seg.start + b - 0.03, gain)
+        for ln in seg.lines:
+            for st in ln.sub_times:
+                sfx.add(au.sfx_pop(), seg.start + st, 0.42)
 
 
 # ---------------------------------------------------------------- audio
@@ -132,4 +240,4 @@ def mix(total, voice_events, music_bus, sfx_bus, path, duck_db=9.0):
     duck = 1 - (1 - 10 ** (-duck_db / 20)) * env
     music = au.reverb(music_bus.buf, 1.8, 0.24) * duck[:, None]
     voice = np.stack([vb, vb], axis=1) * 0.9
-    au.master(music * 0.55 + voice, sfx_bus.buf, path, total=total, fade_out=0.8)
+    au.master(music * 0.55 + voice, sfx_bus.buf, path, total=total, fade_out=0.6)
