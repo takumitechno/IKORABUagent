@@ -69,7 +69,17 @@ python3 preview.py video_b sheet.jpg 1.5 12 20       # 指定秒数のフレー�
 |---|---|---|
 | `fish` | 環境変数 `FISH_API_KEY`、`FISH_VOICE_ID`（使う声のモデルID）、通信先 `api.fish.audio` の許可 | Fish Audio の任意の声（本番向け） |
 | `voicevox` | `VOICEVOX_DIR`（onnxruntime・辞書・VVMモデルを置いたフォルダ）、`pip install voicevox_core`、通信先 GitHub の許可 | 既定は 青山龍星（`VOICEVOX_STYLE_ID=13`）。CTAに「VOICEVOX:青山龍星」のクレジットを自動表示 |
+| `kokoro` | `bash fetch_kokoro.sh`（npm の expo-kokoro からモデルを取得し、日本語の読み変換を導入） | Kokoro-82M のニューラル音声。既定は日本語男性 `jm_kumo`（`KOKORO_VOICE=jf_alpha` で女性）。Apache-2.0 でクレジット表記は不要 |
 | `openjtalk`（既定） | `pip install pyopenjtalk-plus` | 内蔵の女性声（仮音声・尺確認用） |
+
+Kokoro は数字の読みを誤ることがあるため、ナレーション用の文では「みっつ」「いちにち」のようにひらがなで書いています（テロップの表記はそのまま）。
+
+```sh
+bash fetch_kokoro.sh
+cd src
+TTS_BACKEND=kokoro python3 video_c.py   # out/video_c_hook_check_kokoro.mp4
+TTS_BACKEND=kokoro python3 video_d.py   # out/video_d_hook_nige_kokoro.mp4
+```
 
 ```sh
 cd src

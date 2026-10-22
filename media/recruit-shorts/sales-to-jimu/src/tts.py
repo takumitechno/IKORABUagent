@@ -3,6 +3,8 @@
 Backend is chosen with TTS_BACKEND:
   fish      Fish Audio API  (needs FISH_API_KEY, FISH_VOICE_ID; host api.fish.audio)
   voicevox  VOICEVOX CORE   (needs VOICEVOX_DIR with onnxruntime/dict/vvm; VOICEVOX_STYLE_ID)
+  kokoro    Kokoro-82M ONNX (KOKORO_DIR with kokoro-quantized.onnx, tokenizer.json, voices/*.bin;
+            KOKORO_VOICE, default jm_kumo = Japanese male). Japanese G2P via misaki (cutlet).
   openjtalk local OpenJTalk (bundled female voice only; timing drafts)
 """
 import hashlib
@@ -24,7 +26,7 @@ def backend_name():
 
 def speed_mul():
     """Per-backend pacing so every engine lands near the same short-form tempo."""
-    default = {"openjtalk": 1.3, "voicevox": 1.18, "fish": 1.1}.get(backend_name(), 1.0)
+    default = {"openjtalk": 1.3, "voicevox": 1.18, "fish": 1.1, "kokoro": 1.12}.get(backend_name(), 1.0)
     return float(os.environ.get("TTS_SPEED_MUL", default))
 
 
@@ -90,16 +92,41 @@ def _voicevox(text, speed):
     return _read_wav_bytes(_vv.synthesis(q, style))
 
 
+_kk = None
+
+
+def _kokoro(text, speed):
+    global _kk
+    import json
+    import onnxruntime as ort
+    from misaki import ja
+    d = os.environ.get("KOKORO_DIR", os.path.join(ROOT, "kokoro"))
+    name = os.environ.get("KOKORO_VOICE", "jm_kumo")
+    if _kk is None:
+        vocab = json.load(open(os.path.join(d, "tokenizer.json")))["model"]["vocab"]
+        _kk = (ort.InferenceSession(os.path.join(d, "kokoro-quantized.onnx")), vocab, ja.JAG2P())
+    sess, vocab, g2p = _kk
+    voice = np.fromfile(os.path.join(d, "voices", f"{name}.bin"), dtype=np.float32).reshape(-1, 1, 256)
+    ps = g2p(text)
+    ps = ps[0] if isinstance(ps, tuple) else ps
+    ids = [vocab[c] for c in ps if c in vocab][:508]
+    wav = sess.run(None, {"input_ids": np.array([[0] + ids + [0]], dtype=np.int64),
+                          "style": voice[min(len(ids), len(voice) - 1)],
+                          "speed": np.array([speed], dtype=np.float32)})[0][0]
+    return wav.astype(np.float64), 24000
+
+
 def synth(text, speed=1.0):
     """Return mono float waveform at 48 kHz (cached)."""
     be = backend_name()
-    voice = os.environ.get("FISH_VOICE_ID", "") if be == "fish" else os.environ.get("VOICEVOX_STYLE_ID", "")
+    voice = {"fish": os.environ.get("FISH_VOICE_ID", ""), "voicevox": os.environ.get("VOICEVOX_STYLE_ID", ""),
+             "kokoro": os.environ.get("KOKORO_VOICE", "jm_kumo")}.get(be, "")
     key = hashlib.sha1(f"{be}|{voice}|{speed}|{text}".encode()).hexdigest()[:16]
     os.makedirs(CACHE, exist_ok=True)
     path = os.path.join(CACHE, f"{be}_{key}.npy")
     if os.path.exists(path):
         return np.load(path)
-    fn = {"openjtalk": _openjtalk, "fish": _fish, "voicevox": _voicevox}[be]
+    fn = {"openjtalk": _openjtalk, "fish": _fish, "voicevox": _voicevox, "kokoro": _kokoro}[be]
     x, sr = fn(text, speed)
     x = _to_48k(np.asarray(x, dtype=np.float64), sr)
     # trim leading/trailing silence
