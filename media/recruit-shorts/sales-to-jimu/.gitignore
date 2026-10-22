@@ -2,3 +2,5 @@ fonts/
 out/preview/
 out/*.wav
 src/__pycache__/
+tts_cache/
+out/*_openjtalk.mp4

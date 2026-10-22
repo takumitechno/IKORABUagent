@@ -354,7 +354,7 @@ def photo_scene(photo, dur, z0, z1, c0, c1, shake=3.0, seed=0.0, overlays=(), **
     return Scene(dur, fn, overlays, **kw)
 
 
-def render_video(scenes, audio_path, out_path, finisher=None, preview_times=()):
+def render_video(scenes, audio_path, out_path, finisher=None, preview_times=(), global_overlays=()):
     total = build_timeline(scenes)
     n = int(round(total * FPS))
     finisher = finisher or Finisher()
@@ -394,6 +394,8 @@ def render_video(scenes, audio_path, out_path, finisher=None, preview_times=()):
         if tail and lt > s.dur - tail:
             p = (lt - (s.dur - tail)) / tail
             fr = Image.blend(fr, Image.new("RGBA", (W, H), (0, 0, 0, 255)), ease_in_out(p))
+        for o in global_overlays:
+            o.draw(fr, t)
         out = finisher.apply(fr.convert("RGB"), i)
         if i in want:
             Image.fromarray(out).save(os.path.join(prev_dir, f"{os.path.basename(out_path)[:-4]}_{t:05.2f}.jpg"), quality=88)
