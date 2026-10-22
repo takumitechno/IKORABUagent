@@ -1,0 +1,4 @@
+fonts/
+out/preview/
+out/*.wav
+src/__pycache__/
