@@ -70,6 +70,26 @@ python3 preview.py video_b sheet.jpg 1.5 12 20       # 指定秒数のフレー�
 - 黒画面での心音、転換前の上昇音と低音、チェックやスタンプの効果音
 - 読み上げはKokoroで1.4倍（前回比1.25倍）、行間0.06秒、全体は約24〜25秒
 
+### Fish Audio で仕上げる手順（推奨）
+
+1. 環境設定（セッション上部の環境メニュー →「Edit」）
+   - 「Allowed domains」に `api.fish.audio` を追加
+   - Fish Audio の API キーを環境変数 `FISH_API_KEY` として登録（Network secrets か環境変数）
+2. 新しいセッションを開き、次を実行
+
+```sh
+cd media/recruit-shorts/sales-to-jimu
+bash fetch_fonts.sh && pip install pillow numpy scipy
+cd src
+python3 fish_voices.py 男性 ナレーション      # 日本語の声の一覧から FISH_VOICE_ID を選ぶ
+TTS_BACKEND=fish FISH_VOICE_ID=<ID> python3 video_c.py   # out/video_c_hook_check_fish.mp4
+TTS_BACKEND=fish FISH_VOICE_ID=<ID> python3 video_d.py   # out/video_d_hook_nige_fish.mp4
+```
+
+- Fish Audio からは mp3 を受け取り、ffmpeg で音程を変えずに 1.2 倍速にしています（`TTS_SPEED_MUL` で調整可）。
+- `FISH_MODEL` を指定しない場合は `s2-pro`、だめなら `s1` の順に試します。
+- 商用利用できるかは、Fish Audio のプランと、選んだ声のモデルの利用規約で決まります。投稿前に確認してください。
+
 ### ナレーションの声を切り替える
 
 `TTS_BACKEND` で読み上げエンジンを選びます（`src/tts.py`）。

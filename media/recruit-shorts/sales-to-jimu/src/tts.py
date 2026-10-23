@@ -1,7 +1,7 @@
 """Narration synthesis with swappable backends and an on-disk cache.
 
 Backend is chosen with TTS_BACKEND:
-  fish      Fish Audio API  (needs FISH_API_KEY, FISH_VOICE_ID; host api.fish.audio)
+  fish      Fish Audio API  (needs FISH_API_KEY, FISH_VOICE_ID; host api.fish.audio; optional FISH_MODEL list)
   voicevox  VOICEVOX CORE   (needs VOICEVOX_DIR with onnxruntime/dict/vvm; VOICEVOX_STYLE_ID)
   kokoro    Kokoro-82M ONNX (KOKORO_DIR with kokoro-quantized.onnx, tokenizer.json, voices/*.bin;
             KOKORO_VOICE, default jm_kumo = Japanese male). Japanese G2P via misaki (cutlet).
@@ -26,7 +26,7 @@ def backend_name():
 
 def speed_mul():
     """Per-backend pacing so every engine lands near the same short-form tempo."""
-    default = {"openjtalk": 1.3, "voicevox": 1.18, "fish": 1.1, "kokoro": 1.4}.get(backend_name(), 1.0)
+    default = {"openjtalk": 1.3, "voicevox": 1.18, "fish": 1.2, "kokoro": 1.4}.get(backend_name(), 1.0)
     return float(os.environ.get("TTS_SPEED_MUL", default))
 
 
@@ -55,17 +55,35 @@ def _openjtalk(text, speed):
 
 
 def _fish(text, speed):
-    import requests
+    """Fish Audio TTS -> mp3 -> ffmpeg (pitch-preserving tempo) -> 48 kHz mono."""
+    import json
+    import subprocess
+    import urllib.error
+    import urllib.request
     key = os.environ["FISH_API_KEY"]
-    body = {"text": text, "format": "wav", "normalize": True, "latency": "normal",
-            "prosody": {"speed": speed, "volume": 0}}
+    body = {"text": text, "format": "mp3", "mp3_bitrate": 192, "normalize": True, "latency": "normal"}
     if os.environ.get("FISH_VOICE_ID"):
         body["reference_id"] = os.environ["FISH_VOICE_ID"]
-    r = requests.post("https://api.fish.audio/v1/tts", json=body, timeout=120,
-                      headers={"Authorization": f"Bearer {key}",
-                               "model": os.environ.get("FISH_MODEL", "s1")})
-    r.raise_for_status()
-    return _read_wav_bytes(r.content)
+    models = [m for m in os.environ.get("FISH_MODEL", "s2-pro,s1").split(",") if m]
+    last = None
+    for model in models:  # the accepted model names have changed over time; try in order
+        req = urllib.request.Request("https://api.fish.audio/v1/tts", data=json.dumps(body).encode(), method="POST",
+                                     headers={"Authorization": f"Bearer {key}", "Content-Type": "application/json",
+                                              "model": model})
+        try:
+            with urllib.request.urlopen(req, timeout=180) as r:
+                mp3 = r.read()
+            break
+        except urllib.error.HTTPError as e:
+            last = f"{model}: HTTP {e.code} {e.read()[:300]!r}"
+            if e.code in (401, 402, 403):
+                raise RuntimeError(f"Fish Audio refused the request ({last})") from e
+    else:
+        raise RuntimeError(f"Fish Audio TTS failed for all models: {last}")
+    af = f"atempo={speed:.3f}" if abs(speed - 1.0) > 1e-3 else "anull"
+    out = subprocess.run(["ffmpeg", "-loglevel", "error", "-i", "pipe:0", "-af", af, "-ac", "1", "-ar", str(SR),
+                          "-f", "s16le", "pipe:1"], input=mp3, capture_output=True, check=True).stdout
+    return np.frombuffer(out, dtype=np.int16).astype(np.float64) / 32768.0, SR
 
 
 _vv = None
