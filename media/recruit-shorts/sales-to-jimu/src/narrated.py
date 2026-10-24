@@ -21,6 +21,12 @@ SUB_Y = 1400
 _PUNCT = "、。！？!?，,"
 
 
+def moving_avg(x, win):
+    """O(n) centred moving average (np.convolve with a long box kernel is O(n*win))."""
+    c = np.cumsum(np.concatenate([np.zeros(win // 2 + 1), x, np.zeros(win - win // 2)]))
+    return (c[win:win + len(x)] - c[:len(x)]) / win
+
+
 class Line:
     def __init__(self, voice, caption=None, size=78, cy=CAP_Y, speed=1.0, gap=0.06, hl=(255, 225, 77),
                  anim="pop", weight=900, show_from_start=False, subs=None, sub_size=86, sub_cy=SUB_Y):
@@ -275,7 +281,7 @@ def mix(total, voice_events, music_bus, sfx_bus, path, duck_db=9.0):
         vb[i:i + n] += w[:n]
     # sidechain-style ducking driven by the narration envelope
     win = int(0.25 * au.SR)
-    env = np.convolve(np.abs(vb), np.ones(win) / win, mode="same")
+    env = moving_avg(np.abs(vb), win)
     env = np.clip(env / (np.max(env) + 1e-9) * 4, 0, 1)
     duck = 1 - (1 - 10 ** (-duck_db / 20)) * env
     music = au.reverb(music_bus.buf, 1.8, 0.24) * duck[:, None]
@@ -292,7 +298,7 @@ def master_with_voice(total, voice_events, music, sfx, path, duck_db=9.0, music_
         if n > 0:
             vb[i:i + n] += w[:n]
     win = int(0.25 * au.SR)
-    env = np.convolve(np.abs(vb), np.ones(win) / win, mode="same")
+    env = moving_avg(np.abs(vb), win)
     env = np.clip(env / (np.max(env) + 1e-9) * 4, 0, 1)
     duck = 1 - (1 - 10 ** (-duck_db / 20)) * env
     mix = music * (duck * music_gain)[:, None] + np.stack([vb, vb], axis=1) * 0.9
