@@ -15,7 +15,8 @@ def search(title="", language="ja", page_size=30):
     if title:
         q["title"] = title
     req = urllib.request.Request("https://api.fish.audio/model?" + urllib.parse.urlencode(q),
-                                 headers={"Authorization": f"Bearer {os.environ['FISH_API_KEY']}"})
+                                 headers={"Authorization": f"Bearer {os.environ['FISH_API_KEY']}"}
+                                 if os.environ.get("FISH_API_KEY") else {})
     with urllib.request.urlopen(req, timeout=60) as r:
         return json.load(r).get("items", [])
 

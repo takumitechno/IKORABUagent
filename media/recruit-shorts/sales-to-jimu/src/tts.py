@@ -60,7 +60,7 @@ def _fish(text, speed):
     import subprocess
     import urllib.error
     import urllib.request
-    key = os.environ["FISH_API_KEY"]
+    key = os.environ.get("FISH_API_KEY", "")  # empty when the key is injected as a network secret
     body = {"text": text, "format": "mp3", "mp3_bitrate": 192, "normalize": True, "latency": "normal"}
     if os.environ.get("FISH_VOICE_ID"):
         body["reference_id"] = os.environ["FISH_VOICE_ID"]
@@ -68,8 +68,8 @@ def _fish(text, speed):
     last = None
     for model in models:  # the accepted model names have changed over time; try in order
         req = urllib.request.Request("https://api.fish.audio/v1/tts", data=json.dumps(body).encode(), method="POST",
-                                     headers={"Authorization": f"Bearer {key}", "Content-Type": "application/json",
-                                              "model": model})
+                                     headers={**({"Authorization": f"Bearer {key}"} if key else {}),
+                                              "Content-Type": "application/json", "model": model})
         try:
             with urllib.request.urlopen(req, timeout=180) as r:
                 mp3 = r.read()
