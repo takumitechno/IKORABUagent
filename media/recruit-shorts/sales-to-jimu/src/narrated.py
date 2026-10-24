@@ -281,3 +281,19 @@ def mix(total, voice_events, music_bus, sfx_bus, path, duck_db=9.0):
     music = au.reverb(music_bus.buf, 1.8, 0.24) * duck[:, None]
     voice = np.stack([vb, vb], axis=1) * 0.9
     au.master(music * 0.55 + voice, sfx_bus.buf, path, total=total, fade_out=0.6)
+
+
+def master_with_voice(total, voice_events, music, sfx, path, duck_db=9.0, music_gain=0.6, fade_out=1.0):
+    """Mix an already-processed music array with narration (ducked) and SFX, then master."""
+    vb = np.zeros(len(music))
+    for g0, w in voice_events:
+        i = int(g0 * au.SR)
+        n = min(len(w), len(vb) - i)
+        if n > 0:
+            vb[i:i + n] += w[:n]
+    win = int(0.25 * au.SR)
+    env = np.convolve(np.abs(vb), np.ones(win) / win, mode="same")
+    env = np.clip(env / (np.max(env) + 1e-9) * 4, 0, 1)
+    duck = 1 - (1 - 10 ** (-duck_db / 20)) * env
+    mix = music * (duck * music_gain)[:, None] + np.stack([vb, vb], axis=1) * 0.9
+    au.master(mix, sfx, path, total=total, fade_out=fade_out)

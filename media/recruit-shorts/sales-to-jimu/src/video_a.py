@@ -5,6 +5,8 @@ import sys
 import numpy as np
 
 import audio as au
+import narrated as nr
+import voiceover as vo
 from engine import OUT_DIR, W, Photo, Telop, photo_scene, render_video, text_block
 from ui import Notification, QuotaCard, Static, cta_button, note_pill, speech_bubble, vertical_gradient
 
@@ -74,8 +76,24 @@ def build():
     return scenes
 
 
+# Narration cues: (scene, telop time, line). Lines are read in this order in the recorded take.
+CUES = [
+    vo.Cue(0, 0.12, "営業、向いてないかもって、思ってる人へ。"),
+    vo.Cue(0, 2.15, "帰りの電車でも、仕事の通知が止まらない。"),
+    vo.Cue(1, 0.2, "テレアポ、百件。断られるたびに、自分を否定された気がした。"),
+    vo.Cue(2, 0.15, "炎天下の外回り。今月あと二百万が、頭から離れない。"),
+    vo.Cue(3, 0.2, "数字が取れない自分は、ダメなんだって、ずっと思ってた。"),
+    vo.Cue(4, 0.55, "でも。"),
+    vo.Cue(4, 1.75, "向いてないは、ダメじゃない。"),
+    vo.Cue(5, 0.25, "コツコツ正確に進める。誰かの仕事を支える。それが、得意な人もいる。"),
+    vo.Cue(6, 0.2, "電話対応、調整力、パソコン作業。営業で身につけた力は、事務でちゃんと活きる。"),
+    vo.Cue(7, 0.3, "未経験から、事務職へ。まずは、話を聞いてみませんか？プロフィールのリンクから、相談できます。",
+           sync={3: 1, 4: 2, 5: 2}),
+]
+
+
 # ---------------------------------------------------------------- audio
-def build_audio(total, starts):
+def build_audio(total, starts, voice=None):
     music = au.Bus(total)
     sfx = au.Bus(total)
     S = starts
@@ -88,18 +106,18 @@ def build_audio(total, starts):
              ("A", ["A3", "C4", "E4"], "A2")]
     for b, (_, tones, root) in enumerate(prog1):
         t0 = 0.0 + b * bar
-        if t0 > 15.6:
+        if t0 > S[4] - 0.4:
             break
         mids = [au.n(x) for x in tones]
         arp = [mids[0] - 12, mids[2] - 12, mids[0], mids[1], mids[2], mids[1], mids[0], mids[2] - 12]
         for k, m in enumerate(arp):
             tt = t0 + k * beat / 2
-            if tt > 15.7:
+            if tt > S[4] - 0.3:
                 break
             vel = 0.55 + 0.25 * (k == 0) - (0.15 if b == 4 else 0)
             music.add(au.piano(au.midi(m + 12), beat * 0.9, vel), tt, pan=-0.2 + 0.4 * (k % 2))
-        music.add(au.pad([au.midi(x) for x in mids], min(bar, 16.0 - t0), cutoff=900, vel=0.8), t0)
-        music.add(au.bass(au.midi(au.n(root)), min(bar, 16.0 - t0) * 0.95, 0.6), t0)
+        music.add(au.pad([au.midi(x) for x in mids], min(bar, S[4] - t0), cutoff=900, vel=0.8), t0)
+        music.add(au.bass(au.midi(au.n(root)), min(bar, S[4] - t0) * 0.95, 0.6), t0)
 
     # --- turning point
     t_but = S[4] + 0.55
@@ -187,18 +205,22 @@ def build_audio(total, starts):
 
     path = os.path.join(OUT_DIR, "video_a.wav")
     os.makedirs(OUT_DIR, exist_ok=True)
-    au.master(mus * 0.9, sfx.buf, path, total=total, fade_out=1.0)
+    if voice:
+        nr.master_with_voice(total, voice, mus, sfx.buf, path)
+    else:
+        au.master(mus * 0.9, sfx.buf, path, total=total, fade_out=1.0)
     return path
 
 
 if __name__ == "__main__":
     from engine import build_timeline
     scenes = build()
+    voice = vo.apply(scenes, CUES) if os.environ.get("VOICEOVER") else None
     total = build_timeline(scenes)
     starts = [s.start for s in scenes]
-    wav = build_audio(total, starts)
+    wav = build_audio(total, starts, voice)
     prev = [float(x) for x in sys.argv[1:]] or [1.0, 3.5, 6.0, 10.0, 14.0, 18.5, 22.0, 26.5, 34.5]
-    out = os.path.join(OUT_DIR, "video_a_sales_to_jimu_story.mp4")
+    out = os.path.join(OUT_DIR, "video_a_sales_to_jimu_story" + ("_vo" if voice else "") + ".mp4")
     print("total", total)
     render_video(scenes, wav, out, preview_times=prev)
     print("done", out)

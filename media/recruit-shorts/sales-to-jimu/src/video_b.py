@@ -7,6 +7,8 @@ import numpy as np
 from PIL import Image, ImageDraw, ImageFilter
 
 import audio as au
+import narrated as nr
+import voiceover as vo
 from engine import (H, OUT_DIR, W, Photo, Scene, Telop, card, check_icon, clamp, ease_out_back,
                     ease_out_cubic, font, frosted, lerp, paste_center, photo_scene, render_video,
                     rounded_mask, text_block, with_alpha, wrap_jp)
@@ -427,8 +429,21 @@ def build():
     return scenes, sched, sheet, chat, skills
 
 
+# Narration cues: (scene, telop time, line). Lines are read in this order in the recorded take.
+CUES = [
+    vo.Cue(0, 0.12, "営業がしんどい人ほど、事務が合うかもしれない。"),
+    vo.Cue(1, 0.3, "ノルマに、外回りに、飛び込み。合わないと感じるのは、甘えじゃない。", sync={2: 1}),
+    vo.Cue(2, 0.05, "事務が合うかもしれない、三つの理由。"),
+    vo.Cue(3, 0.15, "一つ目。ミスなく、コツコツが苦じゃない。データ入力や書類作成で、そのまま強みになる。", sync={3: 2}),
+    vo.Cue(4, 0.15, "二つ目。人を支えるほうが、やりがいを感じる。ありがとうが、すぐ近くで届く仕事です。", sync={3: 2}),
+    vo.Cue(5, 0.15, "三つ目。営業経験が、そのまま武器になる。未経験でも、アピールできる立派な経験です。", sync={3: 2}),
+    vo.Cue(6, 0.15, "ひとつでも当てはまったら、向いてないで終わらせない。未経験から、事務職へ。相談は、プロフィールのリンクから。",
+           sync={6: 1, 7: 2, 8: 2}),
+]
+
+
 # ---------------------------------------------------------------- audio
-def build_audio(total, S, sheet, chat, skills):
+def build_audio(total, S, sheet, chat, skills, voice=None):
     music = au.Bus(total)
     sfx = au.Bus(total)
     bpm = 92
@@ -516,18 +531,22 @@ def build_audio(total, S, sheet, chat, skills):
 
     path = os.path.join(OUT_DIR, "video_b.wav")
     os.makedirs(OUT_DIR, exist_ok=True)
-    au.master(mus * 0.85, sfx.buf, path, total=total, fade_out=1.0)
+    if voice:
+        nr.master_with_voice(total, voice, mus, sfx.buf, path)
+    else:
+        au.master(mus * 0.85, sfx.buf, path, total=total, fade_out=1.0)
     return path
 
 
 if __name__ == "__main__":
     from engine import build_timeline
     scenes, sched, sheet, chat, skills = build()
+    voice = vo.apply(scenes, CUES) if os.environ.get("VOICEOVER") else None
     total = build_timeline(scenes)
     S = [s.start for s in scenes]
-    wav = build_audio(total, S, sheet, chat, skills)
+    wav = build_audio(total, S, sheet, chat, skills, voice)
     prev = [float(x) for x in sys.argv[1:]] or [1.5, 5.5, 8.6, 12.0, 15.2, 20.5, 26.5, 32.5]
-    out = os.path.join(OUT_DIR, "video_b_sales_to_jimu_3reasons.mp4")
+    out = os.path.join(OUT_DIR, "video_b_sales_to_jimu_3reasons" + ("_vo" if voice else "") + ".mp4")
     print("total", total, "starts", S)
     render_video(scenes, wav, out, preview_times=prev)
     print("done", out)
