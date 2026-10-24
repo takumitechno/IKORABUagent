@@ -70,7 +70,24 @@ python3 preview.py video_b sheet.jpg 1.5 12 20       # 指定秒数のフレー�
 - 黒画面での心音、転換前の上昇音と低音、チェックやスタンプの効果音
 - 読み上げはKokoroで1.4倍（前回比1.25倍）、行間0.06秒、全体は約24〜25秒
 
-### Fish Audio で仕上げる手順（推奨）
+### Fish Audio のサイトで作った音声を使う（今回の方法）
+
+Fish Audio の API 残高がなくても、サイトの「Text To Speech」（プランのクレジット）で作った音声をそのまま使えます。
+声は「Jin」で、動画ごとに台本を1回で読み上げた mp3 を `narration/` に置いています。
+
+```sh
+cd src
+python3 align_clips.py ../narration/video_c_fish.mp3 ../narration/video_c_lines.json ../clips/c   # 無音の位置からセリフごとに切り分け
+python3 align_clips.py ../narration/video_d_fish.mp3 ../narration/video_d_lines.json ../clips/d
+TTS_BACKEND=clips python3 video_c.py   # out/video_c_hook_check_clips.mp4
+TTS_BACKEND=clips python3 video_d.py   # out/video_d_hook_nige_clips.mp4
+```
+
+- 切り分けは、セリフ間の無音とセリフの文字数の比率を照らし合わせて行います（`align_clips.py`）。
+- 音程を変えずに 1.2 倍速にしています（`TTS_SPEED_MUL` で変更可）。
+- 字幕のポップやズームの切り替えは、セリフ内の実際の息継ぎ位置に合わせています。
+
+### Fish Audio の API で仕上げる手順
 
 1. 環境設定（セッション上部の環境メニュー →「Edit」）
    - 「Allowed domains」に `api.fish.audio` を追加

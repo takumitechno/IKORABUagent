@@ -5,6 +5,8 @@ Backend is chosen with TTS_BACKEND:
   voicevox  VOICEVOX CORE   (needs VOICEVOX_DIR with onnxruntime/dict/vvm; VOICEVOX_STYLE_ID)
   kokoro    Kokoro-82M ONNX (KOKORO_DIR with kokoro-quantized.onnx, tokenizer.json, voices/*.bin;
             KOKORO_VOICE, default jm_kumo = Japanese male). Japanese G2P via misaki (cutlet).
+  clips     pre-recorded takes split per line (CLIPS_DIRS=dir1:dir2, each with index.json text -> .npy at 48 kHz),
+            e.g. narration generated on the Fish Audio website; tempo applied with ffmpeg (pitch preserved)
   openjtalk local OpenJTalk (bundled female voice only; timing drafts)
 """
 import hashlib
@@ -26,7 +28,7 @@ def backend_name():
 
 def speed_mul():
     """Per-backend pacing so every engine lands near the same short-form tempo."""
-    default = {"openjtalk": 1.3, "voicevox": 1.18, "fish": 1.2, "kokoro": 1.4}.get(backend_name(), 1.0)
+    default = {"openjtalk": 1.3, "voicevox": 1.18, "fish": 1.2, "kokoro": 1.4, "clips": 1.2}.get(backend_name(), 1.0)
     return float(os.environ.get("TTS_SPEED_MUL", default))
 
 
@@ -86,6 +88,35 @@ def _fish(text, speed):
     return np.frombuffer(out, dtype=np.int16).astype(np.float64) / 32768.0, SR
 
 
+def _atempo(x, speed):
+    import subprocess
+    if abs(speed - 1.0) < 1e-3:
+        return x
+    pcm = (np.clip(x, -1, 1) * 32767).astype(np.int16).tobytes()
+    out = subprocess.run(["ffmpeg", "-loglevel", "error", "-f", "s16le", "-ar", str(SR), "-ac", "1", "-i", "pipe:0",
+                          "-af", f"atempo={speed:.3f}", "-f", "s16le", "pipe:1"], input=pcm, capture_output=True,
+                         check=True).stdout
+    return np.frombuffer(out, dtype=np.int16).astype(np.float64) / 32768.0
+
+
+_clip_index = None
+
+
+def _clips(text, speed):
+    import json
+    global _clip_index
+    if _clip_index is None:
+        _clip_index = {}
+        for d in os.environ.get("CLIPS_DIRS", os.path.join(ROOT, "clips", "c") + ":" + os.path.join(ROOT, "clips", "d")).split(":"):
+            idx = os.path.join(d, "index.json")
+            if os.path.exists(idx):
+                for t, f in json.load(open(idx)).items():
+                    _clip_index[t] = os.path.join(d, f)
+    if text not in _clip_index:
+        raise KeyError(f"no recorded clip for line: {text}")
+    return _atempo(np.load(_clip_index[text]), speed), SR
+
+
 _vv = None
 
 
@@ -138,13 +169,13 @@ def synth(text, speed=1.0):
     """Return mono float waveform at 48 kHz (cached)."""
     be = backend_name()
     voice = {"fish": os.environ.get("FISH_VOICE_ID", ""), "voicevox": os.environ.get("VOICEVOX_STYLE_ID", ""),
-             "kokoro": os.environ.get("KOKORO_VOICE", "jm_kumo")}.get(be, "")
+             "kokoro": os.environ.get("KOKORO_VOICE", "jm_kumo"), "clips": os.environ.get("CLIPS_DIRS", "")}.get(be, "")
     key = hashlib.sha1(f"{be}|{voice}|{speed}|{text}".encode()).hexdigest()[:16]
     os.makedirs(CACHE, exist_ok=True)
     path = os.path.join(CACHE, f"{be}_{key}.npy")
     if os.path.exists(path):
         return np.load(path)
-    fn = {"openjtalk": _openjtalk, "fish": _fish, "voicevox": _voicevox, "kokoro": _kokoro}[be]
+    fn = {"openjtalk": _openjtalk, "fish": _fish, "voicevox": _voicevox, "kokoro": _kokoro, "clips": _clips}[be]
     x, sr = fn(text, speed)
     x = _to_48k(np.asarray(x, dtype=np.float64), sr)
     # trim leading/trailing silence

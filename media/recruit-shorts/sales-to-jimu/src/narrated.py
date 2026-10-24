@@ -81,6 +81,45 @@ def spread(parts, t0, t1):
     return out
 
 
+def pause_ends(wave, sr, thr_db=-38, min_gap=0.1):
+    """Times (s) where speech resumes after an internal pause."""
+    win = int(0.01 * sr)
+    n = len(wave) // win
+    if n < 3:
+        return []
+    rms = np.sqrt(np.mean(wave[: n * win].reshape(n, win) ** 2, axis=1) + 1e-12)
+    db = 20 * np.log10(rms / (rms.max() + 1e-12))
+    quiet = db < thr_db
+    out, k = [], 0
+    while k < n:
+        if quiet[k]:
+            j = k
+            while j < n and quiet[j]:
+                j += 1
+            if k > 0 and j < n and (j - k) * 0.01 >= min_gap:
+                out.append(j * 0.01)
+            k = j
+        else:
+            k += 1
+    return out
+
+
+def snap(estimates, t0, candidates):
+    """Move each estimated phrase start (after the first) to the nearest real pause end."""
+    if not candidates:
+        return estimates
+    out = [estimates[0]]
+    used = set()
+    for e in estimates[1:]:
+        best = min((c for c in candidates if c not in used), key=lambda c: abs(t0 + c - e), default=None)
+        if best is not None and abs(t0 + best - e) < 0.6:
+            used.add(best)
+            out.append(t0 + best)
+        else:
+            out.append(e)
+    return sorted(out)
+
+
 def caption(line, t_in, t_out):
     img = text_block(line.caption, size=line.size, hl=line.hl, weight=line.weight)
     return Telop(img, W / 2, line.cy, t_in, t_out, anim=line.anim, dur_in=0.14, dur_out=0.08)
@@ -125,9 +164,10 @@ def build(segments):
             ln.t0, ln.t1 = lt, lt + d
             ln.g0 = t + lt
             voice.append((ln.g0, ln.wave))
-            ln.beats = spread(split_phrases(ln.voice), ln.t0, ln.t1)
+            pauses = pause_ends(ln.wave, tts.SR)
+            ln.beats = snap(spread(split_phrases(ln.voice), ln.t0, ln.t1), ln.t0, pauses)
             if ln.subs:
-                ln.sub_times = spread(ln.subs, ln.t0, ln.t1)
+                ln.sub_times = snap(spread(ln.subs, ln.t0, ln.t1), ln.t0, pauses)
             lt = ln.t1 + ln.gap
         dur = max(seg.min_dur, lt - seg.lines[-1].gap + seg.tail)
         seg.dur, seg.start = dur, t
