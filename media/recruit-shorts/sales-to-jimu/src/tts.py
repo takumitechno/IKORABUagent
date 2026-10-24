@@ -107,7 +107,7 @@ def _clips(text, speed):
     global _clip_index
     if _clip_index is None:
         _clip_index = {}
-        for d in os.environ.get("CLIPS_DIRS", os.path.join(ROOT, "clips", "c") + ":" + os.path.join(ROOT, "clips", "d")).split(":"):
+        for d in os.environ.get("CLIPS_DIRS", ":".join(os.path.join(ROOT, "clips", k) for k in "abcd")).split(":"):
             idx = os.path.join(d, "index.json")
             if os.path.exists(idx):
                 for t, f in json.load(open(idx)).items():

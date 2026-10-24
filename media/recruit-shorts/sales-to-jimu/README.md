@@ -83,7 +83,15 @@ TTS_BACKEND=clips python3 video_c.py   # out/video_c_hook_check_clips.mp4
 TTS_BACKEND=clips python3 video_d.py   # out/video_d_hook_nige_clips.mp4
 ```
 
-- 切り分けは、セリフ間の無音とセリフの文字数の比率を照らし合わせて行います（`align_clips.py`）。
+- 切り分けは、無音で区切った発話のかたまりを、句読点ごとのフレーズの読み仮名の長さ（モーラ数）と照らし合わせて行います（`align_clips.py`）。セリフの途中の長い間でも境界がずれません。
+- 動画A・Bも同じ声でナレーション付きにできます（テロップが出る瞬間にセリフを置き、収まらない場面だけ伸ばす。`src/voiceover.py`）。
+
+```sh
+python3 align_clips.py ../narration/video_a_fish.mp3 ../narration/video_a_lines.json ../clips/a
+python3 align_clips.py ../narration/video_b_fish.mp3 ../narration/video_b_lines.json ../clips/b
+VOICEOVER=1 TTS_BACKEND=clips python3 video_a.py   # out/video_a_sales_to_jimu_story_vo.mp4
+VOICEOVER=1 TTS_BACKEND=clips python3 video_b.py   # out/video_b_sales_to_jimu_3reasons_vo.mp4
+```
 - 音程を変えずに 1.2 倍速にしています（`TTS_SPEED_MUL` で変更可）。
 - 字幕のポップやズームの切り替えは、セリフ内の実際の息継ぎ位置に合わせています。
 

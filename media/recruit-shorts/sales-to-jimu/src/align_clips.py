@@ -72,12 +72,65 @@ def align(chunks, lines):
     return dp[m][n], spans[::-1]
 
 
+def morae(text):
+    """Approximate spoken length: kana count from OpenJTalk (falls back to characters)."""
+    try:
+        import pyopenjtalk
+        kana = pyopenjtalk.g2p(text, kana=True)
+        return max(1, len(re.sub(r"[、。！？!?\s’']", "", kana)))
+    except Exception:
+        return mora_len(text)
+
+
+def align_phrases(chunks, lines, max_group=3):
+    """Finer DP: map groups of speech chunks to groups of phrases (split on 、。？！) without
+    crossing line boundaries, so pauses inside a line no longer shift the line breaks."""
+    phrases, line_of = [], []
+    for li, t in enumerate(lines):
+        for p in [q for q in re.split(r"(?<=[、。！？!?])", t) if q.strip("、。！？!? ")]:
+            phrases.append(p)
+            line_of.append(li)
+    P, n = len(phrases), len(chunks)
+    exp = np.array([morae(p) for p in phrases], dtype=float)
+    exp /= exp.sum()
+    tot = sum(b - a for a, b in chunks)
+    INF = 1e18
+    dp = np.full((P + 1, n + 1), INF)
+    bk = {}
+    dp[0][0] = 0.0
+    for i in range(P + 1):
+        for j in range(n + 1):
+            if dp[i][j] >= INF:
+                continue
+            for gp in range(1, max_group + 1):
+                if i + gp > P or line_of[i] != line_of[i + gp - 1]:
+                    break
+                e = exp[i:i + gp].sum()
+                for gc in range(1, max_group + 1):
+                    if j + gc > n:
+                        break
+                    d = sum(chunks[k][1] - chunks[k][0] for k in range(j, j + gc)) / tot
+                    c = ((d - e) / max(e, 0.02)) ** 2 + 0.15 * (gp + gc - 2)
+                    if dp[i][j] + c < dp[i + gp][j + gc]:
+                        dp[i + gp][j + gc] = dp[i][j] + c
+                        bk[(i + gp, j + gc)] = (i, j)
+    i, j, spans = P, n, {}
+    while (i, j) != (0, 0):
+        pi, pj = bk[(i, j)]
+        li = line_of[pi]
+        a, b = chunks[pj][0], chunks[j - 1][1]
+        lo, hi = spans.get(li, (a, b))
+        spans[li] = (min(lo, a), max(hi, b))
+        i, j = pi, pj
+    return dp[P][n], [spans[k] for k in range(len(lines))]
+
+
 if __name__ == "__main__":
     audio_path, lines_json, out_dir = sys.argv[1], sys.argv[2], sys.argv[3] if len(sys.argv) > 3 else None
     lines = json.load(open(lines_json))
     x = load(audio_path)
     ch = speech_chunks(x)
-    cost, spans = align(ch, lines)
+    cost, spans = (align_phrases if os.environ.get("ALIGN", "phrases") == "phrases" else align)(ch, lines)
     print(f"cost={cost:.2f} chunks={len(ch)}")
     for t, (a, b) in zip(lines, spans):
         print(f"  {a:6.2f}-{b:6.2f} ({b - a:4.2f}s)  {t}")
