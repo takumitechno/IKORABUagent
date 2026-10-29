@@ -24,7 +24,10 @@ MP4 はリポジトリに入れていません（`out/` は `.gitignore`）。�
 | `timing/*.md` | 同じ内容のタイミング表（書き出し時に自動生成） |
 | `src/mc.py` | 5本共通の部品（字幕、強調テロップ、写真の窓、図解、最終画面、BGM・効果音） |
 | `src/v0N_*.py` | 各動画の構成 |
-| `src/fit_audio.py` | ナレーションに合わせて `timing/*.json` を作り直す |
+| `src/fit_audio.py` | ナレーションに合わせて `timing/*.json` を作り直す（動画ごとの構成 `PLANS` もここ） |
+| `src/preview.py` | 指定した秒のコマを一覧画像にする（書き出し前の確認用） |
+| `src/check.py` | 書き出したMP4の検査（解像度・長さ・ナレーションの位置・音量・3行になる字幕） |
+| `src/transcribe.py` | 音声認識で `narration/*_words.json` を作る（任意。faster-whisper が必要） |
 | `img/` | 画像（一覧は `../IMAGES.md`） |
 
 ## 書き出し
@@ -33,10 +36,13 @@ MP4 はリポジトリに入れていません（`out/` は `.gitignore`）。�
 cd media/makecareer/src
 ../../recruit-shorts/sales-to-jimu/fetch_fonts.sh     # 初回のみ（フォント）
 python3 v03_seishain.py                               # → out/03_seishain.mp4 と .srt、timing/03_seishain.md
+python3 check.py 03_seishain                          # 検査
 ```
 
+新しい動画の作り方の全手順は `../AGENTS.md` にあります。
+
 - 字幕や切り替えの時刻を直すときは `timing/<動画>.json` を書き換えて、上のコマンドを実行し直します。
-- 音声を差し替えたときは、`narration/<動画>_jin.mp3` を置き換えてから `python3 fit_audio.py <動画>` を実行します。手で直した `timing/*.json` は上書きされます。
+- 音声を差し替えたときは、`narration/<動画>_jin.mp3` を置き換えてから `python3 fit_audio.py <動画>` を実行します。手で直した `timing/*.json` は上書きされます。音声の冒頭でタイトルを読んでいない場合は、`narration/scripts.json` のその動画のタイトルを `""` にします。
 - 音声なしの映像だけが必要なときは、各スクリプトの `mc.render(...)` に `with_audio=False` を渡します。
 
 ## 作り方の決めごと

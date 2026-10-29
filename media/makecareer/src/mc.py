@@ -104,12 +104,17 @@ def emph(text, size=80, **kw):
     return text_block(text, size=size, hl=YELLOW, max_w=880, **kw)
 
 
-def subtitle_img(text, size=52, max_w=860):
+def subtitle_lines(text, size=52, max_w=860):
+    """(font size, lines) for a subtitle: explicit breaks first; a long line shrinks a little before it wraps."""
     parts = text.split("\n")
     while size > 44 and max(font(size, 700).getlength(p) for p in parts) > max_w - 64:
-        size -= 2          # a long line shrinks a little before it would wrap onto a third line
+        size -= 2
+    return size, [ln for part in parts for ln in wrap_jp(part, font(size, 700), max_w - 64)]
+
+
+def subtitle_img(text, size=52, max_w=860):
+    size, lines = subtitle_lines(text, size, max_w)
     f = font(size, 700)
-    lines = [ln for part in parts for ln in wrap_jp(part, f, max_w - 64)]
     asc, desc = f.getmetrics()
     lh = int(size * 1.42)
     w = int(max(f.getlength(ln) for ln in lines)) + 64

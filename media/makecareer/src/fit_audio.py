@@ -5,8 +5,9 @@
 Reads ../narration/<name>_jin.mp3, ../narration/scripts.json (subtitle cues per video) and, when present,
 ../narration/<name>_words.json (ASR word times, used only to place marks inside a line). Writes
 ../timing/<name>.json: subtitles follow the voice, scenes switch in the pauses before their first line, and
-the take is used at its recorded speed. The take's opening title line is not used (the scripts start with
-paragraph 1). Re-running overwrites hand edits to that file.
+the take is used at its recorded speed. When scripts.json gives a title for the video, the take is expected to
+open by reading it and that part is not used (the subtitles start with paragraph 1); give "" as the title when
+the take starts directly with paragraph 1. Re-running overwrites hand edits to that file.
 """
 import json
 import os
@@ -107,9 +108,9 @@ def fit(name):
     take = os.path.join(NARR, f"{name}_jin.mp3")
     x = ac.load(take)
     chunks = ac.speech_chunks(x)
-    lines = [title] + [t.replace("\n", "") for _, t in cues]
+    lines = ([title] if title else []) + [t.replace("\n", "") for _, t in cues]
     _, spans = ac.align_phrases(chunks, lines)
-    title_span, spans = spans[0], spans[1:]
+    title_span, spans = (spans[0], spans[1:]) if title else (None, spans)
     cut = spans[0][0] - PRE
     shift = LEAD - cut
     wpath = os.path.join(NARR, f"{name}_words.json")
@@ -157,17 +158,18 @@ def fit(name):
         frac = lambda k, t=t: len(re.sub(r"[、。！？「」]", "", t[:k])) / max(1, len(re.sub(r"[、。！？「」]", "", t)))
         marks[key] = round(phrase_time(words, a - shift, b - shift, pattern, t, frac) + shift, 2)
 
+    dropped = f"音声冒頭のタイトル読み上げ（{title_span[0]:.2f}〜{title_span[1]:.2f}秒）は使わず、" if title_span else ""
     data = {
         "video": f"{name}.mp4",
         "status": (f"ナレーション（{os.path.basename(take)}）に合わせた時刻。速度は変えていない。"
-                   f"音声冒頭のタイトル読み上げ（{title_span[0]:.2f}〜{title_span[1]:.2f}秒）は使わず、"
-                   f"{cut:.2f}秒以降を動画の{LEAD:.2f}秒から置いている。"),
+                   f"{dropped}{cut:.2f}秒以降を動画の{LEAD:.2f}秒から置いている。"),
         "audio": {"file": f"../narration/{os.path.basename(take)}", "cut": round(cut, 3), "at": LEAD},
         "scenes": scenes, "subtitles": subs, "telops": telops, "marks": marks,
     }
     with open(os.path.join(mc.ROOT, "timing", f"{name}.json"), "w", encoding="utf-8") as f:
         json.dump(data, f, ensure_ascii=False, indent=2)
-    print(f"{name}: total {total:.2f}s, title {title_span[0]:.2f}-{title_span[1]:.2f}s dropped, cut at {cut:.2f}s")
+    note = f"title {title_span[0]:.2f}-{title_span[1]:.2f}s dropped, " if title_span else ""
+    print(f"{name}: total {total:.2f}s, {note}cut at {cut:.2f}s")
     for s in subs:
         print(f"  {s['id']:5s} {s['start']:6.2f}-{s['end']:6.2f}  {s['text'].replace(chr(10), ' ')}")
     print("  marks", marks)
