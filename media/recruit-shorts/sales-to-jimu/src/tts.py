@@ -131,7 +131,11 @@ def _clips(text, speed):
         if os.environ.get("CLIPS_ALLOW_MISSING"):
             raise MissingClip(text)
         raise KeyError(f"no recorded clip for line: {text}")
-    return _atempo(np.load(_clip_index[text]), speed), SR
+    path = _clip_index[text]
+    if path.endswith(".wav"):
+        x, sr = _read_wav_bytes(open(path, "rb").read())
+        return _atempo(_to_48k(x, sr), speed), SR
+    return _atempo(np.load(path), speed), SR
 
 
 _vv = None

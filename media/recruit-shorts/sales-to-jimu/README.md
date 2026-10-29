@@ -188,3 +188,19 @@ TTS_BACKEND=fish FISH_VOICE_ID=<声のID> python3 video_d.py   # out/video_d_hoo
 - CTAに「無料」を入れていないのは、サービス条件が未確認だからです。無料相談であることが確かなら、ボタンを「無料で転職相談 ▶」に変えるとクリック率が上がりやすくなります（`video_a.py` / `video_b.py` の `cta_button(...)` の文言）。
 - 登場人物（佐藤課長・田中さんなど）と社名（A商事など）、金額はすべて架空です。実在の人物の体験談として出さないでください。
 - 職業紹介事業者として発信する場合は、事業者名や許可番号の表記をプロフィールや遷移先に用意してください。
+
+
+## 素材一覧（このフォルダに保存しているもの）
+
+| 場所 | 中身 |
+|---|---|
+| `img/*.jpg` | 動画A〜Dの場面画像10枚（Figma AI生成、動画の書き出しに使用） |
+| `img/png/*.png` | 同じ10枚の元データ（無圧縮、768×1376） |
+| `narration/video_*_fish.mp3` | Fish Audio（声：Jin）で作ったナレーション原音（A・B・C・D） |
+| `narration/video_*_lines.json` | 各ナレーションの台本（セリフ順） |
+| `clips/{a,b,c,d}/*.wav` | 原音をセリフごとに切り分けた音声（48kHz、`index.json` がセリフ→ファイルの対応表）。`TTS_BACKEND=clips` でそのまま使用 |
+| `out/*.mp4` | 書き出した動画（字幕版A・B、ナレーション版A〜D、動画D終盤修正のレビュー版 `video_d2_consult_REVIEW.mp4`） |
+| `src/` | 書き出し用のコード一式（BGM・効果音もここで生成） |
+
+フォント（Noto Sans JP）は `fetch_fonts.sh`、Kokoro の音声モデルは `fetch_kokoro.sh` で取得します（容量とライセンス表記の都合でリポジトリには入れていません）。
+動画Dの終盤修正版（`video_d2.py`）の新しい3セリフ（`narration/video_d2_lines.json`）は未収録です。

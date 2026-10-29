@@ -5,4 +5,3 @@ src/__pycache__/
 tts_cache/
 out/*_openjtalk.mp4
 kokoro/
-clips/
