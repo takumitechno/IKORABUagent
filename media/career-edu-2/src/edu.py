@@ -1,8 +1,8 @@
 """転職の教育ショート 第二弾（career_edu_2_*）: project paths, scene plans and diagram parts.
 
 Built on the MakeCareer tools (../../makecareer/src): same engine, fonts, colours, subtitles and sound.
-The diagrams carry each video; a photo strip at the top (people or just places, reused from media/IMAGES.md)
-changes every scene — and inside long scenes — so the screen never sits still.
+The diagrams carry each video over a full-screen photo (people, hands or just the place, reused from
+media/IMAGES.md) that changes every scene — and inside long scenes — so the screen never sits still.
 
     python3 edu.py fit career_edu_2_01_salary        # timing/<name>.json from the narration take
     python3 edu.py preview e01_salary 0.5 3.0 6.0     # contact sheet in out/preview/
@@ -26,10 +26,9 @@ from mc import GREY, INK, TEAL, YELLOW, Telop, clamp, font, label, pill  # noqa:
 ORANGE = (240, 160, 60)
 LINE = (214, 220, 230)
 SOFT = (238, 242, 247)
-AI_NOTE = True       # the header strips use AI stills
-NOTE_XY = (84, 204)  # notice sits inside the top-left of the header strip
+AI_NOTE = True       # the background photos are AI stills
+NOTE_XY = None       # notice at the usual place (top centre)
 TAIL = 1.5           # short hold after the last word (no end card)
-HEAD = (60, 190, 1020, 560)          # header photo strip; the emphasis telop sits on its lower edge
 SFX_BOOST = 2.0      # card / item sounds at the first series' level
 OPENING_PING = 1.2   # attention sound on the first frame, about as loud as the narration
 
@@ -111,7 +110,7 @@ def background():
     return _bg
 
 
-# stills for the header strip (media/IMAGES.md); masks blur stray text and logos
+# background stills (media/IMAGES.md); masks blur stray text and logos
 IMG = {
     "p3_phone": ("makecareer/img/v1_home_evening_phone.jpg", [(0.80, 0.76, 0.90, 0.81)]),
     "p3_bakery": ("makecareer/img/v1_bakery_handing_bag.jpg", [(0.80, 0.71, 1.0, 0.81), (0.86, 0.92, 1.0, 1.0)]),
@@ -131,76 +130,50 @@ IMG = {
     "p7_suggest": ("makecareer/img/v2r_shop_suggesting_items.jpg", [(0.70, 0.70, 1.0, 0.80)]),
     "p7_teach": ("makecareer/img/v2r_shop_teaching_newcomer.jpg", [(0.33, 0.57, 0.70, 0.68, 5), (0.13, 0.83, 0.22, 0.89)]),
 }
-_strips = {}
+BG_BLUR, BG_DARK = 7, 0.5    # full-screen photo behind the diagrams; people and places still read as such
+_photos = {}
 
 
-def strip(key, src):
-    """Crop of a still for the header box (widened to its aspect), cached."""
-    if (key, src) not in _strips:
+def photo(key):
+    if key not in _photos:
         name, masks = IMG[key]
-        _strips[(key, src)] = mc.Window(name, src, box=HEAD, look="neutral", masks=masks, bg_blur=0, bg_dark=0.0,
-                                        overscan=1.16).crop
-    return _strips[(key, src)]
+        _photos[key] = mc.Photo(name, "neutral", blur=BG_BLUR, darken=BG_DARK, masks=masks)
+    return _photos[key]
 
 
-def _strip_shade(w, h):
-    """Darker bottom (telop) and a touch at the top (AI notice)."""
-    g = Image.new("L", (1, h))
-    for y in range(h):
-        k = y / (h - 1)
-        a = 70 * max(0.0, 1 - k / 0.18) + 205 * max(0.0, (k - 0.34) / 0.66) ** 1.2
-        g.putpixel((0, y), int(min(220, a)))
-    shade = Image.new("RGBA", (w, h), (6, 10, 24, 255))
-    shade.putalpha(g.resize((w, h)))
-    return shade
+def backdrop(head, dur):
+    """Full-screen photos for one scene: slow push-in with a gentle drift; a later photo crossfades in at its time."""
+    shots = []
+    for k, (t0, key, src) in enumerate(head):
+        t1 = head[k + 1][0] if k + 1 < len(head) else dur
+        shots.append((t0, photo(key), t1 - t0 + 0.4, clamp((src[1] + src[3]) / 2), (-1, 1)[k % 2]))
 
+    def one(i, t):
+        t0, ph, d, cy, drift = shots[i]
+        p = clamp((t - t0) / max(0.1, d))
+        return ph.render(1.06 + 0.06 * p, 0.5 + 0.08 * drift * (p - 0.5), cy).convert("RGBA")
 
-class Header:
-    """Photo strip at the top: slow pan/zoom; fades in over the previous strip when it changes mid-scene."""
-
-    def __init__(self, key, src, t_in, t_out, dur, pan=((0.35, 0.5), (0.65, 0.5)), zoom=(1.0, 1.08)):
-        self.crop = strip(key, src)
-        self.t_in, self.t_out, self.dur, self.pan, self.zoom = t_in, t_out, dur, pan, zoom
-        bw, bh = HEAD[2] - HEAD[0], HEAD[3] - HEAD[1]
-        self.size = (bw, bh)
-        self.mask = mc.rounded_mask(bw, bh, 30)
-        self.shade = _strip_shade(bw, bh)
-        self.shadow, self.pad = mc.card(bw, bh, r=30, fill=(0, 0, 0, 0))
-
-    def draw(self, frame, t):
-        if not self.t_in <= t <= self.t_out:
-            return
-        p = clamp((t - max(0.0, self.t_in)) / max(0.1, self.dur))
-        a = 1.0 if self.t_in <= 0 else clamp((t - self.t_in) / 0.35)
-        cw, ch = self.crop.size
-        z = self.zoom[0] + (self.zoom[1] - self.zoom[0]) * p
-        vw, vh = cw / z, ch / z
-        cx = self.pan[0][0] + (self.pan[1][0] - self.pan[0][0]) * p
-        cy = self.pan[0][1] + (self.pan[1][1] - self.pan[0][1]) * p
-        x, y = clamp(cx) * (cw - vw), clamp(cy) * (ch - vh)
-        win = self.crop.resize(self.size, Image.BILINEAR, box=(x, y, x + vw, y + vh)).convert("RGBA")
-        win.alpha_composite(self.shade)
-        win.putalpha(self.mask.point(lambda v: int(v * a)))
-        if a >= 1.0:
-            frame.alpha_composite(self.shadow, (HEAD[0] - self.pad, HEAD[1] - self.pad))
-        frame.alpha_composite(win, (HEAD[0], HEAD[1]))
+    def fn(t):
+        k = 0
+        for i, s in enumerate(shots):
+            if t >= s[0]:
+                k = i
+        fr = one(k, t)
+        if k and t - shots[k][0] < 0.4:
+            fr = Image.blend(one(k - 1, t), fr, (t - shots[k][0]) / 0.4)
+        return fr
+    return fn
 
 
 def scene(tm, sid, overlays, head=()):
-    """head: [(local start, IMG key, crop), ...] — strips change at those times (the first starts the scene)."""
-    d = tm.dur(sid)
-    heads = []
-    for k, (t0, key, src) in enumerate(head):
-        t1 = head[k + 1][0] + 0.4 if k + 1 < len(head) else 1e9
-        pan = ((0.35, 0.5), (0.65, 0.5)) if k % 2 == 0 else ((0.65, 0.5), (0.35, 0.5))
-        heads.append(Header(key, src, t0 if k else -1.0, t1, d - t0, pan=pan))
-    return tm.scene(sid, background(), heads + list(overlays))
+    """head: [(local start, IMG key, crop), ...] — the full-screen photo changes at those times
+    (the crop's vertical centre keeps roughly that part of the photo in view)."""
+    return tm.scene(sid, backdrop(head, tm.dur(sid)) if head else background(), overlays)
 
 
 def telop(tm, sid, tid):
-    """Emphasis telop on the lower edge of the header strip (two-line hooks a little smaller)."""
-    two = "\n" in tm.tel[tid]["text"]
-    return tm.telop(sid, tid, size=66 if two else 74, cy=460 if two else 500)
+    """Emphasis telop at the top, as in the first series."""
+    return tm.telop(sid, tid, size=80)
 
 
 def tag(text="説明用の例"):

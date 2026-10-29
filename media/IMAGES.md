@@ -42,10 +42,10 @@ P1 は場面ごとに服装が変わります（紺スーツ／白ブラウス�
 | `recruit-shorts/sales-to-jimu/img/b2_street.jpg` | P2・白シャツ＋ネクタイ | 駅前で腕時計を見て急ぐ | 明るい・強め | 営業→事務 B・D | 背景の看板 |
 | `makecareer/img/v1_home_evening_phone.jpg` | P3 | 夜の自宅の机でスマホを見て考え込む | 普通（室内灯）・落ち着き | MakeCareer ①、教育第二弾 | ノートPCのロゴ（右下） |
 | `makecareer/img/v1_home_morning_notebook.jpg` | P3 | 明るい朝の机でノートを開いて考える | 明るい・落ち着き | MakeCareer ①（ぼかした背景）、教育第二弾 | ノートPCのロゴ（左下） |
-| `makecareer/img/v2_office_desk_thinking.jpg` | P4 | オフィスの机でペンを持って考える | 明るい・落ち着き | 教育第二弾（上部の写真の帯） | マグの「COFFEE」 |
-| `makecareer/img/v2_meeting_taking_notes.jpg` | P4 | 打ち合わせで話を聞いてメモ | 明るい・落ち着き | 教育第二弾（上部の写真の帯） | — |
-| `makecareer/img/v2_explaining_document.jpg` | P4 | 同僚に資料を見せて説明 | 明るい・前向き | 教育第二弾（上部の写真の帯） | ノートPCの「DELL」ロゴ |
-| `makecareer/img/v3_after_shift_street_dusk.jpg` | P5・白シャツ＋ベージュのパンツ | 夕方、店の外でエプロンとトートを持って考える | 普通（夕方）・落ち着き | 教育第二弾（上部の写真の帯） | — |
+| `makecareer/img/v2_office_desk_thinking.jpg` | P4 | オフィスの机でペンを持って考える | 明るい・落ち着き | 教育第二弾（背景） | マグの「COFFEE」 |
+| `makecareer/img/v2_meeting_taking_notes.jpg` | P4 | 打ち合わせで話を聞いてメモ | 明るい・落ち着き | 教育第二弾（背景） | — |
+| `makecareer/img/v2_explaining_document.jpg` | P4 | 同僚に資料を見せて説明 | 明るい・前向き | 教育第二弾（背景） | ノートPCの「DELL」ロゴ |
+| `makecareer/img/v3_after_shift_street_dusk.jpg` | P5・白シャツ＋ベージュのパンツ | 夕方、店の外でエプロンとトートを持って考える | 普通（夕方）・落ち着き | 教育第二弾（背景） | — |
 | `makecareer/img/v3_home_notebook_resume.jpg` | P5・白シャツ | 自宅の座卓でノートに書き出す（履歴書の用紙あり） | 明るい・落ち着き | MakeCareer ③、教育第二弾 | 履歴書の用紙の文字（左下） |
 | `makecareer/img/v3_cafe_serving_customer.jpg` | P5・白シャツ＋紺のエプロン | カフェでお客様にカップを渡す | 明るい・前向き | MakeCareer ③、教育第二弾 | — |
 | `makecareer/img/v3_cafe_teaching_coworker.jpg` | P5・白シャツ＋紺のエプロン | 新人にエスプレッソマシンを教える | 明るい・前向き | MakeCareer ③、教育第二弾 | マシン右下の赤い文字 |
@@ -67,6 +67,6 @@ P1 は場面ごとに服装が変わります（紺スーツ／白ブラウス�
 | ④ 04_korekara_no_hatarakikata | P6 | `v4_office_desk_laptop`（新規）、`v4_train_window_evening`、`v4_home_evening_notebook`（新規） |
 | ⑤ 05_skill_fuan | P8 | `v5_home_reference_book`（新規） |
 
-教育第二弾（`career-edu-2/`）は、上の画像のうち15枚を画面上部の写真の帯に使い回しています（人物の顔・手元・店や職場の背景だけ、をシーンごとに切り替え）。
+教育第二弾（`career-edu-2/`）は、上の画像のうち15枚を画面いっぱいの背景に使い回しています（人物・手元・店や職場の背景だけ、をシーンごとに切り替え）。
 
 未使用で残っているもの：営業→事務の a1〜a5・a8・b1・b2、`v4_home_evening_notebook`、`v4_train_window_evening`、`v5_home_reference_book`（MakeCareer では使用）。
