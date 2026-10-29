@@ -129,20 +129,22 @@ def subtitle_img(text, size=52, max_w=860):
 
 
 def _bare(text):
-    return "".join(ch for ch in text if ch not in "、。，．！？!?「」『』{}（）()…・ \n　")
+    return "".join(ch for ch in text if ch not in "、。，．！？!?「」『』“”{}（）()…・ \n　")
 
 
 class Subtitles:
     """Full narration subtitles (global time), one cue at a time, quick fades.
 
     A cue whose words are already on screen in an emphasis telop (e.g. the opening line repeated in the hook)
-    is not drawn while that telop is up, so the same sentence is never shown twice at once.
+    is not drawn while that telop is up, so the same sentence is never shown twice at once; a telop can also name
+    the cues it stands in for ("covers"), e.g. a hook that rephrases the opening line.
     """
 
     def __init__(self, cues, cy=SUB_CY, telops=()):
         self.cues = []
         for c in cues:
-            covered = [(t["start"], t["end"]) for t in telops if _bare(c["text"]) in _bare(t["text"])]
+            covered = [(t["start"], t["end"]) for t in telops
+                       if _bare(c["text"]) in _bare(t["text"]) or c["id"] in t.get("covers", ())]
             self.cues.append((c["start"], c["end"], subtitle_img(c["text"]), covered))
         self.cy = cy
 
@@ -616,13 +618,30 @@ LIFT = [(["F2", "A2", "C3", "E3"], "F1"), (["G2", "B2", "D3", "E3"], "G1"),
         (["E2", "G2", "B2", "D3"], "E1"), (["A2", "C3", "E3", "G3"], "A1")]
 
 
+def sfx_alert():
+    """Two short descending tones over a soft low thump: a clear 'watch out' on the first frame."""
+    import numpy as np
+    import audio as au
+    out = np.zeros(int(0.9 * au.SR))
+    for st, f in ((0.0, 988), (0.16, 740)):
+        t = au.tl(0.3)
+        s = (np.sin(2 * np.pi * f * t) + 0.35 * np.sin(2 * np.pi * f * 2 * t)) * au.env_adsr(t, 0.3, 0.004, 0.16)
+        s *= np.exp(-t * 5)
+        i = int(st * au.SR)
+        out[i:i + len(s)] += s * 0.24
+    t = au.tl(0.5)
+    out[: len(t)] += np.sin(2 * np.pi * (60 + 50 * np.exp(-t * 18)) * t) * np.exp(-t * 9) * 0.35
+    return out
+
+
 def sfx_sound(kind):
     import audio as au
     return {"pop": au.sfx_pop, "tick": au.sfx_tick, "paper": lambda: au.sfx_swish(0.28), "blip": au.sfx_blip,
-            "ping": au.sfx_ping, "swish": lambda: au.sfx_swish(0.22)}[kind]()
+            "ping": au.sfx_ping, "swish": lambda: au.sfx_swish(0.22), "alert": sfx_alert,
+            "ding": au.sfx_ding}[kind]()
 
 
-def build_audio(tm, sfx_events, lift_at, vel=0.55):
+def build_audio(tm, sfx_events, lift_at, vel=0.55, chords=None, pulse=0.0):
     import audio as au
     import align_clips as ac
     import narrated as nr
@@ -631,7 +650,12 @@ def build_audio(tm, sfx_events, lift_at, vel=0.55):
     x = ac.load(os.path.normpath(os.path.join(ROOT, "timing", a["file"])))
     voice = tts.voice_chain(x[int(a["cut"] * au.SR):])
     music, sfx = au.Bus(tm.total), au.Bus(tm.total)
-    nr.groove(music, 0.0, lift_at, 88, CALM, drums=False, keys="ep", vel=vel, octave=12)
+    nr.groove(music, 0.0, lift_at, 88, chords or CALM, drums=False, keys="ep", vel=vel, octave=12)
+    if pulse:           # quiet eighth-note hats under the keys (keeps a little forward tension)
+        beat, t = 60 / 88, 0.0
+        while t < min(lift_at, tm.total) - 0.05:
+            music.add(au.hat(1.0 if round(t / beat * 2) % 2 == 0 else 0.6), t, pulse, pan=0.2)
+            t += beat / 2
     if lift_at < tm.total:
         nr.groove(music, lift_at, tm.total, 88, LIFT, drums=True, keys="ep", vel=vel, octave=12,
                   hats=True, kick_pattern=(0, 2))
@@ -645,15 +669,16 @@ def build_audio(tm, sfx_events, lift_at, vel=0.55):
 
 # ---------------------------------------------------------------- output
 def render(tm, scenes, preview=(), sfx_events=(), lift_at=None, with_audio=True, ai_note=True, music_vel=0.55,
-           note_xy=None):
+           note_xy=None, chords=None, pulse=0.0):
     """Write the MP4 (narration + BGM + SFX unless with_audio=False) plus the timing table and SRT.
 
     lift_at=None keeps the BGM without drums to the end; ai_note=False drops the AI-image notice
-    (for videos that use no generated images).
+    (for videos that use no generated images). chords replaces the BGM's chord loop (default CALM);
+    pulse > 0 adds quiet hats at that gain while there are no drums.
     """
     out = os.path.join(OUT_DIR, tm.data["video"])
     write_tables(tm)
-    wav = (build_audio(tm, sfx_events, lift_at if lift_at is not None else tm.total, music_vel)
+    wav = (build_audio(tm, sfx_events, lift_at if lift_at is not None else tm.total, music_vel, chords, pulse)
            if with_audio else None)
     overlays = (([disclaimer(tm.total, note_xy, 24 if note_xy else 27)] if ai_note else [])
                 + [Subtitles(tm.subs, telops=tm.data.get("telops", []))])

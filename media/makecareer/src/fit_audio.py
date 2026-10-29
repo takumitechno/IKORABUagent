@@ -29,6 +29,7 @@ PLANS = {
         scenes=[("s1", "p1a", "履歴書の職歴欄で手が止まる"), ("s2", "p2", "メモ「書くことがない？」"),
                 ("s3", "p3a", "勤務中のイメージ（接客→新人に教える）"), ("s4", "p4a", "経験の整理メモ"),
                 ("s5", "p5a", "履歴書・面接準備の2項目"), ("s6", "p6a", "最終CTA")],
+        # telop: (id, text, ("scene", sid) | ("cue", cue[, until_cue])[, cue ids whose subtitle it replaces])
         telops=[("hook", "正社員経験なし。\n職歴、{何を書けばいい？}", ("scene", "s1")),
                 ("s2", "書くことがない？", ("cue", "p2")),
                 ("s3", "{これまで働いてきた}経験", ("scene", "s3")),
@@ -138,7 +139,7 @@ def fit(name):
         subs.append({"id": cid, "start": round(max(0.0, a - 0.06), 2), "end": round(end, 2), "text": text})
     span_of = {s["id"]: s for s in scenes}
     telops = []
-    for tid, text, (kind, ref, *until) in plan["telops"]:
+    for tid, text, (kind, ref, *until), *covers in plan["telops"]:
         if kind == "scene":
             sc = span_of[ref]
             a = 0.0 if sc["start"] == 0 else sc["start"] + 0.1
@@ -146,7 +147,8 @@ def fit(name):
             sc = scene_of[ref]
             a = voice[ref][0] - 0.05
         end = voice[until[0]][0] - 0.12 if until else sc["end"] - 0.1   # until: hand over to the next telop
-        telops.append({"id": tid, "start": round(a, 2), "end": round(end, 2), "text": text})
+        telops.append({"id": tid, "start": round(a, 2), "end": round(end, 2), "text": text,
+                       **({"covers": list(covers[0])} if covers else {})})
     marks = {}
     cue_text = dict(cues)
     for key, cid, pattern in plan["marks"]:
