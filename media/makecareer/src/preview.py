@@ -13,11 +13,14 @@ from engine import Finisher, build_timeline
 
 
 def sheet(module, times, cols=6, tile=(360, 640)):
-    name = module[1:]                      # v03_seishain -> timing/03_seishain.json
+    sys.path.insert(0, os.path.join(mc.ROOT, "src"))   # the video scripts of the current project
+    mod = importlib.import_module(module)
+    name = getattr(mod, "NAME", module[1:])            # v03_seishain -> timing/03_seishain.json
     tm = mc.Timing(name)
-    scenes = importlib.import_module(module).build(tm)
+    scenes = mod.build(tm)
     build_timeline(scenes)
-    overlays = [mc.disclaimer(tm.total), mc.Subtitles(tm.subs, telops=tm.data.get("telops", []))]
+    overlays = (([mc.disclaimer(tm.total)] if getattr(mod, "AI_NOTE", True) else [])
+                + [mc.Subtitles(tm.subs, telops=tm.data.get("telops", []))])
     fin = Finisher()
     tiles = []
     for t in times:

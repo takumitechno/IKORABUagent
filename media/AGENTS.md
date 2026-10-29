@@ -5,6 +5,7 @@
 | フォルダ | 中身 |
 |---|---|
 | `makecareer/` | MakeCareer への送客ショート①〜⑤。ナレーションは支給、BGM と効果音はこちらで生成。**新しく作るときはこの形を基本にする** |
+| `career-edu-2/` | 転職の教育ショート第二弾①〜⑤（求人の見方・自己PRの書き方）。人物写真なし、図解が主役、誘導（CTA）なし。MakeCareer の道具をそのまま使う別シリーズの見本 |
 | `recruit-shorts/sales-to-jimu/` | 営業→事務の動画A〜D（最初に作ったもの）。描画エンジンの本体（`src/engine.py` ほか）もここにある |
 | `IMAGES.md` | 全案件の画像一覧（人物・服装・場面・使用実績・隠すべき文字）。**新しく画像を作る前に必ずここから探す** |
 
@@ -156,7 +157,22 @@ narration/<名前>_words.json ┘                                          │
 - 字幕の1行が長すぎると44pxまで縮み、それでも入らないと折り返す。3行になると `check.py` が知らせる
 - Claude の環境では Figma の画像URLを直接ダウンロードできなかったため、スクリーンショット機能（base64）で PNG を保存した
 
-## 6. 営業→事務の動画（A〜D）
+## 6. 別のシリーズを作るとき（例：`career-edu-2/`）
+
+MakeCareer の道具（`mc.py`、`fit_audio.py`、`preview.py`、`check.py`）は、作業フォルダを切り替えて別シリーズにも使える。新しい仕組みは作らず、`career-edu-2/` と同じ形にする。
+
+- フォルダの形は同じ（`narration/`、`timing/`、`src/`、`out/`）
+- `src/` に小さな設定ファイル（`career-edu-2/src/edu.py`）を置き、次の3つをまとめる
+  - 環境変数 `MC_PROJECT` に自分のフォルダを入れてから `mc` を読み込む（`mc.ROOT` と `mc.OUT_DIR` がそのフォルダになる）
+  - そのシリーズの構成（PLANS）
+  - そのシリーズ専用の図解の部品
+- 構成は `fit_audio.PLANS.update(PLANS)` で足してから `fit_audio.fit(名前)` を呼ぶ。動画ごとに `tail`（最後の言葉のあと何秒残すか）を決められる
+- 各動画のスクリプトには `NAME = "<時刻表の名前>"` を書く（`preview.py` がこれで時刻表を探す）
+- AI画像を使わない動画は、スクリプトに `AI_NOTE = False` と書き、`mc.render(..., ai_note=False)` にする（「※画像はAI生成によるイメージです」を出さない）
+- BGM にドラムを入れないときは `lift_at=None` にする。`music_vel` で BGM の大きさを決める（第二弾は0.42）
+- `career-edu-2` では、コマンドを `python3 edu.py fit|preview|check …` で呼ぶ。`preview.py` は場所を指定して読み込む（営業→事務のフォルダにも同じ名前の `preview.py` があり、名前で読み込むとそちらが先に読まれる）
+
+## 7. 営業→事務の動画（A〜D）
 
 `recruit-shorts/sales-to-jimu/` は仕組みが少し違う。
 - ナレーションは Fish Audio の音声をセリフごとに切り分けた `clips/`（`TTS_BACKEND=clips`）を使う

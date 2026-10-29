@@ -8,8 +8,9 @@ import os
 import sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-ROOT = os.path.dirname(HERE)                      # media/makecareer
-MEDIA = os.path.dirname(ROOT)                     # media
+MEDIA = os.path.dirname(os.path.dirname(HERE))    # media
+# project folder with narration/, timing/, out/ (default media/makecareer; other series set MC_PROJECT)
+ROOT = os.path.abspath(os.environ.get("MC_PROJECT") or os.path.dirname(HERE))
 sys.path.insert(0, os.path.join(MEDIA, "recruit-shorts", "sales-to-jimu", "src"))
 
 from PIL import Image, ImageDraw  # noqa: E402
@@ -619,7 +620,7 @@ def sfx_sound(kind):
     return {"pop": au.sfx_pop, "tick": au.sfx_tick, "paper": lambda: au.sfx_swish(0.28), "blip": au.sfx_blip}[kind]()
 
 
-def build_audio(tm, sfx_events, lift_at):
+def build_audio(tm, sfx_events, lift_at, vel=0.55):
     import audio as au
     import align_clips as ac
     import narrated as nr
@@ -628,9 +629,10 @@ def build_audio(tm, sfx_events, lift_at):
     x = ac.load(os.path.normpath(os.path.join(ROOT, "timing", a["file"])))
     voice = tts.voice_chain(x[int(a["cut"] * au.SR):])
     music, sfx = au.Bus(tm.total), au.Bus(tm.total)
-    nr.groove(music, 0.0, lift_at, 88, CALM, drums=False, keys="ep", vel=0.55, octave=12)
-    nr.groove(music, lift_at, tm.total, 88, LIFT, drums=True, keys="ep", vel=0.55, octave=12,
-              hats=True, kick_pattern=(0, 2))
+    nr.groove(music, 0.0, lift_at, 88, CALM, drums=False, keys="ep", vel=vel, octave=12)
+    if lift_at < tm.total:
+        nr.groove(music, lift_at, tm.total, 88, LIFT, drums=True, keys="ep", vel=vel, octave=12,
+                  hats=True, kick_pattern=(0, 2))
     for t, kind, gain in sfx_events:
         sfx.add(sfx_sound(kind), max(0.0, t), gain)
     path = os.path.join(OUT_DIR, f"{tm.name}.wav")
@@ -640,12 +642,17 @@ def build_audio(tm, sfx_events, lift_at):
 
 
 # ---------------------------------------------------------------- output
-def render(tm, scenes, preview=(), sfx_events=(), lift_at=None, with_audio=True):
-    """Write the MP4 (narration + BGM + SFX unless with_audio=False) plus the timing table and SRT."""
+def render(tm, scenes, preview=(), sfx_events=(), lift_at=None, with_audio=True, ai_note=True, music_vel=0.55):
+    """Write the MP4 (narration + BGM + SFX unless with_audio=False) plus the timing table and SRT.
+
+    lift_at=None keeps the BGM without drums to the end; ai_note=False drops the AI-image notice
+    (for videos that use no generated images).
+    """
     out = os.path.join(OUT_DIR, tm.data["video"])
     write_tables(tm)
-    wav = build_audio(tm, sfx_events, lift_at if lift_at is not None else tm.total) if with_audio else None
-    total = render_video(scenes, wav, out, preview_times=preview,
-                         global_overlays=[disclaimer(tm.total), Subtitles(tm.subs, telops=tm.data.get("telops", []))])
+    wav = (build_audio(tm, sfx_events, lift_at if lift_at is not None else tm.total, music_vel)
+           if with_audio else None)
+    overlays = ([disclaimer(tm.total)] if ai_note else []) + [Subtitles(tm.subs, telops=tm.data.get("telops", []))]
+    total = render_video(scenes, wav, out, preview_times=preview, global_overlays=overlays)
     assert abs(total - tm.total) < 1e-6, (total, tm.total)
     return out

@@ -116,7 +116,7 @@ def fit(name):
     wpath = os.path.join(NARR, f"{name}_words.json")
     words = json.load(open(wpath, encoding="utf-8"))["words"] if os.path.exists(wpath) else []
     voice = {cid: (a + shift, b + shift) for (cid, _), (a, b) in zip(cues, spans)}
-    total = round(spans[-1][1] + shift + TAIL, 2)
+    total = round(spans[-1][1] + shift + plan.get("tail", TAIL), 2)
 
     starts = [0.0] + [round(voice[cid][0] - SCENE_LEAD, 2) for sid, cid, _ in plan["scenes"][1:]]
     scenes = [{"id": sid, "start": s, "end": e, "note": note}
