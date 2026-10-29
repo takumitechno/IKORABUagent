@@ -9,7 +9,8 @@ from edu import ORANGE, at
 from mc import GREY, INK, TEAL, W, YELLOW, label
 
 NAME = "career_edu_2_02_annual_income"
-AI_NOTE = False
+AI_NOTE = True
+NOTE_XY = edu.NOTE_XY
 CARD_Y = 760
 COL_W, HEAD_H, ROW_H = 400, 92, 112
 
@@ -51,7 +52,7 @@ def build(tm):
 
     # s1: the listing's annual-income example, with a small 「入社3年目」
     sid = "s1"
-    scenes.append(edu.scene(tm, sid, [tm.telop(sid, "hook", size=82), at(W / 2, CARD_Y, card, 0.0)]))
+    scenes.append(edu.scene(tm, sid, [edu.telop(tm, sid, "hook"), at(W / 2, CARD_Y, card, 0.0)], head=[(0, "p4_desk", (0, 0.315, 1, 0.53))]))
 
     # s2: zoom in on the small note — it is one senior employee's example
     sid = "s2"
@@ -59,12 +60,12 @@ def build(tm):
     ImageDraw.Draw(ring).rounded_rectangle((2, 2, 187, 59), 16, outline=YELLOW, width=6)
     big = mc.pill("入社3年目", 66, bg=YELLOW, fg=INK, padx=44, pady=18)
     link = Image.new("RGBA", (8, 110), YELLOW + (255,))
-    ov = [tm.telop(sid, "s2", size=80), at(W / 2, CARD_Y, card, -1.0),
+    ov = [edu.telop(tm, sid, "s2"), at(W / 2, CARD_Y, card, -1.0),
           mc.Highlight(ring, note_x, note_y, tm.mark(sid, "s2_note")),
           at(note_x, note_y + 86, link, tm.mark(sid, "s2_note") + 0.1, anim="fade"),
           at(note_x - 60, 1080, big, tm.mark(sid, "s2_note") + 0.15, anim="pop"),
           at(note_x - 60, 1195, label("＝ 先輩社員の一例", 48, 900, (255, 255, 255)), tm.mark(sid, "s2_senpai"))]
-    scenes.append(edu.scene(tm, sid, ov))
+    scenes.append(edu.scene(tm, sid, ov, head=[(0, "p4_explain", (0, 0.235, 1, 0.45))]))
 
     # s3: a senior's example vs. your own start (amounts only from the script; the rest is 要確認)
     sid = "s3"
@@ -73,23 +74,23 @@ def build(tm):
                                      [("賞与の条件：", INK), ("要確認", ORANGE)]], TEAL)
     ty = 820
     row = lambda k: ty - me.height / 2 + 40 + HEAD_H + ROW_H * (k + 0.5)   # noqa: E731
-    ov = [tm.telop(sid, "s3", size=80), at(300, ty, senpai, 0.15),
+    ov = [edu.telop(tm, sid, "s3"), at(300, ty, senpai, 0.15),
           at(300, ty + senpai.height / 2 + 6, edu.tag(), 0.35, anim="fade"),
           at(780, ty, me, tm.mark(sid, "s3_me")),
           mc.Highlight(mc.accent_frame(COL_W - 24, ROW_H - 18, YELLOW, r=18, width=6), 780, row(1), tm.mark(sid, "s3_pay")),
           mc.Highlight(mc.accent_frame(COL_W - 24, ROW_H - 18, YELLOW, r=18, width=6), 780, row(2), tm.mark(sid, "s3_bonus"))]
-    scenes.append(edu.scene(tm, sid, ov))
+    scenes.append(edu.scene(tm, sid, ov, head=[(0, "p4_desk", (0, 0.68, 1, 0.88)), (tm.mark(sid, "s3_pay"), "p6_office", (0, 0.03, 1, 0.23))]))
 
     # s4: the question to ask when checking conditions (two lines, timed with the voice)
     sid = "s4"
     bub, pad = bubble(2)
     by = 860
     top = by - bub.height / 2 + pad
-    ov = [tm.telop(sid, "s4", size=80), at(W / 2, 600, edu.dark_tag("条件の確認で使える質問"), 0.1),
+    ov = [edu.telop(tm, sid, "s4"), at(W / 2, 600, edu.dark_tag("条件の確認で使える質問"), 0.1),
           at(W / 2, by, bub, 0.25),
           at(W / 2, top + 100, edu.text_img("「{入社1年目の月給}と、", 52), tm.mark(sid, "s4_line1"), anim="fade"),
           at(W / 2, top + 196, edu.text_img("{賞与の条件}を教えてください」", 52), tm.mark(sid, "s4_line2"), anim="fade")]
-    scenes.append(edu.scene(tm, sid, ov))
+    scenes.append(edu.scene(tm, sid, ov, head=[(0, "p4_meeting", (0, 0.335, 1, 0.55))]))
 
     # s5: a future annual-income example ≠ your first year's income
     sid = "s5"
@@ -101,12 +102,12 @@ def build(tm):
             edu.paste_mid(img, label(ln, 46, 900, INK), pad + 190, pad + 80 + k * 58)
         edu.paste_mid(img, label(sub, 28, 700, GREY), pad + 190, pad + 210)
         return img
-    ov = [tm.telop(sid, "s5", size=76),
+    ov = [edu.telop(tm, sid, "s5"),
           at(300, 760, box("将来の\n年収例", "先輩社員の一例", (90, 100, 118)), 0.2),
           at(W / 2, 760, label("≠", 96, 900, YELLOW), tm.mark(sid, "s5_first") + 0.15, anim="pop"),
           at(780, 760, box("最初の1年の\n収入", "入社1年目の条件", TEAL), tm.mark(sid, "s5_first")),
           at(W / 2, 1010, mc.guide_band("分けて考える", w=620, h=110, size=50), tm.mark(sid, "s5_sep"))]
-    scenes.append(edu.scene(tm, sid, ov))
+    scenes.append(edu.scene(tm, sid, ov, head=[(0, "p4_desk", (0, 0.02, 1, 0.22))]))
     return scenes
 
 

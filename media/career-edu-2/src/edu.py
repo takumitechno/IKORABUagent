@@ -1,7 +1,8 @@
 """転職の教育ショート 第二弾（career_edu_2_*）: project paths, scene plans and diagram parts.
 
 Built on the MakeCareer tools (../../makecareer/src): same engine, fonts, colours, subtitles and sound.
-No people or generated images here — the diagrams carry each video.
+The diagrams carry each video; a photo strip at the top (people or just places, reused from media/IMAGES.md)
+changes every scene — and inside long scenes — so the screen never sits still.
 
     python3 edu.py fit career_edu_2_01_salary        # timing/<name>.json from the narration take
     python3 edu.py preview e01_salary 0.5 3.0 6.0     # contact sheet in out/preview/
@@ -25,8 +26,12 @@ from mc import GREY, INK, TEAL, YELLOW, Telop, clamp, font, label, pill  # noqa:
 ORANGE = (240, 160, 60)
 LINE = (214, 220, 230)
 SOFT = (238, 242, 247)
-AI_NOTE = False      # no generated images in this series
+AI_NOTE = True       # the header strips use AI stills
+NOTE_XY = (84, 204)  # notice sits inside the top-left of the header strip
 TAIL = 1.5           # short hold after the last word (no end card)
+HEAD = (60, 190, 1020, 560)          # header photo strip; the emphasis telop sits on its lower edge
+SFX_BOOST = 2.0      # card / item sounds at the first series' level
+OPENING_PING = 1.2   # attention sound on the first frame, about as loud as the narration
 
 
 def plan(scenes, telops, marks):
@@ -78,7 +83,8 @@ PLANS = {
          ("s3", "{会社ごとに}違う", ("scene", "s3")),
          ("s4", "{減らしたいこと}は？", ("scene", "s4")),
          ("s5", "働き方を決めてから{比較}", ("scene", "s5"))],
-        [("s2_sales", "p2b", None), ("s3_note", "p3", "会社"), ("s4_stand", "p4a", "立ち"), ("s4_people", "p4b", None),
+        [("s1_office", "p1", "事務"), ("s2_sales", "p2b", None), ("s3_note", "p3", "会社"), ("s4_stand", "p4a", "立ち"),
+         ("s4_people", "p4b", None),
          ("s5_check", "p5", "実際")]),
     "career_edu_2_05_self_pr": plan(
         [("s1", "p1", "空欄の自己PR欄"), ("s2", "p2", "普段の仕事の工夫を振り返る"),
@@ -105,8 +111,96 @@ def background():
     return _bg
 
 
-def scene(tm, sid, overlays):
-    return tm.scene(sid, background(), overlays)
+# stills for the header strip (media/IMAGES.md); masks blur stray text and logos
+IMG = {
+    "p3_phone": ("makecareer/img/v1_home_evening_phone.jpg", [(0.80, 0.76, 0.90, 0.81)]),
+    "p3_bakery": ("makecareer/img/v1_bakery_handing_bag.jpg", [(0.80, 0.71, 1.0, 0.81), (0.86, 0.92, 1.0, 1.0)]),
+    "p3_desk": ("makecareer/img/v1_home_morning_notebook.jpg", [(0.15, 0.78, 0.30, 0.85)]),
+    "p4_desk": ("makecareer/img/v2_office_desk_thinking.jpg", [(0.40, 0.82, 0.60, 0.95), (0.0, 0.68, 0.14, 0.96)]),
+    "p4_meeting": ("makecareer/img/v2_meeting_taking_notes.jpg", [(0.0, 0.76, 0.62, 0.88, 4)]),
+    "p4_explain": ("makecareer/img/v2_explaining_document.jpg", [(0.04, 0.44, 0.38, 0.62, 5), (0.04, 0.62, 0.60, 0.86),
+                                                                (0.08, 0.88, 0.70, 1.0)]),
+    "p1_pc": ("recruit-shorts/sales-to-jimu/img/a6_jimu_pc.jpg", [(0.66, 0.46, 0.92, 0.68, 6)]),
+    "p1_support": ("recruit-shorts/sales-to-jimu/img/a7_jimu_support.jpg", [(0.22, 0.75, 0.33, 0.84), (0.12, 0.80, 0.68, 1.0)]),
+    "p5_street": ("makecareer/img/v3_after_shift_street_dusk.jpg", []),
+    "p5_home": ("makecareer/img/v3_home_notebook_resume.jpg", [(0.0, 0.75, 0.47, 0.94)]),
+    "p5_serve": ("makecareer/img/v3_cafe_serving_customer.jpg", [(0.05, 0.56, 0.22, 0.67)]),
+    "p5_teach": ("makecareer/img/v3_cafe_teaching_coworker.jpg", [(0.85, 0.69, 1.0, 0.77)]),
+    "p6_office": ("makecareer/img/v4_office_desk_laptop.jpg", [(0.20, 0.36, 0.37, 0.46), (0.77, 0.33, 0.95, 0.42),
+                                                               (0.82, 0.72, 1.0, 0.98), (0.80, 0.67, 0.88, 0.73)]),
+    "p7_suggest": ("makecareer/img/v2r_shop_suggesting_items.jpg", [(0.70, 0.70, 1.0, 0.80)]),
+    "p7_teach": ("makecareer/img/v2r_shop_teaching_newcomer.jpg", [(0.33, 0.57, 0.70, 0.68, 5), (0.13, 0.83, 0.22, 0.89)]),
+}
+_strips = {}
+
+
+def strip(key, src):
+    """Crop of a still for the header box (widened to its aspect), cached."""
+    if (key, src) not in _strips:
+        name, masks = IMG[key]
+        _strips[(key, src)] = mc.Window(name, src, box=HEAD, look="neutral", masks=masks, bg_blur=0, bg_dark=0.0,
+                                        overscan=1.16).crop
+    return _strips[(key, src)]
+
+
+def _strip_shade(w, h):
+    """Darker bottom (telop) and a touch at the top (AI notice)."""
+    g = Image.new("L", (1, h))
+    for y in range(h):
+        k = y / (h - 1)
+        a = 70 * max(0.0, 1 - k / 0.18) + 205 * max(0.0, (k - 0.34) / 0.66) ** 1.2
+        g.putpixel((0, y), int(min(220, a)))
+    shade = Image.new("RGBA", (w, h), (6, 10, 24, 255))
+    shade.putalpha(g.resize((w, h)))
+    return shade
+
+
+class Header:
+    """Photo strip at the top: slow pan/zoom; fades in over the previous strip when it changes mid-scene."""
+
+    def __init__(self, key, src, t_in, t_out, dur, pan=((0.35, 0.5), (0.65, 0.5)), zoom=(1.0, 1.08)):
+        self.crop = strip(key, src)
+        self.t_in, self.t_out, self.dur, self.pan, self.zoom = t_in, t_out, dur, pan, zoom
+        bw, bh = HEAD[2] - HEAD[0], HEAD[3] - HEAD[1]
+        self.size = (bw, bh)
+        self.mask = mc.rounded_mask(bw, bh, 30)
+        self.shade = _strip_shade(bw, bh)
+        self.shadow, self.pad = mc.card(bw, bh, r=30, fill=(0, 0, 0, 0))
+
+    def draw(self, frame, t):
+        if not self.t_in <= t <= self.t_out:
+            return
+        p = clamp((t - max(0.0, self.t_in)) / max(0.1, self.dur))
+        a = 1.0 if self.t_in <= 0 else clamp((t - self.t_in) / 0.35)
+        cw, ch = self.crop.size
+        z = self.zoom[0] + (self.zoom[1] - self.zoom[0]) * p
+        vw, vh = cw / z, ch / z
+        cx = self.pan[0][0] + (self.pan[1][0] - self.pan[0][0]) * p
+        cy = self.pan[0][1] + (self.pan[1][1] - self.pan[0][1]) * p
+        x, y = clamp(cx) * (cw - vw), clamp(cy) * (ch - vh)
+        win = self.crop.resize(self.size, Image.BILINEAR, box=(x, y, x + vw, y + vh)).convert("RGBA")
+        win.alpha_composite(self.shade)
+        win.putalpha(self.mask.point(lambda v: int(v * a)))
+        if a >= 1.0:
+            frame.alpha_composite(self.shadow, (HEAD[0] - self.pad, HEAD[1] - self.pad))
+        frame.alpha_composite(win, (HEAD[0], HEAD[1]))
+
+
+def scene(tm, sid, overlays, head=()):
+    """head: [(local start, IMG key, crop), ...] — strips change at those times (the first starts the scene)."""
+    d = tm.dur(sid)
+    heads = []
+    for k, (t0, key, src) in enumerate(head):
+        t1 = head[k + 1][0] + 0.4 if k + 1 < len(head) else 1e9
+        pan = ((0.35, 0.5), (0.65, 0.5)) if k % 2 == 0 else ((0.65, 0.5), (0.35, 0.5))
+        heads.append(Header(key, src, t0 if k else -1.0, t1, d - t0, pan=pan))
+    return tm.scene(sid, background(), heads + list(overlays))
+
+
+def telop(tm, sid, tid):
+    """Emphasis telop on the lower edge of the header strip (two-line hooks a little smaller)."""
+    two = "\n" in tm.tel[tid]["text"]
+    return tm.telop(sid, tid, size=66 if two else 74, cy=460 if two else 500)
 
 
 def tag(text="説明用の例"):
@@ -347,7 +441,10 @@ def phone_icon(size=70, color=TEAL):
 
 
 def render(tm, scenes, preview, sfx):
-    return mc.render(tm, scenes, preview, sfx, lift_at=None, ai_note=AI_NOTE, music_vel=0.42)
+    """Attention sound on the first frame, card/item sounds at the first series' level, soft swish on scene changes."""
+    events = [(0.0, "ping", OPENING_PING)] + [(t, kind, min(0.4, g * SFX_BOOST)) for t, kind, g in sfx]
+    events += [(s["start"] - 0.06, "swish", 0.2) for s in tm.data["scenes"][1:]]
+    return mc.render(tm, scenes, preview, events, lift_at=None, ai_note=AI_NOTE, music_vel=0.42, note_xy=NOTE_XY)
 
 
 # ---------------------------------------------------------------- command line

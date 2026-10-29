@@ -168,7 +168,9 @@ MakeCareer の道具（`mc.py`、`fit_audio.py`、`preview.py`、`check.py`）�
   - そのシリーズ専用の図解の部品
 - 構成は `fit_audio.PLANS.update(PLANS)` で足してから `fit_audio.fit(名前)` を呼ぶ。動画ごとに `tail`（最後の言葉のあと何秒残すか）を決められる
 - 各動画のスクリプトには `NAME = "<時刻表の名前>"` を書く（`preview.py` がこれで時刻表を探す）
-- AI画像を使わない動画は、スクリプトに `AI_NOTE = False` と書き、`mc.render(..., ai_note=False)` にする（「※画像はAI生成によるイメージです」を出さない）
+- AI画像を使わない動画は、スクリプトに `AI_NOTE = False` と書き、`mc.render(..., ai_note=False)` にする（「※画像はAI生成によるイメージです」を出さない）。注記の位置を変えるときは `NOTE_XY` と `mc.render(..., note_xy=…)`
+- 効果音の種類には `ping`（注意音）と `swish`（場面転換の軽い音）もある。第二弾は最初のコマに `ping` を音量1.2（ナレーションと同じくらい）で入れている
+- 第二弾の画面上部の写真の帯は `edu.Header`。シーンごとに `edu.scene(..., head=[(開始秒, 画像の名前, 切り出し範囲), …])` で切り替える（人物の顔・手元・背景だけ、を交互に）
 - BGM にドラムを入れないときは `lift_at=None` にする。`music_vel` で BGM の大きさを決める（第二弾は0.42）
 - `career-edu-2` では、コマンドを `python3 edu.py fit|preview|check …` で呼ぶ。`preview.py` は場所を指定して読み込む（営業→事務のフォルダにも同じ名前の `preview.py` があり、名前で読み込むとそちらが先に読まれる）
 

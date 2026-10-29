@@ -19,7 +19,8 @@ def sheet(module, times, cols=6, tile=(360, 640)):
     tm = mc.Timing(name)
     scenes = mod.build(tm)
     build_timeline(scenes)
-    overlays = (([mc.disclaimer(tm.total)] if getattr(mod, "AI_NOTE", True) else [])
+    xy = getattr(mod, "NOTE_XY", None)
+    overlays = (([mc.disclaimer(tm.total, xy, 24 if xy else 27)] if getattr(mod, "AI_NOTE", True) else [])
                 + [mc.Subtitles(tm.subs, telops=tm.data.get("telops", []))])
     fin = Finisher()
     tiles = []

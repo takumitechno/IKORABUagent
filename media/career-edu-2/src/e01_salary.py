@@ -9,7 +9,8 @@ from edu import ORANGE, at
 from mc import GREY, INK, MINT, TEAL, W, YELLOW, label
 
 NAME = "career_edu_2_01_salary"
-AI_NOTE = False
+AI_NOTE = True
+NOTE_XY = edu.NOTE_XY
 BAR_X, BAR_W, BAR_H = 130, 820, 96
 CARD_Y = 760
 ROWS = [TEAL, YELLOW, (250, 214, 140), (250, 214, 140)]
@@ -89,37 +90,37 @@ def build(tm):
 
     # s1: the listing shows only the total
     sid = "s1"
-    scenes.append(edu.scene(tm, sid, [tm.telop(sid, "hook", size=82), at(W / 2, CARD_Y, card, 0.0),
-                                      at(W / 2, 1060, hidden_breakdown(), 0.3, anim="fade")]))
+    scenes.append(edu.scene(tm, sid, [edu.telop(tm, sid, "hook"), at(W / 2, CARD_Y, card, 0.0),
+                                      at(W / 2, 1060, hidden_breakdown(), 0.3, anim="fade")], head=[(0, "p3_phone", (0, 0.395, 1, 0.61))]))
 
     # s2: 25万円 = 基本給20万円 + 固定残業代5万円 (bar widths 20:5; nothing added on top of 25)
     sid = "s2"
-    ov = [tm.telop(sid, "s2", size=80), at(W / 2, CARD_Y, card, -1.0),
+    ov = [edu.telop(tm, sid, "s2"), at(W / 2, CARD_Y, card, -1.0),
           bar(1050, tm.mark(sid, "s2_base"), tm.mark(sid, "s2_fixed")),
           at(fixed_cx, 1130, label("固定残業代", 32, 700, (255, 255, 255)), tm.mark(sid, "s2_fixed") + 0.3, anim="fade"),
           at(W / 2, 1205, equation(), tm.mark(sid, "s2_total"), anim="up")]
-    scenes.append(edu.scene(tm, sid, ov))
+    scenes.append(edu.scene(tm, sid, ov, head=[(0, "p3_phone", (0.2, 0.47, 1.0, 0.67)), (tm.mark(sid, "s2_total"), "p3_bakery", (0.0, 0.22, 0.6, 0.36))]))
 
     # s3: what to check about the fixed overtime part
     sid = "s3"
-    ov = [tm.telop(sid, "s3", size=78), bar(640, -1.0, -1.0),
+    ov = [edu.telop(tm, sid, "s3"), bar(640, -1.0, -1.0),
           at(fixed_cx, 722, label("固定残業代", 32, 700, (255, 255, 255)), -1.0, anim="fade"),
           mc.Highlight(mc.accent_frame(int(BAR_W * 5 / 25), BAR_H, YELLOW, r=14), fixed_cx, 640, 0.1),
           at(W / 2, 870, edu.q_card("{何時間分}？"), tm.mark(sid, "s3_hours")),
           at(W / 2, 1050, edu.q_card("{超えた分}の支払いは？"), tm.mark(sid, "s3_over"))]
-    scenes.append(edu.scene(tm, sid, ov))
+    scenes.append(edu.scene(tm, sid, ov, head=[(0, "p3_bakery", (0, 0.295, 1, 0.51))]))
 
     # s4: compare the same items side by side (no amount is invented for the current payslip)
     sid = "s4"
     now = pay_column("今の給与明細", [None] * 4, (90, 100, 118))
     new = pay_column("転職先の給与条件", ["20万円", "5万円", ("要確認", ORANGE), ("要確認", ORANGE)], TEAL)
-    ty = 820
-    ov = [tm.telop(sid, "s4", size=80),
+    ty = 852
+    ov = [edu.telop(tm, sid, "s4"),
           at(300, ty, now, tm.mark(sid, "s4_now")),
           Links(ty - now.height / 2 + 40 + HEAD_H, tm.mark(sid, "s4_same") - 0.05),
           at(780, ty, new, tm.mark(sid, "s4_same")),
           at(780, ty + new.height / 2 + 6, edu.tag(), tm.mark(sid, "s4_same") + 0.2, anim="fade")]
-    scenes.append(edu.scene(tm, sid, ov))
+    scenes.append(edu.scene(tm, sid, ov, head=[(0, "p3_desk", (0, 0.62, 1, 0.82))]))
 
     # s5: not just the total — the breakdown too
     sid = "s5"
@@ -134,9 +135,9 @@ def build(tm):
     d.rectangle((bx + bw * 20 / 25, by, bx + bw, by + 76), fill=YELLOW)
     edu.paste_mid(parts, label("基本給 20万円", 36, 900, (255, 255, 255)), bx + bw * 10 / 25, by + 38)
     edu.paste_mid(parts, label("5万円", 34, 900, INK), bx + bw * 22.5 / 25, by + 38)
-    ov = [tm.telop(sid, "s5", size=80), at(W / 2, 650, total, 0.2), at(W / 2, 770, edu.down_arrow(48), 0.45),
+    ov = [edu.telop(tm, sid, "s5"), at(W / 2, 650, total, 0.2), at(W / 2, 770, edu.down_arrow(48), 0.45),
           at(W / 2, 935, parts, 0.6)]
-    scenes.append(edu.scene(tm, sid, ov))
+    scenes.append(edu.scene(tm, sid, ov, head=[(0, "p3_desk", (0, 0.355, 1, 0.57))]))
     return scenes
 
 

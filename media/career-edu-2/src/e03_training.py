@@ -9,8 +9,9 @@ from edu import at
 from mc import GREY, INK, TEAL, W, YELLOW, label
 
 NAME = "career_edu_2_03_training"
-AI_NOTE = False
-CARD_Y = 700
+AI_NOTE = True
+NOTE_XY = edu.NOTE_XY
+CARD_Y = 728
 ITEMS = ["最初の仕事", "教えてくれる人", "困ったときの質問先"]
 
 
@@ -58,39 +59,39 @@ def build(tm):
 
     # s1: the listing says 「研修あり」
     sid = "s1"
-    scenes.append(edu.scene(tm, sid, [tm.telop(sid, "hook", size=80), at(W / 2, CARD_Y, card, 0.0)]))
+    scenes.append(edu.scene(tm, sid, [edu.telop(tm, sid, "hook"), at(W / 2, CARD_Y, card, 0.0)], head=[(0, "p5_street", (0, 0.265, 1, 0.48))]))
 
     # s2: open the label — what does it actually involve?
     sid = "s2"
     ring = Image.new("RGBA", (320, 108), (0, 0, 0, 0))
     ImageDraw.Draw(ring).rounded_rectangle((3, 3, 317, 105), 52, outline=YELLOW, width=6)
-    ov = [tm.telop(sid, "s2", size=80), at(W / 2, CARD_Y, card, -1.0),
+    ov = [edu.telop(tm, sid, "s2"), at(W / 2, CARD_Y, card, -1.0),
           mc.Highlight(ring, chip_x, chip_y, 0.15),
           edu.Unroll(detail_panel(), W / 2, CARD_Y + card.height / 2 - 10, tm.mark(sid, "s2_open") - 0.2, 0.6)]
-    scenes.append(edu.scene(tm, sid, ov))
+    scenes.append(edu.scene(tm, sid, ov, head=[(0, "p5_teach", (0, 0.305, 1, 0.52))]))
 
     # s3: the interview question (the key part highlighted)
     sid = "s3"
     q, pad = question()
     qy = 860
     top = qy - q.height / 2 + pad
-    ov = [tm.telop(sid, "s3", size=80),
-          at(W / 2, 590, edu.dark_tag("面接で聞く質問の例"), 0.1),
+    ov = [edu.telop(tm, sid, "s3"),
+          at(W / 2, 606, edu.dark_tag("面接で聞く質問の例"), 0.1),
           at(W / 2, qy, q, 0.2),
           at(W / 2, top + 80, edu.text_img("「未経験で入った方は、", 50), 0.35, anim="fade"),
           at(W / 2, top + 170, edu.text_img("{最初どんな仕事から}", 56), tm.mark(sid, "s3_q2"), anim="fade"),
           at(W / 2, top + 252, edu.text_img("{始めていますか？}」", 56), tm.mark(sid, "s3_q2") + 0.35, anim="fade")]
-    scenes.append(edu.scene(tm, sid, ov))
+    scenes.append(edu.scene(tm, sid, ov, head=[(0, "p5_home", (0, 0.315, 1, 0.53))]))
 
     # s4: three things to confirm — the list fills in as each is said
     sid = "s4"
     ys = [640, 800, 960]
     checks = [0.25, tm.mark(sid, "s4_who"), tm.mark(sid, "s4_ask")]
-    ov = [tm.telop(sid, "s4", size=80)]
+    ov = [edu.telop(tm, sid, "s4")]
     for k, (text, y) in enumerate(zip(ITEMS, ys)):
         ov.append(at(W / 2, y, edu.check_row(text), 0.1 + 0.1 * k))
         ov.append(at(W / 2, y, edu.check_row(text, checked=True), checks[k], anim="fade", dur_in=0.25))
-    scenes.append(edu.scene(tm, sid, ov))
+    scenes.append(edu.scene(tm, sid, ov, head=[(0, "p5_teach", (0, 0.46, 1, 0.66)), (tm.mark(sid, "s4_ask"), "p5_serve", (0, 0.02, 1, 0.22))]))
 
     # s5: from "is there training?" to "can I learn the job here?"
     sid = "s5"
@@ -105,10 +106,10 @@ def build(tm):
         p = mc.pill(text, 32, bg=(232, 247, 244), fg=TEAL, weight=900, padx=14, pady=10)
         big.alpha_composite(p, (x, pad2 + 190))
         x += p.width + 14
-    ov = [tm.telop(sid, "s5", size=80), at(W / 2, 620, small, 0.15),
+    ov = [edu.telop(tm, sid, "s5"), at(W / 2, 632, small, 0.15),
           at(W / 2, 740, edu.down_arrow(50), tm.mark(sid, "s5_env") - 0.15),
           at(W / 2, 935, big, tm.mark(sid, "s5_env"))]
-    scenes.append(edu.scene(tm, sid, ov))
+    scenes.append(edu.scene(tm, sid, ov, head=[(0, "p5_serve", (0, 0.305, 1, 0.52))]))
     return scenes
 
 

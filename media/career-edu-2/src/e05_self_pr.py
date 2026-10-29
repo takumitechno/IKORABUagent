@@ -9,7 +9,8 @@ from edu import at
 from mc import GREY, INK, TEAL, W, YELLOW, label
 
 NAME = "career_edu_2_05_self_pr"
-AI_NOTE = False
+AI_NOTE = True
+NOTE_XY = edu.NOTE_XY
 ACTIONS = [("予算を聞いた", "s3_budget"), ("商品の違いを説明した", "s3_explain"), ("提案した", "s3_propose")]
 
 
@@ -39,27 +40,27 @@ def build(tm):
     # s1: in front of an empty 自己PR box, the typing has stopped
     sid = "s1"
     form, (cx, cy, ch) = empty_form()
-    fy = 820
+    fy = 862
     ox, oy = W / 2 - form.width / 2, fy - form.height / 2
-    scenes.append(edu.scene(tm, sid, [tm.telop(sid, "hook", size=80), at(W / 2, fy, form, 0.0),
-                                      mc.Blink(ox + cx, oy + cy, ch, 0.3)]))
+    scenes.append(edu.scene(tm, sid, [edu.telop(tm, sid, "hook"), at(W / 2, fy, form, 0.0),
+                                      mc.Blink(ox + cx, oy + cy, ch, 0.3)], head=[(0, "p3_desk", (0, 0.62, 0.75, 0.82))]))
 
     # s2: look back at what you did on ordinary days
     sid = "s2"
     page, ppad = mc.notebook(860, 520, title="いつもの仕事を振り返る", lines_from=232, gap=100)
     pd = ImageDraw.Draw(page)
     pd.text((ppad + 150, ppad + 136), "工夫していたことは？", font=mc.font(44, 900), fill=TEAL)
-    scenes.append(edu.scene(tm, sid, [tm.telop(sid, "s2", size=80), at(W / 2, 830, page, 0.15)]))
+    scenes.append(edu.scene(tm, sid, [edu.telop(tm, sid, "s2"), at(W / 2, 830, page, 0.15)], head=[(0, "p5_home", (0.05, 0.58, 0.85, 0.78))]))
 
     # s3: the same experience, split into what was actually done
     sid = "s3"
     before, pad = mc.white_card(820, 120, r=26, alpha=220)
     edu.paste_mid(before, label("「接客を担当しました」", 50, 900, GREY), pad + 410, pad + 60)
-    ov = [tm.telop(sid, "s3", size=80), at(W / 2, 600, before, 0.1),
-          at(W / 2, 712, edu.down_arrow(44), 0.6)]
+    ov = [edu.telop(tm, sid, "s3"), at(W / 2, 628, before, 0.1),
+          at(W / 2, 734, edu.down_arrow(44), 0.6)]
     for k, ((text, key), y) in enumerate(zip(ACTIONS, (830, 960, 1090))):
         ov.append(at(W / 2, y, action_row(k + 1, text), tm.mark(sid, key)))
-    scenes.append(edu.scene(tm, sid, ov))
+    scenes.append(edu.scene(tm, sid, ov, head=[(0, "p7_suggest", (0, 0.28, 1, 0.495)), (tm.mark(sid, "s3_explain"), "p7_suggest", (0.1, 0.50, 1, 0.68))]))
 
     # s4: before → after (the after text in short lines; an example to rewrite with your own experience)
     sid = "s4"
@@ -71,18 +72,18 @@ def build(tm):
     a.alpha_composite(mc.pill("後", 28, bg=TEAL, padx=16, pady=8), (pad2 + 40, pad2 + 30))
     for k, ln in enumerate(("お客さまの{予算を聞き}、", "{商品の違いを説明して}", "{提案しました}")):
         a.alpha_composite(edu.text_img(ln, 50), (pad2 + 120, pad2 + 30 + k * 96))
-    ov = [tm.telop(sid, "s4", size=80), at(W / 2, 590, b, 0.1), at(W / 2, 690, edu.down_arrow(44), 0.3),
-          at(W / 2, 880, a, 0.45),
-          at(W / 2, 1110, edu.tag("例文：自分が実際にしたことに置き換えて使う"), 0.8, anim="fade")]
-    scenes.append(edu.scene(tm, sid, ov))
+    ov = [edu.telop(tm, sid, "s4"), at(W / 2, 626, b, 0.1), at(W / 2, 718, edu.down_arrow(44), 0.3),
+          at(W / 2, 897, a, 0.45),
+          at(W / 2, 1124, edu.tag("例文：自分が実際にしたことに置き換えて使う"), 0.8, anim="fade")]
+    scenes.append(edu.scene(tm, sid, ov, head=[(0, "p7_teach", (0, 0.28, 1, 0.495))]))
 
     # s5: not adding big achievements — making the usual work concrete
     sid = "s5"
     big, pad = mc.white_card(820, 110, r=26, alpha=190)
     edu.paste_mid(big, label("大きな実績を足す", 46, 700, GREY), pad + 410, pad + 55)
-    ov = [at(W / 2, 600, big, 0.15), at(W / 2, 720, label("ではなく", 40, 700, (255, 255, 255)), 0.4, anim="fade"),
-          at(W / 2, 860, mc.flow_card("実際の行動を具体化する", 820, 150, None, 58, accent=YELLOW), tm.mark(sid, "s5_daily") - 0.3)]
-    scenes.append(edu.scene(tm, sid, ov))
+    ov = [at(W / 2, 618, big, 0.15), at(W / 2, 736, label("ではなく", 40, 700, (255, 255, 255)), 0.4, anim="fade"),
+          at(W / 2, 876, mc.flow_card("実際の行動を具体化する", 820, 150, None, 58, accent=YELLOW), tm.mark(sid, "s5_daily") - 0.3)]
+    scenes.append(edu.scene(tm, sid, ov, head=[(0, "p7_teach", (0, 0.02, 1, 0.22))]))
     return scenes
 
 

@@ -152,9 +152,10 @@ class Subtitles:
                 paste_center(frame, img, W / 2, self.cy, clamp(min((t - a) / 0.12, (b - t) / 0.12)))
 
 
-def disclaimer(total):
-    img = note_pill(AI_NOTE, size=27)
-    return Static(img, 0.0, total, xy=(int((W - img.width) / 2), 200 - img.height // 2))
+def disclaimer(total, xy=None, size=27):
+    """AI-image notice; centred at y=200 unless xy (top-left corner) is given."""
+    img = note_pill(AI_NOTE, size=size)
+    return Static(img, 0.0, total, xy=xy or (int((W - img.width) / 2), 200 - img.height // 2))
 
 
 def pill(text, size=34, bg=TEAL, fg=(255, 255, 255), weight=900, padx=28, pady=12):
@@ -617,7 +618,8 @@ LIFT = [(["F2", "A2", "C3", "E3"], "F1"), (["G2", "B2", "D3", "E3"], "G1"),
 
 def sfx_sound(kind):
     import audio as au
-    return {"pop": au.sfx_pop, "tick": au.sfx_tick, "paper": lambda: au.sfx_swish(0.28), "blip": au.sfx_blip}[kind]()
+    return {"pop": au.sfx_pop, "tick": au.sfx_tick, "paper": lambda: au.sfx_swish(0.28), "blip": au.sfx_blip,
+            "ping": au.sfx_ping, "swish": lambda: au.sfx_swish(0.22)}[kind]()
 
 
 def build_audio(tm, sfx_events, lift_at, vel=0.55):
@@ -642,7 +644,8 @@ def build_audio(tm, sfx_events, lift_at, vel=0.55):
 
 
 # ---------------------------------------------------------------- output
-def render(tm, scenes, preview=(), sfx_events=(), lift_at=None, with_audio=True, ai_note=True, music_vel=0.55):
+def render(tm, scenes, preview=(), sfx_events=(), lift_at=None, with_audio=True, ai_note=True, music_vel=0.55,
+           note_xy=None):
     """Write the MP4 (narration + BGM + SFX unless with_audio=False) plus the timing table and SRT.
 
     lift_at=None keeps the BGM without drums to the end; ai_note=False drops the AI-image notice
@@ -652,7 +655,8 @@ def render(tm, scenes, preview=(), sfx_events=(), lift_at=None, with_audio=True,
     write_tables(tm)
     wav = (build_audio(tm, sfx_events, lift_at if lift_at is not None else tm.total, music_vel)
            if with_audio else None)
-    overlays = ([disclaimer(tm.total)] if ai_note else []) + [Subtitles(tm.subs, telops=tm.data.get("telops", []))]
+    overlays = (([disclaimer(tm.total, note_xy, 24 if note_xy else 27)] if ai_note else [])
+                + [Subtitles(tm.subs, telops=tm.data.get("telops", []))])
     total = render_video(scenes, wav, out, preview_times=preview, global_overlays=overlays)
     assert abs(total - tm.total) < 1e-6, (total, tm.total)
     return out

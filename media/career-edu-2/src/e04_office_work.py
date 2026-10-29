@@ -9,7 +9,8 @@ from edu import at
 from mc import BLUE, TEAL, W, YELLOW, label
 
 NAME = "career_edu_2_04_office_work"
-AI_NOTE = False
+AI_NOTE = True
+NOTE_XY = edu.NOTE_XY
 TABLE_Y = 800
 COLS = [("一般事務", ["書類の管理", "データの管理"], TEAL, 300), ("営業事務", ["見積もり", "注文の処理"], BLUE, 780)]
 
@@ -34,19 +35,19 @@ def build(tm):
 
     # s1: from customer service to office work — "just data entry?"
     sid = "s1"
-    ov = [tm.telop(sid, "hook", size=88),
+    ov = [edu.telop(tm, sid, "hook"),
           at(330, 700, edu.store_icon(190), 0.0, anim="fade"), at(330, 830, label("接客", 46, 900, (255, 255, 255)), 0.0, anim="fade"),
           at(W / 2, 720, mc.arrow(120, 56), 0.15, anim="left"),
           at(750, 700, edu.desk_icon(190), 0.25, anim="fade"), at(750, 830, label("事務", 46, 900, (255, 255, 255)), 0.25, anim="fade"),
           at(W / 2, 1040, edu.q_card("事務＝{入力だけ}の仕事？", 820, 132, 50), 0.45)]
-    scenes.append(edu.scene(tm, sid, ov))
+    scenes.append(edu.scene(tm, sid, ov, head=[(0, "p7_suggest", (0, 0.02, 1, 0.22)), (tm.mark(sid, "s1_office"), "p1_pc", (0, 0.02, 1, 0.22))]))
 
     # s2: examples of what each office role does
     sid = "s2"
     (left, lx), (right, rx) = table_columns()
-    ov = [tm.telop(sid, "s2", size=80), at(W / 2, 575, edu.dark_tag("仕事内容の一例"), 0.1),
+    ov = [edu.telop(tm, sid, "s2"), at(W / 2, 604, edu.dark_tag("仕事内容の一例"), 0.1),
           at(lx, TABLE_Y, left, 0.15), at(rx, TABLE_Y, right, tm.mark(sid, "s2_sales"))]
-    scenes.append(edu.scene(tm, sid, ov))
+    scenes.append(edu.scene(tm, sid, ov, head=[(0, "p1_pc", (0, 0.415, 1, 0.63))]))
 
     # s3: phone work and scope differ by company — one note across both columns (not two separate worlds)
     sid = "s3"
@@ -56,31 +57,31 @@ def build(tm):
     band.alpha_composite(edu.text_img("電話対応・担当範囲は", 44), (pad + 136, pad + 24))
     band.alpha_composite(edu.text_img("{会社ごとに異なる}", 52), (pad + 136, pad + 86))
     col_top = TABLE_Y - left.height / 2 + 40
-    ov = [tm.telop(sid, "s3", size=80), at(W / 2, 575, edu.dark_tag("仕事内容の一例"), -1.0),
+    ov = [edu.telop(tm, sid, "s3"), at(W / 2, 604, edu.dark_tag("仕事内容の一例"), -1.0),
           at(lx, TABLE_Y, left, -1.0), at(rx, TABLE_Y, right, -1.0),
           at(lx + 150, col_top + 48, edu.phone_icon(72, YELLOW), 0.15, anim="pop"),
           at(rx + 150, col_top + 48, edu.phone_icon(72, YELLOW), 0.3, anim="pop"),
           at(W / 2, TABLE_Y + left.height / 2 + 50, band, tm.mark(sid, "s3_note"))]
-    scenes.append(edu.scene(tm, sid, ov))
+    scenes.append(edu.scene(tm, sid, ov, head=[(0, "p1_support", (0, 0.26, 1, 0.475))]))
 
     # s4: shrink the table and sort out what you want to reduce (wishes to check, not a quiz)
     sid = "s4"
     small = table_image()
     small = small.resize((int(small.width * 0.56), int(small.height * 0.56)), Image.LANCZOS)
-    ov = [tm.telop(sid, "s4", size=80), at(W / 2, 610, small, 0.0, anim="fade"),
+    ov = [edu.telop(tm, sid, "s4"), at(W / 2, 668, small, 0.0, anim="fade"),
           at(W / 2, 800, edu.dark_tag("確認したい希望"), 0.2),
           at(W / 2, 930, edu.check_row("{立ち仕事}を減らしたい", w=820, h=118), tm.mark(sid, "s4_stand")),
           at(W / 2, 1090, edu.check_row("{人とのやり取り}を減らしたい", w=820, h=118), tm.mark(sid, "s4_people"))]
-    scenes.append(edu.scene(tm, sid, ov))
+    scenes.append(edu.scene(tm, sid, ov, head=[(0, "p5_serve", (0, 0.305, 1, 0.52)), (tm.mark(sid, "s4_people"), "p7_suggest", (0, 0.28, 1, 0.495))]))
 
     # s5: decide what to change first, then compare the actual duties
     sid = "s5"
-    ov = [tm.telop(sid, "s5", size=80),
+    ov = [edu.telop(tm, sid, "s5"),
           at(W / 2, 660, mc.flow_card("変えたい働き方", 820, 140, edu.check_box(70, True), 54), 0.2),
           at(W / 2, 800, edu.down_arrow(50), tm.mark(sid, "s5_check") - 0.15),
           at(W / 2, 950, mc.flow_card("実際の仕事内容を確認", 820, 140, mc.search_icon(70, TEAL), 54, accent=YELLOW),
              tm.mark(sid, "s5_check"))]
-    scenes.append(edu.scene(tm, sid, ov))
+    scenes.append(edu.scene(tm, sid, ov, head=[(0, "p6_office", (0, 0.335, 1, 0.55))]))
     return scenes
 
 
