@@ -14,7 +14,7 @@ from engine import ease_out_cubic
 from mc import GREY, INK, TEAL, W, YELLOW, clamp, font, label
 
 NAME = "career_edu_3_04_savings"
-AI_NOTE = True
+AI_NOTE = edu3.AI_NOTE
 NOTE_XY = None
 CARD_CY = 905
 BASE_Y, MAX_H, BAR_W = 1100, 330, 150

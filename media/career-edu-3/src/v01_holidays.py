@@ -9,7 +9,7 @@ from edu3 import ORANGE, SOFT, at, paste_mid
 from mc import GREY, INK, TEAL, W, YELLOW, label
 
 NAME = "career_edu_3_01_holidays"
-AI_NOTE = True
+AI_NOTE = edu3.AI_NOTE
 NOTE_XY = None
 DAYS = "月火水木金土日"
 WEEKEND = {5, 6}

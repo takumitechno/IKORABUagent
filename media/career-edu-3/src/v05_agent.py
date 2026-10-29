@@ -9,7 +9,7 @@ from edu3 import RED, at, paste_mid
 from mc import GREY, INK, TEAL, W, YELLOW, label
 
 NAME = "career_edu_3_05_agent"
-AI_NOTE = True
+AI_NOTE = edu3.AI_NOTE
 NOTE_XY = None
 AGENT_BG, ME_BG = (236, 240, 246), (222, 245, 240)
 NG_LINES = ["今回は結構です"]

@@ -9,7 +9,7 @@ from edu3 import at, paste_mid
 from mc import GREY, INK, TEAL, W, YELLOW, label
 
 NAME = "career_edu_3_02_job_types"
-AI_NOTE = True
+AI_NOTE = edu3.AI_NOTE
 NOTE_XY = None
 ROOT_CY, JOB_CY, TAG_CY = 640, 945, 1160
 JOB_X = (190, 540, 890)

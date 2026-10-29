@@ -10,7 +10,7 @@ from edu3 import RED, TEAL, at, paste_mid
 from mc import GREY, INK, W, YELLOW, label
 
 NAME = "career_edu_3_03_interview_reason"
-AI_NOTE = True
+AI_NOTE = edu3.AI_NOTE
 NOTE_XY = None
 NG_X, OK_X, COL_W, COL_CY = 282, 798, 480, 800
 NG_LINES = ["「前職は給料が", "低かったので", "辞めたいです」"]

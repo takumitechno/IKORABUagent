@@ -28,6 +28,7 @@ RED = (226, 78, 78)
 NG_BG = (250, 236, 236)
 OK_BG = (232, 247, 244)
 TAIL = 1.5
+AI_NOTE = False       # no on-screen AI-image notice (the platforms' AI-content label is set when posting instead)
 OPENING_ALERT = 1.0   # warning sound on the first frame, about as loud as the narration
 # quiet minor loop: Am(add9) - Fmaj7 - Dm7 - E7 (a little unresolved, for "watch out" topics)
 TENSE = [(["A2", "C3", "E3", "B3"], "A1"), (["F2", "A2", "C3", "E3"], "F1"),
@@ -277,7 +278,7 @@ def render(tm, scenes, preview, sfx):
     """Alert on the first frame, card/item sounds at the second series' level, soft swish on scene changes."""
     events = [(0.0, "alert", OPENING_ALERT)] + [(t, kind, min(0.4, g * edu.SFX_BOOST)) for t, kind, g in sfx]
     events += [(s["start"] - 0.06, "swish", 0.2) for s in tm.data["scenes"][1:]]
-    return mc.render(tm, scenes, preview, events, lift_at=None, ai_note=edu.AI_NOTE, music_vel=0.42,
+    return mc.render(tm, scenes, preview, events, lift_at=None, ai_note=AI_NOTE, music_vel=0.42,
                      note_xy=edu.NOTE_XY, chords=TENSE, pulse=PULSE)
 
 
