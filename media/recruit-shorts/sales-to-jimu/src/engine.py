@@ -75,8 +75,10 @@ class Photo:
 
     OVERSCAN = 1.25
 
-    def __init__(self, name, look="neutral", crop_top=0.0, crop_bottom=0.0, blur=0, darken=0.0):
+    def __init__(self, name, look="neutral", crop_top=0.0, crop_bottom=0.0, blur=0, darken=0.0, masks=()):
         im = Image.open(os.path.join(IMG_DIR, name)).convert("RGB")
+        for box in masks:  # (x0, y0, x1, y1[, radius]) as fractions of the source: blur stray text / logos
+            im = blur_region(im, box[:4], *box[4:])
         if crop_top or crop_bottom:
             t = int(im.height * crop_top)
             b = int(im.height * (1 - crop_bottom))
@@ -105,6 +107,14 @@ class Photo:
         x0 = clamp(x0, 0, self.bw - ww)
         y0 = clamp(y0, 0, self.bh - wh)
         return self.base.resize((W, H), Image.BILINEAR, box=(x0, y0, x0 + ww, y0 + wh))
+
+
+def blur_region(im, box, radius=14, feather=10):
+    x0, y0, x1, y1 = (int(v * n) for v, n in zip(box, (im.width, im.height, im.width, im.height)))
+    soft = im.filter(ImageFilter.GaussianBlur(radius))
+    m = Image.new("L", im.size, 0)
+    ImageDraw.Draw(m).rectangle((x0, y0, x1, y1), fill=255)
+    return Image.composite(soft, im, m.filter(ImageFilter.GaussianBlur(feather)))
 
 
 def handheld(t, amp=3.0, seed=0.0):
@@ -359,13 +369,15 @@ def render_video(scenes, audio_path, out_path, finisher=None, preview_times=(), 
     n = int(round(total * FPS))
     finisher = finisher or Finisher()
     os.makedirs(os.path.dirname(out_path), exist_ok=True)
+    # audio_path=None writes a video-only MP4 (no audio track at all)
     cmd = ["ffmpeg", "-y", "-loglevel", "error",
            "-f", "rawvideo", "-pix_fmt", "rgb24", "-s", f"{W}x{H}", "-r", str(FPS), "-i", "-",
-           "-i", audio_path,
+           *(["-i", audio_path] if audio_path else []),
            "-c:v", "libx264", "-preset", "medium", "-crf", "21", "-maxrate", "6M", "-bufsize", "12M",
            "-pix_fmt", "yuv420p", "-profile:v", "high",
-           "-af", "loudnorm=I=-14:TP=-1.5:LRA=11", "-c:a", "aac", "-b:a", "192k", "-ar", "48000",
-           "-movflags", "+faststart", "-shortest", out_path]
+           *(["-af", "loudnorm=I=-14:TP=-1.5:LRA=11", "-c:a", "aac", "-b:a", "192k", "-ar", "48000", "-shortest"]
+             if audio_path else ["-an"]),
+           "-movflags", "+faststart", out_path]
     proc = subprocess.Popen(cmd, stdin=subprocess.PIPE)
     prev_dir = os.path.join(os.path.dirname(out_path), "preview")
     os.makedirs(prev_dir, exist_ok=True)

@@ -6,7 +6,8 @@ Figma AI（`generate_image` / gemini-3.1-flash-image、768×1376）で作った�
 - どの案件の動画にも使い回してよい。動画には「※画像はAI生成によるイメージです」を表示する。
 - 同じ動画の中では、同じ人物・同じ服装の画像だけを使う（下の「人物」欄で揃える）。
 - 「注意」欄の文字やロゴは、トリミングかぼかしで隠す。
-- 元データは Figma ファイル `aYdR07np1iCkIrxSygz7pn` にもある（営業→事務の10枚はノード 1:2〜10:2、MakeCareerの10枚は 11:2〜20:2）。
+- 元データは Figma ファイル `aYdR07np1iCkIrxSygz7pn` にもある（営業→事務の10枚はノード 1:2〜10:2、MakeCareerの最初の10枚は 11:2〜20:2、追加の6枚は 22:2〜27:2）。
+- MakeCareerの追加6枚は無圧縮の元データも `makecareer/img/png/` にある。
 
 ## 人物
 
@@ -14,10 +15,12 @@ Figma AI（`generate_image` / gemini-3.1-flash-image、768×1376）で作った�
 |---|---|---|
 | P1 | 20代後半女性・肩下の髪（営業職として作成。場面ごとに服装が違う） | a1〜a8 |
 | P2 | 20代後半男性・短髪（営業職） | b1, b2 |
-| P3 | 20代半ば男性・紺のニット＋白T | v1_* |
+| P3 | 20代半ば男性・紺のニット＋白T（勤務中は黒いエプロン） | v1_* |
 | P4 | 20代女性・水色ブラウス＋グレーのカーディガン | v2_* |
 | P5 | 20代半ば女性・白シャツ、ひとつ結び | v3_* |
 | P6 | 20代後半男性・チャコールのジャケット＋白シャツ | v4_* |
+| P7 | 20代半ば女性・あご下のボブ、ベージュのニット＋緑のエプロン（雑貨店） | v2r_* |
+| P8 | 20代前半男性・少し癖のある短髪、丸めがね、グレーのパーカー | v5_* |
 
 P1 は場面ごとに服装が変わります（紺スーツ／白ブラウス／グレーのニット／ベージュのカーディガン／トレンチコート）。同じ服装どうしで組み合わせてください。
 
@@ -37,25 +40,31 @@ P1 は場面ごとに服装が変わります（紺スーツ／白ブラウス�
 | `recruit-shorts/sales-to-jimu/img/a8_sunset.jpg` | P1・ベージュのトレンチコート | 夕日の歩道を笑顔で歩く | 明るい（夕景）・前向き | 営業→事務 A・C・D | 左のビルの縦看板 |
 | `recruit-shorts/sales-to-jimu/img/b1_train.jpg` | P2・グレーのスーツ | 満員電車で新聞を読む | 普通・強め | 営業→事務 B・D | 上部の車内広告の文字 |
 | `recruit-shorts/sales-to-jimu/img/b2_street.jpg` | P2・白シャツ＋ネクタイ | 駅前で腕時計を見て急ぐ | 明るい・強め | 営業→事務 B・D | 背景の看板 |
-| `makecareer/img/v1_home_evening_phone.jpg` | P3 | 夜の自宅の机でスマホを見て考え込む | 普通（室内灯）・落ち着き | 未使用 | ノートPCのロゴ（右下） |
-| `makecareer/img/v1_home_morning_notebook.jpg` | P3 | 明るい朝の机でノートを開いて考える | 明るい・落ち着き | 未使用 | ノートPCのロゴ（左下） |
+| `makecareer/img/v1_home_evening_phone.jpg` | P3 | 夜の自宅の机でスマホを見て考え込む | 普通（室内灯）・落ち着き | MakeCareer ① | ノートPCのロゴ（右下） |
+| `makecareer/img/v1_home_morning_notebook.jpg` | P3 | 明るい朝の机でノートを開いて考える | 明るい・落ち着き | MakeCareer ①（ぼかした背景） | ノートPCのロゴ（左下） |
 | `makecareer/img/v2_office_desk_thinking.jpg` | P4 | オフィスの机でペンを持って考える | 明るい・落ち着き | 未使用 | マグの「COFFEE」 |
 | `makecareer/img/v2_meeting_taking_notes.jpg` | P4 | 打ち合わせで話を聞いてメモ | 明るい・落ち着き | 未使用 | — |
 | `makecareer/img/v2_explaining_document.jpg` | P4 | 同僚に資料を見せて説明 | 明るい・前向き | 未使用 | ノートPCの「DELL」ロゴ |
 | `makecareer/img/v3_after_shift_street_dusk.jpg` | P5・白シャツ＋ベージュのパンツ | 夕方、店の外でエプロンとトートを持って考える | 普通（夕方）・落ち着き | 未使用 | — |
-| `makecareer/img/v3_home_notebook_resume.jpg` | P5・白シャツ | 自宅の座卓でノートに書き出す（履歴書の用紙あり） | 明るい・落ち着き | 未使用 | 履歴書の用紙の文字（左下） |
-| `makecareer/img/v3_cafe_serving_customer.jpg` | P5・白シャツ＋紺のエプロン | カフェでお客様にカップを渡す | 明るい・前向き | 未使用 | — |
-| `makecareer/img/v3_cafe_teaching_coworker.jpg` | P5・白シャツ＋紺のエプロン | 新人にエスプレッソマシンを教える | 明るい・前向き | 未使用 | マシン右下の赤い文字 |
-| `makecareer/img/v4_train_window_evening.jpg` | P6 | 夕方の電車で窓の外を見て考える | 普通（夕方）・落ち着き | 未使用 | 右上の車内広告の文字 |
+| `makecareer/img/v3_home_notebook_resume.jpg` | P5・白シャツ | 自宅の座卓でノートに書き出す（履歴書の用紙あり） | 明るい・落ち着き | MakeCareer ③ | 履歴書の用紙の文字（左下） |
+| `makecareer/img/v3_cafe_serving_customer.jpg` | P5・白シャツ＋紺のエプロン | カフェでお客様にカップを渡す | 明るい・前向き | MakeCareer ③ | — |
+| `makecareer/img/v3_cafe_teaching_coworker.jpg` | P5・白シャツ＋紺のエプロン | 新人にエスプレッソマシンを教える | 明るい・前向き | MakeCareer ③ | マシン右下の赤い文字 |
+| `makecareer/img/v4_train_window_evening.jpg` | P6 | 夕方の電車で窓の外を見て考える | 普通（夕方）・落ち着き | MakeCareer ④ | 右上の車内広告の文字 |
+| `makecareer/img/v1_bakery_handing_bag.jpg` | P3・紺のニット＋黒いエプロン | パン屋のカウンターでお客様に紙袋を渡す | 明るい・落ち着き | MakeCareer ① | 右下と手前の値札カード |
+| `makecareer/img/v2r_shop_suggesting_items.jpg` | P7 | 雑貨店でお客様の話を聞き、マグカップを2つ見せて提案する | 明るい・前向き | MakeCareer ② | テーブルの紙タグ（右下） |
+| `makecareer/img/v2r_shop_teaching_newcomer.jpg` | P7（新人の男性も同じエプロン） | 店の裏で新人にクリップボードの手順を説明する | 明るい・前向き | MakeCareer ② | クリップボードの手書き、左下の箱のラベル |
+| `makecareer/img/v4_office_desk_laptop.jpg` | P6 | 明るいオフィスで慣れた様子でPC作業 | 明るい・落ち着き | MakeCareer ④ | 周りのPC画面（コード）、ノートPCのロゴ、電卓、手前の書類 |
+| `makecareer/img/v4_home_evening_notebook.jpg` | P6・白シャツ（ジャケットは椅子に。色味がやや違う） | 夜の自宅で一息つき、ノートを前に考える | 普通（電球色）・落ち着き | MakeCareer ④ | 本棚の背表紙 |
+| `makecareer/img/v5_home_reference_book.jpg` | P8 | 明るい自宅の机で参考書を開いて読む（表紙は無地） | 明るい・落ち着き | MakeCareer ⑤ | ノートPCの画面、メモの手書き、本の背、本棚の背表紙 |
 
-## MakeCareer 動画④⑤：今ある画像で足りるか
+## MakeCareer 5本での使い分け
 
-①〜③は今ある画像だけで作れます。④⑤は主人公の画像が足りません。
-
-| 動画 | 今ある画像で使える場面 | 足りない場面（新しく作るなら） |
+| 動画 | 主人公 | 使った画像 |
 |---|---|---|
-| ④ 今の会社での将来が見えない（P6） | 0〜3秒：`v4_train_window_evening` | 職場で働くP6（3〜8秒）、自宅でノートを開くP6（3〜8秒の後半・8〜20秒）。**2枚** |
-| ⑤ 資格も特別なスキルもない | 案A：P1 `a5_home` を0〜8秒（手元のスマホ→考える顔）に使う | 案A：明るい机でPCを開くP1（グレーのニット）**1枚**。ただし別の生成なので顔が完全には揃わない可能性あり。`a5_home` はスマホを持ったままなので「机に置く」動きは描けない |
-| | 案B：使わない（新しい人物で作る） | スマホを持つ手元＋考える顔（1枚をトリミングで兼用）、明るい机でPCを開く場面。**2枚** |
+| ① 01_yaritai_shigoto | P3 | `v1_bakery_handing_bag`（新規）、`v1_home_evening_phone`、`v1_home_morning_notebook`（背景） |
+| ② 02_jibun_no_tsuyomi | P7 | `v2r_shop_suggesting_items`、`v2r_shop_teaching_newcomer`（どちらも新規） |
+| ③ 03_seishain | P5 | `v3_home_notebook_resume`、`v3_cafe_serving_customer`、`v3_cafe_teaching_coworker` |
+| ④ 04_korekara_no_hatarakikata | P6 | `v4_office_desk_laptop`（新規）、`v4_train_window_evening`、`v4_home_evening_notebook`（新規） |
+| ⑤ 05_skill_fuan | P8 | `v5_home_reference_book`（新規） |
 
-①の主人公（P3）を⑤に回せば新規生成はゼロですが、①とほぼ同じ映像になるのでおすすめしません。
+未使用で残っているもの：P4（`v2_*` の3枚）、`v3_after_shift_street_dusk`、営業→事務の10枚。
