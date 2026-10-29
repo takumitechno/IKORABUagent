@@ -12,6 +12,7 @@ Backend is chosen with TTS_BACKEND:
 import hashlib
 import io
 import os
+import re
 import wave
 
 import numpy as np
@@ -102,6 +103,20 @@ def _atempo(x, speed):
 _clip_index = None
 
 
+class MissingClip(KeyError):
+    """A narration line that has not been recorded yet (review renders only)."""
+
+
+def placeholder(text, speed):
+    """Silent stand-in sized like the recorded voice (~7.5 morae/s at 1.0x); never cached."""
+    try:
+        import pyopenjtalk
+        n = len(re.sub(r"[、。！？!?\s’']", "", pyopenjtalk.g2p(text, kana=True)))
+    except Exception:
+        n = len(text)
+    return np.zeros(int(SR * n / (7.5 * speed)))
+
+
 def _clips(text, speed):
     import json
     global _clip_index
@@ -113,6 +128,8 @@ def _clips(text, speed):
                 for t, f in json.load(open(idx)).items():
                     _clip_index[t] = os.path.join(d, f)
     if text not in _clip_index:
+        if os.environ.get("CLIPS_ALLOW_MISSING"):
+            raise MissingClip(text)
         raise KeyError(f"no recorded clip for line: {text}")
     return _atempo(np.load(_clip_index[text]), speed), SR
 
@@ -141,6 +158,7 @@ def _voicevox(text, speed):
     return _read_wav_bytes(_vv.synthesis(q, style))
 
 
+MISSING = []  # lines rendered with a silent placeholder
 _kk = None
 
 
@@ -176,7 +194,11 @@ def synth(text, speed=1.0):
     if os.path.exists(path):
         return np.load(path)
     fn = {"openjtalk": _openjtalk, "fish": _fish, "voicevox": _voicevox, "kokoro": _kokoro, "clips": _clips}[be]
-    x, sr = fn(text, speed)
+    try:
+        x, sr = fn(text, speed)
+    except MissingClip:
+        MISSING.append(text)
+        return placeholder(text, speed)
     x = _to_48k(np.asarray(x, dtype=np.float64), sr)
     # trim leading/trailing silence
     thr = 0.01 * np.max(np.abs(x))
