@@ -347,6 +347,7 @@ STYLES = {
                                                            (["G2", "B2", "D3", "F#3"], "G1"), (["D3", "F#3", "A3", "C4"], "D2")]),
 }
 MUSIC_VEL = 0.5
+SFX_GAIN = 1.35           # card / number / accent sounds: clearly audible on a phone speaker
 VOICE_DUCK_MUSIC = 10.0   # dB the BGM drops under the voice
 VOICE_DUCK_SFX = 4.0      # dB the effects drop under the voice (they stay audible, words stay clear)
 
@@ -384,7 +385,8 @@ def build_audio(tm, sfx_events):
 def render(tm, scenes, preview, sfx):
     """Impact on the first frame, a swipe on every cut, then the video's own effects; MP4 + SRT + timing table."""
     from engine import render_video
-    events = [(0.0, "impact", 1.0)] + [(s["start"] - 0.08, "swipe", 0.75) for s in tm.data["scenes"][1:]] + list(sfx)
+    events = ([(0.0, "impact", 1.0)] + [(s["start"] - 0.08, "swipe", 1.3) for s in tm.data["scenes"][1:]]
+              + [(t, kind, g if kind == "cta" else g * SFX_GAIN) for t, kind, g in sfx])
     out = os.path.join(mc.OUT_DIR, tm.data["video"])
     mc.write_tables(tm)
     wav = build_audio(tm, events)
