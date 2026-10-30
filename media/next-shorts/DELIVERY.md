@@ -6,7 +6,7 @@
 
 | ID | 動画 | 字幕 | 実尺 | CTA |
 |---|---|---|---|---|
-| NEXT01 | `out/NEXT01_salary.mp4` | `out/NEXT01_salary.srt` | 20.6秒 | 保存 |
+| NEXT01 | `out/NEXT01_salary.mp4` | `out/NEXT01_salary.srt` | 20.5秒 | 保存 |
 | NEXT02 | `out/NEXT02_annual_income.mp4` | `out/NEXT02_annual_income.srt` | 20.6秒 | なし |
 | NEXT03 | `out/NEXT03_customer_service.mp4` | `out/NEXT03_customer_service.srt` | 19.9秒 | プロフィールのリンクへ |
 | NEXT04 | `out/NEXT04_requirements.mp4` | `out/NEXT04_requirements.srt` | 17.3秒 | 保存 |
