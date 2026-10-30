@@ -176,6 +176,14 @@ MakeCareer の道具（`mc.py`、`fit_audio.py`、`preview.py`、`check.py`）�
 - 第三弾の音：最初のコマに `alert`（2音の注意音＋低い「ドン」、音量1.0）。BGM は `mc.render(..., chords=edu3.TENSE, pulse=0.55)` で短調のコード（Am–F–Dm–E）と小さなハイハットの刻みにしている（`chords` を省くと第一弾・第二弾と同じ曲）。効果音の種類には `ding` もある
 - `career-edu-2` では、コマンドを `python3 edu.py fit|preview|check …` で呼ぶ。`preview.py` は場所を指定して読み込む（営業→事務のフォルダにも同じ名前の `preview.py` があり、名前で読み込むとそちらが先に読まれる）
 
+### SNS向けの NEXT01〜05（`next-shorts/`）
+
+- 第三弾の部品を使い、`next-shorts/src/nx.py` がこのシリーズの設定・効果音・BGM・書き出しをまとめている（`mc.render` ではなく `nx.render` で書き出す）
+- 0秒目に見出しとインパクト音。効果音は強め（ポップ／クリック／アクセント／スワイプ／CTAの決め音）で、ナレーションと重なる部分だけ4dB下げる。BGM は軽いドラム入りで動画ごとに曲調を変える
+- CTA は依頼ごとに指定がある（保存／プロフィールのリンク／なし）。保存は `nx.cta_save`、リンクは `nx.cta_link`。URL・QRコード・押せるボタンに見せる演出は入れない
+- 各動画のスクリプトでは `import nx` を `import mc` より先に書く（`nx` が道具の場所を登録する）
+- 納品物の一覧と投稿用テキストは `next-shorts/DELIVERY.md`
+
 ## 7. 営業→事務の動画（A〜D）
 
 `recruit-shorts/sales-to-jimu/` は仕組みが少し違う。
