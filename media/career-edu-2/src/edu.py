@@ -26,7 +26,7 @@ from mc import GREY, INK, TEAL, YELLOW, Telop, clamp, font, label, pill  # noqa:
 ORANGE = (240, 160, 60)
 LINE = (214, 220, 230)
 SOFT = (238, 242, 247)
-AI_NOTE = True       # the background photos are AI stills
+AI_NOTE = False      # no on-screen AI-image notice (the platforms' AI-content label is set when posting)
 NOTE_XY = None       # notice at the usual place (top centre)
 TAIL = 1.5           # short hold after the last word (no end card)
 SFX_BOOST = 2.0      # card / item sounds at the first series' level

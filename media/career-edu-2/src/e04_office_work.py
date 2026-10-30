@@ -9,7 +9,7 @@ from edu import at
 from mc import BLUE, TEAL, W, YELLOW, label
 
 NAME = "career_edu_2_04_office_work"
-AI_NOTE = True
+AI_NOTE = edu.AI_NOTE
 NOTE_XY = edu.NOTE_XY
 TABLE_Y = 800
 COLS = [("一般事務", ["書類の管理", "データの管理"], TEAL, 300), ("営業事務", ["見積もり", "注文の処理"], BLUE, 780)]

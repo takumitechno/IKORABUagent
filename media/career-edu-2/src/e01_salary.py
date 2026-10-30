@@ -9,7 +9,7 @@ from edu import ORANGE, at
 from mc import GREY, INK, MINT, TEAL, W, YELLOW, label
 
 NAME = "career_edu_2_01_salary"
-AI_NOTE = True
+AI_NOTE = edu.AI_NOTE
 NOTE_XY = edu.NOTE_XY
 BAR_X, BAR_W, BAR_H = 130, 820, 96
 CARD_Y = 760

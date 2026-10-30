@@ -9,7 +9,7 @@ from edu import at
 from mc import GREY, INK, TEAL, W, YELLOW, label
 
 NAME = "career_edu_2_05_self_pr"
-AI_NOTE = True
+AI_NOTE = edu.AI_NOTE
 NOTE_XY = edu.NOTE_XY
 ACTIONS = [("予算を聞いた", "s3_budget"), ("商品の違いを説明した", "s3_explain"), ("提案した", "s3_propose")]
 

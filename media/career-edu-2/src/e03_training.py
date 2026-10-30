@@ -9,7 +9,7 @@ from edu import at
 from mc import GREY, INK, TEAL, W, YELLOW, label
 
 NAME = "career_edu_2_03_training"
-AI_NOTE = True
+AI_NOTE = edu.AI_NOTE
 NOTE_XY = edu.NOTE_XY
 CARD_Y = 728
 ITEMS = ["最初の仕事", "教えてくれる人", "困ったときの質問先"]
