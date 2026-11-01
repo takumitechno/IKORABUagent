@@ -129,6 +129,19 @@ def telop(tm, sid, tid, size=84, cy=mc.TOP_CY):
                     anim="punch" if sid == tm.data["scenes"][0]["id"] else "up", dur_in=0.28, dur_out=0.2)
 
 
+class Flash:
+    """White flash over the whole frame at t (scene-local), fading out quickly — for the biggest hits only."""
+
+    def __init__(self, t, dur=0.22, strength=0.75):
+        self.t, self.dur, self.strength = t, dur, strength
+
+    def draw(self, frame, t):
+        p = (t - self.t) / self.dur
+        if 0 <= p < 1:
+            a = int(255 * self.strength * (1 - p) ** 2)
+            frame.alpha_composite(Image.new("RGBA", frame.size, (255, 255, 255, a)))
+
+
 def topic(text, cy=232):
     """Small pill above the opening headline: who it is for / what it is about."""
     return at(W / 2, cy, mc.pill(text, 34, bg=TEAL, fg=(255, 255, 255), weight=900, padx=26, pady=11), 0.0,
@@ -343,6 +356,8 @@ STYLES = {
                                                                    (["A2", "C3", "E3", "G3"], "A1"), (["F2", "A2", "C3", "E3"], "F1")]),
     "NEXT04_requirements": dict(bpm=102, keys="ep", chords=[(["D3", "F3", "A3", "C4"], "D2"), (["A#2", "D3", "F3", "A3"], "A#1"),
                                                             (["F2", "A2", "C3", "E3"], "F1"), (["C3", "E3", "G3", "B3"], "C2")]),
+    "TEST01_high_income": dict(bpm=112, keys="piano", chords=[(["A2", "C3", "E3", "G3"], "A1"), (["F2", "A2", "C3", "E3"], "F1"),
+                                                              (["D3", "F3", "A3", "C4"], "D2"), (["E2", "G#2", "B2", "D3"], "E1")]),
     "NEXT05_holidays": dict(bpm=104, keys="piano", chords=[(["E2", "G2", "B2", "D3"], "E1"), (["C3", "E3", "G3", "B3"], "C2"),
                                                            (["G2", "B2", "D3", "F#3"], "G1"), (["D3", "F#3", "A3", "C4"], "D2")]),
 }
@@ -357,15 +372,19 @@ def build_audio(tm, sfx_events):
     import align_clips as ac
     import narrated as nr
     import tts
-    a = tm.data["audio"]
-    x = ac.load(os.path.normpath(os.path.join(mc.ROOT, "timing", a["file"])))
-    voice = tts.voice_chain(x[int(a["cut"] * au.SR):])
+    a = tm.data.get("audio")          # None: a text-led video without narration (BGM and effects only)
+    if a:
+        x = ac.load(os.path.normpath(os.path.join(mc.ROOT, "timing", a["file"])))
+        voice = tts.voice_chain(x[int(a["cut"] * au.SR):])
+    else:
+        a, voice = {"at": 0.0}, np.zeros(1)
+    narrated = len(voice) > 1
     st = STYLES[tm.name]
     music, sfx = au.Bus(tm.total), au.Bus(tm.total)
     nr.groove(music, 0.0, tm.total, st["bpm"], st["chords"], drums=True, keys=st["keys"], vel=MUSIC_VEL, octave=12,
               hats=True, kick_pattern=(0, 2))
-    for t, kind, gain in sfx_events:
-        sfx.add(SE[kind](), max(0.0, t), gain)
+    for t, kind, gain in sfx_events:     # without a voice the effects would carry the loudness: keep them a bit lower
+        sfx.add(SE[kind](), max(0.0, t), gain if narrated else gain * 0.7)
     vb = np.zeros(len(music.buf))
     i = int(a["at"] * au.SR)
     vb[i:i + len(voice)] += voice[: len(vb) - i]
@@ -373,7 +392,7 @@ def build_audio(tm, sfx_events):
     env = np.clip(env / (np.max(env) + 1e-9) * 4, 0, 1)
     duck_m = 1 - (1 - 10 ** (-VOICE_DUCK_MUSIC / 20)) * env
     duck_s = 1 - (1 - 10 ** (-VOICE_DUCK_SFX / 20)) * env
-    mus = au.reverb(music.buf, 1.4, 0.18) * duck_m[:, None] * 0.5
+    mus = au.reverb(music.buf, 1.4, 0.18) * duck_m[:, None] * (0.5 if narrated else 0.85)
     eff = sfx.buf * duck_s[:, None]
     mix = mus + eff + np.stack([vb, vb], axis=1) * 0.9
     path = os.path.join(mc.OUT_DIR, f"{tm.name}.wav")
