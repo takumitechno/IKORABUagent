@@ -6,7 +6,10 @@ Open it directly in a browser. The only external request is Google Fonts.
 V1, V2 and V3 (`../takumi-technologies-v1/`, `-v2/`, `-v3/`) are kept unchanged for comparison.
 
 This pass keeps the V3 look and changes the communication: plain Japanese, lists over paragraphs,
-a clearer product, and philosophy reduced to one moment near the end.
+a clearer product, and philosophy reduced to one moment near the end. A later pass cut the copy by
+about a quarter (≈3,350 → ≈2,500 visible characters) without touching any animation: one-line leads,
+four tags per service, feature names without descriptions, role descriptions shown in the ring
+(the list keeps them for no-JS), shorter cost notes and form hints.
 
 ## Page flow
 
@@ -15,7 +18,7 @@ a clearer product, and philosophy reduced to one moment near the end.
 | 01 | Hero | Technologyを、事業の力に。 運用代行、メディア自動運用、業務改善・BPO、広告運用。 The official 匠 is written stroke by stroke with a dry-brush edge, flying ink and a hard seal stamp; the finished logo is the original artwork |
 | 02 | Services `#services` | Four services, each with a small animated line illustration and a short list: 運用代行 / メディア自動運用 / 業務改善・BPO / 広告・マーケティング |
 | 03 | 環 — MEGURI `#meguri` | 自律型AI運用・改善プラットフォーム. 指示を待つAIではなく、運用を継続するAI。 Platform marks for Threads / X / Instagram / owned media connected to 環 |
-| 04 | Features `#features` | 環でできること: ten capabilities, one line each; icons draw in on arrival |
+| 04 | Features `#features` | 環でできること: ten capabilities as icon + name; icons draw in on arrival |
 | 05 | Autonomous operation `#flow` | Seven specialist roles on one loop (AI / システム), including an AI safety check before publishing, with three short points on running without human involvement |
 | 06 | Product demo `#demo` | 投稿、分析、改善。AIが自律して回し続ける。 A conceptual operating board (表示例, marked 自律運用中) that loops from draft through safety check to improvement ideas and back to the next post; pause and step controls |
 | 07 | Cost model `#cost` | モデルケース（試算例）: outsourcing from published prices (初期30万円 = upper end of the commonly cited 10〜30万円 range, 月25万円 = median) against 環 (初期導入20万円＋月8万円). Bars show the first-year total to one scale; figures count up on arrival; method note and disclaimer below |

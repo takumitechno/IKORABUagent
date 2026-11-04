@@ -472,7 +472,7 @@ html:not(.js) .sq-kanji, .m-reduce .sq-kanji { mask: none; }
 .fi { display: block; width: 28px; height: 28px; flex: none; color: var(--ink); fill: none; stroke: currentColor; stroke-width: 1.4; stroke-linecap: round; stroke-linejoin: round; }
 .feat-grid .fi { margin-bottom: 18px; }
 .feat-grid li:nth-child(4) .fi { color: var(--kin-deep); }
-.feat-grid h3 { margin-bottom: 6px; font-family: var(--f-got); font-weight: 500; font-size: 15.5px; letter-spacing: .06em; line-height: 1.6; color: var(--ink); }
+.feat-grid h3 { margin-bottom: 0; font-family: var(--f-got); font-weight: 500; font-size: 15.5px; letter-spacing: .06em; line-height: 1.6; color: var(--ink); }
 .feat-grid p { font-size: 13px; line-height: 1.8; color: var(--ink-2); }
 
 /* ---------- AUTONOMOUS OPERATION: specialist roles on one loop ---------- */
@@ -505,6 +505,7 @@ html:not(.js) .sq-kanji, .m-reduce .sq-kanji { mask: none; }
 .mg-roles .r-who.hu::before { border-radius: 50%; background: var(--wash); }
 .mg-roles .r-who.sy::before { border: 1px solid var(--wash-2); }
 .mg-roles .r-d { grid-column: 2 / -1; font-size: 13.5px; line-height: 1.8; color: var(--wash-2); }
+.js .mg-roles .r-d { display: none; }
 .mg-roles li.is-on .r-name { color: var(--kin-hi); }
 .mg-roles li.is-human { background: linear-gradient(90deg, rgba(236, 232, 222, .06), transparent 70%); }
 .mg-node .n { color: var(--wash-2); }
@@ -1123,7 +1124,6 @@ html:not(.js) .sq-kanji, .m-reduce .sq-kanji { mask: none; }
       </h1>
       <div class="hero-gap" aria-hidden="true"></div>
       <p class="hero-lead" data-hi style="--d:.7s"><strong>運用代行、メディア自動運用、業務改善・BPO、広告運用。</strong><br>匠Technologiesは、最新のテクノロジーと仕組みで、<br class="br-wide">事業運営の基盤を構築します。</p>
-      <p class="hero-gloss" data-hi style="--d:.8s">BPO：業務の外部委託・代行</p>
       <div class="hero-cta" data-hi style="--d:.95s">
         <a class="btn-primary" href="#services">事業内容を見る<span aria-hidden="true">→</span></a>
         <a class="hero-product" href="#meguri">
@@ -1147,7 +1147,6 @@ html:not(.js) .sq-kanji, .m-reduce .sq-kanji { mask: none; }
         <p class="label" data-r="up"><span lang="en">Services</span><span class="jp">事業内容</span></p>
         <h2 class="title" data-r="lines"><span class="ln"><span>私たちに、</span></span><span class="ln"><span>できること。</span></span></h2>
       </div>
-      <p class="sec-lead" data-r="up">運用の代行から、自動化まで。<br>目的に合わせて、まとめてご相談いただけます。</p>
     </div>
     <div class="svc-grid">
         <article class="svc" id="svc-1" data-r="up" style="--d:0.00s">
@@ -1163,7 +1162,7 @@ html:not(.js) .sq-kanji, .m-reduce .sq-kanji { mask: none; }
           </div>
           <h3 class="svc-name">運用代行</h3>
           <p class="svc-desc">SNSの日々の運用を、まるごと代行。</p>
-          <ul class="svc-list"><li>SNS運用</li><li>投稿企画</li><li>コンテンツ制作</li><li>投稿管理</li><li>KPI集計</li><li>レポート</li><li>改善提案</li></ul>
+          <ul class="svc-list"><li>投稿企画</li><li>コンテンツ制作</li><li>投稿管理</li><li>レポート</li></ul>
         </article>
         <article class="svc" id="svc-2" data-r="up" style="--d:0.08s">
           <div class="svc-art">
@@ -1183,8 +1182,6 @@ html:not(.js) .sq-kanji, .m-reduce .sq-kanji { mask: none; }
             <li><svg class="pl" aria-hidden="true" focusable="false"><use href="#i-instagram"/></svg><span lang="en">Instagram</span></li>
             <li><svg class="pl" aria-hidden="true" focusable="false"><use href="#i-web"/></svg><span>オウンドメディア</span></li>
           </ul>
-          <p class="svc-pl-note">4つの媒体を、人が操作せずにまとめて運用します。</p>
-          <ul class="svc-list"><li>コンテンツ生成</li><li>予約投稿</li><li>公開確認</li><li>KPI取得</li><li>分析</li><li>改善</li></ul>
           <a class="svc-link" href="#meguri"><span>自社開発の環 — <span lang="en">MEGURI</span>で動かします</span><span aria-hidden="true">→</span></a>
         </article>
         <article class="svc" id="svc-3" data-r="up" style="--d:0.16s">
@@ -1197,7 +1194,7 @@ html:not(.js) .sq-kanji, .m-reduce .sq-kanji { mask: none; }
           </div>
           <h3 class="svc-name">業務改善・BPO</h3><p class="svc-gloss">BPO：業務の外部委託・代行</p>
           <p class="svc-desc">繰り返す業務を整理して、代行・自動化。</p>
-          <ul class="svc-list"><li>業務整理</li><li>定型業務の代行</li><li>データ集計</li><li>レポート作成</li><li>AI導入</li><li>業務フロー自動化</li><li>ツール連携</li></ul>
+          <ul class="svc-list"><li>業務整理</li><li>定型業務の代行</li><li>データ集計</li><li>業務フロー自動化</li></ul>
         </article>
         <article class="svc" id="svc-4" data-r="up" style="--d:0.24s">
           <div class="svc-art">
@@ -1215,7 +1212,7 @@ html:not(.js) .sq-kanji, .m-reduce .sq-kanji { mask: none; }
           </div>
           <h3 class="svc-name">広告・マーケティング</h3>
           <p class="svc-desc">広告からLP、計測まで、まとめて改善。</p>
-          <ul class="svc-list"><li>広告運用</li><li>LP制作</li><li>クリエイティブ制作</li><li>計測設計</li><li>トラッキング</li><li>CRM</li><li>導線改善</li></ul>
+          <ul class="svc-list"><li>広告運用</li><li>LP制作</li><li>クリエイティブ制作</li><li>計測設計</li></ul>
         </article>
     </div>
   </div>
@@ -1231,8 +1228,7 @@ html:not(.js) .sq-kanji, .m-reduce .sq-kanji { mask: none; }
         <h2 class="mg-brand" data-r="up"><span class="mg-k">環</span><span class="mg-dash">—</span><span class="mg-en" lang="en">MEGURI</span></h2>
         <p class="mg-pos" data-r="up">自律型AI運用・改善プラットフォーム</p>
         <p class="title mg-claim" data-r="lines"><span class="ln"><span>指示を待つAIではなく、</span></span><span class="ln"><span>運用を継続するAI。</span></span></p>
-        <p class="lead" data-r="up">環 — <span lang="en">MEGURI</span>は、複数の専門AIエージェントとシステムが役割を分担し、企画・制作・確認・投稿・分析・改善までを継続する、自社開発のAI運用基盤です。</p>
-        <p class="lead" data-r="up">人が介在しなくても日々の運用が進み、取得した結果を次の施策へつなげます。</p>
+        <p class="lead" data-r="up">企画から投稿、分析、改善まで。<br>AIが役割を分担して、運用を回し続けます。</p>
       </div>
       <div class="mg-visual">
         <div class="hub" data-r="fade" role="group" aria-label="環 — MEGURI と対応媒体のつながり">
@@ -1251,7 +1247,6 @@ html:not(.js) .sq-kanji, .m-reduce .sq-kanji { mask: none; }
             <li class="is-live"><span class="pl-box"><svg class="pl" aria-hidden="true" focusable="false"><use href="#i-web"/></svg></span><span class="hc-name">オウンドメディア</span><span class="hc-st">自動運用</span></li>
           </ul>
         </div>
-        <p class="hub-fact" data-r="up">媒体ごとに管理画面を開いて操作する必要はありません。企画から投稿・分析まで、環がまとめて動かします。</p>
       </div>
     </div>
   </div>
@@ -1265,19 +1260,19 @@ html:not(.js) .sq-kanji, .m-reduce .sq-kanji { mask: none; }
         <p class="label" data-r="up"><span lang="en">Features</span><span class="jp">機能</span></p>
         <h2 class="title" data-r="lines"><span class="ln"><span>環でできること</span></span></h2>
       </div>
-      <p class="sec-lead" data-r="up">企画から改善まで。<br>運用に必要な作業を、ひとつの基盤で動かします。</p>
+      <p class="sec-lead" data-r="up">企画から改善まで、ひとつの基盤で。</p>
     </div>
     <ul class="feat-grid">
-        <li data-r="up" style="--d:0.00s"><svg class="fi" aria-hidden="true" focusable="false"><use href="#f-research"/></svg><h3>企画・リサーチ</h3><p>過去の反応や話題から、次の投稿テーマを考える。</p></li>
-        <li data-r="up" style="--d:0.06s"><svg class="fi" aria-hidden="true" focusable="false"><use href="#f-content"/></svg><h3>コンテンツ生成</h3><p>投稿文や構成案を作る。</p></li>
-        <li data-r="up" style="--d:0.12s"><svg class="fi" aria-hidden="true" focusable="false"><use href="#f-list"/></svg><h3>品質チェック</h3><p>重複・表現・ルールを確認する。</p></li>
-        <li data-r="up" style="--d:0.18s"><svg class="fi" aria-hidden="true" focusable="false"><use href="#f-check"/></svg><h3>安全確認</h3><p>公開してよいかを、AIが最終チェックする。</p></li>
-        <li data-r="up" style="--d:0.24s"><svg class="fi" aria-hidden="true" focusable="false"><use href="#f-schedule"/></svg><h3>予約投稿</h3><p>チェック済みの投稿を、決めた時間に出す。</p></li>
-        <li data-r="up" style="--d:0.00s"><svg class="fi" aria-hidden="true" focusable="false"><use href="#f-publish"/></svg><h3>公開確認</h3><p>実際に公開されたかを確かめる。</p></li>
-        <li data-r="up" style="--d:0.06s"><svg class="fi" aria-hidden="true" focusable="false"><use href="#f-kpi"/></svg><h3>KPI取得</h3><p>表示・反応・保存などの数字を集める。</p></li>
-        <li data-r="up" style="--d:0.12s"><svg class="fi" aria-hidden="true" focusable="false"><use href="#f-analyze"/></svg><h3>分析</h3><p>伸びた投稿と、その理由を見る。</p></li>
-        <li data-r="up" style="--d:0.18s"><svg class="fi" aria-hidden="true" focusable="false"><use href="#f-improve"/></svg><h3>改善提案</h3><p>結果から、次の企画を提案する。</p></li>
-        <li data-r="up" style="--d:0.24s"><svg class="fi" aria-hidden="true" focusable="false"><use href="#f-accounts"/></svg><h3>複数アカウント管理</h3><p>複数のアカウントを、まとめて運用する。</p></li>
+        <li data-r="up" style="--d:0.00s"><svg class="fi" aria-hidden="true" focusable="false"><use href="#f-research"/></svg><h3>企画・リサーチ</h3></li>
+        <li data-r="up" style="--d:0.06s"><svg class="fi" aria-hidden="true" focusable="false"><use href="#f-content"/></svg><h3>コンテンツ生成</h3></li>
+        <li data-r="up" style="--d:0.12s"><svg class="fi" aria-hidden="true" focusable="false"><use href="#f-list"/></svg><h3>品質チェック</h3></li>
+        <li data-r="up" style="--d:0.18s"><svg class="fi" aria-hidden="true" focusable="false"><use href="#f-check"/></svg><h3>安全確認</h3></li>
+        <li data-r="up" style="--d:0.24s"><svg class="fi" aria-hidden="true" focusable="false"><use href="#f-schedule"/></svg><h3>予約投稿</h3></li>
+        <li data-r="up" style="--d:0.00s"><svg class="fi" aria-hidden="true" focusable="false"><use href="#f-publish"/></svg><h3>公開確認</h3></li>
+        <li data-r="up" style="--d:0.06s"><svg class="fi" aria-hidden="true" focusable="false"><use href="#f-kpi"/></svg><h3>KPI取得</h3></li>
+        <li data-r="up" style="--d:0.12s"><svg class="fi" aria-hidden="true" focusable="false"><use href="#f-analyze"/></svg><h3>分析</h3></li>
+        <li data-r="up" style="--d:0.18s"><svg class="fi" aria-hidden="true" focusable="false"><use href="#f-improve"/></svg><h3>改善提案</h3></li>
+        <li data-r="up" style="--d:0.24s"><svg class="fi" aria-hidden="true" focusable="false"><use href="#f-accounts"/></svg><h3>複数アカウント管理</h3></li>
     </ul>
   </div>
 </section>
@@ -1292,7 +1287,6 @@ html:not(.js) .sq-kanji, .m-reduce .sq-kanji { mask: none; }
       </div>
       <ul class="fl-points" data-r="up">
         <li><svg class="fi" aria-hidden="true" focusable="false"><use href="#f-improve"/></svg><span>人が介在しなくても、運用が回り続ける。</span></li>
-        <li><svg class="fi" aria-hidden="true" focusable="false"><use href="#f-chip"/></svg><span>企画から分析まで、AIとシステムが担う。</span></li>
         <li><svg class="fi" aria-hidden="true" focusable="false"><use href="#f-check"/></svg><span>公開前の安全確認も、AIが行う。</span></li>
       </ul>
     </div>
@@ -1339,7 +1333,7 @@ html:not(.js) .sq-kanji, .m-reduce .sq-kanji { mask: none; }
         <p class="label" data-r="up"><span lang="en">Product demo</span><span class="jp">画面イメージ</span></p>
         <h2 class="title" data-r="lines"><span class="ln"><span>投稿、分析、改善。</span></span><span class="ln"><span><span class="nw">AIが自律して</span><span class="nw">回し続ける。</span></span></span></h2>
       </div>
-      <p class="sec-lead" data-r="up">AIが自ら投稿し、結果を分析し、改善して、また次の投稿へ。<br>人が指示しなくても、このサイクルが自律的に回り続けます。</p>
+      <p class="sec-lead" data-r="up">人が指示しなくても、<br>このサイクルが回り続けます。</p>
     </div>
     <div class="app has-kpi" role="group" aria-label="環 — MEGURI 運用画面の表示例" data-r="up">
       <div class="app-top">
@@ -1432,7 +1426,7 @@ html:not(.js) .sq-kanji, .m-reduce .sq-kanji { mask: none; }
     </div>
     <div class="cost-grid" style="--max:330">
         <div class="cost-col before" data-r="up">
-          <h3>従来の外注費<span class="cc-sub">SNS運用代行・公開相場をもとに算出</span></h3>
+          <h3>従来の外注費<span class="cc-sub">SNS運用代行の公開相場</span></h3>
           <div class="cbar" role="img" aria-label="従来の外注費：初年度の総額330万円（初期費用30万円＋月額25万円×12か月）"><i style="--v:30" data-seg="b0"></i><i style="--v:300" data-seg="b1"></i></div>
           <dl class="cost-rows">
             <div data-seg="b0"><dt>初期費用<span class="med">相場上限</span></dt><dd><b lang="en" data-count="30">30</b>万円</dd></div>
@@ -1441,7 +1435,7 @@ html:not(.js) .sq-kanji, .m-reduce .sq-kanji { mask: none; }
           </dl>
         </div>
         <div class="cost-col after" data-r="up">
-          <h3>環を活用した運用モデル<span class="cc-sub">導入例の一例・初期導入＋月額</span></h3>
+          <h3>環を活用した運用モデル<span class="cc-sub">導入例の一例</span></h3>
           <div class="cbar" role="img" aria-label="環を活用した運用モデル：初年度の総額116万円（初期導入費20万円＋月額8万円×12か月）"><i style="--v:20" data-seg="a0"></i><i style="--v:60" data-seg="a1"></i><i style="--v:36" data-seg="a2"></i></div>
           <dl class="cost-rows">
             <div data-seg="a0"><dt>初期導入費</dt><dd><b lang="en" data-count="20">20</b>万円</dd></div>
@@ -1451,7 +1445,7 @@ html:not(.js) .sq-kanji, .m-reduce .sq-kanji { mask: none; }
           </dl>
         </div>
     </div>
-    <p class="cbar-key" data-r="up"><i aria-hidden="true"></i>棒の長さは、初年度の総額（初期費用＋12か月分）です。</p>
+    <p class="cbar-key" data-r="up"><i aria-hidden="true"></i>棒の長さ＝初年度の総額（初期費用＋12か月）</p>
     <div class="cost-result" data-r="up">
       <p class="cr-main" aria-label="月額25万円から月額8万円へ"><span lang="en" data-count="25">25</span><small>万円</small><i aria-hidden="true"></i><span class="to" lang="en" data-count="8" data-from="25">8</span><small>万円 / 月</small></p>
       <dl class="cr-stats">
@@ -1462,9 +1456,8 @@ html:not(.js) .sq-kanji, .m-reduce .sq-kanji { mask: none; }
       </dl>
     </div>
     <div class="cost-notes" data-r="up">
-      <p>※従来の外注費は、国内のSNS運用代行について公開されている料金情報（比較記事・各社の料金表、2026年10月時点）をもとに概算した金額です。月額は、企画・投稿制作・投稿管理・月次レポートを含む標準的なプランの価格帯の中央値、初期費用は、よく示される相場（10〜30万円）の上限です。</p>
-      <p>※「環を活用した運用モデル」の金額は、導入例の一例です。</p>
-      <p>※上記は想定業務をもとにしたモデルケースです。実際の費用・削減額は、業務量・運用内容・契約条件によって異なります。</p>
+      <p>※従来の外注費は、国内のSNS運用代行の公開料金（2026年10月時点）をもとにした概算です。月額は標準プランの中央値、初期費用は相場（10〜30万円）の上限です。</p>
+      <p>※環の金額は導入例の一例です。実際の費用は、業務量・運用内容・契約条件によって異なります。</p>
     </div>
   </div>
 </section>
@@ -1533,7 +1526,6 @@ html:not(.js) .sq-kanji, .m-reduce .sq-kanji { mask: none; }
     <div class="ct-intro">
       <p class="label" data-r="up"><span lang="en">Contact</span><span class="jp">お問い合わせ</span></p>
       <h2 class="title ct-title" data-r="lines"><span class="ln"><span>事業や運用について、</span></span><span class="ln"><span><span class="nw">まずはお話を</span><span class="nw">聞かせてください。</span></span></span></h2>
-      <p class="ct-lead" data-r="up">運用のご相談、業務改善、自動化、広告運用など、<br class="br-wide">まずはお気軽にご相談ください。</p>
       <p class="ct-mail" data-r="up"><span class="ct-mail-h">メールでのお問い合わせ</span><a href="mailto:info@takumitechno.com" lang="en">info@takumitechno.com</a></p>
       <span class="ct-rule" data-r="rule" aria-hidden="true"></span>
     </div>
@@ -1557,8 +1549,7 @@ html:not(.js) .sq-kanji, .m-reduce .sq-kanji { mask: none; }
           </div>
           <div class="ct-field" data-field="email">
             <label class="ct-label" for="ct-email">メールアドレス<span class="ct-badge req">必須</span></label>
-            <p class="ct-hint" id="ct-email-hint">ご返信は、こちらのアドレスにお送りします。</p>
-            <div class="ct-control"><input class="ct-input" id="ct-email" name="email" type="email" inputmode="email" autocomplete="email" maxlength="254" required aria-required="true" aria-describedby="ct-email-hint ct-email-err" placeholder="name@example.com" enterkeyhint="next"></div>
+            <div class="ct-control"><input class="ct-input" id="ct-email" name="email" type="email" inputmode="email" autocomplete="email" maxlength="254" required aria-required="true" aria-describedby="ct-email-err" placeholder="name@example.com" enterkeyhint="next"></div>
             <div class="ct-meta"><p class="ct-err" id="ct-email-err"></p></div>
           </div>
           <div class="ct-field" data-field="topic">
@@ -1568,14 +1559,12 @@ html:not(.js) .sq-kanji, .m-reduce .sq-kanji { mask: none; }
           </div>
           <div class="ct-field" data-field="message">
             <label class="ct-label" for="ct-message">お問い合わせ内容<span class="ct-badge req">必須</span></label>
-            <p class="ct-hint" id="ct-message-hint">現在の運用状況や、お困りごとをお書きください。</p>
-            <div class="ct-control"><textarea class="ct-input ct-textarea" id="ct-message" name="message" rows="7" maxlength="2000" required aria-required="true" aria-describedby="ct-message-hint ct-message-err"></textarea></div>
+            <div class="ct-control"><textarea class="ct-input ct-textarea" id="ct-message" name="message" rows="7" maxlength="2000" required aria-required="true" aria-describedby="ct-message-err" placeholder="現在の運用状況や、お困りごとなど"></textarea></div>
             <div class="ct-meta"><p class="ct-err" id="ct-message-err"></p><p class="ct-count" aria-hidden="true"><span>0</span> / 2000</p></div>
           </div>
           <div class="ct-field" data-field="url">
             <label class="ct-label" for="ct-url">Webサイト / SNS URL<span class="ct-badge opt">任意</span></label>
-            <p class="ct-hint" id="ct-url-hint">サイトやSNSアカウントのURLがあれば、ご記入ください。</p>
-            <div class="ct-control"><input class="ct-input" id="ct-url" name="url" type="text" inputmode="url" autocomplete="url" maxlength="300" aria-describedby="ct-url-hint ct-url-err" placeholder="https://" enterkeyhint="done"></div>
+            <div class="ct-control"><input class="ct-input" id="ct-url" name="url" type="text" inputmode="url" autocomplete="url" maxlength="300" aria-describedby="ct-url-err" placeholder="https://" enterkeyhint="done"></div>
             <div class="ct-meta"><p class="ct-err" id="ct-url-err"></p></div>
           </div>
           <div class="ct-hp" aria-hidden="true"><label for="ct-fax">FAX番号（入力しないでください）</label><input id="ct-fax" name="fax" type="text" tabindex="-1" autocomplete="off"></div>
