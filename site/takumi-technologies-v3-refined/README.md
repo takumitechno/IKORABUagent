@@ -154,17 +154,15 @@ and the privacy policy must be checked (below). Test once with `wrangler pages d
 
 ## Privacy policy (`privacy.html`)
 
-Written from what this site actually does: the form fields, the three purposes (answering,
-proposals and contracts, preventing misuse), Cloudflare for delivery and the form endpoint,
-an email sending service for the notification, Google Fonts, and Turnstile when it is enabled.
-Requests for disclosure and complaints go through the contact form; no email address is shown.
+A standard Japanese IT-company policy covering the whole business (website, inquiries, contracts,
+service delivery, recruiting), in eleven sections: 個人情報の定義, 取得する個人情報, 利用目的,
+利用目的の変更, 第三者への提供, 業務委託・外国にある第三者, 安全管理措置 (the usual categories:
+基本方針, 規律, 組織的, 人的, 物理的, 技術的, 外的環境の把握), 開示・訂正・利用停止等, Cookie等の利用,
+本ポリシーの変更, お問い合わせ窓口. Requests and complaints go through the contact form; no email address is shown.
 
-It is a draft. Before the site goes public:
+Before the site goes public:
 
-- Have it reviewed (個人情報保護法, especially the foreign-provider paragraph in 04 and 05).
-- 04: name the email sending service once chosen (for example Resend, Inc. (米国)), or drop the row if
-  Cloudflare Email Routing is used.
-- 08: keep the Turnstile line only if Turnstile is enabled.
-- 09: the address and representative's name are given on request (allowed by 個人情報保護法 第32条);
+- Have it reviewed once (個人情報保護法).
+- お問い合わせ窓口: the address and representative are given on request (allowed by 個人情報保護法 第32条);
   list them instead if the company prefers.
 - 制定日: set to the publication date.

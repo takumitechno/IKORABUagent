@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>プライバシーポリシー｜匠Technologies</title>
-<meta name="description" content="合同会社 匠Technologiesの個人情報の取り扱いについて（プライバシーポリシー）。">
+<meta name="description" content="合同会社 匠Technologiesのプライバシーポリシー（個人情報の取り扱いについて）。">
 <meta property="og:title" content="プライバシーポリシー｜匠Technologies">
 <meta property="og:type" content="article">
 <meta property="og:site_name" content="匠Technologies">
@@ -100,7 +100,7 @@ main { overflow-x: clip; }
 .pp-toc-h { font-family: var(--f-lat); font-size: 11px; letter-spacing: .28em; text-transform: uppercase; color: var(--ink-3); margin-bottom: 14px; }
 .pp-toc ol { display: grid; gap: 2px; }
 .pp-toc a { display: flex; align-items: baseline; gap: 14px; padding: 6px 0; font-size: 13px; line-height: 1.6; letter-spacing: .08em; color: var(--ink-2); text-decoration: none; transition: color .3s ease; }
-.pp-toc a span { flex: none; width: 1.6em; font-family: var(--f-lat); font-size: 11px; letter-spacing: .14em; color: var(--kin-deep); }
+.pp-toc a > span { flex: none; width: 1.6em; font-family: var(--f-lat); font-size: 11px; letter-spacing: .14em; color: var(--kin-deep); }
 .pp-toc a:hover { color: var(--ink); }
 .pp-body { grid-column: 5 / span 8; }
 
@@ -114,15 +114,12 @@ main { overflow-x: clip; }
 .pp-sec a { color: var(--ink); text-decoration: underline; text-decoration-color: var(--kin); text-underline-offset: 4px; }
 .pp-sec a:hover { text-decoration-thickness: 2px; }
 
-.pp-fields { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
-.pp-fields li { display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 48px; padding: 8px 14px; border: 1px solid var(--rule-l); border-radius: 2px; background: rgba(255, 255, 255, .55); font-size: 14px; letter-spacing: .06em; color: var(--ink); }
-.pp-fields small { flex: none; font-size: 11px; letter-spacing: .1em; color: var(--ink-3); }
 .pp-dots { display: grid; gap: 8px; }
 .pp-dots li { position: relative; padding-left: 22px; }
 .pp-dots li::before { content: ""; position: absolute; left: 2px; top: 1em; width: 10px; height: 1px; background: var(--kin); }
 .pp-num { display: grid; gap: 10px; counter-reset: pp; }
-.pp-num li { position: relative; padding-left: 40px; counter-increment: pp; }
-.pp-num li::before { content: counter(pp, decimal-leading-zero); position: absolute; left: 0; top: .1em; font-family: var(--f-lat); font-weight: 300; font-size: 13px; letter-spacing: .14em; color: var(--kin-deep); }
+.pp-num li { position: relative; padding-left: 2.6em; counter-increment: pp; }
+.pp-num li::before { content: "（" counter(pp) "）"; position: absolute; left: -.3em; top: 0; letter-spacing: 0; color: var(--kin-deep); }
 .pp-rows > div { display: grid; grid-template-columns: minmax(0, 15em) minmax(0, 1fr); gap: 6px 28px; padding-block: 14px; border-bottom: 1px solid var(--rule-l); }
 .pp-rows > div:first-child { border-top: 1px solid var(--rule-l); }
 .pp-rows dt { font-size: 13.5px; letter-spacing: .08em; color: var(--ink); }
@@ -154,8 +151,7 @@ main { overflow-x: clip; }
 }
 @media (max-width: 767px) {
   .pp-mark { right: -60px; top: 20px; width: 200px; opacity: .55; }
-  .pp-fields { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .pp-rows > div { grid-template-columns: minmax(0, 1fr); }
+    .pp-rows > div { grid-template-columns: minmax(0, 1fr); }
   .foot-in { flex-direction: column; align-items: flex-start; }
 }
 @media (max-width: 479px) {
@@ -164,8 +160,7 @@ main { overflow-x: clip; }
   .pp-back { font-size: 12px; letter-spacing: .08em; }
   .pp-toc ol { grid-template-columns: minmax(0, 1fr); }
   .pp-toc a { padding: 9px 0; }
-  .pp-fields li { font-size: 13.5px; padding: 8px 12px; }
-}
+  }
 </style>
 </head>
 <body>
@@ -197,7 +192,7 @@ main { overflow-x: clip; }
       </svg>
       <p class="label"><span lang="en">Privacy Policy</span><span class="jp">個人情報の取り扱い</span></p>
       <h1 class="pp-title">プライバシーポリシー</h1>
-      <p class="pp-lead">合同会社 匠Technologies（以下「当社」といいます）は、お客さまの個人情報を適切に取り扱うことを、大切な責務と考えています。個人情報の保護に関する法律（以下「個人情報保護法」といいます）その他の関係法令を守り、次のとおり個人情報を取り扱います。</p>
+      <p class="pp-lead">合同会社 匠Technologies（以下「当社」といいます）は、当社が提供するサービス（以下「本サービス」といいます）および当社ウェブサイト（以下「本ウェブサイト」といいます）における個人情報の取り扱いについて、次のとおりプライバシーポリシー（以下「本ポリシー」といいます）を定めます。当社は、個人情報の保護に関する法律（以下「個人情報保護法」といいます）その他の関係法令およびガイドラインを遵守し、個人情報を適切に取り扱います。</p>
       <p class="pp-date"><span>制定日：<time datetime="2026-11-04">2026年11月4日</time></span></p>
     </div>
 
@@ -205,125 +200,128 @@ main { overflow-x: clip; }
       <nav class="pp-toc" aria-label="目次">
         <p class="pp-toc-h" lang="en">Contents</p>
         <ol>
-          <li><a href="#p01"><span lang="en">01</span>取得する情報</a></li>
-          <li><a href="#p02"><span lang="en">02</span>利用目的</a></li>
-          <li><a href="#p03"><span lang="en">03</span>第三者への提供</a></li>
-          <li><a href="#p04"><span lang="en">04</span>業務の委託と外部サービス</a></li>
-          <li><a href="#p05"><span lang="en">05</span>安全管理のための措置</a></li>
-          <li><a href="#p06"><span lang="en">06</span>保管期間</a></li>
-          <li><a href="#p07"><span lang="en">07</span>開示などのご請求</a></li>
-          <li><a href="#p08"><span lang="en">08</span>本サイトの閲覧について</a></li>
-          <li><a href="#p09"><span lang="en">09</span>事業者の情報</a></li>
-          <li><a href="#p10"><span lang="en">10</span>お問い合わせ窓口</a></li>
-          <li><a href="#p11"><span lang="en">11</span>改定</a></li>
+          <li><a href="#p01"><span lang="en">01</span>個人情報の定義</a></li>
+          <li><a href="#p02"><span lang="en">02</span>取得する個人情報</a></li>
+          <li><a href="#p03"><span lang="en">03</span>利用目的</a></li>
+          <li><a href="#p04"><span lang="en">04</span>利用目的の変更</a></li>
+          <li><a href="#p05"><span lang="en">05</span>第三者への提供</a></li>
+          <li><a href="#p06"><span lang="en">06</span>業務委託・外国にある第三者</a></li>
+          <li><a href="#p07"><span lang="en">07</span>安全管理措置</a></li>
+          <li><a href="#p08"><span lang="en">08</span>開示・訂正・利用停止等</a></li>
+          <li><a href="#p09"><span lang="en">09</span>Cookie等の利用</a></li>
+          <li><a href="#p10"><span lang="en">10</span>本ポリシーの変更</a></li>
+          <li><a href="#p11"><span lang="en">11</span>お問い合わせ窓口</a></li>
         </ol>
       </nav>
 
       <div class="pp-body">
         <section class="pp-sec" id="p01" aria-labelledby="p01h">
-          <h2 id="p01h"><span class="no" lang="en">01</span>取得する情報</h2>
-          <p>当社は、本ウェブサイトのお問い合わせフォームから、次の情報を取得します。</p>
-          <ul class="pp-fields">
-            <li>お名前</li>
-            <li>会社名・屋号<small>任意</small></li>
-            <li>メールアドレス</li>
-            <li>ご相談内容</li>
-            <li>お問い合わせ内容</li>
-            <li><span>Webサイト / <span class="nw">SNS URL</span></span><small>任意</small></li>
-          </ul>
-          <p>あわせて、不正な送信を防ぐために、送信日時や送信元のIPアドレスなど、通信に関する情報を利用することがあります。</p>
+          <h2 id="p01h"><span class="no" lang="en">01</span>個人情報の定義</h2>
+          <p>本ポリシーにおいて「個人情報」とは、個人情報保護法第2条第1項に定める個人情報をいい、生存する個人に関する情報であって、氏名、メールアドレスその他の記述等により特定の個人を識別できるもの（他の情報と容易に照合でき、それにより特定の個人を識別できるものを含みます）を指します。</p>
         </section>
 
         <section class="pp-sec" id="p02" aria-labelledby="p02h">
-          <h2 id="p02h"><span class="no" lang="en">02</span>利用目的</h2>
-          <p>取得した個人情報は、次の目的の範囲内で利用します。</p>
-          <ol class="pp-num">
-            <li>お問い合わせへの回答と、そのためのご連絡</li>
-            <li>ご相談内容に関するご提案、お見積り、ご契約の手続き</li>
-            <li>お問い合わせフォームの不正な利用の防止と、本ウェブサイトの安全な運営</li>
-          </ol>
-          <p>これらの目的のほかに利用する場合は、あらかじめご本人の同意をいただきます。</p>
+          <h2 id="p02h"><span class="no" lang="en">02</span>取得する個人情報</h2>
+          <p>当社は、本ウェブサイトのお問い合わせフォーム、メール、お打ち合わせ、ご契約の手続き、本サービスのご利用などを通じて、適法かつ公正な手段により、次の個人情報を取得します。</p>
+          <ul class="pp-dots">
+            <li>氏名、会社名・屋号、部署名、役職</li>
+            <li>メールアドレス、電話番号、住所などの連絡先</li>
+            <li>お問い合わせやご相談の内容</li>
+            <li>ご契約・お取引に関する情報（請求先、お支払いに関する情報など）</li>
+            <li>本サービスのご提供にあたりお預かりする情報（運用を担当するSNSアカウントやWebサイトに関する情報など）</li>
+            <li><span lang="en">Cookie</span>、IPアドレス、閲覧履歴、端末・ブラウザの情報などのアクセス情報</li>
+          </ul>
         </section>
 
         <section class="pp-sec" id="p03" aria-labelledby="p03h">
-          <h2 id="p03h"><span class="no" lang="en">03</span>第三者への提供</h2>
-          <p>当社は、次の場合を除き、ご本人の同意なく個人データを第三者に提供しません。</p>
-          <ul class="pp-dots">
-            <li>法令に基づく場合</li>
-            <li>人の生命、身体または財産を守るために必要で、ご本人の同意を得ることが難しい場合</li>
-            <li>公衆衛生の向上や児童の健全な育成のために特に必要で、ご本人の同意を得ることが難しい場合</li>
-            <li>国の機関や地方公共団体などが法令に定める事務を行うことに協力する必要があり、ご本人の同意を得ることでその事務に支障が出るおそれがある場合</li>
-            <li>そのほか、個人情報保護法で認められている場合</li>
-          </ul>
-          <p>次の「業務の委託と外部サービス」に記載する委託にともなって個人データをお預けする場合は、第三者への提供にはあたりません。</p>
+          <h2 id="p03h"><span class="no" lang="en">03</span>利用目的</h2>
+          <p>当社は、取得した個人情報を、次の目的の範囲内で利用します。</p>
+          <ol class="pp-num">
+            <li>本サービスの提供、運営および保守のため</li>
+            <li>お問い合わせやご相談への回答（ご本人確認を含みます）のため</li>
+            <li>ご提案、お見積り、ご契約の締結・履行、ご請求のため</li>
+            <li>本サービスに関するお知らせやご案内をお送りするため</li>
+            <li>メンテナンスや重要なお知らせなど、必要に応じたご連絡のため</li>
+            <li>不正・不当な目的での利用の防止と、その対応のため</li>
+            <li>本サービスの改善および新たなサービスの開発のため（個人を特定できない統計情報に加工して利用する場合を含みます）</li>
+            <li>採用に応募された方へのご連絡と、採用選考のため</li>
+            <li>上記の利用目的に付随する目的のため</li>
+          </ol>
         </section>
 
         <section class="pp-sec" id="p04" aria-labelledby="p04h">
-          <h2 id="p04h"><span class="no" lang="en">04</span>業務の委託と外部サービス</h2>
-          <p>当社は、利用目的に必要な範囲で、個人情報の取り扱いの一部を外部の事業者に委託することがあります。その場合は、委託先を適切に選び、必要かつ適切な監督を行います。</p>
-          <p>本ウェブサイトでは、次のサービスを利用しています。</p>
-          <dl class="pp-rows">
-            <div><dt>ウェブサイトの配信、お問い合わせの送信処理</dt><dd><span lang="en">Cloudflare, Inc.</span>（米国）</dd></div>
-            <div><dt>お問い合わせ内容の当社への通知</dt><dd>外部のメール送信サービス</dd></div>
-          </dl>
-          <p>外国にある事業者に個人データの取り扱いを委託する場合は、個人情報保護法に従い、委託先が同法の定める措置に相当する措置を継続的に講じる体制を整えていることを確認したうえで行います。その措置の内容などは、ご請求に応じてお知らせします。</p>
+          <h2 id="p04h"><span class="no" lang="en">04</span>利用目的の変更</h2>
+          <p>当社は、利用目的が変更前と関連性を有すると合理的に認められる場合に限り、個人情報の利用目的を変更するものとします。利用目的を変更した場合は、変更後の目的について、ご本人に通知し、または本ウェブサイトで公表します。</p>
         </section>
 
         <section class="pp-sec" id="p05" aria-labelledby="p05h">
-          <h2 id="p05h"><span class="no" lang="en">05</span>安全管理のための措置</h2>
-          <p>当社は、個人データの漏えい、滅失、き損を防ぐため、次の措置を講じます。</p>
+          <h2 id="p05h"><span class="no" lang="en">05</span>第三者への提供</h2>
+          <p>当社は、次の場合を除き、あらかじめご本人の同意を得ることなく、個人データを第三者に提供しません。</p>
           <ul class="pp-dots">
-            <li>個人データを取り扱う担当者とアカウントを限定し、アクセス権限を管理します。</li>
-            <li>通信を暗号化（<span lang="en">HTTPS</span>）し、外部からの不正なアクセスを防ぐ対策を行います。</li>
-            <li>個人データの取り扱いについてルールを定め、それに沿って運用します。</li>
-            <li>外国で個人データを取り扱う場合は、その国の個人情報の保護に関する制度を把握したうえで、必要な措置を講じます。</li>
+            <li>法令に基づく場合</li>
+            <li>人の生命、身体または財産の保護のために必要がある場合であって、ご本人の同意を得ることが困難であるとき</li>
+            <li>公衆衛生の向上または児童の健全な育成の推進のために特に必要がある場合であって、ご本人の同意を得ることが困難であるとき</li>
+            <li>国の機関もしくは地方公共団体またはその委託を受けた者が法令の定める事務を遂行することに対して協力する必要がある場合であって、ご本人の同意を得ることにより当該事務の遂行に支障を及ぼすおそれがあるとき</li>
+            <li>その他、個人情報保護法その他の法令で認められる場合</li>
+          </ul>
+          <p>なお、次の場合は、上記の第三者への提供には該当しないものとします。</p>
+          <ul class="pp-dots">
+            <li>利用目的の達成に必要な範囲内で、個人データの取り扱いの全部または一部を委託する場合</li>
+            <li>合併その他の事由による事業の承継にともなって個人データが提供される場合</li>
           </ul>
         </section>
 
         <section class="pp-sec" id="p06" aria-labelledby="p06h">
-          <h2 id="p06h"><span class="no" lang="en">06</span>保管期間</h2>
-          <p>個人データは、利用目的の達成に必要な期間だけ保管し、必要がなくなったものは、遅滞なく適切な方法で削除するよう努めます。</p>
+          <h2 id="p06h"><span class="no" lang="en">06</span>業務委託・外国にある第三者</h2>
+          <p>当社は、利用目的の達成に必要な範囲内で、個人データの取り扱いの全部または一部を外部に委託することがあります。この場合、当社は、個人データを適切に取り扱うと認められる委託先を選定し、委託契約等において安全管理措置や秘密保持などを定めたうえで、委託先に対して必要かつ適切な監督を行います。</p>
+          <p>当社は、本ウェブサイトの運営や本サービスの提供にあたり、外国の事業者が提供するクラウドサービス等を利用することがあります。外国にある第三者に個人データを提供する場合は、個人情報保護法に従い、必要な措置を講じます。</p>
         </section>
 
         <section class="pp-sec" id="p07" aria-labelledby="p07h">
-          <h2 id="p07h"><span class="no" lang="en">07</span>開示などのご請求</h2>
-          <p>当社が保有する個人データについて、ご本人から次のご請求があった場合は、ご本人であることを確認したうえで、個人情報保護法に従い、遅滞なく対応します。</p>
-          <ul class="pp-dots">
-            <li>利用目的の通知</li>
-            <li>開示（第三者への提供の記録を含みます）</li>
-            <li>内容の訂正、追加、削除</li>
-            <li>利用の停止、消去</li>
-            <li>第三者への提供の停止</li>
-          </ul>
-          <p>ご請求は、<a href="./#contact">お問い合わせフォーム</a>から、ご相談内容で「その他」を選んでお送りください。</p>
-        </section>
-
-        <section class="pp-sec" id="p08" aria-labelledby="p08h">
-          <h2 id="p08h"><span class="no" lang="en">08</span>本サイトの閲覧について</h2>
-          <ul class="pp-dots">
-            <li>本ウェブサイトは、アクセス解析や広告配信を目的とした<span lang="en">Cookie</span>を使用していません。</li>
-            <li>文字の表示に、<span lang="en">Google LLC</span>（米国）の<span lang="en">Google Fonts</span>を利用しています。ページを開くと、IPアドレスなど通信に関する情報が同社に送信されます。</li>
-            <li>お問い合わせフォームの不正な送信を防ぐため、<span lang="en">Cloudflare, Inc.</span>（米国）の<span lang="en">Turnstile</span>を利用することがあります。</li>
-          </ul>
-        </section>
-
-        <section class="pp-sec" id="p09" aria-labelledby="p09h">
-          <h2 id="p09h"><span class="no" lang="en">09</span>事業者の情報</h2>
+          <h2 id="p07h"><span class="no" lang="en">07</span>安全管理措置</h2>
+          <p>当社は、個人データの漏えい、滅失またはき損の防止その他の安全管理のため、次の措置を講じます。</p>
           <dl class="pp-rows">
-            <div><dt>事業者名</dt><dd>合同会社 匠Technologies（<span lang="en">Takumi Technologies LLC</span>）</dd></div>
-            <div><dt>所在地・代表者の氏名</dt><dd>ご請求に応じて、遅滞なくお知らせします。</dd></div>
+            <div><dt>基本方針の策定</dt><dd>個人データの適正な取り扱いを確保するため、本ポリシーを定めています。</dd></div>
+            <div><dt>取り扱い規律の整備</dt><dd>取得、利用、保存、提供、削除・廃棄などの段階ごとに、取り扱いの方法と担当者を定めます。</dd></div>
+            <div><dt>組織的安全管理措置</dt><dd>責任者を定め、個人データを取り扱う者とその範囲を明確にするとともに、法令違反や漏えい等の事案が生じた場合の報告・連絡体制を整えます。</dd></div>
+            <div><dt>人的安全管理措置</dt><dd>個人データを取り扱う者に対し、適切な取り扱いについての教育を行い、秘密保持を徹底します。</dd></div>
+            <div><dt>物理的安全管理措置</dt><dd>個人データを取り扱う機器や電子媒体の盗難・紛失を防ぐための措置を講じます。</dd></div>
+            <div><dt>技術的安全管理措置</dt><dd>アクセス制御により取り扱う者と範囲を限定し、外部からの不正アクセスや不正なソフトウェアから保護する仕組みを導入します。</dd></div>
+            <div><dt>外的環境の把握</dt><dd>外国において個人データを取り扱う場合は、当該外国の個人情報の保護に関する制度を把握したうえで、安全管理措置を講じます。</dd></div>
           </dl>
         </section>
 
+        <section class="pp-sec" id="p08" aria-labelledby="p08h">
+          <h2 id="p08h"><span class="no" lang="en">08</span>開示・訂正・利用停止等</h2>
+          <p>当社は、ご本人から、保有個人データの利用目的の通知、開示（第三者提供記録の開示を含みます）、内容の訂正・追加・削除、利用の停止・消去、第三者への提供の停止（以下「開示等」といいます）を求められた場合は、ご本人であることを確認したうえで、法令に従い遅滞なく対応します。</p>
+          <p>ただし、次のいずれかに該当する場合は、開示等の全部または一部に応じないことがあります。その場合は、遅滞なくその旨をお知らせします。</p>
+          <ul class="pp-dots">
+            <li>ご本人または第三者の生命、身体、財産その他の権利利益を害するおそれがある場合</li>
+            <li>当社の業務の適正な実施に著しい支障を及ぼすおそれがある場合</li>
+            <li>その他、法令に違反することとなる場合</li>
+          </ul>
+          <p>開示等のご請求は、<a href="./#contact">お問い合わせフォーム</a>からお申し出ください。</p>
+        </section>
+
+        <section class="pp-sec" id="p09" aria-labelledby="p09h">
+          <h2 id="p09h"><span class="no" lang="en">09</span><span lang="en">Cookie</span>等の利用</h2>
+          <p>本ウェブサイトでは、利便性の向上や利用状況の把握のために、<span lang="en">Cookie</span>やこれに類する技術、アクセス解析ツールを利用する場合があります。<span lang="en">Cookie</span>はブラウザの設定により無効にできますが、その場合、本ウェブサイトの一部の機能をご利用いただけないことがあります。</p>
+        </section>
+
         <section class="pp-sec" id="p10" aria-labelledby="p10h">
-          <h2 id="p10h"><span class="no" lang="en">10</span>お問い合わせ窓口</h2>
-          <p>個人情報の取り扱いに関するご質問、ご相談、苦情は、本ウェブサイトのお問い合わせフォームからご連絡ください。</p>
-          <a class="pp-cta" href="./#contact">お問い合わせフォームへ<span aria-hidden="true">→</span></a>
+          <h2 id="p10h"><span class="no" lang="en">10</span>本ポリシーの変更</h2>
+          <p>本ポリシーの内容は、法令その他本ポリシーに別段の定めのある事項を除き、ご本人に通知することなく変更できるものとします。変更後の本ポリシーは、本ウェブサイトに掲載したときから効力を生じるものとします。</p>
         </section>
 
         <section class="pp-sec" id="p11" aria-labelledby="p11h">
-          <h2 id="p11h"><span class="no" lang="en">11</span>改定</h2>
-          <p>当社は、法令や事業内容の変更などに応じて、このポリシーを改定することがあります。改定した内容は、このページに掲載した時点から適用します。</p>
+          <h2 id="p11h"><span class="no" lang="en">11</span>お問い合わせ窓口</h2>
+          <p>本ポリシーおよび個人情報の取り扱いに関するお問い合わせ、ご相談、苦情は、下記までお願いいたします。</p>
+          <dl class="pp-rows">
+            <div><dt>事業者名</dt><dd>合同会社 匠Technologies（<span lang="en">Takumi Technologies LLC</span>）</dd></div>
+            <div><dt>所在地・代表者</dt><dd>ご請求に応じて、遅滞なくお知らせします。</dd></div>
+            <div><dt>窓口</dt><dd>本ウェブサイトの<a href="./#contact">お問い合わせフォーム</a></dd></div>
+          </dl>
+          <a class="pp-cta" href="./#contact">お問い合わせフォームへ<span aria-hidden="true">→</span></a>
           <p class="pp-end">以上</p>
         </section>
       </div>
