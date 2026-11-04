@@ -20,9 +20,10 @@ a clearer product, and philosophy reduced to one moment near the end.
 | 06 | Product demo `#demo` | 投稿、分析、改善。AIが自律して回し続ける。 A conceptual operating board (表示例, marked 自律運用中) that loops from draft through safety check to improvement ideas and back to the next post; pause and step controls |
 | 07 | Cost model `#cost` | モデルケース（試算例）: outsourcing from published prices (初期30万円 = upper end of the commonly cited 10〜30万円 range, 月25万円 = median) against 環 (初期導入20万円＋月8万円). Bars show the first-year total to one scale; figures count up on arrival; method note and disclaimer below |
 | 08 | Philosophy | 繰り返しは、AIに。ひらめきは、人に。 A compact section: AI keeps operating and improving, so people can keep their own ひらめき. The four fixed lines sit below as a signature |
-| 09 | Contact `#contact` | 事業や運用について、まずはお話を聞かせてください。 A form that posts only to the server endpoint `POST /api/contact` (see below) |
-| 10 | Closing | Technologyを、事業の力に。 (the hero line, repeated) with the company logo written again by the same brush animation |
-| — | Footer | Company name, link to the privacy policy (`privacy.html`) |
+| 09 | Company `#company` | 会社概要: 会社名 (合同会社 匠Technologies / Takumi Technologies LLC), 代表者 (代表社員 鈴木 拓実), 資本金 (100万円), 事業内容 (IT事業: 運用代行, メディア自動運用 with 環 — MEGURI, 業務改善・BPO, 広告運用・マーケティング支援). Linked from the nav, the menu and the footer |
+| 10 | Contact `#contact` | 事業や運用について、まずはお話を聞かせてください。 A form that posts only to the server endpoint `POST /api/contact` (see below) |
+| 11 | Closing | Technologyを、事業の力に。 (the hero line, repeated) with the company logo written again by the same brush animation |
+| — | Footer | Company name, links to 会社概要 and the privacy policy (`privacy.html`) |
 
 ## Rules kept in the copy
 
@@ -163,6 +164,6 @@ service delivery, recruiting), in eleven sections: 個人情報の定義, 取得
 Before the site goes public:
 
 - Have it reviewed once (個人情報保護法).
-- お問い合わせ窓口: the address and representative are given on request (allowed by 個人情報保護法 第32条);
-  list them instead if the company prefers.
+- お問い合わせ窓口: lists the representative (代表社員 鈴木 拓実, as in 会社概要); the address is given on request
+  (allowed by 個人情報保護法 第32条), as decided by the company.
 - 制定日: set to the publication date.
