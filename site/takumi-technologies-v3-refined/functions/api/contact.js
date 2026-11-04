@@ -1,22 +1,24 @@
 /**
  * POST /api/contact — Cloudflare Pages Function
  *
- * Browser → this function → email provider → company inbox.
- * The recipient, the sender and every credential come from Cloudflare environment
- * variables / secrets. Nothing in the request can choose or change the recipient.
- * The response says { ok: true } only after the provider has accepted the message.
+ * Browser → this function → SMTP2GO (HTTP API) → info@takumitechno.com
+ *   → Cloudflare Email Routing → the company's mailbox.
+ * The recipient is fixed here, on the server. Nothing in the request can choose or change it.
+ * The visitor's address is used only as Reply-To. The API key lives in a Cloudflare secret.
+ * The response says { ok: true } only after SMTP2GO has accepted the message.
  *
- * Environment (see README "Contact form: server configuration"):
- *   EMAIL_PROVIDER        "resend" | "cloudflare"   (unset = sending disabled → 503)
- *   CONTACT_TO            recipient address                       (variable)
- *   CONTACT_FROM          sender address on a verified domain     (variable)
- *   RESEND_API_KEY        Resend API key                          (secret, provider "resend")
- *   SEND_EMAIL            send_email binding                      (binding, provider "cloudflare")
- *   TURNSTILE_SECRET_KEY  Turnstile secret; when set, a token is required (secret)
+ * Environment (see README "Contact form"):
+ *   SMTP2GO_API_KEY       SMTP2GO API key with permission to send   (secret; unset = sending disabled → 503)
+ *   CONTACT_FROM          sender address verified in SMTP2GO        (variable, optional; default info@takumitechno.com)
+ *   TURNSTILE_SECRET_KEY  Turnstile secret; when set, a token is required (secret, optional)
  *   CONTACT_RATE_LIMITER  Workers rate limiting binding            (binding, optional)
  *   ALLOWED_ORIGINS       extra allowed Origin values, comma separated (variable, optional)
  */
 
+const CONTACT_TO = 'info@takumitechno.com';
+const DEFAULT_FROM = 'info@takumitechno.com';
+const SENDER_NAME = 'Takumi Technologies Website';
+const SMTP2GO_SEND = 'https://api.smtp2go.com/v3/email/send';
 const MAX_BODY = 16 * 1024;
 const MIN_ELAPSED_MS = 3000;
 const TOPICS = ['運用代行', 'メディア自動運用', '業務改善・BPO', '広告運用・マーケティング', '環 — MEGURIについて', 'その他'];
@@ -106,67 +108,42 @@ export function buildEmail(v, now = new Date()) {
   return { subject, text };
 }
 
-// ---------- providers: resolve only after the provider has accepted the message ----------
+// ---------- delivery: resolves only after SMTP2GO has accepted the message ----------
 
-async function sendResend(env, mail) {
-  const res = await fetch('https://api.resend.com/emails', {
+// the sender must be an address (or on a domain) verified in SMTP2GO
+export function senderAddress(env) {
+  const from = oneLine(env.CONTACT_FROM);
+  return from && EMAIL_RE.test(from) ? from : DEFAULT_FROM;
+}
+
+export function smtp2goRequest(env, mail) {
+  return {
+    sender: `${SENDER_NAME} <${senderAddress(env)}>`,
+    to: [CONTACT_TO],
+    subject: mail.subject,
+    text_body: mail.text,
+    custom_headers: [{ header: 'Reply-To', value: mail.replyTo }]
+  };
+}
+
+async function sendSmtp2go(env, mail) {
+  const res = await fetch(SMTP2GO_SEND, {
     method: 'POST',
-    headers: { 'Authorization': `Bearer ${env.RESEND_API_KEY}`, 'Content-Type': 'application/json' },
-    body: JSON.stringify({ from: env.CONTACT_FROM, to: [env.CONTACT_TO], reply_to: mail.replyTo, subject: mail.subject, text: mail.text })
+    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'X-Smtp2go-Api-Key': env.SMTP2GO_API_KEY },
+    body: JSON.stringify(smtp2goRequest(env, mail)),
+    signal: AbortSignal.timeout(12000)
   });
   let data = {};
   try { data = await res.json(); } catch { data = {}; }
-  if (!res.ok || !data.id) throw new Error(`resend ${res.status}`);
-  return data.id;
-}
-
-const utf8b64 = str => {
-  const bytes = new TextEncoder().encode(str);
-  let bin = '';
-  for (let i = 0; i < bytes.length; i += 0x8000) bin += String.fromCharCode.apply(null, bytes.subarray(i, i + 0x8000));
-  return btoa(bin);
-};
-// RFC 2047 encoded words, split on character boundaries so no word exceeds 75 characters
-export function encodeWord(str) {
-  const words = [];
-  let cur = '';
-  for (const ch of str) {
-    if (new TextEncoder().encode(cur + ch).length > 42) { words.push(cur); cur = ''; }
-    cur += ch;
+  const d = data && data.data;
+  if (!res.ok || !d || d.succeeded !== 1 || d.failed) {
+    throw new Error(`smtp2go ${res.status} ${(d && d.error_code) || ''}`.trim());
   }
-  if (cur) words.push(cur);
-  return words.map(w => `=?UTF-8?B?${utf8b64(w)}?=`).join('\r\n ');
-}
-export function buildMime(env, mail, id) {
-  const domain = String(env.CONTACT_FROM).split('@')[1] || 'localhost';
-  const body = utf8b64(mail.text).replace(/.{1,76}/g, '$&\r\n');
-  return [
-    `From: ${encodeWord('匠Technologies Webサイト')} <${env.CONTACT_FROM}>`,
-    `To: <${env.CONTACT_TO}>`,
-    `Reply-To: <${mail.replyTo}>`,
-    `Subject: ${encodeWord(mail.subject)}`,
-    `Date: ${new Date().toUTCString()}`,
-    `Message-ID: <${id}@${domain}>`,
-    'MIME-Version: 1.0',
-    'Content-Type: text/plain; charset=UTF-8',
-    'Content-Transfer-Encoding: base64',
-    '',
-    body
-  ].join('\r\n');
-}
-async function sendCloudflare(env, mail) {
-  // Cloudflare Email Routing: CONTACT_TO must be a verified destination address of the account
-  const { EmailMessage } = await import('cloudflare:email');
-  const id = crypto.randomUUID();
-  await env.SEND_EMAIL.send(new EmailMessage(env.CONTACT_FROM, env.CONTACT_TO, buildMime(env, mail, id)));
-  return id;
+  return d.email_id || '';
 }
 
 function providerReady(env) {
-  if (!env.CONTACT_TO || !env.CONTACT_FROM) return null;
-  if (env.EMAIL_PROVIDER === 'resend' && env.RESEND_API_KEY) return sendResend;
-  if (env.EMAIL_PROVIDER === 'cloudflare' && env.SEND_EMAIL) return sendCloudflare;
-  return null;
+  return env.SMTP2GO_API_KEY ? sendSmtp2go : null;
 }
 
 async function verifyTurnstile(env, token, ip) {

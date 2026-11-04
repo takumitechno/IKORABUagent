@@ -102,45 +102,53 @@ Sources consulted:
 
 ## Contact form
 
+Public contact address: **info@takumitechno.com** (mail links in the contact section, 会社概要 and
+the privacy policy). Mail to it is received by Cloudflare Email Routing and forwarded to the company
+mailbox; the forwarding target is never shown on the site or kept in this repository.
+
 ### How it works
 
 ```
-browser form  ──POST /api/contact (JSON)──▶  functions/api/contact.js (Cloudflare Pages Function)
-                                              ├─ checks origin, content type, body size (16 KB), rate limit
-                                              ├─ honeypot + minimum fill time + optional Turnstile
-                                              ├─ validates and cleans every field
-                                              └─ sends through the configured provider ──▶ company inbox
+browser form ──POST /api/contact (JSON)──▶ functions/api/contact.js (Cloudflare Pages Function)
+                                            ├─ checks origin, content type, body size (16 KB), rate limit
+                                            ├─ honeypot + minimum fill time + optional Turnstile
+                                            ├─ validates and cleans every field
+                                            └─ SMTP2GO HTTP API ──▶ info@takumitechno.com ──▶ Email Routing ──▶ company mailbox
 ```
 
-- The recipient, the sender and every key live only in Cloudflare variables and secrets.
-  The page and this repository contain no recipient address and no credentials.
-- The request cannot choose the recipient: the function ignores any extra fields.
-- The visitor's address is used as `Reply-To`, so replying to the email reaches the visitor.
+- Recipient: `info@takumitechno.com`, fixed in `functions/api/contact.js`. Neither the request nor an
+  environment variable can change it, and the request cannot add Cc/Bcc or headers.
+- Sender: `Takumi Technologies Website <info@takumitechno.com>`, an address verified in SMTP2GO
+  (`CONTACT_FROM` can name another verified sender).
+- Reply-To: the visitor's address, so replying to the notification reaches the visitor.
 - Subject: `【匠Technologies お問い合わせ】{ご相談内容} / {お名前}`.
-  Body: お名前, 会社名・屋号, メールアドレス, ご相談内容, Webサイト / SNS URL, お問い合わせ本文, 送信日時 (JST).
-- The function answers `{ ok: true }` only after the provider has accepted the message. The page
-  shows its success message only for that answer.
+  Body: お名前, 会社名・屋号, メールアドレス, ご相談内容, Webサイト / SNS URL, 送信日時 (JST), お問い合わせ本文.
+- The function answers `{ ok: true }` only when SMTP2GO reports the message as accepted
+  (`data.succeeded === 1`). The page shows its success message only for that answer; otherwise it
+  shows an error and points to info@takumitechno.com.
+- SMTP2GO is used through its HTTP API, which a Pages Function can call directly (no SMTP session
+  or password in the code). The API key is a Cloudflare secret and never reaches the page.
 
 ### Page settings (`src/page.html`, on `<form id="contact-form">`)
 
-| Attribute | Now | Production |
-|---|---|---|
-| `data-mode` | `preview`: validates, never sends, shows 「プレビュー環境のため、送信機能は現在接続されていません。」 | `live` |
-| `data-endpoint` | `/api/contact` | `/api/contact` |
-| `data-turnstile-sitekey` | empty (no widget) | the Turnstile **site key** (public) |
+| Attribute | Value |
+|---|---|
+| `data-mode` | `auto`: posts to `/api/contact` on takumitechno.com, `*.pages.dev` and localhost; anywhere else (the preview viewer, a file opened from disk) it validates but never sends and says so: 「プレビュー環境のため、送信機能は現在接続されていません。」. `live` / `preview` force one or the other |
+| `data-endpoint` | `/api/contact` |
+| `data-turnstile-sitekey` | empty (no widget); set the Turnstile **site key** (public) to enable it |
 
-### Server settings (Cloudflare Pages → Settings → Variables and Secrets / Bindings)
+### Server settings (Cloudflare Pages → Settings → Variables and Secrets)
 
 | Name | Type | Value |
 |---|---|---|
-| `EMAIL_PROVIDER` | variable | `resend` or `cloudflare`. Unset = sending disabled (the function returns 503) |
-| `CONTACT_TO` | variable | the company inbox that receives inquiries |
-| `CONTACT_FROM` | variable | sender address on a domain verified with the provider |
-| `RESEND_API_KEY` | **secret** | for `resend` |
-| `SEND_EMAIL` | send_email binding | for `cloudflare` (Email Routing; `CONTACT_TO` must be a verified destination) |
-| `TURNSTILE_SECRET_KEY` | **secret** | when set, a Turnstile token is required |
-| `CONTACT_RATE_LIMITER` | rate limiting binding | optional; otherwise add a WAF rate limiting rule for `/api/contact` |
-| `ALLOWED_ORIGINS` | variable | optional, comma separated, for extra domains that post to the form |
+| `SMTP2GO_API_KEY` | **secret** | SMTP2GO API key allowed to send email. Unset = sending disabled (503) |
+| `CONTACT_FROM` | variable, optional | another sender verified in SMTP2GO; default `info@takumitechno.com` |
+| `TURNSTILE_SECRET_KEY` | secret, optional | when set, a Turnstile token is required |
+| `CONTACT_RATE_LIMITER` | rate limiting binding, optional | otherwise add a WAF rate limiting rule for `/api/contact` |
+| `ALLOWED_ORIGINS` | variable, optional | e.g. `https://www.takumitechno.com` if the form is also served there |
+
+Variables from the earlier setup (`EMAIL_PROVIDER`, `CONTACT_TO`, `RESEND_API_KEY`, `SEND_EMAIL`) are
+no longer read and can be deleted.
 
 ### Deploy (Cloudflare Pages)
 
@@ -148,10 +156,19 @@ browser form  ──POST /api/contact (JSON)──▶  functions/api/contact.js 
 - Build command: `mkdir -p public && cp index.html privacy.html public/`
 - Build output directory: `public` (keeps `src/` and `functions/` out of the static files)
 - Functions are picked up from `functions/` automatically.
+- Custom domain: takumitechno.com. Adding it to the Pages project only adds the web records; the
+  existing MX / Email Routing / SMTP2GO DNS records are left as they are.
 
-Before switching `data-mode` to `live`: the provider, sender domain and secrets above must be set,
-and the privacy policy must be checked (below). Test once with `wrangler pages dev`
-(copy `.dev.vars.example` to `.dev.vars`).
+Local test: copy `.dev.vars.example` to `.dev.vars`, then `npx wrangler pages dev public`.
+
+### Before going live
+
+1. SMTP2GO: create an API key with permission to send email; check that info@takumitechno.com (or the
+   domain takumitechno.com) is a verified sender.
+2. Cloudflare Pages: add the secret `SMTP2GO_API_KEY` (Production), deploy this branch.
+3. Send one inquiry from the live site and confirm it arrives through info@takumitechno.com, and that
+   replying goes to the address entered in the form.
+4. Check the privacy policy (below).
 
 ## Privacy policy (`privacy.html`)
 

@@ -872,6 +872,12 @@ html:not(.js) .sq-kanji, .m-reduce .sq-kanji { mask: none; }
 .co-biz { display: block; font-family: var(--f-min); font-weight: 500; font-size: 18px; letter-spacing: .12em; }
 .co-items { display: grid; gap: 6px; margin-top: 12px; }
 .co-items li { position: relative; padding-left: 20px; font-size: 14.5px; line-height: 1.85; letter-spacing: .06em; color: var(--ink-2); word-break: auto-phrase; }
+.co-mail { color: var(--ink); text-decoration: underline; text-decoration-color: var(--kin); text-underline-offset: 5px; letter-spacing: .04em; }
+.co-mail:hover { text-decoration-thickness: 2px; }
+.ct-mail { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 16px; margin-top: 22px; font-size: 13px; letter-spacing: .1em; color: var(--ink-2); }
+.ct-mail-h { font-size: 12px; letter-spacing: .14em; color: var(--ink-3); }
+.ct-mail a { font-family: var(--f-lat); font-size: 15px; letter-spacing: .06em; color: var(--ink); text-decoration: underline; text-decoration-color: var(--kin); text-underline-offset: 5px; }
+.ct-mail a:hover { text-decoration-thickness: 2px; }
 .co-sub { display: block; font-size: 12.5px; letter-spacing: .06em; color: var(--ink-3); }
 .co-items li::before { content: ""; position: absolute; left: 2px; top: .95em; width: 9px; height: 1px; background: var(--kin); }
 @media (max-width: 959px) {
@@ -1509,7 +1515,8 @@ html:not(.js) .sq-kanji, .m-reduce .sq-kanji { mask: none; }
       <div class="co-row" data-r="up"><dt>会社名</dt><dd>合同会社 匠Technologies<span class="co-en" lang="en">Takumi Technologies LLC</span></dd></div>
       <div class="co-row" data-r="up" style="--d:.08s"><dt>代表者</dt><dd>代表社員　鈴木 拓実</dd></div>
       <div class="co-row" data-r="up" style="--d:.16s"><dt>資本金</dt><dd><span class="co-num" lang="en">100</span>万円</dd></div>
-      <div class="co-row" data-r="up" style="--d:.24s"><dt>事業内容</dt><dd><span class="co-biz">IT事業</span>
+      <div class="co-row" data-r="up" style="--d:.24s"><dt>お問い合わせ</dt><dd><a class="co-mail" href="mailto:info@takumitechno.com" lang="en">info@takumitechno.com</a></dd></div>
+      <div class="co-row" data-r="up" style="--d:.32s"><dt>事業内容</dt><dd><span class="co-biz">IT事業</span>
         <ul class="co-items">
           <li>SNS・メディアの運用代行</li>
           <li>メディア自動運用<span class="co-sub">自律型AI運用・改善プラットフォーム「環 — <span lang="en">MEGURI</span>」の開発・提供</span></li>
@@ -1527,12 +1534,14 @@ html:not(.js) .sq-kanji, .m-reduce .sq-kanji { mask: none; }
       <p class="label" data-r="up"><span lang="en">Contact</span><span class="jp">お問い合わせ</span></p>
       <h2 class="title ct-title" data-r="lines"><span class="ln"><span>事業や運用について、</span></span><span class="ln"><span><span class="nw">まずはお話を</span><span class="nw">聞かせてください。</span></span></span></h2>
       <p class="ct-lead" data-r="up">運用のご相談、業務改善、自動化、広告運用など、<br class="br-wide">まずはお気軽にご相談ください。</p>
+      <p class="ct-mail" data-r="up"><span class="ct-mail-h">メールでのお問い合わせ</span><a href="mailto:info@takumitechno.com" lang="en">info@takumitechno.com</a></p>
       <span class="ct-rule" data-r="rule" aria-hidden="true"></span>
     </div>
     <div class="ct-panel" data-r="up">
       <!-- Delivery runs only on the server (POST /api/contact). The recipient is configured there, never here.
-           data-mode: "preview" never sends; "live" posts to data-endpoint. data-turnstile-sitekey: Cloudflare Turnstile site key (public). -->
-      <form class="ct-form" id="contact-form" novalidate data-endpoint="/api/contact" data-mode="preview" data-turnstile-sitekey="" aria-label="お問い合わせフォーム">
+           data-mode: "auto" posts to data-endpoint on takumitechno.com, *.pages.dev and localhost, and never sends anywhere else (preview);
+           "live" / "preview" force one or the other. data-turnstile-sitekey: Cloudflare Turnstile site key (public). -->
+      <form class="ct-form" id="contact-form" novalidate data-endpoint="/api/contact" data-mode="auto" data-turnstile-sitekey="" aria-label="お問い合わせフォーム">
         <p class="ct-req-note"><span class="ct-badge req">必須</span>の項目は、入力が必要です。</p>
           <div class="ct-row">
             <div class="ct-field" data-field="name">
@@ -2159,7 +2168,8 @@ html:not(.js) .sq-kanji, .m-reduce .sq-kanji { mask: none; }
      ========================================================= */
   const ctForm = $('#contact-form');
   if (ctForm) {
-    const MODE = ctForm.dataset.mode === 'live' ? 'live' : 'preview';
+    const LIVE_HOST = /(^|\.)takumitechno\.com$|\.pages\.dev$|^localhost$|^127\.0\.0\.1$/;
+    const MODE = ctForm.dataset.mode === 'live' || (ctForm.dataset.mode === 'auto' && LIVE_HOST.test(location.hostname)) ? 'live' : 'preview';
     const ENDPOINT = ctForm.dataset.endpoint || '/api/contact';
     const TS_KEY = ctForm.dataset.turnstileSitekey || '';
     const ctStatus = $('#ct-status'), ctBtn = $('.ct-submit', ctForm), ctBtnT = $('.ct-submit-t', ctForm);
@@ -2256,9 +2266,9 @@ html:not(.js) .sq-kanji, .m-reduce .sq-kanji { mask: none; }
         } else if (res.status === 429) {
           setStatus('error', '送信が集中しています。しばらく時間をおいてから、もう一度お試しください。');
         } else if (res.status === 503) {
-          setStatus('error', '現在、フォームからの送信を受け付けていません。時間をおいて、もう一度お試しください。');
+          setStatus('error', '現在、フォームからの送信を受け付けていません。お手数ですが、info@takumitechno.com までメールでご連絡ください。');
         } else {
-          setStatus('error', '送信できませんでした。時間をおいて、もう一度お試しください。');
+          setStatus('error', '送信できませんでした。時間をおいてもう一度お試しいただくか、info@takumitechno.com までメールでご連絡ください。');
         }
       } catch (err) {
         setStatus('error', '送信できませんでした。通信環境をご確認のうえ、もう一度お試しください。');
