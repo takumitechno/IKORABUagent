@@ -857,38 +857,26 @@ html:not(.js) .sq-kanji, .m-reduce .sq-kanji { mask: none; }
 .foot-link { display: inline-flex; align-items: center; min-height: 44px; font-size: 12px; letter-spacing: .14em; color: var(--wash-2); text-decoration: underline; text-decoration-color: rgba(173, 149, 100, .55); text-underline-offset: 5px; transition: color .3s ease; }
 .foot-link:hover { color: var(--kin-hi); }
 
-/* ---------- COMPANY: a quiet profile table ---------- */
-.co { padding-block: clamp(88px, 10vw, 152px); }
-.co-grid { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: var(--colgap); align-items: start; }
-.co-intro { position: relative; grid-column: 1 / span 4; }
-.co-title { margin-bottom: 0; }
-.co-mark { display: block; width: clamp(150px, 15vw, 220px); height: auto; margin-top: clamp(40px, 5vw, 72px); opacity: .055; pointer-events: none; }
-.co-list { grid-column: 5 / span 8; border-top: 1px solid var(--ink); }
-.co-row { display: grid; grid-template-columns: minmax(0, 10em) minmax(0, 1fr); column-gap: clamp(20px, 3vw, 48px); padding-block: clamp(22px, 2.2vw, 30px); border-bottom: 1px solid var(--rule-l); }
-.co-row dt { position: relative; padding-left: 18px; font-size: 13px; letter-spacing: .2em; line-height: 2; color: var(--ink-3); }
-.co-row dt::before { content: ""; position: absolute; left: 0; top: 1em; width: 8px; height: 1px; background: var(--kin); }
-.co-row dd { font-size: 16px; letter-spacing: .08em; line-height: 1.9; color: var(--ink); }
-.co-en { display: block; margin-top: 2px; font-family: var(--f-lat); font-weight: 300; font-size: 12.5px; letter-spacing: .18em; color: var(--ink-3); }
-.co-num { font-family: var(--f-lat); font-weight: 300; font-size: 1.12em; letter-spacing: .04em; margin-right: .12em; }
-.co-biz { display: block; font-family: var(--f-min); font-weight: 500; font-size: 18px; letter-spacing: .12em; }
-.co-items { display: grid; gap: 6px; margin-top: 12px; }
-.co-items li { position: relative; padding-left: 20px; font-size: 14.5px; line-height: 1.85; letter-spacing: .06em; color: var(--ink-2); word-break: auto-phrase; }
-.co-mail { color: var(--ink); text-decoration: underline; text-decoration-color: var(--kin); text-underline-offset: 5px; letter-spacing: .04em; }
-.co-mail:hover { text-decoration-thickness: 2px; }
-.ct-mail { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 16px; margin-top: 22px; font-size: 13px; letter-spacing: .1em; color: var(--ink-2); }
-.ct-mail-h { font-size: 12px; letter-spacing: .14em; color: var(--ink-3); }
-.ct-mail a { font-family: var(--f-lat); font-size: 15px; letter-spacing: .06em; color: var(--ink); text-decoration: underline; text-decoration-color: var(--kin); text-underline-offset: 5px; }
-.ct-mail a:hover { text-decoration-thickness: 2px; }
-.co-sub { display: block; font-size: 12.5px; letter-spacing: .06em; color: var(--ink-3); }
-.co-items li::before { content: ""; position: absolute; left: 2px; top: .95em; width: 9px; height: 1px; background: var(--kin); }
-@media (max-width: 959px) {
-  .co-intro, .co-list { grid-column: 1 / -1; }
-  .co-intro { margin-bottom: clamp(32px, 5vw, 48px); }
-  .co-mark { position: absolute; right: 0; bottom: -8px; width: 120px; margin: 0; }
-}
+/* ---------- company profile: folded under the footer, opened by the 会社概要 button ---------- */
+.foot-co-btn { display: none; gap: 10px; background: none; border: 0; padding: 0; cursor: pointer; font-family: inherit; }
+.js .foot-co-btn { display: inline-flex; }
+.foot-co-ic { position: relative; width: 9px; height: 9px; flex: none; }
+.foot-co-ic::before, .foot-co-ic::after { content: ""; position: absolute; left: 0; top: 4px; width: 9px; height: 1px; background: var(--kin); transition: transform .5s var(--ease); }
+.foot-co-ic::after { transform: rotate(90deg); }
+.foot-co-btn[aria-expanded="true"] .foot-co-ic::after { transform: rotate(0deg); }
+.foot-co { display: grid; grid-template-rows: 1fr; }
+.js .foot-co { grid-template-rows: 0fr; transition: grid-template-rows .7s var(--ease); }
+.js .foot-co.is-open { grid-template-rows: 1fr; }
+.m-reduce .foot-co { transition: none; }
+.foot-co-in { min-height: 0; overflow: hidden; }
+.foot-co-list { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 18px var(--colgap); margin-top: 28px; padding-top: 26px; padding-bottom: 4px; border-top: 1px solid var(--rule-d); }
+.foot-co-list .wide { grid-column: 1 / -1; }
+.foot-co-list dt { margin-bottom: 4px; font-size: 11px; letter-spacing: .2em; color: var(--wash-3); }
+.foot-co-list dd { font-size: 13px; line-height: 1.8; letter-spacing: .08em; color: var(--wash); word-break: auto-phrase; }
+.foot-co-list a { color: inherit; text-decoration: underline; text-decoration-color: rgba(173, 149, 100, .55); text-underline-offset: 4px; }
+.foot-co-list a:hover { color: var(--kin-hi); }
 @media (max-width: 719px) {
-  .co-row { grid-template-columns: minmax(0, 1fr); row-gap: 6px; }
-  .co-row dd { font-size: 15.5px; }
+  .foot-co-list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 
 /* ---------- responsive ---------- */
@@ -1058,7 +1046,6 @@ html:not(.js) .sq-kanji, .m-reduce .sq-kanji { mask: none; }
       <a href="#flow">自律運用</a>
       <a href="#demo">画面イメージ</a>
       <a href="#cost">試算例</a>
-      <a href="#company">会社概要</a>
       <a class="nav-contact" href="#contact">お問い合わせ</a>
     </nav>
     <button class="menu-btn" type="button" aria-expanded="false" aria-controls="menu"><span class="menu-lines" aria-hidden="true"></span><span class="menu-txt">Menu</span></button>
@@ -1072,7 +1059,6 @@ html:not(.js) .sq-kanji, .m-reduce .sq-kanji { mask: none; }
     <a href="#flow"><span>Autonomous</span>自律運用</a>
     <a href="#demo"><span>Demo</span>画面イメージ</a>
     <a href="#cost"><span>Model case</span>試算例</a>
-    <a href="#company"><span>Company</span>会社概要</a>
     <a href="#contact"><span>Contact</span>お問い合わせ</a>
   </nav>
   <p class="menu-foot">合同会社 匠Technologies</p>
@@ -1496,30 +1482,6 @@ html:not(.js) .sq-kanji, .m-reduce .sq-kanji { mask: none; }
   </div>
 </section>
 
-<!-- ================= COMPANY ================= -->
-<section class="sec co t-paper t-light" id="company" data-tone="light">
-  <div class="wrap co-grid">
-    <div class="co-intro">
-      <p class="label" data-r="up"><span lang="en">Company</span></p>
-      <h2 class="title co-title" data-r="lines"><span class="ln"><span>会社概要</span></span></h2>
-      <svg class="co-mark" viewBox="400 270 490 500" aria-hidden="true" focusable="false"><use href="#sqKanji"/></svg>
-    </div>
-    <dl class="co-list">
-      <div class="co-row" data-r="up"><dt>会社名</dt><dd>合同会社 匠Technologies<span class="co-en" lang="en">Takumi Technologies LLC</span></dd></div>
-      <div class="co-row" data-r="up" style="--d:.08s"><dt>代表者</dt><dd>代表社員　鈴木 拓実</dd></div>
-      <div class="co-row" data-r="up" style="--d:.16s"><dt>資本金</dt><dd><span class="co-num" lang="en">100</span>万円</dd></div>
-      <div class="co-row" data-r="up" style="--d:.24s"><dt>お問い合わせ</dt><dd><a class="co-mail" href="mailto:info@takumitechno.com" lang="en">info@takumitechno.com</a></dd></div>
-      <div class="co-row" data-r="up" style="--d:.32s"><dt>事業内容</dt><dd><span class="co-biz">IT事業</span>
-        <ul class="co-items">
-          <li>SNS・メディアの運用代行</li>
-          <li>メディア自動運用<span class="co-sub">自律型AI運用・改善プラットフォーム「環 — <span lang="en">MEGURI</span>」の開発・提供</span></li>
-          <li>業務改善・BPO</li>
-          <li>広告運用・マーケティング支援</li>
-        </ul></dd></div>
-    </dl>
-  </div>
-</section>
-
 <!-- ================= CONTACT ================= -->
 <section class="sec ct t-kinari t-light" id="contact" data-tone="light">
   <div class="wrap ct-grid">
@@ -1627,9 +1589,20 @@ html:not(.js) .sq-kanji, .m-reduce .sq-kanji { mask: none; }
       <p class="foot-name">合同会社 匠Technologies<span lang="en">Takumi Technologies LLC</span></p>
     </div>
     <div class="foot-end">
-      <a class="foot-link" href="#company">会社概要</a>
+      <button class="foot-link foot-co-btn" type="button" aria-expanded="true" aria-controls="company">会社概要<span class="foot-co-ic" aria-hidden="true"></span></button>
       <a class="foot-link" href="privacy.html">プライバシーポリシー</a>
       <p class="foot-copy" lang="en">© 2026 Takumi Technologies LLC</p>
+    </div>
+  </div>
+  <div class="foot-co" id="company" role="region" aria-label="会社概要">
+    <div class="foot-co-in">
+      <dl class="wrap foot-co-list">
+        <div><dt>会社名</dt><dd>合同会社 匠Technologies</dd></div>
+        <div><dt>代表者</dt><dd>代表社員　鈴木 拓実</dd></div>
+        <div><dt>資本金</dt><dd>100万円</dd></div>
+        <div><dt>お問い合わせ</dt><dd><a href="mailto:info@takumitechno.com" lang="en">info@takumitechno.com</a></dd></div>
+        <div class="wide"><dt>事業内容</dt><dd>IT事業（SNS・メディアの運用代行／メディア自動運用「環 — <span lang="en">MEGURI</span>」の開発・提供／業務改善・BPO／広告運用・マーケティング支援）</dd></div>
+      </dl>
     </div>
   </div>
 </footer>
@@ -2266,6 +2239,33 @@ html:not(.js) .sq-kanji, .m-reduce .sq-kanji { mask: none; }
         if (window.turnstile && TS_KEY) { window.turnstile.reset($('.ct-turnstile', ctForm)); tsToken = ''; }
       }
     });
+  }
+
+  /* =========================================================
+     Footer: 会社概要 opens a small profile below the footer line
+     ========================================================= */
+  const coBtn = $('.foot-co-btn'), coPanel = $('#company');
+  if (coBtn && coPanel) {
+    const setCo = open => {
+      coBtn.setAttribute('aria-expanded', String(open));
+      coPanel.classList.toggle('is-open', open);
+      coPanel.inert = !open;
+    };
+    setCo(false);
+    coBtn.addEventListener('click', () => {
+      const open = coBtn.getAttribute('aria-expanded') !== 'true';
+      setCo(open);
+      if (!open) return;
+      // bring the whole profile into view once it has finished opening
+      let done = false;
+      const show = () => { if (done) return; done = true; coPanel.scrollIntoView({ block: 'end', behavior: reduce ? 'auto' : 'smooth' }); };
+      if (reduce) { show(); return; }
+      coPanel.addEventListener('transitionend', show, { once: true });
+      setTimeout(show, 800);
+    });
+    const fromHash = () => { if (location.hash === '#company') { setCo(true); coPanel.scrollIntoView({ block: 'end' }); } };
+    addEventListener('hashchange', fromHash);
+    fromHash();
   }
 
   /* =========================================================
