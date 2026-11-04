@@ -4,11 +4,14 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <!--BODY-START-->
-<title>Takumi Technologies</title>
+<title>匠Technologies｜Technologyを、事業の力に。</title>
 <meta name="description" content="合同会社 匠Technologies（Takumi Technologies LLC）は、SNS・メディア運用、業務改善・BPO、広告運用、業務自動化を支援する会社です。自社開発の自律型AI運用・改善プラットフォーム「環 — MEGURI」を開発しています。">
-<meta property="og:title" content="Takumi Technologies — 事業の運用を、もっとシンプルに。">
-<meta property="og:description" content="SNS・メディア運用、業務改善・BPO、広告運用、業務自動化。自社開発のAI運用基盤「環 — MEGURI」で、日々の運用を自動化します。">
+<meta property="og:title" content="匠Technologies｜Technologyを、事業の力に。">
+<meta property="og:description" content="運用代行、メディア自動運用、業務改善・BPO、広告運用。匠Technologiesは、最新のテクノロジーと仕組みで、事業運営の基盤を構築します。">
 <meta property="og:type" content="website">
+<meta property="og:site_name" content="匠Technologies">
+<meta property="og:locale" content="ja_JP">
+<meta name="twitter:card" content="summary">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Saira:wght@200;300;400&family=Shippori+Mincho:wght@500;600&family=Zen+Kaku+Gothic+New:wght@400;500&display=swap">
@@ -847,6 +850,9 @@ html:not(.js) .sq-kanji, .m-reduce .sq-kanji { mask: none; }
 .foot-name { font-size: 12.5px; letter-spacing: .14em; line-height: 1.8; }
 .foot-name span { display: block; font-family: var(--f-lat); font-size: 11px; letter-spacing: .2em; color: var(--wash-3); }
 .foot-copy { font-family: var(--f-lat); font-size: 11px; letter-spacing: .2em; color: var(--wash-3); }
+.foot-end { display: flex; align-items: center; gap: 12px 28px; flex-wrap: wrap; }
+.foot-link { display: inline-flex; align-items: center; min-height: 44px; font-size: 12px; letter-spacing: .14em; color: var(--wash-2); text-decoration: underline; text-decoration-color: rgba(173, 149, 100, .55); text-underline-offset: 5px; transition: color .3s ease; }
+.foot-link:hover { color: var(--kin-hi); }
 
 /* ---------- responsive ---------- */
 @media (max-width: 1199px) {
@@ -1512,7 +1518,7 @@ html:not(.js) .sq-kanji, .m-reduce .sq-kanji { mask: none; }
           <div class="ct-field ct-consent" data-field="consent">
             <div class="ct-check">
               <input class="ct-box" id="ct-consent" name="consent" type="checkbox" required aria-required="true" aria-describedby="ct-consent-err">
-              <label for="ct-consent"><span><span class="ct-privacy" data-privacy-url="">プライバシーポリシー</span>に同意する</span><span class="ct-badge req">必須</span></label>
+              <label for="ct-consent"><span><a class="ct-privacy" href="privacy.html" target="_blank" rel="noopener">プライバシーポリシー<span class="sr-only">（新しいタブで開きます）</span></a>に同意する</span><span class="ct-badge req">必須</span></label>
             </div>
             <div class="ct-meta"><p class="ct-err" id="ct-consent-err"></p></div>
           </div>
@@ -1532,7 +1538,7 @@ html:not(.js) .sq-kanji, .m-reduce .sq-kanji { mask: none; }
   <svg class="cl-art" aria-hidden="true" focusable="false"></svg>
   <div class="wrap cl-grid">
     <div class="cl-text">
-      <h2 class="cl-title" data-r="lines"><span class="ln"><span>事業の運用を、</span></span><span class="ln"><span>もっとシンプルに。</span></span></h2>
+      <h2 class="cl-title" data-r="lines"><span class="ln"><span><span class="ht-tech" lang="en">Technology</span>を、</span></span><span class="ln"><span>事業の力に。</span></span></h2>
       <p class="cl-sub" data-r="up" style="--d:.4s"><span class="nw">運用代行</span><i>／</i><span class="nw">メディア自動運用</span><i>／</i><span class="nw">業務改善・BPO</span><i>／</i><span class="nw">広告・マーケティング</span></p>
     </div>
     <div class="cl-logo">
@@ -1567,7 +1573,10 @@ html:not(.js) .sq-kanji, .m-reduce .sq-kanji { mask: none; }
       <svg viewBox="0 0 1868 394" role="img" aria-label="匠 Technologies"><use href="#logo-h"/></svg>
       <p class="foot-name">合同会社 匠Technologies<span lang="en">Takumi Technologies LLC</span></p>
     </div>
-    <p class="foot-copy" lang="en">© 2026 Takumi Technologies LLC</p>
+    <div class="foot-end">
+      <a class="foot-link" href="privacy.html">プライバシーポリシー</a>
+      <p class="foot-copy" lang="en">© 2026 Takumi Technologies LLC</p>
+    </div>
   </div>
 </footer>
 
@@ -2116,14 +2125,6 @@ html:not(.js) .sq-kanji, .m-reduce .sq-kanji { mask: none; }
     const val = n => (el(n).value || '').trim();
     const t0 = performance.now();
     let tsToken = '', busy = false;
-
-    // the privacy policy becomes a link once its page exists (set data-privacy-url)
-    $$('[data-privacy-url]', ctForm).forEach(sp => {
-      const u = sp.dataset.privacyUrl;
-      if (!u) return;
-      const a = d.createElement('a'); a.href = u; a.target = '_blank'; a.rel = 'noopener'; a.textContent = sp.textContent;
-      sp.replaceWith(a);
-    });
 
     function setError(n, msg) {
       const f = el(n), wrap = f.closest('.ct-field'), err = $(`#ct-${n}-err`);

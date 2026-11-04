@@ -2,6 +2,7 @@
 
 `index.html` is a single, self-contained page: HTML / CSS / inline SVG / vanilla JS.
 Open it directly in a browser. The only external request is Google Fonts.
+`privacy.html` is the privacy policy, linked from the contact form's consent box and from the footer.
 V1, V2 and V3 (`../takumi-technologies-v1/`, `-v2/`, `-v3/`) are kept unchanged for comparison.
 
 This pass keeps the V3 look and changes the communication: plain Japanese, lists over paragraphs,
@@ -20,7 +21,8 @@ a clearer product, and philosophy reduced to one moment near the end.
 | 07 | Cost model `#cost` | モデルケース（試算例）: outsourcing from published prices (初期30万円 = upper end of the commonly cited 10〜30万円 range, 月25万円 = median) against 環 (初期導入20万円＋月8万円). Bars show the first-year total to one scale; figures count up on arrival; method note and disclaimer below |
 | 08 | Philosophy | 繰り返しは、AIに。ひらめきは、人に。 A compact section: AI keeps operating and improving, so people can keep their own ひらめき. The four fixed lines sit below as a signature |
 | 09 | Contact `#contact` | 事業や運用について、まずはお話を聞かせてください。 A form that posts only to the server endpoint `POST /api/contact` (see below) |
-| 10 | Closing | The company logo, written again with the same brush animation |
+| 10 | Closing | Technologyを、事業の力に。 (the hero line, repeated) with the company logo written again by the same brush animation |
+| — | Footer | Company name, link to the privacy policy (`privacy.html`) |
 
 ## Rules kept in the copy
 
@@ -40,10 +42,15 @@ Threads, X and Instagram marks are the monochrome paths from Simple Icons 13.21.
 
 ## Editing
 
+`src/page.html` and `src/privacy.html` are the sources; edit them, then build:
+
 ```sh
 cd src
-python3 build.py   # page.html + logo-paths.json → ../index.html
+python3 build.py   # page.html, privacy.html + logo-paths.json → ../index.html, ../privacy.html
 ```
+
+Page title and sharing (OG) title: 匠Technologies｜Technologyを、事業の力に。 The OG description is the hero lead.
+There is no `og:image` yet: it needs the production domain, because the image URL must be absolute.
 
 `prefers-reduced-motion` shows every figure in its final state with no animation.
 Without JavaScript, all text, lists, the role list, the demo's final state and the cost model stay readable.
@@ -120,7 +127,6 @@ browser form  ──POST /api/contact (JSON)──▶  functions/api/contact.js 
 | `data-mode` | `preview`: validates, never sends, shows 「プレビュー環境のため、送信機能は現在接続されていません。」 | `live` |
 | `data-endpoint` | `/api/contact` | `/api/contact` |
 | `data-turnstile-sitekey` | empty (no widget) | the Turnstile **site key** (public) |
-| `data-privacy-url` (on the プライバシーポリシー text) | empty (plain text) | URL of the privacy policy page; the text becomes a link |
 
 ### Server settings (Cloudflare Pages → Settings → Variables and Secrets / Bindings)
 
@@ -138,10 +144,27 @@ browser form  ──POST /api/contact (JSON)──▶  functions/api/contact.js 
 ### Deploy (Cloudflare Pages)
 
 - Root directory: `site/takumi-technologies-v3-refined`
-- Build command: `mkdir -p public && cp index.html public/`
+- Build command: `mkdir -p public && cp index.html privacy.html public/`
 - Build output directory: `public` (keeps `src/` and `functions/` out of the static files)
 - Functions are picked up from `functions/` automatically.
 
-Before switching `data-mode` to `live`: a privacy policy page must exist and be linked, and the
-provider, sender domain and secrets above must be set. Test once with `wrangler pages dev`
+Before switching `data-mode` to `live`: the provider, sender domain and secrets above must be set,
+and the privacy policy must be checked (below). Test once with `wrangler pages dev`
 (copy `.dev.vars.example` to `.dev.vars`).
+
+## Privacy policy (`privacy.html`)
+
+Written from what this site actually does: the form fields, the three purposes (answering,
+proposals and contracts, preventing misuse), Cloudflare for delivery and the form endpoint,
+an email sending service for the notification, Google Fonts, and Turnstile when it is enabled.
+Requests for disclosure and complaints go through the contact form; no email address is shown.
+
+It is a draft. Before the site goes public:
+
+- Have it reviewed (個人情報保護法, especially the foreign-provider paragraph in 04 and 05).
+- 04: name the email sending service once chosen (for example Resend, Inc. (米国)), or drop the row if
+  Cloudflare Email Routing is used.
+- 08: keep the Turnstile line only if Turnstile is enabled.
+- 09: the address and representative's name are given on request (allowed by 個人情報保護法 第32条);
+  list them instead if the company prefers.
+- 制定日: set to the publication date.
